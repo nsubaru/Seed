@@ -1,5 +1,6 @@
 #pragma once
-#include "interlocked.h"
+
+#include "sal.h"
 
 #include "Seed.Core.Base.Types.h"
 #include "Seed.Core.Base.Math.h"
@@ -17,7 +18,7 @@
 
 typedef void(__cdecl *PF)(void);
 
-extern int __cdecl Internal::DestroyStaticVariables(PF pf);
+extern int __cdecl DestroyStaticVariables(PF pf);
 
 #pragma warning(push)
 #pragma warning(disable: 4075)
@@ -51,6 +52,13 @@ ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassNam
 ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(std::move(From)); return *this; }; \
 ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {OnDestroy;delete This;}This = nullptr;}}
 
+
+#define __Property1(Getter) __declspec( property( get=Getter) ) 
+#define __Property2(Getter, Setter) __declspec( property( get=Getter, set=Setter ) )  
+
+#define __Property_GET_MACRO(_1,_2,NAME,...) NAME
+#define Property(...) __Property_GET_MACRO(__VA_ARGS__, __Property2, __Property1)(__VA_ARGS__)
+
 ///<summary>Головний простір імен</summary>
 namespace Seed {
 	///<summary>Простір імен функцій ядра Рем</summary>
@@ -71,7 +79,7 @@ namespace Seed {
 			///</summary>
 			///<returns>Вертає силку на елемент після інкременту</returns>
 			__forceinline RefCountT & operator++() {
-				InterlockedIncrementSizeTNoFence(&this->Count);
+				this->Count++;
 				return *this;
 			}
 
@@ -80,8 +88,9 @@ namespace Seed {
 			///</summary>
 			///<returns>Вертає копію об'єкта до інкремента</returns>
 			__forceinline RefCountT operator++(int) {
-				InterlockedIncrementSizeTNoFence(&this->Count);
-				return this->Count;
+				auto cp = *this;
+				++this->Count;
+				return cp;
 			}
 
 			///<summary>Префіксний декремент
@@ -89,7 +98,7 @@ namespace Seed {
 			///</summary>
 			///<returns>Вертає силку на елемент після декременту</returns>
 			__forceinline RefCountT & operator--() {
-				InterlockedDecrementSizeTNoFence(&this->Count);
+				this->Count--;
 				return *this;
 			}
 
@@ -98,8 +107,9 @@ namespace Seed {
 			///</summary>
 			///<returns>Вертає копію об'єкта до декременту</returns>
 			__forceinline RefCountT operator--(int) {
-				InterlockedDecrementSizeTNoFence(&this->Count);
-				return this->Count;
+				auto cp = *this;
+				this->Count--;
+				return cp;
 			}
 
 			///<summary>Вертає значення в вигляді <code>SizeT<code> змінної</summary>
@@ -111,7 +121,7 @@ namespace Seed {
 		///<param name='Array'>Масив</param>
 		///<param name='Size'>Кількість елементів</param>
 		template<typename T>
-		__forceinline void Reverse(T * Array, SizeT size) {
+		DeprecatedCall("Робота з с-подібнимим масивами") __forceinline void Reverse(T * Array, SizeT size) {
 			for (size_t i = 0; i < size / 2; i++) {
 				Swap(Array[i], Array[(size - 1) - i]);
 			}

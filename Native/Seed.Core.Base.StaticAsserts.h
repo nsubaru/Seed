@@ -44,11 +44,11 @@ namespace Seed {
 			//struct IsClass :LogicConst<CRT::is_class<T>::value> {}; //Implementation defined
 
 
-			/////<summary>Compile-time логічне суддження, 
-			/////<para>якщо клас Derivde наслідує клас Base то вертає True інакше False</para></summary>
-			/////<remarks>Спирається на реалізацію в компіляторі</remarks>
-			//template<typename Base, typename Derived>
-			//struct IsBasedOn :LogicConst<CRT::is_base_of<Base, Derived>::value> {}; //Implementation defined
+			///<summary>Compile-time логічне суддження, 
+			///<para>якщо клас Derivde наслідує клас Base то вертає True інакше False</para></summary>
+			///<remarks>Спирається на реалізацію в компіляторі</remarks>
+			template<typename Base, typename Derived>
+			struct IsBasedOn :LogicConst<__is_base_of(Base, Derived)> {}; //Implementation defined
 
 
 			/////<summary>Compile-time логічне суддження, 

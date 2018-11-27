@@ -47,7 +47,7 @@ typedef struct EHExceptionRecord {
 	void *		ExceptionAddress;		// Address at which exception occurred
 	unsigned long 		NumberParameters;		// Number of extended parameters. (= EH_EXCEPTION_PARAMETERS)
 	struct EHParameters {
-		unsigned long		magicNumber;		// = EH_MAGIC_NUMBER1
+		unsigned long long		magicNumber;		// = EH_MAGIC_NUMBER1
 		void *		pExceptionObject;	// Pointer to the actual object thrown
 		ThrowInfo*	pThrowInfo;		// Description of thrown object
 		void *		pThrowImageBase;	// Image base of thrown object
@@ -94,18 +94,6 @@ typedef struct _UNWIND_INFO {
 
 typedef struct _UNWIND_HISTORY_TABLE* PUNWIND_HISTORY_TABLE;
 
-typedef struct _xDISPATCHER_CONTEXT {
-	long long ControlPc;
-	long long ImageBase;
-	PRUNTIME_FUNCTION FunctionEntry;
-	ULONG_PTR EstablisherFrame;
-	ULONG64 TargetIp;
-	PCONTEXT ContextRecord;
-	PVOID LanguageHandler;
-	PVOID HandlerData;
-	PUNWIND_HISTORY_TABLE HistoryTable;
-} DispatcherContext;					// changed the case of the name to conform to EH conventions
-
 
 //
 // Current state of a function.
@@ -139,7 +127,7 @@ typedef const struct _s_FuncInfo
 } FuncInfo;
 
 //SEH Exeption code for C++ exeptions
-#define EH_EXCEPTION_NUMBER	('msc' | 0xE0000000)
+#define EH_EXCEPTION_NUMBER	('seed' | 0xE0000000)
 
 // EH_MAGIC_NUMBER3     Used in the FuncInfo if FuncInfo::EHFlags is valid, so
 //                      we can check if the function was compiled -EHs or -EHa.
@@ -337,7 +325,7 @@ struct TryBlockMap {
 
 struct TryBlockMapIterator {
 	TryBlockMap * entrys;
-	int Index;
+	unsigned int Index;
 };
 
 struct TryBlockMapIteratorPair {
