@@ -1,6 +1,7 @@
 #pragma once
 #include "Seed.Core.Base.h"
 
+#define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
 typedef	int	PMFN;					// Image relative offset of Member Function

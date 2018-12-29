@@ -61,9 +61,9 @@
 //
 //		SRM_CODE void Login(SecureString & Login, Array<Byte> Pswd){
 //			if(loginHandleFunction == nullptr)
-//				throw(InternalError(ExeptionPosition))
+//				throw(InternalError(ExceptionPosition))
 //			if(threadImpersonatedToken.IsNullToken())
-//				Throw(SecurityError(ExeptionPosition);
+//				Throw(SecurityError(ExceptionPosition);
 //			auto res = authVerficationFunction(Login, Pswd);
 //			threadImpersonatedToken = SecurityToken(res.Id, res.Rights);
 //		}

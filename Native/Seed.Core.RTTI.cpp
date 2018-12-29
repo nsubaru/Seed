@@ -1,8 +1,10 @@
 #include "Seed.Core.Base.h"
-#include "Seed.Core.Base.NTAPI.h"
 
 #include "Seed.Core.Exceptions.h"
+
+#define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.RTTI.Internals.h"
+#include "Seed.Core.Base.NTAPI.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -125,7 +127,7 @@ extern "C" void * __cdecl __RTtypeid(
 	noexcept(false)
 {
 	if (!inptr) {
-		Throw(Seed::BadCast(ExeptionPosition));   // WP 5.2.7
+		Throw(Seed::BadCast(ExceptionPosition));   // WP 5.2.7
 	}
 
 	const auto pCompleteLocator = GetCompleteObjectLocatorFromObject(inptr);
@@ -138,7 +140,7 @@ extern "C" void * __cdecl __RTtypeid(
 		return (void *)COL_PTD(*pCompleteLocator);
 	}
 
-	Throw(Seed::NullPointExeption(ExeptionPosition, (Seed::SizeT)nullptr, Seed::NullPointExeption::Types::Read));
+	Throw(Seed::NullPointExeption(ExceptionPosition, (Seed::SizeT)nullptr, Seed::NullPointExeption::Types::Read));
 	return nullptr;
 }
 
@@ -248,7 +250,7 @@ extern "C" void * __cdecl __RTDynamicCast(
 		{
 			if (isReference)
 			{
-				Throw(Seed::BadCast(ExeptionPosition));
+				Throw(Seed::BadCast(ExceptionPosition));
 			}
 
 			return nullptr;
@@ -950,7 +952,7 @@ static ptrdiff_t PMDtoOffset(
 }
 
 extern "C" int __cdecl _purecall() {
-	Throw(Seed::BadPureCall(ExeptionPosition));
+	Throw(Seed::BadPureCall(ExceptionPosition));
 	return -1;
 }
 

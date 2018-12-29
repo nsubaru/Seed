@@ -63,7 +63,10 @@ namespace Seed {
 				this->~Array();
 				this->size = From.size;
 				this->arr = new T[size];
+#pragma warning(push)
+#pragma warning(disable: 4996)
 				Memory::Copy(From.arr, this->arr, size);
+#pragma warning(pop)
 				return *this;
 			}
 
@@ -85,7 +88,7 @@ namespace Seed {
 				if (Index < size)
 					return arr[Index];
 				else
-					Throw(Seed::IndexOutOfRange(ExeptionPosition, Index, getSize()));
+					Throw(Seed::IndexOutOfRange(ExceptionPosition, Index, getSize()));
 			}
 
 			///<summary>Констатний оператор доступу по індексу</summary>
@@ -95,7 +98,7 @@ namespace Seed {
 				if (index < size)
 					return arr[index];
 				else
-					Throw(Seed::IndexOutOfRange(ExeptionPosition, index, getSize()));
+					Throw(Seed::IndexOutOfRange(ExceptionPosition, index, getSize()));
 			}
 
 			///<summary>Оператор рівності</summary>
@@ -125,37 +128,48 @@ namespace Seed {
 				return arr;
 			}
 
-			//Зміна розміру
+			///<summary>Зміна розміру<summary>
+			///<param name = 'NewSize'>Новий розмір масиву</param>
 			__forceinline void ReSize(SizeT NewSize) {
 				T* buf = new T[NewSize];
 				SizeT CopySize = (NewSize > size) ? size : NewSize;
+#pragma warning(push)
+#pragma warning(disable: 4996)
 				Memory::Copy(this->arr, buf, CopySize);
+#pragma warning(pop)
 				delete[] this->arr;
 				size = NewSize;
 				this->arr = buf;
 			}
 
-			//Оптимізований обмін динамічних масивів
+			///<summary>Оптимізований обмін динамічних масивів</summary>
+			///<param name = 'A'>Перший елемент</param>
+			///<param name = 'B'>Другий елемент</param>
 			__forceinline friend void Swap(Array & A, Array & B) {
 				Swap(A.arr, B.arr);
 				Swap(A.size, B.size);
 			}
 
-			//Перевертає елементи масиву
-			__forceinline void Reverse() {
+			///<summary>Перевертає елементи масиву</summary>
+			///<returns>Силку на поточний масив після зміни порядку елементів</returns>
+			__forceinline Array<T> & Reverse() {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 				Seed::Reverse(arr, size);
 #pragma warning(pop)
+				return *this;
 			}
 
-			//Вертає підмасив який складається з Count елементів
-			//починаючи з StartIndex елемента
+			///<summary>Вертаж підмасив який складається з всіх елементів 
+			///<para>починаючи з елемента StartIndex</para></summary>
+			///<param name = 'StartIndex'>Номер першого елемента починаючи 
+			///<para>з нуля який має бути включений в Slice</para></param>
+			///<returns>Підмасив</returns>
 			Array<T> Slice(SizeT StartIndex) {
 				if(StartIndex > size)
 					Throw(
 						NullPointExeption(
-							ExeptionPosition,
+							ExceptionPosition,
 							((SizeT)this->arr) + StartIndex,
 							NullPointExeption::Types::Read
 						)
@@ -170,12 +184,17 @@ namespace Seed {
 				return Array<T>(MoveRValue(__array), Count);
 			}
 
+			///<summary>Вертає підмасив який складається з Count елементів починаючи з StartIndex елемента</summary>
+			///<param name = 'StartIndex'>Номер першого елемента починаючи 
+			///<para>з нуля який має бути включений в Slice</para></param>
+			///<param name = 'Count'>Кількість елементів</param>
+			///<returns>Підмасив</returns>
 			Array<T> Slice(SizeT StartIndex, SizeT Count) {
 				
 				if (StartIndex + Count > size)
 					Throw(
 						NullPointExeption(
-							ExeptionPosition, 
+							ExceptionPosition, 
 							((SizeT)this->arr) + StartIndex + Count, 
 							NullPointExeption::Types::Read
 						)
@@ -190,24 +209,30 @@ namespace Seed {
 				return Array<T>(MoveRValue(__array), Count);
 			}
 
-			//Деструктор
+			///<summary>Деструктор</summary>
 			__forceinline ~Array() {
 				if (this->arr != nullptr) {
 					delete[] this->arr;
 					size = 0;
+					this->arr = nullptr;
 				}
 			}
 		};
 
-		//Копіювальний конструктор
+		///<summary>Копіювальний конструктор</summary>
+		///<param name = 'Orig'>Оригинал масиву</param>
 		template<typename T>
 		__forceinline Array<T>::Array(const Array& orig) {
 			this->arr = new T[orig.size];
+#pragma warning(push)
+#pragma warning(disable: 4996)
 			Memory::Copy(orig.arr, this->arr, sizeof(T)*orig.size);
+#pragma warning(pop)
 			this->size = orig.size;
 		}
 
-		//Конструктор переміщення
+		///<summary>Конструктор переміщення</summary>
+		///<param name = 'From'>Оригинал який буде обнулено після виклику конструктора</param>
 		template<typename T>
 		__forceinline Array<T>::Array(Array&& orig) noexcept {
 			this->arr = orig.arr;

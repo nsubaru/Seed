@@ -1,11 +1,13 @@
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Exceptions.h"
 
-#include "Seed.Core.Base.NTAPI.h"
 #include "Seed.Core.Exceptions.Internals.h"
 #include "Seed.Core.Exceptions.Internals.SEH.h"
 
 #include "typeinfo"
+
+#define SEED_RT_ALLOW_INTERNAL_NT_API
+#include "Seed.Core.Base.NTAPI.h"
 
 extern void * InternalCxxCallCatchBlock(
 	EXCEPTION_RECORD *pExcept

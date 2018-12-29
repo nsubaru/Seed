@@ -1,15 +1,51 @@
 #pragma once
 #include "Seed.Core.Base.h"
+#include "Seed.Core.Memory.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
 namespace Seed {
 	inline namespace Core {
+		namespace Memory {
+			class ExceptionHeap : public BasicHeap {
+			public:
+				///<summary>Виділення пам'яті</summary>
+				///<param name='Size'>Розмір ділянки в байтах</param>
+				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
+				///<returns>Виділену ділянку</returns>
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Allocate(SizeT Size) final;
+				///<summary>Вирівнняне виділення пам'яті</summary>
+				///<param name='Size'>Розмір ділянки в байтах</param>
+				///<param name='AllocationReq'>Границя вирівнювання</param>
+				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
+				///<returns>Виділену ділянку</returns>
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
+
+				///<summary>Звільнення пам'яті</summary>
+				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
+				///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Free(void * MemBlk) final;
+				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
+				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
+				///<param name='AllocationReq'>Границя вирівнювання</param>
+				///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedFree(void * MemBlk, SizeT AllocationReq) final;
+
+				///<summary>Кількість виділених блоків даних</summary>
+				virtual SizeT CurrentMemBlkCount() noexcept final;
+				///<summary>Розмір виділеної пам'яті в байтах</summary>
+				virtual SizeT CurrentAllocatedMemory() noexcept final;
+				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
+				virtual SizeT CurrentHeapUsage() noexcept final;
+			};
+		}
 		///<summary>Підсистема помилок в рантаймі</summary>
 		inline namespace Exceptions {
 			///<summary>Макрос локалізації помилки</summary>
-#define ExeptionPosition __FILE__, __FUNCSIG__, __LINE__
+#define ExceptionPosition __FILE__, __FUNCSIG__, __LINE__
 
 			///<summary>Класс базової помилки</summary>
-			class Exception {
+			class Exception: public Memory::Allocator<Memory::ExceptionHeap> {
 			private:
 				///<sumary>Місце генерації помилки</summary>
 				struct ExeptionLocation {
@@ -24,23 +60,6 @@ namespace Seed {
 				ExeptionLocation Location;
 				///<summary>Ім'я помилки</summary>
 				const Char * ExeptionName;
-
-				///<summary>Виділення пам'яті</summary>
-				///<param name='Size'>Розмір ділянки в байтах</param>
-				///<returns>Виділену ділянку або <c>nullptr</c></returns>
-				static DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall _Ret_notnull_ _Post_writable_byte_size_(Size) void * Allocate(SizeT Size) noexcept;
-				///<summary>Вирівнняне виділення пам'яті</summary>
-				///<param name='Size'>Розмір ділянки в байтах</param>
-				///<param name='AllocationReq'>Границя вирівнювання</param>
-				///<returns>Виділену ділянку або <c>nullptr</c></returns>
-				static DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall _Ret_notnull_ _Post_writable_byte_size_(Size) void * AllignedAllocate(SizeT Size, SizeT AllocationReq) noexcept;
-
-				///<summary>Звільнення пам'яті</summary>
-				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				static DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Free(void * MemBlk);
-				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
-				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				static DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedFree(void * MemBlk, Seed::SizeT AllocationReq);
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -53,65 +72,6 @@ namespace Seed {
 
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
 				virtual ~Exception() = 0 {}
-
-#pragma warning(push)
-#pragma warning(disable: 4996)
-				///<summary>Оператор виділення пам'яті</summary>
-				///<param name='Size'>Розмір ділянки пам'яті</param>
-				///<returns>Вертає ділянку пам'яті</returns>
-				inline  void * operator new(SizeT Size) {
-					return Allocate(Size);
-				}
-				///<summary>Оператор виділення масиву об'єктів</summary>
-				///<param name='Size'>Розмір масиву об'єктів</param>
-				///<returns>Вертає ділянку пам'яті</returns>
-				inline _Ret_notnull_ _Post_writable_byte_size_(Size) void * operator new[](SizeT Size) {
-					return Allocate(Size);
-				}
-				///<summary>Оператор виділення одиночного об'єкта з специфічним вирівнюванням</summary>
-				///<param name='Size'>Розмір ділянки пам'яті</param>
-				///<param name='Allign'>Границя вирівнювання</param>
-				///<returns>Вертає ділянку пам'яті</returns>
-				static inline _Ret_notnull_ _Post_writable_byte_size_(Size) void* operator new(Seed::SizeT Size, Seed::AllignRequirements al) {
-					return AllignedAllocate(Size, (Seed::SizeT)al);
-				}
-				///<summary>Оператор виділення масиву об'єктів з специфічним вирівнюванням</summary>
-				///<param name='Size'>Розмір ділянки пам'яті</param>
-				///<param name='Allign'>Границя вирівнювання</param>
-				///<returns>Вертає ділянку пам'яті</returns>
-				static inline _Ret_notnull_ _Post_writable_byte_size_(Size) void* operator new[](Seed::SizeT Size, Seed::AllignRequirements Allign) {
-					return AllignedAllocate(Size, (Seed::SizeT)Allign);
-				}
-				///<summary>Оператор видалення одиночного об'єкту</summary>
-				///<param name='MemBlk'>Ділянка пам'яті</param>
-				static inline void operator delete(void * MemBlk) {
-					Free(MemBlk);
-				}
-				///<summary>Оператор видалення масиву об'єктів</summary>
-				///<param name='MemBlk'>Ділянка пам'яті</param>
-				static inline void operator delete[](void * MemBlk) {
-					Free(MemBlk);
-				}
-				///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням</summary>
-				///<param name='MemBlk'>Ділянка пам'яті</param>
-				///<param name='Allign'>Границя вирівнювання</param>
-				static inline void __cdecl operator delete(void * MemBlk, Seed::AllignRequirements Allign) {
-					AllignedFree(MemBlk, (SizeT)Allign);
-				}
-				///<summary>Оператор видалення масиву об'єктів з специфічним вирівннюванням</summary>
-				///<param name='MemBlk'>Ділянка пам'яті</param>
-				///<param name='Allign'>Границя вирівнювання</param>
-				static inline void __cdecl operator delete[](void * MemBlk, Seed::AllignRequirements Allign) {
-					AllignedFree(MemBlk, (SizeT)Allign);
-				}
-#pragma warning(pop)
-
-				///<summary>Кількість виділених блоків даних</summary>
-				///<returns>Кількість виділених блоків даних</returns>
-				SeedKernelCall SizeT CurrentMemBlkCount() noexcept;
-				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				///<returns>Розмір виділеної пам'яті в байтах</returns>
-				SeedKernelCall SizeT CurrentAllocatedMemory() noexcept;
 			};
 
 			///<summary>Ділення на ноль</summary>
@@ -282,18 +242,38 @@ namespace Seed {
 	}
 }
 
-template<typename E> __forceinline InternalApiCall __declspec(noreturn) void __throw(E && ex) { throw ex; }
+template<class Type>
+using ThrowableObj = typename Seed::Core::StaticAsserts::ConditionT <
+	Seed::Core::StaticAsserts::IsFunction<Type>::State,
+	typename Seed::Core::StaticAsserts::ResultOf<Type>::Type ,
+	typename Type
+>::Result;
 
+template<typename Type>
+struct IsThrowable :
+	Seed::Core::StaticAsserts::IsBasedOn< 
+		Seed::Core::Exceptions::Exception,
+		Seed::Core::StaticAsserts::RemoveRefT<ThrowableObj<Type>>
+	>
+{};
+
+///<summary>Внутрішня функція генерації помилки</summary>
+///<param name = 'ex'>Об'єкт помилки</param>
+template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___cxxthrow(E && ex) { throw ex; }
+
+///<summary>Генерація помилки з провіркою типу</summary>
+///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>
 #define Throw(ExceptionObj)\
 { \
-	static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::Core::Exceptions::Exception, decltype(ExceptionObj)>(), \
+	static_assert(IsThrowable<decltype(ExceptionObj)>(), \
 	"Only Seed::Exception and derived classes cant be throw as exception"); \
-	__assume(Seed::Core::StaticAsserts::IsBasedOn<Seed::Core::Exceptions::Exception, decltype(ExceptionObj)>()); \
+	__assume(IsThrowable<decltype(ExceptionObj)>()); \
 	__pragma(warning(push)) \
 	__pragma(warning(disable: 4996)) \
-	__throw(ExceptionObj);\
+	___cxxthrow(ExceptionObj);\
 	__pragma(warning(pop)) \
  }
 
+#define throw static_cast("Use Throw insted")
 
-#define throw static_assert(false, "Use Throw insteed")
+#pragma warning(pop)

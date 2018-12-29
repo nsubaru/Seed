@@ -1,12 +1,11 @@
 #pragma once
 #include "Seed.Core.Base.h"
-#include "Seed.Core.Exceptions.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
 namespace Seed {
 	inline namespace Core {
-		///<summary>Робота з пам'ятю</summary>
+		///<summary>Простір імен підсистеми пам'яті рантайму Рем</summary>
 		namespace Memory {
 			///<summary>Базовий клас куч</summary>
 			class BasicHeap {
@@ -45,15 +44,6 @@ namespace Seed {
 			///<summary>Загальна куча</summary>
 			class Heap : public BasicHeap {
 			private:
-				///<summary>Дескриптор кучі</summary>
-				inline static Handle HeapHandle;
-				///<summary>Поточне використання кучі</summary>
-				inline static SizeT AllocatedMemory;
-				///<summary>Поточна кількість виділених блоків</summary>
-				inline static SizeT AllocatedMemBlksCount;
-				///<summary>Фактичне використання пам'яті кучею</summary>
-				inline static SizeT CurrentHeapSize;
-			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
 				static Boolean Init() noexcept;
@@ -88,25 +78,16 @@ namespace Seed {
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedFree(void * MemBlk, SizeT AllocationReq) override final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				__forceinline virtual SizeT CurrentMemBlkCount() noexcept override final { return AllocatedMemory; }
+				__forceinline virtual SizeT CurrentMemBlkCount() noexcept override final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				__forceinline virtual SizeT CurrentAllocatedMemory() noexcept override final { return AllocatedMemBlksCount; }
+				__forceinline virtual SizeT CurrentAllocatedMemory() noexcept override final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentHeapUsage() noexcept { return CurrentHeapSize; }
+				virtual SizeT CurrentHeapUsage() noexcept;
 			};
 
 			///<summary>Захищена куча</summary>
 			///<remarks>Перед виділенням і після звільнення відбувається обнулення пам'яті</remarks>
 			class SecuredHeap : public BasicHeap {
-			private:
-				///<summary>Дескриптор кучі</summary>
-				inline static Handle HeapHandle;
-				///<summary>Поточне використання кучі</summary>
-				inline static SizeT AllocatedMemory;
-				///<summary>Поточна кількість виділених блоків</summary>
-				inline static SizeT AllocatedMemBlksCount;
-				///<summary>Фактичне використання пам'яті кучею</summary>
-				inline static SizeT CurrentHeapSize;
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -142,11 +123,11 @@ namespace Seed {
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedFree(void * MemBlk, SizeT AllocationReq) override final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SizeT CurrentMemBlkCount() noexcept override final { return AllocatedMemBlksCount; }
+				virtual SizeT CurrentMemBlkCount() noexcept override final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentAllocatedMemory() noexcept override final { return AllocatedMemory; }
+				virtual SizeT CurrentAllocatedMemory() noexcept override final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentHeapUsage() noexcept override final { return CurrentHeapSize; }
+				virtual SizeT CurrentHeapUsage() noexcept override final;
 			};
 
 			///<summary>Копіювання ділянки пам'яті</summary>
@@ -154,8 +135,8 @@ namespace Seed {
 			///<param name='Destination'>Ділянка пам'яті куда копіюється</param>
 			///<param name='Size'>Кількість байт як потрібно скопіювати</param>
 			DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void Copy(
-				_In_reads_(Size) const void * Source,
-				_Out_writes_all_(Size) void * Destination,
+				const void * Source,
+				void * Destination,
 				SizeT Size);
 
 			///<summary>Заповнює блок пам'яті певним значенням</summary>
@@ -163,9 +144,9 @@ namespace Seed {
 			///<param name='Size'>Розмір в байтах ділянки пам'яті</param>
 			///<param name='Filler'>Значення яким заповнить ділянку пам'яті</param>
 			DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void MemBlkFill(
-				_Out_writes_bytes_all_(Size) void * MemBlk,
+				void * MemBlk,
 				SizeT Size,
-				_In_ const Byte Filler);
+				const Byte Filler);
 
 			///<summary>Загальне кількість виділених блоків пам'яті у обох кучами</summary>
 			__forceinline SizeT CurrentTotalAllocatedMemBlks() noexcept
@@ -190,7 +171,7 @@ namespace Seed {
 			///</summary>
 			template<class Heap>
 			class Allocator {
-				//static_assert(StaticAsserts::IsBasedOn<Memory::BasicHeap, Heap>(), L"Класс Heap не є кучею");
+				static_assert(StaticAsserts::IsBasedOn<Memory::BasicHeap, Heap>(), L"Класс Heap не є кучею");
 			private:
 				///<value>Куча з якої відбуватиметься виділення</value>
 				inline static Heap heap;
@@ -224,22 +205,22 @@ namespace Seed {
 				///<param name='Size'>Розмір ділянки пам'яті</param>
 				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 				///<returns>Вертає ділянку пам'яті</returns>
-				static __forceinline _Outptr_result_nullonfailure_ void * operator new(SizeT Size) {
+				static __forceinline void * operator new(SizeT Size) {
 					return heap.Allocate(Size);
 				}
 				///<summary>Оператор виділення масиву об'єктів</summary>
 				///<param name='Size'>Розмір масиву об'єктів</param>
 				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 				///<returns>Вертає ділянку пам'яті</returns>
-				static __forceinline _Ret_notnull_ _Post_writable_byte_size_(Size) void * operator new[](SizeT Size) {
+				static __forceinline void * operator new[](SizeT Size) {
 					return heap.Allocate(Size);
 				}
-					///<summary>Оператор виділення одиночного об'єкта з специфічним вирівнюванням</summary>
-					///<param name='Size'>Розмір ділянки пам'яті</param>
-					///<param name='Allign'>Границя вирівнювання</param>
-					///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
-					///<returns>Вертає ділянку пам'яті</returns>
-					static __forceinline _Ret_notnull_ _Post_writable_byte_size_(Size) void* operator new(Seed::SizeT Size, CRT::align_val_t Allign) {
+				///<summary>Оператор виділення одиночного об'єкта з специфічним вирівнюванням</summary>
+				///<param name='Size'>Розмір ділянки пам'яті</param>
+				///<param name='Allign'>Границя вирівнювання</param>
+				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
+				///<returns>Вертає ділянку пам'яті</returns>
+				static __forceinline void* operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
 					return heap.AllignedAllocate(Size, (Seed::SizeT)Allign);
 				}
 				///<summary>Оператор виділення масиву об'єктів з специфічним вирівнюванням</summary>
@@ -247,13 +228,13 @@ namespace Seed {
 				///<param name='Allign'>Границя вирівнювання</param>
 				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 				///<returns>Вертає ділянку пам'яті</returns>
-				static __forceinline _Ret_notnull_ _Post_writable_byte_size_(Size) void* operator new[](Seed::SizeT Size, CRT::align_val_t Allign) {
+				static __forceinline void* operator new[](Seed::SizeT Size, Seed::AllignRequirements Allign) {
 					return heap.AllignedAllocate(Size, (Seed::SizeT)Allign);
 				}
-					///<summary>Оператор видалення одиночного об'єкту</summary>
-					///<param name='MemBlk'>Ділянка пам'яті</param>
-					///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
-					static __forceinline void operator delete(void * MemBlk) {
+				///<summary>Оператор видалення одиночного об'єкту</summary>
+				///<param name='MemBlk'>Ділянка пам'яті</param>
+				///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				static __forceinline void operator delete(void * MemBlk) {
 					heap.Free(MemBlk);
 				}
 				///<summary>Оператор видалення масиву об'єктів</summary>
@@ -262,18 +243,18 @@ namespace Seed {
 				static __forceinline void operator delete[](void * MemBlk) {
 					heap.Free(MemBlk);
 				}
-					///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням</summary>
-					///<param name='MemBlk'>Ділянка пам'яті</param>
-					///<param name='Allign'>Границя вирівнювання</param>
-					///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
-					static __forceinline void __cdecl operator delete(void * MemBlk, CRT::align_val_t Allign) {
+				///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням</summary>
+				///<param name='MemBlk'>Ділянка пам'яті</param>
+				///<param name='Allign'>Границя вирівнювання</param>
+				///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				static __forceinline void __cdecl operator delete(void * MemBlk, Seed::AllignRequirements Allign) {
 					heap.AllignedFree(MemBlk, (SizeT)Allign);
 				}
 				///<summary>Оператор видалення масиву об'єктів з специфічним вирівннюванням</summary>
 				///<param name='MemBlk'>Ділянка пам'яті</param>
 				///<param name='Allign'>Границя вирівнювання</param>
 				///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
-				static __forceinline void __cdecl operator delete[](void * MemBlk, CRT::align_val_t Allign) {
+				static __forceinline void __cdecl operator delete[](void * MemBlk, Seed::AllignRequirements Allign) {
 					heap.AllignedFree(MemBlk, (SizeT)Allign);
 				}
 			};
@@ -287,14 +268,14 @@ namespace Seed {
 ///<param name='Size'>Розмір ділянки пам'яті</param>
 ///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 ///<returns>Вертає ділянку пам'яті</returns>
-inline _Outptr_result_nullonfailure_ void * __cdecl operator new(Seed::SizeT Size) {
+inline void * __cdecl operator new(Seed::SizeT Size) {
 	return Seed::Memory::Heap().Allocate(Size);
 }
 ///<summary>Оператор виділення масиву об'єктів</summary>
 ///<param name='Size'>Розмір масиву об'єктів</param>
 ///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 ///<returns>Вертає ділянку пам'яті</returns>
-inline _Ret_notnull_ _Post_writable_byte_size_(Size) void * __cdecl operator new[](Seed::SizeT Size) {
+inline void * __cdecl operator new[](Seed::SizeT Size) {
 	return Seed::Memory::Heap().Allocate(Size);
 }
 ///<summary>Оператор виділення одиночного об'єкта з специфічним вирівнюванням</summary>
@@ -302,7 +283,7 @@ inline _Ret_notnull_ _Post_writable_byte_size_(Size) void * __cdecl operator new
 ///<param name='Allign'>Границя вирівнювання</param>
 ///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 ///<returns>Вертає ділянку пам'яті</returns>
-inline _Ret_notnull_ _Post_writable_byte_size_(Size) void * __cdecl operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
+inline void * __cdecl operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
 	return Seed::Memory::Heap().AllignedAllocate(Size, (Seed::SizeT)Allign);
 }
 ///<summary>Оператор виділення масиву об'єктів з специфічним вирівнюванням</summary>
@@ -310,7 +291,7 @@ inline _Ret_notnull_ _Post_writable_byte_size_(Size) void * __cdecl operator new
 ///<param name='Allign'>Границя вирівнювання</param>
 ///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 ///<returns>Вертає ділянку пам'яті</returns>
-inline _Ret_notnull_ _Post_writable_byte_size_(Size) void * __cdecl operator new[](Seed::SizeT Size, Seed::AllignRequirements Allign) {
+inline void * __cdecl operator new[](Seed::SizeT Size, Seed::AllignRequirements Allign) {
 	return Seed::Memory::Heap().AllignedAllocate(Size, (Seed::SizeT)Allign);
 }
 ///<summary>Оператор видалення одиночного об'єкту</summary>

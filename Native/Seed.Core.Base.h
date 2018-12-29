@@ -1,7 +1,5 @@
 #pragma once
 
-#include "sal.h"
-
 #include "Seed.Core.Base.Types.h"
 #include "Seed.Core.Base.Math.h"
 #include "Seed.Core.Base.BitOperations.h"
@@ -133,6 +131,79 @@ namespace Seed {
 		template<typename T>
 		__forceinline T&& MoveRValue(T& Obj) {
 			return CRT::move(Obj);
+		}
+
+		///<summary>Ідеальна передача</summary>
+		///<param name = 'Arg'>Аргумент</param>
+		///<returns>RV-силку</returns>
+		template<typename Type>
+		[[nodiscard]]
+		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefT<Type>& Arg) noexcept
+		{	// forward an lvalue as either an lvalue or an rvalue
+			return (static_cast<Type&&>(Arg));
+		}
+
+		///<summary>Ідеальна передача</summary>
+		///<param name = 'Arg'>Аргумент</param>
+		///<returns>RV-силку</returns>
+		template<typename Type>
+		[[nodiscard]]
+		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefT<Type>&& Arg) noexcept
+		{	// forward an rvalue as an rvalue
+			static_assert(!StaticAsserts::IsLValueRef<Type>(), "Bad forward call");
+			return (static_cast<Type&&>(_Arg));
+		}
+	}
+}
+
+namespace {
+	template <class F, class... Args>
+	inline auto INVOKE(F&& f, Args&&... args) ->
+		decltype(Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...)) {
+		return Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...);
+	}
+
+	template <class Base, class T, class Derived>
+	inline auto INVOKE(T Base::*pmd, Derived&& ref) ->
+		decltype(Seed::ForwardReference<Derived>(ref).*pmd) {
+		return Seed::ForwardReference<Derived>(ref).*pmd;
+	}
+
+	template <class PMD, class Pointer>
+	inline auto INVOKE(PMD&& pmd, Pointer&& ptr) ->
+		decltype((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMD>(pmd)) {
+		return (*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMD>(pmd);
+	}
+
+	template <class Base, class T, class Derived, class... Args>
+	inline auto INVOKE(T Base::*pmf, Derived&& ref, Args&&... args) ->
+		decltype((Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...)) {
+		return (Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...);
+	}
+
+	template <class PMF, class Pointer, class... Args>
+	inline auto INVOKE(PMF&& pmf, Pointer&& ptr, Args&&... args) ->
+		decltype(((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...)) {
+		return ((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...);
+	}
+}
+
+namespace Seed {
+	inline namespace Core {
+		namespace StaticAsserts {
+			template <typename, typename = void>
+			struct ResultOf {
+				using Type = VoidT<>;
+			};
+			template <typename F, typename...Args>
+			struct ResultOf<F(Args...),
+				decltype(void(::INVOKE(StaticAsserts::DeclVal<F>(), StaticAsserts::DeclVal<Args>()...)))> {
+				using Type = decltype(::INVOKE(StaticAsserts::DeclVal<F>(), StaticAsserts::DeclVal<Args>()...));
+			};
+
+			///<summary>Тип без силки</summary>
+			template<typename T>
+			using ResultOfT = typename ResultOf<T>::Type;
 		}
 	}
 }

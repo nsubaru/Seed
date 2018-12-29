@@ -2,6 +2,9 @@
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"
 
+#include "Seed.Core.SettingsAPI.h"
+
+#define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
 #pragma warning(push)
@@ -9,28 +12,45 @@
 
 using namespace Seed;
 
+///<summary>≤нформац≥€ про кучу помилок</summary>
 struct
 {
-	Handle HeapHandle;
-	SizeT AllocatedMemory;
-	SizeT AllocatedMemBlksCount;
-	SizeT CurrentHeapSize;
+	///<summary>ƒескриптор куч≥</summary>
+	Seed::Handle HeapHandle;
+	///<summary>ѕоточне використанн€ куч≥</summary>
+	Seed::SizeT AllocatedMemory;
+	///<summary>ѕоточна к≥льк≥сть вид≥лених блок≥в</summary>
+	Seed::SizeT AllocatedMemBlksCount;
+	///<summary>‘актичне використанн€ пам'€т≥ кучею</summary>
+	Seed::SizeT CurrentHeapSize;
 } ExceptionsHeap;
 
 Boolean Seed::Core::Init::Exceptions() noexcept
 {
-	ExceptionsHeap.HeapHandle =
-		RtlCreateHeap(
-			HEAP_GROWABLE,
-			NULL,
-			10485760ull,
-			0,
-			NULL,
-			NULL
-		);
+	ULONG Flags = HEAP_GROWABLE;
+	Settings::HEAP_CONFIGS configs = Settings::EXCEPTION_HEAP_ADDITIONAL_CONFIGS();
+
+	if (configs.HEAP_ARGS_CHECK)
+		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
+	if (configs.HEAP_FREE_CHECK)
+		Flags |= FLG_HEAP_ENABLE_FREE_CHECK;
+	if (configs.HEAP_TAIL_CHECK)
+		Flags |= FLG_HEAP_ENABLE_FREE_CHECK;
+
+	ExceptionsHeap.HeapHandle = RtlCreateHeap(
+		Flags,
+		NULL,
+		Settings::EXCEPTION_HEAP_START_SIZE(),
+		Settings::EXCEPTION_HEAP_START_SIZE(),
+		NULL,
+		NULL);
+
+	if (ExceptionsHeap.HeapHandle == nullptr)
+		return false;
+
 	ExceptionsHeap.AllocatedMemBlksCount = ExceptionsHeap.AllocatedMemory = 0;
 
-	return Boolean();
+	return true;
 }
 
 void Seed::Core::Stop::Exceptions() noexcept
@@ -38,7 +58,7 @@ void Seed::Core::Stop::Exceptions() noexcept
 	RtlDestroyHeap(ExceptionsHeap.HeapHandle);
 }
 
-SeedKernelCall void * Seed::Core::Exceptions::Exception::Allocate(SizeT Size) noexcept
+SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 {
 	//якщо розм≥р задано максимальне можливе значенн€ SizeT то це €вно помилка ≥ генеруЇм виключенн€ OutOfMemory
 	if (Size == Math::Max::SizeT)
@@ -61,7 +81,7 @@ SeedKernelCall void * Seed::Core::Exceptions::Exception::Allocate(SizeT Size) no
 	return obj + 1;
 }
 
-SeedKernelCall void * Seed::Core::Exceptions::Exception::AllignedAllocate(SizeT Size, SizeT AllocationReq) noexcept
+SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT Size, SizeT AllocationReq)
 {
 	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне, 
 	//а отже викликаЇм просте вид≥ленн€ пам'€т≥
@@ -94,7 +114,7 @@ SeedKernelCall void * Seed::Core::Exceptions::Exception::AllignedAllocate(SizeT 
 	return (void*)AllignedAddress;
 }
 
-SeedKernelCall void * Seed::Core::Exceptions::Exception::Free(void * MemBlk)
+SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::Free(void * MemBlk)
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
@@ -112,11 +132,11 @@ SeedKernelCall void * Seed::Core::Exceptions::Exception::Free(void * MemBlk)
 		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
-	//якщо н≥ то генеруЇм помилку NullPointExeption
+	//якщо н≥ то вертаЇм об'Їкт
 	else return MemBlk;
 }
 
-SeedKernelCall void * Seed::Core::Exceptions::Exception::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
+SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::AllignedFree(void * MemBlk, SizeT AllocationReq)
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
@@ -136,18 +156,23 @@ SeedKernelCall void * Seed::Core::Exceptions::Exception::AllignedFree(void * Mem
 		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
-	//якщо н≥ то генеруЇм помилку NullPointExeption
+	//якщо н≥ то вертаЇм об'Їкт
 	else return MemBlk;
 }
 
-SeedKernelCall SizeT Seed::Core::Exceptions::Exception::CurrentMemBlkCount() noexcept
+SizeT Seed::Core::Memory::ExceptionHeap::CurrentMemBlkCount() noexcept
 {
 	return ExceptionsHeap.AllocatedMemBlksCount;
 }
 
-SeedKernelCall SizeT Seed::Core::Exceptions::Exception::CurrentAllocatedMemory() noexcept
+SizeT Seed::Core::Memory::ExceptionHeap::CurrentAllocatedMemory() noexcept
 {
 	return ExceptionsHeap.AllocatedMemory;
+}
+
+SizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsage() noexcept
+{
+	return ExceptionsHeap.CurrentHeapSize;
 }
 
 #pragma warning(pop)

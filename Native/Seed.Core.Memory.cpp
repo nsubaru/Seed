@@ -3,23 +3,41 @@
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"
 
+#include "Seed.Core.SettingsAPI.h"
+
+#include "Seed.Core.Exceptions.h"
+
+#define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
 
+///<summary>Інформація про кучі</summary>
+struct
+{
+	///<summary>Дескриптор кучі</summary>
+	Seed::Handle HeapHandle;
+	///<summary>Поточне використання кучі</summary>
+	Seed::SizeT AllocatedMemory;
+	///<summary>Поточна кількість виділених блоків</summary>
+	Seed::SizeT AllocatedMemBlksCount;
+	///<summary>Фактичне використання пам'яті кучею</summary>
+	Seed::SizeT CurrentHeapSize;
+} HeapData, SecureHeapData;
+
 Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 {
-	HeapHandle = RtlCreateHeap(
+	HeapData.HeapHandle = RtlCreateHeap(
 		HEAP_GROWABLE,
 		NULL,
 		10 * 1024 * 1024,
 		0,
 		NULL,
 		NULL);
-	if (HeapHandle == nullptr)
+	if (HeapData.HeapHandle == nullptr)
 		return False;
-	AllocatedMemBlksCount = AllocatedMemory = CurrentHeapSize = 0;
+	HeapData.AllocatedMemBlksCount = HeapData.AllocatedMemory = HeapData.CurrentHeapSize = 0;
 	return True;
 }
 
@@ -27,28 +45,28 @@ void Seed::Core::Memory::Heap::Stop() noexcept
 {
 	//if (AllocatedMemBlksCount > 0)
 	//	toKernelLog(L"Попередження: виявлено утічку пам'яті в стандартній кучі");
-	RtlDestroyHeap(HeapHandle);
+	RtlDestroyHeap(HeapData.HeapHandle);
 }
 
 SeedKernelCall void * Seed::Core::Memory::Heap::Allocate(Seed::SizeT Size)
 {
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max::SizeT)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, this->AllocatedMemory, this->AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі
-	SizeT * obj = (SizeT*)RtlAllocateHeap(this->HeapHandle, 0, FullSize);
+	SizeT * obj = (SizeT*)RtlAllocateHeap(HeapData.HeapHandle, 0, FullSize);
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, this->AllocatedMemory, this->AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
 	//Записуєм розмір ділянки в заголовок
 	obj[0] = Size;
 	//Атомарно оновлюєм статистику
-	InterlockedIncrementSizeTNoFence(&this->AllocatedMemBlksCount);
-	InterlockedExchangeAddSizeT(&this->AllocatedMemory, Size);
-	InterlockedExchangeAddSizeT(&this->CurrentHeapSize, FullSize);
+	InterlockedIncrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
+	InterlockedExchangeAddSizeT(&HeapData.AllocatedMemory, Size);
+	InterlockedExchangeAddSizeT(&HeapData.CurrentHeapSize, FullSize);
 	//Вертаєм покажчик на ділянку після заголовку
 	return obj + 1;
 }
@@ -63,11 +81,11 @@ SeedKernelCall void * Seed::Core::Memory::Heap::AllignedAllocate(Seed::SizeT Siz
 	//Виділяєм ділянку більшу для того щоб помістити розмір і реальний початок ділянки пам'яті
 	//Також враховуєм що ділянка може бути не вирівнена тому додаєм AllocationReq до розміру,
 	//щоб гарантувати щоб вирівнений адрес знайдеться в ділянці
-	void * obj = RtlAllocateHeap(this->HeapHandle, 0, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
+	void * obj = RtlAllocateHeap(HeapData.HeapHandle, 0, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
 	//Якщо функція вернула nullptr то це значить що або розмір завеликий або пам'яті немає
 	//В обох випадках генеруєм помилку OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, this->AllocatedMemory, this->AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
 	//Вираховуєм мінімальний можливий адресс початку даних в ділянці пам'яті
 	SizeT Address = ((SizeT)obj) + sizeof(SizeT) + sizeof(SizeT); //-V119
 	//Вираховуєм точний адресс початку ділянки
@@ -79,9 +97,9 @@ SeedKernelCall void * Seed::Core::Memory::Heap::AllignedAllocate(Seed::SizeT Siz
 	//Та розмір даних
 	RealPtr[1] = Size;
 	//Атомарно оновлюєм статитистику
-	InterlockedIncrementSizeTNoFence(&this->AllocatedMemBlksCount);
-	InterlockedExchangeAddSizeT(&this->AllocatedMemory, Size);
-	InterlockedExchangeAddSizeT(&this->CurrentHeapSize, Size + Size + sizeof(SizeT) + sizeof(SizeT));
+	InterlockedIncrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
+	InterlockedExchangeAddSizeT(&HeapData.AllocatedMemory, Size);
+	InterlockedExchangeAddSizeT(&HeapData.CurrentHeapSize, Size + Size + sizeof(SizeT) + sizeof(SizeT));
 	//Вертаєм покажчик на початок даних
 	return (void*)AllignedAddress;
 }
@@ -97,11 +115,11 @@ SeedKernelCall void * Seed::Core::Memory::Heap::Free(void * MemBlk)
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + DataSize;
 	//Пробуєм звільнити пам'ять
-	if (RtlFreeHeap(this->HeapHandle, 0, RealPtr)) {
+	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//Якщо вдало то оновлюєм статистику
-		InterlockedDecrementSizeTNoFence(&this->AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&this->AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&this->CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
+		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointExeption
@@ -121,29 +139,44 @@ SeedKernelCall void * Seed::Core::Memory::Heap::AllignedFree(void * MemBlk, Seed
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + sizeof(SizeT) + AllocationReq + DataSize;
 	//Пробуєм звільнити ділянку пам'яті
-	if (RtlFreeHeap(this->HeapHandle, 0, RealPtr)) {
+	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//Якшо успішно то оновлюєм статистику
-		InterlockedDecrementSizeTNoFence(&this->AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&this->AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&this->CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
+		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointExeption
 	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
 }
 
+Seed::SizeT Seed::Core::Memory::Heap::CurrentMemBlkCount() noexcept
+{
+	return HeapData.AllocatedMemBlksCount;
+}
+
+Seed::SizeT Seed::Core::Memory::Heap::CurrentAllocatedMemory() noexcept
+{
+	return HeapData.AllocatedMemory;
+}
+
+Seed::SizeT Seed::Core::Memory::Heap::CurrentHeapUsage() noexcept
+{
+	return HeapData.CurrentHeapSize;
+}
+
 Seed::Boolean Seed::Core::Memory::SecuredHeap::Init() noexcept
 {
-	HeapHandle = RtlCreateHeap(
+	SecureHeapData.HeapHandle = RtlCreateHeap(
 		HEAP_GROWABLE | HEAP_ZERO_MEMORY,
 		NULL,
 		2 * 1024 * 1024,
 		0,
 		NULL,
 		NULL);
-	if (HeapHandle == nullptr)
+	if (SecureHeapData.HeapHandle == nullptr)
 		return False;
-	AllocatedMemBlksCount = AllocatedMemory = CurrentHeapSize = 0;
+	SecureHeapData.AllocatedMemBlksCount = SecureHeapData.AllocatedMemory = SecureHeapData.CurrentHeapSize = 0;
 	return True;
 }
 
@@ -151,28 +184,28 @@ void Seed::Core::Memory::SecuredHeap::Stop() noexcept
 {
 	//if (AllocatedMemBlksCount > 0)
 	//	toKernelLog(L"Попередження: виявлено утічку пам'яті в захищеній кучі");
-	RtlDestroyHeap(HeapHandle);
+	RtlDestroyHeap(SecureHeapData.HeapHandle);
 }
 
 DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Core::Memory::SecuredHeap::Allocate(Seed::SizeT Size)
 {
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max::SizeT)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, this->AllocatedMemory, this->AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі і вказуєм системі обнулити ділянку пам'яті
-	SizeT * obj = (SizeT*)RtlAllocateHeap(this->HeapHandle, HEAP_ZERO_MEMORY, FullSize);
+	SizeT * obj = (SizeT*)RtlAllocateHeap(SecureHeapData.HeapHandle, HEAP_ZERO_MEMORY, FullSize);
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, this->AllocatedMemory, this->AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
 	//Записуєм розмір ділянки в заголовок
 	obj[0] = Size;
 	//Атомарно оновлюєм статистику
-	InterlockedIncrementSizeTNoFence(&this->AllocatedMemBlksCount);
-	InterlockedExchangeAddSizeT(&this->AllocatedMemory, Size);
-	InterlockedExchangeAddSizeT(&this->CurrentHeapSize, FullSize);
+	InterlockedIncrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
+	InterlockedExchangeAddSizeT(&SecureHeapData.AllocatedMemory, Size);
+	InterlockedExchangeAddSizeT(&SecureHeapData.CurrentHeapSize, FullSize);
 	//Вертаєм покажчик на ділянку після заголовку
 	return obj + 1;
 }
@@ -188,11 +221,11 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Cor
 	//Також враховуєм що ділянка може бути не вирівнена тому додаєм AllocationReq до розміру,
 	//щоб гарантувати щоб вирівнений адрес знайдеться в ділянці
 	//Вказуєм системі обнулити ділянку пам'яті пееред виділенням
-	void * obj = RtlAllocateHeap(this->HeapHandle, HEAP_ZERO_MEMORY, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
+	void * obj = RtlAllocateHeap(SecureHeapData.HeapHandle, HEAP_ZERO_MEMORY, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
 	//Якщо функція вернула nullptr то це значить що або розмір завеликий або пам'яті немає
 	//В обох випадках генеруєм помилку OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, this->AllocatedMemory, this->AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
 	//Вираховуєм мінімальний можливий адресс початку даних в ділянці пам'яті
 	SizeT Address = ((SizeT)obj) + sizeof(SizeT) + sizeof(SizeT); //-V119
 	//Вираховуєм точний адресс початку ділянки
@@ -204,9 +237,9 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Cor
 	//Та розмір даних
 	RealPtr[1] = Size;
 	//Атомарно оновлюєм статитистику
-	InterlockedIncrementSizeTNoFence(&this->AllocatedMemBlksCount);
-	InterlockedExchangeAddSizeT(&this->AllocatedMemory, Size);
-	InterlockedExchangeAddSizeT(&this->CurrentHeapSize, Size + Size + sizeof(SizeT) + sizeof(SizeT));
+	InterlockedIncrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
+	InterlockedExchangeAddSizeT(&SecureHeapData.AllocatedMemory, Size);
+	InterlockedExchangeAddSizeT(&SecureHeapData.CurrentHeapSize, Size + Size + sizeof(SizeT) + sizeof(SizeT));
 	//Вертаєм покажчик на початок даних
 	return (void*)AllignedAddress;
 }
@@ -224,11 +257,11 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Cor
 	//Обнулюєм ділянку пам'яті
 	RtlSecureZeroMemory(MemBlk, DataSize);
 	//Пробуєм звільнити пам'ять
-	if (RtlFreeHeap(this->HeapHandle, 0, RealPtr)) {
+	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//Якщо вдало то оновлюєм статистику
-		InterlockedDecrementSizeTNoFence(&this->AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&this->AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&this->CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointExeption
@@ -250,16 +283,31 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Cor
 	//Обнулюєм ділянку пам'яті
 	RtlSecureZeroMemory(MemBlk, DataSize);
 	//Пробуєм звільнити ділянку пам'яті
-	if (RtlFreeHeap(this->HeapHandle, 0, RealPtr)) {
+	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//Якшо успішно то оновлюєм статистику
-		InterlockedDecrementSizeTNoFence(&this->AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&this->AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&this->CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointExeption
 	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
 
+}
+
+Seed::SizeT Seed::Core::Memory::SecuredHeap::CurrentMemBlkCount() noexcept
+{
+	return SecureHeapData.AllocatedMemBlksCount;
+}
+
+Seed::SizeT Seed::Core::Memory::SecuredHeap::CurrentAllocatedMemory() noexcept
+{
+	return SecureHeapData.AllocatedMemory;
+}
+
+Seed::SizeT Seed::Core::Memory::SecuredHeap::CurrentHeapUsage() noexcept
+{
+	return SecureHeapData.CurrentHeapSize;
 }
 
 #pragma intrinsic(memcpy)
@@ -286,13 +334,7 @@ Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {
 
 Seed::Boolean Seed::Core::Memory::Init()
 {
-	if (!Memory::Heap::Init())
-		return false;
-	if (!Memory::SecuredHeap::Init())
-	{
-		Memory::Heap::Stop();
-		return false;
-	}
+	
 	//toKernelLog(L"Підсистема оперативної пам'яті ініціалізована");
 	return true;
 }

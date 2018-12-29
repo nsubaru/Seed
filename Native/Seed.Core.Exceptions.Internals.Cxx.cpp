@@ -1,11 +1,13 @@
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Exceptions.h"
 
-#include "Seed.Core.Base.NTAPI.h"
 #include "Seed.Core.Exceptions.Internals.h"
 #include "Seed.Core.Exceptions.Internals.SEH.h"
 
 #include "typeinfo"
+
+#define SEED_RT_ALLOW_INTERNAL_NT_API
+#include "Seed.Core.Base.NTAPI.h"
 
 __declspec(thread) tls_exeption_info_t ThreadExceptionInfo;
 
@@ -139,7 +141,7 @@ void FrameUnwindToState(
 					GetByOffset<UnwindMapEntry>(pFuncInfo->dispUnwindMap, UnwindImageBase)->action,
 					UnwindImageBase);
 				//If not null
-				if (pAction != nullptr) {
+				if ((SizeT)pAction != UnwindImageBase) {
 
 					// Before calling unwind action, adjust state as if it were
 					// already completed:
@@ -678,20 +680,17 @@ int BuildCatchObjectHelperInternal(
 					pConv->thisDisplacement);
 			}
 			else {
-				throwInternalError(ExeptionPosition);
-				//TODO:terminate(); // Does not return; TKB
+				throwInternalError(ExceptionPosition);
 			}
 		}
 		else {
-			__DestructExceptionObject(pExcept, TRUE, 1);   // destroy the original object
-			throwInternalError(ExeptionPosition);
+			__DestructExceptionObject(pExcept, TRUE, 1);  
+			throwInternalError(ExceptionPosition);
 		}
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER) {
-		// Something went wrong when building the catch object.
-		//TODO: terminate();
 		__DestructExceptionObject(pExcept, TRUE, 1);   // destroy the original object
-		throwInternalError(ExeptionPosition);
+		throwInternalError(ExceptionPosition);
 	}
 
 	return retval;
@@ -707,7 +706,7 @@ __forceinline void  _CallMemberFunction2(void *const pthis, void *const pmfn, vo
 	((void(__vectorcall *)(void *const, void *const, UInt64))pmfn)(pthis, pthat, (unsigned int)val2);
 }
 
-void BuildCatchObject(
+inline void BuildCatchObject(
 	EHExceptionRecord *pExcept,
 	void *pRN,
 	HandlerType *pCatch,
@@ -715,41 +714,10 @@ void BuildCatchObject(
 )
 {
 	void **pCatchBuffer;
-	if (false)
-	{
-		;
-	}
-	else
-	{
-		pCatchBuffer = GetByOffset<void*>((SizeT)pRN, pCatch->dispCatchObj);
-	}
 
-//	__try {
+	pCatchBuffer = GetByOffset<void*>((SizeT)pRN, pCatch->dispCatchObj);
+
 	BuildCatchObjectHelperInternal(pExcept, pRN, pCatch, pConv);
-		/*switch (BuildCatchObjectHelperInternal(pExcept, pRN, pCatch, pConv))
-		{
-		case 1:
-			_CallMemberFunction1((char *)pCatchBuffer,
-				GetByOffset<void>((SizeT)pExcept->params.pThrowImageBase, pConv->copyFunction),
-				__AdjustPointer(pExcept->params.pExceptionObject,
-					pConv->thisDisplacement));
-			break;
-		case 2:
-			_CallMemberFunction2((char *)pCatchBuffer,
-				GetByOffset<void>((SizeT)pExcept->params.pThrowImageBase, pConv->copyFunction),
-				__AdjustPointer(pExcept->params.pExceptionObject,
-					pConv->thisDisplacement), 1);
-			break;
-		case 0:
-			break;
-		default:
-			break;
-		}*/
-//	}
-//	__except (EXCEPTION_EXECUTE_HANDLER) {
-//		// Something went wrong when building the catch object.
-//		//TODO: terminate();
-//	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -963,7 +931,7 @@ void FindHandler(
 
 		if (ThreadExceptionInfo._curexception == nullptr) {
 			// Oops!  User re-threw a non-existent exception!  Let it propagate.
-			Throw(InternalError(ExeptionPosition));
+			Throw(InternalError(ExceptionPosition));
 		}
 
 		pExcept = (EHExceptionRecord*)ThreadExceptionInfo._curexception;
@@ -1007,7 +975,7 @@ void FindHandler(
 
 					__DestructExceptionObject(pExcept, TRUE, 1);   // destroy the original object
 
-					Throw(BadException(ExeptionPosition));
+					Throw(BadException(ExceptionPosition));
 				}
 				else
 				{
@@ -1165,7 +1133,7 @@ void FindHandler(
 
 				// Two choices here: we could let the new exception take over, or we could abort. We abort.
 
-				Throw(InternalError(ExeptionPosition));
+				Throw(InternalError(ExceptionPosition));
 			}
 		}
 	} // It wasn't our exception
