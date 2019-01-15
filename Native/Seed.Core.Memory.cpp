@@ -7,6 +7,8 @@
 
 #include "Seed.Core.Exceptions.h"
 
+#include "Seed.Core.CoreLog.h"
+
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
@@ -43,13 +45,15 @@ Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 
 void Seed::Core::Memory::Heap::Stop() noexcept
 {
-	//if (AllocatedMemBlksCount > 0)
-	//	toKernelLog(L"Попередження: виявлено утічку пам'яті в стандартній кучі");
+	if (HeapData.AllocatedMemBlksCount > 0)
+		toCoreLog(L"Попередження: виявлено утічку пам'яті в стандартній кучі");
 	RtlDestroyHeap(HeapData.HeapHandle);
 }
 
-void * Seed::Core::Memory::Heap::GenericAllocate(Seed::SizeT Size)
+void * GenericAllocate(Seed::SizeT Size)
 {
+	using namespace Seed;
+	using namespace Seed::Memory;
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max::SizeT)
 		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
@@ -71,8 +75,10 @@ void * Seed::Core::Memory::Heap::GenericAllocate(Seed::SizeT Size)
 	return obj + 1;
 }
 
-void * Seed::Core::Memory::Heap::GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
+void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
+	using namespace Seed;
+	using namespace Seed::Memory;
 	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне, 
 	//а отже викликаєм просте виділення пам'яті
 	if (AllocationReq == 0 || AllocationReq == 1)
@@ -104,8 +110,10 @@ void * Seed::Core::Memory::Heap::GenericAllignedAllocate(Seed::SizeT Size, Seed:
 	return (void*)AllignedAddress;
 }
 
-void * Seed::Core::Memory::Heap::GenericFree(void * MemBlk)
+void * GenericFree(void * MemBlk)
 {
+	using namespace Seed;
+	using namespace Seed::Memory;
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
@@ -126,8 +134,10 @@ void * Seed::Core::Memory::Heap::GenericFree(void * MemBlk)
 	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
 }
 
-void * Seed::Core::Memory::Heap::GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
+void * GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 {
+	using namespace Seed;
+	using namespace Seed::Memory;
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
@@ -182,8 +192,8 @@ Seed::Boolean Seed::Core::Memory::SecuredHeap::Init() noexcept
 
 void Seed::Core::Memory::SecuredHeap::Stop() noexcept
 {
-	//if (AllocatedMemBlksCount > 0)
-	//	toKernelLog(L"Попередження: виявлено утічку пам'яті в захищеній кучі");
+	if (SecureHeapData.AllocatedMemBlksCount > 0)
+		toCoreLog(L"Попередження: виявлено утічку пам'яті в захищеній кучі");
 	RtlDestroyHeap(SecureHeapData.HeapHandle);
 }
 
@@ -335,7 +345,7 @@ Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {
 Seed::Boolean Seed::Core::Memory::Init()
 {
 	
-	//toKernelLog(L"Підсистема оперативної пам'яті ініціалізована");
+	toCoreLog(L"Підсистема оперативної пам'яті ініціалізована");
 	return true;
 }
 
@@ -343,7 +353,7 @@ void Seed::Core::Memory::Stop()
 {
 	Memory::SecuredHeap::Stop();
 	Memory::Heap::Stop();
-	///toKernelLog(L"Підсистема оперативної пам'яті зупинена успішно");
+	toCoreLog(L"Підсистема оперативної пам'яті зупинена успішно");
 }
 
 void Seed::Core::Stop::MemoryManagment() noexcept
