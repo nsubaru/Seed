@@ -167,4 +167,36 @@ Double Seed::Core::Details::RuntimeSqrt(Double X)
 	return sqrt(X);
 }
 
+Seed::Float Seed::Core::Details::Ceil(Seed::Float X)
+{
+	return ceil(X);
+}
+
+Seed::Double Seed::Core::Details::Ceil(Seed::Double X)
+{
+	return ceil(X);
+}
+
+Seed::Float Seed::Core::Details::Floor(Seed::Float X)
+{
+	return floor(X);
+}
+
+Seed::Double Seed::Core::Details::Floor(Seed::Double X)
+{
+	return floor(X);
+}
+
+Seed::Float Seed::Core::Details::ModD(Seed::Float In, Seed::Float & Part)
+{
+	Part = floor(In);
+	return RuntimeAbs(Part - In);
+}
+
+Seed::Double Seed::Core::Details::ModD(Seed::Double In, Seed::Double & Part)
+{
+	Part = floor(In);
+	return RuntimeAbs(Part - In);
+}
+
 #pragma warning(pop)

@@ -212,9 +212,15 @@ namespace Seed {
 				return ((*D.I) & ((Seed::Int64)1 << 63));
 			}
 
-			__forceinline Seed::Float Ceil(Seed::Float X) {
-				
-			}
+			Seed::Float Ceil(Seed::Float X);
+			Seed::Double Ceil(Seed::Double X);
+
+			Seed::Float Floor(Seed::Float X);
+			Seed::Double Floor(Seed::Double X);
+
+			Seed::Float ModD(Seed::Float In, Seed::Float & Part);
+			Seed::Double ModD(Seed::Double In, Seed::Double & Part);
+
 		}
 	}
 }

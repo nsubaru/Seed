@@ -41,6 +41,9 @@ namespace Seed {
 		///<summary>Розмірний тип</summary>
 		inline namespace { using SizeT = size_t; }
 
+		///<summary>Кількість байт</summary>
+		inline namespace { using Bytes = size_t; }
+
 		static_assert(sizeof(char16_t) == sizeof(wchar_t), "Помилка розмір char16_t не є рівний wchar_t");
 		///<summary>Символ в кодувані UTF-16LE</summary>
 		inline namespace { using Char = wchar_t; using UChar = wchar_t; }
@@ -90,4 +93,21 @@ __forceinline constexpr const Seed::Core::CharStr const operator "" U(const wcha
 	using namespace Seed;
 	return (const CharStr const)Text;
 }
+
+__forceinline constexpr Seed::Core::Bytes operator "" Kb(unsigned long long Size) {
+	using namespace Seed;
+	return Size * 1024;
+}
+
+__forceinline constexpr Seed::Core::Bytes operator "" Mb(unsigned long long Size) {
+	using namespace Seed;
+	return Size * 1024Kb;
+}
+
+__forceinline constexpr Seed::Core::Bytes operator "" Gb(unsigned long long Size) {
+	using namespace Seed;
+	return Size * 1024Mb;
+}
 #pragma warning(pop)
+
+#define interface __interface

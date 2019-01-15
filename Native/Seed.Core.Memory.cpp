@@ -48,7 +48,7 @@ void Seed::Core::Memory::Heap::Stop() noexcept
 	RtlDestroyHeap(HeapData.HeapHandle);
 }
 
-SeedKernelCall void * Seed::Core::Memory::Heap::Allocate(Seed::SizeT Size)
+void * Seed::Core::Memory::Heap::GenericAllocate(Seed::SizeT Size)
 {
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max::SizeT)
@@ -71,12 +71,12 @@ SeedKernelCall void * Seed::Core::Memory::Heap::Allocate(Seed::SizeT Size)
 	return obj + 1;
 }
 
-SeedKernelCall void * Seed::Core::Memory::Heap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
+void * Seed::Core::Memory::Heap::GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
 	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне, 
 	//а отже викликаєм просте виділення пам'яті
 	if (AllocationReq == 0 || AllocationReq == 1)
-		return Allocate(Size);
+		return GenericAllocate(Size);
 	//Пробуєм виділити пам'ять з кучі
 	//Виділяєм ділянку більшу для того щоб помістити розмір і реальний початок ділянки пам'яті
 	//Також враховуєм що ділянка може бути не вирівнена тому додаєм AllocationReq до розміру,
@@ -104,7 +104,7 @@ SeedKernelCall void * Seed::Core::Memory::Heap::AllignedAllocate(Seed::SizeT Siz
 	return (void*)AllignedAddress;
 }
 
-SeedKernelCall void * Seed::Core::Memory::Heap::Free(void * MemBlk)
+void * Seed::Core::Memory::Heap::GenericFree(void * MemBlk)
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
@@ -126,7 +126,7 @@ SeedKernelCall void * Seed::Core::Memory::Heap::Free(void * MemBlk)
 	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
 }
 
-SeedKernelCall void * Seed::Core::Memory::Heap::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
+void * Seed::Core::Memory::Heap::GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
@@ -187,7 +187,7 @@ void Seed::Core::Memory::SecuredHeap::Stop() noexcept
 	RtlDestroyHeap(SecureHeapData.HeapHandle);
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Core::Memory::SecuredHeap::Allocate(Seed::SizeT Size)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::Allocate(Seed::SizeT Size)
 {
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max::SizeT)
@@ -210,7 +210,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Cor
 	return obj + 1;
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Core::Memory::SecuredHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
 	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне, 
 	//а отже викликаєм просте виділення пам'яті
@@ -244,7 +244,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Cor
 	return (void*)AllignedAddress;
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Core::Memory::SecuredHeap::Free(void * MemBlk)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::Free(void * MemBlk)
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
@@ -268,7 +268,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Cor
 	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Seed::Core::Memory::SecuredHeap::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
@@ -311,7 +311,7 @@ Seed::SizeT Seed::Core::Memory::SecuredHeap::CurrentHeapUsage() noexcept
 }
 
 #pragma intrinsic(memcpy)
-DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void Seed::Core::Memory::Copy(
+DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::Copy(
 	_In_reads_(Size) const void * Source,
 	_Out_writes_all_(Size) void * Destination,
 	Seed::SizeT Size)
@@ -320,7 +320,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void Seed::Core:
 }
 
 #pragma intrinsic(memset)
-DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void Seed::Core::Memory::MemBlkFill(
+DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::MemBlkFill(
 	_Out_writes_bytes_all_(Size) void * MemBlk,
 	Seed::SizeT Size,
 	_In_ const Seed::Byte Filler)

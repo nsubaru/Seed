@@ -147,9 +147,19 @@ namespace Seed {
 				else
 					return Details::RuntimeAbs(Val);
 			}
+			
+			__forceinline constexpr Boolean GetNumberByPos(const UInt64 Number, const UInt8 Pos) {
+				return Number % Pow(10ULL, Pos + 1) / Pow(10ULL, Pos + 1);
+			}
 
-			__forceinline constexpr Float Ceil(Float Val);
-			__forceinline constexpr Double Ceil(Double Val);
+			__forceinline constexpr Float Ceil(Float Val) { return Details::Ceil(Val); }
+			__forceinline constexpr Double Ceil(Double Val) { return Details::Ceil(Val); }
+
+			__forceinline constexpr Float Floor(Float Val) { return Details::Floor(Val); }
+			__forceinline constexpr Double Floor(Double Val) { return Details::Floor(Val); }
+
+			__forceinline constexpr Double ModD(Double Val, Double & IntPart) { return Details::ModD(Val, IntPart); }
+			__forceinline constexpr Float ModD(Float Val, Float & IntPart) { return Details::ModD(Val, IntPart); }
 
 			__forceinline constexpr Float Log2(Float X);
 			__forceinline constexpr Double Log2(Double X);

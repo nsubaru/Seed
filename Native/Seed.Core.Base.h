@@ -6,6 +6,7 @@
 #include "Seed.Core.Base.CStr.h"
 #include "Seed.Core.Base.Swap.h"
 #include "Seed.Core.Base.StaticAsserts.h"
+#include "Seed.Core.Base.UUID.h"
 
 ///<summary>Якщо визначено SeedKernel то всі виклики 
 ///позначенні SeedKernelCall будуть експортуватись з виконавчого файла
@@ -13,9 +14,10 @@
 #ifdef SeedKernel
 ///<summary>Системний виклик який експортується з ядра Рем</summary>
 #define SeedKernelCall __declspec(dllexport)
+///<summary>Сигнатура статичного конструктор зміної</summary>
+namespace { typedef void(__cdecl *PF)(void); }
 
-typedef void(__cdecl *PF)(void);
-
+///<summary>Сигнатура декструктора статичних зміних</summary>
 extern int __cdecl DestroyStaticVariables(PF pf);
 
 #pragma warning(push)
@@ -23,10 +25,18 @@ extern int __cdecl DestroyStaticVariables(PF pf);
 #pragma init_seg("INIT$b", DestroyStaticVariables)  
 #define INIT
 #pragma warning(pop)
+///<summary>Експортує але в межах ядра замість виклику підставляє тіло функції</summary>
+///<param name = 'FuncSig'>Сигнатура функції</param>
+///<param name = 'Body'>Тіло функції</param>
+#define OptimizeExport(FunctSig, Body) SeedKernelCall __forceinline FunctSig Body
 
 #else
 ///<summary>Системний виклик який імпортується з ядра Рем</summary>
 #define SeedKernelCall __declspec(dllimport)
+///<summary>Імпортує як явний виклик</summary>
+///<param name = 'FuncSig'>Сигнатура функції</param>
+///<param name = 'Body'>Тіло функції</param>
+#define OptimizeExport(FunctSig, Body) SeedKernelCall FunctSig;
 #endif
 ///<summary>Не рекомендована функція</summary>
 ///<param name = 'Why'>Причина</param>
@@ -44,17 +54,20 @@ extern int __cdecl DestroyStaticVariables(PF pf);
 ///Дефайн додає конструктор та оператор копіювання і переміщення та деструктор
 ///</remarks>
 #define RefCountClass(ClassName, This, OnDestroy) \
-ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
-ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
-ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
-ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(std::move(From)); return *this; }; \
-~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {OnDestroy;delete This;}This = nullptr;}}
+__forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
+__forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
+__forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
+__forceinline ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
+__forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {OnDestroy;delete This;}This = nullptr;}};
 
-
+///<summary>Властивість яка можна лиш читати</summary>
 #define __Property1(Getter) __declspec( property( get=Getter) ) 
-#define __Property2(Getter, Setter) __declspec( property( get=Getter, set=Setter ) )  
+///<summary>Властивість яку можна і читати і записувати</summary>
+#define __Property2(Getter, Setter) __declspec( property( get=Getter, put=Setter ) )  
 
 #define __Property_GET_MACRO(_1,_2,NAME,...) NAME
+///<summary>Властивість яку можна читати або читати якщо дано лиш гетер і записувати якщо є гетер і сетер</summary>
+///<param name = '__VA_ARGS__'>Гетер або гетер і сетер</param>
 #define Property(...) __Property_GET_MACRO(__VA_ARGS__, __Property2, __Property1)(__VA_ARGS__)
 
 ///<summary>Головний простір імен</summary>
@@ -65,19 +78,26 @@ namespace Seed {
 		class SeedKernelCall RefCountT {
 		private:
 			///<summary>Містить значення</summary>
-			volatile SizeT Count;
+			volatile SizeT count;
+		protected:
 		public:
+			///<summary>Гетер</summary>
+			///<returns>Значення лічильника</returns>
+			SizeT GetValue() { return count; }
+			///<summary>Поточне значення лічильника</summary>
+			///<value>Значення лічильника</value>
+			Property(GetValue) SizeT Count;
 			///<summary>Конструктор з <code>SizeT</code></summary>
 			///<param name='Count'>Початкове значення</param>
 			__forceinline RefCountT(SizeT Count = 0) noexcept :
-				Count(Count) {};
+				count(Count) {};
 
 			///<summary>Префіксний інкремент
 			///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
 			///</summary>
 			///<returns>Вертає силку на елемент після інкременту</returns>
 			__forceinline RefCountT & operator++() {
-				this->Count++;
+				this->count++;
 				return *this;
 			}
 
@@ -87,7 +107,7 @@ namespace Seed {
 			///<returns>Вертає копію об'єкта до інкремента</returns>
 			__forceinline RefCountT operator++(int) {
 				auto cp = *this;
-				++this->Count;
+				++this->count;
 				return cp;
 			}
 
@@ -96,7 +116,7 @@ namespace Seed {
 			///</summary>
 			///<returns>Вертає силку на елемент після декременту</returns>
 			__forceinline RefCountT & operator--() {
-				this->Count--;
+				this->count--;
 				return *this;
 			}
 
@@ -106,13 +126,13 @@ namespace Seed {
 			///<returns>Вертає копію об'єкта до декременту</returns>
 			__forceinline RefCountT operator--(int) {
 				auto cp = *this;
-				this->Count--;
+				this->count--;
 				return cp;
 			}
 
 			///<summary>Вертає значення в вигляді <code>SizeT<code> змінної</summary>
 			///<returns>Поточне значення об'єкта</returns>
-			__forceinline operator SizeT() const { return this->Count; }
+			__forceinline operator SizeT() const { return this->count; }
 		};
 
 		///<summary>Змінює порядок елементів в масиву Array</summary>
