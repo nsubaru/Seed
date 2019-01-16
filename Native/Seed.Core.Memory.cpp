@@ -50,10 +50,11 @@ void Seed::Core::Memory::Heap::Stop() noexcept
 	RtlDestroyHeap(HeapData.HeapHandle);
 }
 
+using namespace Seed;
+using namespace Seed::Memory;
+
 void * GenericAllocate(Seed::SizeT Size)
 {
-	using namespace Seed;
-	using namespace Seed::Memory;
 	//якщо розм≥р задано максимальне можливе значенн€ SizeT то це €вно помилка ≥ генеруЇм виключенн€ OutOfMemory
 	if (Size == Math::Max::SizeT)
 		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
@@ -77,8 +78,6 @@ void * GenericAllocate(Seed::SizeT Size)
 
 void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
-	using namespace Seed;
-	using namespace Seed::Memory;
 	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне, 
 	//а отже викликаЇм просте вид≥ленн€ пам'€т≥
 	if (AllocationReq == 0 || AllocationReq == 1)
@@ -112,8 +111,6 @@ void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 
 void * GenericFree(void * MemBlk)
 {
-	using namespace Seed;
-	using namespace Seed::Memory;
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
@@ -136,8 +133,6 @@ void * GenericFree(void * MemBlk)
 
 void * GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 {
-	using namespace Seed;
-	using namespace Seed::Memory;
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
