@@ -31,7 +31,7 @@ namespace Seed {
 			};
 
 			///<summary>Запису доступу</summary>
-			struct ACE : virtual Memory::Allocator<Memory::SecuredHeap> {
+			struct ACE : virtual Memory::Allocator<Memory::SensitiveDataHeap> {
 				///<summary>Користувач</summary>
 				UserIDType UserID;
 				///<summary>Класс запису</summary>
@@ -42,7 +42,7 @@ namespace Seed {
 				ACEMask Mask;
 			};
 
-			class SecurableObject : public virtual Memory::Allocator<Memory::SecuredHeap> {
+			class SecurableObject : public virtual Memory::Allocator<Memory::SensitiveDataHeap> {
 				struct Data {
 					void * SecurityDescriptor;
 					RefCountT RefCount;

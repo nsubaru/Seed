@@ -5,7 +5,6 @@ namespace Seed {
 	inline namespace Core {
 		///<summary>Простір імен функцій для роботи з C-подібними рядковими зміними</summary>
 		namespace CStr {
-
 #pragma inline_recursion(on)
 #pragma inline_depth(256)
 			///<summary>Compile-time функція визначення кількості сиволів в символьному масиві</summary>
@@ -113,6 +112,16 @@ namespace Seed {
 				for (SizeT i = 0; i < Str1Size; i++)
 					if (Str1[i] != Str2[i]) return false;
 				return true;
+			}
+
+			__forceinline Char ToUpcase(Char Symbol) {
+				extern Seed::Core::Char UpcaseCharImp(Seed::Core::Char symb);
+				return UpcaseCharImp(Symbol);
+			}
+
+			__forceinline Char ToDowncase(Char Symbol) {
+				extern Seed::Core::Char DowncaseCharImp(Seed::Core::Char symb);
+				return DowncaseCharImp(Symbol);
 			}
 		}
 	}

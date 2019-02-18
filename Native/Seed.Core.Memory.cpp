@@ -78,7 +78,7 @@ void * GenericAllocate(Seed::SizeT Size)
 
 void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
-	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне, 
+	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне,
 	//а отже викликаєм просте виділення пам'яті
 	if (AllocationReq == 0 || AllocationReq == 1)
 		return GenericAllocate(Size);
@@ -127,8 +127,8 @@ void * GenericFree(void * MemBlk)
 		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
-	//Якщо ні то генеруєм помилку NullPointExeption
-	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
+	//Якщо ні то генеруєм помилку NullPointException
+	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
 void * GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
@@ -151,8 +151,8 @@ void * GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
-	//Якщо ні то генеруєм помилку NullPointExeption
-	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
+	//Якщо ні то генеруєм помилку NullPointException
+	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
 Seed::SizeT Seed::Core::Memory::Heap::CurrentMemBlkCount() noexcept
@@ -170,7 +170,7 @@ Seed::SizeT Seed::Core::Memory::Heap::CurrentHeapUsage() noexcept
 	return HeapData.CurrentHeapSize;
 }
 
-Seed::Boolean Seed::Core::Memory::SecuredHeap::Init() noexcept
+Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 {
 	SecureHeapData.HeapHandle = RtlCreateHeap(
 		HEAP_GROWABLE | HEAP_ZERO_MEMORY,
@@ -185,14 +185,14 @@ Seed::Boolean Seed::Core::Memory::SecuredHeap::Init() noexcept
 	return True;
 }
 
-void Seed::Core::Memory::SecuredHeap::Stop() noexcept
+void Seed::Core::Memory::SensitiveDataHeap::Stop() noexcept
 {
 	if (SecureHeapData.AllocatedMemBlksCount > 0)
 		toCoreLog(L"Попередження: виявлено утічку пам'яті в захищеній кучі");
 	RtlDestroyHeap(SecureHeapData.HeapHandle);
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::Allocate(Seed::SizeT Size)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Allocate(Seed::SizeT Size)
 {
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max::SizeT)
@@ -215,9 +215,9 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Secu
 	return obj + 1;
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
-	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне, 
+	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне,
 	//а отже викликаєм просте виділення пам'яті
 	if (AllocationReq == 0 || AllocationReq == 1)
 		return Allocate(Size);
@@ -249,7 +249,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Secu
 	return (void*)AllignedAddress;
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::Free(void * MemBlk)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Free(void * MemBlk)
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
@@ -269,11 +269,11 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Secu
 		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
-	//Якщо ні то генеруєм помилку NullPointExeption
-	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
+	//Якщо ні то генеруєм помилку NullPointException
+	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SecuredHeap::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
@@ -295,22 +295,21 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Secu
 		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
-	//Якщо ні то генеруєм помилку NullPointExeption
-	else Throw(NullPointExeption(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointExeption::Types::Read));
-
+	//Якщо ні то генеруєм помилку NullPointException
+	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
-Seed::SizeT Seed::Core::Memory::SecuredHeap::CurrentMemBlkCount() noexcept
+Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentMemBlkCount() noexcept
 {
 	return SecureHeapData.AllocatedMemBlksCount;
 }
 
-Seed::SizeT Seed::Core::Memory::SecuredHeap::CurrentAllocatedMemory() noexcept
+Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentAllocatedMemory() noexcept
 {
 	return SecureHeapData.AllocatedMemory;
 }
 
-Seed::SizeT Seed::Core::Memory::SecuredHeap::CurrentHeapUsage() noexcept
+Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentHeapUsage() noexcept
 {
 	return SecureHeapData.CurrentHeapSize;
 }
@@ -339,14 +338,13 @@ Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {
 
 Seed::Boolean Seed::Core::Memory::Init()
 {
-	
 	toCoreLog(L"Підсистема оперативної пам'яті ініціалізована");
 	return true;
 }
 
 void Seed::Core::Memory::Stop()
 {
-	Memory::SecuredHeap::Stop();
+	Memory::SensitiveDataHeap::Stop();
 	Memory::Heap::Stop();
 	toCoreLog(L"Підсистема оперативної пам'яті зупинена успішно");
 }

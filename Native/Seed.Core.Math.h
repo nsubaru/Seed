@@ -1,6 +1,7 @@
 #pragma once
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Math.Imp.h"
+#include "Seed.Core.Math.SafeInt.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -8,6 +9,16 @@ namespace Seed {
 			inline constexpr Double Pi = Details::Pi;
 
 			__forceinline constexpr Double Pow(Double What, Double By) {
+				auto constexprLambda = [](Double What, Double Base, Double By) constexpr {
+					auto internalLambda = [&](Double What, Double Base, Double By) -> Double {
+						if (By == 1)
+							return What;
+						if (By == 0)
+							return 1;
+						return internalLambda(What*Base, Base, By - 1);
+					}
+					return internalLambda();
+				};
 				if constexpr (IS_CONSTEXPR(Details::ConstexprPow(What, What, By)))
 					return Details::ConstexprPow(What, What, By);
 				else
@@ -38,7 +49,6 @@ namespace Seed {
 				else
 					return Details::RuntimeSin(Rad);
 			}
-
 
 			__forceinline constexpr Double Cos(Double Rad) {
 				if constexpr (IS_CONSTEXPR(Details::ConstexprCos(Rad)))
@@ -147,7 +157,7 @@ namespace Seed {
 				else
 					return Details::RuntimeAbs(Val);
 			}
-			
+
 			__forceinline constexpr Boolean GetNumberByPos(const UInt64 Number, const UInt8 Pos) {
 				return Number % Pow(10ULL, Pos + 1) / Pow(10ULL, Pos + 1);
 			}

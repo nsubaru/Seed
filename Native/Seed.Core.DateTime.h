@@ -9,8 +9,6 @@ namespace Seed {
 		//Клас дати
 		class SeedKernelCall Date {
 		public:
-			//Перетворення в текстове представлення
-			void ConvertDataToText(CharStr buffer, SizeT Size) const;
 			//Окремі поля
 			UInt16 Year, Month, Week, Day, Hour, Minutes, Second, MiliSecond;
 			//Конструктор
@@ -51,8 +49,12 @@ namespace Seed {
 			friend DateTime operator-(DateTime time1, DateTime time2) { return time1.time_ms - time2.time_ms; }
 			//Вертає кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 			UInt64 GetMsFrom1600() { return time_ms; }
+			//Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
+			UInt64 Property(GetMsFrom1600) TimeFromStartEpoch;
 			//Вертає кількість 100 наносекудних інтервалів
-			UInt64 GetRelativeTime() { return -(Int64)time_ms; }
+			UInt64 GetAsRelativeTime() { return -(Int64)time_ms; }
+			//Кількість 100 наносекудних інтервалів
+			UInt64 Property(GetAsRelativeTime) GetRelatimeTime;
 			//Вертає поточний системний час
 			//по грінвінському часовому поясі
 			static DateTime GetCurrentSystemTimeData();

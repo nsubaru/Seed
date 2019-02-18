@@ -81,9 +81,8 @@ namespace Seed {
 				return Res;
 			}
 
-
 			__forceinline constexpr Double ConstexprPi(Double A = 1, Double  B = 1 / ConstexprSqrt(2), Double T = 1 / 4.0, Double P = 1, Double Res = 0) {
-				while(ConstexprAbs(A-B) != 0) {
+				while (ConstexprAbs(A - B) != 0) {
 					Res = A;
 					A = (Res + B) / 2.0;
 					B = ConstexprSqrt(Res * B);
@@ -103,7 +102,6 @@ namespace Seed {
 				}
 				return Res;
 			}
-
 
 			__forceinline constexpr Double ConstexprSin(Double X, Double Res = 0) {
 				for (int N = 0; N < 20; N++) {
@@ -157,7 +155,7 @@ namespace Seed {
 			Double RuntimeCos(Double X);
 
 			Double RuntimeTan(Double X);
-			
+
 			Double RuntimeCtan(Double X);
 
 			Double RuntimeASin(Double X);
@@ -170,7 +168,7 @@ namespace Seed {
 
 			Double RuntimeSqrt(Double X);
 
-			__forceinline Double RuntimeAbs(Float Val) {
+			__forceinline Float RuntimeAbs(Float Val) {
 				union {
 					Int32 * I;
 					Float * D;
@@ -212,6 +210,21 @@ namespace Seed {
 				return ((*D.I) & ((Seed::Int64)1 << 63));
 			}
 
+			__forceinline constexpr Seed::Int64 ConstexprCeil(Seed::Float X) {
+				return ConstexprPow(static_cast<Double>(2L), static_cast<Double>(2L), static_cast<Double>((sizeof(Seed::Int64) / 2) * 8)) -
+					Int64(ConstexprPow(static_cast<Double>(2L), static_cast<Double>(2L), (sizeof(Seed::Int64) / 2) * 8) - X);
+			}
+			static_assert(250L == ConstexprCeil(250.0f), "ConstexprCeil not work properly");
+			static_assert(251L == ConstexprCeil(250.5f), "ConstexprCeil not work properly");
+
+			__forceinline constexpr Seed::Int64 ConstexprFloor(Seed::Float X) {
+				return Int64(X + ConstexprPow(static_cast<Double>(2L), static_cast<Double>(2L), (sizeof(Seed::Int64) / 2) * 8)) -
+					ConstexprPow(static_cast<Double>(2L), static_cast<Double>(2L), (sizeof(Seed::Int64) / 2) * 8);
+			}
+
+			static_assert(250L == ConstexprFloor(250.0f), "ConstexprFloor not work properly");
+			static_assert(250L == ConstexprFloor(250.5f), "ConstexprFloor not work properly");
+
 			Seed::Float Ceil(Seed::Float X);
 			Seed::Double Ceil(Seed::Double X);
 
@@ -220,7 +233,6 @@ namespace Seed {
 
 			Seed::Float ModD(Seed::Float In, Seed::Float & Part);
 			Seed::Double ModD(Seed::Double In, Seed::Double & Part);
-
 		}
 	}
 }

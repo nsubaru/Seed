@@ -20,11 +20,11 @@ namespace Seed {
 		}
 
 		///<summary>Провірка біта під індексом bitIndex в байті b</summary>
-		///<`param name='b'> Байт в якому треба виставити біт</param>
+		///<param name='b'> Байт в якому треба виставити біт</param>
 		///<param name='bitIndex> Номер біта від нуля</param>
 		///<returns>True якщо 1, якщо 0 False</returns>
 		///<remarks>порядок bigEndian</remarks>
-		constexpr __forceinline Boolean BitCheck(Byte & b, SizeT bitIndex) { //-V669
+		constexpr __forceinline Boolean BitCheck(const Byte b, SizeT bitIndex) { //-V669
 			return (b & (1 << bitIndex)) == 1;
 		}
 	}

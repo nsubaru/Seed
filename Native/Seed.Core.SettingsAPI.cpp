@@ -13,7 +13,6 @@
 using namespace Seed;
 using namespace Seed::Settings;
 
-
 namespace Seed {
 	inline namespace Core {
 		Boolean isFirstStartup = false;
@@ -147,7 +146,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 		}
 		else if (!NT_SUCCESS(status)) {
 			return false;
-		} 
+		}
 		else {
 			toCoreLog(L"First start. Use default configs.");
 			Settings::CurrentSettings = Settings::Default::InitDefaultSettings();

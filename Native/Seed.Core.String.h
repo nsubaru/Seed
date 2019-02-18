@@ -4,6 +4,9 @@
 #include "Seed.Core.SettingsAPI.h"
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Exceptions.h"
+#include "Seed.Core.DateTime.h"
+#include "Seed.Core.Containers.Array.h"
+#include "Seed.Core.Containers.List.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -12,12 +15,19 @@ namespace Seed {
 			SizeT requiredSize;
 		public:
 			StringToLong(const AChar * File, const AChar * FunctName, SizeT Line, SizeT RequiredSize) :
-				Exception(File, FunctName, Line, L"Seed::StringToLong"), requiredSize(RequiredSize) {}
+				Exception(File, FunctName, Line, L"String to long"), requiredSize(RequiredSize) {}
 
 			SizeT GetRequiredSize() { return requiredSize; }
-			
+
 			SizeT Property(GetRequiredSize) RequiredSize;
 		};
+
+		class SeedKernelCall InvalidNumberFormatException : public Exception {
+		public:
+			InvalidNumberFormatException(const AChar * File, const AChar * FunctName, SizeT Line) :
+				Exception(File, FunctName, Line, L"Invalid integer exception") {}
+		};
+
 #pragma warning(push)
 #pragma warning(disable: 4996)
 		template<class Base>
@@ -52,13 +62,20 @@ namespace Seed {
 				-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
 				-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
 			};
+
+			BaseString(CharStr && rawPtr, SizeT CurrentSize, SizeT ReservedSize)
+				:str(rawPtr), CurrentSize(CurrentSize), ReservedSize(ReservedSize) {}
+
+		public:
+			//Масив символів шістнадцятирядкового числа
+			static constexpr const auto HexNumbers = L"0123456789abcdef";
 		public:
 			//Конструктор
 			__forceinline BaseString() noexcept : str(nullptr), CurrentSize(0), ReservedSize(0) {};
 			//Конструктор з готової рядка
 			BaseString(const Char * text) {
 				CurrentSize = CStr::Size((CharStr)text); //-V2005
-				if (CurrentSize == Math::Max::SizeT)
+				if (CurrentSize == Math::Max<SizeT>())
 					Throw(Seed::StringToLong(ExceptionPosition, CurrentSize));
 				ReservedSize = CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
@@ -68,7 +85,7 @@ namespace Seed {
 			//Конструктор з готової рядка
 			BaseString(const AChar * text) {
 				CurrentSize = CStr::Size((ACharStr)text); //-V2005
-				if (CurrentSize == Math::Max::SizeT)
+				if (CurrentSize == Math::Max<SizeT>())
 					Throw(Seed::StringToLong(ExceptionPosition, CurrentSize));
 				ReservedSize = CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
@@ -88,7 +105,7 @@ namespace Seed {
 					return;
 				}
 				CurrentSize = size;
-				if (CurrentSize > Math::Max::SizeT)
+				if (CurrentSize > Math::Max<SizeT>())
 					Throw(Seed::StringToLong(ExceptionPosition, CurrentSize));
 				ReservedSize = CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
@@ -99,7 +116,7 @@ namespace Seed {
 			}
 			//Конструктор з стартовим резервованим розміром
 			BaseString(SizeT StartSize) {
-				if (StartSize > Math::Max::SizeT)
+				if (StartSize > Math::Max<SizeT>())
 					Throw(Seed::StringToLong(ExceptionPosition, CurrentSize));
 				this->ReservedSize = StartSize;
 				this->CurrentSize = 0;
@@ -216,11 +233,11 @@ namespace Seed {
 				BaseString ret_data;
 				SizeT Size = CStr::Size((CharStr)second); //-V2005
 				SizeT NewSize = CurrentSize + Size;
-				if (NewSize > Math::Max::SizeT)
+				if (NewSize > Math::Max<SizeT>())
 					Throw(Seed::StringToLong(ExceptionPosition, NewSize));
 				SizeT NewFullSize = NewSize + CurrentSettings::Memory::GetStringReserveSpace();
-				if (NewFullSize > Math::Max::SizeT)
-					NewFullSize = Math::Max::SizeT;
+				if (NewFullSize > Math::Max<SizeT>())
+					NewFullSize = Math::Max<SizeT>();
 				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char) * NewFullSize); //-V2005
 				CStr::Copy(this->str, ret_data.str);
 				CStr::Copy(second, ret_data.str + this->CurrentSize);
@@ -237,11 +254,11 @@ namespace Seed {
 				BaseString ret_data;
 				SizeT Size = CStr::Size((ACharStr)second); //-V2005
 				SizeT NewSize = CurrentSize + Size;
-				if (NewSize > Math::Max::SizeT)
+				if (NewSize > Math::Max<SizeT>())
 					Throw(StringToLong(ExceptionPosition, NewSize));
-				SizeT NewFullSize = NewSize + Math::Max::SizeT;
-				if (NewFullSize > Math::Max::SizeT)
-					NewFullSize = Math::Max::SizeT;
+				SizeT NewFullSize = NewSize + Math::Max<SizeT>();
+				if (NewFullSize > Math::Max<SizeT>())
+					NewFullSize = Math::Max<SizeT>();
 				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char) * NewFullSize); //-V2005
 				if (this->str != nullptr)
 					CStr::Copy(this->str, ret_data.str);
@@ -257,11 +274,11 @@ namespace Seed {
 			//Оператор додавання рядка
 			BaseString<Base> operator+(const BaseString & second) const {
 				SizeT NewSize = CurrentSize + second.CurrentSize;
-				if (NewSize > Math::Max::SizeT)
+				if (NewSize > Math::Max<SizeT>())
 					Throw(StringToLong(ExceptionPosition, NewSize));
-				SizeT NewFullSize = NewSize + Math::Max::SizeT;
-				if (NewFullSize > Math::Max::SizeT)
-					NewFullSize = Math::Max::SizeT;
+				SizeT NewFullSize = NewSize + Math::Max<SizeT>();
+				if (NewFullSize > Math::Max<SizeT>())
+					NewFullSize = Math::Max<SizeT>();
 				BaseString retData;
 				CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)*NewFullSize); //-V2005
 				if (this->str != nullptr)
@@ -296,11 +313,11 @@ namespace Seed {
 			//Оператор контактенації масиву букв до поточного рядка
 			BaseString<Base> & operator+=(const CharStr temp_str) {
 				SizeT StrSize = CStr::Size(temp_str);
-				if (StrSize > Math::Max::SizeT)
+				if (StrSize > Math::Max<SizeT>())
 					Throw(Seed::StringToLong(ExceptionPosition, StrSize));
 				SizeT NewSize = CurrentSize + StrSize;
 				if (NewSize > ReservedSize) {
-					NewSize = NewSize + Math::Max::SizeT;
+					NewSize = NewSize + Math::Max<SizeT>();
 					CharStr buf = (CharStr)BaseString<Base>::operator new[](sizeof(Char)*NewSize); //-V2005
 					if (this->str != nullptr)
 						CStr::Copy(this->str, buf);
@@ -326,7 +343,7 @@ namespace Seed {
 					return *this;
 				}
 				else {
-					ReservedSize = NewSize + Math::Max::SizeT;
+					ReservedSize = NewSize + Math::Max<SizeT>();
 					CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)*ReservedSize);
 					if (this->str != nullptr)
 						CStr::Copy(this->str, buf);
@@ -390,7 +407,9 @@ namespace Seed {
 
 			//Оператор конвертації до символьного масиву
 			__forceinline explicit operator const CharStr() const noexcept { return str; }
-
+#pragma region Converting to string
+#pragma region Converting int types to string
+#pragma region Convertinh signed int types to string
 			//Конвертація цілого числа до рядка
 			static BaseString toString(Int8 val) {
 				if (val == 0) return BaseString(L"0");
@@ -493,7 +512,8 @@ namespace Seed {
 				Reverse(str.str, str.CurrentSize);
 				return str;
 			}
-
+#pragma endregion
+#pragma region Convert unsigned int types to string
 			//Конвертація цілого числа до рядка
 			static BaseString toString(UInt8 val) {
 				if (val == 0) return BaseString(L"0");
@@ -570,7 +590,8 @@ namespace Seed {
 				Reverse(str.str, str.CurrentSize);
 				return str;
 			}
-
+#pragma endregion
+#pragma endregion
 			//Конвертація логічного значення до рядка вертає 'True' або 'False'
 			__forceinline static BaseString toString(Boolean val) {
 				if (val) return BaseString(L"True"); else return BaseString(L"False");
@@ -579,7 +600,9 @@ namespace Seed {
 			__forceinline static BaseString toString(Boolean val, const BaseString & IfTrue, const BaseString & IfFalse) {
 				if (val) return IfTrue; else return IfFalse;
 			}
-
+#pragma endregion
+#pragma region Converting string to types
+#pragma region Converting float typed to string
 			//Конвертація дійсного числа з одинарною точністю до рядка
 			static BaseString toString(Float val) {
 				using namespace Math;
@@ -670,7 +693,6 @@ namespace Seed {
 				CStr::Copy(buf, str.str);
 				return str;
 			}
-
 
 			//Конвертація дійсного числа з подвійною точністю до рядка
 			static BaseString toString(Double val) {
@@ -768,237 +790,229 @@ namespace Seed {
 				CStr::Copy(buf, str.str);
 				return str;
 			}
-
+#pragma endregion
+#pragma region Converting to int types
+#pragma region Converting to unsigned int types
 			//Спроба перетворення в ціле число
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			UInt8 toUInt8() {
-				if (this->CurrentSize == 0) throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 3) throw new Seed::IntegerOverflow(ExeptionPosition);
-				UInt8 ret_val = 0;
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 3)
+					Throw(IntegerOverflowException(ExceptionPosition));
+				Math::SafeInt<UInt8> ret;
 				for (SizeT i = 0; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt8Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += static_cast<UInt8>(str[i] - L'0');
 					if (i != CurrentSize - 1)
-						if (RtlUInt8Mult(ret_val, 10ui8, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				return ret_val;
+				return ret.Value;
 			}
 
 			//Спроба перетворення в ціле число
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			UInt16 toUInt16() {
-				if (this->CurrentSize == 0) throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 5) throw new Seed::IntegerOverflow(ExeptionPosition);
-				UInt16 ret_val = 0;
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 5)
+					Throw(IntegerOverflowException(ExceptionPosition));
+				Math::SafeInt<UInt16> ret = 0;
 				for (SizeT i = 0; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt16Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += str[i] - L'0';
 					if (i != CurrentSize - 1)
-						if (RtlUInt16Mult(ret_val, 10ui16, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				return ret_val;
+				return ret.Value;
 			}
 
 			//Спроба перетворення в ціле число
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			UInt32 toUInt32() {
-				if (this->CurrentSize == 0) throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 10) throw new Seed::IntegerOverflow(ExeptionPosition);
-				UInt32 ret_val = 0;
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 10)
+					Throw(IntegerOverflowException(ExceptionPosition));
+				Math::SafeInt<UInt32> ret = 0;
 				for (SizeT i = 0; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt32Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += str[i] - L'0';
 					if (i != CurrentSize - 1)
-						if (RtlUInt32Mult(ret_val, 10ui32, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				return ret_val;
+				return ret.Value;
 			}
 
 			//Спроба перетворення в ціле число
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			UInt64 toUInt64() {
-				if (this->CurrentSize == 0) throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 20) throw new Seed::IntegerOverflow(ExeptionPosition);
-				UInt64 ret_val = 0;
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 20)
+					Throw(IntegerOverflowException(ExceptionPosition));
+				Math::SafeInt<UInt64> ret = 0;
 				for (SizeT i = 0; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt64Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += str[i] - L'0';
 					if (i != CurrentSize - 1)
-						if (RtlUInt64Mult(ret_val, 10ui64, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				return ret_val;
+				return ret.Value;
 			}
 
 			//Спроба перетворення в ціле число
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			__forceinline SizeT toSizeT() {
 				return toUInt64();
 			}
-
-			//Спроба перетворення в ціле число, 
+#pragma endregion
+#pragma region Convert to signed int types
+			//Спроба перетворення в ціле число,
 			//на початку може стояти символ '+' або '-'
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			Int8 toInt8() {
 				if (this->CurrentSize == 0)
-					throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 4)  //-V112
-					throw new Seed::IntegerOverflow(ExeptionPosition);
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 20)
+					Throw(IntegerOverflowException(ExceptionPosition));
 				Boolean sign(this->str[0] == '-');
 				SizeT i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
-				UInt8 ret_val = 0;
+				Math::SafeInt<UInt8> ret = 0;
 				for (i; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt8Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += str[i] - L'0';
 					if (i != CurrentSize - 1)
-						if (RtlUInt8Mult(ret_val, 10i8, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				Int8 res;
-				if (RtlUInt8ToInt8(ret_val, (INT8*)&res) == STATUS_INTEGER_OVERFLOW)
-					throw new Seed::IntegerOverflow(ExeptionPosition);
-				return (sign) ? res * -1 : res;
+				return Math::ConvertUnsignedToSigned<UInt8>(ret.Value);
 			}
 
-			//Спроба перетворення в ціле число, 
+			//Спроба перетворення в ціле число,
 			//на початку може стояти символ '+' або '-'
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			Int16 toInt16() {
-				if (this->CurrentSize == 0) throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 6) throw new Seed::IntegerOverflow(ExeptionPosition);
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 20)
+					Throw(IntegerOverflowException(ExceptionPosition));
 				Boolean sign(this->str[0] == '-');
 				SizeT i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
-				UInt16 ret_val = 0;
+				Math::SafeInt<UInt16> ret = 0;
 				for (i; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt16Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += str[i] - L'0';
 					if (i != CurrentSize - 1)
-						if (RtlUInt16Mult(ret_val, 10i16, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				Int16 res;
-				if (RtlUInt16ToInt16(ret_val, (INT16*)&res) == STATUS_INTEGER_OVERFLOW)
-					throw new Seed::IntegerOverflow(ExeptionPosition);
-				return (sign) ? res * -1 : res;
+				return Math::ConvertUnsignedToSigned<UInt16>(ret.Value);
 			}
 
-			//Спроба перетворення в ціле число, 
+			//Спроба перетворення в ціле число,
 			//на початку може стояти символ '+' або '-'
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			Int32 toInt32() {
-				if (this->CurrentSize == 0) throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 11) throw new Seed::IntegerOverflow(ExeptionPosition);
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 20)
+					Throw(IntegerOverflowException(ExceptionPosition));
 				Boolean sign(this->str[0] == '-');
 				SizeT i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
-				UInt32 ret_val = 0;
+				Math::SafeInt<UInt32> ret = 0;
 				for (i; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt32Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += str[i] - L'0';
 					if (i != CurrentSize - 1)
-						if (RtlUInt32Mult(ret_val, 10i32, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				Int32 res;
-				if (RtlUInt32ToInt32(ret_val, (INT32*)&res) == STATUS_INTEGER_OVERFLOW) //-V2002
-					throw new Seed::IntegerOverflow(ExeptionPosition);
-				return (sign) ? res * -1 : res;
+				return Math::ConvertUnsignedToSigned<UInt32>(ret.Value);
 			}
 
-			//Спроба перетворення в ціле число, 
+			//Спроба перетворення в ціле число,
 			//на початку може стояти символ '+' або '-'
 			//
 			//Може генерувати помилки:
-			//	NullPointExeption	- якщо рядок пустий
+			//	NullPointException	- якщо рядок пустий
 			//	IntegerOverflow	    - якщо число є завеликим
 			//	InvalidFormat		- якщо в рядку є відміний від числа символ
 			Int64 toInt64() {
-				if (this->CurrentSize == 0) throw new Seed::NullPointExeption(ExeptionPosition);
-				if (this->CurrentSize > 21) throw new Seed::IntegerOverflow(ExeptionPosition);
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 20)
+					Throw(IntegerOverflowException(ExceptionPosition));
 				Boolean sign(this->str[0] == '-');
 				SizeT i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
-				UInt64 ret_val = 0;
+				Math::SafeInt<UInt64> ret = 0;
 				for (i; i < CurrentSize; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
-					if (RtlUInt64Add(ret_val, str[i] - L'0', &ret_val) == STATUS_INTEGER_OVERFLOW)
-						throw new Seed::IntegerOverflow(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
+					ret += str[i] - L'0';
 					if (i != CurrentSize - 1)
-						if (RtlUInt64Mult(ret_val, 10i64, &ret_val) == STATUS_INTEGER_OVERFLOW)
-							throw new Seed::IntegerOverflow(ExeptionPosition);
+						ret *= 10;
 				}
-				Int64 res;
-				if (RtlUInt64ToInt64(ret_val, (INT64*)&res) == STATUS_INTEGER_OVERFLOW)
-					throw new Seed::IntegerOverflow(ExeptionPosition);
-				return (sign) ? res * -1 : res;
+				return Math::ConvertUnsignedToSigned<UInt64>(ret.Value);
 			}
-
-
+#pragma endregion
+#pragma endregion
+#pragma region Converting to float point types
 			//Перетворення тексту в дійсне число Float
 			//
 			//Можу генерувати помилки:
-			//	NullPointExeption	- якщо строка є нуль-строкою
+			//	NullPointException	- якщо строка є нуль-строкою
 			//	FloatOverflow	    - якщо кількість цифр є більшою ніж можу вмістити число Float
 			//	InvalidFormat		- якщо в строці є відміні від цифр і одної крапки символи
 			Float toFloat() {
-				if (this->CurrentSize == 0) Throw(Seed::NullPointExeption(ExeptionPosition, this, Seed::NullPointExeption::Types::Read));
-				if (this->CurrentSize > 9) throw new Seed::FloatOverflow(ExeptionPosition);
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 9)
+					Throw(IntegerOverflowException(ExceptionPosition));
 				Boolean sign(this->str[0] == '-');
 				size_t i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
@@ -1006,7 +1020,7 @@ namespace Seed {
 				Float int_part = 0.0, double_part = 0.0;
 				for (i; i < CurrentSize && this->str[i] != L'.'; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new Seed::InvalidFormat(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
 					int_part += this->str[i] - L'0';
 					int_part *= 10;
 				}
@@ -1015,7 +1029,7 @@ namespace Seed {
 					i++;
 					for (size_t j = CurrentSize - 1; j >= i; j--) {
 						if (str[i]<L'0' || str[i]>L'9')
-							throw new Seed::InvalidFormat(ExeptionPosition);
+							Throw(InvalidNumberFormatException(ExceptionPosition));
 						double_part += this->str[j] - L'0';
 						double_part /= 10;
 					}
@@ -1027,12 +1041,14 @@ namespace Seed {
 			//Перетворення тексту в дійсне число Double
 			//
 			//Можу генерувати помилки:
-			//	NullPointExeption	- якщо строка є нуль-строкою
+			//	NullPointException	- якщо строка є нуль-строкою
 			//	FloatOverflow	    - якщо кількість цифр є більшою ніж можу вмістити число Double
 			//	InvalidFormat		- якщо в строці є відміні від цифр і одної крапки символи
 			Double toDouble() {
-				if (this->CurrentSize == 0) Throw(Seed::NullPointExeption(ExeptionPosition, this, Seed::NullPointExeption::Types::Read));
-				if (this->CurrentSize > 18) throw new Seed::FloatOverflow(ExeptionPosition);
+				if (this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				if (this->CurrentSize > 18)
+					Throw(IntegerOverflowException(ExceptionPosition));
 				Boolean sign(this->str[0] == '-');
 				size_t i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
@@ -1040,7 +1056,7 @@ namespace Seed {
 				Double int_part = 0.0, double_part = 0.0;
 				for (i; i < CurrentSize && this->str[i] != L'.'; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
-						throw new InvalidFormat(ExeptionPosition);
+						Throw(InvalidNumberFormatException(ExceptionPosition));
 					int_part += this->str[i] - L'0';
 					int_part *= 10;
 				}
@@ -1049,7 +1065,7 @@ namespace Seed {
 					i++;
 					for (size_t j = CurrentSize - 1; j >= i; j--) {
 						if (str[i]<L'0' || str[i]>L'9')
-							throw new InvalidFormat(ExeptionPosition);
+							Throw(InvalidNumberFormatException(ExceptionPosition));
 						double_part += this->str[j] - L'0';
 						double_part /= 10;
 					}
@@ -1057,81 +1073,50 @@ namespace Seed {
 				}
 				return int_part * ((sign) ? -1.0 : 1.0);
 			}
-
+#pragma endregion
 			//Вертає рядкове представлення UUID
 			static BaseString<Base> toString(const UUID & id) {
-				UNICODE_STRING raw_str;
-				GUID rawId = id;
-				RtlStringFromGUID(&rawId, &raw_str);
-				BaseString<Base> str(raw_str.Buffer);
-				RtlFreeUnicodeString(&raw_str);
-				return str;
+				auto ReservedSize = sizeof(UUID::UUIDStringWildCard) + CurrentSettings::Memory::GetStringReserveSpace();
+				CharStr buffer = reinterpret_cast<CharStr>(BaseString<Base>::operator new[](sizeof(UUID::UUIDStringWildCard)));
+				extern void ConvertUUIDtoCharStr(const Seed::Core::UUID & id, Seed::CharStr buffer);
+				ConvertUUIDtoCharStr(id, buffer);
+				return BaseString<Base>(MoveRValue(buffer), sizeof(UUID::UUIDStringWildCard), ReservedSize);
 			}
 			//Перетворення дати і часу в строкове представлення
-			static BaseString<Base> toString(Seed::CoreAPI::Date date) {
-				Char buffer[200];
-				date.ConvertDataToText((CharStr)buffer, 200);
+			static BaseString<Base> toString(Seed::Core::Date date) {
+				Char buffer[22];
+				extern void ConvertDateToStringImpl(Seed::Core::Date date, Seed::Core::CharStr buffer);
+				ConvertDateToStringImpl(date, buffer);
 				return buffer;
 			}
 			//Перетворення часу і дати в строкове представлення
-			static BaseString<Base> toString(Seed::CoreAPI::DateTime time) {
-				Char buffer[200];
-				((Date)time).ConvertDataToText((CharStr)buffer, 200);
+			static BaseString<Base> toString(Seed::Core::DateTime time) {
+				Char buffer[22];
+				extern void ConvertDateTimeToStringImpl(Seed::Core::DateTime time, Seed::CharStr buffer);
+				ConvertDateTimeToStringImpl(time, buffer);
 				return buffer;
 			}
 
-			static BaseString<Base> toString(const Seed::CoreAPI::Array<Seed::Byte> & array) {
+			static BaseString<Base> toString(const Seed::Core::Array<Seed::Byte> & array) {
 				BaseString<Base> str;
-				str.ReservedSize = str.CurrentSize = array.Size() / sizeof(Char);
+				str.ReservedSize = str.CurrentSize = array.Count / sizeof(Char);
 				str.str = new Char[str.CurrentSize + 1];
-				Memory::Copy((Byte*)array, str.str, array.Size());
+				Memory::Copy(array.Raw, str.str, array.Count);
 				str.str[str.CurrentSize] = L'\0';
 				return str;
 			}
+#pragma endregion
 
 			//Конвертація з рядкового в бінарне представлення UUID
 			UUID toUUID() {
-				typedef struct _UNICODE_STRING
-				{
-					USHORT Length;
-					USHORT MaximumLength;
-					_Field_size_bytes_part_(MaximumLength, Length) PWCH Buffer;
-				} UNICODE_STRING, *PUNICODE_STRING;
-				extern extern "C"
-				__declspec(dllimport)
-				long
-				__stdcall
-				RtlInitUnicodeStringEx(
-					PUNICODE_STRING DestinationString,
-					PWSTR SourceString
-				);
-				extern extern "C"
-				__declspec(dllimport)
-				void
-				__stdcall
-				RtlFreeUnicodeString(
-					PUNICODE_STRING UnicodeString
-				);
-				extern extern "C"
-				__declspec(dllimport)
-				long
-				__stdcall
-				RtlGUIDFromString(
-					PUNICODE_STRING GuidString,
-					Guid * Guid
-				);
-
-				Guid uuid;
-				if (str == nullptr)
-					throw new NullPointExeption(ExeptionPosition);
-				UNICODE_STRING raw_str;
-				RtlInitUnicodeStringEx(&raw_str, this->str);
-				if (!NT_SUCCESS(RtlGUIDFromString(&raw_str, &uuid))) {
-					RtlFreeUnicodeString(&raw_str);
-					throw new InvalidFormat(ExeptionPosition);
+				if (this->str == nullptr || this->CurrentSize == 0)
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				UUID res;
+				extern bool ConvertCharStrToUUID(Seed::Core::CharStr str, Seed::Core::UUID & uuid);
+				if (!ConvertCharStrToUUID(this->str, res)) {
+					Throw(InvalidFormat(ExceptionPosition));
 				}
-				RtlFreeUnicodeString(&raw_str);
-				return uuid;
+				return res;
 			}
 
 			//Поточна довжина строки
@@ -1139,19 +1124,25 @@ namespace Seed {
 
 			//Зміна розміру рядка
 			BaseString & Reserve(SizeT NewReservedSize) {
-				if (str == nullptr) {
-					Throw(Seed::NullPointExeption(ExeptionPosition, this, Seed::NullPointExeption::Types::Write));
+				if (this->str == nullptr)
+				{
+					this->str = static_cast<CharStr>(this->operator new[](sizeof(Char) * NewReservedSize));
+					this->str[0] = L'\0';
+					this->CurrentSize = 0;
+					this->ReservedSize = NewReservedSize;
+					return *this;
 				}
-				if (CurrentSize > NewReservedSize) str[NewReservedSize] = L'\0';
-				CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)*NewReservedSize); //-V2005
+				if (CurrentSize > NewReservedSize)
+					str[NewReservedSize] = L'\0';
+				CharStr buf = static_cast<CharStr>(this->operator new[](sizeof(Char) * NewReservedSize));
 				CStr::Copy(str, buf);
-				Base::Free(str);
+				this->operator delete[](buf);
 				str = buf;
 				str[NewReservedSize] = L'\0';
 				CurrentSize = ReservedSize = NewReservedSize;
 				return *this;
 			}
-			//заміна першого входження символа Filler на \0 тим самим зменшуючи розмір строки 
+			//заміна першого входження символа Filler на \0 тим самим зменшуючи розмір строки
 			BaseString & Shrink(Char Filler) {
 				SizeT Pos = Find(Filler);
 				if (Pos == -1)
@@ -1235,40 +1226,65 @@ namespace Seed {
 
 			//Перетворення байтового масиву в строку з 16 бітних символів (0-9a-f)
 			static BaseString<Base> binaryToHex(const Array<Byte> & binaryData) {
-				Seed::Conv conv;
-				CharStr ret = (CharStr)BaseString::operator new[](binaryData.Size() * 2 * sizeof(Char) + 1);
+				//Bite <-> 2 hex digits
+				union {
+					//1 Byte (8 bits)
+					const Byte * binary;
+					//2 Hex digits (4x2 bits)
+					const struct {
+						//Secon hex (4 bits)
+						Byte bit1 : 4;
+						//First hex (4 bits)
+						Byte bit0 : 4;
+					} *Hex;
+				} conv;
+				if (binaryData.Count % 2 != 0)
+					Throw(InvalidFormat(ExceptionPosition));
+				auto CurrentSize = binaryData.Count * 2 * sizeof(Char) + 1;
+				auto ReservedSize = CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
+				CharStr ret = (CharStr)BaseString::operator new[](ReservedSize);
 				SizeT i1 = 0, i2 = 0;
-				ret[(binaryData.Size() * 2) - 1] = L'\0';
-				ret[binaryData.Size() * 2] = L'\0';
-				for (i1; i1 < binaryData.Size(); i1++) {
-					conv.binary = (Byte*)&binaryData[i1];
-					ret[i2] = Seed::HexNumbers[conv.Hex->bit0];
+				ret[(binaryData.Count * 2) - 1] = L'\0';
+				ret[binaryData.Count * 2] = L'\0';
+				for (i1; i1 < binaryData.Count; i1++) {
+					conv.binary = reinterpret_cast<const Byte*>(&binaryData[i1]);
+					ret[i2] = HexNumbers[conv.Hex->bit0];
 					i2++;
-					ret[i2] = Seed::HexNumbers[conv.Hex->bit1];
+					ret[i2] = HexNumbers[conv.Hex->bit1];
 					i2++;
 				}
-				BaseString str(ret, binaryData.Size() * 2);
-				Base::Free(ret);
+				BaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
 				return str;
 			}
 
 			//Конвертація в масив байт
 			operator Array<Byte>() const {
 				if (this->str == nullptr || this->CurrentSize == 0)
-					throw new NullPointExeption(ExeptionPosition);
-				CharStr data = (CharStr)Memory::Allocate(sizeof(Char)* CurrentSize);
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this), NullPointException::Types::Read));
+				CharStr data = (CharStr)BaseString::operator new[](this->CurrentSize);
 				Memory::Copy(this->str, data, CurrentSize * sizeof(Char));
-				return Array<Byte>((Byte*)data, this->CurrentSize * sizeof(Char));
+				return Array<Byte>((Byte*&&)data, this->CurrentSize * sizeof(Char));
 			}
 
 			//Конвертаця строки 16 значних символів в байтовий масив
-			static Array<Byte> hexToBinary(BaseString stringData) {
+			static Array<Byte> hexToBinary(const BaseString & stringData) {
 				if (stringData.Size() % 2)
-					throw new InvalidFormat(ExeptionPosition);
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(&stringData), NullPointException::Types::Read));
 				SizeT Size = stringData.Size() / 2;
 				SizeT i1 = 0, i2 = 0;
 				Array<Byte> bytes(Size);
-				Seed::Conv conv;
+				//Bite <-> 2 hex digits
+				union {
+					//1 Byte (8 bits)
+					Byte * binary;
+					//2 Hex digits (4x2 bits)
+					struct {
+						//Secon hex (4 bits)
+						Byte bit1 : 4;
+						//First hex (4 bits)
+						Byte bit0 : 4;
+					} *Hex;
+				} conv;
 				for (i1; i1 < Size; i1++) {
 					conv.binary = &bytes[i1];
 					switch (stringData[i2]) {
@@ -1285,7 +1301,7 @@ namespace Seed {
 						conv.Hex->bit1 = 0x3;
 						break;
 					case L'4':
-						conv.Hex->bit1 = 0x4; 
+						conv.Hex->bit1 = 0x4;
 						break;
 					case L'5':
 						conv.Hex->bit1 = 0x5;
@@ -1327,7 +1343,7 @@ namespace Seed {
 						conv.Hex->bit1 = 0xf;
 						break;
 					default:
-						throw new InvalidFormat(ExeptionPosition);
+						Throw(InvalidFormat(ExceptionPosition));
 					}
 					i2++;
 					switch (stringData[i2]) {
@@ -1344,7 +1360,7 @@ namespace Seed {
 						conv.Hex->bit0 = 0x3;
 						break;
 					case L'4':
-						conv.Hex->bit0 = 0x4; 
+						conv.Hex->bit0 = 0x4;
 						break;
 					case L'5':
 						conv.Hex->bit0 = 0x5;
@@ -1386,7 +1402,7 @@ namespace Seed {
 						conv.Hex->bit0 = 0xf;
 						break;
 					default:
-						throw new InvalidFormat(ExeptionPosition);
+						Throw(InvalidFormat(ExceptionPosition));
 					}
 					i2++;
 				}
@@ -1399,28 +1415,29 @@ namespace Seed {
 				return binaryToHex(Array<Byte>((const Byte*)(&Data), sizeof(T)));
 			}
 
-			//Заміна по таблиці символів 
+			//Заміна по таблиці символів
 			//Може згенерувати помилку IndexOutOfRange, якщо
 			//- StartPos більша ніж кількість символів в рядку
 			//- StartPos більша ніж EndPos
-			BaseString & Replace(
-				Array<Pair<Char, Char>> ReplaceTable,
-				SizeT StartPos = 0,
-				SizeT EndPos = Seed::Math::Max::SizeT
-			) {
-				if (StartPos > this->CurrentSize)
-					Throw(IndexOutOfRange(ExeptionPosition, StartPos, this->CurrentSize));
-				if (StartPos > EndPos)
-					Throw(IndexOutOfRange(ExeptionPosition, StartPos, EndPos));
-				if (EndPos > this->CurrentSize) EndPos = this->CurrentSize;
-				for (SizeT i = StartPos; i < EndPos; i++) {
-					for (SizeT j = 0; j < ReplaceTable.Size(); j++) {
-						if (this->str[i] == ReplaceTable[j].key)
-							this->str[i] = ReplaceTable[j].value;
-					}
-				}
-				return *this;
-			}
+			//TODO: Write Dictionary<TKey, TValue>
+			//BaseString & Replace(
+			//	Array<Pair<Char, Char>> ReplaceTable,
+			//	SizeT StartPos = 0,
+			//	SizeT EndPos = Seed::Math::Max::SizeT
+			//) {
+			//	if (StartPos > this->CurrentSize)
+			//		Throw(IndexOutOfRange(ExceptionPosition, StartPos, this->CurrentSize));
+			//	if (StartPos > EndPos)
+			//		Throw(IndexOutOfRange(ExceptionPosition, StartPos, EndPos));
+			//	if (EndPos > this->CurrentSize) EndPos = this->CurrentSize;
+			//	for (SizeT i = StartPos; i < EndPos; i++) {
+			//		for (SizeT j = 0; j < ReplaceTable.Count; j++) {
+			//			if (this->str[i] == ReplaceTable[j].key)
+			//				this->str[i] = ReplaceTable[j].value;
+			//		}
+			//	}
+			//	return *this;
+			//}
 
 			//Заміна всіх входжень символа What на символ To
 			//Може згенерувати помилку IndexOutOfRange, якщо
@@ -1433,9 +1450,9 @@ namespace Seed {
 				SizeT EndPos = Seed::Math::Max::SizeT
 			) {
 				if (StartPos > this->CurrentSize)
-					Throw(IndexOutOfRange(ExeptionPosition, StartPos, this->CurrentSize));
+					Throw(IndexOutOfRange(ExceptionPosition, StartPos, this->CurrentSize));
 				if (StartPos > EndPos)
-					Throw(IndexOutOfRange(ExeptionPosition, StartPos, EndPos));
+					Throw(IndexOutOfRange(ExceptionPosition, StartPos, EndPos));
 				if (EndPos > this->CurrentSize) EndPos = this->CurrentSize;
 				for (SizeT i = StartPos; i < EndPos; i++) {
 					if (this->str[i] == What)
@@ -1445,28 +1462,26 @@ namespace Seed {
 			}
 
 			//Приведення всіх букв в заглавні
-			BaseString & toUpper() noexcept {
-				extern "C" extern __declspec(dllimport) wchar_t RtlUpcaseUnicodeChar(wchar_t);
+			BaseString & toUpcase() noexcept {
 				for (SizeT i = 0; i < this->CurrentSize; i++)
-					str[i] = RtlUpcaseUnicodeChar(str[i]);
+					str[i] = CStr::ToUpcase(str[i]);
 				return *this;
 			}
 
 			//Приведення всіх букв в нижній регістр
-			BaseString & toLower() noexcept {
-				extern "C" extern __declspec(dllimport) wchar_t RtlDowncaseUnicodeChar(wchar_t);
+			BaseString & toDowncase() noexcept {
 				for (SizeT i = 0; i < this->CurrentSize; i++)
-					str[i] = RtlDowncaseUnicodeChar(str[i]);
+					str[i] = CStr::ToDowncase(str[i]);
 				return *this;
 			}
 
-			//Розширює рядок до розміру NewSize 
+			//Розширює рядок до розміру NewSize
 			//заповнюючи елементи після поточного розміру символами Filler
 			//Може згенерувати помилку IndexOutOfRange, якщо
 			//- NewSize менший ніж кількість символів в рядку
 			BaseString Extend(Char Filler, SizeT NewSize) {
 				if (this->CurrentSize > NewSize)
-					Throw(IndexOutOfRange(ExeptionPosition, NewSize, this->CurrentSize));
+					Throw(IndexOutOfRange(ExceptionPosition, NewSize, this->CurrentSize));
 				if (this->CurrentSize == NewSize)
 					return *this;
 				BaseString newStr(NewSize);
@@ -1488,7 +1503,8 @@ namespace Seed {
 			//Деструктор
 			__forceinline ~BaseString() {
 				if (str == nullptr) return;
-				str = (CharStr)Base::Free(str); //-V2005
+				BaseString::operator delete[](str);
+				str = nullptr;
 				CurrentSize = ReservedSize = 0;
 			}
 		};
@@ -1510,7 +1526,7 @@ namespace Seed {
 		//Простий рядок
 		typedef BaseString<Memory::Heap> String;
 		//Рядок для збереження конфіденційної інформації
-		typedef BaseString<Memory::SecuredHeap> SecuredString;
+		typedef BaseString<Memory::SensitiveDataHeap> SecuredString;
 #pragma warning(pop)
 	}
 }

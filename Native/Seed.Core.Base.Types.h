@@ -1,6 +1,5 @@
 #pragma once
 
-
 ///<summary>Простір імен VCRT
 ///<para> По можливості уникати використання </para>
 ///</summary>
@@ -54,6 +53,11 @@ namespace Seed {
 		inline namespace { using CharStr = Char * ; using UCharStr = UChar * ; }
 		///<summary>Покажчик на масив символів в кодуванні ASCII</summary>
 		inline namespace { using ACharStr = AChar * ; }
+
+		///<summary>Покажчик на статичний масив символів в кодуванні ASCII</summary>
+		inline namespace { using AConstCharStr = const AChar * const; }
+		///<summary>Покажчик на статичний масив символів в кодуванні UTF-16LE</summary>
+		inline namespace { using ConstCharStr = const Char * const; using UConstCharStr = UChar * ; }
 
 		///<summary>Логічний тип</summary>
 		inline namespace { using Boolean = bool; }

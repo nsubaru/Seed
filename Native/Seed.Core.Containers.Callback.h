@@ -4,11 +4,10 @@
 
 namespace Seed {
 	inline namespace Core {
-
 		///<summary>Класс контейнер для об'єкта функтора</summary>
-		template<typename Allocator, typename Callback>
-		class BaseCallbackContainer : public Allocator {
-			struct Data : Allocator {
+		template<typename Heap, typename Callback>
+		class BaseCallbackContainer : virtual public Memory::Allocator<Heap> {
+			struct Data : virtual public Memory::Allocator<Heap> {
 				RefCountT RefCount;
 				Callback * callback;
 

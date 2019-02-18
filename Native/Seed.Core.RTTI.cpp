@@ -112,7 +112,6 @@ extern "C" void * __cdecl __RTCastToVoid(
 	return FindCompleteObject(inptr);
 }
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // __RTtypeid - Implements typeid() operator
@@ -140,10 +139,9 @@ extern "C" void * __cdecl __RTtypeid(
 		return (void *)COL_PTD(*pCompleteLocator);
 	}
 
-	Throw(Seed::NullPointExeption(ExceptionPosition, (Seed::SizeT)nullptr, Seed::NullPointExeption::Types::Read));
+	Throw(Seed::NullPointException(ExceptionPosition, (Seed::SizeT)nullptr, Seed::NullPointException::Types::Read));
 	return nullptr;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -262,7 +260,6 @@ extern "C" void * __cdecl __RTDynamicCast(
 	}
 }
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // FindCompleteObject - Calculate member offset from PMD & this
@@ -293,7 +290,6 @@ static void * FindCompleteObject(void* inptr)           // Pointer to polymorphi
 
 	return reinterpret_cast<void *>(pCompleteObject - offsetValue);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -391,13 +387,12 @@ static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
 		}
 	}
 
-
 	// Same as loop above, but falling back to strcmp in case pCOLocator comes
 	// from a different image than pSrcTypeID / pTargetTypeID
 	for (DWORD i = 0; i < nCompleteObjectBases; i++)
 	{
 		_RTTIBaseClassDescriptor * pBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[i]);
-		
+
 		if (Seed::CStr::Compare(BCD_PTD(*pBCD)->name, pTargetTypeID->name))
 		{
 			for (DWORD j = i + 1; j < nCompleteObjectBases; j++)
@@ -423,7 +418,6 @@ static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
 
 	return nullptr;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -633,7 +627,6 @@ static _RTTIBaseClassDescriptor * FindMITargetTypeInstance(
 
 	return nullptr;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -922,7 +915,6 @@ static _RTTIBaseClassDescriptor * FindVITargetTypeInstance(
 
 	return nullptr;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -38,7 +38,6 @@ namespace Seed {
 			template<typename IfTrue, typename IfFalse>
 			struct ConditionT<true, IfTrue, IfFalse> { using Result = IfTrue; };
 
-
 			/////<summary>Compile-time логічне суддження, якщо T є об'єднанням то вертає True інакше False</summary>
 			/////<remarks>Спирається на реалізацію в компіляторі</remarks>
 			//template<typename T>
@@ -49,15 +48,13 @@ namespace Seed {
 			//template<typename T>
 			//struct IsClass :LogicConst<CRT::is_class<T>::value> {}; //Implementation defined
 
-
-			///<summary>Compile-time логічне суддження, 
+			///<summary>Compile-time логічне суддження,
 			///<para>якщо клас Derivde наслідує клас Base то вертає True інакше False</para></summary>
 			///<remarks>Спирається на реалізацію в компіляторі</remarks>
 			template<typename Base, typename Derived>
 			struct IsBasedOn :LogicConst<__is_base_of(Base, Derived)> {}; //Implementation defined
 
-
-			/////<summary>Compile-time логічне суддження, 
+			/////<summary>Compile-time логічне суддження,
 			/////<para>вертає true якщо даний тип можна скопіювати простим побітовим копіюванням</para>
 			/////</summary>
 			/////<remarks>Спирається на реалізацію в компіляторі</remarks>
@@ -80,7 +77,7 @@ namespace Seed {
 			template<typename T>
 			using RemoveRefT = typename RemoveRef<T>::Type;
 
-
+#pragma region Is Function static assert
 			///<summary>primary template</summary>
 			template<typename>
 			struct IsFunction : LogicFalse { };
@@ -190,6 +187,7 @@ namespace Seed {
 			struct IsFunction<Ret(Args..., ...) volatile && noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args..., ...) const volatile && noexcept> : LogicTrue {};
+#pragma endregion
 
 			template<class... _Types>
 			using VoidT = void;
@@ -224,6 +222,102 @@ namespace Seed {
 
 			template<typename Type>
 			struct IsLValueRef<Type&> : LogicTrue {};
+
+#pragma region Signed type converter helpers
+			template<typename>
+			struct MakeSigned {};
+
+			template<>
+			struct MakeSigned<unsigned __int8> {
+				using Type = signed __int8;
+			};
+
+			template<>
+			struct MakeSigned<unsigned __int16> {
+				using Type = signed __int16;
+			};
+
+			template<>
+			struct MakeSigned<unsigned __int32> {
+				using Type = signed __int32;
+			};
+
+			template<>
+			struct MakeSigned<unsigned __int64> {
+				using Type = signed __int64;
+			};
+
+			template<>
+			struct MakeSigned<signed __int8> {
+				using Type = signed __int8;
+			};
+
+			template<>
+			struct MakeSigned<signed __int16> {
+				using Type = signed __int16;
+			};
+
+			template<>
+			struct MakeSigned<signed __int32> {
+				using Type = signed __int32;
+			};
+
+			template<>
+			struct MakeSigned<signed __int64> {
+				using Type = signed __int64;
+			};
+#pragma endregion
+
+			template<typename Int>
+			using Signed = MakeSigned<Int>::Type;
+
+#pragma region Unsigned type converter helpers
+			template<typename>
+			struct MakeUnsigned {};
+
+			template<>
+			struct MakeUnsigned<signed __int8> {
+				using Type = unsigned __int8;
+			};
+
+			template<>
+			struct MakeUnsigned<signed __int16> {
+				using Type = unsigned __int16;
+			};
+
+			template<>
+			struct MakeUnsigned<signed __int32> {
+				using Type = unsigned __int32;
+			};
+
+			template<>
+			struct MakeUnsigned<signed __int64> {
+				using Type = unsigned __int64;
+			};
+
+			template<>
+			struct MakeUnsigned<unsigned __int8> {
+				using Type = unsigned __int8;
+			};
+
+			template<>
+			struct MakeUnsigned<unsigned __int16> {
+				using Type = unsigned __int16;
+			};
+
+			template<>
+			struct MakeUnsigned<unsigned __int32> {
+				using Type = unsigned __int32;
+			};
+
+			template<>
+			struct MakeUnsigned<unsigned __int64> {
+				using Type = unsigned __int64;
+			};
+#pragma endregion
+
+			template<typename Int>
+			using Unsigned = MakeUnsigned<Int>::Type;
 		}
 	}
 }

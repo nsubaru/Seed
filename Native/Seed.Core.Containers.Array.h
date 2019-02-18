@@ -18,8 +18,14 @@ namespace Seed {
 			///<returns>Кількість елементів</returns>
 			__forceinline SizeT GetCount() const { return count; }
 
+			///<summary>Вертає покажчик на масив</summary>
+			///<returns>Вертає покажчик на масив</returns>
+			__forceinline const T* const GetRawArray() const { return arr; }
+
 			///<summary>Кількість елементів в масиві</summary>
 			Property(GetCount) SizeT Count;
+			///<summary>Покажчик на масив</summary>
+			Property(GetRawArray) const T* const Raw;
 
 			///<summary>Конструктор</summary>
 			__forceinline Array() noexcept : arr(nullptr), count(0) {}
@@ -121,7 +127,6 @@ namespace Seed {
 				return false;
 			}
 
-
 			///<summary>Оператор перетворення який вертає константний покажчик на С подібний масив</summary>
 			///<returns>Покажчик на внутрішній масив</returns>
 			DeprecatedCall("Робота з с-подібнимим масивами") operator const T*() const {
@@ -160,18 +165,18 @@ namespace Seed {
 				return *this;
 			}
 
-			///<summary>Вертаж підмасив який складається з всіх елементів 
+			///<summary>Вертаж підмасив який складається з всіх елементів
 			///<para>починаючи з елемента StartIndex</para></summary>
-			///<param name = 'StartIndex'>Номер першого елемента починаючи 
+			///<param name = 'StartIndex'>Номер першого елемента починаючи
 			///<para>з нуля який має бути включений в Slice</para></param>
 			///<returns>Підмасив</returns>
 			Array<T> Slice(SizeT StartIndex) {
-				if(StartIndex > count)
+				if (StartIndex > count)
 					Throw(
-						NullPointExeption(
+						NullPointException(
 							ExceptionPosition,
 							((SizeT)this->arr) + StartIndex,
-							NullPointExeption::Types::Read
+							NullPointException::Types::Read
 						)
 					);
 				SizeT Count = count - StartIndex;
@@ -185,18 +190,17 @@ namespace Seed {
 			}
 
 			///<summary>Вертає підмасив який складається з Count елементів починаючи з StartIndex елемента</summary>
-			///<param name = 'StartIndex'>Номер першого елемента починаючи 
+			///<param name = 'StartIndex'>Номер першого елемента починаючи
 			///<para>з нуля який має бути включений в Slice</para></param>
 			///<param name = 'Count'>Кількість елементів</param>
 			///<returns>Підмасив</returns>
 			Array<T> Slice(SizeT StartIndex, SizeT Count) {
-				
 				if (StartIndex + Count > count)
 					Throw(
-						NullPointExeption(
-							ExceptionPosition, 
-							((SizeT)this->arr) + StartIndex + Count, 
-							NullPointExeption::Types::Read
+						NullPointException(
+							ExceptionPosition,
+							((SizeT)this->arr) + StartIndex + Count,
+							NullPointException::Types::Read
 						)
 					);
 

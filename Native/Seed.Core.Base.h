@@ -8,7 +8,7 @@
 #include "Seed.Core.Base.StaticAsserts.h"
 #include "Seed.Core.Base.UUID.h"
 
-///<summary>Якщо визначено SeedKernel то всі виклики 
+///<summary>Якщо визначено SeedKernel то всі виклики
 ///позначенні SeedKernelCall будуть експортуватись з виконавчого файла
 ///інакше будуть імпортуватись</summary>
 #ifdef SeedKernel
@@ -22,7 +22,7 @@ extern int __cdecl DestroyStaticVariables(PF pf);
 
 #pragma warning(push)
 #pragma warning(disable: 4075)
-#pragma init_seg("INIT$b", DestroyStaticVariables)  
+#pragma init_seg("INIT$b", DestroyStaticVariables)
 #define INIT
 #pragma warning(pop)
 ///<summary>Експортує але в межах ядра замість виклику підставляє тіло функції</summary>
@@ -44,31 +44,17 @@ extern int __cdecl DestroyStaticVariables(PF pf);
 ///<summary>Внутрішній апі, використовувати напряму заборонено</summary>
 #define InternalApiCall __declspec(deprecated("Internal API"))
 
-///<summary>Якщо <code>RefCountClass</code> вставлено в тіло класу в .h файлі то даних клас автоматично отримує підрахунок силок</summary>
-///<param name = 'ClassName'>назва класу</param> 
-///<param name = 'This'>покажчик в який поміщено дані екземаляра, має містити зміну RefCount типу RefCountT</param> 
-///<param name = 'OnDestroy'>код(функція) який викличеться в деструкторі при знищені останього екземпляра
-///<para>параметр не обов'язковий</para>
-///</param> 
-///<remarks>
-///Дефайн додає конструктор та оператор копіювання і переміщення та деструктор
-///</remarks>
-#define RefCountClass(ClassName, This, OnDestroy) \
-__forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
-__forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
-__forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
-__forceinline ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
-__forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {OnDestroy;delete This;}This = nullptr;}};
+#define EXPAND_VA_ARGS(x) x
 
 ///<summary>Властивість яка можна лиш читати</summary>
-#define __Property1(Getter) __declspec( property( get=Getter) ) 
+#define __Property1(Getter) __declspec( property( get=Getter) )
 ///<summary>Властивість яку можна і читати і записувати</summary>
-#define __Property2(Getter, Setter) __declspec( property( get=Getter, put=Setter ) )  
+#define __Property2(Getter, Setter) __declspec( property( get=Getter, put=Setter ) )
 
 #define __Property_GET_MACRO(_1,_2,NAME,...) NAME
 ///<summary>Властивість яку можна читати або читати якщо дано лиш гетер і записувати якщо є гетер і сетер</summary>
 ///<param name = '__VA_ARGS__'>Гетер або гетер і сетер</param>
-#define Property(...) __Property_GET_MACRO(__VA_ARGS__, __Property2, __Property1)(__VA_ARGS__)
+#define Property(...) EXPAND_VA_ARGS(__Property_GET_MACRO(__VA_ARGS__, __Property2, __Property1)(__VA_ARGS__))
 
 ///<summary>Головний простір імен</summary>
 namespace Seed {
@@ -173,8 +159,48 @@ namespace Seed {
 			static_assert(!StaticAsserts::IsLValueRef<Type>(), "Bad forward call");
 			return (static_cast<Type&&>(_Arg));
 		}
+
+		///<summary>Інтерфейс клонування</summary>
+		template<typename T>
+		interface IClonable
+		{
+			///<summary>Метод клонуванння</summary>
+			T Clone();
+		};
+
+		///<summary>Інтерфес звільнення ресурсів з класу з підрахунком силок</summary>
+		interface IDisposable
+		{
+			///<summary>Метод для звільнення ресурсів,
+			///<para>викликається деструктором автоматично в класів з підрахунком силок</para></summary>
+			///<see><code>RefCountClass</code></see>
+			void Dispose();
+		};
+
+		template<typename T>
+		interface IComparable
+		{
+			UInt8 CompareTo(const T & Val);
+		};
 	}
 }
+
+///<summary>Якщо <code>RefCountClass</code> вставлено в тіло класу в .h файлі то даних клас автоматично отримує підрахунок силок</summary>
+///<param name = 'ClassName'>назва класу</param>
+///<param name = 'This'>покажчик в який поміщено дані екземаляра, має містити зміну RefCount типу RefCountT</param>
+///<param name = 'OnDestroy'>код(функція) який викличеться в деструкторі при знищені останього екземпляра
+///<para>параметр не обов'язковий</para>
+///</param>
+///<remarks>
+///Дефайн додає конструктор та оператор копіювання і переміщення та деструктор
+///</remarks>
+#define RefCountClass(ClassName, This) \
+ static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");\
+__forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
+__forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
+__forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
+__forceinline ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
+__forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}};
 
 namespace {
 	template <class F, class... Args>

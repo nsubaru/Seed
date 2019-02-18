@@ -28,7 +28,7 @@ struct
 Boolean Seed::Core::Init::Exceptions() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
-	Settings::HEAP_CONFIGS configs = Settings::EXCEPTION_HEAP_ADDITIONAL_CONFIGS();
+	auto configs = CurrentSettings::Memory::ExceptionHeap::GetConfigs();
 
 	if (configs.HEAP_ARGS_CHECK)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
@@ -40,8 +40,8 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 	ExceptionsHeap.HeapHandle = RtlCreateHeap(
 		Flags,
 		NULL,
-		Settings::EXCEPTION_HEAP_START_SIZE(),
-		Settings::EXCEPTION_HEAP_START_SIZE(),
+		CurrentSettings::Memory::ExceptionHeap::GetMaxSize(),
+		CurrentSettings::Memory::ExceptionHeap::GetStartSize(),
 		NULL,
 		NULL);
 

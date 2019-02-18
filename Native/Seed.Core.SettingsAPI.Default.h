@@ -5,8 +5,7 @@
 namespace Seed {
 	inline namespace Core {
 		///<summary>Конфігурації рантайму  Рем<summary>
-		namespace Settings{
-
+		namespace Settings {
 			constexpr Char SettingsFileName[16] = L"CoreSettings";
 			///<summary>Стандартні налаштування рантайму Seed</summary>
 			namespace Default {
@@ -19,15 +18,14 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.DefaultHeap.MaxSize = 0Mb;
 						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalСhecks = { 0 };
 						//Секція захищеного алокатора пам'яті
-						DefaultSettings.MainMemoryManager.SecuredHeap.StartSize = 1Mb;
-						DefaultSettings.MainMemoryManager.SecuredHeap.MaxSize = 0Mb;
-						DefaultSettings.MainMemoryManager.SecuredHeap.AdditionalСhecks = { 0 };
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.StartSize = 1Mb;
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = 0Mb;
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.AdditionalСhecks = { 0 };
 						//Секція алокатора пам'яті для обробника помилок
 						DefaultSettings.MainMemoryManager.ExceptionHeap.StartSize = 10Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.MaxSize = 0Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalСhecks = { 0 };
 					}
-
 				}
 			}
 		}

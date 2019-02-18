@@ -13,17 +13,33 @@ namespace Seed {
 		private:
 			static constexpr SizeT size = Seed::Math::RoundToUpper(BitCount, sizeof(Byte) * 8ui64);
 			static constexpr SizeT fullBytesCount = BitCount / 8ui64;
+			static constexpr SizeT LastByteBitsCount = BitCount - (fullBytesCount * 8);
 		public:
 			__forceinline constexpr SizeT GetCount() { return BitCount; }
 			SizeT Property(GetCount) Count;
- 		private:
+		private:
 			Byte bitMap[size] = { 0 };
 		public:
-			SizeT FindBitSequal(SizeT RequireCount) {
+			__forceinline constexpr BitMapT(Boolean IsSetAll = false) {
+				if (IsSetAll) {
+					for (SizeT i = 0; i < fullBytesCount; i++)
+					{
+						bitMap[i] = Seed::Math::Max<Byte>();
+					}
+					if constexpr (fullBytesCount < size) {
+						for (SizeT i = 0; i < LastByteBitsCount; i++)
+						{
+							BitSet(bitMap[fullBytesCount], i);
+						}
+					}
+				}
+			}
+
+			constexpr SizeT FindBitSequal(SizeT RequireCount) {
 				SizeT RangeSize;
 				Boolean IsFound = false;
 				for (SizeT byte = 0; byte < fullBytesCount; byte++) {
-					if (bitMap[byte] == Math::Max::Byte)
+					if (bitMap[byte] == Math::Max<Byte>())
 						continue;
 					for (SizeT bit = 0; bit < 8ui64; bit++) {
 						if (!BitCheck(bitMap[byte], bit))
@@ -58,7 +74,7 @@ namespace Seed {
 				return -1;
 			};
 
-			void SetBitSequal(SizeT Position, SizeT Count) {
+			constexpr void SetBitSequal(SizeT Position, SizeT Count) {
 				if (Position + Count > BitCount)
 					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount + Count));
 
@@ -80,14 +96,14 @@ namespace Seed {
 							BitSet(bitMap[StartByte], bit);
 					}
 					else {
-						bitMap[StartByte] = Math::Max::Byte;
+						bitMap[StartByte] = Math::Max<Byte>();
 					}
 					if (EndBit != 8) {
 						for (SizeT bit = 0; bit < EndBit; bit++)
 							BitSet(bitMap[EndByte], bit);
 					}
 					else {
-						bitMap[EndByte] = Math::Max::Byte;
+						bitMap[EndByte] = Math::Max<Byte>();
 					}
 					if (StartByte - EndByte > 1) {
 						for (SizeT byte = StartByte + 1; byte < EndByte; byte++)
@@ -95,7 +111,7 @@ namespace Seed {
 					}
 				}
 			};
-			void ResetBitSequal(SizeT Position, SizeT Count) {
+			constexpr void ResetBitSequal(SizeT Position, SizeT Count) {
 				if (Position + Count > BitCount)
 					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount + Count));
 
@@ -133,28 +149,29 @@ namespace Seed {
 				}
 			};
 
-			void SetBit(SizeT Position) {
+			constexpr void SetBit(SizeT Position) {
 				if (Position > BitCount)
 					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount));
 				BitSet(bitMap[Position / 8ui64], Position % 8ui64);
 			};
-			void ResetBit(SizeT Position) {
+
+			constexpr void ResetBit(SizeT Position) {
 				if (Position > BitCount)
 					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount));
 				BitReset(bitMap[Position / 8ui64], Position % 8ui64);
 			};
 
-			Boolean IsZero(SizeT Position) {
+			constexpr Boolean IsZero(SizeT Position) {
 				if (Position > BitCount)
 					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount));
 				return !BitCheck(bitMap[Position / 8], Position % 8);
 			};
 
-			void ResetAll() {
+			constexpr void ResetAll() {
 				Memory::MemBlkFill(bitMap, size, 0);
 			};
 
-			SizeT SettedBitCount() {
+			constexpr SizeT SettedBitCount() {
 				SizeT Count = 0;
 				for (SizeT byte = 0; byte < fullBytesCount; byte++) {
 					if (bitMap[byte] == 0)
@@ -163,7 +180,6 @@ namespace Seed {
 						for (SizeT j = 0; j < 8; j++)
 							if (BitCheck(bitMap[byte], j))
 								Count++;
-
 				}
 				if constexpr (fullBytesCount > size) {
 					for (SizeT j = 0; j < 8; j++)
@@ -172,6 +188,66 @@ namespace Seed {
 				}
 				return Count;
 			};
+
+			constexpr BitMapT & operator&=(const BitMapT & Second) {
+				for (SizeT i = 0; i < fullBytesCount; i++)
+				{
+					this->bitMap[i] &= Second.bitMap[i];
+				}
+
+				for (SizeT i = 0; i < LastByteBitsCount; i++)
+				{
+					if (Seed::BitCheck(this->bitMap[fullBytesCount], i) && Seed::BitCheck(Second.bitMap[fullBytesCount], i))
+						Seed::BitSet(this->bitMap[fullBytesCount], i);
+					else
+						Seed::BitReset(this->bitMap[fullBytesCount], i);
+				}
+			}
+
+			constexpr BitMapT & operator|=(const BitMapT & Second) {
+				for (SizeT i = 0; i < fullBytesCount; i++)
+				{
+					this->bitMap[i] |= Second.bitMap[i];
+				}
+
+				for (SizeT i = 0; i < LastByteBitsCount; i++)
+				{
+					if (Seed::BitCheck(this->bitMap[fullBytesCount], i) || Seed::BitCheck(Second.bitMap[fullBytesCount], i))
+						Seed::BitSet(this->bitMap[fullBytesCount], i);
+					else
+						Seed::BitReset(this->bitMap[fullBytesCount], i);
+				}
+			}
+
+			constexpr bool operator==(BitMapT & Second) {
+				for (SizeT i = 0; i < fullBytesCount; i++)
+				{
+					if (this->bitMap[i] != Second.bitMap[i])
+						return false;
+				}
+
+				for (SizeT i = 0; i < LastByteBitsCount; i++)
+				{
+					if (Seed::BitCheck(this->bitMap[fullBytesCount], i) == Seed::BitCheck(Second.bitMap[fullBytesCount], i))
+						return false;
+				}
+				return true;
+			}
+
+			constexpr bool operator!=(BitMapT & Second) {
+				for (SizeT i = 0; i < fullBytesCount; i++)
+				{
+					if (this->bitMap[i] != Second.bitMap[i])
+						return true;
+				}
+
+				for (SizeT i = 0; i < LastByteBitsCount; i++)
+				{
+					if (Seed::BitCheck(this->bitMap[fullBytesCount], i) == Seed::BitCheck(Second.bitMap[fullBytesCount], i))
+						return true;
+				}
+				return false;
+			}
 		};
 	}
 }

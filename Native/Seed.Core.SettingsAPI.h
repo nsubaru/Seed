@@ -21,7 +21,7 @@ namespace Seed {
 					};
 
 					HeapCfg DefaultHeap;
-					HeapCfg SecuredHeap;
+					HeapCfg SensitiveDataHeap;
 					HeapCfg ExceptionHeap;
 
 					SizeT StringReserveSize;
@@ -65,36 +65,36 @@ namespace Seed {
 					}
 				};
 
-				class SecuredHeap {
+				class SensitiveDataHeap {
 				public:
 					static __forceinline Bytes GetStartSize() {
 						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.SecuredHeap.StartSize;
+						return CurrentSettings.MainMemoryManager.SensitiveDataHeap.StartSize;
 					}
 
 					static __forceinline Bytes GetMaxSize() {
 						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.SecuredHeap.MaxSize;
+						return CurrentSettings.MainMemoryManager.SensitiveDataHeap.MaxSize;
 					}
 
 					static __forceinline SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks GetConfigs() {
 						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.SecuredHeap.Additional—hecks;
+						return CurrentSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks;
 					}
 
 					static __forceinline void SetStartSize(Bytes NewStartSize) {
 						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.SecuredHeap.StartSize = NewStartSize;
+						CurrentSettings.MainMemoryManager.SensitiveDataHeap.StartSize = NewStartSize;
 					}
 
 					static __forceinline void SetMaxSize(Bytes NewMaxSize) {
 						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.SecuredHeap.MaxSize = NewMaxSize;
+						CurrentSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = NewMaxSize;
 					}
 
 					static __forceinline void SetAdditionalChecks(SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks NewAdditionalCheks) {
 						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.SecuredHeap.Additional—hecks = NewAdditionalCheks;
+						CurrentSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks = NewAdditionalCheks;
 					}
 				};
 
@@ -136,7 +136,7 @@ namespace Seed {
 					return CurrentSettings.MainMemoryManager.StringReserveSize;
 				}
 
-				static __forceinline void SetStringReserveSpace(SizeT NewStringReserverSpace){
+				static __forceinline void SetStringReserveSpace(SizeT NewStringReserverSpace) {
 					extern SettingsData CurrentSettings;
 					CurrentSettings.MainMemoryManager.StringReserveSize = NewStringReserverSpace;
 				}

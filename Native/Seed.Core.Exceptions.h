@@ -1,6 +1,7 @@
 #pragma once
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Memory.h"
+#include "typeinfo"
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -23,12 +24,12 @@ namespace Seed {
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				///<exeption cref='Seed::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Free(void * MemBlk) final;
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				///<exeption cref='Seed::NullPointExeption'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				///<exeption cref='Seed::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedFree(void * MemBlk, SizeT AllocationReq) final;
 
 				///<summary>Кількість виділених блоків даних</summary>
@@ -45,7 +46,7 @@ namespace Seed {
 #define ExceptionPosition __FILE__, __FUNCSIG__, __LINE__
 
 			///<summary>Класс базової помилки</summary>
-			class Exception: public Memory::Allocator<Memory::ExceptionHeap> {
+			class Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
 			private:
 				///<sumary>Місце генерації помилки</summary>
 				struct ExeptionLocation {
@@ -93,14 +94,14 @@ namespace Seed {
 			///<para> - Execute - спроба виконати команду за неіснуючим адресом</para>
 			///<para>Тому помилка містить інформацію про тип доступу та адресс який пробували використати</para>
 			///</summary>
-			class NullPointExeption : public Exception {
+			class NullPointException : public Exception {
 			public:
 				///<summary> Можливі варіанти помилки</summary>
 				enum class Types : UInt8 { Read, Write, Execute };
 			private:
 				///<summary>Адресс який спробували використати</summary>
 				SizeT Addr;
-				///<summary>Тип доступу який згенерував помилку</summary> 
+				///<summary>Тип доступу який згенерував помилку</summary>
 				Types Type;
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -109,7 +110,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'Addr'>Адрес комірки пам'яті яка згенерувала помилку</param>
 				///<param mame = 'Type'>Тип доступу до комірки який згенерував помилку</param>
-				NullPointExeption(const AChar * File, const AChar * FunctName, SizeT Line, SizeT Addr, Types Type)
+				NullPointException(const AChar * File, const AChar * FunctName, SizeT Line, SizeT Addr, Types Type)
 					:Exception(File, FunctName, Line, L"Помилка доступу до пам'яті"), Addr(Addr), Type(Type)
 				{}
 
@@ -215,6 +216,18 @@ namespace Seed {
 				{}
 			};
 
+			///<summary>Невірний формат</summary>
+			class InvalidFormat : public Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				InvalidFormat(const AChar * File, const AChar * FunctName, SizeT Line)
+					:Exception(File, FunctName, Line, L"Невірний формат")
+				{}
+			};
+
 			///<summary>Доступ до елемента який знаходится за межею розмірів</summary>
 			class IndexOutOfRange :public Exception {
 			private:
@@ -228,15 +241,48 @@ namespace Seed {
 				///<param name = 'RequiredIndex'>Індекс елемента який пробували отримати</param>
 				///<param name = 'MaxAllowedIndex'>Максимальний допустимий індекс</param>
 				__forceinline IndexOutOfRange(const AChar * File, const AChar * FunctName, SizeT Line, SizeT RequiredIndex, SizeT MaxAllowedIndex)
-					noexcept : Exception(File, FunctName, Line, L"Index out of range") {
-					this->Index = RequiredIndex;
-					this->MaxIndex = MaxAllowedIndex;
-				}
+					noexcept : Exception(File, FunctName, Line, L"Вихід за межі"),
+					Index(RequiredIndex), MaxIndex(MaxAllowedIndex)
+				{}
 
 				///<summary>Запрошуваний індекс</summary>
-				__forceinline SizeT RequiredIndex() { return Index; }
+				__forceinline SizeT GetRequiredIndex() { return Index; }
 				///<summary>Максимальний достуаний індекс</summary>
-				__forceinline SizeT MaxAllowedIndex() { return MaxIndex; }
+				__forceinline SizeT GetMaxAllowedIndex() { return MaxIndex; }
+
+				///<summary>Запрошуваний індекс</summary>
+				SizeT Property(GetRequiredIndex) RequiredIndex;
+				///<summary>Максимальний достуаний індекс</summary>
+				SizeT Property(GetMaxAllowedIndex) MaxAllowedIndex;
+			};
+
+			///<summary>Некоректний тип</summary>
+			class InvalidTypeException : public Exception {
+			private:
+				const TypeInfo & requireType;
+				const TypeInfo & actuallyType;
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				///<param name = 'RequireType'>Інформація про очікуваний тип</param>
+				///<param name = 'ActuallyType'>Інформація про фактичний тип</param>
+				__forceinline InvalidTypeException(const AChar * File, const AChar * FunctName, SizeT Line, const TypeInfo & RequireType, const TypeInfo & ActuallyType)
+					noexcept : Exception(File, FunctName, Line, L"Invalid type"),
+					requireType(RequireType), actuallyType(ActuallyType)
+				{
+				}
+
+				///<summary>Інформація про очікуваний тип</summary>
+				const TypeInfo & GetRequireType() { return requireType; }
+				///<summary>Інформація про фактичний тип</summary>
+				const TypeInfo & GetActuallyType() { return actuallyType; }
+
+				///<summary>Інформація про очікуваний тип</summary>
+				const TypeInfo Property(GetRequireType) RequireType;
+				///<summary>Інформація про фактичний тип</summary>
+				const TypeInfo Property(GetActuallyType) ActuallyType;
 			};
 		}
 	}
@@ -245,15 +291,15 @@ namespace Seed {
 template<class Type>
 using ThrowableObj = typename Seed::Core::StaticAsserts::ConditionT <
 	Seed::Core::StaticAsserts::IsFunction<Type>::State,
-	typename Seed::Core::StaticAsserts::ResultOf<Type>::Type ,
+	typename Seed::Core::StaticAsserts::ResultOf<Type>::Type,
 	typename Type
 >::Result;
 
 template<typename Type>
 struct IsThrowable :
-	Seed::Core::StaticAsserts::IsBasedOn< 
-		Seed::Core::Exceptions::Exception,
-		Seed::Core::StaticAsserts::RemoveRefT<ThrowableObj<Type>>
+	Seed::Core::StaticAsserts::IsBasedOn<
+	Seed::Core::Exceptions::Exception,
+	Seed::Core::StaticAsserts::RemoveRefT<ThrowableObj<Type>>
 	>
 {};
 
@@ -263,16 +309,16 @@ template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___
 
 ///<summary>Генерація помилки з провіркою типу</summary>
 ///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>
-#define Throw(ExceptionObj)\
-{ \
+#define Throw(ExceptionObj) \
+do{ \
 	static_assert(IsThrowable<decltype(ExceptionObj)>(), \
 	"Only Seed::Exception and derived classes cant be throw as exception"); \
 	__assume(IsThrowable<decltype(ExceptionObj)>()); \
-	__pragma(warning(push)) \
-	__pragma(warning(disable: 4996)) \
+	__pragma(warning(push)); \
+	__pragma(warning(disable: 4996)); \
 	___cxxthrow(ExceptionObj);\
-	__pragma(warning(pop)) \
- }
+	__pragma(warning(pop)); \
+ }while(false)
 
 #define throw static_cast("Use Throw insted")
 

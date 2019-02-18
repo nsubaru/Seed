@@ -6,6 +6,9 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 struct {
 	HANDLE handle;
 	IO_STATUS_BLOCK ioBlock;
@@ -104,11 +107,11 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 	return Seed::Core::toCoreLog(L"Starting core...");
 }
 
-SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Char * Value, SizeT Lenght)
+SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char * Value, Seed::SizeT Lenght)
 {
-	if (Lenght > Math::Max::Int16 - 22);
-		return false;
-	Char raw[Math::Max::Int16];
+	if (Lenght > Math::Max<Int16>() - 22);
+	return false;
+	Char raw[Math::Max<Int16>()];
 	FormatCurrentTime(raw);
 	raw[21] = L' ';
 	CStr::Copy(Value, raw + 22);
@@ -137,3 +140,5 @@ void Seed::Core::Stop::Loging() noexcept
 	NtClose(LogFile.handle);
 	RtlDeleteCriticalSection(&LogFile.lock);
 }
+
+#pragma warning(pop)

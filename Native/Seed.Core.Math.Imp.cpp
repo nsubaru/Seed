@@ -146,7 +146,7 @@ Double Seed::Core::Details::RuntimeASin(Double X)
 
 Double Seed::Core::Details::RuntimeACos(Double X)
 {
-	return (Seed::Core::Details::Pi / 2) -  asin(X);
+	return (Seed::Core::Details::Pi / 2) - asin(X);
 }
 
 #pragma intrinsic(atan)
@@ -169,7 +169,7 @@ Double Seed::Core::Details::RuntimeSqrt(Double X)
 
 Seed::Float Seed::Core::Details::Ceil(Seed::Float X)
 {
-	return ceil(X);
+	return static_cast<Float>(ceil(X));
 }
 
 Seed::Double Seed::Core::Details::Ceil(Seed::Double X)
@@ -179,7 +179,7 @@ Seed::Double Seed::Core::Details::Ceil(Seed::Double X)
 
 Seed::Float Seed::Core::Details::Floor(Seed::Float X)
 {
-	return floor(X);
+	return static_cast<Float>(floor(X));
 }
 
 Seed::Double Seed::Core::Details::Floor(Seed::Double X)
@@ -189,7 +189,7 @@ Seed::Double Seed::Core::Details::Floor(Seed::Double X)
 
 Seed::Float Seed::Core::Details::ModD(Seed::Float In, Seed::Float & Part)
 {
-	Part = floor(In);
+	Part = static_cast<Float>(floor(In));
 	return RuntimeAbs(Part - In);
 }
 

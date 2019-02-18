@@ -62,7 +62,6 @@ typedef struct EHExceptionRecord {
 //On ARM64 we don't have a registration node, just a pointer to the stack frame base
 typedef void* EHRegistrationNode;
 
-
 #pragma warning (push)
 #pragma warning (disable: 4201)
 
@@ -94,7 +93,6 @@ typedef struct _UNWIND_INFO {
 #pragma warning (pop)
 
 typedef struct _UNWIND_HISTORY_TABLE* PUNWIND_HISTORY_TABLE;
-
 
 //
 // Current state of a function.
@@ -165,7 +163,6 @@ typedef struct
 											 // will have been already unwound before calling the catch, so this prevents us from unwinding those states twice.
 											 // Also used if an SEH exception is thrown out of a dtor, in which case it's encoded as an offset into the UW map.
 	bool               _IsOffset;            // Whether the value in _UnwindStateorOffset is an offset from the start of the UW map or an actual state.
-
 } tls_exeption_info_t;
 
 // As magic numbers increase, we have to keep track of the versions that we are
