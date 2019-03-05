@@ -56,7 +56,7 @@ using namespace Seed::Memory;
 void * GenericAllocate(Seed::SizeT Size)
 {
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
-	if (Size == Math::Max::SizeT)
+	if (Size == Math::Max<SizeT>())
 		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
@@ -195,7 +195,7 @@ void Seed::Core::Memory::SensitiveDataHeap::Stop() noexcept
 DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Allocate(Seed::SizeT Size)
 {
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
-	if (Size == Math::Max::SizeT)
+	if (Size == Math::Max<SizeT>())
 		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;

@@ -182,6 +182,12 @@ namespace Seed {
 		{
 			UInt8 CompareTo(const T & Val);
 		};
+
+		template<typename T>
+		__forceinline constexpr T Max(T V1, T V2) { return (V1 > V2) ? V1 : V2; }
+
+		template<typename T>
+		__forceinline constexpr T Min(T V1, T V2) { return (V1 < V2) ? V1 : V2; }
 	}
 }
 

@@ -2,7 +2,7 @@
 #include "Seed.Core.Base.h"
 
 namespace std {
-	// CLASS TEMPLATE initializer_list
+	///<summary>Список ініціалізації</summary>
 	template<class _Elem>
 	class initializer_list
 	{	// list of pointers to elements
@@ -70,4 +70,14 @@ ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
 ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
 ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(std::move(From)); return *this; }; \
 ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {__VA_ARGS__ ;delete This;}This = nullptr;}}
+}
+
+namespace Seed {
+	inline namespace Core {
+		///<summary>Список ініціалізації</summary>
+		namespace {
+			template<typename T>
+			using InitilizerList = std::initializer_list;
+		}
+	}
 }

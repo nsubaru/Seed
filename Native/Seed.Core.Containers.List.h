@@ -4,291 +4,578 @@
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Base.Interlocked.h"
 #include "Seed.Core.Containers.Array.h"
+#include "Seed.Core.Threading.SRWLock.h"
 
 namespace Seed {
 	inline namespace Core {
-		class EndNodeNotDeferencable : public Exception {
+		class EndNodeNotDeferencable : public Exception
+		{
 		public:
 			//Помилка: Ітератор на кінець не є визначеним
 			__forceinline EndNodeNotDeferencable(const AChar * File, const AChar * FunctName, SizeT Line) noexcept
-				: Exception(File, FunctName, Line, L"End node of list not deferencable") {};
+				: Exception(File, FunctName, Line, L"End node of list not deferencable")
+			{};
 		};
 #pragma warning(push)
 #pragma warning(disable: 4251)
-		//Шаблон двозвязний список
-		// для кожного елемента відбувається підрахунок силок,
-		// що дозволяє корректно його знищити навіть
-		// якщо десь використовується ітератор на елемент
+		///<summary>Шаблон потоко-захищеного двозвязний список
+		///<para>
+		/// Для кожного елемента відбувається підрахунок силок,
+		/// що дозволяє корректно його знищити навіть
+		/// якщо десь використовується ітератор на елемент
+		///</para>
+		///</summary>
+		///<param name = "Heap">Класс кучі з якої буде алокуватись пам'ять для елементів ліста</param>
+		///<param name = "T">Тип значеннь</param>
 		template<typename Heap, typename T>
-		class BaseList : virtual public Memory::Allocator<Heap> {
+		class BaseList : virtual public Memory::Allocator<Heap>
+		{
 		private:
-			//Дані списку
+			///<summary>Дані списку</summary>
 			struct list_data;
-			//Структурв елемента списку
-			struct elem : virtual public Memory::Allocator<Heap> {
+			///<summary>Структурв елемента списку</summary>
+			struct elem : virtual public Memory::Allocator<Heap>
+			{
 			public:
-				//Покажчик на список який є власником елемента
+				///<summary>Покажчик на об'єкт списка який є власником елемента</summary>
 				list_data * father;
-				//Покажчик на наступний елемент
+				///<summary>Покажчик на наступний елемент</summary>
 				elem * next;
-				//Покажчик на попередній елемент
+				///<summary>Покажчик на попередній елемент</summary>
 				elem * prev;
 
-				//Лічиьник силок на даний елемент
+				///<summary>Лічиьник силок на даний елемент</summary>
 				mutable RefCountT RefCount;
 
-				//Значення елементів
+				///<summary>Значення елементів</summary>
 				T value;
 
-				//Пустий конструктор
+				///<summary>Пустий конструктор</summary>
 				elem() :
 					father(nullptr), next(nullptr), prev(nullptr),
-					RefCount(1), value() {};
-				//Конструктор з присвоєнням значення
+					RefCount(1), value()
+				{};
+				///<summary>Конструктор з присвоєнням значення</summary>
+				///<param name = "obj">Значення елемента</summary>
+				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				elem(const T & obj, list_data * data) :
 					father(data), next(nullptr), prev(nullptr),
-					RefCount(1), value(obj) {};
-				//Конструктор з переміщенням значення
+					RefCount(1), value(obj)
+				{};
+				///<summary>Конструктор з переміщенням значення</summary>
+				///<param name = "obj">Значення елемента</summary>
+				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				elem(T && obj, list_data * data) :
 					father(data), next(nullptr), prev(nullptr),
-					RefCount(1), value(MoveRValue(obj)) {};
-				//Конструктор з присвоєнням значення
+					RefCount(1), value(MoveRValue(obj))
+				{};
+				///<summary>Конструктор з присвоєнням значення і виставленням покажчика на попередній елемент</summary>
+				///<param name = "obj">Значення елемента</summary>
+				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
+				///<param name = "prev">Покажчик на попередній елемент</param>
 				elem(const T & obj, list_data * data, elem * prev) : //-V730
 					father(data), prev(prev), next(nullptr),
-					RefCount(1), value(obj) {};
-				//Конструктор з переміщенням значення
+					RefCount(1), value(obj)
+				{};
+				///<summary>Конструктор з переміщенням значення і виставленням покажчика на попередній елемент</summary>
+				///<param name = "obj">Значення елемента</summary>
+				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
+				///<param name = "prev">Покажчик на попередній елемент</param>
 				elem(T && obj, list_data * data, elem * prev) : //-V730
 					father(data), prev(prev), next(nullptr),
-					RefCount(1), value(MoveRValue(obj)) {};
-				//Конструктор з присвоєнням значення
-				elem(const T & obj, list_data * data, elem * prev, elem * next) : //-V730
+					RefCount(1), value(MoveRValue(obj))
+				{};
+				///<summary>Конструктор з присвоєнням значення і встановлення покажчиків на сусідні елементи</summary>
+				///<param name = "obj">Значення елемента</summary>
+				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
+				///<param name = "prev">Покажчик на попередній елемент</param>
+				///<param name = "next">Покажчик на наступний елемент</param>
+				elem(const T & obj, list_data * data, elem * prev, elem * next) :
 					father(data), prev(prev), next(next),
-					RefCount(1), value(obj) {};
-				//Конструктор з переміщенням значення
-				elem(T && obj, list_data * data, elem * prev, elem * next) : //-V730
+					RefCount(1), value(obj)
+				{};
+				///<summary>Конструктор з переміщенням значення і встановлення покажчиків на сусідні елементи</summary>
+								///<param name = "obj">Значення елемента</summary>
+				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
+				///<param name = "prev">Покажчик на попередній елемент</param>
+				///<param name = "next">Покажчик на наступний елемент</param>
+				elem(T && obj, list_data * data, elem * prev, elem * next) :
 					father(data), prev(prev), next(next),
-					RefCount(1), value(MoveRValue(obj)) {};
+					RefCount(1), value(MoveRValue(obj))
+				{};
 			};
-			//Дані списку
-			struct list_data : virtual public Memory::Allocator<Heap> {
-				//Покажчик на перший  елемент
+			///<summary>Дані списку</summary>
+			struct list_data : virtual public Memory::Allocator<Heap>
+			{
+				///<summary>Покажчик на перший  елемент</summary>
 				elem *root = nullptr;
-				//Покажчик на останй елемент
+				///<summary>Покажчик на останй елемент</summary>
 				elem *last = nullptr;
-				//Кількість елементів
+				///<summary>Кількість елементів</summary>
 				RefCountT size = 0;
+				///<summary>RWLock - для синхронізації читання запису
+				///<para>Він захищає структуру списка, а не значення елемента</para>
+				///</summary>
+				Threading::SRWLock lock;
 			};
-			//Об'єкти списку
+			///<summary>Об'єкти списку</summary>
 			list_data * data;
 		public:
-			//Ітератор
-			class Node : virtual public Memory::Allocator<Heap> {
+			///<summary>Ітератор
+			///<para> Особливістю ітератора в списку є те що елементи існуватимуть
+			///після знищення списку який був власником елементів.
+			///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
+			///</para>
+			///</summary>
+			class Iterator : virtual public Memory::Allocator<Heap>
+			{
+				friend BaseList;
 			private:
-				//Елемент списка
+				///<summary>Елемент списка</summary>
 				mutable elem * This;
-			public:
-				//Пустий конструктор
-				__forceinline Node() :This(nullptr) {};
-
-				//Конструктор з елемента списку
-				__forceinline Node(elem * This) :This(This) {
+			private:
+				///<summary>Конструктор з елемента списку</summary>
+				///<param name = "This">Покажчик на елемент</param>
+				__forceinline Iterator(elem * This) :This(This)
+				{
 					if (This != nullptr) ++This->RefCount;
 				}
+			public:
+				///<summary>Пустий конструктор</summary>
+				__forceinline Iterator() :This(nullptr)
+				{};
 
-				//Копіювальний конструктор
-				__forceinline Node(const Node & orig) : This(orig.This) {
+				///<summary>Копіювальний конструктор</summary>
+				///<param name = "orig">Оригинал ітератора</param>
+				__forceinline Iterator(const Iterator & orig) : This(orig.This)
+				{
 					if (this->This != nullptr) ++This->RefCount;
 				}
 
-				//Конструктор переміщення
-				__forceinline Node(Node && orig) noexcept : This(MoveRValue(orig.This)) {
+				///<summary>Конструктор переміщення</summary>
+				///<param name = "orig">Оригинал ітератора</summary>
+				__forceinline Iterator(Iterator && orig) noexcept : This(MoveRValue(orig.This))
+				{
 					orig.This = nullptr;
 				}
-
-				//Оператор присвоєння
-				__forceinline Node & operator=(const Node & orig) {
-					this->~Node();
+#pragma region Operators
+#pragma region Copy\Move
+				///<summary>Оператор присвоєння</summary>
+				///<param name = "orig">Оригинал ітератора</summary>
+				__forceinline Iterator & operator=(const Iterator & orig)
+				{
+					this->~Iterator();
 					This = orig.This;
 					if (this->This != nullptr) ++This->RefCount;
 					return *this;
 				}
-				//Оператор переміщення
-				__forceinline Node & operator=(Node && orig) noexcept {
-					this->~Node();
+				///<summary>Оператор переміщення</summary>
+				///<param name = "orig">Оригинал ітератора</summary>
+				__forceinline Iterator & operator=(Iterator && orig) noexcept
+				{
+					this->~Iterator();
 					This = orig.This;
 					orig.This = nullptr;
 					return *this;
 				}
-
-				//Наступний елемент
-				__forceinline const Node Next() const {
-					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
-					return Node(This->next);
-				}
-
-				//Попередній елемент
-				__forceinline const Node Prev() const {
-					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
-					return Node(This->prev);
-				}
-
-				//Константний постфіксний інкремент
-				const Node operator++(int) const {
-					Node node(*this);
+#pragma endregion
+#pragma region Iterator Ariphmetic
+				///<summary>Константний постфіксний інкремент</summary>
+				const Iterator operator++(int) const
+				{
+					Iterator node(*this);
 					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
 					This->RefCount--;
-					this->This = this->This->next;
-					if (This != nullptr) This->RefCount++;
-					return node;
+					if (this->This->father == nullptr)
+					{
+						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
+						this->This = nullptr;
+						return node;
+					}
+					else
+					{
+						return this->This->father->lock.ShareLock([&]()
+						{
+							this->This = this->This->next;
+							if (This != nullptr) This->RefCount++;
+							return node;
+						});
+					}
 				}
-				//Константний постфіксний декремент
-				const Node operator--(int) const {
-					Node node(*this);
+				///<summary>Константний постфіксний декремент</summary>
+				const Iterator operator--(int) const
+				{
+					Iterator node(*this);
 					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
 					This->RefCount--;
-					this->This = this->This->prev;
-					if (This != nullptr) This->RefCount++;
-					return node;
+					if (This->father == nullptr)
+					{
+						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
+						this->This = nullptr;
+						return node;
+					}
+					else
+					{
+						return this->This->father->lock.ShareLock([&]()
+						{
+							this->This = this->This->prev;
+							if (This != nullptr) This->RefCount++;
+							return node;
+						});
+					}
 				}
-				//Префіксний інкремент
-				Node & operator++() {
+				///<summary>Префіксний інкремент</summary>
+				Iterator & operator++()
+				{
 					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
 					This->RefCount--;
-					this->This = this->This->next;
-					if (This != nullptr) This->RefCount++;
-					return *this;
+					if (This->father == nullptr)
+					{
+						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
+						This = nullptr;
+						return *this;
+					}
+					else
+					{
+						return this->This->father->lock.ShareLock([&]()
+						{
+							this->This = this->This->next;
+							if (This != nullptr) This->RefCount++;
+							return *this;
+						});
+					}
 				}
-				//Префіксний декремент
-				Node & operator--() {
+				///<summary>Префіксний декремент</summary>
+				Iterator & operator--()
+				{
 					if (This == nullptr)
 						Throw(EndNodeNotDeferencable(ExceptionPosition));
 					This->RefCount--;
-					this->This = this->This->prev;
-					if (This != nullptr) This->RefCount++;
-					return *this;
+					if (this->This->father == nullptr)
+					{
+						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
+						this->This = nullptr;
+						return *this;
+					}
+					else
+					{
+						return this->This->father->lock.ShareLock([&]()
+						{
+							this->This = this->This->prev;
+							if (This != nullptr) This->RefCount++;
+							return *this;
+						});
+					}
 				}
-				//Оператор рівності двох ітераторів
-				__forceinline bool operator==(const Node & second) const {
-					return This == second.This;
+#pragma endregion
+#pragma region Comparing
+				///<summary>Оператор рівності двох ітераторів</summary>
+				///<param name = "seconde">Правий ітератор</param>
+				__forceinline bool operator==(const Iterator & second) const
+				{
+					return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(second.This);
 				}
-				//Оператор не рівності двох ітераторів
-				__forceinline bool operator!=(const Node & second) const {
-					return This != second.This;
+				///<summary>Оператор не рівності двох ітераторів</summary>
+				///<param name = "seconde">Правий ітератор</param>
+				__forceinline bool operator!=(const Iterator & second) const
+				{
+					return reinterpret_cast<SizeT>(This) != reinterpret_cast<SizeT>(second.This);
 				}
-				//Оператор рівності з nullptr
-				__forceinline bool operator==(const std::nullptr_t) const {
-					return This == nullptr;
+
+				///<summary>Оператор рівності з nullptr</summary>
+				__forceinline bool operator==(const Seed::NullptrT) const
+				{
+					return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(nullptr);
 				}
-				//Оператор не рівності з nullptr
-				__forceinline bool operator!=(const std::nullptr_t) const {
+				///<summary>Оператор не рівності з nullptr</summary>
+				__forceinline bool operator!=(const Seed::NullptrT) const
+				{
 					return This != nullptr;
 				}
-				//Оператор розіменування ітератора
-				__forceinline T & operator*() {
+#pragma endregion
+#pragma region Data access operators
+				///<summary>Оператор розіменування ітератора</summary>
+				///<returns>Значення елемента</returns>
+				__forceinline T & operator*()
+				{
 					if (This == nullptr)
 						Throw(EndNodeNotDeferencable(ExceptionPosition));
 					return This->value;
 				}
-				//Константний оператор розіменування ітератора
-				__forceinline const T & operator*() const {
+				///<summary>Константний оператор розіменування ітератора</summary>
+				///<returns>Константне значення елемента</returns>
+				__forceinline const T & operator*() const
+				{
 					if (This == nullptr)
 						Throw(EndNodeNotDeferencable(ExceptionPosition));
 					return This->value;
 				}
-				//Оператор доступу до полів/методів структури/класу
-				__forceinline T * operator->() {
+				///<summary>Оператор доступу до полів/методів структури/класу</summary>
+				///<returns>Покажчик на елемент</returns>
+				__forceinline T * operator->()
+				{
 					if (This == nullptr)
 						Throw(EndNodeNotDeferencable(ExceptionPosition));
 					return &This->value;
 				}
-				//Константний оператор доступу до полів/методів структури/класу
-				__forceinline const T * operator->() const {
+				///<summary>Константний оператор доступу до полів/методів структури/класу</summary>
+				///<returns>Константний покажчик на елемент</returns>
+				__forceinline const T * operator->() const
+				{
 					if (This == nullptr)
 						Throw(EndNodeNotDeferencable(ExceptionPosition));
 					return &This->value;
 				}
-				//Видалення значення ітератора, ітератор отримує значення наступного елемента
-				void Remove() {
+#pragma endregion
+#pragma endregion
+#pragma region Iterator move
+				///<summary>Вертає наступний елемент</summary>
+				__forceinline const Iterator Next() const
+				{
+					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
+					if (This->father = nullptr)
+						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
+						return Iterator(nullptr);
+					else
+						return This->father->lock.ShareLock([&]()
+					{
+						return Iterator(This->next);
+					});
+				}
+
+				///<summary>Попередній елемент</summary>
+				__forceinline const Iterator Prev() const
+				{
+					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
+					if (This->father = nullptr)
+						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
+						return Iterator(nullptr);
+					else
+						return This->father->lock.ShareLock([&]()
+					{
+						return Iterator(This->prev);
+					});
+				}
+#pragma endregion
+#pragma region List element manipulations
+				///<summary>Видалення значення ітератора, ітератор отримує значення наступного елемента</summary>
+				void Remove()
+				{
 					if (this->This == nullptr)
 						Throw(EndNodeNotDeferencable(ExceptionPosition));
 					list_data * data = this->This->father;
-					--((This)->RefCount);
-					if (this->This->next == nullptr && this->This->prev == nullptr) {
-						if (this->This->father != nullptr) {
-							this->This->father->root = this->This->father->last = nullptr;
-						}
+					if (this->This->father == nullptr)
+					{
+						if (--This->RefCount == 0)
+							delete This;
+						This = nullptr;
+						return;
 					}
-					else if (this->This->next != nullptr && this->This->prev != nullptr) {
-						this->This->prev->next = this->This->next;
-						this->This->next->prev = this->This->prev;
-					}
-					else if (this->This->next == nullptr) {
-						this->This->prev->next = nullptr; //-V522
-						this->This->father->last = this->This->prev;
-					}
-					else if (this->This->prev == nullptr) {
-						this->This->next->prev = nullptr;
-						this->This->father->root = this->This->next;
-					}
-					if (this->This->father != nullptr)
+					else
+						//Якщо власник існує то видалення виконується в екслюзивному блокуванні
+						this->This->father->lock.ExclusiveLock([&]()
+					{
 						--((This)->RefCount);
-					if (this->This->RefCount == 0) {
-						delete this->This;
-					}
-					else {
-						this->This->next = nullptr;
-						this->This->prev = nullptr;
-						this->This = nullptr;
-					}
+						if (this->This->next == nullptr && this->This->prev == nullptr)
+						{
+							if (this->This->father != nullptr)
+							{
+								this->This->father->root = this->This->father->last = nullptr;
+							}
+						}
+						else if (this->This->next != nullptr && this->This->prev != nullptr)
+						{
+							this->This->prev->next = this->This->next;
+							this->This->next->prev = this->This->prev;
+						}
+						else if (this->This->next == nullptr)
+						{
+							this->This->prev->next = nullptr;
+							this->This->father->last = this->This->prev;
+						}
+						else if (this->This->prev == nullptr)
+						{
+							this->This->next->prev = nullptr;
+							this->This->father->root = this->This->next;
+						}
+						if (this->This->father != nullptr)
+							--((This)->RefCount);
+						if (this->This->RefCount == 0)
+						{
+							delete this->This;
+						}
+						else
+						{
+							this->This->next = nullptr;
+							this->This->prev = nullptr;
+							this->This = nullptr;
+						}
+					});
 				}
-				//Деструктор ітератора, якщо елемент є останьою силкою на об'єкт то відбувається знищення об'єкта
-				//завдяки цьому ітератори можна безпечно передавати не слідкуючи за життямм списку який є
-				//власником об'єкта
-				__forceinline ~Node() noexcept {
+#pragma region Adding element to list by iterator
+				///<summary>Вставка елемента після заданого</summary>
+				///<param name = "Value">Значення нового елемента</summary>
+				__forceinline Iterator Insert(const T & Value)
+				{
+					AddAfter(Value);
+				}
+				///<summary>Оптимізована вставка елемента після заданого</summary>
+				///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
+				__forceinline Iterator Insert(T && Value)
+				{
+					AddAfter(MoveRValue(Value));
+				}
+				///<summary>Вставка елемента після поточного</summary>
+				///<param name = "Value">Значення нового елемента</summary>
+				__forceinline Iterator AddAfter(const T & Value)
+				{
+					if (This == nullptr)
+						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+					if (This->father == nullptr)
+						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+					//Виконується в екслюзивному блокуванні
+					return This->father->lock.ExclusiveLock([&]() mutable
+					{
+						//Створення нового елемента
+						auto newAfter = new elem(Value, This->father, This, this->This->next);
+						if (this->This->next == nullptr)
+						{
+							this->This->father->last = this->This->next = newAfter;
+							newAfter->next->prev = newAfter;
+						}
+						else
+						{
+							this->This->next = newAfter;
+							newAfter->next->prev = newAfter;
+						}
+						return newAfter;
+					});
+				}
+				///<summary>Оптимізована вставка елемента після поточного</summary>
+				///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
+				__forceinline Iterator AddAfter(T && Value)
+				{
+					if (This == nullptr)
+						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+					if (This->father == nullptr)
+						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+					//Виконується в екслюзивному блокуванні
+					return This->father->lock.ExclusiveLock([&]() mutable  
+					{
+						//Створення нового елемента
+						auto newAfter = new elem(MoveRValue(Value), This->father, This, this->This->next);
+						if (this->This->next == nullptr)
+						{
+							this->This->father->last = this->This->next = newAfter;
+							newAfter->next->prev = newAfter;
+						}
+						else
+						{
+							this->This->next = newAfter;
+							newAfter->next->prev = newAfter;
+						}
+						return newAfter;
+					});
+				}
+				///<summary>Вставка елемента перед поточним</summary>
+				///<param name = "Value">Значення нового елемента</summary>
+				__forceinline Iterator AddBefore(const T & Value)
+				{
+					if (This == nullptr)
+						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+					if (This->father == nullptr)
+						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+					//Виконується в екслюзивному блокуванні
+					return This->father->lock.ExclusiveLock([&]() mutable
+					{
+						//Створення нового елемента
+						auto newBefore = new elem(Value, This->father, nullptr, this->This->father->root);
+						if (this->This->prev == nullptr)
+						{
+							this->This->father->root = this->This->prev = newBefore;
+							newBefore->next->prev = newBefore;
+						}
+						else
+						{
+							this->This->prev = newBefore;
+							newBefore->prev->next = newBefore;
+						}
+						return newBefore;
+					});
+				}
+				///<summary>Оптимізована вставка елемента перед поточним</summary>
+				///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
+				__forceinline Iterator AddBefore(T && Value)
+				{
+					if (This == nullptr)
+						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+					if (This->father == nullptr)
+						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+					//Виконується в екслюзивному блокуванні
+					return This->father->lock.ExclusiveLock([&]() mutable
+					{
+						//Створення нового елемента
+						auto newBefore = new elem(MoveRValue(Value), This->father, nullptr, this->This->father->root);
+						if (this->This->prev == nullptr)
+						{
+							this->This->father->root = this->This->prev = newBefore;
+							newBefore->next->prev = newBefore;
+						}
+						else
+						{
+							this->This->prev = newBefore;
+							newBefore->prev->next = newBefore;
+						}
+						return newBefore;
+					});
+				}
+#pragma endregion
+#pragma endregion
+
+				///<summary>Деструктор ітератора
+				///<para>Якщо елемент є останьою силкою на об'єкт то відбувається знищення об'єкта
+				///завдяки цьому ітератори можна безпечно передавати не слідкуючи за життямм списку який є
+				///власником об'єкта
+				///</para></summary>
+				__forceinline ~Iterator() noexcept
+				{
 					if (This == nullptr) return;
-					--This->RefCount;
-					if (This->RefCount == 0) {
+					if (--This->RefCount == 0)
+					{
 						delete This;
 					}
 					This = nullptr;
 				}
-				//Вставка елемента після заданого
-				__forceinline Node Insert(const T & value) {
-					if (This == nullptr)
-						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
-					auto newElem = new elem(value, This->father, This->prev, This->next);
-					auto cp = newElem;
-					Synchonize::MemoryBarrier();
-					Synchonize::InterlockedExchangePointer((void * volatile *)&newElem, This->next->prev);
-					Synchonize::InterlockedExchangePointer((void * volatile *)&cp, This->next->prev);
-					Synchonize::MemoryBarrier();
-					return Node(This->next->next);
-				}
-				//Оптимізована вставка елемента після заданого
-				__forceinline Node Insert(T && value) {
-					if (This == nullptr)
-						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
-					auto newElem = new elem(MoveRValue(value), This->father, This->prev, This->next);
-					auto cp = newElem;
-					Synchonize::MemoryBarrier();
-					Synchonize::InterlockedExchangePointer((void * volatile *)&newElem, This->next->prev);
-					Synchonize::InterlockedExchangePointer((void * volatile *)&cp, This->next);
-					Synchonize::MemoryBarrier();
-					return Node(This->next->next);
-				}
 			};
 		public:
-			//Пустий конструктор
-			__forceinline BaseList() noexcept :data(nullptr) {};
-			//Конструктор з значенням першого елемента
-			__forceinline BaseList(T & Value) {
+			friend Iterator;
+#pragma region Ctors
+			///<summary>Пустий конструктор</summary>
+			__forceinline BaseList() noexcept :data(nullptr)
+			{};
+			///<summary>Конструктор з значенням першого елемента</summary>
+			///<param name = "Value">Значення першого елемента</summary>
+			__forceinline BaseList(const T & Value)
+			{
 				data = new list_data;
 				data->root = new elem(Value, data);
 				data->last = data->root;
 				data->size = 1;
 			}
-			//Конструктор з масиву та його розміру
-			BaseList(T * Array, SizeT Size) {
+			///<summary>Конструктор з значенням першого елемента</summary>
+			///<param name = "Value">rvalue силка на перший елемент</summary>
+			__forceinline BaseList(T && Value)
+			{
+				data = new list_data;
+				data->root = new elem(MoveRValue(Value), data);
+				data->last = data->root;
+				data->size = 1;
+			}
+			///<summary>Конструктор з масиву та його розміру</summary>
+			///<param name = "Array">С-подібний масив</summary>
+			///<param name = "Count">Кількість елементів в ньому</summary>
+			InternalApiCall BaseList(T * Array, SizeT Count)
+			{
 				data = new list_data;
 				if (Array == nullptr)
 				{
@@ -297,34 +584,43 @@ namespace Seed {
 				}
 				data->root = new elem(Array[0], data);
 				data->last = data->root;
-				if (Size != 1) {
-					for (SizeT i = 1; i < Size; i++) {
+				if (Count != 1)
+				{
+					for (SizeT i = 1; i < Count; i++)
+					{
 						data->last->next = new elem(Array[i], data, data->last);
 						data->last = data->last->next;
 					}
 					data->last->next = nullptr;
 				}
-				data->size = Size;
+				data->size = Count;
 			}
 
-			//Конструктор з масиву та його розміру
-			BaseList(const Array<T> & array) {
+			///<summary>Конструктор з масиву та його розміру</summary>
+			///<param name = "array"> Масив елементів</param>
+			BaseList(const Array<T> & array)
+			{
 				data = new list_data;
-				if (array.Size() == 0) return;
+				if (array.Count == 0) return;
 				data->root = new elem(array[0], data);
 				data->last = data->root;
-				if (array.Size() != 1) {
-					for (SizeT i = 1; i < array.Size(); i++) {
+				if (array.Count != 1)
+				{
+					for (SizeT i = 1; i < array.Count; i++)
+					{
 						data->last->next = new elem(array[i], data, data->last);
 						data->last = data->last->next;
 					}
 					data->last->next = nullptr;
 				}
-				data->size = array.Size();
+				data->size = array.Count;
 			}
 
-			//Конструктор через list-initializer
-			BaseList(CRT::initializer_list<T> list) {
+			///<summary>Конструктор через list-initializer</summary>
+			///<param name = "list">Список ініціалізації</param>
+			BaseList(InitilizerList<T> && list)
+			{
+				////TODO: Write optimized InitilizerList ctors
 				data = new list_data;
 				if (list.size() == 0) return;
 				this->data->size = list.size();
@@ -332,8 +628,10 @@ namespace Seed {
 				data->root = new elem(*it, data);
 				data->root->value = *it;
 				data->last = data->root;
-				if (this->data->size != 1) {
-					for (SizeT i = 0; i < this->data->size; i++) {
+				if (this->data->size != 1)
+				{
+					for (SizeT i = 0; i < this->data->size; i++)
+					{
 						it++;
 						data->last->next = new elem(*it, data, data->last);
 						data->last = data->last->next;
@@ -341,38 +639,53 @@ namespace Seed {
 				}
 			}
 
-			//Копіювальний конструктор
-			BaseList(const BaseList&);
-			//Конструктор переміщення
-			BaseList(BaseList&&) noexcept;
-			//Оператор присвоєння
-			BaseList& operator=(const BaseList & Orig) {
+			///<summary>Копіювальний конструктор</sumary>
+			///<param name = "orig">Оригінал списку</param>
+			BaseList(const BaseList& orig);
+			///<summary>Конструктор переміщення</sumary>
+			///<param name = "orig">Оригінал списку</param>
+			BaseList(BaseList&& orig) noexcept;
+#pragma endregion
+#pragma region Operators
+			///<summary>Оператор присвоєння, виконує копіювання елементів списку</sumary>
+			///<param name = "orig">Оригінал списку</param>
+			BaseList& operator=(const BaseList & Orig)
+			{
 				if (this->data == Orig.data) return *this;
 				this->~BaseList();
-				if (Orig.data == nullptr) {
+				if (Orig.data == nullptr)
+				{
 					this->data = nullptr;
 					return *this;
 				}
-				this->data = new list_data;
-				this->data->size = Orig.data->size;
-				elem * root_orig = Orig.data->root;
-				this->data->root = new elem(root_orig->value, data);
-				this->data->last = this->data->root;
-				root_orig = root_orig->next;
-				if (root_orig == nullptr) {
-					this->data->root->next = nullptr;
-					return *this;
-				}
-				while (root_orig != nullptr) {
-					this->data->last->next = new elem(root_orig->value, data, this->data->last);
-					this->data->last = this->data->last->next;
+				//Виконується в спільній блокировці оригиналу
+				return Orig.data->lock.ShareLock([&]()
+				{
+					this->data = new list_data;
+					this->data->size = Orig.data->size;
+					elem * root_orig = Orig.data->root;
+					this->data->root = new elem(root_orig->value, data);
+					this->data->last = this->data->root;
 					root_orig = root_orig->next;
-				}
-				this->data->last->next = nullptr;
-				return *this;
+					if (root_orig == nullptr)
+					{
+						this->data->root->next = nullptr;
+						return *this;
+					}
+					while (root_orig != nullptr)
+					{
+						this->data->last->next = new elem(root_orig->value, data, this->data->last);
+						this->data->last = this->data->last->next;
+						root_orig = root_orig->next;
+					}
+					this->data->last->next = nullptr;
+					return *this;
+				});
 			}
-			//Оператор переміщення
-			__forceinline BaseList& operator=(BaseList && Orig) noexcept {
+			///<summary>Оператор переміщення, виконує переміщення об'єкта списку</sumary>
+			///<param name = "orig">Оригінал списку</param>
+			__forceinline BaseList& operator=(BaseList && Orig) noexcept
+			{
 				if (this->data == Orig.data) return *this;
 				this->~BaseList();
 				this->data = Orig.data;
@@ -380,306 +693,632 @@ namespace Seed {
 				return *this;
 			}
 
-			//Вертає true якщо список пустий
-			__forceinline Boolean IsEmpty() const noexcept { return (this->data == nullptr || this->data->size == 0); }
-
-			__forceinline SizeT Size() const noexcept { return IsEmpty() ? 0ull : (SizeT)data->size; }
-
-			//Одержання ітератора на перший елемент
-			__forceinline Node Root() {
-				if (data == nullptr) return End();
-				return Node(data->root);
+			///<summary>Оператор додавання значення в кінець списку</summary>
+			///<param name = "Value">Значення нового елемента</param>
+			__forceinline BaseList & operator+=(const T & Value)
+			{
+				this->AddLast(Value); return *this;
 			}
-			//Одержання ітератора на останій елемент
-			__forceinline Node Last() {
-				if (data == nullptr) return End();
-				return Node(data->last);
+			///<summary>Оптимізований оператор додавання значення в кінець списку</summary>
+			///<param name = "Value">rvalue силка на значення нового елемента</param>
+			__forceinline BaseList & operator+=(T && Value)
+			{
+				this->AddLast(Value); return *this;
 			}
-			//Константне одержання ітератора на перший елемент
-			__forceinline const Node Root() const {
-				if (data == nullptr) return End();
-				return Node(data->root);
-			}
-			//Константне одержання ітератора на останій елемент
-			__forceinline const Node Last() const {
-				if (data == nullptr) return End();
-				return Node(data->last);
-			}
-			//Нуль ітератора на кінець
-			__forceinline static Node End() {
-				return Node(nullptr);
-			}
-			//Додавання нового елемента до списку
-			Node Add(const T & Value) {
-				if (data == nullptr) {
-					data = new list_data;
-					data->root = new elem(Value, data);
-					data->last = data->root;
-					data->size = 1;
-					return data->last;
-				}
-				if (data->root == nullptr) {
-					data->root = new elem(Value, data);
-					data->last = data->root;
-					data->size = 1;
-					return data->last;
-				}
-				auto new_last = new elem(Value, data, data->last);
-				InterlockedExchangePointerNoFence((void * volatile *)&data->last, new_last);
-				new_last = data->last;
-				InterlockedExchangePointerNoFence((void * volatile *)&data->last->prev->next, new_last);
-				++data->size;
-				return data->last;
-			}
-			//Оптимізоване додавання елемента до списку
-			Node Add(const T && Value) {
-				if (data == nullptr) {
-					data = new list_data;
-					data->root = new elem(Value, data);
-					data->last = data->root;
-					data->size = 1;
-					return data->last;
-				}
-				if (data->root == nullptr) {
-					data->root = new elem(Value, data);
-					data->last = data->root;
-					data->size = 1;
-					return data->last;
-				}
-				auto new_end = new elem(MoveRValue(Value), data, data->last);
-				InterlockedExchangePointerNoFence((void * volatile *)&data->last, new_end);
-				new_end = data->last;
-				InterlockedExchangePointerNoFence((void * volatile *)&data->last->prev->next, new_end);
-				++data->size;
-				return data->last;
+#pragma endregion
+#pragma region Item count methods
+			///<summary>Вертає true якщо список пустий</summary>
+			__forceinline Boolean IsEmpty() const noexcept
+			{
+				return (this->data == nullptr || this->data->size == 0);
 			}
 
-			//Перетворення в масив
-			Array<T> toArray() const {
+			///<summary>Вертає кількість елементів в списку</summary>
+			__forceinline SizeT GetCount() const noexcept
+			{
+				return IsEmpty() ? 0ull : (SizeT)data->size;
+			}
+
+			///<summary>Кількість елементів в списку</summary>
+			SizeT Property(GetCount) Count;
+#pragma endregion
+#pragma region Iterators
+#pragma region Gettter
+			////TODO: Maybe implement as property
+
+			///<summary>Одержання ітератора на перший елемент</summary>
+			__forceinline Iterator GetRoot()
+			{
+				if (data == nullptr) return GetEnd();
+				return this->data->lock.ShareLock([&]()
+				{
+					return Iterator(data->root);
+				});
+			}
+			///<summary>Одержання ітератора на останій елемент</summary>
+			__forceinline Iterator GetLast()
+			{
+				if (data == nullptr) return GetEnd();
+				return this->data->lock.ShareLock([&]()
+				{
+					return Iterator(data->last);
+				});
+			}
+			///<summary>Константне одержання ітератора на перший елемент</summary>
+			__forceinline const Iterator GetRoot() const
+			{
+				if (data == nullptr) return GetEnd();
+				return this->data->lock.ShareLock([&]()
+				{
+					return Iterator(data->root);
+				});
+			}
+			///<summary>Константне одержання ітератора на останій елемент</summary>
+			__forceinline const Iterator GetLast() const
+			{
+				if (data == nullptr) return GetEnd();
+				return this->data->lock.ShareLock([&]()
+				{
+					return Iterator(data->last);
+				});
+			}
+			///<summary>Одержання нуль ітератора на кінець списку</summary>
+			__forceinline static Iterator GetEnd()
+			{
+				return Iterator(nullptr);
+			}
+
+			///<summary>Ітератора на перший елемент</summary>
+			Iterator Property(GetRoot) First;
+			///<summary>Ітератора на останій елемент</summary>
+			Iterator Property(GetLast) Last;
+			///<summary>Нуль ітератора на кінець списку</summary>
+			Iterator Property(GetEnd) End;
+#pragma endregion
+#pragma region Add new value by iterator
+			///<summary>Додавання нового елемента в кінець списку</summary>
+			///<param name = "Value">Значення нового елемента</param>
+			Iterator AddLast(const T & Value)
+			{
 				if (data == nullptr)
-					throw new NullPointExeption(ExeptionPosition);
+				{
+					data = new list_data;
+					data->root = new elem(Value, data);
+					data->last = data->root;
+					data->size = 1;
+					return data->last;
+				}
+				if (data->root == nullptr)
+				{
+					data->root = new elem(Value, data);
+					data->last = data->root;
+					data->size = 1;
+					return data->last;
+				}
+				//Виконується в ексклюзивній блокировці
+				return this->data->lock.ExclusiveLock([&]() mutable
+				{
+					auto newLast = new elem(Value, data, data->last);
+					auto cp = newLast;
+					this->data->last = newLast;
+					this->data->last->prev->next = newLast;
+					++data->size;
+					return data->last;
+				});
+			}
+
+			///<summary>Оптимізоване додавання елемента до списку</summary>
+			///<param name = "Value">rvalue силка на значення нового елемента</param>
+			Iterator AddLast(const T && Value)
+			{
+				if (data == nullptr)
+				{
+					data = new list_data;
+					data->root = new elem(Value, data);
+					data->last = data->root;
+					data->size = 1;
+					return data->last;
+				}
+				if (data->root == nullptr)
+				{
+					data->root = new elem(Value, data);
+					data->last = data->root;
+					data->size = 1;
+					return data->last;
+				}
+				//Виконується в ексклюзивній блокировці
+				this->data->lock.ExclusiveLock([&]() mutable
+				{
+					auto newLast = new elem(MoveRValue(Value), data, data->last);
+					auto cp = newLast;
+					this->data->last = newLast;
+					this->data->last->prev->next = newLast;
+					++data->size;
+					return data->last;
+				});
+			}
+			///<summary>Додавання нового елемента після заданого ітератором</summary>
+			///<param name = "Item">Ітератор на елмент</param>
+			///<param name = "Value">Значення нового елемента</param>
+			Iterator AddAfter(Iterator Item, const T & Value)
+			{
+				return Item.AddAfter(Value);
+			}
+			///<summary>Оптимізоване додавання елемента після заданого ітератором</summary>
+			///<param name = "Item">Ітератор на елмент</param>
+			///<param name = "Value">rvalue силка на значення нового елемента</param>
+			Iterator AddAfter(Iterator Item, T && Value)
+			{
+				return Item.AddAfter(MoveRValue(Value));
+			}
+			///<summary>Додавання нового елемента перед елементом заданим ітератором</summary>
+			///<param name = "Item">Ітератор на елмент</param>
+			///<param name = "Value">Значення нового елемента</param>
+			Iterator AddBefore(Iterator Item, const T & Value)
+			{
+				return Item.AddBefore(Value);
+			}
+			///<summary>Додавання нового елемента перед елементом заданим ітератором</summary>
+			///<param name = "Item">Ітератор на елмент</param>
+			///<param name = "Value">rvalue силка на значення нового елемента</param>
+			Iterator AddBefore(Iterator Item, T && Value)
+			{
+				return Item.AddBefore(MoveRValue(Value));
+			}
+#pragma endregion
+#pragma region Convertors
+
+			///<summary>Отримання масиву елементів списку
+			///<para>На час перетворення список блокується</para>
+			///</summary>
+			///<returns>Масив елементів</returns>
+			Array<T> toArray() const
+			{
+				if (data == nullptr)
+					return Array<T>();
 				if (data->root == nullptr)
 					return Array<T>();
 				T * __array = new T[data->size];
 				SizeT i = 0;
-				auto it = data->root;
-				while (it != nullptr) {
-					__array[i] = it->value;
-					it = it->next;
-				}
+				this->data->lock.ShareLock([&]()
+				{
+					auto it = data->root;
+					while (it != nullptr)
+					{
+						__array[i] = it->value;
+						it = it->next;
+					}
+				});
 				return Array<T>(__array, i);
 			}
+#pragma endregion
 
-			//Оператор додавання значення до списку
-			__forceinline BaseList & operator+=(const T & Value) { this->Add(Value); return *this; }
-			//Оптимізований оператор додавання до списку
-			__forceinline BaseList & operator+=(T && Value) { this->Add(Value); return *this; }
-
-			//Вертає ітератор на початок для циклу з перебором
-			__forceinline const Node begin() const {
-				return Root();
+		private:
+#pragma region For each support methods
+			///<summary>Вертає константний ітератор на початок для циклу з перебором</summary>
+			__forceinline const Iterator begin() const
+			{
+				return GetRoot();
 			}
-			//Вертає ітератор на кінець для циклу з перебором
-			__forceinline const Node end() const {
+			///<summary>Вертає константний ітератор на кінець для циклу з перебором</summary>
+			__forceinline const Iterator end() const
+			{
 				return nullptr;
 			}
-			//Видалення всіх елементів які рівні значенню
-			void Remove(const T & value) {
+			///<summary>Вертає ітератор на початок для циклу з перебором</summary>
+			__forceinline Iterator begin()
+			{
+				return GetRoot();
+			}
+#pragma endregion
+		public:
+#pragma region Removing
+			///<summary>Видалення всіх елементів які рівні значенню
+			///<para>Якщо вказано IsRemoveAll false то видаленно буде тільки перше включення</para>
+			///</summary>
+			///<param name = "Value">Значення яке вказує що треба видалити елемент</param>
+			///<param name = "IsRemoveAll">Не обов'язово. Якщо вказано false то видаленно буде тільки перше включення</param>
+			///<returns>Силку на список</returns>
+			BaseList & Remove(const T & Value, bool IsRemoveAll = true)
+			{
 				elem * it = data->root;
 				elem * tmp;
-				while (it != nullptr) {
-					if (it->value == value) {
-						if (it->next == nullptr && it->prev == nullptr) {
+				while (it != nullptr)
+				{
+					if (it->value == Value) //Видалення виконуєтсья в екслюзивній блокировці
+						this->data->lock.ExclusiveLock([&]()
+					{
+						if (it->next == nullptr && it->prev == nullptr)
+						{
 							data->root = nullptr;
 							data->last = nullptr;
 							tmp = nullptr;
 						}
-						else if (it->next == nullptr) {
+						else if (it->next == nullptr)
+						{
 							tmp = nullptr;
 							it->prev->next = nullptr; //-V522
 							data->last = it->prev;
 						}
-						else if (it->prev == nullptr) {
+						else if (it->prev == nullptr)
+						{
 							tmp = it->next;
 							it->next->prev = nullptr;
 							data->root = it->next;
 						}
-						else {
+						else
+						{
 							tmp = it->next;
 							tmp->prev = it->prev;
 							it->prev->next = tmp;
 						}
 						--it->RefCount;
-						if (it->RefCount == 0) {
+						if (it->RefCount == 0)
+						{
 							delete it;
 						}
 						--data->size;
 						it = tmp;
-					}
+					});
 					else  it = it->next;
 				}
+				return *this;
 			}
 
-			//Видалення всіх елементів які рівні значенню
-			//Якщо вказано IsRemoveAll false то видаленно буде тільки перше включення
-			void Remove(const T & value, bool IsRemoveAll = true) {
+			////TODO: Write removing all with speicific function which execute for each item
+
+			///<summary>Видалення елементів які задовільняють умову функції Comp</summary>
+			///<param name = "Filter">Функція-фільтр якщо вертає true то елемент видаляється</param>
+			///<returns>Силку на список</returns>
+			template<typename TFilter>
+			BaseList & RemoveIf(const TFilter & Filter)
+			{
+				static_assert(!StaticAsserrts::CheckSignature<TFilter, Boolean, const T&>(), "Invalid filter");
+				if (data == nullptr)
+					return;
 				elem * it = data->root;
 				elem * tmp;
-				while (it != nullptr) {
-					if (it->value == value) {
-						if (it->next == nullptr && it->prev == nullptr) {
-							data->root = nullptr;
-							data->last = nullptr;
-							tmp = nullptr;
+				while (it != nullptr)
+				{
+					if (Filter(it->value))
+						this->data->lock.ExclusiveLock([&]()
+						{
+							if (it->next == nullptr && it->prev == nullptr)
+							{
+								data->root = nullptr;
+								data->last = nullptr;
+								tmp = nullptr;
+							}
+							else if (it->next == nullptr)
+							{
+								tmp = nullptr;
+								it->prev->next = nullptr;
+								data->last = it->prev;
+							}
+							else if (it->prev == nullptr)
+							{
+								tmp = it->next;
+								it->next->prev = nullptr;
+								data->root = it->next;
+							}
+							else
+							{
+								tmp = it->next;
+								tmp->prev = it->prev;
+								it->prev->next = tmp;
+							}
+							--it->RefCount;
+							if (it->RefCount == 0)
+							{
+								delete it;
+							}
+							--data->size;
+							it = tmp;
 						}
-						else if (it->next == nullptr) {
-							tmp = nullptr;
-							it->prev->next = nullptr; //-V522
-							data->last = it->prev;
-						}
-						else if (it->prev == nullptr) {
-							tmp = it->next;
-							it->next->prev = nullptr;
-							data->root = it->next;
-						}
-						else {
-							tmp = it->next;
-							tmp->prev = it->prev;
-							it->prev->next = tmp;
-						}
-						--it->RefCount;
-						if (it->RefCount == 0) {
-							delete it;
-						}
-						--data->size;
-						it = tmp;
-						if (!IsRemoveAll)
-							break;
-					}
 					else  it = it->next;
 				}
-			}
-			template<UInt8(Comparator)(const T&, const T&)>
-			void Sort() {
-				return 1;
+				return *this;
 			}
 
-			void Sort() {
-				static_assert(Seed::StaticAsserts::IsBasedOn<IComparable<T>, T>(), "Cant sort class witch not implemented sort")
-			}
-
-			//Видалення елементів які задовільняють умову функції Comp
-			template<typename Filter>
-			void RemoveIf(const Filter & filter) {
-				static_assert(!StaticAsserrts::CheckSignature<Filter, Boolean, const T&>(), "Non valid filter");
-				elem * it = data->root;
-				elem * tmp;
-				while (it != nullptr) {
-					if (filter(it->value)) {
-						if (it->next == nullptr && it->prev == nullptr) {
-							data->root = nullptr;
-							data->last = nullptr;
-							tmp = nullptr;
-						}
-						else if (it->next == nullptr) {
-							tmp = nullptr;
-							it->prev->next = nullptr; //-V522
-							data->last = it->prev;
-						}
-						else if (it->prev == nullptr) {
-							tmp = it->next;
-							it->next->prev = nullptr;
-							data->root = it->next;
-						}
-						else {
-							tmp = it->next;
-							tmp->prev = it->prev;
-							it->prev->next = tmp;
-						}
-						--it->RefCount;
-						if (it->RefCount == 0) {
-							delete it;
-						}
-						--data->size;
-						it = tmp;
-					}
-					else  it = it->next;
-				}
-			}
-
-			void AddAfter();
-			void AddBefore();
-			void AddLast();
-
-			Node Find();
-			Node FindLast();
-
-			//Видалення елемента по ітератору
-			__forceinline void Remove(Node & node) {
+			///<summary>Видалення елемента по ітератору</summary>
+			__forceinline void Remove(Iterator & node)
+			{
 				node.Remove();
 			}
-			//Деструктор звільняє пам'ять виділену під елементи але якщо елемент використовується через ітератор
-			//то його знищення оминається
-			~BaseList() {
-				if (data == nullptr) return;
-				elem * node;
-				while (data->root != nullptr) {
-					node = data->root;
-					data->root = data->root->next;
-					--node->RefCount;
-					if (node->RefCount == 0) {
-						delete node;
-						continue;
-					}
-					node->next = nullptr;
-					node->father = nullptr;
-					node->prev = nullptr;
-				}
-				data->last = nullptr;
-				data->size = 0;
-				delete data;
-				data = nullptr;
-			}
-		};
+#pragma endregion
+#pragma region Sorting
+		private:
+			///<summary>Внутріщшня функція сортування списку</summary>
+			///<param name = "Comparator">Фукція\лямбда яка приймає дві константні силки
+			///на значення і вертає true якщо перше значення більше другого</param>
+			template<typename TComparator>
+			elem * SortedMerge(elem * a, elem * b, TComparator Comparator)
+			{
+				elem * result = nullptr;
 
-		//Копіювальний конструктор
+				if (a == NULL)
+					return(b);
+				else if (b == NULL)
+					return(a);
+
+				if (Comparator(a->data, b->data))
+				{
+					result = a;
+					result->next = SortedMerge(a->next, b);
+				}
+				else
+				{
+					result = b;
+					result->next = SortedMerge(a, b->next);
+				}
+				return(result);
+			}
+
+			/* UTILITY FUNCTIONS */
+			/* Split the nodes of the given list into front and back halves,
+				and return the two lists using the reference parameters.
+				If the length is odd, the extra node should go in the front list.
+				Uses the fast/slow pointer strategy. */
+			void FrontBackSplit(elem * source, elem** frontRef, elem** backRef)
+			{
+				elem * fast = source->next;
+				elem * slow = source;
+
+				/* Advance 'fast' two nodes, and advance 'slow' one node */
+				while (fast != nullptr)
+				{
+					fast = fast->next;
+					if (fast != nullptr)
+					{
+						slow = slow->next;
+						fast = fast->next;
+					}
+				}
+
+				/* 'slow' is before the midpoint in the list, so split it in two
+				at that point. */
+				*frontRef = source;
+				*backRef = slow->next;
+				slow->next = nullptr;
+			}
+			///<summary>Внутріщшня функція сортування списку</summary>
+			///<param name = "Comparator">Фукція\лямбда яка приймає дві константні силки
+			///на значення і вертає true якщо перше значення більше другого</param>
+			template<typename Comparator>
+			void MergeSort(elem ** headRef, Comparator cmp)
+			{
+				elem * head = *headRef;
+				elem * a;
+				elem * b;
+
+				if ((head == nullptr) || (head->next == nullptr))
+				{
+					return;
+				}
+
+				FrontBackSplit(head, &a, &b);
+
+				/* Recursively sort the sublists */
+				MergeSort(&a);
+				MergeSort(&b);
+
+				/* answer = merge the two sorted lists together */
+				*headRef = SortedMerge(a, b);
+			}
+		public:
+			///<summary>Функція сортування списку</summary>
+			///<param name = "Comparator">Фукція\лямбда яка приймає дві константні силки
+			///на значення і вертає true якщо перше значення більше другого</param>
+			///<returns>Силку на список</returns>
+			template<typename TComparator>
+			BaseList & Sort(TComparator Compator)
+			{
+				static_assert(!StaticAsserrts::CheckSignature<Compator, Boolean, const T&, const T&>(), "Invalid comparator");
+				this->data->lock.ExclusiveLock([&]()
+				{
+					MergeSort(&data->root, Compator);
+					data->last = data->root;
+					while (data->last->next != nullptr) data->last = data->last->next;
+				});
+				return *this;
+			}
+			///<summary>Функція сортування списку</summary>
+			///<param name = "Ascend">Якщо true то сортування відбувається по зростанню</param>
+			///<returns>Силку на список</returns>
+			BaseList & Sort(bool Ascend = true)
+			{
+				this->data->lock.ExclusiveLock([&]()
+				{
+					if (Ascend)
+						MergeSort(&data->root, [](const T & V1, const T& V2)
+					{
+						return V1 >= V2;
+					});
+					else
+						MergeSort(&data->root, [](const T & V1, const T& V2)
+					{
+						return V1 <= V2;
+					});
+					data->last = data->root;
+					while (data->last->next != nullptr) data->last = data->last->next;
+				});
+				return *this;
+			}
+
+#pragma endregion
+#pragma region Search
+
+			///<summary>Пошук елемента з певним значенням. Вертає ітератор на перший збіг</summary>
+			///<param name = "Value">Значення по якому відбувається пошук<param>
+			Iterator FindFirst(const T & Value)
+			{
+				if (this->data == nullptr || this->data->root == nullptr)
+					return Iterator(nullptr);
+
+				return this->data->lock.ShareLock([&]()
+				{
+					auto it = this->data->root;
+					while (it != nullptr)
+					{
+						if (it->value == Value)
+							return Iterator(it);
+					}
+					return Iterator(nullptr);
+				});
+			}
+			///<summary>Пошук елемента з певним значенням. Вертає ітератор на оастаній збіг</summary>
+			///<param name = "Value">Значення по якому відбувається пошук<param>
+			Iterator FindLast(const T & Value)
+			{
+				if (this->data == nullptr || this->data->root == nullptr)
+					return Iterator(nullptr);
+
+				return this->data->lock.ShareLock([&]()
+				{
+					auto it = this->data->root;
+					elem * found = nullptr;
+					while (it != nullptr)
+					{
+						if (it->value == Value)
+							found = it;
+					}
+					return Iterator(found);
+				});
+			}
+			///<summary>Пошук елемента по фільтру. Вертає список елементів</summary>
+			///<param name = "Filter">Функція\лямбда фільтр яка приймає константну силку на елемент і вертає true якщо елемент потрібний</param>
+			typedef bool(*TFilterExample)(const T&);
+			template<typename TFilter>
+			BaseList Find(TFilter Filter)
+			{
+				static_assert(!StaticAsserrts::CheckSignature<Filter, Boolean, const T&>(), "Invalid filter");
+				if (data == nullptr)
+					return BaseList();
+
+				BaseList list;
+
+				this->data->lock.ShareLock([&]()
+				{
+					it = data->root;
+					list.data = new list_data();
+					while (it != nullptr)
+					{
+						if (filter(it->value))
+						{
+							elem * elemInNewList = new elem(value, list.data, list.data->last, nullptr);
+							if (list.data->root == nullptr)
+								list.data->root = elemInNewList;
+							list.data->last->next = elemInNewList;
+						}
+					}
+				});
+
+				return list;
+			}
+#pragma endregion
+#pragma region Dtor
+
+			///<summary>Деструктор звільняє пам'ять виділену під елементи
+			///<para>Але якщо елемент використовується через ітератор
+			///то його знищення оминається але елемент втрачає покажчик на сусідні елементи
+			///</para></summary>
+			~BaseList()
+			{
+				if (data == nullptr) return;
+				data->lock.ExclusiveLock([&]()
+				{
+					elem * node;
+					while (data->root != nullptr)
+					{
+						node = data->root;
+						data->root = data->root->next;
+						if (--node->RefCount == 0)
+						{
+							delete node;
+							continue;
+						}
+						node->next = nullptr;
+						node->father = nullptr;
+						node->prev = nullptr;
+					}
+					data->last = nullptr;
+					data->size = 0;
+					delete data;
+					data = nullptr;
+				});
+			}
+#pragma endregion
+		};
+#pragma region Copy\move ctors implementation
+		///<summary>Копіювальний конструктор</sumary>
+		///<param name = "orig">Оригінал списку<</param>
 		template<typename Allocator, typename T>
-		inline BaseList<Allocator, T>::BaseList(const BaseList & Orig) {
+		inline BaseList<Allocator, T>::BaseList(const BaseList & Orig)
+		{
 			if (this == &Orig)return;
-			if (Orig.data == nullptr) {
+			if (Orig.data == nullptr)
+			{
 				this->data = nullptr;
 				return;
 			}
-			this->data = new list_data;
-			this->data->size = Orig.data->size;
-			elem * root_orig = Orig.data->root;
-			this->data->root = new elem(root_orig->value, this->data);
-			this->data->last = this->data->root;
-			root_orig = root_orig->next;
-			if (root_orig == nullptr) {
-				this->data->root->next = nullptr;
-				return;
-			}
-			while (root_orig != nullptr) {
-				this->data->last->next = new elem(root_orig->value, this->data, this->data->last);
-				this->data->last = this->data->last->next;
+			Orig.data->lock.ShareLock([&]()
+			{
+				this->data = new list_data;
+				this->data->size = Orig.data->size;
+				elem * root_orig = Orig.data->root;
+				this->data->root = new elem(root_orig->value, this->data);
+				this->data->last = this->data->root;
 				root_orig = root_orig->next;
-			}
-			this->data->last->next = nullptr;
+				if (root_orig == nullptr)
+				{
+					this->data->root->next = nullptr;
+					return;
+				}
+				while (root_orig != nullptr)
+				{
+					this->data->last->next = new elem(root_orig->value, this->data, this->data->last);
+					this->data->last = this->data->last->next;
+					root_orig = root_orig->next;
+				}
+				this->data->last->next = nullptr;
+			});
 		}
-		//Конструктор переміщення
+		///<summary>Конструктор переміщення</sumary>
+		///<param name = "orig">Оригінал списку<</param>
 		template<typename Allocator, typename T>
-		__forceinline BaseList<Allocator, T>::BaseList(BaseList && Orig) noexcept {
+		__forceinline BaseList<Allocator, T>::BaseList(BaseList && Orig) noexcept
+		{
 			this->data = Orig.data; Orig.data = nullptr;
 		}
+#pragma endregion
+#pragma Partical implementation for default and sensitive heaps
 
-		//Двохзвязний список з стандартним алокатором
-		template<typename T>
-		using List = BaseList<Seed::Core::Memory::Heap, T>;
+		///<summary>Двохзвязний список з стандартним алокатором</summary>
+		///<para>
+		/// Для кожного елемента відбувається підрахунок силок,
+		/// що дозволяє корректно його знищити навіть
+		/// якщо десь використовується ітератор на елемент
+		///</para>
+		///</summary>
+		///<param name = "T">Тип значеннь</param>
+		namespace {
+			template<typename T>
+			using List = BaseList<Seed::Core::Memory::Heap, T>;
+		}
 
-		//Двохзвязний список з захищеним алокатором
-		template<typename T>
-		using SecuredList = BaseList<Seed::Core::Memory::SensitiveDataHeap, T>;
+		///<summary>Двохзвязний список з захищеним алокатором
+		///<para>
+		/// Для кожного елемента відбувається підрахунок силок,
+		/// що дозволяє корректно його знищити навіть
+		/// якщо десь використовується ітератор на елемент
+		///</para>
+		///</summary>
+		///<param name = "T">Тип значеннь</param>
+		namespace {
+			template<typename T>
+			using SensitiveList = BaseList<Seed::Core::Memory::SensitiveDataHeap, T>;
+		}
+#pragma endregion
 
 #pragma warning(pop)
 	}

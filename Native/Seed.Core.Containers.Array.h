@@ -94,7 +94,7 @@ namespace Seed {
 				if (Index < count)
 					return arr[Index];
 				else
-					Throw(Seed::IndexOutOfRange(ExceptionPosition, Index, getSize()));
+					Throw(Seed::IndexOutOfRange(ExceptionPosition, Index, GetCount()));
 			}
 
 			///<summary>Констатний оператор доступу по індексу</summary>
@@ -104,7 +104,7 @@ namespace Seed {
 				if (index < count)
 					return arr[index];
 				else
-					Throw(Seed::IndexOutOfRange(ExceptionPosition, index, getSize()));
+					Throw(Seed::IndexOutOfRange(ExceptionPosition, index, GetCount()));
 			}
 
 			///<summary>Оператор рівності</summary>

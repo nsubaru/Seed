@@ -5,8 +5,11 @@ namespace Seed {
 	inline namespace Core {
 		///<summary>Математичні функції</summary>
 		namespace Math {
+			///<summary>Максимальне значення типу</summary>
 			template<typename T>
-			constexpr T Max() {};
+			constexpr T Max() {
+				static_assert(false, "Invalid type");
+			};
 
 			///<summary>Максимальне значення Int8</summary>
 			template<>
@@ -39,8 +42,12 @@ namespace Seed {
 			template<>
 			constexpr UInt64 Max() { return 0xFFFFFFFFFFFFFFFFui64; };
 
+			///<summary>Мінімальне значення типу</summary>
 			template<typename T>
-			constexpr T Min() {};
+			constexpr T Min()
+			{
+				static_assert(false, "Invalid type");
+			};
 
 			///<summary>Мінімальне значення Int8</summary>
 			template<>
@@ -72,6 +79,26 @@ namespace Seed {
 			///<summary>Мінімальне значення UInt64</summary>
 			template<>
 			constexpr UInt64 Min() { return 0x0000000000000000ui64; };
+
+			///<summary>Машиний епсилон(ноль) типу</summary>
+			template<typename T>
+			constexpr T Epsilon()
+			{
+				static_assert(false, "Invalid type");
+			};
+			///<summary>Машиний епсилон(ноль) для Float</summary>
+			template<>
+			constexpr Float Epsilon()
+			{
+				return 1.192092896e-07F;
+			};
+			///<summary>Машиний епсилон(ноль) для Double</summary>
+			template<>
+			constexpr Double Epsilon()
+			{
+				return 2.2204460492503131e-016;
+			};
+
 
 			///<summary>Бескінечність</summary>
 			constexpr Double Infinity = 1e+300 * 1e+300;
