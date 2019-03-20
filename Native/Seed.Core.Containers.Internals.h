@@ -59,17 +59,6 @@ namespace std {
 	{	// get end of sequence
 		return (_Ilist.end());
 	}
-
-	///<summary>Дефайн для імплементація конструктора\оператора копіювання\переміщення та деструктора</summary>
-	///<param name = 'ClassName'>Ім'я классу</summary>
-	///<param name = 'This'>Покажчик на екземпляр классу(this)</param>
-	///<param name = '...'>Операції при знищенні</param>
-#define CopyAndMoveSemantic(ClassName, This, ...) \
-ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
-ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
-ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
-ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(std::move(From)); return *this; }; \
-~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {__VA_ARGS__ ;delete This;}This = nullptr;}}
 }
 
 namespace Seed {
@@ -77,7 +66,215 @@ namespace Seed {
 		///<summary>Список ініціалізації</summary>
 		namespace {
 			template<typename T>
-			using InitilizerList = std::initializer_list;
+			using InitilizerList = std::initializer_list<T>;
 		}
+
+
+
+		template<typename... Types>
+		class Tuple
+		{
+		private:
+			template <size_t... Indices>
+			struct index_sequence
+			{
+				using type = index_sequence<Indices...>;
+			};
+
+			template <size_t I, typename Sequence>
+			struct cat_index_sequence;
+
+			template <size_t I, size_t... Indices>
+			struct cat_index_sequence<I, index_sequence<Indices...>>
+				: index_sequence<Indices..., I>
+			{};
+
+			template <size_t N>
+			struct make_index_sequence
+				: cat_index_sequence<N - 1, typename make_index_sequence<N - 1>::type>::type
+			{};
+
+			template <>
+			struct make_index_sequence<1> : index_sequence<0> {};
+
+
+			template <size_t, typename T>
+			struct tuple_element
+			{
+				T value_;
+
+				__forceinline constexpr tuple_element() : value_() {}
+				__forceinline constexpr tuple_element(const T& value) : value_(value) {}
+
+				template <typename U>
+				__forceinline constexpr explicit tuple_element(U&& value) : value_(ForwardReference<U>(value)) {}
+			};
+
+
+
+			template <typename Sequences, typename... TypesInternal>
+			struct tuple_impl;
+
+			template <typename>
+			struct is_tuple_impl
+				: StaticAsserts::LogicFalse
+			{};
+
+			template <size_t... Indices>
+			struct is_tuple_impl<tuple_impl<index_sequence<Indices...>, Types...>>
+				: StaticAsserts::LogicTrue
+			{};
+
+			template <template <class> typename>
+			__forceinline static constexpr bool is_any_of() {
+				return false;
+			}
+
+			template <template <class> typename Op, typename Head, typename... Tail>
+			__forceinline static constexpr bool is_any_of() {
+				return Op<Head>::State || is_any_of<Op, Tail...>();
+			}
+
+			template <SizeT... Indices>
+			struct tuple_impl<index_sequence<Indices...>, Types...>
+				: public tuple_element<Indices, Types>...
+			{
+				constexpr tuple_impl() = default;
+				constexpr tuple_impl(const tuple_impl&) = default;
+				constexpr tuple_impl(tuple_impl&&) = default;
+
+				template <typename... OtherTypes,
+					typename = typename StaticAsserts::EnableIf<
+					!is_any_of<is_tuple_impl, typename StaticAsserts::Decay<OtherTypes>...>()
+					>::type
+				>
+					__forceinline constexpr explicit tuple_impl(OtherTypes&&... elements)
+					: tuple_element<Indices, Types>(ForwardReference<OtherTypes>(elements))...
+				{
+				}
+			};
+
+
+			template <typename... TypesInternal>
+			class tuple
+				: public tuple_impl<typename make_index_sequence<sizeof...(TypesInternal)>::type, TypesInternal...>
+			{
+			public:
+				__forceinline constexpr tuple() = default;
+				__forceinline constexpr tuple(tuple const&) = default;
+				__forceinline constexpr tuple(tuple&&) = default;
+				__forceinline constexpr tuple& operator=(tuple const& rhs) = default;
+				__forceinline constexpr tuple& operator=(tuple&&) = default;
+
+				using base_t = tuple_impl<typename make_index_sequence<sizeof...(TypesInternal)>::type,
+					TypesInternal...>;
+
+				template <typename... OtherTypes>
+				__forceinline constexpr explicit tuple(tuple<OtherTypes...> const& rhs) : base_t(rhs) {}
+
+				template <typename... OtherTypes>
+				__forceinline constexpr explicit tuple(tuple<OtherTypes...>&& rhs) : base_t(rhs) {}
+
+				template <typename... OtherTypes,
+					typename = typename StaticAsserts::EnableIf<
+					sizeof...(OtherTypes) == sizeof...(TypesInternal)>::type>
+					__forceinline constexpr explicit tuple(OtherTypes&&... elements)
+					: base_t(ForwardReference<OtherTypes>(elements)...) {}
+			};
+
+			template <size_t I, typename Head, typename... Tail>
+			struct type_at_index
+			{
+				using type = typename type_at_index<I - 1, Tail...>::type;
+			};
+
+			template <typename Head, typename... Tail>
+			struct type_at_index<0, Head, Tail...>
+			{
+				using type = Head;
+			};
+
+			template <size_t I>
+			using type_at_index_t = typename type_at_index<I, Types...>::type;
+
+			template <size_t I>
+			__forceinline static constexpr type_at_index_t<I> const& get(tuple<Types...> const& tup) {
+				const tuple_element<I, type_at_index_t<I>>& base = tup;
+				return base.value_;
+			}
+
+			template <size_t I>
+			__forceinline static type_at_index_t<I>& get(tuple<Types...>& tup) {
+				tuple_element<I, type_at_index_t<I>>& base = tup;
+				return base.value_;
+			}
+
+			template <size_t I>
+			__forceinline static constexpr StaticAsserts::RemoveRefT<type_at_index_t<I>>&& get(tuple<Types...>&& tup) {
+				tuple_element<I, type_at_index_t<I>>& base = tup;
+				return ForwardReference(base.value_);
+			}
+
+			template <typename>
+			__forceinline static constexpr int count() {
+				return 0;
+			}
+			template <typename T, typename Head, typename... Tail>
+			__forceinline static constexpr int count() {
+				return (std::is_same<T, Head>::value ? 1 : 0) + count<T, Tail...>();
+			}
+
+			template <typename>
+			__forceinline static constexpr int find(int) {
+				return -1;
+			}
+			template <typename T, typename Head, typename... Tail>
+			__forceinline static constexpr int find(int current_index = 0) {
+				return std::is_same<T, Head>::value
+					? current_index
+					: find<T, Tail...>(current_index + 1);
+			}
+
+			template <typename T>
+			__forceinline static constexpr T& get(tuple<Types...>& tup) {
+				static_assert(count<T, Types...>() == 1, "T must appear exactly once in ...TypesInternal");
+				get<find<T, Types...>()>(tup);
+			}
+
+			__forceinline static constexpr tuple<Types...> MakeTuple(const Types&...  variables) {
+				return tuple<Types...>(variables...);
+			}
+			__forceinline static constexpr tuple<Types...> MakeTuple(Types&& ...  variables) {
+				return tuple<Types...>(ForwardReference<Types>(variables)...);
+			}
+		private:
+			tuple<Types...> data;
+		public:
+			__forceinline constexpr Tuple() : data() {}
+			__forceinline constexpr Tuple(const Types & ... values) : data(MakeTuple<Types...>(values...)) {}
+			__forceinline constexpr Tuple(Types && ... values) : data(MakeTuple(ForwardReference<Types>(values)...)) {}
+			__forceinline constexpr Tuple(const Tuple & orig) : data(orig.data) {}
+			__forceinline constexpr Tuple(Tuple && orig) : data(ForwardReference<tuple<Types...>>(orig.data)) {}
+
+			__forceinline constexpr Tuple & operator=(const Tuple & orig) {
+				this->Tuple::~Tuple();
+				this->Tuple::Tuple(orig);
+			}
+
+			__forceinline constexpr Tuple & operator=(Tuple && orig) {
+				this->Tuple::~Tuple();
+				this->Tuple::Tuple(ForwardReference<Tuple<Types...>>(orig));
+			}
+
+			template<SizeT Index> 
+			__forceinline constexpr auto& Get() const {
+				return get<Index>(data);
+			}
+
+			template<SizeT Index>
+			__forceinline auto& Get() {
+				return get<Index>(data);
+			}
+		};
 	}
 }

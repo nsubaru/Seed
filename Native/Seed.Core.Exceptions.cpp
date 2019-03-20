@@ -61,7 +61,7 @@ void Seed::Core::Stop::Exceptions() noexcept
 SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 {
 	//якщо розм≥р задано максимальне можливе значенн€ SizeT то це €вно помилка ≥ генеруЇм виключенн€ OutOfMemory
-	if (Size == Math::Max::SizeT)
+	if (Size == Math::Max<SizeT>())
 		return nullptr;
 	//ќбчислюЇм повний розм≥р д≥л€нки пам'€т≥
 	SizeT FullSize = sizeof(SizeT) + Size;

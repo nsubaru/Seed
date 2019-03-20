@@ -7,6 +7,7 @@
 #include "Seed.Core.Base.Swap.h"
 #include "Seed.Core.Base.StaticAsserts.h"
 #include "Seed.Core.Base.UUID.h"
+#include "Seed.Core.Base.Utils.h"
 
 ///<summary>якщо визначено SeedKernel то вс≥ виклики
 ///позначенн≥ SeedKernelCall будуть експортуватись з виконавчого файла
@@ -131,35 +132,6 @@ namespace Seed {
 			}
 		}
 
-		///<summary>‘ункц≥€ перем≥щенн€ об'Їкта(перенесенн€ rvalue)</summary>
-		///<param name="Obj"> lvalue-силка на об'Їкт</param>
-		///<returns>rvalue силку на об'Їкт</returns>
-		template<typename T>
-		__forceinline T&& MoveRValue(T& Obj) {
-			return CRT::move(Obj);
-		}
-
-		///<summary>≤деальна передача</summary>
-		///<param name = 'Arg'>јргумент</param>
-		///<returns>RV-силку</returns>
-		template<typename Type>
-		[[nodiscard]]
-		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefT<Type>& Arg) noexcept
-		{	// forward an lvalue as either an lvalue or an rvalue
-			return (static_cast<Type&&>(Arg));
-		}
-
-		///<summary>≤деальна передача</summary>
-		///<param name = 'Arg'>јргумент</param>
-		///<returns>RV-силку</returns>
-		template<typename Type>
-		[[nodiscard]]
-		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefT<Type>&& Arg) noexcept
-		{	// forward an rvalue as an rvalue
-			static_assert(!StaticAsserts::IsLValueRef<Type>(), "Bad forward call");
-			return (static_cast<Type&&>(_Arg));
-		}
-
 		///<summary>≤нтерфейс клонуванн€</summary>
 		template<typename T>
 		interface IClonable
@@ -169,12 +141,13 @@ namespace Seed {
 		};
 
 		///<summary>≤нтерфес зв≥льненн€ ресурс≥в з класу з п≥драхунком силок</summary>
-		interface IDisposable
+		class IDisposable
 		{
+		protected:
 			///<summary>ћетод дл€ зв≥льненн€ ресурс≥в,
 			///<para>викликаЇтьс€ деструктором автоматично в клас≥в з п≥драхунком силок</para></summary>
 			///<see><code>RefCountClass</code></see>
-			void Dispose();
+			virtual void Dispose() = 0;
 		};
 
 		template<typename T>

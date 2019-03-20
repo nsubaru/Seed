@@ -12,7 +12,7 @@ namespace Seed {
 
 			__forceinline void MemoryBarrier() {
 				extern void implMemoryBarrier();
-				_ReadWriteBarrier();
+				//_ReadWriteBarrier();
 				implMemoryBarrier();
 			}
 		}

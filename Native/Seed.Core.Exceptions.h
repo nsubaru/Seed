@@ -46,43 +46,65 @@ namespace Seed {
 #define ExceptionPosition __FILE__, __FUNCSIG__, __LINE__
 
 			///<summary>Класс базової помилки</summary>
-			class Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
-			private:
+			class SeedKernelCall Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
+			public:
 				///<sumary>Місце генерації помилки</summary>
 				struct ExeptionLocation {
 					///<summary>Ім'я файла</summary>
-					const AChar * File;
+					ConstACharStr File;
 					///<summary>Ім'я функції</summary>
-					const AChar * FunctName;
+					ConstACharStr FunctName;
 					///<summary>Номер рядка</summary>
 					SizeT Line;
+					///<summary>ID потоку</summary>
+					ID ThreadID;
 				};
+			private:
 				///<summary>Місце генерації даної помилки</summary>
-				ExeptionLocation Location;
+				ExeptionLocation location;
 				///<summary>Ім'я помилки</summary>
-				const Char * ExeptionName;
+				const Char * exeptionName;
 			public:
+				//TODO: Modify ctor by receiving size of exceptio name string by template
+				//TODO: Set thread id
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'Name'>Ім'я помилки</param>
 				///<returns>Екземпляр класу Exeption</returns>
-				__forceinline Exception(const AChar * File, const AChar * FunctName, SizeT Line, const Char * ExeptionName) noexcept
-					:Location({ File,FunctName,Line }), ExeptionName(ExeptionName) {}
+				__forceinline Exception(ConstACharStr File, ConstACharStr FunctName, SizeT Line, ConstCharStr ExeptionName) noexcept
+					:location({ File,FunctName,Line, 0 }), exeptionName(ExeptionName) {}
+
+				///<summary>Вертає користувальницьку назву помилки</summary>
+				__forceinline ConstCharStr GetExceptioName() const
+				{
+					return exeptionName;
+				}
+
+				///<summary>Вертає місце генерації помилки</summary>
+				__forceinline const ExeptionLocation & GetLocation() const
+				{
+					return location;
+				}
+
+				///<summary>Користувальницька назва помилки</summary>
+				ConstCharStr Property(GetExceptioName) Name;
+				///<summary>Місце генерації помилки</summary>
+				ExeptionLocation Property(GetLocation) Location;
 
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
 				virtual ~Exception() = 0 {}
 			};
 
 			///<summary>Ділення на ноль</summary>
-			class DivideByZero : public Exception {
+			class SeedKernelCall DivideByZero : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				DivideByZero(const AChar * File, const AChar * FunctName, SizeT Line)
+				DivideByZero(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Ділення на ноль")
 				{}
 			};
@@ -110,7 +132,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'Addr'>Адрес комірки пам'яті яка згенерувала помилку</param>
 				///<param mame = 'Type'>Тип доступу до комірки який згенерував помилку</param>
-				NullPointException(const AChar * File, const AChar * FunctName, SizeT Line, SizeT Addr, Types Type)
+				NullPointException(ConstACharStr File, ConstACharStr FunctName, SizeT Line, SizeT Addr, Types Type)
 					:Exception(File, FunctName, Line, L"Помилка доступу до пам'яті"), Addr(Addr), Type(Type)
 				{}
 
@@ -127,49 +149,49 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				InvalidHandleUsage(const AChar * File, const AChar * FunctName, SizeT Line)
+				InvalidHandleUsage(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Використання не валідного дескриптора")
 				{}
 			};
 
 			///<summary>Неможливо перетворити тип</summary>
-			class BadCast : public Exception {
+			class SeedKernelCall BadCast : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				BadCast(const AChar * File, const AChar * FunctName, SizeT Line)
+				BadCast(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Неможливо пертворити тип")
 				{}
 			};
 
 			///<summary>Неможливо викликати віртуальну функцію</summary>
-			class BadPureCall : public Exception {
+			class SeedKernelCall BadPureCall : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				BadPureCall(const AChar * File, const AChar * FunctName, SizeT Line)
+				BadPureCall(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Неможливо викликати віртуальну функцію")
 				{}
 			};
 
 			///<summary>Некоректний тип помилки</summary>
-			class BadException : public Exception {
+			class SeedKernelCall BadException : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				BadException(const AChar * File, const AChar * FunctName, SizeT Line)
+				BadException(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Не коректний тип помилки")
 				{}
 			};
 
 			///<summary>Недостатньо оперативної пам'яті для операції</summary>
-			class OutOfMemory :public Exception {
+			class SeedKernelCall OutOfMemory :public Exception {
 			private:
 				///<summary>Кількість байт які пробували виділити</summary>
 				SizeT TryAllocate;
@@ -186,8 +208,8 @@ namespace Seed {
 				///<param name = 'AllocatedBefore'>Кількість байт які були виділені на момент генерації виключення</param>
 				///<param name = 'MemBlksCountBefore'>Кількість блоків які були виділені на момент генерації виключення</param>
 				OutOfMemory(
-					const AChar * File,
-					const AChar * FunctName,
+					ConstACharStr File,
+					ConstACharStr FunctName,
 					SizeT Line,
 					SizeT TryAllocate,
 					SizeT AllocatedBefore,
@@ -205,31 +227,31 @@ namespace Seed {
 			};
 
 			///<summary>Внутрішня помилка ядра</summary>
-			class InternalError : public Exception {
+			class SeedKernelCall InternalError : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				InternalError(const AChar * File, const AChar * FunctName, SizeT Line)
+				InternalError(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Внутрішня помилка ядра")
 				{}
 			};
 
 			///<summary>Невірний формат</summary>
-			class InvalidFormat : public Exception {
+			class SeedKernelCall InvalidFormat : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				InvalidFormat(const AChar * File, const AChar * FunctName, SizeT Line)
+				InvalidFormat(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Невірний формат")
 				{}
 			};
 
 			///<summary>Доступ до елемента який знаходится за межею розмірів</summary>
-			class IndexOutOfRange :public Exception {
+			class SeedKernelCall IndexOutOfRange :public Exception {
 			private:
 				SizeT Index;
 				SizeT MaxIndex;
@@ -240,7 +262,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'RequiredIndex'>Індекс елемента який пробували отримати</param>
 				///<param name = 'MaxAllowedIndex'>Максимальний допустимий індекс</param>
-				__forceinline IndexOutOfRange(const AChar * File, const AChar * FunctName, SizeT Line, SizeT RequiredIndex, SizeT MaxAllowedIndex)
+				__forceinline IndexOutOfRange(ConstACharStr File, ConstACharStr FunctName, SizeT Line, SizeT RequiredIndex, SizeT MaxAllowedIndex)
 					noexcept : Exception(File, FunctName, Line, L"Вихід за межі"),
 					Index(RequiredIndex), MaxIndex(MaxAllowedIndex)
 				{}
@@ -257,7 +279,7 @@ namespace Seed {
 			};
 
 			///<summary>Некоректний тип</summary>
-			class InvalidTypeException : public Exception {
+			class SeedKernelCall InvalidTypeException : public Exception {
 			private:
 				const TypeInfo & requireType;
 				const TypeInfo & actuallyType;
@@ -268,7 +290,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'RequireType'>Інформація про очікуваний тип</param>
 				///<param name = 'ActuallyType'>Інформація про фактичний тип</param>
-				__forceinline InvalidTypeException(const AChar * File, const AChar * FunctName, SizeT Line, const TypeInfo & RequireType, const TypeInfo & ActuallyType)
+				__forceinline InvalidTypeException(ConstACharStr File, ConstACharStr FunctName, SizeT Line, const TypeInfo & RequireType, const TypeInfo & ActuallyType)
 					noexcept : Exception(File, FunctName, Line, L"Invalid type"),
 					requireType(RequireType), actuallyType(ActuallyType)
 				{

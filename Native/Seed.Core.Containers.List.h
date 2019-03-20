@@ -12,7 +12,7 @@ namespace Seed {
 		{
 		public:
 			//Помилка: Ітератор на кінець не є визначеним
-			__forceinline EndNodeNotDeferencable(const AChar * File, const AChar * FunctName, SizeT Line) noexcept
+			__forceinline EndNodeNotDeferencable(ConstACharStr File, ConstACharStr FunctName, SizeT Line) noexcept
 				: Exception(File, FunctName, Line, L"End node of list not deferencable")
 			{};
 		};
@@ -159,7 +159,7 @@ namespace Seed {
 					orig.This = nullptr;
 				}
 #pragma region Operators
-#pragma region Copy\Move
+#pragma region Copy and Move
 				///<summary>Оператор присвоєння</summary>
 				///<param name = "orig">Оригинал ітератора</summary>
 				__forceinline Iterator & operator=(const Iterator & orig)
@@ -1015,6 +1015,7 @@ namespace Seed {
 							--data->size;
 							it = tmp;
 						}
+					);
 					else  it = it->next;
 				}
 				return *this;
@@ -1036,20 +1037,20 @@ namespace Seed {
 			{
 				elem * result = nullptr;
 
-				if (a == NULL)
+				if (a == nullptr)
 					return(b);
-				else if (b == NULL)
+				else if (b == nullptr)
 					return(a);
 
-				if (Comparator(a->data, b->data))
+				if (Comparator(a->value, b->value))
 				{
 					result = a;
-					result->next = SortedMerge(a->next, b);
+					result->next = SortedMerge(a->next, b, Comparator);
 				}
 				else
 				{
 					result = b;
-					result->next = SortedMerge(a, b->next);
+					result->next = SortedMerge(a, b->next, Comparator);
 				}
 				return(result);
 			}
@@ -1099,11 +1100,11 @@ namespace Seed {
 				FrontBackSplit(head, &a, &b);
 
 				/* Recursively sort the sublists */
-				MergeSort(&a);
-				MergeSort(&b);
+				MergeSort(&a, cmp);
+				MergeSort(&b, cmp);
 
 				/* answer = merge the two sorted lists together */
-				*headRef = SortedMerge(a, b);
+				*headRef = SortedMerge(a, b, cmp);
 			}
 		public:
 			///<summary>Функція сортування списку</summary>
@@ -1113,7 +1114,7 @@ namespace Seed {
 			template<typename TComparator>
 			BaseList & Sort(TComparator Compator)
 			{
-				static_assert(!StaticAsserrts::CheckSignature<Compator, Boolean, const T&, const T&>(), "Invalid comparator");
+				//static_assert(!StaticAsserts::IsFunction<TComparator, Boolean, const T&, const T&>(), "Invalid comparator");
 				this->data->lock.ExclusiveLock([&]()
 				{
 					MergeSort(&data->root, Compator);
@@ -1249,7 +1250,7 @@ namespace Seed {
 			}
 #pragma endregion
 		};
-#pragma region Copy\move ctors implementation
+#pragma region Copy & move ctors implementation
 		///<summary>Копіювальний конструктор</sumary>
 		///<param name = "orig">Оригінал списку<</param>
 		template<typename Allocator, typename T>
@@ -1291,9 +1292,9 @@ namespace Seed {
 			this->data = Orig.data; Orig.data = nullptr;
 		}
 #pragma endregion
-#pragma Partical implementation for default and sensitive heaps
+#pragma region Partical implementation for default and sensitive heaps
 
-		///<summary>Двохзвязний список з стандартним алокатором</summary>
+		///<summary>Двохзвязний список з стандартним алокатором
 		///<para>
 		/// Для кожного елемента відбувається підрахунок силок,
 		/// що дозволяє корректно його знищити навіть

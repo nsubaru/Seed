@@ -338,6 +338,8 @@ Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {
 
 Seed::Boolean Seed::Core::Memory::Init()
 {
+	Memory::Heap::Init();
+	Memory::SensitiveDataHeap::Init();
 	toCoreLog(L"Підсистема оперативної пам'яті ініціалізована");
 	return true;
 }

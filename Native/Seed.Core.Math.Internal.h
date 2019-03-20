@@ -255,6 +255,30 @@ namespace Seed {
 					return Val;
 				}
 
+				__forceinline Seed::Boolean RuntimeSign(Seed::Float val)
+				{
+					static_assert(sizeof(Float) == sizeof(Int32), "Ðîçì³ðè Float ³ Int32 ð³çí³");
+					union
+					{
+						Int32 *  I;
+						Float * D;
+					} D;
+					D.D = &val;
+					return ((*D.I) & ((Seed::Int32)1 << 31));
+				}
+
+				__forceinline Seed::Boolean RuntimeSign(Seed::Double val)
+				{
+					static_assert(sizeof(Double) == sizeof(Int64), "Ðîçì³ðè Float ³ Int32 ð³çí³");
+					union
+					{
+						Int64 *  I;
+						Double * D;
+					} D;
+					D.D = &val;
+					return ((*D.I) & ((Seed::Int64)1 << 63));
+				}
+
 				Double RuntimePow(Double What, Double By);
 				UInt64 RuntimePow(UInt64 What, UInt8 By);
 

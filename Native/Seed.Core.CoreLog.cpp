@@ -1,4 +1,5 @@
 #include "Seed.Core.CoreLog.h"
+#include "Seed.Core.CoreLog.Managed.h"
 
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"
@@ -37,10 +38,10 @@ void FormatCurrentTime(Seed::Char * buffer) {
 	buffer[10] = ' ';
 	buffer[12] = '0' + timeFields.Hour % 10; timeFields.Hour /= 10;
 	buffer[11] = '0' + timeFields.Hour % 10;
-	buffer[13] = ':';
+	buffer[13] = '-';
 	buffer[15] = '0' + timeFields.Minute % 10; timeFields.Minute /= 10;
 	buffer[14] = '0' + timeFields.Minute % 10;
-	buffer[16] = ':';
+	buffer[16] = '-';
 	buffer[18] = '0' + timeFields.Second % 10; timeFields.Second /= 10;
 	buffer[17] = '0' + timeFields.Second % 10;
 	buffer[19] = '.';
@@ -67,7 +68,7 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 		}
 		Char raw[1000];
 		FormatCurrentTime(raw);
-		CStr::Copy(L" Seed.CoreLog.log", raw + 20);
+		CStr::Copy(L" Seed.CoreLog.log", raw + 23);
 		CStr::Copy(raw, str->Buffer + last_dir + 1);
 		RtlInitUnicodeStringEx(&name, str->Buffer);
 	}
@@ -109,8 +110,8 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 
 SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char * Value, Seed::SizeT Lenght)
 {
-	if (Lenght > Math::Max<Int16>() - 22);
-	return false;
+	if (Lenght > Math::Max<Int16>() - 22)
+		return false;
 	Char raw[Math::Max<Int16>()];
 	FormatCurrentTime(raw);
 	raw[21] = L' ';
@@ -139,6 +140,57 @@ void Seed::Core::Stop::Loging() noexcept
 	toCoreLog(L"Stoping loging...");
 	NtClose(LogFile.handle);
 	RtlDeleteCriticalSection(&LogFile.lock);
+}
+
+bool SeedKernelCall Seed::Core::toCoreLog(const Array<String>& lines)
+{
+	if (lines.Count == 0) return true;
+	try
+	{
+		SizeT worldCount = 0;
+		for (SizeT i = 0; i < lines.Count; i++)
+			worldCount += lines[i].Size;
+		String data(worldCount);
+		data += lines[0];
+		if (lines.Count > 1)
+		{
+			for (SizeT i = 1; i < lines.Count; i++)
+			{
+				data += String(L"\r\n                    ") + lines[i];
+			}
+		}
+		{
+			Char raw[1000];
+			FormatCurrentTime(raw);
+			raw[21] = L'\0';
+			data = String(raw) + data + String(L"\r\n");
+			SizeT bytesCount = data.Size;
+			bytesCount *= sizeof(wchar_t);
+			RtlEnterCriticalSection(&LogFile.lock);
+			NTSTATUS status = NtWriteFile( //-V107
+				LogFile.handle,
+				NULL,
+				NULL,
+				NULL,
+				&LogFile.ioBlock,
+				(void*)(Seed::CharStr) data, //-V2005
+				(ULONG)bytesCount, //-V2005 //-V202
+				NULL,
+				NULL);
+			RtlLeaveCriticalSection(&LogFile.lock);
+			if (!NT_SUCCESS(status)) return false;
+			else return true;
+		}
+	}
+	catch (Seed::Exception & ex)
+	{
+		toCoreLog(L"Internal coreLog exeption: ");
+		toCoreLog(ex.Name, Seed::CStr::Size(ex.Name));
+		toCoreLog(L"Passed data(only first line): ");
+		toCoreLog(lines[0]);
+		return false;
+	}
+	return true;
 }
 
 #pragma warning(pop)

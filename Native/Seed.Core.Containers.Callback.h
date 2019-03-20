@@ -1,4 +1,5 @@
 #pragma once
+#include "Seed.Core.Base.h"
 #include "Seed.Core.Containers.Internals.h"
 #include "Seed.Core.Memory.h"
 
@@ -6,7 +7,7 @@ namespace Seed {
 	inline namespace Core {
 		///<summary>Класс контейнер для об'єкта функтора</summary>
 		template<typename Heap, typename Callback>
-		class BaseCallbackContainer : virtual public Memory::Allocator<Heap> {
+		class BaseCallbackContainer : public IDisposable, virtual public Memory::Allocator<Heap> {
 			struct Data : virtual public Memory::Allocator<Heap> {
 				RefCountT RefCount;
 				Callback * callback;
@@ -17,12 +18,14 @@ namespace Seed {
 			};
 
 			Data * This;
+		private:
+			void Dispose() { delete This->callback; }
 		public:
 			BaseCallbackContainer(Callback *&& callback)
 				:This(new Data(MoveRValue(callback)))
 			{}
 
-			CopyAndMoveSemantic(BaseCallbackContainer, This, delete This->callback);
+			RefCountClass(BaseCallbackContainer, This);
 
 			const Callback * const operator->() {
 				return This->callback;

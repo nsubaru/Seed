@@ -10,8 +10,13 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 using namespace Seed;
 using namespace Seed::Settings;
+
+CurrentSettings::SettingsData CurrentSettingsData = CurrentSettings::SettingsData();
 
 namespace Seed {
 	inline namespace Core {
@@ -19,7 +24,7 @@ namespace Seed {
 
 		namespace Settings {
 			Handle SettingsFile;
-			CurrentSettings::SettingsData CurrentSettings;
+
 			Char ExecutableDirectory[UNICODE_STRING_MAX_CHARS];
 		}
 
@@ -33,8 +38,8 @@ namespace Seed {
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)&Settings::CurrentSettings, //-V2005
-				sizeof(Settings::CurrentSettings),
+				(void*)&CurrentSettingsData, //-V2005
+				sizeof(CurrentSettingsData),
 				&Offset,
 				NULL
 			);
@@ -138,8 +143,8 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)&Settings::CurrentSettings, //-V2005
-				sizeof(Settings::CurrentSettings),
+				(void*)&CurrentSettingsData, //-V2005
+				sizeof(CurrentSettingsData),
 				NULL,
 				NULL
 			);
@@ -149,7 +154,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 		}
 		else {
 			toCoreLog(L"First start. Use default configs.");
-			Settings::CurrentSettings = Settings::Default::InitDefaultSettings();
+			CurrentSettingsData = Settings::Default::InitDefaultSettings();
 			isFirstStartup = true;
 			status = NtWriteFile(
 				SettingsFile,
@@ -157,8 +162,8 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)&Settings::CurrentSettings, //-V2005
-				sizeof(Settings::CurrentSettings),
+				(void*)&CurrentSettingsData, //-V2005
+				sizeof(CurrentSettingsData),
 				NULL,
 				NULL
 			);
@@ -168,8 +173,10 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 	return true;
 }
 
-void Seed::Core::Stop::Settings() noexcept
+void Seed::Core::Stop::SettingsAPI() noexcept
 {
 	CurrentSettings::SaveCurrentSettings();
 	NtClose(SettingsFile);
 }
+
+#pragma warning(pop)

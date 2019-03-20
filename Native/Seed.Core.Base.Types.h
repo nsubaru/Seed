@@ -1,5 +1,10 @@
 #pragma once
 
+namespace std {
+	enum class align_val_t : unsigned __int64
+	{};
+}
+
 ///<summary>Простір імен VCRT
 ///<para> По можливості уникати використання </para>
 ///</summary>
@@ -55,7 +60,7 @@ namespace Seed {
 		inline namespace { using ACharStr = AChar * ; }
 
 		///<summary>Покажчик на статичний масив символів в кодуванні ASCII</summary>
-		inline namespace { using AConstCharStr = const AChar * const; }
+		inline namespace { using ConstACharStr = const AChar * const; }
 		///<summary>Покажчик на статичний масив символів в кодуванні UTF-16LE</summary>
 		inline namespace { using ConstCharStr = const Char * const; using UConstCharStr = UChar * ; }
 
@@ -68,7 +73,7 @@ namespace Seed {
 		constexpr Boolean False = false;
 
 		///<summary>Тип для ідентифікацій</summary>
-		inline namespace { using ID = SizeT; }
+		inline namespace { using ID = UInt64; }
 
 		///<summary>Нуль тип для покажчиків</summary>
 		inline namespace { using NullptrT = CRT::nullptr_t; }
@@ -82,7 +87,7 @@ namespace Seed {
 		inline namespace { using Handle = void*; }
 
 		///<summary>Тип мітка, який вказує що треба структуру\класс вирівнювати по певній границі</summary>
-		enum class AllignRequirements : SizeT {};
+		inline namespace { using AllignRequirements  = CRT::align_val_t; }
 	}
 }
 

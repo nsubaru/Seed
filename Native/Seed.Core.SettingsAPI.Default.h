@@ -26,6 +26,8 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.ExceptionHeap.MaxSize = 0Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.Additional—hecks = { 0 };
 					}
+
+					return DefaultSettings;
 				}
 			}
 		}

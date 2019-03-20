@@ -12,23 +12,23 @@ namespace Seed {
 			enum class SystemRights {
 				Login,
 				Logoff,
-
+			
 				TokenCreate,
 				TokenUpdate,
 				TokenRead,
-
+			
 				ReadUserData,
-
+			
 				UserCreate,
 				UserUpdate,
 				UserRead,
 				UserDelete,
-
+			
 				GroupCreate,
 				GroupUpdate,
 				GroupRead,
 				GroupDelete,
-
+			
 				MaxRight
 			};
 			///<summary>Маска системних прав</summary>
@@ -142,7 +142,7 @@ namespace Seed {
 				List<ACE<RightsEnumaration>> ACLs;
 				List<ACE<RightsEnumaration>> AuditACLs;
 
-				ACL(UserIDType & Owner, GroupIDType & GroupOwner, Array<ACE> & ACLs, Array<ACE> & AuditACLs) :
+				ACL(UserIDType & Owner, GroupIDType & GroupOwner, Array<ACE<RightsEnumaration>> & ACLs, Array<ACE<RightsEnumaration>> & AuditACLs) :
 					Owner(Owner), GroupOwner(GroupOwner), ACLs(ACLs), AuditACLs(AuditACLs)
 				{}
 			};
@@ -178,18 +178,17 @@ namespace Seed {
 			template<typename RightsEnumaration>
 			interface ISecurityDescriptor
 			{
-			protected:
 				void VerifyRight(
 					ACLAcessEnumaration requiredRight,
-					AConstCharStr file,
-					AConstCharStr functionSignature,
+					ConstACharStr file,
+					ConstACharStr functionSignature,
 					SizeT line
 				);
 
 				void VerifyRight(
 					RightsEnumaration requiredRight,
-					AConstCharStr file,
-					AConstCharStr functionSignature,
+					ConstACharStr file,
+					ConstACharStr functionSignature,
 					SizeT line
 				);
 
@@ -201,17 +200,22 @@ namespace Seed {
 			};
 
 			template<typename RightsEnumaration>
-			interface ISecurable
+			class ISecurableImplementation
 			{
 			protected:
-				ISecurityDescriptor<RightsEnumaration> & impGetSecurityDescriptor();
+				virtual ISecurityDescriptor<RightsEnumaration> & impGetSecurityDescriptor() = 0;
+			};
+
+			template<typename RightsEnumaration>
+			class ISecurable : protected ISecurableImplementation<RightsEnumaration>
+			{
 			public:
-				ISecurityDescriptor<RightsEnumaration> & GetSecurityDescriptor() final {
+				virtual ISecurityDescriptor<RightsEnumaration> & GetSecurityDescriptor() final {
 					auto descriptor = impGetSecurityDescriptor();
 					descriptor.VerifyRight(ACLAcessEnumaration::ReadACE, __FILE__, __FUNCSIG__, __LINE__);
 					return descriptor;
 				}
-				ISecurityDescriptor<RightsEnumaration> & Property(GetSecurityDescriptor) SecurityDescriptor;
+				ISecurityDescriptor<RightsEnumaration> Property(GetSecurityDescriptor) SecurityDescriptor;
 			};
 
 			template<
@@ -222,42 +226,38 @@ namespace Seed {
 				BitMapT<static_cast<SizeT>(RightsEnumaration::MaxRight)>(GenericExecuteMaskF)()
 			>
 				class GenericSecurityDescriptor : public ISecurityDescriptor<RightsEnumaration> {
-				requires = IsEnum<RightsEnumaration>;
+				//requires = IsEnum<RightsEnumaration>;
 				public:
 					using RightMap = BitMapT<static_cast<SizeT>(RightsEnumaration::MaxRight)>;
 				public:
 
-					static constexpr RightMap GetGenericReadMask() const {
+					static constexpr RightMap GetGenericReadMask() {
 						return GenericReadMaskF();
 					}
-					static constexpr RightMap GetGenericWriteMask() const {
+					static constexpr RightMap GetGenericWriteMask() {
 						return GenericWriteMaskF();
 					}
-					static constexpr RightMap GetGenericDeleteMask() const {
+					static constexpr RightMap GetGenericDeleteMask() {
 						return GenericDeleteMaskF();
 					}
-					static constexpr RightMap GetGenericExecuteMask() const {
+					static constexpr RightMap GetGenericExecuteMask() {
 						return GenericExecuteMaskF();
 					}
 				private:
-					static_assert(IS_CONSTEXPR(GetGenericReadMask()), "GenericReadMask funct non constexpr");
-					static_assert(IS_CONSTEXPR(GetGenericWriteMask()), "GenericWriteMask funct non constexpr");
-					static_assert(IS_CONSTEXPR(GetGenericDeleteMask()), "GenericDeleteMask funct non constexpr");
-					static_assert(IS_CONSTEXPR(GetGenericExecuteMask()), "GenericExecuteMask funct non constexpr");
+					static_assert(!IS_CONSTEXPR(GetGenericReadMask()), "GenericReadMask funct non constexpr");
+					static_assert(!IS_CONSTEXPR(GetGenericWriteMask()), "GenericWriteMask funct non constexpr");
+					static_assert(!IS_CONSTEXPR(GetGenericDeleteMask()), "GenericDeleteMask funct non constexpr");
+					static_assert(!IS_CONSTEXPR(GetGenericExecuteMask()), "GenericExecuteMask funct non constexpr");
 				private:
 					ACL<RightsEnumaration> CurrentACL;
 				protected:
-					void VerifyRight(
-						RightsEnumaration requiredRight,
-						AConstCharStr file,
-						AConstCharStr functionSignature,
-						SizeT line
-					);
+					GenericSecurityDescriptor(const NullptrT) : CurrentACL() {};
+					GenericSecurityDescriptor(const ACL<RightsEnumaration> & CurrentACL) : CurrentACL(CurrentACL) {};
 
 					void VerifyRight(
 						RightsEnumaration requiredRight,
-						AConstCharStr file,
-						AConstCharStr functionSignature,
+						ConstACharStr file,
+						ConstACharStr functionSignature,
 						SizeT line
 					);
 
@@ -266,7 +266,7 @@ namespace Seed {
 							return CurrentACL;
 					}
 
-					void SetACL(ACL NewACL) {
+					void SetACL(ACL<RightsEnumaration> NewACL) {
 						CurrentACL = NewACl;
 					}
 
@@ -275,30 +275,35 @@ namespace Seed {
 					~GenericSecurityDescriptor() {};
 			};
 
-			using SystemRightSecurityDescriptor = GenericSecurityDescriptor < SystemRights,
-				[]()->auto {
+			constexpr auto SystemRightGenericReadMask = [] ()->SystemRightsMask {
 				SystemRightsMask mask;
-				mask.SetBit(static_cast<SizeT>(SystemRights::GroupRead));
-				mask.SetBit(static_cast<SizeT>(SystemRights::ReadUserData));
-				mask.SetBit(static_cast<SizeT>(SystemRights::UserRead));
+				mask.SetBit (static_cast<SizeT>(SystemRights::GroupRead));
+				mask.SetBit (static_cast<SizeT>(SystemRights::ReadUserData));
+				mask.SetBit (static_cast<SizeT>(SystemRights::UserRead));
 				return mask;
-			},
-				[]()->auto{
+			};
+
+			constexpr auto SystemRightGenericWriteMask = [] ()->SystemRightsMask {
 				SystemRightsMask mask;
-				mask.SetBit(static_cast<SizeT>(SystemRights::GroupUpdate));
-				mask.SetBit(static_cast<SizeT>(SystemRights::UserUpdate));
+				mask.SetBit (static_cast<SizeT>(SystemRights::GroupUpdate));
+				mask.SetBit (static_cast<SizeT>(SystemRights::UserUpdate));
 				return mask;
-			},
-				[]()->auto{
+			};
+
+			constexpr auto SystemRightGenericExecuteMask = [] ()->SystemRightsMask {
 				SystemRightsMask mask;
-				mask.SetBit(static_cast<SizeT>(SystemRights::GroupDelete));
-				mask.SetBit(static_cast<SizeT>(SystemRights::UserDelete));
+				mask.SetBit (static_cast<SizeT>(SystemRights::GroupDelete));
+				mask.SetBit (static_cast<SizeT>(SystemRights::UserDelete));
 				return mask;
-			},
-				[]()->auto{
+			};
+
+			constexpr auto SystemRightGenericDeleteMask = [] ()->SystemRightsMask {
 				SystemRightsMask mask;
 				return mask;
-			} > ;
+			};
+
+			using SystemRightSecurityDescriptor = GenericSecurityDescriptor<SystemRights,
+				SystemRightGenericWriteMask, SystemRightGenericWriteMask, SystemRightGenericExecuteMask, SystemRightGenericDeleteMask>;
 
 			Boolean RightCheck(SystemRights requiredRight);
 

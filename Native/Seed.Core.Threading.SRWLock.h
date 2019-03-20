@@ -17,8 +17,8 @@ namespace Seed {
 			public:
 				SRWLock()
 				{
-					extern void InitSRWLock(RTL_SRWLOCK&);
-					InitSRWLock(lock);
+					extern void InitSRWLock(void*);
+					InitSRWLock(&lock);
 				}
 				///<summary>Виконує <see cref="Funct"/> з еклюзивним блокуванням</summary>
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
@@ -26,20 +26,20 @@ namespace Seed {
 				template<typename T>
 				auto ExclusiveLock(T & Funct) -> decltype(Funct())
 				{
-					extern void AcquireLockExclusiveSRWLock(RTL_SRWLOCK&);
-					extern void ReleaseLockExclusiveSRWLock(RTL_SRWLOCK&);
+					extern void AcquireLockExclusiveSRWLock(void*);
+					extern void ReleaseLockExclusiveSRWLock(void*);
 
 					if constexpr (StaticAsserts::IsSame<decltype(Funct()), void>())
 					{
-						AcquireLockExclusiveSRWLock(lock);
+						AcquireLockExclusiveSRWLock(&lock);
 						Funct();
-						ReleaseLockExclusiveSRWLock(lock);
+						ReleaseLockExclusiveSRWLock(&lock);
 					}
 					else
 					{
-						AcquireLockExclusiveSRWLock(lock);
+						AcquireLockExclusiveSRWLock(&lock);
 						auto && ret = MoveRValue(Scope());
-						ReleaseLockExclusiveSRWLock(lock);
+						ReleaseLockExclusiveSRWLock(&lock);
 						return MoveRValue(ret);
 					}
 				}
@@ -49,20 +49,20 @@ namespace Seed {
 				template<typename T>
 				auto ShareLock(T & Funct) -> decltype(Funct())
 				{
-					extern void AcquireLockSharedSRWLock(RTL_SRWLOCK&);
-					extern void ReleaseLockSharedSRWLock(RTL_SRWLOCK&);
+					extern void AcquireLockSharedSRWLock(void*);
+					extern void ReleaseLockSharedSRWLock(void*);
 
 					if constexpr (StaticAsserts::IsSame<decltype(Funct()), void>())
 					{
-						AcquireLockSharedSRWLock(lock);
+						AcquireLockSharedSRWLock(&lock);
 						Funct();
-						ReleaseLockSharedSRWLock(lock);
+						ReleaseLockSharedSRWLock(&lock);
 					}
 					else
 					{
-						AcquireLockSharedSRWLock(lock);
+						AcquireLockSharedSRWLock(&lock);
 						auto && ret = MoveRValue(Funct());
-						ReleaseLockSharedSRWLock(lock);
+						ReleaseLockSharedSRWLock(&lock);
 						return MoveRValue(ret);
 					}
 				}

@@ -4,6 +4,9 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 inline 
 bool ConvertCharStrToUUID(Seed::Core::CharStr str, Seed::Core::UUID & uuid) {
 	GUID guid;
@@ -54,3 +57,5 @@ void DowncaseCharStrImpl(Seed::Core::CharStr from, Seed::Core::CharStr to) {
 	__to.Buffer = to;
 	RtlDowncaseUnicodeString(&__to, &__from, FALSE);
 }
+
+#pragma warning(pop)

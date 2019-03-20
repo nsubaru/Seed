@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.Types.h"
+#include "Seed.Core.Base.Utils.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -12,7 +13,11 @@ namespace Seed {
 		///<para><code> C = A; A = B; B = C;</code></para>
 		///</remarks>
 		template<typename T>
-		__forceinline void Swap(T & First, T & Second) noexcept { T tmp = First; First = Second; Second = tmp; }
+		__forceinline void Swap(T & First, T & Second) noexcept { 
+			T tmp(MoveRValue(First)); 
+			First = MoveRValue(Second);
+			Second = MoveRValue(tmp);
+		}
 
 		///<summary>Оптимізований обмін значеннями зміних AChar</summary>
 		///<param name='First'>Перше значення</param>

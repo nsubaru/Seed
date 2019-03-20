@@ -5,9 +5,9 @@
 namespace Seed {
 	inline namespace Core {
 		inline namespace Exceptions {
-			class SeedKernelCall IntegerOverflowException : public Exception {
+			class  IntegerOverflowException : public Exception {
 			public:
-				IntegerOverflowException(const AChar * File, const AChar * FunctName, SizeT Line) :
+				IntegerOverflowException(ConstACharStr File, ConstACharStr FunctName, SizeT Line) :
 					Exception(File, FunctName, Line, L"Integer owerflow") {}
 			};
 		}
@@ -16,7 +16,7 @@ namespace Seed {
 #pragma region SafeInt
 			template<typename T>
 			class SafeInt {
-				static_assert(false, "Safe int not implemented for this type");
+				//static_assert(false, "Safe int not implemented for this type");
 			};
 
 			template<>
@@ -140,7 +140,7 @@ namespace Seed {
 #pragma endregion
 #pragma endregion
 
-#pragma region Get\Set
+#pragma region Get & Set
 
 				constexpr __forceinline UInt8 Get() { return value; }
 				constexpr __forceinline void Set(UInt8 Value) { this->value = Value; }
@@ -271,7 +271,7 @@ namespace Seed {
 #pragma endregion
 #pragma endregion
 
-#pragma region Get\Set
+#pragma region Get and Set
 
 				constexpr __forceinline UInt16 Get() { return value; }
 				constexpr __forceinline void Set(UInt16 Value) { this->value = Value; }
@@ -402,7 +402,7 @@ namespace Seed {
 #pragma endregion
 #pragma endregion
 
-#pragma region Get\Set
+#pragma region Get and Set
 
 				constexpr __forceinline UInt32 Get() { return value; }
 				constexpr __forceinline void Set(UInt32 Value) { this->value = Value; }
@@ -533,7 +533,7 @@ namespace Seed {
 #pragma endregion
 #pragma endregion
 
-#pragma region Get\Set
+#pragma region Get and Set
 
 				constexpr __forceinline UInt64 Get() { return value; }
 				constexpr __forceinline void Set(UInt64 Value) { this->value = Value; }

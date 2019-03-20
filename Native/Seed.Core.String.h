@@ -14,7 +14,7 @@ namespace Seed {
 		private:
 			SizeT requiredSize;
 		public:
-			StringToLong(const AChar * File, const AChar * FunctName, SizeT Line, SizeT RequiredSize) :
+			StringToLong(ConstACharStr File, ConstACharStr FunctName, SizeT Line, SizeT RequiredSize) :
 				Exception(File, FunctName, Line, L"String to long"), requiredSize(RequiredSize) {}
 
 			SizeT GetRequiredSize() { return requiredSize; }
@@ -1120,7 +1120,9 @@ namespace Seed {
 			}
 
 			//Поточна довжина строки
-			SizeT Size() const { return CurrentSize; }
+			SizeT GetSize() const { return CurrentSize; }
+
+			SizeT Property(GetSize) Size;
 
 			//Зміна розміру рядка
 			BaseString & Reserve(SizeT NewReservedSize) {
@@ -1447,7 +1449,7 @@ namespace Seed {
 				Char What,
 				Char To,
 				SizeT StartPos = 0,
-				SizeT EndPos = Seed::Math::Max::SizeT
+				SizeT EndPos = Seed::Math::Max<SizeT>()
 			) {
 				if (StartPos > this->CurrentSize)
 					Throw(IndexOutOfRange(ExceptionPosition, StartPos, this->CurrentSize));

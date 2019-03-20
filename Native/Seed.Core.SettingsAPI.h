@@ -35,110 +35,110 @@ namespace Seed {
 				class DefaultHeap {
 				public:
 					static __forceinline Bytes GetStartSize() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.DefaultHeap.StartSize;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize;
 					}
 
 					static __forceinline Bytes GetMaxSize() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.DefaultHeap.MaxSize;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.DefaultHeap.MaxSize;
 					}
 
 					static __forceinline SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks GetConfigs() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.DefaultHeap.Additional—hecks;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.DefaultHeap.Additional—hecks;
 					}
 
 					static __forceinline void SetStartSize(Bytes NewStartSize) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.DefaultHeap.StartSize = NewStartSize;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize = NewStartSize;
 					}
 
 					static __forceinline void SetMaxSize(Bytes NewMaxSize) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.DefaultHeap.MaxSize = NewMaxSize;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.DefaultHeap.MaxSize = NewMaxSize;
 					}
 
 					static __forceinline void SetAdditionalChecks(SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks NewAdditionalCheks) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.DefaultHeap.Additional—hecks = NewAdditionalCheks;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.DefaultHeap.Additional—hecks = NewAdditionalCheks;
 					}
 				};
 
 				class SensitiveDataHeap {
 				public:
 					static __forceinline Bytes GetStartSize() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.SensitiveDataHeap.StartSize;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.StartSize;
 					}
 
 					static __forceinline Bytes GetMaxSize() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.SensitiveDataHeap.MaxSize;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.MaxSize;
 					}
 
 					static __forceinline SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks GetConfigs() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.Additional—hecks;
 					}
 
 					static __forceinline void SetStartSize(Bytes NewStartSize) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.SensitiveDataHeap.StartSize = NewStartSize;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.StartSize = NewStartSize;
 					}
 
 					static __forceinline void SetMaxSize(Bytes NewMaxSize) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = NewMaxSize;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.MaxSize = NewMaxSize;
 					}
 
 					static __forceinline void SetAdditionalChecks(SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks NewAdditionalCheks) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks = NewAdditionalCheks;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.Additional—hecks = NewAdditionalCheks;
 					}
 				};
 
 				class ExceptionHeap {
 				public:
 					static __forceinline Bytes GetStartSize() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.ExceptionHeap.StartSize;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.ExceptionHeap.StartSize;
 					}
 
 					static __forceinline Bytes GetMaxSize() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.ExceptionHeap.MaxSize;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.ExceptionHeap.MaxSize;
 					}
 
 					static __forceinline SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks GetConfigs() {
-						extern SettingsData CurrentSettings;
-						return CurrentSettings.MainMemoryManager.ExceptionHeap.Additional—hecks;
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.MainMemoryManager.ExceptionHeap.Additional—hecks;
 					}
 
 					static __forceinline void SetStartSize(Bytes NewStartSize) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.ExceptionHeap.StartSize = NewStartSize;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.ExceptionHeap.StartSize = NewStartSize;
 					}
 
 					static __forceinline void SetMaxSize(Bytes NewMaxSize) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.ExceptionHeap.MaxSize = NewMaxSize;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.ExceptionHeap.MaxSize = NewMaxSize;
 					}
 
 					static __forceinline void SetAdditionalChecks(SettingsData::MemoryManager::HeapCfg::PosibleAdditional—hecks NewAdditionalCheks) {
-						extern SettingsData CurrentSettings;
-						CurrentSettings.MainMemoryManager.ExceptionHeap.Additional—hecks = NewAdditionalCheks;
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.MainMemoryManager.ExceptionHeap.Additional—hecks = NewAdditionalCheks;
 					}
 				};
 
 				static __forceinline SizeT GetStringReserveSpace() {
-					extern SettingsData CurrentSettings;
-					return CurrentSettings.MainMemoryManager.StringReserveSize;
+					extern SettingsData CurrentSettingsData;
+					return CurrentSettingsData.MainMemoryManager.StringReserveSize;
 				}
 
 				static __forceinline void SetStringReserveSpace(SizeT NewStringReserverSpace) {
-					extern SettingsData CurrentSettings;
-					CurrentSettings.MainMemoryManager.StringReserveSize = NewStringReserverSpace;
+					extern SettingsData CurrentSettingsData;
+					CurrentSettingsData.MainMemoryManager.StringReserveSize = NewStringReserverSpace;
 				}
 			};
 

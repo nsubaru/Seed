@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.Types.h"
+#include "Seed.Core.Base.Utils.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -7,20 +8,35 @@ namespace Seed {
 		namespace Details {
 			template <class T>
 			constexpr void IsConstexprHelper(T&& t) {}
+
+			template< class T, bool IsFunctionType = false >
+			struct AddPointer
+			{
+				using Type = typename StaticAsserts::RemoveRef<T>::Type*;
+			};
+
+			template< class T >
+			struct AddPointer<T, true>
+			{
+				using Type = T;
+			};
+
+			template< class T, class... Args >
+			struct AddPointer<T(Args...), true>
+			{
+				using Type = T(*)(Args...);
+			};
+
+			template< class T, class... Args >
+			struct AddPointer<T(Args..., ...), true>
+			{
+				using Type = T(*)(Args..., ...);
+			};
 		}
 
 		///<summary>Простір імен статичних провірок</summary>
 		namespace StaticAsserts {
-			///<summary>Шаблон логічної константи, використовується для логічних суджень в compile-time</summary>
-			template<Boolean value>
-			struct LogicConst {
-				__forceinline constexpr operator Boolean() { return value; }
-				static constexpr Boolean State = value;
-			};
-			///<summary>Логічна істина для статичних провірок</summary>
-			inline namespace { typedef LogicConst<True> LogicTrue; }
-			///<summary>Логічна хиба для статичних провірок</summary>
-			inline namespace { typedef LogicConst<False> LogicFalse; }
+
 
 			///<summary>Логічне суддження чи тип T1 == T2 виконується в compile-time</summary>
 			template<typename T1, typename T2>
@@ -37,6 +53,15 @@ namespace Seed {
 			///<summary>Compile-time логічне суддження, якщо Cond == True, вертає тип IfTrue, інакше IfFalse</summary>
 			template<typename IfTrue, typename IfFalse>
 			struct ConditionT<true, IfTrue, IfFalse> { using Result = IfTrue; };
+
+			template<Boolean Cond, typename IfTrue, typename IfFalse>
+			using Condition = typename ConditionT<Cond, IfTrue, IfFalse>::Result;
+
+			template<bool B, class T = void>
+			struct EnableIf {};
+
+			template<class T>
+			struct EnableIf<true, T> { typedef T type; };
 
 			/////<summary>Compile-time логічне суддження, якщо T є об'єднанням то вертає True інакше False</summary>
 			/////<remarks>Спирається на реалізацію в компіляторі</remarks>
@@ -61,21 +86,63 @@ namespace Seed {
 			//template<typename T>
 			//constexpr bool IsMemCopySupported() { return CRT::is_trivially_copyable<T>(); }
 
-			///<summary>Знімає силку з типу</summary>
-			template<typename T>
-			struct RemoveRef { using Type = T; };
+			template<class T>
+			struct IsCArray : LogicFalse {};
 
-			///<summary>Знімає силку з типу</summary>
-			template<typename T>
-			struct RemoveRef<T&> { using Type = T; };
+			template<class T>
+			struct IsCArray<T[]> : LogicTrue {};
 
-			///<summary>Знімає силку з типу</summary>
-			template<typename T>
-			struct RemoveRef<T&&> { using Type = T; };
+			template<class T, SizeT N>
+			struct IsCArray<T[N]> : LogicTrue {};
 
-			///<summary>Тип без силки</summary>
+
+			template<class T>
+			struct RemoveSizeFromCArray { typedef T type; };
+
+			template<class T>
+			struct RemoveSizeFromCArray<T[]> { typedef T type; };
+
+			template<class T, SizeT N>
+			struct RemoveSizeFromCArray<T[N]> { typedef T type; };
+
 			template<typename T>
-			using RemoveRefT = typename RemoveRef<T>::Type;
+			struct RemoveConstStruct
+			{
+				using Type = T;
+			};
+
+			template<typename T>
+			struct RemoveConstStruct<const T>
+			{
+				using Type = T;
+			};
+
+			template<typename T>
+			using RemoveConst = typename RemoveConstStruct<T>::Type;
+
+			template<typename T>
+			struct RemoveVolatileStruct
+			{
+				using Type = T;
+			};
+
+			template<typename T>
+			struct RemoveVolatileStruct<volatile T>
+			{
+				using Type = T;
+			};
+
+			template<typename T>
+			using RemoveVolatile = typename RemoveVolatileStruct<T>::Type;
+
+			template< class T >
+			struct RemoveCVStruct
+			{
+				typedef typename RemoveVolatileStruct<typename RemoveConstStruct<T>::Type>::Type Type;
+			};
+
+			template<typename T>
+			using RemoveCV = typename RemoveCVStruct<T>::Type;
 
 #pragma region Is Function static assert
 			///<summary>primary template</summary>
@@ -189,39 +256,11 @@ namespace Seed {
 			struct IsFunction<Ret(Args..., ...) const volatile && noexcept> : LogicTrue {};
 #pragma endregion
 
-			template<class... _Types>
-			using VoidT = void;
+			template<typename T >
+			struct AddPointerStruct : Details::AddPointer<T, IsFunction<T>::State> {};
 
-			// STRUCT TEMPLATE _Add_reference
-			template<class Type,
-				class = void>
-				struct AddReference
-			{	// add reference
-				using Lvalue = Type;
-				using Rvalue = Type;
-			};
-
-			template<class Type>
-			struct AddReference<Type, VoidT<Type&>>
-			{	// add reference
-				using Lvalue = Type & ;
-				using Rvalue = Type && ;
-			};
-
-			template<class Type>
-			using AddRvalueReferenceT = typename AddReference<Type>::Rvalue;
-
-			template<class Type>
-			using AddLvalueReferenceT = typename AddReference<Type>::Lvalue;
-
-			template<class Type>
-			AddRvalueReferenceT<Type> DeclVal() noexcept {};
-
-			template<typename Type>
-			struct IsLValueRef : LogicFalse {};
-
-			template<typename Type>
-			struct IsLValueRef<Type&> : LogicTrue {};
+			template<typename T>
+			using AddPointer = typename AddPointerStruct<T>::Type;
 
 #pragma region Signed type converter helpers
 			template<typename>
@@ -269,7 +308,7 @@ namespace Seed {
 #pragma endregion
 
 			template<typename Int>
-			using Signed = MakeSigned<Int>::Type;
+			using Signed = typename MakeSigned<Int>::Type;
 
 #pragma region Unsigned type converter helpers
 			template<typename>
@@ -317,7 +356,27 @@ namespace Seed {
 #pragma endregion
 
 			template<typename Int>
-			using Unsigned = MakeUnsigned<Int>::Type;
+			using Unsigned = typename MakeUnsigned<Int>::Type;
+
+			template< class T >
+			struct DecayStruct
+			{
+			private:
+				typedef typename RemoveRef<T>::Type U;
+			public:
+				typedef typename Condition<
+					IsCArray<U>::State,
+					typename RemoveSizeFromCArray<U>::type*,
+					typename Condition<
+					IsFunction<U>::State,
+					typename AddPointer<U>,
+					typename RemoveCV<U>
+					>
+				> Type;
+			};
+
+			template<class T>
+			using Decay = typename DecayStruct<T>::Type;
 		}
 	}
 }

@@ -7,53 +7,6 @@ namespace Seed {
 	inline namespace Core {
 		namespace Math {
 			namespace Internal {
-				__forceinline Float RuntimeAbs(Float Val)
-				{
-					union
-					{
-						Int32 * I;
-						Float * D;
-					} D;
-					D.D = &Val;
-					*D.I &= 1 << 31;
-					return Val;
-				}
-
-				__forceinline Double RuntimeAbs(Double Val)
-				{
-					union
-					{
-						Int64 *  I;
-						Double * D;
-					} D;
-					D.D = &Val;
-					*D.I &= 1ULL << 63;
-					return Val;
-				}
-
-				__forceinline Seed::Boolean RuntimeSign(Seed::Float val)
-				{
-					static_assert(sizeof(Float) == sizeof(Int32), "Ðîçì³ðè Float ³ Int32 ð³çí³");
-					union
-					{
-						Int32 *  I;
-						Float * D;
-					} D;
-					D.D = &val;
-					return ((*D.I) & ((Seed::Int32)1 << 31));
-				}
-
-				__forceinline Seed::Boolean RuntimeSign(Seed::Double val)
-				{
-					static_assert(sizeof(Double) == sizeof(Int64), "Ðîçì³ðè Float ³ Int32 ð³çí³");
-					union
-					{
-						Int64 *  I;
-						Double * D;
-					} D;
-					D.D = &val;
-					return ((*D.I) & ((Seed::Int64)1 << 63));
-				}
 #pragma warning(push)
 #pragma warning(disable: 4162)
 #pragma intrinsic(pow)
@@ -166,7 +119,7 @@ namespace Seed {
 #pragma intrinsic(log)
 				Double RuntimeLog2(Double X)
 				{
-					log(X) / log(2);
+					return log(X) / log(2);
 				}
 
 				Double exp(Double X)
