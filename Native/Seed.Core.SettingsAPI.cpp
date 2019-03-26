@@ -44,7 +44,7 @@ namespace Seed {
 				NULL
 			);
 			if (!NT_SUCCESS(status)) {
-				toCoreLog(L"Can't save runtime settings");
+				toCoreLog(L"Помилка: Не можливо зберегти налаштування ядра");
 			}
 		}
 	}
@@ -82,7 +82,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 	}
 	//Init setting file
 	{
-		toCoreLog(L"Init cpp settings file...");
+		toCoreLog(L"Ініціалізація файла конфігурацій...");
 		Char raw[sizeof(size_t) + 1024];
 		UNICODE_STRING * str = (UNICODE_STRING*)raw; //-V2005
 		NtQueryInformationProcess(
@@ -153,7 +153,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 			return false;
 		}
 		else {
-			toCoreLog(L"First start. Use default configs.");
+			toCoreLog(L"Перший запуск. Використання стандартних налаштуваннь ядра");
 			CurrentSettingsData = Settings::Default::InitDefaultSettings();
 			isFirstStartup = true;
 			status = NtWriteFile(

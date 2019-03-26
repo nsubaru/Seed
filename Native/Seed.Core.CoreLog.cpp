@@ -137,12 +137,12 @@ SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::C
 
 void Seed::Core::Stop::Loging() noexcept
 {
-	toCoreLog(L"Stoping loging...");
+	toCoreLog(L"Зупинка логування...");
 	NtClose(LogFile.handle);
 	RtlDeleteCriticalSection(&LogFile.lock);
 }
 
-bool SeedKernelCall Seed::Core::toCoreLog(const Array<String>& lines)
+bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::String>& lines)
 {
 	if (lines.Count == 0) return true;
 	try
@@ -162,8 +162,9 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Array<String>& lines)
 		{
 			Char raw[1000];
 			FormatCurrentTime(raw);
-			raw[21] = L'\0';
-			data = String(raw) + data + String(L"\r\n");
+			raw[21] = L' ';
+			raw[22] = L'\0';
+			data = String(raw) + data + NextLine();
 			SizeT bytesCount = data.Size;
 			bytesCount *= sizeof(wchar_t);
 			RtlEnterCriticalSection(&LogFile.lock);
@@ -173,7 +174,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Array<String>& lines)
 				NULL,
 				NULL,
 				&LogFile.ioBlock,
-				(void*)(Seed::CharStr) data, //-V2005
+				(void*)(Seed::ConstCharStr) data, //-V2005
 				(ULONG)bytesCount, //-V2005 //-V202
 				NULL,
 				NULL);

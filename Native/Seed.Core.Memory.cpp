@@ -8,6 +8,7 @@
 #include "Seed.Core.Exceptions.h"
 
 #include "Seed.Core.CoreLog.h"
+#include "Seed.Core.CoreLog.Managed.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
@@ -53,8 +54,40 @@ void Seed::Core::Memory::Heap::Stop() noexcept
 using namespace Seed;
 using namespace Seed::Memory;
 
+template<SizeT HeapNameSize>
+void LogAllocating(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)[HeapNameSize]) {
+	using SafeString = BaseString<Memory::ExceptionHeap>;
+	SafeString str(100);
+	str += L"Відлагодження: виділення ";
+	str += SafeString::toString(MemBlkIndex);
+	str += L" розміром ";
+	str += SafeString::toString(MemBlkSize);
+	str += L" байт з кучі "; 
+	str += HeapName; 
+	str += L".";
+	toCoreLog(str);
+}
+
+template<SizeT HeapNameSize>
+void LogFree(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)[HeapNameSize]) {
+	using SafeString = BaseString<Memory::ExceptionHeap>;
+	SafeString str(100);
+	str += L"Відлагодження: звільнення ";
+	str += SafeString::toString(MemBlkIndex);
+	str += L" розміром ";
+	str += SafeString::toString(MemBlkSize);
+	str += L" байт з кучі ";
+	str += HeapName;
+	str += L".";
+	toCoreLog(str);
+}
+
 void * GenericAllocate(Seed::SizeT Size)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Загальна");
+#endif
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
 		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
@@ -78,6 +111,10 @@ void * GenericAllocate(Seed::SizeT Size)
 
 void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Загальна");
+#endif
 	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне,
 	//а отже викликаєм просте виділення пам'яті
 	if (AllocationReq == 0 || AllocationReq == 1)
@@ -111,12 +148,18 @@ void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 
 void * GenericFree(void * MemBlk)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+#endif
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
 	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//Отримуєм розмір ділянки пам'яті
 	SizeT DataSize = RealPtr[0];
+#if PreReleaseMode || DebugMode
+	LogFree(DataSize, HeapData.AllocatedMemBlksCount + 1, L"Загальна");
+#endif
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + DataSize;
 	//Пробуєм звільнити пам'ять
@@ -133,12 +176,18 @@ void * GenericFree(void * MemBlk)
 
 void * GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+#endif
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
 	SizeT * Header = ((SizeT*)MemBlk) - 2;
 	//Отримуєм розмір даних в ділянці пам'яті
 	SizeT DataSize = Header[0];
+#if PreReleaseMode || DebugMode
+	LogFree(DataSize, HeapData.AllocatedMemBlksCount + 1, L"Загальна");
+#endif
 	//Отрмуєм покажчик на початок ділянки пам'яті
 	void* RealPtr = (void*)Header[1];
 	//Обчислюєм повний розмір ділянки пам'яті
@@ -194,6 +243,10 @@ void Seed::Core::Memory::SensitiveDataHeap::Stop() noexcept
 
 DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Allocate(Seed::SizeT Size)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+#endif
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
 		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
@@ -217,6 +270,10 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 
 DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+#endif
 	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне,
 	//а отже викликаєм просте виділення пам'яті
 	if (AllocationReq == 0 || AllocationReq == 1)
@@ -251,12 +308,18 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 
 DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Free(void * MemBlk)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+#endif
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
 	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//Отримуєм розмір ділянки пам'яті
 	SizeT DataSize = RealPtr[0];
+#if PreReleaseMode || DebugMode
+	LogFree(DataSize, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+#endif
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + DataSize;
 	//Обнулюєм ділянку пам'яті
@@ -275,6 +338,9 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 
 DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+#endif
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
@@ -283,6 +349,9 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	void* RealPtr = (void*)Header[0];
 	//Отримуєм розмір даних в ділянці пам'яті
 	SizeT DataSize = Header[1];
+#if PreReleaseMode || DebugMode
+	LogFree(DataSize, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+#endif
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + sizeof(SizeT) + AllocationReq + DataSize;
 	//Обнулюєм ділянку пам'яті

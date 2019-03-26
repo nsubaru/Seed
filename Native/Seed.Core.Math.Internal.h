@@ -306,6 +306,10 @@ namespace Seed {
 
 				Double RuntimeSqrt(Double X);
 #pragma endregion
+
+				Float ModD(Float X, Float & intPart);
+
+				Double ModD(Double X, Double & intPart);
 			}
 		}
 	}

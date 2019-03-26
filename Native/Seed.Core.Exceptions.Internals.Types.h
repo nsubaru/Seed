@@ -133,7 +133,7 @@ typedef const struct _s_FuncInfo
 #define EH_MAGIC_NUMBER3        0x19930522
 
 typedef void(__cdecl* unexpected_handler)();
-typedef void(__cdecl* unexpected_function)();
+typedef void(__cdecl* unexpected_function)(); //-V677
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //
 // Per-thread data

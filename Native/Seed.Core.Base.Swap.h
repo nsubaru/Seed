@@ -139,7 +139,7 @@ namespace Seed {
 			Swap((UInt64&)First, (UInt64&)Second); //-V2005
 		}
 		static_assert(sizeof(void*) == sizeof(SizeT), "Помилка розмір SizeT не є рівним розміру покажчика");
-		static_assert((SizeT)(void*)(0xF0F0F0F0F) == (SizeT)0xF0F0F0F0F, "Помилка неможливо правильно перетворити адресс покажчик в SizeT");
+		static_assert((SizeT)(void*)(0xF0F0F0F0F) == (SizeT)0xF0F0F0F0F, "Помилка неможливо правильно перетворити адресс покажчик в SizeT"); //-V566
 
 		///<summary>Оптимізований обмін значеннями зміних Float </summary>
 		///<param name='First'>Перше значення</param>

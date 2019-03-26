@@ -4,12 +4,14 @@
 #include "Seed.Core.Exceptions.Internals.h"
 #include "Seed.Core.Exceptions.Internals.SEH.h"
 
+#include "Seed.Core.CoreLog.Managed.h"
+
 #include "typeinfo"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-__declspec(thread, selectany) tls_exeption_info_t * ThreadExceptionInfo;
+tls_exeption_info_t * ThreadExceptionInfo;
 
 extern void * CxxCallCatchBlock(
 	EXCEPTION_RECORD *pExcept
@@ -407,7 +409,7 @@ static BOOLEAN IsInExceptionSpec(
 
 
 //////////////////////////////////////////////////////////////////////////////////
-// Is_bad_exception_allowed - checks if std::bad_exception belongs to the list
+// Is_bad_exception_allowed - checks if BadException belongs to the list
 //
 BOOLEAN Is_bad_exception_allowed(ESTypeList *pESTypeList, size_t ImageBase)
 {
@@ -756,8 +758,6 @@ void __cdecl CatchIt(
 
 	// These parameters are not used in some compilations
 
-
-	EHRegistrationNode *pEstablisher = pRN;
 //	auto cp = pEntry;
 	typedef void(*pCatchT)(...);
 //	volatile auto pCatchC = pCatch;
@@ -766,7 +766,7 @@ void __cdecl CatchIt(
 //	volatile auto cppDC = pDC;
 
 	EHRegistrationNode EstablisherFramePointers;
-	pEstablisher = GetEstablisherFrame(pRN, pDC, pFuncInfo, &EstablisherFramePointers);
+	EHRegistrationNode * pEstablisher = GetEstablisherFrame(pRN, pDC, pFuncInfo, &EstablisherFramePointers);
 
 	// Copy the thrown object into a buffer in the handler's stack frame,
 	// unless the catch was by elipsis (no conversion) OR the catch was by
@@ -831,6 +831,23 @@ void FindHandlerForForeignException(
 		return;
 	}
 
+	switch (pExcept->ExceptionCode) {
+#if !(PreReleaseMode || DebugMode)
+	case STATUS_BREAKPOINT:
+		Seed::toCoreLog(L"Критична помилка: Відбувається відлагодження");
+		break;
+#endif
+	case STATUS_HEAP_CORRUPTION:
+		Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
+		break;
+	case STATUS_ACCESS_VIOLATION:
+		Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+	default:
+		Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
+		str +=
+			Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::UInt64asHex(pExcept->ExceptionCode);
+		Seed::toCoreLog(str);
+	}
 
 	//if (__pSETranslator != nullptr && __pSETranslator != RtlEncodePointer(nullptr)) {
 

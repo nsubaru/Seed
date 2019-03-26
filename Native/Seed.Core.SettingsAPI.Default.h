@@ -25,6 +25,9 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.ExceptionHeap.StartSize = 10Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.MaxSize = 0Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalСhecks = { 0 };
+
+						//Cекція резервування пам'яті для буфера рядків
+						DefaultSettings.MainMemoryManager.StringReserveSize = 50;
 					}
 
 					return DefaultSettings;

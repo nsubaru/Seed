@@ -5,8 +5,6 @@
 #include "Seed.Core.Containers.Internals.h"
 #include "typeinfo"
 
-#define _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING
-
 namespace {
 	////Структура для збереження результату і його типу
 	//struct variadic_data{
@@ -78,7 +76,7 @@ namespace Seed {
 				return *(T*)__get_result(typeid(T));
 			}
 			//Деструктор, для коректного видалення об'єкта який наслідує цей класс
-			virtual ~FunctionObj()
+			virtual ~FunctionObj() = 0
 			{};
 		};
 	}
@@ -103,7 +101,7 @@ struct call_impl<F, Tuple, true, TotalArgs, N...>
 {
 	auto __forceinline static call(F f, Tuple&& t)
 	{
-		return f(Seed::Get<N>(Seed::MoveRValue<Tuple>(t))...);
+		return f(Seed::MoveRValue(t.Get<N>())...);
 	}
 };
 //Внутрішні структури для запуску функції і розкрутки аргументів. 
@@ -111,10 +109,10 @@ struct call_impl<F, Tuple, true, TotalArgs, N...>
 template<typename F, typename Tuple>
 auto __forceinline call(F f, Tuple&& t)
 {
-	typedef typename std::decay<Tuple>::type type;
-	return call_impl<F, Tuple, 0 == std::tuple_size<type>::value,
-		std::tuple_size<type>::value
-	>::call(f, std::forward<Tuple>(t));
+	using type = Seed::StaticAsserts::Decay<Tuple>;
+	return call_impl<F, Tuple, 0 == type::Count(),
+		type::Count()
+	>::call(f, Seed::ForwardReference<Tuple>(t));
 }
 
 //Внутрішній клас реалізація делегата
@@ -134,6 +132,8 @@ class TemplateFunctionT :public Seed::Core::FunctionObj
 	volatile bool isEnded = false;
 	//Флаг запуску функції
 	volatile bool isStarted = false;
+
+	using retType = decltype(call(f, args));
 protected:
 	//Вертає результат
 	//Генерить наступні ексепшини
@@ -141,14 +141,14 @@ protected:
 	//- InvalidType якщо типи результату не коректний
 	__forceinline virtual void * __get_result(const Seed::TypeInfo & type) override final
 	{
-		if constexpr (Seed::Core::StaticAsserts::IsSame<decltype(call(f, args)), void>::State)
-			Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(decltype(call(f,args)), type)));
+		if constexpr (Seed::Core::StaticAsserts::IsSame<retType, void>::State)
+			Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(void), type));
 		else if (result == nullptr)
-			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this->result), NullPointException::Types::Read));
+			Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
 		else
 		{
 			if (typeid(decltype(call(f, args))).hash_code() != type.hash_code())
-				Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(decltype(call(f, args)), type)));
+				Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(retType), type));
 			return result;
 		}
 	}
@@ -161,7 +161,7 @@ public:
 		try
 		{
 			//Умова часу компіляції, яка провіряє чи функція вертає void
-			if constexpr (!Seed::CoreAPI::StaticAsserrts::IsSame<decltype(call(f, args)), void>::State)
+			if constexpr (!Seed::Core::StaticAsserts::IsSame<decltype(call(f, args)), void>::State)
 			{
 				//Якщо ні то запамятовує результат в покажчику res
 				//В який переміщає конструктором переміщення результат
@@ -170,11 +170,15 @@ public:
 			//Якщо функція вертає void то просто викликаєм її
 			else call(f, args);
 		}
+		catch (Seed::InteruptException & ex) {
+			isEnded = true;
+			Throw(ex);
+		}
 		//Якщо зловили якись ексепшн то важаєм що функція завершила свою роботу
-		catch (Seed::Exeption * ex)
+		catch (Seed::Exception & ex)
 		{
 			isEnded = true;
-			throw ex;
+			Throw(ex);
 		}
 		isEnded = true;
 	}
@@ -191,16 +195,16 @@ public:
 	{
 		return isEnded;
 	}
-	//Деструктор, видаляє результат якщо він є
-	__forceinline ~TemplateFunctionT()
-	{
-		if constexpr (!std::is_same<decltype(call(f, args)), void>::value)
-			if (result != nullptr)
-			{
-				delete (decltype(call(f, args))*)result;
-				result = nullptr;
-			}
-	}
+	////Деструктор, видаляє результат якщо він є
+	//virtual ~TemplateFunctionT()
+	//{
+	//	if constexpr (!Seed::StaticAsserts::IsSame<decltype(call(f, args)), void>())
+	//		if (result != nullptr)
+	//		{
+	//			delete (decltype(call(f, args))*)result;
+	//			result = nullptr;
+	//		}
+	//}
 };
 
 namespace Seed {
@@ -233,7 +237,7 @@ namespace Seed {
 			__forceinline Delegate(F f, Args... args) : data(new delegate(new TemplateFunctionT<F, Args...>(f, args...)))
 			{};
 
-			RefCountClass(Delegate, data);
+			//RefCountClass(Delegate, data);
 			
 
 			//Вертає true якщо делегат виконується зараз

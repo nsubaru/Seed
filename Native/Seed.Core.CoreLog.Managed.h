@@ -16,22 +16,25 @@ namespace Seed {
 		{
 #pragma warning(push)
 #pragma warning(disable: 4996)
-			return toCoreLog((Char*)msg, msg.Size);
+			return toCoreLog((ConstCharStr)msg, msg.Size);
 #pragma warning(pop)
 		}
+
+#pragma warning(push)
+#pragma warning(disable: 4996)
 
 		template<typename Heap>
 		__forceinline bool SeedKernelCall toCoreLog(const BaseString<Heap> & Msg, const Seed::Exception & ex)
 		{
 			auto location = ex.Location;
 			return Seed::Core::toCoreLog({
-				Seed::Core::String(Msg),
-				Seed::Core::String(L"Cathed exeption in thread with TID	: ") + Seed::Core::String::toString(location.ThreadID),
-				Seed::Core::String(L"        Exeption name				: ") + ex.Name,
-				Seed::Core::String(L"        Exeption location			: "),
-				Seed::Core::String(L"                 File				: ") + (Seed::ACharStr)location.File, //-V2005
-				Seed::Core::String(L"                 In method			: ") + (Seed::ACharStr)location.FunctName, //-V2005
-				Seed::Core::String(L"                 On exec line		: ") + Seed::Core::String::toString(location.Line) });
+				Msg,
+				L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
+				L"        Ім'я помилки	           : " + String((CharStr)ex.Name),
+				L"        Розташування помилки	   : ",
+				L"                 Файл	           : " + String((Seed::ACharStr)location.File),
+				L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
+				L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
 		}
 
 		template<SizeT Lenght>
@@ -40,12 +43,13 @@ namespace Seed {
 			auto location = ex.Location;
 			return Seed::Core::toCoreLog({
 				Seed::Core::String(Msg),
-				Seed::Core::String(L"Cathed exeption in thread with TID	: ") + Seed::Core::String::toString(location.ThreadID),
-				Seed::Core::String(L"        Exeption name				: ") + ex.Name,
-				Seed::Core::String(L"        Exeption location			: "),
-				Seed::Core::String(L"                 File				: ") + (Seed::ACharStr)location.File, //-V2005
-				Seed::Core::String(L"                 In method			: ") + (Seed::ACharStr)location.FunctName, //-V2005
-				Seed::Core::String(L"                 On exec line		: ") + Seed::Core::String::toString(location.Line) });
+				L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
+				L"        Ім'я помилки	           : " + String((CharStr)ex.Name),
+				L"        Розташування помилки	   : ",
+				L"                 Файл	           : " + String((Seed::ACharStr)location.File),
+				L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
+				L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
 		}
+#pragma warning(pop)
 	}
 }

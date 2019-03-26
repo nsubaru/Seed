@@ -59,7 +59,7 @@ namespace Seed {
 					///<summary>ID потоку</summary>
 					ID ThreadID;
 				};
-			private:
+			protected:
 				///<summary>Місце генерації даної помилки</summary>
 				ExeptionLocation location;
 				///<summary>Ім'я помилки</summary>
@@ -94,7 +94,7 @@ namespace Seed {
 				ExeptionLocation Property(GetLocation) Location;
 
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
-				virtual ~Exception() = 0 {}
+				virtual ~Exception() {}
 			};
 
 			///<summary>Ділення на ноль</summary>
@@ -305,6 +305,27 @@ namespace Seed {
 				const TypeInfo Property(GetRequireType) RequireType;
 				///<summary>Інформація про фактичний тип</summary>
 				const TypeInfo Property(GetActuallyType) ActuallyType;
+			};
+
+			///<summary>Операцію перервано</summary>
+			class SeedKernelCall InteruptException : protected Exception
+			{
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				__forceinline InteruptException(ConstACharStr File, ConstACharStr FunctName, SizeT Line) 
+					noexcept : Exception(File, FunctName, Line, L"Операція перервана")
+				{};
+
+				///<summary>Вертає місце генерації помилки</summary>
+				__forceinline const ExeptionLocation & GetLocation() const
+				{
+					return location;
+				}
+				
+				virtual ~InteruptException() {}
 			};
 		}
 	}
