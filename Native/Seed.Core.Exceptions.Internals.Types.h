@@ -4,6 +4,15 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+//SEH Exeption code for C++ exeptions
+#if  defined(PreReleaseMode) || defined(DebugMode)
+#define EH_EXCEPTION_NUMBER	('msc' | 0xE0000000)
+#else
+#define EH_EXCEPTION_NUMBER	('seed' | 0xE0000000)
+#endif // PreReleaseMode || DebugMode
+
+
+
 typedef	int	PMFN;					// Image relative offset of Member Function
 
 //
@@ -124,9 +133,6 @@ typedef const struct _s_FuncInfo
 	int					dispESTypeList;		// Image relative list of types for exception specifications
 	int					EHFlags;			// Flags for some features.
 } FuncInfo;
-
-//SEH Exeption code for C++ exeptions
-#define EH_EXCEPTION_NUMBER	('seed' | 0xE0000000)
 
 // EH_MAGIC_NUMBER3     Used in the FuncInfo if FuncInfo::EHFlags is valid, so
 //                      we can check if the function was compiled -EHs or -EHa.

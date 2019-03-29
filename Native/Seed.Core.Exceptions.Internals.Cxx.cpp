@@ -135,13 +135,13 @@ void FrameUnwindToState(
 	__try {
 		while (curState != -1 && curState > targetState)
 		{
-			__ehstate_t nxtState = GetByOffset<UnwindMapEntry>(pFuncInfo->dispUnwindMap, UnwindImageBase)->toState;
+			__ehstate_t nxtState = GetByOffset<UnwindMapEntry>(pFuncInfo->dispUnwindMap, UnwindImageBase)[curState].toState;
 			
 			__try {
 				//Find unwind action for function
 				auto pAction = (action)GetByOffset<action>(
-					GetByOffset<UnwindMapEntry>(pFuncInfo->dispUnwindMap, UnwindImageBase)->action,
-					UnwindImageBase);
+					GetByOffset<UnwindMapEntry>(pFuncInfo->dispUnwindMap, UnwindImageBase)[curState].action,
+					pDC->ImageBase);
 				//If not null
 				if ((SizeT)pAction != UnwindImageBase) {
 

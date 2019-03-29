@@ -171,12 +171,13 @@ namespace Seed {
 ///Дефайн додає конструктор та оператор копіювання і переміщення та деструктор
 ///</remarks>
 #define RefCountClass(ClassName, This) \
- static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");\
 __forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
 __forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
 __forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
 __forceinline ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
 __forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}};
+// static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");\
+
 
 namespace {
 	template <class F, class... Args>

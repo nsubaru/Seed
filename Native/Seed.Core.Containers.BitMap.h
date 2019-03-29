@@ -9,7 +9,7 @@ namespace Seed {
 		template<SizeT BitCount>
 		class BitMapT {
 			static_assert(BitCount != 0, "BitMap bit count must not equal zero");
-			static_assert(BitCount < 2Gb, "BitMap size must not bigger then 2GB - 1b");
+			static_assert(Seed::Math::RoundToUpper(BitCount, sizeof(Byte) * 8ui64) < 2Gb, "BitMap size must not bigger then 2GB - 1b");
 		private:
 			static constexpr SizeT size = Seed::Math::RoundToUpper(BitCount, sizeof(Byte) * 8ui64);
 			static constexpr SizeT fullBytesCount = BitCount / 8ui64;

@@ -195,16 +195,16 @@ public:
 	{
 		return isEnded;
 	}
-	////Деструктор, видаляє результат якщо він є
-	//virtual ~TemplateFunctionT()
-	//{
-	//	if constexpr (!Seed::StaticAsserts::IsSame<decltype(call(f, args)), void>())
-	//		if (result != nullptr)
-	//		{
-	//			delete (decltype(call(f, args))*)result;
-	//			result = nullptr;
-	//		}
-	//}
+	//Деструктор, видаляє результат якщо він є
+	virtual ~TemplateFunctionT()
+	{
+		if constexpr (!Seed::StaticAsserts::IsSame<decltype(call(f, args)), void>())
+			if (result != nullptr)
+			{
+				delete (decltype(call(f, args))*)result;
+				result = nullptr;
+			}
+	}
 };
 
 namespace Seed {
@@ -212,7 +212,7 @@ namespace Seed {
 		//Делегат це об'єкт який інкапсулює, функцію з аргументами, 
 		//тим самим дозволяючи її відкладено виконати, 
 		//навіть в іншому потоці, apc якогось потоку чи пулі потоків
-		class SeedKernelCall Delegate : IDisposable
+		class SeedKernelCall Delegate : protected IDisposable
 		{
 		private:
 			//Внутрішня структура в які дані делегата
@@ -237,7 +237,7 @@ namespace Seed {
 			__forceinline Delegate(F f, Args... args) : data(new delegate(new TemplateFunctionT<F, Args...>(f, args...)))
 			{};
 
-			//RefCountClass(Delegate, data);
+			RefCountClass(Delegate, data)
 			
 
 			//Вертає true якщо делегат виконується зараз
