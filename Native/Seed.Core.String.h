@@ -206,7 +206,7 @@ namespace Seed {
 				}
 			}
 			///<summary>Оптимізований конструктор</summary>
-			///<param name = "from">RValue силка на оригинал</summary>
+			///<param name = "from">RValue силка на оригинал</param>
 			__forceinline BaseString(BaseString && from) noexcept {
 				this->str = from.str; from.str = nullptr;
 				this->CurrentSize = from.CurrentSize; from.CurrentSize = 0;
@@ -422,7 +422,7 @@ namespace Seed {
 			///<summary>Оператор додавання рядкового літералу</summary>
 			///<param name = "Text">Рядковий літерал</param>
 			///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
-			///<param name = "str">
+			///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
 			///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
 			template<SizeT Size>
 			__forceinline friend BaseString operator+(const Char(&Text)[Size], const BaseString & Right) {
@@ -457,15 +457,6 @@ namespace Seed {
 				}
 				ret_data.CurrentSize = NewSize;
 				ret_data.ReservedSize = NewFullSize;
-				return ret_data;
-			}
-
-			template<SizeT Size>
-			friend BaseString<Base> operator+(const AChar(&Text)[Size], const BaseString<Base> & Right) {
-				if constexpr (Size < 2)
-					return Right;
-				BaseString ret_data(Text);
-				ret_data += Right;
 				return ret_data;
 			}
 

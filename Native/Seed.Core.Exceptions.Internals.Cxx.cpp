@@ -11,7 +11,8 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-tls_exeption_info_t * ThreadExceptionInfo;
+__declspec(thread)
+tls_exeption_info_t ThreadExceptionInfo;
 
 extern void * CxxCallCatchBlock(
 	EXCEPTION_RECORD *pExcept
@@ -85,16 +86,16 @@ __int64 __fastcall FrameUnwindFilter(PEXCEPTION_POINTERS pExPtrs)
 	v3 = pExPtrs->ExceptionRecord->ExceptionCode;
 	if (v3 == -532462766 || v3 == -532459699)
 	{
-		if (ThreadExceptionInfo->_ProcessingThrow > 0)
+		if (ThreadExceptionInfo._ProcessingThrow > 0)
 		{
-			--ThreadExceptionInfo->_ProcessingThrow;
+			--ThreadExceptionInfo._ProcessingThrow;
 		}
 	}
 	else
 	{
 		if (v3 == -529697949)
 		{
-			ThreadExceptionInfo->_ProcessingThrow = 0;
+			ThreadExceptionInfo._ProcessingThrow = 0;
 			//TODO: Replace __fastfaile by emergency shutdown procedure
 			__fastfail(-1);
 		}
@@ -129,7 +130,7 @@ void FrameUnwindToState(
 {
 	typedef void(__cdecl *action)(void);
 
-	UInt64 UnwindImageBase = ThreadExceptionInfo->_ImageBase;
+	UInt64 UnwindImageBase = ThreadExceptionInfo._ImageBase;
 	__ehstate_t curState = GetCurrentState(pRN, pDC, pFuncInfo);
 
 	__try {
@@ -154,7 +155,7 @@ void FrameUnwindToState(
 						pRN,
 						0x103);
 
-					ThreadExceptionInfo->_ImageBase = UnwindImageBase;
+					ThreadExceptionInfo._ImageBase = UnwindImageBase;
 				}
 			}
 			__except (FrameUnwindFilter(GetExceptionInformation())) {
@@ -165,8 +166,8 @@ void FrameUnwindToState(
 		}
 	}
 	__finally {
-		if (ThreadExceptionInfo->_ProcessingThrow > 0) {
-			ThreadExceptionInfo->_ProcessingThrow--;
+		if (ThreadExceptionInfo._ProcessingThrow > 0) {
+			ThreadExceptionInfo._ProcessingThrow--;
 		}
 	}
 }
@@ -194,7 +195,7 @@ EHRegistrationNode * GetEstablisherFrame(
 		pEntry = &(GetByOffset<TryBlockMapEntry>(pDC->ImageBase, pFuncInfo->dispTryBlockMap)[index - 1]);
 		if (curState > pEntry->tryHigh && curState <= pEntry->catchHigh) {
 			// Get target function begin address
-			HandlerAdd = RtlLookupFunctionEntry(pDC->ControlPc, (PDWORD64)ThreadExceptionInfo->_ImageBase, nullptr)->BeginAddress;
+			HandlerAdd = RtlLookupFunctionEntry(pDC->ControlPc, (PDWORD64)ThreadExceptionInfo._ImageBase, nullptr)->BeginAddress;
 			// Get catch handler address.
 			pHandler = GetByOffset<HandlerType>(pDC->ImageBase, pEntry->dispHandlerArray);
 			for (i = 0;
@@ -221,7 +222,7 @@ TryBlockMapEntry * CatchTryBlock(
 	unsigned index;
 
 	for (index = num_of_try_blocks; index > 0; index--) {
-		pEntry = &(GetByOffset<TryBlockMapEntry>(ThreadExceptionInfo->_ImageBase, pFuncInfo->dispTryBlockMap)[index - 1]);
+		pEntry = &(GetByOffset<TryBlockMapEntry>(ThreadExceptionInfo._ImageBase, pFuncInfo->dispTryBlockMap)[index - 1]);
 		if (curState > pEntry->tryHigh && curState <= pEntry->catchHigh) {
 			return pEntry;
 		}
@@ -271,7 +272,7 @@ __forceinline ESTypeList* getESTypes(FuncInfo* pFuncInfo)
 {
 	if (pFuncInfo->dispESTypeList == 0)
 		return nullptr;
-	return GetByOffset<ESTypeList>(ThreadExceptionInfo->_ImageBase, pFuncInfo->dispESTypeList);
+	return GetByOffset<ESTypeList>(ThreadExceptionInfo._ImageBase, pFuncInfo->dispESTypeList);
 }
 
 __forceinline bool isNoExcept(FuncInfo* pFuncInfo) {
@@ -761,8 +762,8 @@ void __cdecl CatchIt(
 //	auto cp = pEntry;
 	typedef void(*pCatchT)(...);
 //	volatile auto pCatchC = pCatch;
-	volatile pCatchT pCatchF = (pCatchT)GetByOffset<pCatchT>(ThreadExceptionInfo->_ImageBase, pCatch->dispOfHandler);
-//	volatile TypeDescriptor * CatchType = GetByOffset<TypeDescriptor>(ThreadExceptionInfo->_ImageBase, pCatch->dispType);
+	volatile pCatchT pCatchF = (pCatchT)GetByOffset<pCatchT>(ThreadExceptionInfo._ImageBase, pCatch->dispOfHandler);
+//	volatile TypeDescriptor * CatchType = GetByOffset<TypeDescriptor>(ThreadExceptionInfo._ImageBase, pCatch->dispType);
 //	volatile auto cppDC = pDC;
 
 	EHRegistrationNode EstablisherFramePointers;
@@ -946,15 +947,15 @@ void FindHandler(
 			|| pExcept->params.magicNumber == EH_MAGIC_NUMBER3)
 		&& pExcept->params.pThrowInfo != nullptr) {
 
-		if (ThreadExceptionInfo->_curexception == nullptr) {
+		if (ThreadExceptionInfo._curexception == nullptr) {
 			// Oops!  User re-threw a non-existent exception!  Let it propagate.
 			Throw(InternalError(ExceptionPosition));
 		}
 
-		pExcept = (EHExceptionRecord*)ThreadExceptionInfo->_curexception;
-		pContext = (CONTEXT*)ThreadExceptionInfo->_curcontext;
+		pExcept = (EHExceptionRecord*)ThreadExceptionInfo._curexception;
+		pContext = (CONTEXT*)ThreadExceptionInfo._curcontext;
 		IsRethrow = TRUE;
-		ThreadExceptionInfo->_ThrowImageBase = (ptrdiff_t)pExcept->params.pThrowImageBase;
+		ThreadExceptionInfo._ThrowImageBase = (ptrdiff_t)pExcept->params.pThrowImageBase;
 
 		//DASSERT(_ValidateRead(pExcept));
 		//DASSERT(!PER_IS_MSVC_EH(pExcept) || PER_PTHROW(pExcept) != nullptr);
@@ -963,10 +964,10 @@ void FindHandler(
 		// We know it is a rethrow -- did we come here as a result of an
 		// exception re-thrown from CallUnexpected() ?
 		//
-		if (ThreadExceptionInfo->_curexcspec != nullptr)
+		if (ThreadExceptionInfo._curexcspec != nullptr)
 		{
-			ESTypeList* pCurrentFuncInfo = (ESTypeList*)ThreadExceptionInfo->_curexcspec;   // remember it in a local variable
-			ThreadExceptionInfo->_curexcspec = nullptr;   // and reset it immediately -- so we don't forget to do it later
+			ESTypeList* pCurrentFuncInfo = (ESTypeList*)ThreadExceptionInfo._curexcspec;   // remember it in a local variable
+			ThreadExceptionInfo._curexcspec = nullptr;   // and reset it immediately -- so we don't forget to do it later
 
 			// Does the exception thrown by CallUnexpected belong to the exception specification?
 
@@ -1039,9 +1040,9 @@ void FindHandler(
 					for (int catchables = ppCatchable->nCatchableTypes;
 						catchables > 0; catchables--, ppCatchable++) {
 
-						pCatchable = GetByOffset<CatchableType>(ThreadExceptionInfo->_ThrowImageBase, *(int*)ppCatchable->arrayOfCatchableTypes);
+						pCatchable = GetByOffset<CatchableType>(ThreadExceptionInfo._ThrowImageBase, *(int*)ppCatchable->arrayOfCatchableTypes);
 
-						if (!TypeMatch(&handlerItem[i], pCatchable, pExcept->params.pThrowInfo, ThreadExceptionInfo->_ImageBase)) {
+						if (!TypeMatch(&handlerItem[i], pCatchable, pExcept->params.pThrowInfo, ThreadExceptionInfo._ImageBase)) {
 							continue;
 						}
 
@@ -1201,7 +1202,7 @@ __forceinline EXCEPTION_DISPOSITION InternalLanguageSpecficHandle(
 	return ExceptionContinueSearch;
 }
 
-#define pFrameInfoChain   (*((FRAMEINFO **)    &(ThreadExceptionInfo->_pFrameInfoChain)))
+#define pFrameInfoChain   (*((FRAMEINFO **)    &(ThreadExceptionInfo._pFrameInfoChain)))
 
 __forceinline
 FRAMEINFO * __cdecl _CreateFrameInfo(
@@ -1247,7 +1248,7 @@ int ExFilterRethrow(
 		// In a rethrow, ExceptionCode isn't set to EH_EXCEPTION_NUMBER even for a
 		// C++ Exception. Hence we use cxxReThrow in __InternalCxxFrameHandler
 		// to check for a C++ Exception
-		ThreadExceptionInfo->_cxxReThrow = true;
+		ThreadExceptionInfo._cxxReThrow = true;
 		*rethrow = 1;
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
@@ -1269,7 +1270,7 @@ bool _IsExceptionObjectToBeDestroyed(void *pExceptionObject)
 {
 	void **i;
 
-	for (i = (void **)ThreadExceptionInfo->_pFrameInfoChain; i; i = (void **)i[1])
+	for (i = (void **)ThreadExceptionInfo._pFrameInfoChain; i; i = (void **)i[1])
 	{
 		if (*i == pExceptionObject)
 			return true;
@@ -1317,8 +1318,8 @@ void * InternalCxxCallCatchBlock(
 	EHRegistrationNode *pEstablisherFrame;
 	EHExceptionRecord *pThisException, *pSaveException, *pForeignException = nullptr;
 
-	pSaveContext = (CONTEXT*)ThreadExceptionInfo->_curcontext;
-	pSaveException = (EHExceptionRecord*)ThreadExceptionInfo->_curexception;
+	pSaveContext = (CONTEXT*)ThreadExceptionInfo._curcontext;
+	pSaveException = (EHExceptionRecord*)ThreadExceptionInfo._curexception;
 
 	// Copy Necessary Information which is passed from UnwindNestedFrames.
 	pThisException = (EHExceptionRecord *)pExcept->ExceptionInformation[6];
@@ -1329,11 +1330,11 @@ void * InternalCxxCallCatchBlock(
 
 	//VerifyCpuContext(pContext);
 
-	ThreadExceptionInfo->_curcontext = pContext;
-	ThreadExceptionInfo->_curexception = pThisException;
+	ThreadExceptionInfo._curcontext = pContext;
+	ThreadExceptionInfo._curexception = pThisException;
 
 	FRAMEINFO *pFrameInfo = _CreateFrameInfo(&FrameInfo,
-		(void *)((EHExceptionRecord*)ThreadExceptionInfo->_curexception)->params.pExceptionObject);
+		(void *)((EHExceptionRecord*)ThreadExceptionInfo._curexception)->params.pExceptionObject);
 
 	if (pExcept->ExceptionInformation[7]) {
 		// Stuff for SehTranslation book keeping
@@ -1341,7 +1342,7 @@ void * InternalCxxCallCatchBlock(
 		// be destroyed in any case. If there is rethrow, throw ForeignException.
 		// IMPORTANT: No one else can rethrow this Exception Object.
 		TranslatedCatch = 1;
-		pForeignException = (EHExceptionRecord*)ThreadExceptionInfo->_pForeignException;
+		pForeignException = (EHExceptionRecord*)ThreadExceptionInfo._pForeignException;
 		// End Translation Stuff
 	}
 
@@ -1355,7 +1356,7 @@ void * InternalCxxCallCatchBlock(
 			pThisException,
 			&rethrow)) {
 			rethrow = 1;
-			ThreadExceptionInfo->_cxxReThrow = false;
+			ThreadExceptionInfo._cxxReThrow = false;
 			if (TranslatedCatch) {
 				// Note in case of rethrow, no one else can convert rethrow to
 				// pThisException. This means only this except will deal with conversion
@@ -1381,8 +1382,8 @@ void * InternalCxxCallCatchBlock(
 		{
 			__DestructExceptionObject(pThisException, TRUE, 0);
 		}
-		ThreadExceptionInfo->_curexception = pSaveException;
-		ThreadExceptionInfo->_curcontext = pSaveContext;
+		ThreadExceptionInfo._curexception = pSaveException;
+		ThreadExceptionInfo._curcontext = pSaveContext;
 
 		*GetByOffset<UInt64>((SizeT)pEstablisherFrame, pFuncInfo->dispUwindHelp) = -2;
 	}
@@ -1395,8 +1396,8 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler3(
 	CONTEXT            *pContext,        // Context info
 	DISPATCHER_CONTEXT  *pDC              // More dynamic info for this frame
 ) {
-	ThreadExceptionInfo->_ImageBase = pDC->ImageBase;
-	ThreadExceptionInfo->_ThrowImageBase = (UInt64)pExcept->params.pThrowImageBase;
+	ThreadExceptionInfo._ImageBase = pDC->ImageBase;
+	ThreadExceptionInfo._ThrowImageBase = (UInt64)pExcept->params.pThrowImageBase;
 	FuncInfo * pFuncInfo = GetByOffset<FuncInfo>(pDC->ImageBase, *(PULONG)pDC->HandlerData);
 	return InternalLanguageSpecficHandle(pExcept, &RN, pContext, pDC, pFuncInfo, 0, nullptr, FALSE);
 }
@@ -1531,14 +1532,4 @@ inline void CALEETYPE __ehvec_dtor(
 		if (!success)
 			__ArrayUnwind(ptr, size, (int)count, pDtor);
 	}
-}
-
-void ThreadEhInit()
-{
-	ThreadExceptionInfo = new tls_exeption_info_t;
-}
-
-void ThreadEhStop()
-{
-	delete ThreadExceptionInfo;
 }

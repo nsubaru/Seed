@@ -8,29 +8,29 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Memory {
-			class ExceptionHeap : public BasicHeap {
+			class SeedKernelCall ExceptionHeap : public BasicHeap {
 			public:
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
-				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
+				///<exeption cref='Seed::Core::Exceptions::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 				///<returns>Виділену ділянку</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Allocate(SizeT Size) final;
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) final;
 				///<summary>Вирівнняне виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				///<exeption cref='Seed::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
+				///<exeption cref='Seed::Core::Exceptions::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 				///<returns>Виділену ділянку</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				///<exeption cref='Seed::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * Free(void * MemBlk) final;
+				///<exeption cref='Seed::Core::Exceptions::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) final;
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				///<exeption cref='Seed::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") SeedKernelCall void * AllignedFree(void * MemBlk, SizeT AllocationReq) final;
+				///<exeption cref='Seed::Core::Exceptions::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) final;
 
 				///<summary>Кількість виділених блоків даних</summary>
 				virtual SizeT CurrentMemBlkCount() noexcept final;
@@ -38,6 +38,8 @@ namespace Seed {
 				virtual SizeT CurrentAllocatedMemory() noexcept final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
 				virtual SizeT CurrentHeapUsage() noexcept final;
+
+				ExceptionHeap& operator=(const ExceptionHeap&) = delete;
 			};
 		}
 		///<summary>Підсистема помилок в рантаймі</summary>
@@ -48,7 +50,7 @@ namespace Seed {
 			///<summary>Класс базової помилки</summary>
 			class SeedKernelCall Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
 			public:
-				///<sumary>Місце генерації помилки</summary>
+				///<summary>Місце генерації помилки</summary>
 				struct ExeptionLocation {
 					///<summary>Ім'я файла</summary>
 					ConstACharStr File;
@@ -63,9 +65,9 @@ namespace Seed {
 				///<summary>Місце генерації даної помилки</summary>
 				ExeptionLocation location;
 				///<summary>Ім'я помилки</summary>
-				const Char * exeptionName;
+				const Char* exeptionName;
 			public:
-				//TODO: Modify ctor by receiving size of exceptio name string by template
+				//TODO: Modify ctor by receiving size of exception name string by template
 				//TODO: Set thread id
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -83,7 +85,7 @@ namespace Seed {
 				}
 
 				///<summary>Вертає місце генерації помилки</summary>
-				__forceinline const ExeptionLocation & GetLocation() const
+				__forceinline const ExeptionLocation& GetLocation() const
 				{
 					return location;
 				}
@@ -116,7 +118,7 @@ namespace Seed {
 			///<para> - Execute - спроба виконати команду за неіснуючим адресом</para>
 			///<para>Тому помилка містить інформацію про тип доступу та адресс який пробували використати</para>
 			///</summary>
-			class NullPointException : public Exception {
+			class SeedKernelCall NullPointException : public Exception {
 			public:
 				///<summary> Можливі варіанти помилки</summary>
 				enum class Types : UInt8 { Read, Write, Execute };
@@ -143,7 +145,7 @@ namespace Seed {
 			};
 
 			///<summary>Використання невалідного дескриптора</summary>
-			class InvalidHandleUsage : public Exception {
+			class SeedKernelCall InvalidHandleUsage : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -281,8 +283,8 @@ namespace Seed {
 			///<summary>Некоректний тип</summary>
 			class SeedKernelCall InvalidTypeException : public Exception {
 			private:
-				const TypeInfo & requireType;
-				const TypeInfo & actuallyType;
+				const TypeInfo& requireType;
+				const TypeInfo& actuallyType;
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -290,16 +292,16 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'RequireType'>Інформація про очікуваний тип</param>
 				///<param name = 'ActuallyType'>Інформація про фактичний тип</param>
-				__forceinline InvalidTypeException(ConstACharStr File, ConstACharStr FunctName, SizeT Line, const TypeInfo & RequireType, const TypeInfo & ActuallyType)
+				__forceinline InvalidTypeException(ConstACharStr File, ConstACharStr FunctName, SizeT Line, const TypeInfo& RequireType, const TypeInfo& ActuallyType)
 					noexcept : Exception(File, FunctName, Line, L"Invalid type"),
 					requireType(RequireType), actuallyType(ActuallyType)
 				{
 				}
 
 				///<summary>Інформація про очікуваний тип</summary>
-				const TypeInfo & GetRequireType() { return requireType; }
+				const TypeInfo& GetRequireType() { return requireType; }
 				///<summary>Інформація про фактичний тип</summary>
-				const TypeInfo & GetActuallyType() { return actuallyType; }
+				const TypeInfo& GetActuallyType() { return actuallyType; }
 
 				///<summary>Інформація про очікуваний тип</summary>
 				const TypeInfo Property(GetRequireType) RequireType;
@@ -315,16 +317,16 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline InteruptException(ConstACharStr File, ConstACharStr FunctName, SizeT Line) 
+				__forceinline InteruptException(ConstACharStr File, ConstACharStr FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Операція перервана")
 				{};
 
 				///<summary>Вертає місце генерації помилки</summary>
-				__forceinline const ExeptionLocation & GetLocation() const
+				__forceinline const ExeptionLocation& GetLocation() const
 				{
 					return location;
 				}
-				
+
 				virtual ~InteruptException() {}
 			};
 		}
@@ -348,7 +350,7 @@ struct IsThrowable :
 
 ///<summary>Внутрішня функція генерації помилки</summary>
 ///<param name = 'ex'>Об'єкт помилки</param>
-template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___cxxthrow(E && ex) { throw ex; }
+template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___cxxthrow(E&& ex) { throw ex; }
 
 ///<summary>Генерація помилки з провіркою типу</summary>
 ///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>

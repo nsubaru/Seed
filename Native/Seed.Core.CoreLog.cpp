@@ -156,7 +156,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::String>& lines
 		{
 			for (SizeT i = 1; i < lines.Count; i++)
 			{
-				data += String(L"\r\n                    ") + lines[i];
+				data += String(L"\r\n                      ") + lines[i];
 			}
 		}
 		{

@@ -16,44 +16,24 @@
 #pragma warning(push)
 #pragma warning(disable: 4996)
 
-///<summary>Інформація про кучі</summary>
-struct
-{
-	///<summary>Дескриптор кучі</summary>
-	Seed::Handle HeapHandle;
-	///<summary>Поточне використання кучі</summary>
-	Seed::SizeT AllocatedMemory;
-	///<summary>Поточна кількість виділених блоків</summary>
-	Seed::SizeT AllocatedMemBlksCount;
-	///<summary>Фактичне використання пам'яті кучею</summary>
-	Seed::SizeT CurrentHeapSize;
-} HeapData, SecureHeapData;
-
-Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
-{
-	HeapData.HeapHandle = RtlCreateHeap(
-		HEAP_GROWABLE,
-		NULL,
-		10 * 1024 * 1024,
-		0,
-		NULL,
-		NULL);
-	if (HeapData.HeapHandle == nullptr)
-		return False;
-	HeapData.AllocatedMemBlksCount = HeapData.AllocatedMemory = HeapData.CurrentHeapSize = 0;
-	return True;
-}
-
-void Seed::Core::Memory::Heap::Stop() noexcept
-{
-	if (HeapData.AllocatedMemBlksCount > 0)
-		toCoreLog(L"Попередження: виявлено утічку пам'яті в стандартній кучі");
-	RtlDestroyHeap(HeapData.HeapHandle);
-}
-
 using namespace Seed;
 using namespace Seed::Memory;
 
+///<summary>Інформація про кучі</summary>
+static struct
+{
+	///<summary>Дескриптор кучі</summary>
+	Handle HeapHandle = nullptr;
+	///<summary>Поточне використання кучі</summary>
+	SizeT AllocatedMemory = 0;
+	///<summary>Поточна кількість виділених блоків</summary>
+	SizeT AllocatedMemBlksCount = 0;
+	///<summary>Фактичне використання пам'яті кучею</summary>
+	SizeT CurrentHeapSize = 0;
+} InternalHeapData, HeapData, SecureHeapData;
+
+
+#pragma region Loging
 template<SizeT HeapNameSize>
 void LogAllocating(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)[HeapNameSize]) {
 	using SafeString = BaseString<Memory::ExceptionHeap>;
@@ -80,6 +60,30 @@ void LogFree(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)[HeapN
 	str += HeapName;
 	str += L".";
 	toCoreLog(str);
+}
+#pragma endregion
+
+#pragma region Default heap
+Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
+{
+	HeapData.HeapHandle = RtlCreateHeap(
+		HEAP_GROWABLE,
+		NULL,
+		10 * 1024 * 1024,
+		0,
+		NULL,
+		NULL);
+	if (HeapData.HeapHandle == nullptr)
+		return False;
+	HeapData.AllocatedMemBlksCount = HeapData.AllocatedMemory = HeapData.CurrentHeapSize = 0;
+	return True;
+}
+
+void Seed::Core::Memory::Heap::Stop() noexcept
+{
+	if (HeapData.AllocatedMemBlksCount > 0)
+		toCoreLog(L"Попередження: виявлено утічку пам'яті в стандартній кучі");
+	RtlDestroyHeap(HeapData.HeapHandle);
 }
 
 void * GenericAllocate(Seed::SizeT Size)
@@ -218,6 +222,8 @@ Seed::SizeT Seed::Core::Memory::Heap::CurrentHeapUsage() noexcept
 {
 	return HeapData.CurrentHeapSize;
 }
+#pragma endregion
+#pragma region Sensitive heap
 
 Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 {
@@ -382,7 +388,95 @@ Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentHeapUsage() noexcept
 {
 	return SecureHeapData.CurrentHeapSize;
 }
+#pragma endregion
 
+#pragma region Internal heap allocate and free
+DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapFree(void* MemBlk)
+{
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(RtlProcessHeap(), 0, nullptr);
+#endif
+	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
+	if (MemBlk == nullptr) return nullptr;
+	//Отримуєм покажчик на заголовок ділянки пам'яті
+	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
+	//Отримуєм розмір ділянки пам'яті
+	SizeT DataSize = RealPtr[0];
+	//Обчислюєм повний розмір ділянки пам'яті
+	SizeT FullSize = sizeof(SizeT) + DataSize;
+	//Обнулюєм ділянку пам'яті
+	RtlSecureZeroMemory(MemBlk, DataSize);
+	//Пробуєм звільнити пам'ять
+	if (RtlFreeHeap(RtlProcessHeap(), 0, RealPtr)) {
+		//Якщо вдало то оновлюєм статистику
+		InterlockedDecrementSizeTNoFence(&InternalHeapData.AllocatedMemBlksCount);
+		InterlockedAddNoFence64((LONG64*)& InternalHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)& InternalHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		return nullptr;
+	}
+	//Якщо ні то генеруєм помилку NullPointException
+	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
+}
+
+DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed::SizeT Size)
+{
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(RtlProcessHeap(), 0, nullptr);
+#endif
+	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
+	if (Size == Math::Max<SizeT>())
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, InternalHeapData.AllocatedMemory, InternalHeapData.AllocatedMemBlksCount));
+	//Обчислюєм повний розмір ділянки пам'яті
+	SizeT FullSize = sizeof(SizeT) + Size;
+	//Пробуєм виділити ділянку пам'яті з кучі і вказуєм системі обнулити ділянку пам'яті
+	SizeT * obj = (SizeT*)RtlAllocateHeap(RtlProcessHeap(), 0, FullSize);
+	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
+	//Відповідно генеруєм виключення OutOfMemory
+	if (obj == nullptr)
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, InternalHeapData.AllocatedMemory, InternalHeapData.AllocatedMemBlksCount));
+	//Записуєм розмір ділянки в заголовок
+	obj[0] = Size;
+	//Атомарно оновлюєм статистику
+	InterlockedIncrementSizeTNoFence(&InternalHeapData.AllocatedMemBlksCount);
+	InterlockedExchangeAddSizeT(&InternalHeapData.AllocatedMemory, Size);
+	InterlockedExchangeAddSizeT(&InternalHeapData.CurrentHeapSize, FullSize);
+	//Вертаєм покажчик на ділянку після заголовку
+	return obj + 1;
+}
+
+SizeT Seed::Core::Memory::CurrentInternalHeapAllocatedMemBlks() noexcept
+{
+	return InternalHeapData.AllocatedMemBlksCount;
+}
+
+SizeT Seed::Core::Memory::CurrentInternalHeapAllocatedMemory() noexcept
+{
+	return InternalHeapData.AllocatedMemory;
+}
+
+SizeT Seed::Core::Memory::CurrentInternalHeapHeapsUsage() noexcept
+{
+	return InternalHeapData.CurrentHeapSize;
+}
+#pragma endregion
+
+#pragma region Statistic
+SizeT Seed::Core::Memory::CurrentTotalAllocatedMemBlks() noexcept
+{
+	return InternalHeapData.AllocatedMemBlksCount + HeapData.AllocatedMemBlksCount + SecureHeapData.AllocatedMemBlksCount;
+}
+
+SizeT Seed::Core::Memory::CurrentTotalAllocatedMemory() noexcept
+{
+	return InternalHeapData.AllocatedMemory + HeapData.AllocatedMemory + SecureHeapData.CurrentHeapSize;
+}
+
+SizeT Seed::Core::Memory::CurrentTotalHeapsUsage() noexcept
+{
+	return InternalHeapData.CurrentHeapSize + HeapData.CurrentHeapSize + SecureHeapData.CurrentHeapSize;
+}
+#pragma endregion
+#pragma region Miscelenious functions
 #pragma intrinsic(memcpy)
 DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::Copy(
 	_In_reads_(Size) const void * Source,
@@ -400,6 +494,9 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::MemBlk
 {
 	memset(MemBlk, Filler, Size);
 }
+
+#pragma endregion
+#pragma region Init and stop
 
 Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {
 	return Seed::Core::Memory::Init();
@@ -424,5 +521,6 @@ void Seed::Core::Stop::MemoryManagment() noexcept
 {
 	Memory::Stop();
 }
+#pragma endregion
 
 #pragma warning(pop)

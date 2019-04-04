@@ -8,11 +8,17 @@
 
 namespace Seed {
 	inline namespace Core {
-		//Вивід в логи складеного повідомлення в логи, кожен елемент масиву окремий рядок
+		///<summary>Вивід в логи складеного повідомлення в логи, кожен елемент масиву окремий рядок</summary>
+		///<param name = "lines">Список рядків</param>
+		///<returns><c>True</c> якщо запис в логи було проведено успішно</returns>
 		bool SeedKernelCall toCoreLog(const Array<String> & lines);
-		//Вивід в логи рядка з повідомленням
-		template<typename Base>
-		__forceinline bool SeedKernelCall toCoreLog(const BaseString<Base> & msg)
+
+		///<summary>Вивід в логи рядка з повідомленням</summary>
+		///<param name = "msg">Повідомлення</param>
+		///<param name = "Heap">Куча для алокатора пам'яті</param>
+		///<returns><c>True</c> якщо запис в логи було проведено успішно</returns>
+		template<typename Heap>
+		__forceinline bool SeedKernelCall toCoreLog(const BaseString<Heap> & msg)
 		{
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -23,32 +29,42 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 
+		///<summary>Запис повідомлення про помилки</summary>
+		///<param name = "Msg">Користувальницьке повідомлення</param>
+		///<param name = "Base">Куча для алокатора пам'яті</param>
+		///<param name = "ex">Об'єкт помилки</param>
+		///<returns><c>True</c> якщо запис в логи було проведено успішно</returns>
 		template<typename Heap>
 		__forceinline bool SeedKernelCall toCoreLog(const BaseString<Heap> & Msg, const Seed::Exception & ex)
 		{
 			auto location = ex.Location;
 			return Seed::Core::toCoreLog({
-				Msg,
-				L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
-				L"        Ім'я помилки	           : " + String((CharStr)ex.Name),
-				L"        Розташування помилки	   : ",
-				L"                 Файл	           : " + String((Seed::ACharStr)location.File),
-				L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
-				L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
+							Msg,
+							L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
+							L"        Ім'я помилки             : " + String((CharStr)ex.Name),
+							L"        Розташування помилки       ",
+							L"                 Файл            : " + String((Seed::ACharStr)location.File),
+							L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
+							L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
 		}
 
+		///<summary>Запис повідомлення про помилки</summary>
+		///<param name = "Msg">Користувальницьке повідомлення</param>
+		///<param name = "Lenght">Розмір повідомлення</param>
+		///<param name = "ex">Об'єкт помилки</param>
+		///<returns><c>True</c> якщо запис в логи було проведено успішно</returns>
 		template<SizeT Lenght>
 		__forceinline bool SeedKernelCall toCoreLog(const wchar_t(&Msg)[Lenght], const Seed::Exception & ex)
 		{
 			auto location = ex.Location;
 			return Seed::Core::toCoreLog({
-				Seed::Core::String(Msg),
-				L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
-				L"        Ім'я помилки	           : " + String((CharStr)ex.Name),
-				L"        Розташування помилки	   : ",
-				L"                 Файл	           : " + String((Seed::ACharStr)location.File),
-				L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
-				L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
+							Msg,
+							L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
+							L"        Ім'я помилки             : " + String((CharStr)ex.Name),
+							L"        Розташування помилки       ",
+							L"                 Файл            : " + String((Seed::ACharStr)location.File),
+							L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
+							L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
 		}
 #pragma warning(pop)
 	}

@@ -196,9 +196,9 @@ public:
 		return isEnded;
 	}
 	//Деструктор, видаляє результат якщо він є
-	virtual ~TemplateFunctionT()
+	__forceinline ~TemplateFunctionT()
 	{
-		if constexpr (!Seed::StaticAsserts::IsSame<decltype(call(f, args)), void>())
+		if constexpr (!Seed::Core::StaticAsserts::IsSame<decltype(call(f, args)), void>::State)
 			if (result != nullptr)
 			{
 				delete (decltype(call(f, args))*)result;

@@ -16,7 +16,7 @@
 ///<summary>Системний виклик який експортується з ядра Рем</summary>
 #define SeedKernelCall __declspec(dllexport)
 ///<summary>Сигнатура статичного конструктор зміної</summary>
-namespace { typedef void(__cdecl *PF)(void); }
+namespace { typedef void(__cdecl* PF)(void); }
 
 ///<summary>Сигнатура декструктора статичних зміних</summary>
 extern int __cdecl DestroyStaticVariables(PF pf);
@@ -83,7 +83,7 @@ namespace Seed {
 			///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
 			///</summary>
 			///<returns>Вертає силку на елемент після інкременту</returns>
-			__forceinline RefCountT & operator++() {
+			__forceinline RefCountT& operator++() {
 				this->count++;
 				return *this;
 			}
@@ -102,7 +102,7 @@ namespace Seed {
 			///<para>Використовує функцію <code>InterlockedDecrementSizeTNoFence</code> для декременту</para>
 			///</summary>
 			///<returns>Вертає силку на елемент після декременту</returns>
-			__forceinline RefCountT & operator--() {
+			__forceinline RefCountT& operator--() {
 				this->count--;
 				return *this;
 			}
@@ -117,7 +117,7 @@ namespace Seed {
 				return cp;
 			}
 
-			///<summary>Вертає значення в вигляді <code>SizeT<code> змінної</summary>
+			///<summary>Вертає значення в вигляді <code>SizeT</code> змінної</summary>
 			///<returns>Поточне значення об'єкта</returns>
 			__forceinline operator SizeT() const { return this->count; }
 		};
@@ -126,7 +126,7 @@ namespace Seed {
 		///<param name='Array'>Масив</param>
 		///<param name='Size'>Кількість елементів</param>
 		template<typename T>
-		DeprecatedCall("Робота з с-подібнимим масивами") __forceinline void Reverse(T * Array, SizeT size) {
+		DeprecatedCall("Робота з с-подібнимим масивами") __forceinline void Reverse(T* Array, SizeT size) {
 			for (size_t i = 0; i < size / 2; i++) {
 				Swap(Array[i], Array[(size - 1) - i]);
 			}
@@ -153,7 +153,7 @@ namespace Seed {
 		template<typename T>
 		interface IComparable
 		{
-			UInt8 CompareTo(const T & Val);
+			UInt8 CompareTo(const T& Val);
 		};
 
 		template<typename T>
@@ -181,13 +181,13 @@ __forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {thi
 
 namespace {
 	template <class F, class... Args>
-	inline auto INVOKE(F&& f, Args&&... args) ->
+	inline auto INVOKE(F&& f, Args&& ... args) ->
 		decltype(Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...)) {
 		return Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...);
 	}
 
 	template <class Base, class T, class Derived>
-	inline auto INVOKE(T Base::*pmd, Derived&& ref) ->
+	inline auto INVOKE(T Base::* pmd, Derived&& ref) ->
 		decltype(Seed::ForwardReference<Derived>(ref).*pmd) {
 		return Seed::ForwardReference<Derived>(ref).*pmd;
 	}
@@ -199,13 +199,13 @@ namespace {
 	}
 
 	template <class Base, class T, class Derived, class... Args>
-	inline auto INVOKE(T Base::*pmf, Derived&& ref, Args&&... args) ->
+	inline auto INVOKE(T Base::* pmf, Derived&& ref, Args&& ... args) ->
 		decltype((Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...)) {
 		return (Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...);
 	}
 
 	template <class PMF, class Pointer, class... Args>
-	inline auto INVOKE(PMF&& pmf, Pointer&& ptr, Args&&... args) ->
+	inline auto INVOKE(PMF&& pmf, Pointer&& ptr, Args&& ... args) ->
 		decltype(((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...)) {
 		return ((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...);
 	}
