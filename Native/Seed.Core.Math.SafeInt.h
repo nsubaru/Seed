@@ -5,10 +5,23 @@
 namespace Seed {
 	inline namespace Core {
 		inline namespace Exceptions {
+			///<summary>Цілочисельне переповнення</summary>
 			class  IntegerOverflowException : public Exception {
 			public:
-				IntegerOverflowException(ConstACharStr File, ConstACharStr FunctName, SizeT Line) :
-					Exception(File, FunctName, Line, L"Integer owerflow") {}
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				IntegerOverflowException(const ConstAString& File, const ConstAString& FunctName, SizeT Line) :
+					Exception(File, FunctName, Line, L"Цілочисельне переповнення") {}
+
+				/////<summary>Текстове представлення інформації про помилки помилки</summary>
+				//virtual ExceptionString toString() const override final {
+				//	return ExceptionString(exeptionName)
+				//		+ ExceptionString(L". ")
+				//		+ location.toString()
+				//		+ ExceptionString(L". ");
+				//}
 			};
 		}
 

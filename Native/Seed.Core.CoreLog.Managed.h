@@ -41,10 +41,10 @@ namespace Seed {
 			return Seed::Core::toCoreLog({
 							Msg,
 							L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
-							L"        Ім'я помилки             : " + String((CharStr)ex.Name),
+							L"        Ім'я помилки             : " + String(ex.Name),
 							L"        Розташування помилки       ",
-							L"                 Файл            : " + String((Seed::ACharStr)location.File),
-							L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
+							L"                 Файл            : " + String(location.File),
+							L"                 Метод           : " + String(location.FunctName),
 							L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
 		}
 
@@ -60,10 +60,10 @@ namespace Seed {
 			return Seed::Core::toCoreLog({
 							Msg,
 							L"Перехоплено помилку з потоку з ID: " + Seed::Core::String::toString(location.ThreadID),
-							L"        Ім'я помилки             : " + String((CharStr)ex.Name),
+							L"        Ім'я помилки             : " + String(ex.Name),
 							L"        Розташування помилки       ",
-							L"                 Файл            : " + String((Seed::ACharStr)location.File),
-							L"                 Метод           : " + String((Seed::ACharStr)location.FunctName),
+							L"                 Файл            : " + String(location.File),
+							L"                 Метод           : " + String(location.FunctName),
 							L"                 Рядок           : " + Seed::Core::String::toString(location.Line) });
 		}
 #pragma warning(pop)

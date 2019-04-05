@@ -8,13 +8,25 @@
 
 namespace Seed {
 	inline namespace Core {
+		///<summary>Ітератор на кінець не є визначеним</summary>
 		class EndNodeNotDeferencable : public Exception
 		{
 		public:
-			//Помилка: Ітератор на кінець не є визначеним
-			__forceinline EndNodeNotDeferencable(ConstACharStr File, ConstACharStr FunctName, SizeT Line) noexcept
-				: Exception(File, FunctName, Line, L"End node of list not deferencable")
+			///<summary>Конструктор помилки</summary>
+			///<param name = 'File'>Файл в якому згенерована помилка</param>
+			///<param name = 'FunctName'>Ім'я функції</param>
+			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+			__forceinline EndNodeNotDeferencable(const ConstAString& File, const ConstAString& FunctName, SizeT Line) noexcept
+				: Exception(File, FunctName, Line, L"Ітератор на кінець не є визначеним")
 			{};
+
+			/////<summary>Текстове представлення інформації про помилки помилки</summary>
+			//virtual ExceptionString toString() const override final {
+			//	return ExceptionString(exeptionName)
+			//		+ ExceptionString(L". ")
+			//		+ location.toString()
+			//		+ ExceptionString(L". ");
+			//}
 		};
 #pragma warning(push)
 #pragma warning(disable: 4251)

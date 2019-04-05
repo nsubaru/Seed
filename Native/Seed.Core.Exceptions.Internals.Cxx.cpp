@@ -621,7 +621,7 @@ __forceinline void *__AdjustPointer(
 }
 
 __declspec(noreturn, noinline)
-void throwInternalError(const AChar * File, const AChar * FunctName, SizeT Line) {
+void throwInternalError(const Seed::ConstAString & File, const Seed::ConstAString& FunctName, SizeT Line) {
 	Throw(InternalError(File, FunctName, Line));
 }
 

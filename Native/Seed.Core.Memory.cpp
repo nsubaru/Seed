@@ -32,6 +32,10 @@ static struct
 	SizeT CurrentHeapSize = 0;
 } InternalHeapData, HeapData, SecureHeapData;
 
+constexpr Seed::ConstString InternalHeapName = L"внутрішній";
+constexpr Seed::ConstString DefaultHeapName = L"загальній";
+constexpr Seed::ConstString SecureHeapName = L"захищеній";
+
 
 #pragma region Loging
 template<SizeT HeapNameSize>
@@ -94,7 +98,7 @@ void * GenericAllocate(Seed::SizeT Size)
 #endif
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, DefaultHeapName, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі
@@ -102,7 +106,7 @@ void * GenericAllocate(Seed::SizeT Size)
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, DefaultHeapName, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
 	//Записуєм розмір ділянки в заголовок
 	obj[0] = Size;
 	//Атомарно оновлюєм статистику
@@ -131,7 +135,7 @@ void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 	//Якщо функція вернула nullptr то це значить що або розмір завеликий або пам'яті немає
 	//В обох випадках генеруєм помилку OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, DefaultHeapName, Size, HeapData.AllocatedMemory, HeapData.AllocatedMemBlksCount));
 	//Вираховуєм мінімальний можливий адресс початку даних в ділянці пам'яті
 	SizeT Address = ((SizeT)obj) + sizeof(SizeT) + sizeof(SizeT); //-V119
 	//Вираховуєм точний адресс початку ділянки
@@ -255,7 +259,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 #endif
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, SecureHeapName, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі і вказуєм системі обнулити ділянку пам'яті
@@ -263,7 +267,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, SecureHeapName, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
 	//Записуєм розмір ділянки в заголовок
 	obj[0] = Size;
 	//Атомарно оновлюєм статистику
@@ -293,7 +297,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	//Якщо функція вернула nullptr то це значить що або розмір завеликий або пам'яті немає
 	//В обох випадках генеруєм помилку OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, SecureHeapName, Size, SecureHeapData.AllocatedMemory, SecureHeapData.AllocatedMemBlksCount));
 	//Вираховуєм мінімальний можливий адресс початку даних в ділянці пам'яті
 	SizeT Address = ((SizeT)obj) + sizeof(SizeT) + sizeof(SizeT); //-V119
 	//Вираховуєм точний адресс початку ділянки
@@ -425,7 +429,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed
 #endif
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, InternalHeapData.AllocatedMemory, InternalHeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, InternalHeapName, Size, InternalHeapData.AllocatedMemory, InternalHeapData.AllocatedMemBlksCount));
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі і вказуєм системі обнулити ділянку пам'яті
@@ -433,7 +437,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
-		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, Size, InternalHeapData.AllocatedMemory, InternalHeapData.AllocatedMemBlksCount));
+		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, InternalHeapName, Size, InternalHeapData.AllocatedMemory, InternalHeapData.AllocatedMemBlksCount));
 	//Записуєм розмір ділянки в заголовок
 	obj[0] = Size;
 	//Атомарно оновлюєм статистику

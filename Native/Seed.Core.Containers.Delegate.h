@@ -16,34 +16,67 @@ namespace {
 
 namespace Seed {
 	inline namespace Exeptions {
-		//Спроба отримати результат не виконаної ще функції
+		///<summary>Спроба отримати результат не виконаної ще функції</summary>
 		class SeedKernelCall CantGetResultNotInvokedFunction :public Exception
 		{
 		public:
-			//Генерація помилки спроби отримати результат не виконаної ще функції
-			__forceinline CantGetResultNotInvokedFunction(const AChar * File, const AChar * FunctName, SizeT Line)
-				noexcept : Exception(File, FunctName, Line, L"Can get result not invoked function")
+			///<summary>Генерація помилки спроби отримати результат не виконаної ще функції</summary>
+			///<param name = 'File'>Файл в якому згенерована помилка</param>
+			///<param name = 'FunctName'>Ім'я функції</param>
+			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+			__forceinline CantGetResultNotInvokedFunction(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				noexcept : Exception(File, FunctName, Line, L"Не можливо отримати результат не виконаної функції")
 			{}
+
+			/////<summary>Текстове представлення інформації про помилки помилки</summary>
+			//virtual ExceptionString toString() const override final {
+			//	return ExceptionString(exeptionName)
+			//		+ ExceptionString(L". ")
+			//		+ Location.toString()
+			//		+ ExceptionString(L".");
+			//}
 		};
 
-		//Спроба повторно запусти вже виконаний делегат або який виконується зараз
+		///<summary>Спроба повторно запусти вже виконаний делегат або який виконується зараз</summary>
 		class SeedKernelCall TryReStartDelegate :public Exception
 		{
 		public:
-			//Генерація помилки спроби повторно запусти вже виконаний делегат або який виконується зараз
-			__forceinline TryReStartDelegate(const AChar * File, const AChar * FunctName, SizeT Line)
-				noexcept : Exception(File, FunctName, Line, L"Can start alredy started or alredy executed delegate")
+			///<summary>Генерація помилки спроби повторно запусти вже виконаний делегат або який виконується зараз</summary>
+			///<param name = 'File'>Файл в якому згенерована помилка</param>
+			///<param name = 'FunctName'>Ім'я функції</param>
+			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+			__forceinline TryReStartDelegate(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				noexcept : Exception(File, FunctName, Line, L"Неможливо повторно запустити делегат на виконання")
 			{}
+
+			/////<summary>Текстове представлення інформації про помилки помилки</summary>
+			//virtual ExceptionString toString() const override final {
+			//	return ExceptionString(exeptionName)
+			//		+ ExceptionString(L". ")
+			//		+ Location.toString()
+			//		+ ExceptionString(L".");
+			//}
 		};
 
-		//Делегат в процесі виконання
+		///<summary>Делегат в процесі виконання</summary>
 		class SeedKernelCall AlredyExecute :public Exception
 		{
 		public:
-			//Генерація помилки
-			__forceinline AlredyExecute(const AChar * File, const AChar * FunctName, SizeT Line)
-				noexcept : Exception(File, FunctName, Line, L"Can start alredy started or alredy executed delegate")
+			///<summary>Конструктор помилки</summary>
+			///<param name = 'File'>Файл в якому згенерована помилка</param>
+			///<param name = 'FunctName'>Ім'я функції</param>
+			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+			__forceinline AlredyExecute(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				noexcept : Exception(File, FunctName, Line, L"Неможливо отримати результат делегат в процесі його виконання")
 			{}
+
+			/////<summary>Текстове представлення інформації про помилки помилки</summary>
+			//virtual ExceptionString toString() const override final {
+			//	return ExceptionString(exeptionName)
+			//		+ ExceptionString(L". ")
+			//		+ Location.toString()
+			//		+ ExceptionString(L".");
+			//}
 		};
 	}
 }
@@ -237,8 +270,7 @@ namespace Seed {
 			__forceinline Delegate(F f, Args... args) : data(new delegate(new TemplateFunctionT<F, Args...>(f, args...)))
 			{};
 
-			RefCountClass(Delegate, data)
-			
+			RefCountClass(Delegate, data);
 
 			//Вертає true якщо делегат виконується зараз
 			//генерує NullPointExeption, якщо делегат не валідний

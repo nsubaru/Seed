@@ -5,6 +5,7 @@
 //#include "Seed.Core.Exceptions.h"
 //#include "Seed.Core.Containers.Delegate.h"
 //#include "Seed.Core.Security.h"
+//#include "Seed.Core.Threading.SRWLock.h"
 //
 //namespace Seed {
 //	namespace Exeptions {
@@ -15,7 +16,7 @@
 //			SizeT TID;
 //		public:
 //			//Неіснуючий потік або він не є керований через Core
-//			__forceinline InvalidThread(const AChar * File, const AChar * FunctName, SizeT Line, SizeT TID)
+//			__forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT TID)
 //				noexcept : Exception(File, FunctName, Line, L"Cannot manage non managed thread"), TID(TID)
 //			{};
 //			//ID потоку який згенерував помилку
@@ -29,7 +30,7 @@
 //		{
 //		public:
 //			//Не валідний об'єкт потоку
-//			__forceinline InvalidThreadObj(const AChar * File, const AChar * FunctName, SizeT Line)
+//			__forceinline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 //				noexcept : Exception(File, FunctName, Line, L"Cannot manage non managed thread")
 //			{};
 //		};
@@ -38,7 +39,7 @@
 //		{
 //		public:
 //			//Спроба запуску потоку якщо він вже запущений
-//			__forceinline ThreadAlredyStrated(const AChar * File, const AChar * FunctName, SizeT Line)
+//			__forceinline ThreadAlredyStrated(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 //				noexcept : Exception(File, FunctName, Line, L"Thread alredy started")
 //			{};
 //		};
@@ -47,7 +48,7 @@
 //		{
 //		public:
 //			//Спроба запуску основного потоку якщо він вже запущений
-//			__forceinline MainThreadAlredyStrated(const AChar * File, const AChar * FunctName, SizeT Line)
+//			__forceinline MainThreadAlredyStrated(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 //				noexcept : Exception(File, FunctName, Line, L"Main thread alredy started")
 //			{};
 //		};
@@ -56,7 +57,7 @@
 //		{
 //		public:
 //			//Спроба зробити бескінчене не контрольоване блокування
-//			__forceinline DedlockExpected(const AChar * File, const AChar * FunctName, SizeT Line)
+//			__forceinline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 //				noexcept : Exception(File, FunctName, Line, L"Dedlock cathed")
 //			{};
 //		};
@@ -64,52 +65,52 @@
 //		class AlertByEvent :public Seed::Exception
 //		{
 //		public:
-//			//Спроба зробити бескінчене не контрольоване блокування
+//			//Генерується при переривані очікування на nt event
 //			__forceinline AlertByEvent(const AChar * File, const AChar * FunctName, SizeT Line)
 //				noexcept : Exception(File, FunctName, Line, L"Allerted by event")
 //			{};
 //		};
 //	}
 //	inline namespace Core {
-//		namespace Security {
-//			namespace Thread {
-//				enum class AccessRight
-//				{
-//					Read,
-//					Suspend,
-//					Interupt,
-//					ExecAPC,
-//					Terminate,
-//					MaxRight
-//				};
-//				constexpr auto GenericReadAccess = [] () {
-//					BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
-//					mask.SetBit (static_cast<SizeT>(AccessRight::Read));
-//					return mask;
-//				};
-//				constexpr auto GenericWriteAccess = [] () {
-//					BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
-//					mask.SetBit (static_cast<SizeT>(AccessRight::Suspend));
-//					return mask;
-//				};
-//				constexpr auto GenericExecuteAccess = [] () {
-//					BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
-//					mask.SetBit (static_cast<SizeT>(AccessRight::Interupt));
-//					mask.SetBit (static_cast<SizeT>(AccessRight::Terminate));
-//					return mask;
-//				};
-//				constexpr auto GenericDeleteAccess = [] () {
-//					BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
-//					mask.SetBit (static_cast<SizeT>(AccessRight::ExecAPC));
-//					return mask;
-//				};
-//			}
-//			using ThreadSecurityDescriptor = Seed::Core::Security::GenericSecurityDescriptor<Thread::AccessRight,
-//				Thread::GenericReadAccess, Thread::GenericWriteAccess, Thread::GenericExecuteAccess, Thread::GenericDeleteAccess
-//			>;
-//		}
+//		//namespace Security {
+//		//	namespace Thread {
+//		//		enum class AccessRight
+//		//		{
+//		//			Read,
+//		//			Suspend,
+//		//			Interupt,
+//		//			ExecAPC,
+//		//			Terminate,
+//		//			MaxRight
+//		//		};
+//		//		constexpr auto GenericReadAccess = [] () {
+//		//			BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
+//		//			mask.SetBit (static_cast<SizeT>(AccessRight::Read));
+//		//			return mask;
+//		//		};
+//		//		constexpr auto GenericWriteAccess = [] () {
+//		//			BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
+//		//			mask.SetBit (static_cast<SizeT>(AccessRight::Suspend));
+//		//			return mask;
+//		//		};
+//		//		constexpr auto GenericExecuteAccess = [] () {
+//		//			BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
+//		//			mask.SetBit (static_cast<SizeT>(AccessRight::Interupt));
+//		//			mask.SetBit (static_cast<SizeT>(AccessRight::Terminate));
+//		//			return mask;
+//		//		};
+//		//		constexpr auto GenericDeleteAccess = [] () {
+//		//			BitMapT<static_cast<UInt64>(AccessRight::MaxRight)> mask;
+//		//			mask.SetBit (static_cast<SizeT>(AccessRight::ExecAPC));
+//		//			return mask;
+//		//		};
+//		//	}
+//		//	using ThreadSecurityDescriptor = Seed::Core::Security::GenericSecurityDescriptor<Thread::AccessRight,
+//		//		Thread::GenericReadAccess, Thread::GenericWriteAccess, Thread::GenericExecuteAccess, Thread::GenericDeleteAccess
+//		//	>;
+//		//}
 //		//Потік
-//		class SeedKernelCall Thread// : private Security::ThreadSecurityDescriptor
+//		class SeedKernelCall Thread
 //		{
 //		private:
 //			//Список всіх керованих потоків
@@ -131,19 +132,21 @@
 //					void * Handle;
 //					//Кількість силок на об'єкт
 //					RefCountT RefCount;
-//					//Ім'я обєкта події в об'єктній системі NT
+//					//Ім'я обєкта події в об'єктній системі NT, якщо немає то рядок пустий
 //					String Name;
 //					//Конструктор з отриманням дескриптора
-//					event_data(void * handle, const String & name) :Handle(handle), RefCount(1), Name(name)
+//					event_data(const String & name) :Handle(nullptr), RefCount(1), Name(name)
 //					{};
 //					//Конструктор з оптимізована отриманням дескриптора
-//					event_data(void * handle, String && name) :Handle(handle), RefCount(1), Name(name)
+//					event_data(String && name) :Handle(nullptr), RefCount(1), Name(name)
 //					{};
 //				};
 //				//Дані об'єкту події
 //				event_data * data;
+//				//Знищення останнього елемента
+//				virtual void Dispose() override final;
 //			public:
-//				//RefCountClass (Event, data);
+//				RefCountClass (Event, data);
 //				//Конструктор
 //				Event(Boolean IsManualReset = false) noexcept;
 //				//Конструктор з іменем об'єкта
@@ -162,12 +165,6 @@
 //				void Set();
 //				//Виставити false на подію
 //				void Reset();
-//
-//				//Поточна кількість об'єктів подій
-//				static SizeT EventObjCount();
-//
-//				//Знищення останнього елемента
-//				virtual void Dispose () override final;
 //			};
 //
 //			//Блокувальник для багатопотокових об'єктів
@@ -180,52 +177,36 @@
 //			class SeedKernelCall GuardLock : IDisposable
 //			{
 //			private:
-//			#pragma pack(push, 8)
-//
-//				typedef struct _RTL_CRITICAL_SECTION
-//				{
-//					void* DebugInfo;
-//
-//					//
-//					//  The following three fields control entering and exiting the critical
-//					//  section for the resource
-//					//
-//
-//					long LockCount;
-//					long RecursionCount;
-//					Handle OwningThread;        // from the thread's ClientId->UniqueThread
-//					Handle LockSemaphore;
-//					SizeT SpinCount;        // force size on 64-bit systems when packed
-//				} RTL_CRITICAL_SECTION, *PRTL_CRITICAL_SECTION;
-//
-//			#pragma pack(pop)
-//			private:
 //				//Дані блокувальника
 //				struct guardlock_data
 //				{
 //					//Дескриптор події
-//					Handle EventHandle;
-//					//Дескриптор критичної секції
-//					RTL_CRITICAL_SECTION CriticalSection;
+//					Event EventHandle;
+//					//SRW блокировка
+//					Threading::SRWLock lock;
 //					//Кількість активних блокуваннь
 //					RefCountT GuardsCount;
 //					//Кількість силок на об'єкт
 //					RefCountT RefCount;
 //					//Конструктор з отриманням дескриптора
-//					guardlock_data(void * EventHandle, RTL_CRITICAL_SECTION CriticalSection) :
-//						EventHandle(EventHandle),
-//						CriticalSection(CriticalSection),
+//					guardlock_data() :
+//						EventHandle(true),
 //						RefCount(1),
 //						GuardsCount(0)
 //					{};
 //				};
 //				//Дані об'єкту блокуваннь
 //				guardlock_data * data;
+//
+//				// Inherited via IDisposable
+//				__forceinline virtual void Dispose() override {
+//					delete data;
+//				}
 //			public:
 //				//Конструктор створює об'єкт, ініціалізовуючи внутрішню структуру guardlock_data
-//				GuardLock() noexcept;
+//				GuardLock(): data(new guardlock_data) {}
 //
-//				//RefCountClass (GuardLock, data);
+//				RefCountClass (GuardLock, data);
 //
 //				//Блокує WaitFree для чого використовується об'єкт події з NT Native
 //				//Для атомарності операції використовується критична секція
@@ -234,53 +215,46 @@
 //				template<typename lambda>
 //				__forceinline auto Guard(lambda scope)
 //				{
-//					extern void EnterCriticalSection(void * CriticalSection);
-//					extern void LeaveCriticalSection(void * CriticalSection);
-//					extern void SetNtEvent(void * handle);
-//					extern void ResetNtEvent(void * handle);
-//
-//					EnterCriticalSection(&this->data->CriticalSection);
-//					ResetNtEvent(this->data->EventHandle, NULL);
-//					this->data->GuardsCount++;
-//					LeaveCriticalSection(&this->data->CriticalSection);
-//
 //					try
 //					{
-//						if constexpr (Seed::Core::StaticAsserrts::IsSame<decltype(scope()), void>())
+//						if constexpr (Seed::Core::StaticAsserts::IsSame<decltype(scope()), void>())
 //						{
-//							scope();
+//							this->data->lock.ExclusiveLock([&]() {
+//								this->data->EventHandle.Reset();
+//								this->data->GuardsCount++;
+//								scope();
 //
-//							EnterCriticalSection(&this->data->CriticalSection);
-//							if (--data->GuardsCount == 0)
-//								SetNtEvent(this->data->EventHandle);
-//							LeaveCriticalSection(&this->data->CriticalSection);
+//								if (--data->GuardsCount == 0)
+//									this->data->EventHandle.Set();
+//								});
 //						}
 //						else
 //						{
-//							auto && result = MoveRValue(scope());
+//							return this->data->lock.ExclusiveLock([&]() -> decltype(scope()) {
+//								this->data->EventHandle.Reset();
+//								auto&& result = MoveRValue(scope());
 //
-//							EnterCriticalSection(&this->data->CriticalSection);
-//							if (--data->GuardsCount == 0)
-//								NtSetEvent(this->data->EventHandle, NULL);
-//							LeaveCriticalSection(&this->data->CriticalSection);
+//								if (--data->GuardsCount == 0)
+//									this->data->EventHandle.Set();
 //
-//							return result;
+//								return result;
+//								});
 //						}
 //					}
-//					catch (Exception * ex)
+//					catch (Exception & ex)
 //					{
-//						EnterCriticalSection(&this->data->CriticalSection);
-//						if (--data->GuardsCount == 0)
-//							NtSetEvent(this->data->EventHandle, NULL);
-//						LeaveCriticalSection(&this->data->CriticalSection);
+//						this->data->lock.ExclusiveLock([&]() {
+//							if (--data->GuardsCount == 0)
+//								this->data->EventHandle.Set();
+//							});
 //						Throw(ex);
 //					}
-//					catch (InteruptExeption * ex)
+//					catch (InteruptException & ex)
 //					{
-//						EnterCriticalSection(&this->data->CriticalSection);
-//						if (--data->GuardsCount == 0)
-//							NtSetEvent(this->data->EventHandle, NULL);
-//						LeaveCriticalSection(&this->data->CriticalSection);
+//						this->data->lock.ExclusiveLock([&]() {
+//							if (--data->GuardsCount == 0)
+//								this->data->EventHandle.Set();
+//							});
 //						Throw(ex);
 //					}
 //				}
@@ -288,7 +262,7 @@
 //				//Очікує завершення всіх блоків запущених в блоці Guard
 //				__forceinline void WaitFree()
 //				{
-//					//TODO: NtWaitForSingleObject(data->EventHandle, 1, nullptr);
+//					this->data->EventHandle.Wait();
 //				}
 //
 //				//Вертає true якщо немає блоків в блоці Guard
@@ -300,127 +274,6 @@
 //				__forceinline SizeT GetGuardedScopesCount() noexcept
 //				{
 //					return data->GuardsCount;
-//				}
-//
-//				// Inherited via IDisposable
-//				virtual void Dispose () override;
-//			};
-//
-//			//Об'єкт критичної секції
-//			//Метод ExecuteInCriticalSection дозволяє виконати лямбду l 
-//			//автоматично ввійшовши в критичну секцію і вийшовши з неї по завершенню виконання лямбди
-//			class SeedKernelCall CriticalSection
-//			{
-//			private:
-//#pragma pack(push, 8)
-//
-//				typedef struct _RTL_CRITICAL_SECTION
-//				{
-//					void* DebugInfo;
-//
-//					//
-//					//  The following three fields control entering and exiting the critical
-//					//  section for the resource
-//					//
-//
-//					long LockCount;
-//					long RecursionCount;
-//					Handle OwningThread;        // from the thread's ClientId->UniqueThread
-//					Handle LockSemaphore;
-//					SizeT SpinCount;        // force size on 64-bit systems when packed
-//				} RTL_CRITICAL_SECTION, *PRTL_CRITICAL_SECTION;
-//
-//#pragma pack(pop)
-//				//Внутрішня структура даних
-//				struct __section
-//				{
-//					//Критична секція
-//					RTL_CRITICAL_SECTION section;
-//					//Кількість силок на даний екзмемпляр
-//					RefCountT RefCount;
-//				};
-//				//Поле цього екземпляра класу
-//				__section * This;
-//			public:
-//				//Ініціалізовує нову критичну секцію
-//				__forceinline CriticalSection()
-//				{
-//					This = new __section;
-//					//TODO: RtlInitializeCriticalSection(&This->section);
-//					This->RefCount = 1;
-//				}
-//				//Створює копію секції збільшуючи кількість силок на даний екземаляр
-//				__forceinline CriticalSection(const CriticalSection & orig) noexcept :This(orig.This)
-//				{
-//					++This->RefCount;
-//				}
-//				//Переміщає покажчик в новий екзмемпляр, а в старому обнулює
-//				__forceinline CriticalSection(CriticalSection && from) noexcept :This(from.This)
-//				{
-//					from.This = nullptr;
-//				}
-//				//Оператор присвоєння, знищує поточний об'єкт і створює копію задопомогою конструктор
-//				__forceinline CriticalSection operator=(const CriticalSection & orig) noexcept
-//				{
-//					this->~CriticalSection();
-//					this->CriticalSection::CriticalSection(orig);
-//					return *this;
-//				}
-//				//Оператор переміщення, знищує поточний об'єкт викликом деструктора
-//				//І переміщує задопомогою конструктор переміщення критичну секцію в новий об'єкт
-//				__forceinline CriticalSection operator=(CriticalSection && orig) noexcept
-//				{
-//					this->~CriticalSection();
-//					this->CriticalSection::CriticalSection(MoveRValue(orig));
-//					return *this;
-//				}
-//
-//				//Виконує лямбду l 
-//				//автоматично ввійшовши в критичну секцію перед виконанням і 
-//				//вийшовши з неї після виконання
-//				template<typename lambda>
-//				__forceinline auto ExecuteInCriticalSection(lambda l)
-//				{
-//					RtlEnterCriticalSection(&This->section);
-//					try
-//					{
-//						if constexpr (Seed::CoreAPI::StaticAsserrts::IsSame<decltype(l()), void>())
-//						{
-//							l();
-//							RtlLeaveCriticalSection(&This->section);
-//						}
-//						else
-//						{
-//							auto res = l();
-//							RtlLeaveCriticalSection(&This->section);
-//							return res;
-//						}
-//					}
-//					catch (Exeption * ex)
-//					{
-//						RtlLeaveCriticalSection(&This->section);
-//						throw ex;
-//					}
-//					catch (InteruptExeption * ex)
-//					{
-//						RtlLeaveCriticalSection(&This->section);
-//						throw ex;
-//					}
-//				}
-//
-//				//Деструктор перевіряє чи цей об'єкт нульовий
-//				//Якщо не нульовий то декрементить лічильник силок
-//				//Якщо силок лишилось 0 то знищує секцію і видаляє виділену пам'ять
-//				__forceinline ~CriticalSection() noexcept
-//				{
-//					if (This != nullptr)
-//					{
-//						if (--This->RefCount == 0)
-//						{
-//							//TODO: RtlDeleteCriticalSection(&This->section);
-//							delete This;
-//						}
-//					}
 //				}
 //			};
 //

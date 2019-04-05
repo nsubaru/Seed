@@ -175,4 +175,12 @@ SizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsage() noexcept
 	return ExceptionsHeap.CurrentHeapSize;
 }
 
+__declspec(noreturn) void ThrowIndexOutOfRange(
+	const Seed::ConstAString & File, 
+	const Seed::ConstAString & Function, 
+	const Seed::SizeT Required,
+	const Seed::SizeT MaxAllowed) {
+	Throw(IndexOutOfRange(ExceptionPosition, Required, MaxAllowed));
+}
+
 #pragma warning(pop)

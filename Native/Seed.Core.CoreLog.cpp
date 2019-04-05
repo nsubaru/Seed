@@ -160,7 +160,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::String>& lines
 			}
 		}
 		{
-			Char raw[1000];
+			Char raw[23];
 			FormatCurrentTime(raw);
 			raw[21] = L' ';
 			raw[22] = L'\0';
@@ -186,7 +186,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::String>& lines
 	catch (Seed::Exception & ex)
 	{
 		toCoreLog(L"Internal coreLog exeption: ");
-		toCoreLog(ex.Name, Seed::CStr::Size(ex.Name));
+		toCoreLog(ex.Name.Str, ex.Name.Size);
 		toCoreLog(L"Passed data(only first line): ");
 		toCoreLog(lines[0]);
 		return false;
