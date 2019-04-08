@@ -32,15 +32,27 @@ namespace Seed {
 					if constexpr (StaticAsserts::IsSame<decltype(Funct()), void>())
 					{
 						AcquireLockExclusiveSRWLock(&lock);
-						Funct();
+						try {
+							Funct();
+						}
+						catch (...) {
+							ReleaseLockExclusiveSRWLock(&lock);
+							throw;
+						}
 						ReleaseLockExclusiveSRWLock(&lock);
 					}
 					else
 					{
 						AcquireLockExclusiveSRWLock(&lock);
-						auto && ret = MoveRValue(Scope());
-						ReleaseLockExclusiveSRWLock(&lock);
-						return MoveRValue(ret);
+						try {
+							auto && ret = MoveRValue(Funct());
+							ReleaseLockExclusiveSRWLock(&lock);
+							return MoveRValue(ret);
+						}
+						catch (...) {
+							ReleaseLockExclusiveSRWLock(&lock);
+							throw;
+						}
 					}
 				}
 				///<summary>Виконує <see cref="Funct"/> з cпільни блокуванням</summary>
@@ -55,15 +67,27 @@ namespace Seed {
 					if constexpr (StaticAsserts::IsSame<decltype(Funct()), void>())
 					{
 						AcquireLockSharedSRWLock(&lock);
-						Funct();
+						try {
+							Funct();
+						}
+						catch (...) {
+							ReleaseLockSharedSRWLock(&lock);
+							throw;
+						}
 						ReleaseLockSharedSRWLock(&lock);
 					}
 					else
 					{
 						AcquireLockSharedSRWLock(&lock);
-						auto && ret = MoveRValue(Funct());
-						ReleaseLockSharedSRWLock(&lock);
-						return MoveRValue(ret);
+						try {
+							auto && ret = MoveRValue(Funct());
+							ReleaseLockSharedSRWLock(&lock);
+							return MoveRValue(ret);
+						}
+						catch (...) {
+							ReleaseLockSharedSRWLock(&lock);
+							throw;
+						}
 					}
 				}
 			};

@@ -30,6 +30,15 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.StringReserveSize = 50;
 					}
 
+					//Багатопотоковість
+					{
+						//Потоки
+						{
+							DefaultSettings.Threading.Thread.StackStartSize = 5Mb;
+							DefaultSettings.Threading.Thread.StackMaxSize = 10Mb;
+						}
+					}
+
 					return DefaultSettings;
 				}
 			}

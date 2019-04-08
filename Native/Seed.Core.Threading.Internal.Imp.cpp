@@ -25,3 +25,21 @@ inline void ReleaseLockSharedSRWLock(void* PSRWLock)
 {
 	RtlReleaseSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
 }
+
+void PulseNtEvent(void* handle)
+{
+	LONG state;
+	NtPulseEvent(handle, &state);
+}
+
+void SetNtEvent(void* handle)
+{
+	LONG state;
+	NtSetEvent(handle, &state);
+}
+
+void ResetNtEvent(void* handle)
+{
+	LONG state;
+	NtResetEvent(handle, &state);
+}

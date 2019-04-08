@@ -105,7 +105,7 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 		NULL);
 	RtlInitializeCriticalSection(&LogFile.lock);
 	if (!NT_SUCCESS(status)) return false;
-	return Seed::Core::toCoreLog(L"Starting core...");
+	return Seed::Core::toCoreLog(L"Запуск ядра...");
 }
 
 SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char * Value, Seed::SizeT Lenght)
@@ -142,7 +142,7 @@ void Seed::Core::Stop::Loging() noexcept
 	RtlDeleteCriticalSection(&LogFile.lock);
 }
 
-bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::String>& lines)
+bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::ExceptionString>& lines)
 {
 	if (lines.Count == 0) return true;
 	try
@@ -150,7 +150,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::String>& lines
 		SizeT worldCount = 0;
 		for (SizeT i = 0; i < lines.Count; i++)
 			worldCount += lines[i].Size;
-		String data(worldCount);
+		ExceptionString data(worldCount);
 		data += lines[0];
 		if (lines.Count > 1)
 		{
@@ -164,7 +164,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::String>& lines
 			FormatCurrentTime(raw);
 			raw[21] = L' ';
 			raw[22] = L'\0';
-			data = String(raw) + data + NextLine();
+			data = ExceptionString(raw) + data + NextLine();
 			SizeT bytesCount = data.Size;
 			bytesCount *= sizeof(wchar_t);
 			RtlEnterCriticalSection(&LogFile.lock);

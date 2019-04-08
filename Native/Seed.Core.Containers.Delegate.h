@@ -7,14 +7,16 @@
 
 namespace {
 	////Структура для збереження результату і його типу
-	//struct variadic_data{
-	//	void * data;
-	//	size_t type_hash;
-	//	__forceinline variadic_data(void *&& data, size_t type_hash) noexcept :data(data), type_hash(type_hash) {}
-	//};
+	////struct variadic_data{
+	////	void * data;
+	////	size_t type_hash;
+	////	__forceinline variadic_data(void *&& data, size_t type_hash) noexcept :data(data), type_hash(type_hash) {}
+	////};
 }
 
 namespace Seed {
+#pragma warning(push)
+#pragma warning(disable: 4996)
 	inline namespace Exeptions {
 		///<summary>Спроба отримати результат не виконаної ще функції</summary>
 		class SeedKernelCall CantGetResultNotInvokedFunction :public Exception
@@ -28,13 +30,13 @@ namespace Seed {
 				noexcept : Exception(File, FunctName, Line, L"Не можливо отримати результат не виконаної функції")
 			{}
 
-			/////<summary>Текстове представлення інформації про помилки помилки</summary>
-			//virtual ExceptionString toString() const override final {
-			//	return ExceptionString(exeptionName)
-			//		+ ExceptionString(L". ")
-			//		+ Location.toString()
-			//		+ ExceptionString(L".");
-			//}
+			///<summary>Текстове представлення інформації про помилки помилки</summary>
+			virtual ExceptionString toString() const override final {
+				return ExceptionString(exeptionName)
+					+ ExceptionString(L". ")
+					+ Location.toString()
+					+ ExceptionString(L".");
+			}
 		};
 
 		///<summary>Спроба повторно запусти вже виконаний делегат або який виконується зараз</summary>
@@ -49,13 +51,13 @@ namespace Seed {
 				noexcept : Exception(File, FunctName, Line, L"Неможливо повторно запустити делегат на виконання")
 			{}
 
-			/////<summary>Текстове представлення інформації про помилки помилки</summary>
-			//virtual ExceptionString toString() const override final {
-			//	return ExceptionString(exeptionName)
-			//		+ ExceptionString(L". ")
-			//		+ Location.toString()
-			//		+ ExceptionString(L".");
-			//}
+			///<summary>Текстове представлення інформації про помилки помилки</summary>
+			virtual ExceptionString toString() const override final {
+				return ExceptionString(exeptionName)
+					+ ExceptionString(L". ")
+					+ Location.toString()
+					+ ExceptionString(L".");
+			}
 		};
 
 		///<summary>Делегат в процесі виконання</summary>
@@ -70,15 +72,16 @@ namespace Seed {
 				noexcept : Exception(File, FunctName, Line, L"Неможливо отримати результат делегат в процесі його виконання")
 			{}
 
-			/////<summary>Текстове представлення інформації про помилки помилки</summary>
-			//virtual ExceptionString toString() const override final {
-			//	return ExceptionString(exeptionName)
-			//		+ ExceptionString(L". ")
-			//		+ Location.toString()
-			//		+ ExceptionString(L".");
-			//}
+			///<summary>Текстове представлення інформації про помилки помилки</summary>
+			virtual ExceptionString toString() const override final {
+				return ExceptionString(exeptionName)
+					+ ExceptionString(L". ")
+					+ Location.toString()
+					+ ExceptionString(L".");
+			}
 		};
 	}
+#pragma warning(pop)
 }
 
 namespace Seed {
@@ -203,15 +206,15 @@ public:
 			//Якщо функція вертає void то просто викликаєм її
 			else call(f, args);
 		}
-		catch (Seed::InteruptException & ex) {
+		catch ([[maybe_unused]] Seed::InteruptException&) {
 			isEnded = true;
-			Throw(ex);
+			ReThrow;
 		}
 		//Якщо зловили якись ексепшн то важаєм що функція завершила свою роботу
-		catch (Seed::Exception & ex)
+		catch ([[maybe_unused]] Seed::Exception&)
 		{
 			isEnded = true;
-			Throw(ex);
+			ReThrow;
 		}
 		isEnded = true;
 	}
@@ -228,6 +231,7 @@ public:
 	{
 		return isEnded;
 	}
+
 	//Деструктор, видаляє результат якщо він є
 	__forceinline ~TemplateFunctionT()
 	{

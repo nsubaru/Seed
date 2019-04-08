@@ -90,6 +90,9 @@ void Seed::Core::Memory::Heap::Stop() noexcept
 	RtlDestroyHeap(HeapData.HeapHandle);
 }
 
+#ifndef ReleaseMode
+__declspec(allocator)
+#endif // !ReleaseMode
 void * GenericAllocate(Seed::SizeT Size)
 {
 #if PreReleaseMode || DebugMode
@@ -117,6 +120,9 @@ void * GenericAllocate(Seed::SizeT Size)
 	return obj + 1;
 }
 
+#ifndef ReleaseMode
+__declspec(allocator)
+#endif // !ReleaseMode
 void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
@@ -251,6 +257,9 @@ void Seed::Core::Memory::SensitiveDataHeap::Stop() noexcept
 	RtlDestroyHeap(SecureHeapData.HeapHandle);
 }
 
+#ifndef ReleaseMode
+__declspec(allocator)
+#endif // !ReleaseMode
 DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Allocate(Seed::SizeT Size)
 {
 #if PreReleaseMode || DebugMode
@@ -278,6 +287,9 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	return obj + 1;
 }
 
+#ifndef ReleaseMode
+__declspec(allocator)
+#endif // !ReleaseMode
 DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
@@ -422,6 +434,9 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapFree(void* Me
 	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
+#ifndef ReleaseMode
+__declspec(allocator)
+#endif // !ReleaseMode
 DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed::SizeT Size)
 {
 #if PreReleaseMode || DebugMode

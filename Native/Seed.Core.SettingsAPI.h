@@ -27,7 +27,17 @@ namespace Seed {
 					SizeT StringReserveSize;
 				};
 
+				struct ThreadingCfg {
+					struct ThreadCfg {
+						SizeT StackMaxSize;
+						SizeT StackStartSize;
+					};
+
+					ThreadCfg Thread;
+				};
+
 				MemoryManager MainMemoryManager;
+				ThreadingCfg Threading;
 			};
 		public:
 			class Memory {
@@ -140,6 +150,32 @@ namespace Seed {
 					extern SettingsData CurrentSettingsData;
 					CurrentSettingsData.MainMemoryManager.StringReserveSize = NewStringReserverSpace;
 				}
+			};
+
+			class Threading {
+			public:
+				class Thread {
+				public:
+					static __forceinline SizeT GetStackStartSize() {
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.Threading.Thread.StackStartSize;
+					}
+
+					static __forceinline void SetStackStartSize(SizeT NewThreadStackStartSize) {
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.Threading.Thread.StackStartSize = NewThreadStackStartSize;
+					}
+
+					static __forceinline SizeT GetStackMaxSize() {
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.Threading.Thread.StackMaxSize;
+					}
+
+					static __forceinline void SetStackMaxSize(SizeT NewThreadStackMaxSize) {
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.Threading.Thread.StackMaxSize = NewThreadStackMaxSize;
+					}
+				};
 			};
 
 			static void SaveCurrentSettings();

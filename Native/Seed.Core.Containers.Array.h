@@ -91,20 +91,32 @@ namespace Seed {
 			///<param name = 'Index'>Індекс елемент</param>
 			///<returns>Силка на елемент</returns>
 			__forceinline T& operator[](SizeT Index) {
+				extern __declspec(noreturn) void ThrowIndexOutOfRange(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT Required,
+					const Seed::SizeT MaxAllowed);
 				if (Index < count)
 					return arr[Index];
 				else
-					Throw(Seed::IndexOutOfRange(ExceptionPosition, Index, GetCount()));
+					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, count);
 			}
 
 			///<summary>Констатний оператор доступу по індексу</summary>
 			///<param name = 'Index'>Індекс елемент</param>
 			///<returns>Константа силка на елемент</returns>
 			__forceinline const T& operator[](SizeT index) const {
+				extern __declspec(noreturn) void ThrowIndexOutOfRange(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT Required,
+					const Seed::SizeT MaxAllowed);
 				if (index < count)
 					return arr[index];
 				else
-					Throw(Seed::IndexOutOfRange(ExceptionPosition, index, GetCount()));
+					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, index, count);
 			}
 
 			///<summary>Оператор рівності</summary>
@@ -171,14 +183,19 @@ namespace Seed {
 			///<para>з нуля який має бути включений в Slice</para></param>
 			///<returns>Підмасив</returns>
 			Array<T> Slice(SizeT StartIndex) {
+				extern __declspec(noreturn) void ThrowNullPointException(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT Address,
+					const Seed::UInt8 Mode);
 				if (StartIndex > count)
-					Throw(
-						NullPointException(
-							ExceptionPosition,
-							((SizeT)this->arr) + StartIndex,
-							NullPointException::Types::Read
-						)
-					);
+					ThrowNullPointException(
+						__FILE__,
+						__FUNCSIG__,
+						__LINE__,
+						reinterpret_cast<SizeT>(this->arr + StartIndex),
+						0);
 				SizeT Count = count - StartIndex;
 				T * __array = new T[Count];
 
@@ -195,14 +212,19 @@ namespace Seed {
 			///<param name = 'Count'>Кількість елементів</param>
 			///<returns>Підмасив</returns>
 			Array<T> Slice(SizeT StartIndex, SizeT Count) {
+				extern __declspec(noreturn) void ThrowNullPointException(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT Address,
+					const Seed::UInt8 Mode);
 				if (StartIndex + Count > count)
-					Throw(
-						NullPointException(
-							ExceptionPosition,
-							((SizeT)this->arr) + StartIndex + Count,
-							NullPointException::Types::Read
-						)
-					);
+					ThrowNullPointException(
+						__FILE__,
+						__FUNCSIG__,
+						__LINE__,
+						reinterpret_cast<SizeT>(this->arr + StartIndex + Count),
+						0);
 
 				T * __array = new T[Count];
 

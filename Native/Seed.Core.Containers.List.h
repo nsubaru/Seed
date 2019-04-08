@@ -1,33 +1,12 @@
 #pragma once
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Memory.h"
-#include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Base.Interlocked.h"
 #include "Seed.Core.Containers.Array.h"
 #include "Seed.Core.Threading.SRWLock.h"
 
 namespace Seed {
 	inline namespace Core {
-		///<summary>Ітератор на кінець не є визначеним</summary>
-		class EndNodeNotDeferencable : public Exception
-		{
-		public:
-			///<summary>Конструктор помилки</summary>
-			///<param name = 'File'>Файл в якому згенерована помилка</param>
-			///<param name = 'FunctName'>Ім'я функції</param>
-			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-			__forceinline EndNodeNotDeferencable(const ConstAString& File, const ConstAString& FunctName, SizeT Line) noexcept
-				: Exception(File, FunctName, Line, L"Ітератор на кінець не є визначеним")
-			{};
-
-			/////<summary>Текстове представлення інформації про помилки помилки</summary>
-			//virtual ExceptionString toString() const override final {
-			//	return ExceptionString(exeptionName)
-			//		+ ExceptionString(L". ")
-			//		+ location.toString()
-			//		+ ExceptionString(L". ");
-			//}
-		};
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		///<summary>Шаблон потоко-захищеного двозвязний список
@@ -195,8 +174,13 @@ namespace Seed {
 				///<summary>Константний постфіксний інкремент</summary>
 				const Iterator operator++(int) const
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					Iterator node(*this);
-					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
+					if (This == nullptr)
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					This->RefCount--;
 					if (this->This->father == nullptr)
 					{
@@ -217,8 +201,13 @@ namespace Seed {
 				///<summary>Константний постфіксний декремент</summary>
 				const Iterator operator--(int) const
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					Iterator node(*this);
-					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
+					if (This == nullptr) 
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					This->RefCount--;
 					if (This->father == nullptr)
 					{
@@ -239,29 +228,39 @@ namespace Seed {
 				///<summary>Префіксний інкремент</summary>
 				Iterator & operator++()
 				{
-					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
+					if (This == nullptr) 
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					This->RefCount--;
 					if (This->father == nullptr)
 					{
 						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
+						if (This->RefCount == 0)
+							delete This;
 						This = nullptr;
-						return *this;
 					}
 					else
 					{
-						return this->This->father->lock.ShareLock([&]()
+						this->This->father->lock.ShareLock([&]()
 						{
 							this->This = this->This->next;
 							if (This != nullptr) This->RefCount++;
-							return *this;
 						});
 					}
+					return *this;
 				}
 				///<summary>Префіксний декремент</summary>
 				Iterator & operator--()
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					if (This == nullptr)
-						Throw(EndNodeNotDeferencable(ExceptionPosition));
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					This->RefCount--;
 					if (this->This->father == nullptr)
 					{
@@ -310,32 +309,48 @@ namespace Seed {
 				///<returns>Значення елемента</returns>
 				__forceinline T & operator*()
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					if (This == nullptr)
-						Throw(EndNodeNotDeferencable(ExceptionPosition));
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					return This->value;
 				}
 				///<summary>Константний оператор розіменування ітератора</summary>
 				///<returns>Константне значення елемента</returns>
 				__forceinline const T & operator*() const
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					if (This == nullptr)
-						Throw(EndNodeNotDeferencable(ExceptionPosition));
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					return This->value;
 				}
 				///<summary>Оператор доступу до полів/методів структури/класу</summary>
 				///<returns>Покажчик на елемент</returns>
 				__forceinline T * operator->()
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					if (This == nullptr)
-						Throw(EndNodeNotDeferencable(ExceptionPosition));
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					return &This->value;
 				}
 				///<summary>Константний оператор доступу до полів/методів структури/класу</summary>
 				///<returns>Константний покажчик на елемент</returns>
 				__forceinline const T * operator->() const
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					if (This == nullptr)
-						Throw(EndNodeNotDeferencable(ExceptionPosition));
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					return &This->value;
 				}
 #pragma endregion
@@ -344,7 +359,12 @@ namespace Seed {
 				///<summary>Вертає наступний елемент</summary>
 				__forceinline const Iterator Next() const
 				{
-					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
+					if (This == nullptr) 
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					if (This->father = nullptr)
 						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
 						return Iterator(nullptr);
@@ -358,7 +378,12 @@ namespace Seed {
 				///<summary>Попередній елемент</summary>
 				__forceinline const Iterator Prev() const
 				{
-					if (This == nullptr) Throw(EndNodeNotDeferencable(ExceptionPosition));
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
+					if (This == nullptr) 
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					if (This->father = nullptr)
 						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
 						return Iterator(nullptr);
@@ -371,23 +396,26 @@ namespace Seed {
 #pragma endregion
 #pragma region List element manipulations
 				///<summary>Видалення значення ітератора, ітератор отримує значення наступного елемента</summary>
-				void Remove()
+				Iterator Remove()
 				{
+					extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line);
 					if (this->This == nullptr)
-						Throw(EndNodeNotDeferencable(ExceptionPosition));
+						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
 					list_data * data = this->This->father;
 					if (this->This->father == nullptr)
 					{
 						if (--This->RefCount == 0)
 							delete This;
 						This = nullptr;
-						return;
+						return *this;
 					}
 					else
 						//Якщо власник існує то видалення виконується в екслюзивному блокуванні
 						this->This->father->lock.ExclusiveLock([&]()
 					{
-						--((This)->RefCount);
 						if (this->This->next == nullptr && this->This->prev == nullptr)
 						{
 							if (this->This->father != nullptr)
@@ -410,19 +438,23 @@ namespace Seed {
 							this->This->next->prev = nullptr;
 							this->This->father->root = this->This->next;
 						}
-						if (this->This->father != nullptr)
-							--((This)->RefCount);
-						if (this->This->RefCount == 0)
+
+						--((This)->father->size);
+						
+						if (--this->This->RefCount == 0)
 						{
+							auto newThis = this->This->next;
 							delete this->This;
+							this->This = newThis;
 						}
 						else
 						{
 							this->This->next = nullptr;
 							this->This->prev = nullptr;
-							this->This = nullptr;
+							this->This = this->This->next;
 						}
 					});
+					return *this;
 				}
 #pragma region Adding element to list by iterator
 				///<summary>Вставка елемента після заданого</summary>
@@ -441,10 +473,17 @@ namespace Seed {
 				///<param name = "Value">Значення нового елемента</summary>
 				__forceinline Iterator AddAfter(const T & Value)
 				{
+					extern __declspec(noreturn) void ThrowNullPointException(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line,
+						const Seed::SizeT Address,
+						const Seed::UInt8 Mode);
+					
 					if (This == nullptr)
-						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					if (This->father == nullptr)
-						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 					//Виконується в екслюзивному блокуванні
 					return This->father->lock.ExclusiveLock([&]() mutable
 					{
@@ -467,10 +506,16 @@ namespace Seed {
 				///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
 				__forceinline Iterator AddAfter(T && Value)
 				{
+					extern __declspec(noreturn) void ThrowNullPointException(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line,
+						const Seed::SizeT Address,
+						const Seed::UInt8 Mode);
 					if (This == nullptr)
-						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					if (This->father == nullptr)
-						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 					//Виконується в екслюзивному блокуванні
 					return This->father->lock.ExclusiveLock([&]() mutable  
 					{
@@ -493,10 +538,16 @@ namespace Seed {
 				///<param name = "Value">Значення нового елемента</summary>
 				__forceinline Iterator AddBefore(const T & Value)
 				{
+					extern __declspec(noreturn) void ThrowNullPointException(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line,
+						const Seed::SizeT Address,
+						const Seed::UInt8 Mode);
 					if (This == nullptr)
-						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					if (This->father == nullptr)
-						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 					//Виконується в екслюзивному блокуванні
 					return This->father->lock.ExclusiveLock([&]() mutable
 					{
@@ -519,10 +570,16 @@ namespace Seed {
 				///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
 				__forceinline Iterator AddBefore(T && Value)
 				{
+					extern __declspec(noreturn) void ThrowNullPointException(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line,
+						const Seed::SizeT Address,
+						const Seed::UInt8 Mode);
 					if (This == nullptr)
-						Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					if (This->father == nullptr)
-						Throw(NullPointException(ExceptionPosition, (SizeT)This->father, NullPointException::Types::Read));
+						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 					//Виконується в екслюзивному блокуванні
 					return This->father->lock.ExclusiveLock([&]() mutable
 					{
@@ -905,7 +962,7 @@ namespace Seed {
 			}
 #pragma endregion
 
-		private:
+		public:
 #pragma region For each support methods
 			///<summary>Вертає константний ітератор на початок для циклу з перебором</summary>
 			__forceinline const Iterator begin() const

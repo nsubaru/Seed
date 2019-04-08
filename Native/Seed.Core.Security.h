@@ -1,4 +1,4 @@
-//#pragma once
+#pragma once
 //#include "Seed.Core.Base.h"
 //#include "Seed.Core.Containers.BitMap.h"
 //#include "Seed.Core.Containers.Array.h"
