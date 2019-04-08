@@ -34,13 +34,13 @@ namespace Seed {
 			//Пустий конструктор, генерує нульовий ідентифікатор
 			constexpr __forceinline UUID() noexcept : uuid({ 0 }) { }
 			//Конструктор з GUID
-			__forceinline UUID(const GUID & uuid) noexcept { this->uuid = uuid; }
+			__forceinline UUID(const GUID& uuid) noexcept { this->uuid = uuid; }
 
 			//Неявне перетворення в GUID потрібно для сумісності з Nt і Rtl функціями ntdll
-			__forceinline operator const GUID&() const noexcept { return this->uuid; }
+			__forceinline operator const GUID& () const noexcept { return this->uuid; }
 
 			//Постфіксний декремени
-			__forceinline UUID & operator--() noexcept {
+			__forceinline UUID& operator--() noexcept {
 				if (uuid.Data4[3] == 0)
 					if (uuid.Data4[2] == 0)
 						if (uuid.Data4[1] == 0)

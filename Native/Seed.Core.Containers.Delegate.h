@@ -91,13 +91,13 @@ namespace Seed {
 		{
 		protected:
 			//Вертає результат. Реалізація в TemplateFunctionT
-			virtual void * __get_result(const TypeInfo & type) = 0;
+			virtual void* __get_result(const TypeInfo& type) = 0;
 		public:
 			//Виконує функцію. Реалізація в TemplateFunctionT
 			virtual void Init() = 0;
 			//Вертає true якщо функція запущена. Реалізація в TemplateFunctionT
 			virtual bool IsStarted() const noexcept = 0;
-			//Вертає true якщо функція завершила свою роботу. 
+			//Вертає true якщо функція завершила свою роботу.
 			//Якщо при виконанні викликано було помилку то функція буде важатись завершеною
 			//Але результату не буде і при спробі його отримати буде згенеровано помилку NullPointExeption
 			//Реалізація в TemplateFunctionT
@@ -118,7 +118,7 @@ namespace Seed {
 	}
 }
 
-//Внутрішні структури для запуску функції і розкрутки аргументів. 
+//Внутрішні структури для запуску функції і розкрутки аргументів.
 //Магія, не чіпати
 template<typename F, typename Tuple, bool Enough, int TotalArgs, int... N>
 struct call_impl
@@ -130,7 +130,7 @@ struct call_impl
 		>::call(f, Seed::ForwardReference<Tuple>(t));
 	}
 };
-//Внутрішні структури для запуску функції і розкрутки аргументів. 
+//Внутрішні структури для запуску функції і розкрутки аргументів.
 //Магія, не чіпати
 template<typename F, typename Tuple, int TotalArgs, int... N>
 struct call_impl<F, Tuple, true, TotalArgs, N...>
@@ -140,7 +140,7 @@ struct call_impl<F, Tuple, true, TotalArgs, N...>
 		return f(Seed::MoveRValue(t.Get<N>())...);
 	}
 };
-//Внутрішні структури для запуску функції і розкрутки аргументів. 
+//Внутрішні структури для запуску функції і розкрутки аргументів.
 //Магія, не чіпати
 template<typename F, typename Tuple>
 auto __forceinline call(F f, Tuple&& t)
@@ -161,7 +161,7 @@ class TemplateFunctionT :public Seed::Core::FunctionObj
 	//Функція
 	F f;
 	//Контейнер для результату
-	void * result;
+	void* result;
 	//Контейнер для аргументів
 	Seed::Tuple<Args...> args;
 	//Флаг завершення виконання функції
@@ -175,7 +175,7 @@ protected:
 	//Генерить наступні ексепшини
 	//- NullPointExeption якщо результату немає, або функція завершилась через генерацію ексепшина
 	//- InvalidType якщо типи результату не коректний
-	__forceinline virtual void * __get_result(const Seed::TypeInfo & type) override final
+	__forceinline virtual void* __get_result(const Seed::TypeInfo& type) override final
 	{
 		if constexpr (Seed::Core::StaticAsserts::IsSame<retType, void>::State)
 			Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(void), type));
@@ -189,8 +189,8 @@ protected:
 		}
 	}
 public:
-	//Виконанує функцію, записує що функція запустилась і завершилась, 
-	//і якщо результат функції на void то і результат запам'ятовує 
+	//Виконанує функцію, записує що функція запустилась і завершилась,
+	//і якщо результат функції на void то і результат запам'ятовує
 	__forceinline void Init() override final
 	{
 		isStarted = true;
@@ -246,8 +246,8 @@ public:
 
 namespace Seed {
 	inline namespace Core {
-		//Делегат це об'єкт який інкапсулює, функцію з аргументами, 
-		//тим самим дозволяючи її відкладено виконати, 
+		//Делегат це об'єкт який інкапсулює, функцію з аргументами,
+		//тим самим дозволяючи її відкладено виконати,
 		//навіть в іншому потоці, apc якогось потоку чи пулі потоків
 		class SeedKernelCall Delegate : protected IDisposable
 		{
@@ -255,13 +255,13 @@ namespace Seed {
 			//Внутрішня структура в які дані делегата
 			struct delegate
 			{
-				FunctionObj * function;
+				FunctionObj* function;
 				RefCountT RefCount;
-				__forceinline delegate(FunctionObj *  function) : function(function), RefCount(1)
+				__forceinline delegate(FunctionObj* function) : function(function), RefCount(1)
 				{}
 			};
 			//Покажчик на дані даного делегата
-			delegate * data;
+			delegate* data;
 
 			// Inherited via IDisposable
 			virtual void Dispose() override final
@@ -295,7 +295,7 @@ namespace Seed {
 			}
 
 			//Запуск функції, можливий лиш раз, для отримання результату є функція GetResult<T>
-			//генерує наступні помилки: 
+			//генерує наступні помилки:
 			//- NullPointExeption якщо дані делегата силаються на nullptr
 			//- AlredyExecuteOrExecuteEnded якщо делегат виконувався або виконується
 			__forceinline void Init()

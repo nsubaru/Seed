@@ -20,7 +20,7 @@ namespace Seed {
 				Hour(Hour), Minutes(Minutes), Second(Seconds), MiliSecond(MiliSeconds) {};
 
 			//Конструктор з об'єкта клас час
-			Date(const DateTime & time) noexcept;
+			Date(const DateTime& time) noexcept;
 			//Конвертація в час
 			operator DateTime() const noexcept;
 			~Date() {};
@@ -36,13 +36,13 @@ namespace Seed {
 			//Конструктор з задаванням 100 наносекндних інтервалах
 			DateTime(UInt64 time) :time_ms(time) {};
 			//Копіювальний конструктор
-			DateTime(const DateTime & orig) :time_ms(orig.time_ms) {};
+			DateTime(const DateTime& orig) :time_ms(orig.time_ms) {};
 			//Оператор присвоєння
-			DateTime & operator=(const DateTime & from) { this->time_ms = from.time_ms; return *this; }
+			DateTime& operator=(const DateTime& from) { this->time_ms = from.time_ms; return *this; }
 			//Оператор додавання до
-			DateTime & operator+=(DateTime time) { this->time_ms += time.time_ms; return *this; }
+			DateTime& operator+=(DateTime time) { this->time_ms += time.time_ms; return *this; }
 			//Оператор віднімання від
-			DateTime & operator-=(DateTime time) { this->time_ms -= time.time_ms; return *this; }
+			DateTime& operator-=(DateTime time) { this->time_ms -= time.time_ms; return *this; }
 			//Оператор додавання
 			friend DateTime operator+(DateTime time1, DateTime time2) { return time1.time_ms + time2.time_ms; }
 			//Оператор віднімання
@@ -64,7 +64,7 @@ namespace Seed {
 			//Деструктор
 			~DateTime() {};
 			//Конвертуючий конструктор
-			friend Date::Date(const DateTime & time) noexcept;
+			friend Date::Date(const DateTime& time) noexcept;
 
 			static constexpr UInt64 SecondInNtTime = 1000ULL * 10000ULL;
 		};

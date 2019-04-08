@@ -10,7 +10,7 @@ namespace Seed {
 		class Array {
 		private:
 			///<summary>Масив</summary>
-			T * arr;
+			T* arr;
 			///<summary>Розмір</summary>
 			SizeT count;
 		public:
@@ -36,7 +36,7 @@ namespace Seed {
 
 			///<summary>Конструктор через list-initializer</summary>
 			///<param name = 'list'>Статичний список ініціалізація</param>
-			__forceinline Array(const CRT::initializer_list<T> & list) : arr(new T[list.size()]), count(list.size()) {
+			__forceinline Array(const CRT::initializer_list<T>& list) : arr(new T[list.size()]), count(list.size()) {
 				auto it = list.begin();
 				for (SizeT i = 0; i < count; i++)
 					this->arr[i] = *it, it++; //-V108
@@ -45,26 +45,26 @@ namespace Seed {
 			///<summary>Копіювальний конструктор з С подібного масиву і його розміру</summary>
 			///<param name = 'RawArray'>С-подібний масив</param>
 			///<param name = 'RawArraySize'>Розмір масиву</param>
-			__forceinline Array(const T* RawArray, SizeT RawArraySize) : arr(new T[RawArraySize]), count(RawArraySize) {
+			__forceinline Array(const T * RawArray, SizeT RawArraySize) : arr(new T[RawArraySize]), count(RawArraySize) {
 				Memory::Copy(RawArray, this->arr, RawArraySize);
 			}
 
 			///<summary>Конструктор переміщення для С подібного масиву і його розміру</summary>
 			///<param name = 'RawArray'>С-подібний масив який буде переміщатись</param>
 			///<param name = 'Count'>Кількість елементів в масиві</param>
-			__forceinline Array(T *&& RawArray, SizeT Count) : arr(MoveRValue(RawArray)), count(Count) { RawArray = nullptr; }
+			__forceinline Array(T * &&RawArray, SizeT Count) : arr(MoveRValue(RawArray)), count(Count) { RawArray = nullptr; }
 
 			///<summary>Копіювальний конструктор</summary>
 			///<param name = 'Orig'>Оригинал масиву</param>
-			Array(const Array<T>& Orig);
+			Array(const Array<T> & Orig);
 			///<summary>Конструктор переміщення</summary>
 			///<param name = 'From'>Оригинал який буде обнулено після виклику конструктора</param>
-			Array(Array<T>&& From) noexcept;
+			Array(Array<T> && From) noexcept;
 
 			///<summary>Оператор присвоєння</summary>
 			///<param name = 'From'>Оригинал масиву</param>
 			///<returns>Силка на копію масиву</returns>
-			__forceinline Array<T> & operator=(const Array<T> & From) {
+			__forceinline Array<T>& operator=(const Array<T> & From) {
 				if (this == &From) return *this;
 				this->~Array();
 				this->count = From.count;
@@ -79,7 +79,7 @@ namespace Seed {
 			///<summary>Оператор переміщення</summary>
 			///<param name = 'From'>Оригинал який буде обнулено після виклику конструктора</param>
 			///<returns>Силка на копію масиву</returns>
-			__forceinline Array<T> & operator=(Array<T> && From) noexcept {
+			__forceinline Array<T>& operator=(Array<T> && From) noexcept {
 				this->count = From.count;
 				this->arr = From.arr;
 				From.arr = nullptr;
@@ -141,7 +141,7 @@ namespace Seed {
 
 			///<summary>Оператор перетворення який вертає константний покажчик на С подібний масив</summary>
 			///<returns>Покажчик на внутрішній масив</returns>
-			DeprecatedCall("Робота з с-подібнимим масивами") operator const T*() const {
+			DeprecatedCall("Робота з с-подібнимим масивами") operator const T * () const {
 				return arr;
 			}
 
@@ -169,7 +169,7 @@ namespace Seed {
 
 			///<summary>Перевертає елементи масиву</summary>
 			///<returns>Силку на поточний масив після зміни порядку елементів</returns>
-			__forceinline Array<T> & Reverse() {
+			__forceinline Array<T>& Reverse() {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 				Seed::Reverse(arr, count);
@@ -248,11 +248,11 @@ namespace Seed {
 		///<summary>Копіювальний конструктор</summary>
 		///<param name = 'Orig'>Оригинал масиву</param>
 		template<typename T>
-		__forceinline Array<T>::Array(const Array& orig) {
+		__forceinline Array<T>::Array(const Array & orig) {
 			this->arr = new T[orig.count];
 #pragma warning(push)
 #pragma warning(disable: 4996)
-			Memory::Copy(orig.arr, this->arr, sizeof(T)*orig.count);
+			Memory::Copy(orig.arr, this->arr, sizeof(T) * orig.count);
 #pragma warning(pop)
 			this->count = orig.count;
 		}
@@ -260,7 +260,7 @@ namespace Seed {
 		///<summary>Конструктор переміщення</summary>
 		///<param name = 'From'>Оригинал який буде обнулено після виклику конструктора</param>
 		template<typename T>
-		__forceinline Array<T>::Array(Array&& orig) noexcept {
+		__forceinline Array<T>::Array(Array && orig) noexcept {
 			this->arr = orig.arr;
 			this->count = orig.count;
 			orig.arr = nullptr;

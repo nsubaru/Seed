@@ -11,7 +11,6 @@ extern void ReleaseLockExclusiveSRWLock(void* PSRWLock);
 extern void AcquireLockSharedSRWLock(void* PSRWLock);
 extern void ReleaseLockSharedSRWLock(void* PSRWLock);
 
-
 extern void PulseNtEvent(void* handle);
-extern void SetNtEvent(void * handle);
-extern void ResetNtEvent(void * handle);
+extern void SetNtEvent(void* handle);
+extern void ResetNtEvent(void* handle);

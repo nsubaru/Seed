@@ -16,7 +16,7 @@ struct {
 	RTL_CRITICAL_SECTION lock;
 } LogFile;
 
-void FormatCurrentTime(Seed::Char * buffer) {
+void FormatCurrentTime(Seed::Char* buffer) {
 	using namespace Seed;
 	LARGE_INTEGER timeMs, localTimeMs;
 	TIME_FIELDS timeFields;
@@ -55,7 +55,7 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 	BOOLEAN state;
 	RtlAdjustPrivilege(SE_TIME_ZONE_PRIVILEGE, TRUE, FALSE, &state);
 	Char raw[sizeof(size_t) + 1024];
-	UNICODE_STRING * str = (UNICODE_STRING*)raw; //-V2005
+	UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005
 	UNICODE_STRING name;
 	{
 		str->Length = 0;
@@ -142,7 +142,7 @@ void Seed::Core::Stop::Loging() noexcept
 	RtlDeleteCriticalSection(&LogFile.lock);
 }
 
-bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::ExceptionString>& lines)
+bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::ExceptionString> & lines)
 {
 	if (lines.Count == 0) return true;
 	try

@@ -24,10 +24,10 @@ void Seed::Core::Thread::Event::Dispose()
 Seed::Core::Thread::Event::Event(Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, String()))
 {
 	NTSTATUS status = NtCreateEvent(
-		&data->handle, 
-		GENERIC_ALL, 
-		NULL, 
-		(IsManualReset) ? EVENT_TYPE::SynchronizationEvent : EVENT_TYPE::NotificationEvent, 
+		&data->handle,
+		GENERIC_ALL,
+		NULL,
+		(IsManualReset) ? EVENT_TYPE::SynchronizationEvent : EVENT_TYPE::NotificationEvent,
 		FALSE
 	);
 
@@ -35,7 +35,7 @@ Seed::Core::Thread::Event::Event(Seed::Boolean IsManualReset) noexcept : data(ne
 		Throw(NtException(ExceptionPosition, status));
 }
 
-Seed::Core::Thread::Event::Event(const Seed::String& name, Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, name)) {
+Seed::Core::Thread::Event::Event(const Seed::String & name, Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, name)) {
 	OBJECT_ATTRIBUTES attrbs;
 	UNICODE_STRING label;
 	RtlInitUnicodeStringEx(&label, (PWSTR)(ConstCharStr)data->Name);
@@ -53,7 +53,7 @@ Seed::Core::Thread::Event::Event(const Seed::String& name, Seed::Boolean IsManua
 		Throw(NtException(ExceptionPosition, status));
 }
 
-Seed::Core::Thread::Event::Event(Seed::String&& name, Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, name)) {
+Seed::Core::Thread::Event::Event(Seed::String && name, Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, name)) {
 	OBJECT_ATTRIBUTES attrbs;
 	UNICODE_STRING label;
 	RtlInitUnicodeStringEx(&label, (PWSTR)(ConstCharStr)data->Name);
@@ -143,7 +143,7 @@ void Seed::Core::Thread::Wait(UInt64 TargetTID, SizeT Timeout)
 	Throw(InvalidThread(ExceptionPosition, TargetTID));
 }
 
-Seed::Core::List<Seed::Core::Thread> Seed::Core::Thread::GetByLabel(const Seed::Core::String& Label)
+Seed::Core::List<Seed::Core::Thread> Seed::Core::Thread::GetByLabel(const Seed::Core::String & Label)
 {
 	List<Thread> rets;
 	for (auto& thread : *Threads) {
@@ -160,7 +160,6 @@ Seed::Core::List<Seed::Core::Thread> Seed::Core::Thread::GetAllThreads()
 	return *Threads;
 }
 
-
 bool Seed::Core::InitCoreThreading() noexcept
 {
 	auto nativeMainThread = Thread(L"Native main thread");
@@ -171,7 +170,7 @@ bool Seed::Core::InitCoreThreading() noexcept
 		THREADINFOCLASS::ThreadNameInformation,
 		&name,
 		sizeof(THREAD_NAME_INFORMATION));
-	NTSTATUS status = 
+	NTSTATUS status =
 		NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &nativeMainThread.thread->handle, GENERIC_ALL, 0, 0);
 	if (!NT_SUCCESS(status))
 		return false;
@@ -201,9 +200,9 @@ Seed::Int32 Seed::Core::ThreadInitRoute(void* arg) noexcept {
 	THREAD_NAME_INFORMATION name;
 	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)This->thread->Label);
 	NtSetInformationThread(
-		NtCurrentThread(), 
-		THREADINFOCLASS::ThreadNameInformation, 
-		&name, 
+		NtCurrentThread(),
+		THREADINFOCLASS::ThreadNameInformation,
+		&name,
 		sizeof(THREAD_NAME_INFORMATION)
 	);
 	try {
@@ -234,7 +233,7 @@ Seed::Int32 Seed::Core::ThreadInitRoute(void* arg) noexcept {
 			return STATUS_UNHANDLED_EXCEPTION;
 		}
 	}
-	catch (Exception& ex) {
+	catch (Exception & ex) {
 		toCoreLog(L"Внутрішня помилка при виконані APC", ex);
 		This->thread->state = Seed::Thread::ThreadState::ClosedByExeption;
 		NtTestAlert();
@@ -264,7 +263,7 @@ NTSTATUS __cdecl threadStartRoutineDynEntryPoint(PVOID args) {
 	return result;
 }
 
-void Seed::Core::Thread::ExecDelegate(Seed::Delegate&& ThreadMain) {
+void Seed::Core::Thread::ExecDelegate(Seed::Delegate && ThreadMain) {
 	thread->EntryPoint = new Delegate(MoveRValue(ThreadMain));
 	if (this->thread->thread_list_node != nullptr)
 		Throw(ThreadAlredyStrated(ExceptionPosition));
@@ -288,11 +287,11 @@ void Seed::Core::Thread::ExecDelegate(Seed::Delegate&& ThreadMain) {
 	this->thread->ID = reinterpret_cast<SizeT>(id.UniqueThread);
 }
 
-void Seed::Core::Thread::ChangeLabel(const String& NewLabel) {
+void Seed::Core::Thread::ChangeLabel(const String & NewLabel) {
 	if (thread->ID != -1) {
 		ULONG suspendCount;
 		NTSTATUS status = NtSuspendThread(thread->handle, &suspendCount);
-		if(NT_SUCCESS(status))
+		if (NT_SUCCESS(status))
 			Throw(InvalidThreadObj(ExceptionPosition));
 		thread->Label = NewLabel;
 		THREAD_NAME_INFORMATION name;
@@ -317,7 +316,7 @@ void Seed::Core::Thread::ExecApc() {
 			Throw(InvalidThreadObj(ExceptionPosition));
 		NtAlertResumeThread(thread->handle, &suspendCount);
 	}
-	else 
+	else
 		Throw(InvalidThreadObj(ExceptionPosition));
 }
 
@@ -345,9 +344,9 @@ void NTAPI APCDelegateExecutor(void* arg, void*, void*) {
 	delete delegate;
 }
 
-void Seed::Core::Thread::DispatchAPC(Delegate&& APCDelegate) {
+void Seed::Core::Thread::DispatchAPC(Delegate && APCDelegate) {
 	if (thread->ID != -1) {
-		NTSTATUS status = 
+		NTSTATUS status =
 			NtQueueApcThread(thread->handle, APCDelegateExecutor, new Delegate(MoveRValue(APCDelegate)), NULL, NULL);
 		if (NT_SUCCESS(status))
 			Throw(NtException(ExceptionPosition, status));
@@ -377,12 +376,11 @@ __declspec(noreturn, noinline, safebuffers) void DontOptimize() {
 
 Seed::Core::Thread& Seed::Core::Thread::Interupt()
 {
-	
 	if (this->thread->state == ThreadState::Init)
 	{
 		this->thread->abortEvent->Wait();
 	}
-	else 
+	else
 		if (this->thread->state != ThreadState::Work)
 		{
 			Throw(InvalidThreadObj(ExceptionPosition));

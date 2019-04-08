@@ -4,9 +4,9 @@
 namespace Seed {
 	inline namespace Core {
 		SeedKernelCall InternalApiCall Boolean toCoreLog(const Char* Value, SizeT Lenght);
-		
+
 		template<SizeT Lenght>
-		__forceinline Boolean toCoreLog(const wchar_t (&Msg)[Lenght]) {
+		__forceinline Boolean toCoreLog(const wchar_t(&Msg)[Lenght]) {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 			return toCoreLog(Msg, Lenght);

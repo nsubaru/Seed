@@ -131,13 +131,13 @@ namespace Seed {
 					RefCountT RefCount;
 					///<summary>Ім'я обєкта події в об'єктній системі NT, якщо немає то рядок пустий</summary>
 					String Name;
-	
+
 					///<summary>Конструктор з отриманням дескриптора</summary>
-					event_data(Boolean IsManualReset, const String& name) 
+					event_data(Boolean IsManualReset, const String& name)
 						:IsManualReset(IsManualReset), handle(nullptr), RefCount(1), Name(name)
 					{};
 					///<summary>Конструктор з оптимізована отриманням дескриптора</summary>
-					event_data(Boolean IsManualReset, String&& name) 
+					event_data(Boolean IsManualReset, String&& name)
 						:IsManualReset(IsManualReset), handle(nullptr), RefCount(1), Name(MoveRValue(name))
 					{};
 				};
@@ -178,7 +178,7 @@ namespace Seed {
 			};
 
 			///<summary>Блокувальник для багатопотокових об'єктів
-			///<para> Принцип наступний, дозволяє дочекатись 
+			///<para> Принцип наступний, дозволяє дочекатись
 			///завершення всіх операції запущених в блоці Guard
 			///методом WaitFree
 			///Також методом IsFree можна провірити чи зараз відбувається виконання
@@ -231,7 +231,7 @@ namespace Seed {
 								this->data->EventHandle.Reset();
 								this->data->GuardsCount++;
 								scope();
-								
+
 								if (--data->GuardsCount == 0)
 									this->data->EventHandle.Set();
 								});
@@ -332,36 +332,36 @@ namespace Seed {
 #pragma warning(pop)
 				///<summary>Пустий конструктор</summary>
 				__forceinline ThreadData() noexcept :
-					state(ThreadState::NotStarted), 
-					Label(), 
-					handle(nullptr), 
-					ID(-1), 
-					RefCount(1), 
-					thread_list_node(), 
-					abortEvent(nullptr), 
+					state(ThreadState::NotStarted),
+					Label(),
+					handle(nullptr),
+					ID(-1),
+					RefCount(1),
+					thread_list_node(),
+					abortEvent(nullptr),
 					EntryPoint(nullptr)
 				{};
 				///<summary>Конструктор з імен потоку</summary>
 				///<param name = "label">Назва потоку</param>
 				__forceinline ThreadData(const String& label) :
-					state(ThreadState::NotStarted), 
-					Label(label), 
-					handle(nullptr), 
-					ID(-1), 
-					RefCount(1), 
-					thread_list_node(), 
-					abortEvent(nullptr), 
+					state(ThreadState::NotStarted),
+					Label(label),
+					handle(nullptr),
+					ID(-1),
+					RefCount(1),
+					thread_list_node(),
+					abortEvent(nullptr),
 					EntryPoint(nullptr)
 				{};
 				///<summary>Конструктор з оптимізованою передачею імені потока</summary>
 				///<param name = "label">Назва потоку</param>
 				__forceinline ThreadData(String&& label) :
-					state(ThreadState::NotStarted), 
-					Label(MoveRValue(label)), 
-					handle(nullptr), ID(-1), 
-					RefCount(1), 
-					thread_list_node(), 
-					abortEvent(nullptr), 
+					state(ThreadState::NotStarted),
+					Label(MoveRValue(label)),
+					handle(nullptr), ID(-1),
+					RefCount(1),
+					thread_list_node(),
+					abortEvent(nullptr),
 					EntryPoint(nullptr)
 				{};
 			};
@@ -375,7 +375,7 @@ namespace Seed {
 			extern friend void StopCoreThreading() noexcept;
 
 			///<summary>Внутрішня функція ініціалізації потоку</summary>
-			extern friend Int32 ThreadInitRoute(void * arg) noexcept;
+			extern friend Int32 ThreadInitRoute(void* arg) noexcept;
 		protected:
 			///<summary>Знищення останього екземпляра</summary>
 			virtual void Dispose() override final;
@@ -461,9 +461,8 @@ namespace Seed {
 			{
 				return thread->ID;
 			}
-			
-			ID Property(GetThisThreadID) TID;
 
+			ID Property(GetThisThreadID) TID;
 
 			//Оператор перетворення вертає true яко потік запущений, false якщо ні
 			__forceinline operator Boolean() const

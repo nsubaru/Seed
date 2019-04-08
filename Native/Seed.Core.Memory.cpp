@@ -36,7 +36,6 @@ constexpr Seed::ConstString InternalHeapName = L"внутрішній";
 constexpr Seed::ConstString DefaultHeapName = L"загальній";
 constexpr Seed::ConstString SecureHeapName = L"захищеній";
 
-
 #pragma region Loging
 template<SizeT HeapNameSize>
 void LogAllocating(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)[HeapNameSize]) {
@@ -46,8 +45,8 @@ void LogAllocating(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)
 	str += SafeString::toString(MemBlkIndex);
 	str += L" розміром ";
 	str += SafeString::toString(MemBlkSize);
-	str += L" байт з кучі "; 
-	str += HeapName; 
+	str += L" байт з кучі ";
+	str += HeapName;
 	str += L".";
 	toCoreLog(str);
 }
@@ -93,7 +92,7 @@ void Seed::Core::Memory::Heap::Stop() noexcept
 #ifndef ReleaseMode
 __declspec(allocator)
 #endif // !ReleaseMode
-void * GenericAllocate(Seed::SizeT Size)
+void* GenericAllocate(Seed::SizeT Size)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -123,7 +122,7 @@ void * GenericAllocate(Seed::SizeT Size)
 #ifndef ReleaseMode
 __declspec(allocator)
 #endif // !ReleaseMode
-void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
+void* GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -137,7 +136,7 @@ void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 	//Виділяєм ділянку більшу для того щоб помістити розмір і реальний початок ділянки пам'яті
 	//Також враховуєм що ділянка може бути не вирівнена тому додаєм AllocationReq до розміру,
 	//щоб гарантувати щоб вирівнений адрес знайдеться в ділянці
-	void * obj = RtlAllocateHeap(HeapData.HeapHandle, 0, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
+	void* obj = RtlAllocateHeap(HeapData.HeapHandle, 0, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
 	//Якщо функція вернула nullptr то це значить що або розмір завеликий або пам'яті немає
 	//В обох випадках генеруєм помилку OutOfMemory
 	if (obj == nullptr)
@@ -160,7 +159,7 @@ void * GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 	return (void*)AllignedAddress;
 }
 
-void * GenericFree(void * MemBlk)
+void* GenericFree(void* MemBlk)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -168,7 +167,7 @@ void * GenericFree(void * MemBlk)
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
-	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
+	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
 	//Отримуєм розмір ділянки пам'яті
 	SizeT DataSize = RealPtr[0];
 #if PreReleaseMode || DebugMode
@@ -180,15 +179,15 @@ void * GenericFree(void * MemBlk)
 	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//Якщо вдало то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)& HeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)& HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
 	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
-void * GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
+void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -210,8 +209,8 @@ void * GenericAllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
 	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//Якшо успішно то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)& HeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)& HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
@@ -260,7 +259,7 @@ void Seed::Core::Memory::SensitiveDataHeap::Stop() noexcept
 #ifndef ReleaseMode
 __declspec(allocator)
 #endif // !ReleaseMode
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Allocate(Seed::SizeT Size)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::SensitiveDataHeap::Allocate(Seed::SizeT Size)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -290,7 +289,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 #ifndef ReleaseMode
 __declspec(allocator)
 #endif // !ReleaseMode
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::SensitiveDataHeap::AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -305,7 +304,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	//Також враховуєм що ділянка може бути не вирівнена тому додаєм AllocationReq до розміру,
 	//щоб гарантувати щоб вирівнений адрес знайдеться в ділянці
 	//Вказуєм системі обнулити ділянку пам'яті пееред виділенням
-	void * obj = RtlAllocateHeap(SecureHeapData.HeapHandle, HEAP_ZERO_MEMORY, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
+	void* obj = RtlAllocateHeap(SecureHeapData.HeapHandle, HEAP_ZERO_MEMORY, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
 	//Якщо функція вернула nullptr то це значить що або розмір завеликий або пам'яті немає
 	//В обох випадках генеруєм помилку OutOfMemory
 	if (obj == nullptr)
@@ -328,7 +327,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	return (void*)AllignedAddress;
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::Free(void * MemBlk)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::SensitiveDataHeap::Free(void* MemBlk)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -336,7 +335,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
-	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
+	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
 	//Отримуєм розмір ділянки пам'яті
 	SizeT DataSize = RealPtr[0];
 #if PreReleaseMode || DebugMode
@@ -350,15 +349,15 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//Якщо вдало то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)& SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)& SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
 	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
-DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::SensitiveDataHeap::AllignedFree(void * MemBlk, Seed::SizeT AllocationReq)
+DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::SensitiveDataHeap::AllignedFree(void* MemBlk, Seed::SizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -382,8 +381,8 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void * Seed::Core::Memory::Sens
 	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//Якшо успішно то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)& SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)& SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
@@ -498,8 +497,8 @@ SizeT Seed::Core::Memory::CurrentTotalHeapsUsage() noexcept
 #pragma region Miscelenious functions
 #pragma intrinsic(memcpy)
 DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::Copy(
-	_In_reads_(Size) const void * Source,
-	_Out_writes_all_(Size) void * Destination,
+	_In_reads_(Size) const void* Source,
+	_Out_writes_all_(Size) void* Destination,
 	Seed::SizeT Size)
 {
 	memcpy(Destination, Source, Size);
@@ -507,7 +506,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::Copy(
 
 #pragma intrinsic(memset)
 DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::MemBlkFill(
-	_Out_writes_bytes_all_(Size) void * MemBlk,
+	_Out_writes_bytes_all_(Size) void* MemBlk,
 	Seed::SizeT Size,
 	_In_ const Seed::Byte Filler)
 {

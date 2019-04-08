@@ -19,17 +19,17 @@ static bool TypeidsEqual(const _RTTITypeDescriptor* const lhs, const _RTTITypeDe
 }
 
 #if _RTTI_RELATIVE_TYPEINFO
-static inline uintptr_t GetImageBase(const void * pCallerPC)
+static inline uintptr_t GetImageBase(const void* pCallerPC)
 {
-	void * _ImageBase;
+	void* _ImageBase;
 	_ImageBase = RtlPcToFileHeader(
-		const_cast<void *>(pCallerPC),
+		const_cast<void*>(pCallerPC),
 		&_ImageBase);
 	return reinterpret_cast<uintptr_t>(_ImageBase);
 }
 
 static inline uintptr_t GetImageBaseFromCompleteObjectLocator(
-	const _RTTICompleteObjectLocator * const pCompleteLocator
+	const _RTTICompleteObjectLocator* const pCompleteLocator
 )
 {
 	if (pCompleteLocator->signature == COL_SIG_REV0)
@@ -65,29 +65,29 @@ static inline uintptr_t GetImageBaseFromCompleteObjectLocator(
 #define IMAGEBASE_ARGUMENT
 #endif
 
-static void * FindCompleteObject(void *);
-static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(_RTTICompleteObjectLocator *,
-	_RTTITypeDescriptor *,
-	_RTTITypeDescriptor *
+static void* FindCompleteObject(void*);
+static _RTTIBaseClassDescriptor* FindSITargetTypeInstance(_RTTICompleteObjectLocator*,
+	_RTTITypeDescriptor*,
+	_RTTITypeDescriptor*
 	IMAGEBASE_PROTOTYPE
 );
-static _RTTIBaseClassDescriptor * FindMITargetTypeInstance(void *,
-	_RTTICompleteObjectLocator *,
-	_RTTITypeDescriptor *,
+static _RTTIBaseClassDescriptor* FindMITargetTypeInstance(void*,
+	_RTTICompleteObjectLocator*,
+	_RTTITypeDescriptor*,
 	ptrdiff_t,
-	_RTTITypeDescriptor *
+	_RTTITypeDescriptor*
 	IMAGEBASE_PROTOTYPE
 );
-static _RTTIBaseClassDescriptor * FindVITargetTypeInstance(void *,
-	_RTTICompleteObjectLocator *,
-	_RTTITypeDescriptor *,
+static _RTTIBaseClassDescriptor* FindVITargetTypeInstance(void*,
+	_RTTICompleteObjectLocator*,
+	_RTTITypeDescriptor*,
 	ptrdiff_t,
-	_RTTITypeDescriptor *
+	_RTTITypeDescriptor*
 	IMAGEBASE_PROTOTYPE
 );
-static ptrdiff_t PMDtoOffset(void *, const PMD&);
+static ptrdiff_t PMDtoOffset(void*, const PMD&);
 
-static inline _RTTICompleteObjectLocator * GetCompleteObjectLocatorFromObject(void * pointerToObject)
+static inline _RTTICompleteObjectLocator* GetCompleteObjectLocatorFromObject(void* pointerToObject)
 {
 	// Ptr to CompleteObjectLocator should be stored at vfptr[-1]
 	return static_cast<_RTTICompleteObjectLocator***>(pointerToObject)[0][-1];
@@ -102,8 +102,8 @@ static inline _RTTICompleteObjectLocator * GetCompleteObjectLocatorFromObject(vo
 // Side-effects: NONE.
 //
 
-extern "C" void * __cdecl __RTCastToVoid(
-	void * inptr)            // Pointer to polymorphic object
+extern "C" void* __cdecl __RTCastToVoid(
+	void* inptr)            // Pointer to polymorphic object
 	noexcept(false)
 {
 	if (inptr == nullptr)
@@ -121,8 +121,8 @@ extern "C" void * __cdecl __RTCastToVoid(
 // Side-effects: NONE.
 //
 
-extern "C" void * __cdecl __RTtypeid(
-	void * inptr)            // Pointer to polymorphic object
+extern "C" void* __cdecl __RTtypeid(
+	void* inptr)            // Pointer to polymorphic object
 	noexcept(false)
 {
 	if (!inptr) {
@@ -134,9 +134,9 @@ extern "C" void * __cdecl __RTtypeid(
 	const auto _ImageBase = GetImageBaseFromCompleteObjectLocator(pCompleteLocator);
 #endif
 
-	if (((const void *)COL_PTD(*pCompleteLocator)) != nullptr)
+	if (((const void*)COL_PTD(*pCompleteLocator)) != nullptr)
 	{
-		return (void *)COL_PTD(*pCompleteLocator);
+		return (void*)COL_PTD(*pCompleteLocator);
 	}
 
 	Throw(Seed::NullPointException(ExceptionPosition, (Seed::SizeT)nullptr, Seed::NullPointException::Types::Read));
@@ -177,23 +177,23 @@ extern "C" void * __cdecl __RTtypeid(
 // B->D->C->A succeeds with a runtime check.
 //
 #pragma optimize("",off)
-extern "C" void * __cdecl __RTDynamicCast(
-	void * inptr,            // Pointer to polymorphic object
+extern "C" void* __cdecl __RTDynamicCast(
+	void* inptr,            // Pointer to polymorphic object
 	LONG VfDelta,            // Offset of vfptr in object
-	void * srcVoid,          // Static type of object pointed to by inptr
-	void * targetVoid,       // Desired result of cast
+	void* srcVoid,          // Static type of object pointed to by inptr
+	void* targetVoid,       // Desired result of cast
 	BOOL isReference)        // TRUE if input is reference, FALSE if input is ptr
 	noexcept(false)
 {
-	const auto srcType = static_cast<_RTTITypeDescriptor *>(srcVoid);
-	const auto targetType = static_cast<_RTTITypeDescriptor *>(targetVoid);
+	const auto srcType = static_cast<_RTTITypeDescriptor*>(srcVoid);
+	const auto targetType = static_cast<_RTTITypeDescriptor*>(targetVoid);
 
 	if (inptr == nullptr)
 	{
 		return nullptr;
 	}
 	{
-		void * pCompleteObject = FindCompleteObject(inptr);
+		void* pCompleteObject = FindCompleteObject(inptr);
 		const auto pCompleteLocator = GetCompleteObjectLocatorFromObject(inptr);
 #if _RTTI_RELATIVE_TYPEINFO
 		const auto _ImageBase = GetImageBaseFromCompleteObjectLocator(pCompleteLocator);
@@ -213,10 +213,10 @@ extern "C" void * __cdecl __RTDynamicCast(
 		else
 		{
 			// Adjust by vfptr displacement, if any
-			inptr = ((char *)inptr - VfDelta);
+			inptr = ((char*)inptr - VfDelta);
 
 			// Calculate offset of source object in complete object
-			ptrdiff_t inptr_delta = (char *)inptr - (char *)pCompleteObject;
+			ptrdiff_t inptr_delta = (char*)inptr - (char*)pCompleteObject;
 
 			if (!(COL_PCHD(*pCompleteLocator)->attributes & CHD_VIRTINH))
 			{
@@ -255,7 +255,7 @@ extern "C" void * __cdecl __RTDynamicCast(
 		}
 
 		// Calculate ptr to result base class from pBaseClass->where
-		return reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(pCompleteObject) +
+		return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(pCompleteObject) +
 			PMDtoOffset(pCompleteObject, pBaseClass->where));
 	}
 }
@@ -269,7 +269,7 @@ extern "C" void * __cdecl __RTDynamicCast(
 // Side-effects: NONE.
 //
 
-static void * FindCompleteObject(void* inptr)           // Pointer to polymorphic object
+static void* FindCompleteObject(void* inptr)           // Pointer to polymorphic object
 {
 	// Ptr to CompleteObjectLocator should be stored at vfptr[-1]
 	const auto pCompleteLocator = GetCompleteObjectLocatorFromObject(inptr);
@@ -282,13 +282,13 @@ static void * FindCompleteObject(void* inptr)           // Pointer to polymorphi
 	// Therefore we optimistically read the int here even if cdOffset is 0, in
 	// order to make it legal to generate a cmov instruction.
 	const auto cdOffset = pCompleteLocator->cdOffset;
-	auto offsetValue = *reinterpret_cast<int *>(inAddr - cdOffset);
+	auto offsetValue = *reinterpret_cast<int*>(inAddr - cdOffset);
 	if (cdOffset == 0)
 	{
 		offsetValue = 0;
 	}
 
-	return reinterpret_cast<void *>(pCompleteObject - offsetValue);
+	return reinterpret_cast<void*>(pCompleteObject - offsetValue);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -328,7 +328,7 @@ static void * FindCompleteObject(void* inptr)           // Pointer to polymorphi
 // * Otherwise, the run-time check fails.
 //
 
-static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
+static _RTTIBaseClassDescriptor* FindSITargetTypeInstance(
 	_RTTICompleteObjectLocator * const pCOLocator, // pointer to Locator of complete object
 	_RTTITypeDescriptor * const pSrcTypeID,        // pointer to TypeDescriptor of source object
 	_RTTITypeDescriptor * const pTargetTypeID      // pointer to TypeDescriptor of result of cast
@@ -336,7 +336,7 @@ static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
 )
 {
 	auto classDescriptor = COL_PCHD(*pCOLocator);
-	_RTTIBaseClassArray *pBaseClassArray = CHD_PBCA(*classDescriptor);
+	_RTTIBaseClassArray* pBaseClassArray = CHD_PBCA(*classDescriptor);
 	DWORD nCompleteObjectBases = classDescriptor->numBaseClasses;
 
 	// Walk the BaseClassArray, which for single inheritance lists the complete
@@ -347,7 +347,7 @@ static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
 	// identity comparison; so we walk the tree with that predicate first:
 	for (DWORD i = 0; i < nCompleteObjectBases; ++i)
 	{
-		_RTTIBaseClassDescriptor * pBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[i]);
+		_RTTIBaseClassDescriptor* pBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[i]);
 		if (BCD_PTD(*pBCD) == pTargetTypeID)
 		{
 			// Single inheritance implies no ambiguous bases, so we know we've
@@ -358,7 +358,7 @@ static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
 
 			for (DWORD j = i + 1; j < nCompleteObjectBases; j++)
 			{
-				_RTTIBaseClassDescriptor * pSourceBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[j]);
+				_RTTIBaseClassDescriptor* pSourceBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[j]);
 				if (pSourceBCD->attributes & BCD_PRIVORPROTBASE)
 				{
 					// If we find any non-public derivation between the target
@@ -391,13 +391,13 @@ static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
 	// from a different image than pSrcTypeID / pTargetTypeID
 	for (DWORD i = 0; i < nCompleteObjectBases; i++)
 	{
-		_RTTIBaseClassDescriptor * pBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[i]);
+		_RTTIBaseClassDescriptor* pBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[i]);
 
 		if (Seed::CStr::Compare(BCD_PTD(*pBCD)->name, pTargetTypeID->name))
 		{
 			for (DWORD j = i + 1; j < nCompleteObjectBases; j++)
 			{
-				_RTTIBaseClassDescriptor * pSourceBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[j]);
+				_RTTIBaseClassDescriptor* pSourceBCD = CHD_PBCD(pBaseClassArray->arrayOfBaseClassDescriptors[j]);
 				if (pSourceBCD->attributes & BCD_PRIVORPROTBASE)
 				{
 					return nullptr;
@@ -462,21 +462,21 @@ static _RTTIBaseClassDescriptor * FindSITargetTypeInstance(
 // * Otherwise, the run-time check fails.
 //
 
-static _RTTIBaseClassDescriptor * FindMITargetTypeInstance(
-	void * pCompleteObject,                 // pointer to complete object
-	_RTTICompleteObjectLocator *pCOLocator, // pointer to Locator of complete object
-	_RTTITypeDescriptor *pSrcTypeID,        // pointer to TypeDescriptor of source object
+static _RTTIBaseClassDescriptor* FindMITargetTypeInstance(
+	void* pCompleteObject,                 // pointer to complete object
+	_RTTICompleteObjectLocator * pCOLocator, // pointer to Locator of complete object
+	_RTTITypeDescriptor * pSrcTypeID,        // pointer to TypeDescriptor of source object
 	ptrdiff_t SrcOffset,                    // offset of source object in complete object
-	_RTTITypeDescriptor *pTargetTypeID      // pointer to TypeDescriptor of result of cast
+	_RTTITypeDescriptor * pTargetTypeID      // pointer to TypeDescriptor of result of cast
 	IMAGEBASE_PARAMETER
 )
 {
-	_RTTIBaseClassDescriptor *pBCD;
-	_RTTIBaseClassDescriptor *pTargetBCD = nullptr;
-	_RTTIBaseClassDescriptor *pSourceBCD = nullptr;
-	_RTTIBaseClassDescriptor *pSourceInTargetBCD;
-	_RTTIBaseClassArray *pBaseClassArray = CHD_PBCA(*COL_PCHD(*pCOLocator));
-	_RTTIBaseClassArray *pTargetBaseClassArray;
+	_RTTIBaseClassDescriptor* pBCD;
+	_RTTIBaseClassDescriptor* pTargetBCD = nullptr;
+	_RTTIBaseClassDescriptor* pSourceBCD = nullptr;
+	_RTTIBaseClassDescriptor* pSourceInTargetBCD;
+	_RTTIBaseClassArray* pBaseClassArray = CHD_PBCA(*COL_PCHD(*pCOLocator));
+	_RTTIBaseClassArray* pTargetBaseClassArray;
 	DWORD i;
 	DWORD nCompleteObjectBases = COL_PCHD(*pCOLocator)->numBaseClasses;
 	DWORD nTargetBases = 0;
@@ -656,23 +656,23 @@ static _RTTIBaseClassDescriptor * FindMITargetTypeInstance(
 // followed without simplification.
 //
 
-static _RTTIBaseClassDescriptor * FindVITargetTypeInstance(
-	void * pCompleteObject,                 // pointer to complete object
-	_RTTICompleteObjectLocator *pCOLocator, // pointer to Locator of complete object
-	_RTTITypeDescriptor *pSrcTypeID,        // pointer to TypeDescriptor of source object
+static _RTTIBaseClassDescriptor* FindVITargetTypeInstance(
+	void* pCompleteObject,                 // pointer to complete object
+	_RTTICompleteObjectLocator * pCOLocator, // pointer to Locator of complete object
+	_RTTITypeDescriptor * pSrcTypeID,        // pointer to TypeDescriptor of source object
 	ptrdiff_t SrcOffset,                    // offset of source object in complete object
-	_RTTITypeDescriptor *pTargetTypeID      // pointer to TypeDescriptor of result of cast
+	_RTTITypeDescriptor * pTargetTypeID      // pointer to TypeDescriptor of result of cast
 	IMAGEBASE_PARAMETER
 )
 {
-	_RTTIBaseClassDescriptor *pBCD;
-	_RTTIBaseClassDescriptor *pDownCastResultBCD = nullptr;
-	_RTTIBaseClassDescriptor *pCrossCastSourceBCD = nullptr;
-	_RTTIBaseClassDescriptor *pCrossCastTargetBCD = nullptr;
-	_RTTIBaseClassDescriptor *pTargetBCD = nullptr;
-	_RTTIBaseClassDescriptor *pSourceInTargetBCD;
-	_RTTIBaseClassArray *pBaseClassArray = CHD_PBCA(*COL_PCHD(*pCOLocator));
-	_RTTIBaseClassArray *pTargetBaseClassArray;
+	_RTTIBaseClassDescriptor* pBCD;
+	_RTTIBaseClassDescriptor* pDownCastResultBCD = nullptr;
+	_RTTIBaseClassDescriptor* pCrossCastSourceBCD = nullptr;
+	_RTTIBaseClassDescriptor* pCrossCastTargetBCD = nullptr;
+	_RTTIBaseClassDescriptor* pTargetBCD = nullptr;
+	_RTTIBaseClassDescriptor* pSourceInTargetBCD;
+	_RTTIBaseClassArray* pBaseClassArray = CHD_PBCA(*COL_PCHD(*pCOLocator));
+	_RTTIBaseClassArray* pTargetBaseClassArray;
 	DWORD i;
 	DWORD nCompleteObjectBases = COL_PCHD(*pCOLocator)->numBaseClasses;
 	DWORD nTargetBases = 0;
@@ -926,15 +926,15 @@ static _RTTIBaseClassDescriptor * FindVITargetTypeInstance(
 //
 
 static ptrdiff_t PMDtoOffset(
-	void * pThis,           // ptr to complete object
-	const PMD& pmd)         // pointer-to-member-data structure
+	void* pThis,           // ptr to complete object
+	const PMD & pmd)         // pointer-to-member-data structure
 {
 	ptrdiff_t RetOff = 0;
 
 	if (pmd.pdisp >= 0) {
 		// if base is in the virtual part of class
 		RetOff = pmd.pdisp;
-		RetOff += *(__int32*)((char*)*(ptrdiff_t*)((char*)pThis + RetOff) +
+		RetOff += *(__int32*)((char*) * (ptrdiff_t*)((char*)pThis + RetOff) +
 			pmd.vdisp);
 	}
 

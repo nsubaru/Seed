@@ -178,7 +178,6 @@ __forceinline ClassName & operator=(ClassName && From){if(this == &From) return 
 __forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}}
 // static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");\
 
-
 namespace {
 	template <class F, class... Args>
 	inline auto INVOKE(F&& f, Args&& ... args) ->

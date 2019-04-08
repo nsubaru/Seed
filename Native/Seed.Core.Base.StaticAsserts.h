@@ -36,8 +36,6 @@ namespace Seed {
 
 		///<summary>Простір імен статичних провірок</summary>
 		namespace StaticAsserts {
-
-
 			///<summary>Логічне суддження чи тип T1 == T2 виконується в compile-time</summary>
 			template<typename T1, typename T2>
 			struct IsSame :public LogicFalse {};
@@ -94,7 +92,6 @@ namespace Seed {
 
 			template<class T, SizeT N>
 			struct IsCArray<T[N]> : LogicTrue {};
-
 
 			template<class T>
 			struct RemoveSizeFromCArray { typedef T type; };
@@ -173,7 +170,7 @@ namespace Seed {
 
 			///<summary>specialization for function types that have ref-qualifiers</summary>
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) &> : LogicTrue {};
+			struct IsFunction<Ret(Args...)&> : LogicTrue {};
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args...) const &> : LogicTrue {};
 			template<typename Ret, typename... Args>
@@ -181,7 +178,7 @@ namespace Seed {
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args...) const volatile &> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) &> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...)&> : LogicTrue {};
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args..., ...) const &> : LogicTrue {};
 			template<typename Ret, typename... Args>

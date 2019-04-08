@@ -40,7 +40,7 @@ namespace Seed {
 		///<summary>Один байт</summary>
 		inline namespace { using Byte = unsigned char; }
 		///<summary>Масив байтів</summary>
-		inline namespace { using ByteArray = Byte * ; }
+		inline namespace { using ByteArray = Byte *; }
 
 		///<summary>Розмірний тип</summary>
 		inline namespace { using SizeT = size_t; }
@@ -55,14 +55,14 @@ namespace Seed {
 		inline namespace { using AChar = char; }
 
 		///<summary>Покажчик на масив символів в кодуванні UTF-16LE</summary>
-		inline namespace { using CharStr = Char * ; using UCharStr = UChar * ; }
+		inline namespace { using CharStr = Char *; using UCharStr = UChar *; }
 		///<summary>Покажчик на масив символів в кодуванні ASCII</summary>
-		inline namespace { using ACharStr = AChar * ; }
+		inline namespace { using ACharStr = AChar *; }
 
 		///<summary>Покажчик на статичний масив символів в кодуванні ASCII</summary>
-		inline namespace { using ConstACharStr = const AChar * const; }
+		inline namespace { using ConstACharStr = const AChar* const; }
 		///<summary>Покажчик на статичний масив символів в кодуванні UTF-16LE</summary>
-		inline namespace { using ConstCharStr = const Char * const; using UConstCharStr = UChar * ; }
+		inline namespace { using ConstCharStr = const Char* const; using UConstCharStr = UChar *; }
 
 		///<summary>Логічний тип</summary>
 		inline namespace { using Boolean = bool; }
@@ -98,7 +98,7 @@ namespace Seed {
 ///<param name='Text'>Покажчик на рядкову константу</param>
 ///<param name='Size'>Кількість елементів рядкового масиву</param>
 ///<returns>Константу CharStr</returns>
-__forceinline constexpr const Seed::Core::CharStr const operator "" U(const wchar_t * const Text, const Seed::SizeT Size) {
+__forceinline constexpr const Seed::Core::CharStr const operator "" U(const wchar_t* const Text, const Seed::SizeT Size) {
 	using namespace Seed;
 	return (const CharStr const)Text;
 }

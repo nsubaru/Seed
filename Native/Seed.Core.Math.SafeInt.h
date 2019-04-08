@@ -99,7 +99,7 @@ namespace Seed {
 
 #pragma region Extended operations
 #pragma region SafeInt arg
-				__forceinline SafeInt & operator+=(SafeInt second) {
+				__forceinline SafeInt& operator+=(SafeInt second) {
 					extern bool Add(UInt8 First, UInt8 Second, UInt8 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -112,7 +112,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(SafeInt second) {
+				__forceinline SafeInt& operator-=(SafeInt second) {
 					extern bool Sub(UInt8 First, UInt8 Second, UInt8 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -125,7 +125,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(SafeInt second) {
+				__forceinline SafeInt& operator*=(SafeInt second) {
 					extern bool Mul(UInt8 First, UInt8 Second, UInt8 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -139,7 +139,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Int arg
-				__forceinline SafeInt & operator+=(UInt8 second) {
+				__forceinline SafeInt& operator+=(UInt8 second) {
 					extern bool Add(UInt8 First, UInt8 Second, UInt8 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -152,7 +152,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(UInt8 second) {
+				__forceinline SafeInt& operator-=(UInt8 second) {
 					extern bool Sub(UInt8 First, UInt8 Second, UInt8 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -165,7 +165,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(UInt8 second) {
+				__forceinline SafeInt& operator*=(UInt8 second) {
 					extern bool Mul(UInt8 First, UInt8 Second, UInt8 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -278,7 +278,7 @@ namespace Seed {
 
 #pragma region Extended operations
 #pragma region SafeInt arg
-				__forceinline SafeInt & operator+=(SafeInt second) {
+				__forceinline SafeInt& operator+=(SafeInt second) {
 					extern bool Add(UInt16 First, UInt16 Second, UInt16 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -291,7 +291,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(SafeInt second) {
+				__forceinline SafeInt& operator-=(SafeInt second) {
 					extern bool Sub(UInt16 First, UInt16 Second, UInt16 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -304,7 +304,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(SafeInt second) {
+				__forceinline SafeInt& operator*=(SafeInt second) {
 					extern bool Mul(UInt16 First, UInt16 Second, UInt16 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -318,7 +318,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Int arg
-				__forceinline SafeInt & operator+=(UInt16 second) {
+				__forceinline SafeInt& operator+=(UInt16 second) {
 					extern bool Add(UInt16 First, UInt16 Second, UInt16 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -331,7 +331,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(UInt16 second) {
+				__forceinline SafeInt& operator-=(UInt16 second) {
 					extern bool Sub(UInt16 First, UInt16 Second, UInt16 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -344,7 +344,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(UInt16 second) {
+				__forceinline SafeInt& operator*=(UInt16 second) {
 					extern bool Mul(UInt16 First, UInt16 Second, UInt16 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -457,7 +457,7 @@ namespace Seed {
 
 #pragma region Extended operations
 #pragma region SafeInt arg
-				__forceinline SafeInt & operator+=(SafeInt second) {
+				__forceinline SafeInt& operator+=(SafeInt second) {
 					extern bool Add(UInt32 First, UInt32 Second, UInt32 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -470,7 +470,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(SafeInt second) {
+				__forceinline SafeInt& operator-=(SafeInt second) {
 					extern bool Sub(UInt32 First, UInt32 Second, UInt32 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -483,7 +483,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(SafeInt second) {
+				__forceinline SafeInt& operator*=(SafeInt second) {
 					extern bool Mul(UInt32 First, UInt32 Second, UInt32 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -497,7 +497,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Int arg
-				__forceinline SafeInt & operator+=(UInt32 second) {
+				__forceinline SafeInt& operator+=(UInt32 second) {
 					extern bool Add(UInt32 First, UInt32 Second, UInt32 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -510,7 +510,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(UInt32 second) {
+				__forceinline SafeInt& operator-=(UInt32 second) {
 					extern bool Sub(UInt32 First, UInt32 Second, UInt32 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -523,7 +523,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(UInt32 second) {
+				__forceinline SafeInt& operator*=(UInt32 second) {
 					extern bool Mul(UInt32 First, UInt32 Second, UInt32 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -636,7 +636,7 @@ namespace Seed {
 
 #pragma region Extended operations
 #pragma region SafeInt arg
-				__forceinline SafeInt & operator+=(SafeInt second) {
+				__forceinline SafeInt& operator+=(SafeInt second) {
 					extern bool Add(UInt64 First, UInt64 Second, UInt64 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -649,7 +649,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(SafeInt second) {
+				__forceinline SafeInt& operator-=(SafeInt second) {
 					extern bool Sub(UInt64 First, UInt64 Second, UInt64 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -662,7 +662,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(SafeInt second) {
+				__forceinline SafeInt& operator*=(SafeInt second) {
 					extern bool Mul(UInt64 First, UInt64 Second, UInt64 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -676,7 +676,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Int arg
-				__forceinline SafeInt & operator+=(UInt64 second) {
+				__forceinline SafeInt& operator+=(UInt64 second) {
 					extern bool Add(UInt64 First, UInt64 Second, UInt64 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -689,7 +689,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator-=(UInt64 second) {
+				__forceinline SafeInt& operator-=(UInt64 second) {
 					extern bool Sub(UInt64 First, UInt64 Second, UInt64 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,
@@ -702,7 +702,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline SafeInt & operator*=(UInt64 second) {
+				__forceinline SafeInt& operator*=(UInt64 second) {
 					extern bool Mul(UInt64 First, UInt64 Second, UInt64 & Result);
 					extern __declspec(noreturn) void ThrowIntegerOverflowException(
 						const Seed::ConstAString & File,

@@ -58,7 +58,7 @@ void Seed::Core::Stop::Exceptions() noexcept
 	RtlDestroyHeap(ExceptionsHeap.HeapHandle);
 }
 
-SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
+SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 {
 	//якщо розм≥р задано максимальне можливе значенн€ SizeT то це €вно помилка ≥ генеруЇм виключенн€ OutOfMemory
 	if (Size == Math::Max<SizeT>())
@@ -81,9 +81,9 @@ SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 	return obj + 1;
 }
 
-SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT Size, SizeT AllocationReq)
+SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT Size, SizeT AllocationReq)
 {
-	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне, 
+	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне,
 	//а отже викликаЇм просте вид≥ленн€ пам'€т≥
 	if (AllocationReq == 0 || AllocationReq == 1)
 		return Allocate(Size);
@@ -91,7 +91,7 @@ SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT 
 	//¬ид≥л€Їм д≥л€нку б≥льшу дл€ того щоб пом≥стити розм≥р ≥ реальний початок д≥л€нки пам'€т≥
 	//“акож враховуЇм що д≥л€нка може бути не вир≥внена тому додаЇм AllocationReq до розм≥ру,
 	//щоб гарантувати щоб вир≥внений адрес знайдетьс€ в д≥л€нц≥
-	void * obj = RtlAllocateHeap(ExceptionsHeap.HeapHandle, 0, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
+	void* obj = RtlAllocateHeap(ExceptionsHeap.HeapHandle, 0, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
 	//якщо функц≥€ вернула nullptr то це значить що або розм≥р завеликий або пам'€т≥ немаЇ
 	//¬ обох випадках генеруЇм помилку OutOfMemory
 	if (obj == nullptr)
@@ -114,12 +114,12 @@ SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT 
 	return (void*)AllignedAddress;
 }
 
-SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::Free(void * MemBlk)
+SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Free(void* MemBlk)
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
-	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
+	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
 	//ќтримуЇм розм≥р д≥л€нки пам'€т≥
 	SizeT DataSize = RealPtr[0];
 	//ќбчислюЇм повний розм≥р д≥л€нки пам'€т≥
@@ -128,15 +128,15 @@ SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::Free(void * MemBlk)
 	if (RtlFreeHeap(ExceptionsHeap.HeapHandle, 0, RealPtr)) {
 		//якщо вдало то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//якщо н≥ то вертаЇм об'Їкт
 	else return MemBlk;
 }
 
-SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::AllignedFree(void * MemBlk, SizeT AllocationReq)
+SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBlk, SizeT AllocationReq)
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
@@ -152,8 +152,8 @@ SeedKernelCall void * Seed::Core::Memory::ExceptionHeap::AllignedFree(void * Mem
 	if (RtlFreeHeap(ExceptionsHeap.HeapHandle, 0, RealPtr)) {
 		//якшо усп≥шно то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//якщо н≥ то вертаЇм об'Їкт
@@ -176,8 +176,8 @@ SizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsage() noexcept
 }
 
 __declspec(noreturn) void ThrowIndexOutOfRange(
-	const Seed::ConstAString & File, 
-	const Seed::ConstAString & Function, 
+	const Seed::ConstAString & File,
+	const Seed::ConstAString & Function,
 	const Seed::SizeT Line,
 	const Seed::SizeT Required,
 	const Seed::SizeT MaxAllowed) {
@@ -185,8 +185,8 @@ __declspec(noreturn) void ThrowIndexOutOfRange(
 }
 
 __declspec(noreturn) void ThrowEndNodeNotDeferencable(
-	const Seed::ConstAString& File,
-	const Seed::ConstAString& Function,
+	const Seed::ConstAString & File,
+	const Seed::ConstAString & Function,
 	const Seed::SizeT Line) {
 	Throw(EndNodeNotDeferencable(File, Function, Line));
 }

@@ -97,7 +97,7 @@ namespace Seed {
 #pragma region Ln
 				constexpr Double ConstexprLnIter(Double x, Double y)
 				{
-					return y + 2.0 *(x - ConstexprExp(y, 1, 1, 2, y)) / (x + ConstexprExp(y, 1, 1, 2, y));
+					return y + 2.0 * (x - ConstexprExp(y, 1, 1, 2, y)) / (x + ConstexprExp(y, 1, 1, 2, y));
 				}
 				constexpr Double ConstexprLog(Double x, Double y)
 				{
@@ -146,7 +146,7 @@ namespace Seed {
 				}
 				__forceinline constexpr Double ConstexprPow(Double X, Double Y)
 				{
-					return ConstexprExp(ConstexprLog(X, 0)*Y);
+					return ConstexprExp(ConstexprLog(X, 0) * Y);
 				}
 
 				__forceinline constexpr Double ConstexprPow(Double X, Int32 Y)
@@ -183,7 +183,7 @@ namespace Seed {
 				{
 					for (int N = 0; N < 15; N++)
 					{
-						Res += (ConstexprPow(-1.0, N) / ConstexprFactorial(2 * N))*ConstexprPow(X, 2 * N);
+						Res += (ConstexprPow(-1.0, N) / ConstexprFactorial(2 * N)) * ConstexprPow(X, 2 * N);
 					}
 					return Res;
 				}
@@ -206,7 +206,7 @@ namespace Seed {
 				{
 					for (int N = 0; N <= 20; N++)
 					{
-						Res += (ConstexprFactorial(2 * N) / (ConstexprPow(4.0, N)*ConstexprPow(static_cast<Double>(ConstexprFactorial(N)), 2.0)*(2 * N + 1)))*ConstexprPow(X, 2 * N + 1);
+						Res += (ConstexprFactorial(2 * N) / (ConstexprPow(4.0, N) * ConstexprPow(static_cast<Double>(ConstexprFactorial(N)), 2.0) * (2 * N + 1))) * ConstexprPow(X, 2 * N + 1);
 					}
 					return Res;
 				}
@@ -235,8 +235,8 @@ namespace Seed {
 				{
 					union
 					{
-						Int32 * I;
-						Float * D;
+						Int32* I;
+						Float* D;
 					} D;
 					D.D = &Val;
 					*D.I &= 1 << 31;
@@ -247,8 +247,8 @@ namespace Seed {
 				{
 					union
 					{
-						Int64 *  I;
-						Double * D;
+						Int64* I;
+						Double* D;
 					} D;
 					D.D = &Val;
 					*D.I &= 1ULL << 63;
@@ -260,8 +260,8 @@ namespace Seed {
 					static_assert(sizeof(Float) == sizeof(Int32), "Ðîçì³ðè Float ³ Int32 ð³çí³");
 					union
 					{
-						Int32 *  I;
-						Float * D;
+						Int32* I;
+						Float* D;
 					} D;
 					D.D = &val;
 					return ((*D.I) & ((Seed::Int32)1 << 31));
@@ -272,8 +272,8 @@ namespace Seed {
 					static_assert(sizeof(Double) == sizeof(Int64), "Ðîçì³ðè Float ³ Int32 ð³çí³");
 					union
 					{
-						Int64 *  I;
-						Double * D;
+						Int64* I;
+						Double* D;
 					} D;
 					D.D = &val;
 					return ((*D.I) & ((Seed::Int64)1 << 63));

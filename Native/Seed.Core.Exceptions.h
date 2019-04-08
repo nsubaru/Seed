@@ -89,7 +89,7 @@ namespace Seed {
 					:location({ File, FunctName, Line, GetTargetThreadID() }), exeptionName(ExeptionName) {}
 
 				///<summary>Вертає користувальницьку назву помилки</summary>
-				__forceinline const ConstString & GetExceptioName() const
+				__forceinline const ConstString& GetExceptioName() const
 				{
 					return exeptionName;
 				}
@@ -313,14 +313,13 @@ namespace Seed {
 				SizeT GetAllocatedBytes() const { return AllocatedBefore; }
 				///<summary>Вертає кількість блоків пам'яті які були виділенні на момент виникненя помилки</summary>
 				SizeT GetAllocatedMemBlksCount() const { return MemBlkscountBefore; }
-				
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString(exeptionName)
 						+ ExceptionString(L" в ") + ExceptionString(HeapName) + ExceptionString(L" кучі ")
 						+ ExceptionString(L" при виділені ") + BaseString<Memory::ExceptionHeap>::toString(TryAllocate)
-						+ ExceptionString(L" байт, на момент виникнення помилки було виділено ") 
+						+ ExceptionString(L" байт, на момент виникнення помилки було виділено ")
 						+ BaseString<Memory::ExceptionHeap>::toString(AllocatedBefore) + ExceptionString(L" байт в ")
 						+ BaseString<Memory::ExceptionHeap>::toString(MemBlkscountBefore)
 						+ ExceptionString((MemBlkscountBefore == 1) ? ExceptionString(L" блоку пам'яті. ") : (L"блоках пам'яті. "))
@@ -549,7 +548,7 @@ namespace Seed {
 						+ ExceptionString(L". ");
 				}
 			};
-			
+
 			class NtException : public Exception {
 			private:
 				///<summary>NtStatus code операції</summary>

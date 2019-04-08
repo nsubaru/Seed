@@ -99,7 +99,6 @@ namespace Seed {
 				return 2.2204460492503131e-016;
 			};
 
-
 			///<summary>Бескінечність</summary>
 			constexpr Double Infinity = 1e+300 * 1e+300;
 			///<summary>Невизначене значення</summary>

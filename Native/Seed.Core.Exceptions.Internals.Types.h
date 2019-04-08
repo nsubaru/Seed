@@ -11,8 +11,6 @@
 #define EH_EXCEPTION_NUMBER	('seed' | 0xE0000000)
 #endif // PreReleaseMode || DebugMode
 
-
-
 typedef	int	PMFN;					// Image relative offset of Member Function
 
 //
@@ -53,14 +51,14 @@ typedef const struct _s_ThrowInfo {
 typedef struct EHExceptionRecord {
 	unsigned long	ExceptionCode;			// The code of this exception. (= EH_EXCEPTION_NUMBER)
 	unsigned long	ExceptionFlags;			// Flags determined by NT
-	struct _EXCEPTION_RECORD *	ExceptionRecord;	// An extra exception record (not used)
-	void *		ExceptionAddress;		// Address at which exception occurred
+	struct _EXCEPTION_RECORD* ExceptionRecord;	// An extra exception record (not used)
+	void* ExceptionAddress;		// Address at which exception occurred
 	unsigned long 		NumberParameters;		// Number of extended parameters. (= EH_EXCEPTION_PARAMETERS)
 	struct EHParameters {
 		unsigned long long		magicNumber;		// = EH_MAGIC_NUMBER1
-		void *		pExceptionObject;	// Pointer to the actual object thrown
-		ThrowInfo*	pThrowInfo;		// Description of thrown object
-		void *		pThrowImageBase;	// Image base of thrown object
+		void* pExceptionObject;	// Pointer to the actual object thrown
+		ThrowInfo* pThrowInfo;		// Description of thrown object
+		void* pThrowImageBase;	// Image base of thrown object
 	} params;
 } EHExceptionRecord;
 
@@ -81,7 +79,7 @@ typedef union _UNWIND_CODE {
 		unsigned char OpInfo : 4;
 	};
 	unsigned short FrameOffset;
-} UNWIND_CODE, *PUNWIND_CODE;
+} UNWIND_CODE, * PUNWIND_CODE;
 typedef struct _UNWIND_INFO {
 	unsigned char Version : 3;
 	unsigned char Flags : 5;
@@ -97,7 +95,7 @@ typedef struct _UNWIND_INFO {
 	 *  };
 	 *  OPTIONAL unsigned long ExceptionData[];
 	 */
-} UNWIND_INFO, *PUNWIND_INFO;
+} UNWIND_INFO, * PUNWIND_INFO;
 
 #pragma warning (pop)
 
@@ -150,19 +148,19 @@ typedef struct
 	// C++ Exception Handling (EH) state
 	unsigned long      _NLG_dwCode;      // Required by NLG routines
 	unexpected_handler _unexpected;      // unexpected() routine
-	void*              _translator;      // S.E. translator
-	void*              _purecall;        // called when pure virtual happens
-	void*              _curexception;    // current exception
-	void*              _curcontext;      // current exception context
+	void* _translator;      // S.E. translator
+	void* _purecall;        // called when pure virtual happens
+	void* _curexception;    // current exception
+	void* _curcontext;      // current exception context
 	int                _ProcessingThrow; // for uncaught_exception
-	void*              _curexcspec;      // for handling exceptions thrown from std::unexpected
+	void* _curexcspec;      // for handling exceptions thrown from std::unexpected
 	int                _cxxReThrow;      // true if it's a rethrown C++ exception
-	void*              _pExitContext;
-	void*              _pUnwindContext;
-	void*              _pFrameInfoChain;
+	void* _pExitContext;
+	void* _pUnwindContext;
+	void* _pFrameInfoChain;
 	unsigned __int64          _ImageBase;
 	unsigned __int64          _ThrowImageBase;
-	void*              _pForeignException;
+	void* _pForeignException;
 	int                _HandlerSearchState;  // Used when exceptions occur in catch funclets in Pass 1 of SEH handling, represents a state in the throwing catch funclet
 											 // so unwind can properly search through parent catch funclets.
 	__int64          _UnwindStateorOffset; // In Pass 2 of SEH handling, represents the start state of the try enclosing the catch funclet. All states within the try
@@ -238,8 +236,8 @@ typedef const struct _s_TryBlockMapEntry {
 
 typedef struct TypeDescriptor
 {
-	const void * pVFTable;	// Field overloaded by RTTI
-	void *	spare;			// reserved, possible for RTTI
+	const void* pVFTable;	// Field overloaded by RTTI
+	void* spare;			// reserved, possible for RTTI
 	char			name[];			// The decorated name of the type; 0 terminated.
 } TypeDescriptor;
 
@@ -323,12 +321,12 @@ typedef const struct _s_CatchableTypeArray {
 #define TI_IsWinRT          0x00000010      // object thrown is a WinRT Exception
 
 struct TryBlockMap {
-	FuncInfo * pFuncInfo;
-	DISPATCHER_CONTEXT * pDC;
+	FuncInfo* pFuncInfo;
+	DISPATCHER_CONTEXT* pDC;
 };
 
 struct TryBlockMapIterator {
-	TryBlockMap * entrys;
+	TryBlockMap* entrys;
 	unsigned int Index;
 };
 
@@ -339,5 +337,5 @@ struct TryBlockMapIteratorPair {
 
 typedef struct FrameInfo {
 	PVOID               pExceptionObject;
-	struct FrameInfo *  pNext;
+	struct FrameInfo* pNext;
 } FRAMEINFO;

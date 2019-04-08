@@ -20,18 +20,18 @@ namespace std {
 		{	// empty list
 		}
 
-		constexpr initializer_list(const _Elem *_First_arg,
-			const _Elem *_Last_arg) noexcept
+		constexpr initializer_list(const _Elem* _First_arg,
+			const _Elem* _Last_arg) noexcept
 			: _First(_First_arg), _Last(_Last_arg)
 		{	// construct with pointers
 		}
 
-		[[nodiscard]] constexpr const _Elem * begin() const noexcept
+		[[nodiscard]] constexpr const _Elem* begin() const noexcept
 		{	// get beginning of list
 			return (_First);
 		}
 
-		[[nodiscard]] constexpr const _Elem * end() const noexcept
+		[[nodiscard]] constexpr const _Elem* end() const noexcept
 		{	// get end of list
 			return (_Last);
 		}
@@ -42,20 +42,20 @@ namespace std {
 		}
 
 	private:
-		const _Elem *_First;
-		const _Elem *_Last;
+		const _Elem* _First;
+		const _Elem* _Last;
 	};
 
 	// FUNCTION TEMPLATE begin
 	template<class _Elem>
-	[[nodiscard]] constexpr const _Elem * begin(initializer_list<_Elem> _Ilist) noexcept
+	[[nodiscard]] constexpr const _Elem* begin(initializer_list<_Elem> _Ilist) noexcept
 	{	// get beginning of sequence
 		return (_Ilist.begin());
 	}
 
 	// FUNCTION TEMPLATE end
 	template<class _Elem>
-	[[nodiscard]] constexpr const _Elem * end(initializer_list<_Elem> _Ilist) noexcept
+	[[nodiscard]] constexpr const _Elem* end(initializer_list<_Elem> _Ilist) noexcept
 	{	// get end of sequence
 		return (_Ilist.end());
 	}
@@ -79,7 +79,7 @@ namespace Seed {
 				};
 
 				template <SizeT I, typename Sequence>
-				struct cat_index_sequence{};
+				struct cat_index_sequence {};
 
 				template <SizeT I, SizeT... Indices>
 				struct cat_index_sequence<I, index_sequence<Indices...>>
@@ -105,8 +105,6 @@ namespace Seed {
 					template <typename U>
 					__forceinline constexpr explicit tuple_element(U&& value) : value_(ForwardReference<U>(value)) {}
 				};
-
-
 
 				template <typename Sequence, typename... Types>
 				struct tuple_impl {};
@@ -144,7 +142,7 @@ namespace Seed {
 						!is_any_of<is_tuple_impl, typename StaticAsserts::Decay<OtherTypes>...>()
 						>::type
 					>
-						__forceinline constexpr explicit tuple_impl(OtherTypes&&... elements)
+						__forceinline constexpr explicit tuple_impl(OtherTypes&& ... elements)
 						: tuple_element<Indices, Types>(ForwardReference<OtherTypes>(elements))...
 					{
 					}
@@ -154,7 +152,7 @@ namespace Seed {
 				class tuple
 					: public tuple_impl<typename make_index_sequence<sizeof...(Types)>::type, Types...>
 				{
-				public: 
+				public:
 					__forceinline constexpr tuple() = default;
 					__forceinline constexpr tuple(tuple const&) = default;
 					__forceinline constexpr tuple(tuple&&) = default;
@@ -173,7 +171,7 @@ namespace Seed {
 					template <typename... OtherTypes,
 						typename = typename StaticAsserts::EnableIf<
 						sizeof...(OtherTypes) == sizeof...(Types)>::type>
-						__forceinline constexpr explicit tuple(OtherTypes&&... elements)
+						__forceinline constexpr explicit tuple(OtherTypes && ... elements)
 						: base_t(ForwardReference<OtherTypes>(elements)...) {}
 				};
 
@@ -252,16 +250,16 @@ namespace Seed {
 				}
 
 				template <typename T, typename ... Types>
-				__forceinline static constexpr T& get(tuple<Types...>& tup) {
+				__forceinline static constexpr T& get(tuple<Types...> & tup) {
 					static_assert(count<T, Types...>() == 1, "T must appear exactly once in ...Types");
 					get<find<T, Types...>()>(tup);
 				}
 				template<typename ... Types>
-				__forceinline static constexpr tuple<Types...> MakeTuple(const Types&...  variables) {
+				__forceinline static constexpr tuple<Types...> MakeTuple(const Types & ...  variables) {
 					return tuple<Types...>(variables...);
 				}
 				template<typename ... Types>
-				__forceinline static constexpr tuple<Types...> MakeTuple(Types&& ...  variables) {
+				__forceinline static constexpr tuple<Types...> MakeTuple(Types && ...  variables) {
 					return tuple<Types...>(ForwardReference<Types>(variables)...);
 				}
 			}
@@ -274,26 +272,26 @@ namespace Seed {
 			Internal::TupleImpl::tuple<Types...> data;
 		public:
 			__forceinline constexpr Tuple() : data() {}
-			__forceinline constexpr Tuple(const Types & ... values) 
+			__forceinline constexpr Tuple(const Types& ... values)
 				: data(Internal::TupleImpl::MakeTuple<Types...>(values...)) {}
-			__forceinline constexpr Tuple(Types && ... values) 
+			__forceinline constexpr Tuple(Types&& ... values)
 				: data(Internal::TupleImpl::MakeTuple(ForwardReference<Types>(values)...)) {}
-			__forceinline constexpr Tuple(const Tuple & orig) 
+			__forceinline constexpr Tuple(const Tuple& orig)
 				: data(orig.data) {}
-			__forceinline constexpr Tuple(Tuple && orig) 
+			__forceinline constexpr Tuple(Tuple&& orig)
 				: data(ForwardReference<Internal::TupleImpl::tuple<Types...>>(orig.data)) {}
 
-			__forceinline constexpr Tuple & operator=(const Tuple & orig) {
+			__forceinline constexpr Tuple& operator=(const Tuple& orig) {
 				this->Tuple::~Tuple();
 				this->Tuple::Tuple(orig);
 			}
 
-			__forceinline constexpr Tuple & operator=(Tuple && orig) {
+			__forceinline constexpr Tuple& operator=(Tuple&& orig) {
 				this->Tuple::~Tuple();
 				this->Tuple::Tuple(ForwardReference<Tuple<Types...>>(orig));
 			}
 
-			template<SizeT Index> 
+			template<SizeT Index>
 			__forceinline constexpr auto& Get() const {
 				return Internal::TupleImpl::get<Index>(data);
 			}

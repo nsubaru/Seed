@@ -189,7 +189,7 @@ namespace Seed {
 				return Count;
 			};
 
-			constexpr BitMapT & operator&=(const BitMapT & Second) {
+			constexpr BitMapT& operator&=(const BitMapT & Second) {
 				for (SizeT i = 0; i < fullBytesCount; i++)
 				{
 					this->bitMap[i] &= Second.bitMap[i];
@@ -204,7 +204,7 @@ namespace Seed {
 				}
 			}
 
-			constexpr BitMapT & operator|=(const BitMapT & Second) {
+			constexpr BitMapT& operator|=(const BitMapT & Second) {
 				for (SizeT i = 0; i < fullBytesCount; i++)
 				{
 					this->bitMap[i] |= Second.bitMap[i];

@@ -1,7 +1,6 @@
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Exceptions.Internals.h"
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // _CxxThrowException - implementation of 'throw'
@@ -22,10 +21,9 @@
 //
 extern "C" __declspec(noreturn) void __stdcall
 _CxxThrowException(
-	void*           pExceptionObject,   // The object thrown
-	_ThrowInfo*     pThrowInfo          // Everything we need to know about it
+	void* pExceptionObject,   // The object thrown
+	_ThrowInfo* pThrowInfo          // Everything we need to know about it
 ) {
-
 	static const EHExceptionRecord ExceptionTemplate = { // A generic exception record
 		EH_EXCEPTION_NUMBER,            // Exception number
 		EXCEPTION_NONCONTINUABLE,       // Exception flags (we don't do resume)
@@ -61,10 +59,9 @@ _CxxThrowException(
 	// attributes field.
 	//
 
-
 	//
 	// Hand it off to the OS:
 	//
 
-	RtlRaiseException((PEXCEPTION_RECORD)&ThisException);
+	RtlRaiseException((PEXCEPTION_RECORD)& ThisException);
 }

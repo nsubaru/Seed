@@ -5,7 +5,6 @@ namespace Seed
 	{
 		namespace StaticAsserts
 		{
-
 			template<class... _Types>
 			using VoidT = void;
 
@@ -49,8 +48,8 @@ namespace Seed
 			template<class Type>
 			struct AddReference<Type, VoidT<Type&>>
 			{	// add reference
-				using Lvalue = Type & ;
-				using Rvalue = Type && ;
+				using Lvalue = Type &;
+				using Rvalue = Type &&;
 			};
 
 			template<class Type>

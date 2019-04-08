@@ -19,7 +19,7 @@ namespace Seed {
 			///<summary>Compile-time функція визначення кількості сиволів в символьному масиві</summary>
 			///<param name="CStr">Рядкова зміна</param>
 			///<returns>Кількість елементів в рядковому масиві</returns>
-			__forceinline constexpr SizeT Size(const Char* CStr) noexcept {
+			__forceinline constexpr SizeT Size(const Char * CStr) noexcept {
 				return *CStr == '\0' ? 0 : Size(CStr + 1) + 1;
 			}
 
@@ -79,7 +79,7 @@ namespace Seed {
 			///<param name="Str1">Перша рядкова змінна</param>
 			///<param name="Str2">Друга рядкова змінна</param>
 			///<returns>True якщо всі символи ідендисні</returns>
-			__forceinline constexpr Boolean Compare(const Char* Str1, const Char* Str2) {
+			__forceinline constexpr Boolean Compare(const Char * Str1, const Char * Str2) {
 				SizeT Str1Size = Size(Str1);
 				SizeT Str2Size = Size(Str2);
 				if (Str1Size != Str2Size) return false;
@@ -105,7 +105,7 @@ namespace Seed {
 			///<param name="Str1">Перша рядкова змінна</param>
 			///<param name="Str2">Друга рядкова змінна</param>
 			///<returns>True якщо всі символи ідендисні</returns>
-			__forceinline constexpr Boolean Compare(const AChar* Str1, const AChar* Str2) {
+			__forceinline constexpr Boolean Compare(const AChar * Str1, const AChar * Str2) {
 				SizeT Str1Size = Size((ACharStr)Str1);
 				SizeT Str2Size = Size((ACharStr)Str2);
 				if (Str1Size != Str2Size) return false;

@@ -7,8 +7,8 @@
 #pragma warning(push)
 #pragma warning(disable: 4996)
 
-inline 
-bool ConvertCharStrToUUID(Seed::Core::CharStr str, Seed::Core::UUID & uuid) {
+inline
+bool ConvertCharStrToUUID(Seed::Core::CharStr str, Seed::Core::UUID& uuid) {
 	GUID guid;
 	UNICODE_STRING raw_str;
 	RtlInitUnicodeStringEx(&raw_str, str);
@@ -21,8 +21,8 @@ bool ConvertCharStrToUUID(Seed::Core::CharStr str, Seed::Core::UUID & uuid) {
 	return true;
 }
 
-inline 
-void ConvertUUIDtoCharStr(const Seed::Core::UUID & id, Seed::Core::CharStr buffer) {
+inline
+void ConvertUUIDtoCharStr(const Seed::Core::UUID& id, Seed::Core::CharStr buffer) {
 	UNICODE_STRING raw_str;
 	GUID rawId = id;
 	RtlStringFromGUID(&rawId, &raw_str);
@@ -30,7 +30,7 @@ void ConvertUUIDtoCharStr(const Seed::Core::UUID & id, Seed::Core::CharStr buffe
 	RtlFreeUnicodeString(&raw_str);
 }
 
-inline 
+inline
 Seed::Core::Char UpcaseCharImp(Seed::Core::Char symb) {
 	return RtlUpcaseUnicodeChar(symb);
 }

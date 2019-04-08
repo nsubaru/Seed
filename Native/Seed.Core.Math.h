@@ -387,11 +387,11 @@ namespace Seed {
 					return Internal::RuntimeExp(X);
 			}
 
-			__forceinline Double ModD(Double X, Double& Y) {
+			__forceinline Double ModD(Double X, Double & Y) {
 				return Internal::ModD(X, Y);
 			}
 
-			__forceinline Float ModD(Float X, Float& Y) {
+			__forceinline Float ModD(Float X, Float & Y) {
 				return Internal::ModD(X, Y);
 			}
 		}

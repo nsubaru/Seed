@@ -38,7 +38,7 @@ namespace Seed {
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)&CurrentSettingsData, //-V2005
+				(void*)& CurrentSettingsData, //-V2005
 				sizeof(CurrentSettingsData),
 				&Offset,
 				NULL
@@ -59,7 +59,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 {
 	{
 		Char raw[sizeof(size_t) + 1024];
-		UNICODE_STRING * str = (UNICODE_STRING*)raw; //-V2005
+		UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005
 		str->Length = 0;
 		str->MaximumLength = 0;
 		NtQueryInformationProcess(
@@ -84,7 +84,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 	{
 		toCoreLog(L"Ініціалізація файла конфігурацій...");
 		Char raw[sizeof(size_t) + 1024];
-		UNICODE_STRING * str = (UNICODE_STRING*)raw; //-V2005
+		UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005
 		NtQueryInformationProcess(
 			NtCurrentProcess(),
 			PROCESSINFOCLASS::ProcessImageFileName,
@@ -143,7 +143,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)&CurrentSettingsData, //-V2005
+				(void*)& CurrentSettingsData, //-V2005
 				sizeof(CurrentSettingsData),
 				NULL,
 				NULL
@@ -162,7 +162,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)&CurrentSettingsData, //-V2005
+				(void*)& CurrentSettingsData, //-V2005
 				sizeof(CurrentSettingsData),
 				NULL,
 				NULL

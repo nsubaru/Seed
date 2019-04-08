@@ -12,23 +12,23 @@
 //			enum class SystemRights {
 //				Login,
 //				Logoff,
-//			
+//
 //				TokenCreate,
 //				TokenUpdate,
 //				TokenRead,
-//			
+//
 //				ReadUserData,
-//			
+//
 //				UserCreate,
 //				UserUpdate,
 //				UserRead,
 //				UserDelete,
-//			
+//
 //				GroupCreate,
 //				GroupUpdate,
 //				GroupRead,
 //				GroupDelete,
-//			
+//
 //				MaxRight
 //			};
 //			///<summary>Маска системних прав</summary>

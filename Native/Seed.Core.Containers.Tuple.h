@@ -2,6 +2,5 @@
 
 namespace Seed {
 	inline namespace Core {
-		
 	}
 }

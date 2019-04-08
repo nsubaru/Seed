@@ -10,17 +10,17 @@ __declspec(noreturn) void ThrowStringToLong(
 }
 
 __declspec(noreturn) void ThrowNullPointException(
-	const Seed::ConstAString& File, 
-	const Seed::ConstAString& Function, 
-	const Seed::SizeT Line, 
-	const Seed::SizeT Address, 
+	const Seed::ConstAString& File,
+	const Seed::ConstAString& Function,
+	const Seed::SizeT Line,
+	const Seed::SizeT Address,
 	const Seed::UInt8 Mode)
 {
 	Throw(NullPointException(File, Function, Line, Address, static_cast<NullPointException::Types>(Mode)));
 }
 
 __declspec(noreturn) void ThrowIntegerOverflowException(
-	const Seed::ConstAString& File, 
+	const Seed::ConstAString& File,
 	const Seed::ConstAString& Function,
 	const Seed::SizeT Line
 )
@@ -29,8 +29,8 @@ __declspec(noreturn) void ThrowIntegerOverflowException(
 }
 
 __declspec(noreturn) void ThrowInvalidFormatException(
-	const Seed::ConstAString& File, 
-	const Seed::ConstAString& Function, 
+	const Seed::ConstAString& File,
+	const Seed::ConstAString& Function,
 	const Seed::SizeT Line
 )
 {

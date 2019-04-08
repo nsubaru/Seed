@@ -10,24 +10,24 @@ namespace Seed {
 		class BaseCallbackContainer : public IDisposable, virtual public Memory::Allocator<Heap> {
 			struct Data : virtual public Memory::Allocator<Heap> {
 				RefCountT RefCount;
-				Callback * callback;
+				Callback* callback;
 
-				Data(Callback *&& callback)
+				Data(Callback*&& callback)
 					:callback(callback), RefCount(1)
 				{}
 			};
 
-			Data * This;
+			Data* This;
 		private:
 			void Dispose() { delete This->callback; }
 		public:
-			BaseCallbackContainer(Callback *&& callback)
+			BaseCallbackContainer(Callback*&& callback)
 				:This(new Data(MoveRValue(callback)))
 			{}
 
 			RefCountClass(BaseCallbackContainer, This);
 
-			const Callback * const operator->() {
+			const Callback* const operator->() {
 				return This->callback;
 			}
 		};
