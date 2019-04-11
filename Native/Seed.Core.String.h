@@ -921,8 +921,8 @@ namespace Seed {
 					buf[i] = L'-';
 					i++;
 				}
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
@@ -949,8 +949,8 @@ namespace Seed {
 					buf[i] = L'-';
 					i++;
 				}
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
@@ -977,8 +977,8 @@ namespace Seed {
 					buf[i] = L'-';
 					i++;
 				}
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
@@ -1004,8 +1004,8 @@ namespace Seed {
 					buf[i] = L'-';//
 					i++;
 				}
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
@@ -1027,8 +1027,8 @@ namespace Seed {
 					i++;
 					val /= 10;
 				} while (val != 0);
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
@@ -1049,8 +1049,8 @@ namespace Seed {
 					i++;
 					val /= 10;
 				} while (val != 0);
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
@@ -1071,8 +1071,8 @@ namespace Seed {
 					i++;
 					val /= 10;
 				} while (val != 0);
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
@@ -1093,8 +1093,8 @@ namespace Seed {
 					i++;
 					val /= 10;
 				} while (val != 0);
-				i++;
 				buf[i] = L'\0';
+				i++;
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();

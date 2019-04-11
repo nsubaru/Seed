@@ -23,13 +23,13 @@ using namespace Seed::Memory;
 static struct
 {
 	///<summary>Дескриптор кучі</summary>
-	Handle HeapHandle = nullptr;
+	Handle HeapHandle;
 	///<summary>Поточне використання кучі</summary>
-	SizeT AllocatedMemory = 0;
+	SizeT AllocatedMemory;
 	///<summary>Поточна кількість виділених блоків</summary>
-	SizeT AllocatedMemBlksCount = 0;
+	SizeT AllocatedMemBlksCount;
 	///<summary>Фактичне використання пам'яті кучею</summary>
-	SizeT CurrentHeapSize = 0;
+	SizeT CurrentHeapSize;
 } InternalHeapData, HeapData, SecureHeapData;
 
 constexpr Seed::ConstString InternalHeapName = L"внутрішній";

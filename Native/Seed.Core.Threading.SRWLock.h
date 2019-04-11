@@ -80,9 +80,9 @@ namespace Seed {
 					{
 						AcquireLockSharedSRWLock(&lock);
 						try {
-							auto&& ret = MoveRValue(Funct());
+							auto ret(Funct());
 							ReleaseLockSharedSRWLock(&lock);
-							return MoveRValue(ret);
+							return ret;
 						}
 						catch (...) {
 							ReleaseLockSharedSRWLock(&lock);

@@ -410,13 +410,18 @@ void Seed::Core::Thread::Join(SizeT Timeout) const
 		NtWaitForSingleObject(this->thread->handle, TRUE, &delay);
 }
 
+extern void InitThreadEH();
+extern void StopThreadEH();
+
 Seed::Boolean Seed::Core::Init::Threading() noexcept {
 	toCoreLog(L"Ініціалізація підсистеми багатопотоковості...");
+	InitThreadEH();
 	return Seed::Core::InitCoreThreading();
 }
 
 void Seed::Core::Stop::Threading() noexcept {
 	toCoreLog(L"Зупинка підсистеми багатопотоковості...");
+	StopThreadEH();
 	Seed::Core::StopCoreThreading();
 }
 

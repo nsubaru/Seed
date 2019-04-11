@@ -5,12 +5,47 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-extern void InitSRWLock(void* PSRWLock);
-extern void AcquireLockExclusiveSRWLock(void* PSRWLock);
-extern void ReleaseLockExclusiveSRWLock(void* PSRWLock);
-extern void AcquireLockSharedSRWLock(void* PSRWLock);
-extern void ReleaseLockSharedSRWLock(void* PSRWLock);
+InternalApiCall OptimizeExport(extern void InitSRWLock(void* PSRWLock),
+	{
+	RtlInitializeSRWLock(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
+	}
+);
+InternalApiCall OptimizeExport(extern void AcquireLockExclusiveSRWLock(void* PSRWLock),
+	{
+	RtlAcquireSRWLockExclusive(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
+	}
+);
+InternalApiCall OptimizeExport(extern void ReleaseLockExclusiveSRWLock(void* PSRWLock),
+	{
+	RtlReleaseSRWLockExclusive(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
+	}
+);
+InternalApiCall OptimizeExport(extern void AcquireLockSharedSRWLock(void* PSRWLock),
+	{
+		RtlAcquireSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
+	}
+);
+InternalApiCall OptimizeExport(extern void ReleaseLockSharedSRWLock(void* PSRWLock),
+	{
+	RtlReleaseSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
+	}
+);
 
-extern void PulseNtEvent(void* handle);
-extern void SetNtEvent(void* handle);
-extern void ResetNtEvent(void* handle);
+InternalApiCall OptimizeExport(extern void PulseNtEvent(void* handle),
+	{
+	LONG state;
+	NtPulseEvent(handle, &state);
+	}
+);
+InternalApiCall OptimizeExport(extern void SetNtEvent(void* handle),
+	{
+	LONG state;
+	NtSetEvent(handle, &state);
+	}
+);
+InternalApiCall OptimizeExport(extern void ResetNtEvent(void* handle),
+	{
+		LONG state;
+		NtResetEvent(handle, &state);
+	}
+);

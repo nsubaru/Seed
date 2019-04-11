@@ -9,23 +9,31 @@
 #include "Seed.Core.Base.UUID.h"
 #include "Seed.Core.Base.Utils.h"
 
+///<summary>Не рекомендована функція</summary>
+///<param name = 'Why'>Причина</param>
+#define DeprecatedCall(Why) __declspec(deprecated(Why))
+///<summary>Внутрішній апі, використовувати напряму заборонено</summary>
+#define InternalApiCall __declspec(deprecated("Internal API"))
+
 ///<summary>Якщо визначено SeedKernel то всі виклики
 ///позначенні SeedKernelCall будуть експортуватись з виконавчого файла
 ///інакше будуть імпортуватись</summary>
 #ifdef SeedKernel
 ///<summary>Системний виклик який експортується з ядра Рем</summary>
 #define SeedKernelCall __declspec(dllexport)
+
 ///<summary>Сигнатура статичного конструктор зміної</summary>
 namespace { typedef void(__cdecl* PF)(void); }
 
 ///<summary>Сигнатура декструктора статичних зміних</summary>
-extern int __cdecl DestroyStaticVariables(PF pf);
+InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 
 #pragma warning(push)
 #pragma warning(disable: 4075)
-#pragma init_seg("INIT$b", DestroyStaticVariables)
+#pragma init_seg(".INIT$m", RegisterStaticDtors)
 #define INIT
 #pragma warning(pop)
+
 ///<summary>Експортує але в межах ядра замість виклику підставляє тіло функції</summary>
 ///<param name = 'FuncSig'>Сигнатура функції</param>
 ///<param name = 'Body'>Тіло функції</param>
@@ -39,11 +47,6 @@ extern int __cdecl DestroyStaticVariables(PF pf);
 ///<param name = 'Body'>Тіло функції</param>
 #define OptimizeExport(FunctSig, Body) SeedKernelCall FunctSig;
 #endif
-///<summary>Не рекомендована функція</summary>
-///<param name = 'Why'>Причина</param>
-#define DeprecatedCall(Why) __declspec(deprecated(Why))
-///<summary>Внутрішній апі, використовувати напряму заборонено</summary>
-#define InternalApiCall __declspec(deprecated("Internal API"))
 
 #define EXPAND_VA_ARGS(x) x
 

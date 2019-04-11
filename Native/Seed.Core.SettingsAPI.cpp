@@ -16,7 +16,7 @@
 using namespace Seed;
 using namespace Seed::Settings;
 
-CurrentSettings::SettingsData CurrentSettingsData = CurrentSettings::SettingsData();
+CurrentSettings::SettingsData CurrentSettingsData;
 
 namespace Seed {
 	inline namespace Core {
