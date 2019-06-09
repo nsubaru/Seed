@@ -74,15 +74,15 @@ namespace Seed {
 				return -1;
 			};
 
-			constexpr void SetBitSequal(SizeT Position, SizeT Count) {
-				if (Position + Count > BitCount)
-					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount + Count));
+			constexpr void SetBitSequal(SizeT Position, SizeT BitsCount) {
+				if (Position + BitsCount > BitCount)
+					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount + BitsCount));
 
 				SizeT StartByte = Position / 8;
 				SizeT StartBit = Position % 8;
 
-				SizeT EndByte = ((Position / 8) + Count);
-				SizeT EndBit = ((Position % 8) + Count) % 8;
+				SizeT EndByte = ((Position / 8) + BitsCount);
+				SizeT EndBit = ((Position % 8) + BitsCount) % 8;
 
 				EndBit++;
 
@@ -111,15 +111,15 @@ namespace Seed {
 					}
 				}
 			};
-			constexpr void ResetBitSequal(SizeT Position, SizeT Count) {
-				if (Position + Count > BitCount)
-					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount + Count));
+			constexpr void ResetBitSequal(SizeT Position, SizeT BitsCount) {
+				if (Position + BitsCount > BitCount)
+					Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount + BitsCount));
 
 				SizeT StartByte = Position / 8;
 				SizeT StartBit = Position % 8;
 
-				SizeT EndByte = ((Position / 8) + Count);
-				SizeT EndBit = ((Position % 8) + Count) % 8;
+				SizeT EndByte = ((Position / 8) + BitsCount);
+				SizeT EndBit = ((Position % 8) + BitsCount) % 8;
 
 				EndBit++;
 
@@ -172,7 +172,7 @@ namespace Seed {
 			};
 
 			constexpr SizeT SettedBitCount() {
-				SizeT Count = 0;
+				SizeT Count = 0; //-V688
 				for (SizeT byte = 0; byte < fullBytesCount; byte++) {
 					if (bitMap[byte] == 0)
 						Count += 8;

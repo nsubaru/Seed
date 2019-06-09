@@ -17,7 +17,7 @@ namespace Seed {
 			private:
 				UInt8 value;
 			public:
-				constexpr __forceinline SafeInt(UInt8 Value = 0) : value(Value) {};
+				constexpr __forceinline SafeInt(UInt8 Value = 0) : value(Value) {}; //-V730
 
 #pragma region Simple operations
 #pragma region SafeInt arg
@@ -183,7 +183,7 @@ namespace Seed {
 #pragma region Get & Set
 
 				constexpr __forceinline UInt8 Get() { return value; }
-				constexpr __forceinline void Set(UInt8 Value) { this->value = Value; }
+				constexpr __forceinline void Set(UInt8 Value) { this->value = Value; } //-V688
 
 				UInt8 Property(Get, Set) Value;
 
@@ -196,7 +196,7 @@ namespace Seed {
 			private:
 				UInt16 value;
 			public:
-				constexpr __forceinline SafeInt(UInt16 Value = 0) : value(Value) {};
+				constexpr __forceinline SafeInt(UInt16 Value = 0) : value(Value) {}; //-V730
 
 #pragma region Simple operations
 #pragma region SafeInt arg
@@ -362,7 +362,7 @@ namespace Seed {
 #pragma region Get and Set
 
 				constexpr __forceinline UInt16 Get() { return value; }
-				constexpr __forceinline void Set(UInt16 Value) { this->value = Value; }
+				constexpr __forceinline void Set(UInt16 Value) { this->value = Value; } //-V688
 
 				UInt16 Property(Get, Set) Value;
 
@@ -375,7 +375,7 @@ namespace Seed {
 			private:
 				UInt32 value;
 			public:
-				constexpr __forceinline SafeInt(UInt32 Value = 0) : value(Value) {};
+				constexpr __forceinline SafeInt(UInt32 Value = 0) : value(Value) {}; //-V730
 
 #pragma region Simple operations
 #pragma region SafeInt arg
@@ -541,7 +541,7 @@ namespace Seed {
 #pragma region Get and Set
 
 				constexpr __forceinline UInt32 Get() { return value; }
-				constexpr __forceinline void Set(UInt32 Value) { this->value = Value; }
+				constexpr __forceinline void Set(UInt32 Value) { this->value = Value; } //-V688
 
 				UInt32 Property(Get, Set) Value;
 
@@ -554,7 +554,7 @@ namespace Seed {
 			private:
 				UInt64 value;
 			public:
-				constexpr __forceinline SafeInt(UInt64 Value = 0) : value(Value) {};
+				constexpr __forceinline SafeInt(UInt64 Value = 0) : value(Value) {}; //-V730
 
 #pragma region Simple operations
 #pragma region SafeInt arg
@@ -720,7 +720,7 @@ namespace Seed {
 #pragma region Get and Set
 
 				constexpr __forceinline UInt64 Get() { return value; }
-				constexpr __forceinline void Set(UInt64 Value) { this->value = Value; }
+				constexpr __forceinline void Set(UInt64 Value) { this->value = Value; } //-V688
 
 				UInt64 Property(Get, Set) Value;
 

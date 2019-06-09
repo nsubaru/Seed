@@ -31,5 +31,11 @@ namespace Seed {
 				return This->callback;
 			}
 		};
+
+		template<typename Signature>
+		using Callback = BaseCallbackContainer<Seed::Core::Memory::Heap, Signature>;
+
+		template<typename Signature>
+		using SensitiveCallback = BaseCallbackContainer<Seed::Core::Memory::SensitiveDataHeap, Signature>;
 	}
 }

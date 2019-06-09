@@ -23,7 +23,7 @@ namespace Seed {
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'TID'>Id не існуючого потоку</param>
-				__forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID)
+				__forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID) //-V730
 					noexcept : Exception(File, FunctName, Line, L"Не можна працювати з незареєстрованим в рантаймі потоком"), tid(TID)
 				{};
 
@@ -147,11 +147,11 @@ namespace Seed {
 				virtual void Dispose() override final;
 			public:
 				///<summary>Конструктор</summary>
-				Event(Boolean IsManualReset = false) noexcept;
+				Event(Boolean IsManualReset = false);
 				///<summary>Конструктор з іменем об'єкта</summary>
-				Event(const String& name, Boolean IsManualReset = false) noexcept;
+				Event(const String& name, Boolean IsManualReset = false);
 				///<summary>Конструктор з оптимізованою передачею імені об'єкта</summary>
-				Event(String&& name, Boolean IsManualReset = false) noexcept;
+				Event(String&& name, Boolean IsManualReset = false);
 
 				RefCountClass(Event, data);
 
@@ -225,11 +225,11 @@ namespace Seed {
 				{
 					try
 					{
-						if constexpr (Seed::Core::StaticAsserts::IsSame<decltype(scope()), void>())
+						if constexpr (Seed::Core::StaticAsserts::IsSameT<decltype(scope()), void>())
 						{
 							this->data->lock.ExclusiveLock([&]() {
 								this->data->EventHandle.Reset();
-								this->data->GuardsCount++;
+								++this->data->GuardsCount;
 								scope();
 
 								if (--data->GuardsCount == 0)
@@ -399,13 +399,13 @@ namespace Seed {
 			static List<Thread> GetAllThreads();
 		public:
 			///<summary>Конструктор</summary>
-			Thread() : thread(new ThreadData(L"unnamed")) {}
+			Thread() : thread(new ThreadData(L"unnamed")) {} //-V730
 			///<summary>Конструктор з імена потоку</summary>
-			Thread(const String& Label) : thread(new ThreadData(L"Label")) {}
+			Thread(const String& Label) : thread(new ThreadData(L"Label")) {} //-V730
 			///<summary>Конструктор з оптимізованою передачею імені</summary>
-			Thread(String&& Label) : thread(new ThreadData(MoveRValue(Label))) {}
+			Thread(String&& Label) : thread(new ThreadData(MoveRValue(Label))) {} //-V730
 
-			RefCountClass(Thread, thread);
+			RefCountClass(Thread, thread); //-V730
 
 			///<summary>Зміна імені потоку</summary>
 			void ChangeLabel(const String& NewLabel);
@@ -454,7 +454,10 @@ namespace Seed {
 			}
 
 			//Очікувати на завершення потоку
-			void Join(SizeT Timeout = 0) const;
+			Thread& Join(SizeT Timeout = 0);
+
+			//Очікувати на завершення потоку
+			const Thread& Join(SizeT Timeout = 0) const;
 
 			//Вертає ID потоку
 			__forceinline ID GetThisThreadID() const
@@ -468,6 +471,26 @@ namespace Seed {
 			__forceinline operator Boolean() const
 			{
 				return thread->ID != -1;
+			}
+
+			//Вертає результат точки входу потоку потоку
+			template<typename T>
+			T GetResult() {
+				switch (this->thread->state) //-V2520
+				{
+				case ThreadState::NotStarted:
+				case ThreadState::Init:
+				case ThreadState::Work:
+				case ThreadState::Killed:
+				case ThreadState::Terminated:
+					Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+				case ThreadState::ClosedByExeption:
+					Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+				case ThreadState::CorrectlyEnded:
+					return this->thread->EntryPoint->GetResult<T>();
+				default:
+					Throw(NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
+				}
 			}
 
 			//Функція обміну для об'єктів потоків

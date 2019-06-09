@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #pragma once
 #include "Seed.Core.Base.h"
 
@@ -64,6 +67,7 @@ OptimizeExport(
 	}
 );
 
+InternalApiCall
 OptimizeExport(
 	void DowncaseCharStrImpl(Seed::Core::CharStr from, Seed::Core::CharStr to),
 	{
@@ -73,6 +77,13 @@ OptimizeExport(
 		__to.MaximumLength = __to.Length = __from.Length;
 		__to.Buffer = to;
 		RtlDowncaseUnicodeString(&__to, &__from, FALSE);
+	}
+);
+
+InternalApiCall
+OptimizeExport(
+	Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize), {
+		return RtlCompareUnicodeStrings(left, leftSize, right, rightSize, TRUE);
 	}
 );
 

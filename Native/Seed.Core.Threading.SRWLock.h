@@ -29,7 +29,7 @@ namespace Seed {
 					extern void AcquireLockExclusiveSRWLock(void*);
 					extern void ReleaseLockExclusiveSRWLock(void*);
 
-					if constexpr (StaticAsserts::IsSame<decltype(Funct()), void>())
+					if constexpr (StaticAsserts::IsSameT<decltype(Funct()), void>())
 					{
 						AcquireLockExclusiveSRWLock(&lock);
 						try {
@@ -45,9 +45,9 @@ namespace Seed {
 					{
 						AcquireLockExclusiveSRWLock(&lock);
 						try {
-							auto&& ret = MoveRValue(Funct());
+							auto ret(Funct());
 							ReleaseLockExclusiveSRWLock(&lock);
-							return MoveRValue(ret);
+							return ret;
 						}
 						catch (...) {
 							ReleaseLockExclusiveSRWLock(&lock);
@@ -64,7 +64,7 @@ namespace Seed {
 					extern void AcquireLockSharedSRWLock(void*);
 					extern void ReleaseLockSharedSRWLock(void*);
 
-					if constexpr (StaticAsserts::IsSame<decltype(Funct()), void>())
+					if constexpr (StaticAsserts::IsSameT<decltype(Funct()), void>())
 					{
 						AcquireLockSharedSRWLock(&lock);
 						try {

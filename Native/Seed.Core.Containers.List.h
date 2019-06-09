@@ -47,21 +47,21 @@ namespace Seed {
 					RefCount(1), value()
 				{};
 				///<summary>Конструктор з присвоєнням значення</summary>
-				///<param name = "obj">Значення елемента</summary>
+				///<param name = "obj">Значення елемента</param>
 				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				elem(const T& obj, list_data* data) :
 					father(data), next(nullptr), prev(nullptr),
 					RefCount(1), value(obj)
 				{};
 				///<summary>Конструктор з переміщенням значення</summary>
-				///<param name = "obj">Значення елемента</summary>
+				///<param name = "obj">Значення елемента</param>
 				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				elem(T&& obj, list_data* data) :
 					father(data), next(nullptr), prev(nullptr),
 					RefCount(1), value(MoveRValue(obj))
 				{};
 				///<summary>Конструктор з присвоєнням значення і виставленням покажчика на попередній елемент</summary>
-				///<param name = "obj">Значення елемента</summary>
+				///<param name = "obj">Значення елемента</param>
 				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				///<param name = "prev">Покажчик на попередній елемент</param>
 				elem(const T& obj, list_data* data, elem* prev) : //-V730
@@ -69,7 +69,7 @@ namespace Seed {
 					RefCount(1), value(obj)
 				{};
 				///<summary>Конструктор з переміщенням значення і виставленням покажчика на попередній елемент</summary>
-				///<param name = "obj">Значення елемента</summary>
+				///<param name = "obj">Значення елемента</param>
 				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				///<param name = "prev">Покажчик на попередній елемент</param>
 				elem(T&& obj, list_data* data, elem* prev) : //-V730
@@ -77,7 +77,7 @@ namespace Seed {
 					RefCount(1), value(MoveRValue(obj))
 				{};
 				///<summary>Конструктор з присвоєнням значення і встановлення покажчиків на сусідні елементи</summary>
-				///<param name = "obj">Значення елемента</summary>
+				///<param name = "obj">Значення елемента</param>
 				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				///<param name = "prev">Покажчик на попередній елемент</param>
 				///<param name = "next">Покажчик на наступний елемент</param>
@@ -86,7 +86,7 @@ namespace Seed {
 					RefCount(1), value(obj)
 				{};
 				///<summary>Конструктор з переміщенням значення і встановлення покажчиків на сусідні елементи</summary>
-								///<param name = "obj">Значення елемента</summary>
+				///<param name = "obj">Значення елемента</param>
 				///<param name = "data">Покажчик на об'єкт списка який є власником нового елемента</param>
 				///<param name = "prev">Покажчик на попередній елемент</param>
 				///<param name = "next">Покажчик на наступний елемент</param>
@@ -365,7 +365,7 @@ namespace Seed {
 						const Seed::SizeT Line);
 					if (This == nullptr)
 						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-					if (This->father = nullptr)
+					if (This->father == nullptr)
 						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
 						return Iterator(nullptr);
 					else
@@ -384,7 +384,7 @@ namespace Seed {
 						const Seed::SizeT Line);
 					if (This == nullptr)
 						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-					if (This->father = nullptr)
+					if (This->father == nullptr)
 						//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
 						return Iterator(nullptr);
 					else
@@ -430,10 +430,11 @@ namespace Seed {
 								}
 								else if (this->This->next == nullptr)
 								{
-									this->This->prev->next = nullptr;
+									if(this->This->prev != nullptr)
+										this->This->prev->next = nullptr;
 									this->This->father->last = this->This->prev;
 								}
-								else if (this->This->prev == nullptr)
+								else if (this->This->prev == nullptr) //-V2516
 								{
 									this->This->next->prev = nullptr;
 									this->This->father->root = this->This->next;
@@ -441,7 +442,7 @@ namespace Seed {
 
 								--((This)->father->size);
 
-								if (--this->This->RefCount == 0)
+								if (--this->This->RefCount == 1)
 								{
 									auto newThis = this->This->next;
 									delete this->This;
@@ -461,13 +462,13 @@ namespace Seed {
 				///<param name = "Value">Значення нового елемента</summary>
 				__forceinline Iterator Insert(const T & Value)
 				{
-					AddAfter(Value);
+					return AddAfter(Value);
 				}
 				///<summary>Оптимізована вставка елемента після заданого</summary>
 				///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
 				__forceinline Iterator Insert(T && Value)
 				{
-					AddAfter(MoveRValue(Value));
+					return AddAfter(MoveRValue(Value));
 				}
 				///<summary>Вставка елемента після поточного</summary>
 				///<param name = "Value">Значення нового елемента</summary>
@@ -643,7 +644,7 @@ namespace Seed {
 			///<summary>Конструктор з масиву та його розміру</summary>
 			///<param name = "Array">С-подібний масив</summary>
 			///<param name = "Count">Кількість елементів в ньому</summary>
-			InternalApiCall BaseList(T * Array, SizeT Count)
+			InternalApiCall BaseList(T * Array, SizeT NewCount)
 			{
 				data = new list_data;
 				if (Array == nullptr)
@@ -653,16 +654,16 @@ namespace Seed {
 				}
 				data->root = new elem(Array[0], data);
 				data->last = data->root;
-				if (Count != 1)
+				if (NewCount != 1)
 				{
-					for (SizeT i = 1; i < Count; i++)
+					for (SizeT i = 1; i < NewCount; i++)
 					{
 						data->last->next = new elem(Array[i], data, data->last);
 						data->last = data->last->next;
 					}
 					data->last->next = nullptr;
 				}
-				data->size = Count;
+				data->size = NewCount;
 			}
 
 			///<summary>Конструктор з масиву та його розміру</summary>
@@ -694,16 +695,16 @@ namespace Seed {
 				if (list.size() == 0) return;
 				this->data->size = list.size();
 				auto it = list.begin();
-				data->root = new elem(*it, data);
+				data->root = new elem(MoveRValue(*it), data);
 				data->root->value = *it;
 				data->last = data->root;
 				if (this->data->size != 1)
 				{
 					for (SizeT i = 0; i < this->data->size; i++)
 					{
-						it++;
-						data->last->next = new elem(*it, data, data->last);
+						data->last->next = new elem(MoveRValue(*it), data, data->last);
 						data->last = data->last->next;
+						it++;
 					}
 				}
 			}
@@ -774,6 +775,25 @@ namespace Seed {
 			{
 				this->AddLast(Value); return *this;
 			}
+
+			Boolean operator==(const BaseList& second) {
+				if (this->Count == second.Count) {
+					return this->data->lock.ShareLock([&]()
+						{
+							auto it1 = this->data->root;
+							auto it2 = second.data->root;
+							while (it1 != nullptr)
+							{
+								if (it1->value != it2->value)
+									return false;
+								it1 = it1->next;
+								it2 = it2->next;
+							}
+							return true;
+						});
+				}
+				return false;
+			}
 #pragma endregion
 #pragma region Item count methods
 			///<summary>Вертає true якщо список пустий</summary>
@@ -785,7 +805,7 @@ namespace Seed {
 			///<summary>Вертає кількість елементів в списку</summary>
 			__forceinline SizeT GetCount() const noexcept
 			{
-				return IsEmpty() ? 0ull : (SizeT)data->size;
+				return IsEmpty() ? 0ull : (SizeT)data->size; //-V2517
 			}
 
 			///<summary>Кількість елементів в списку</summary>
@@ -872,7 +892,7 @@ namespace Seed {
 						this->data->last = newLast;
 						this->data->last->prev->next = newLast;
 						++data->size;
-						return data->last;
+						return newLast;
 					});
 			}
 
@@ -896,14 +916,14 @@ namespace Seed {
 					return data->last;
 				}
 				//Виконується в ексклюзивній блокировці
-				this->data->lock.ExclusiveLock([&]() mutable
+				return this->data->lock.ExclusiveLock([&]() mutable
 					{
 						auto newLast = new elem(MoveRValue(Value), data, data->last);
 						auto cp = newLast;
 						this->data->last = newLast;
 						this->data->last->prev->next = newLast;
 						++data->size;
-						return data->last;
+						return newLast;
 					});
 			}
 			///<summary>Додавання нового елемента після заданого ітератором</summary>
@@ -1049,7 +1069,7 @@ namespace Seed {
 				elem * tmp;
 				while (it != nullptr)
 				{
-					if (Filter(it->value))
+					if (Filter(it->value)) {
 						this->data->lock.ExclusiveLock([&]()
 							{
 								if (it->next == nullptr && it->prev == nullptr)
@@ -1061,7 +1081,8 @@ namespace Seed {
 								else if (it->next == nullptr)
 								{
 									tmp = nullptr;
-									it->prev->next = nullptr;
+									if (it->prev != nullptr)
+										it->prev->next = nullptr;
 									data->last = it->prev;
 								}
 								else if (it->prev == nullptr)
@@ -1084,7 +1105,65 @@ namespace Seed {
 								--data->size;
 								it = tmp;
 							}
-					);
+						);
+					}
+					else  it = it->next;
+				}
+				return *this;
+			}
+
+			///<summary>Видалення першого елемента який задовільняє умову функції Comp</summary>
+			///<param name = "Filter">Функція-фільтр якщо вертає true то елемент видаляється</param>
+			///<returns>Силку на список</returns>
+			template<typename TFilter>
+			BaseList& RemoveIfFirstOnly(const TFilter& Filter)
+			{
+				static_assert(!StaticAsserrts::CheckSignature<TFilter, Boolean, const T&>(), "Invalid filter");
+				if (data == nullptr)
+					return;
+				elem * it = data->root;
+				elem * tmp;
+				while (it != nullptr)
+				{
+					if (Filter(it->value)) {
+						this->data->lock.ExclusiveLock([&]()
+							{
+								if (it->next == nullptr && it->prev == nullptr)
+								{
+									data->root = nullptr;
+									data->last = nullptr;
+									tmp = nullptr;
+								}
+								else if (it->next == nullptr)
+								{
+									tmp = nullptr;
+									if (it->prev != nullptr)
+										it->prev->next = nullptr;
+									data->last = it->prev;
+								}
+								else if (it->prev == nullptr)
+								{
+									tmp = it->next;
+									it->next->prev = nullptr;
+									data->root = it->next;
+								}
+								else
+								{
+									tmp = it->next;
+									tmp->prev = it->prev;
+									it->prev->next = tmp;
+								}
+								--it->RefCount;
+								if (it->RefCount == 0)
+								{
+									delete it;
+								}
+								--data->size;
+								it = tmp;
+							}
+						);
+						return *this;
+					}
 					else  it = it->next;
 				}
 				return *this;
@@ -1232,6 +1311,7 @@ namespace Seed {
 						{
 							if (it->value == Value)
 								return Iterator(it);
+							it = it->next;
 						}
 						return Iterator(nullptr);
 					});
@@ -1251,6 +1331,7 @@ namespace Seed {
 						{
 							if (it->value == Value)
 								found = it;
+							it = it->next;
 						}
 						return Iterator(found);
 					});
@@ -1280,6 +1361,7 @@ namespace Seed {
 									list.data->root = elemInNewList;
 								list.data->last->next = elemInNewList;
 							}
+							it = it->next;
 						}
 					});
 
@@ -1294,14 +1376,14 @@ namespace Seed {
 			///</para></summary>
 			~BaseList()
 			{
-				if (data == nullptr) return;
-				data->lock.ExclusiveLock([&]()
+				if (this->data == nullptr) return;
+				this->data->lock.ExclusiveLock([&]()
 					{
 						elem* node;
-						while (data->root != nullptr)
+						while (this->data->root != nullptr)
 						{
-							node = data->root;
-							data->root = data->root->next;
+							node = this->data->root;
+							this->data->root = data->root->next;
 							if (--node->RefCount == 0)
 							{
 								delete node;
@@ -1311,10 +1393,10 @@ namespace Seed {
 							node->father = nullptr;
 							node->prev = nullptr;
 						}
-						data->last = nullptr;
-						data->size = 0;
+						this->data->last = nullptr;
+						this->data->size = 0;
 						delete data;
-						data = nullptr;
+						this->data = nullptr;
 					});
 			}
 #pragma endregion

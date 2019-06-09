@@ -32,27 +32,27 @@ namespace Seed {
 			UInt64 time_ms;
 		public:
 			//Пустий конструктор
-			DateTime() noexcept :time_ms(0) {};
+			DateTime() noexcept :time_ms(0) {}; //-V730
 			//Конструктор з задаванням 100 наносекндних інтервалах
-			DateTime(UInt64 time) :time_ms(time) {};
+			DateTime(UInt64 time) :time_ms(time) {}; //-V730
 			//Копіювальний конструктор
-			DateTime(const DateTime& orig) :time_ms(orig.time_ms) {};
+			DateTime(const DateTime& orig) :time_ms(orig.time_ms) {}; //-V730
 			//Оператор присвоєння
 			DateTime& operator=(const DateTime& from) { this->time_ms = from.time_ms; return *this; }
 			//Оператор додавання до
-			DateTime& operator+=(DateTime time) { this->time_ms += time.time_ms; return *this; }
+			DateTime& operator+=(const DateTime& time) { this->time_ms += time.time_ms; return *this; }
 			//Оператор віднімання від
-			DateTime& operator-=(DateTime time) { this->time_ms -= time.time_ms; return *this; }
+			DateTime& operator-=(const DateTime& time) { this->time_ms -= time.time_ms; return *this; }
 			//Оператор додавання
-			friend DateTime operator+(DateTime time1, DateTime time2) { return time1.time_ms + time2.time_ms; }
+			friend DateTime operator+(const DateTime & time1, const DateTime & time2) { return time1.time_ms + time2.time_ms; }
 			//Оператор віднімання
-			friend DateTime operator-(DateTime time1, DateTime time2) { return time1.time_ms - time2.time_ms; }
+			friend DateTime operator-(const DateTime & time1, const DateTime & time2) { return time1.time_ms - time2.time_ms; }
 			//Вертає кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
-			UInt64 GetMsFrom1600() { return time_ms; }
+			UInt64 GetMsFrom1600() const { return time_ms; }
 			//Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 			UInt64 Property(GetMsFrom1600) TimeFromStartEpoch;
 			//Вертає кількість 100 наносекудних інтервалів
-			UInt64 GetAsRelativeTime() { return -(Int64)time_ms; }
+			UInt64 GetAsRelativeTime() const { return -static_cast<Int64>(time_ms); }
 			//Кількість 100 наносекудних інтервалів
 			UInt64 Property(GetAsRelativeTime) GetRelatimeTime;
 			//Вертає поточний системний час

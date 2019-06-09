@@ -88,6 +88,10 @@ namespace Seed {
 				__forceinline Exception(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& ExeptionName) noexcept
 					:location({ File, FunctName, Line, GetTargetThreadID() }), exeptionName(ExeptionName) {}
 
+				//__forceinline Exception(const Exception& orig)
+				//	: location(orig.location), exeptionName(orig.exeptionName) {}
+
+
 				///<summary>Вертає користувальницьку назву помилки</summary>
 				__forceinline const ConstString& GetExceptioName() const
 				{
@@ -114,6 +118,32 @@ namespace Seed {
 
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
 				virtual ~Exception() {}
+			public:
+				class RawException {
+				private:
+					void* ptr;
+				private:
+					RawException(void* ptr) : ptr(ptr) {};
+				public:
+					RawException() :ptr(nullptr) {};
+					RawException(RawException&) = delete;
+					RawException(RawException&& orig) : ptr(orig.ptr) 
+					{
+						orig.ptr = nullptr;
+					}
+					RawException& operator=(RawException&) = delete;
+					RawException& operator=(RawException&& orig) {
+						this->ptr = orig.ptr;
+						orig.ptr = nullptr;
+					}
+
+					~RawException();
+				public:
+					friend Exception;
+				};
+			public:
+				static RawException StoreCurrentException();
+				static void ThrowRawException(RawException&& exception);
 			};
 
 			///<summary>Ділення на ноль</summary>
@@ -552,7 +582,7 @@ namespace Seed {
 			class NtException : public Exception {
 			private:
 				///<summary>NtStatus code операції</summary>
-				Int32 statusCode;
+				Int64 statusCode;
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -563,6 +593,11 @@ namespace Seed {
 					noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 				{}
 
+				//NtException(const NtException& orig): statusCode(orig.statusCode), Exception(orig) {
+				//	extern void NtStatusExceptionMethodsCallsLogging(ConstAString & methodName);
+				//	NtStatusExceptionMethodsCallsLogging(ConstAString(__FUNCSIG__));
+				//}
+
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override {
 					return ExceptionString(exeptionName)
@@ -572,7 +607,10 @@ namespace Seed {
 						+ ExceptionString(L". ");
 				}
 
-				virtual ~NtException() {}
+				virtual ~NtException() {
+					//extern void NtStatusExceptionMethodsCallsLogging(ConstAString & methodName);
+					//NtStatusExceptionMethodsCallsLogging(ConstAString(__FUNCSIG__));
+				}
 			};
 		}
 	}
@@ -592,7 +630,7 @@ template<typename Type>
 struct IsThrowable :
 	Seed::Core::StaticAsserts::IsBasedOn<
 	Seed::Core::Exceptions::Exception,
-	Seed::Core::StaticAsserts::RemoveRefT<ThrowableObj<Type>>
+	Seed::Core::StaticAsserts::RemoveRefV<ThrowableObj<Type>>
 	>
 {};
 
@@ -601,13 +639,13 @@ struct IsThrowable :
 template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___cxxthrow(E&& ex) { throw ex; }
 
 ///<summary>Внутрішня функція пркидування поточної помилки</summary>
-InternalApiCall __forceinline void __declspec(noreturn) __cxxrethrow() { throw; }
+InternalApiCall __forceinline void __declspec(noreturn) __cxxrethrow() { throw; } //-V667
 
 ///<summary>Генерація помилки з провіркою типу</summary>
 ///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>
 #define Throw(ExceptionObj) \
 do{ \
-	static_assert(IsThrowable<decltype(ExceptionObj)>() | Seed::StaticAsserts::IsSame<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>(), \
+	static_assert(IsThrowable<decltype(ExceptionObj)>() | Seed::StaticAsserts::IsSameV<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>, \
 	"Only Seed::Exception and derived classes cant be throw as exception"); \
 	__assume(IsThrowable<decltype(ExceptionObj)>()); \
 	__pragma(warning(push)); \

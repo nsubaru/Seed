@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.Security.h"
 #include "Seed.Core.Security.Manage.h"
 #include "Seed.Core.Security.Internal.h"
@@ -45,23 +48,23 @@ Seed::Boolean InitModuleFilter() {
 	NTSTATUS status;
 	UNICODE_STRING ntdll;
 	ANSI_STRING func_name;
-	RtlInitUnicodeStringEx(&ntdll, (PWSTR)AllowedDLL[0]);
-	RtlInitAnsiStringEx(&func_name, (PCSZ)"LdrRegisterDllNotification");
+	RtlInitUnicodeStringEx(&ntdll, (PWSTR)AllowedDLL[0]); //-V2533
+	RtlInitAnsiStringEx(&func_name, (PCSZ)"LdrRegisterDllNotification"); //-V2533
 	LdrGetDllHandle(NULL, NULL, &ntdll, &ntdllHandle);
-	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)& pLdrRegisterDllNotification);
+	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)& pLdrRegisterDllNotification); //-V2533
 	status = pLdrRegisterDllNotification(0, LdrDllNotification, NULL, &LdrDllNotificationHandleCokies);
 	return NT_SUCCESS(status);
 }
 
 void StopModuleFilter() noexcept {
 	ANSI_STRING func_name;
-	RtlInitAnsiStringEx(&func_name, (PCSZ)"LdrUnregisterDllNotification");
-	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)& pLdrUnregisterDllNotification);
+	RtlInitAnsiStringEx(&func_name, (PCSZ)"LdrUnregisterDllNotification"); //-V2533
+	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)& pLdrUnregisterDllNotification); //-V2533
 	pLdrUnregisterDllNotification(LdrDllNotificationHandleCokies);
 }
 
 //Dll loading\unloading verification
-VOID CALLBACK LdrDllNotification(
+VOID CALLBACK LdrDllNotification( //-V2537
 	_In_     ULONG                       NotificationReason,
 	_In_     PLDR_DLL_NOTIFICATION_DATA  NotificationData,
 	_In_opt_ PVOID                       Context
@@ -69,7 +72,7 @@ VOID CALLBACK LdrDllNotification(
 	if (NotificationReason == LDR_DLL_NOTIFICATION_REASON_LOADED) {
 		UNICODE_STRING str;
 		for (Seed::SizeT i = 0; i < AllowedDllCout; i++) {
-			RtlInitUnicodeString(&str, (PWSTR)AllowedDLL[i]);
+			RtlInitUnicodeString(&str, (PWSTR)AllowedDLL[i]); //-V2533
 			if (RtlCompareUnicodeString(NotificationData->Loaded.BaseDllName, &str, TRUE) == 0)
 				return;
 		}

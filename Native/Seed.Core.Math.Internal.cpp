@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.Math.Internal.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
@@ -18,7 +21,7 @@ namespace Seed {
 #pragma intrinsic(pow)
 				Float RuntimePow(Float What, Float By)
 				{
-					return (Float)pow(What, By);
+					return (Float)pow(What, By); //-V2533
 				}
 
 				UInt64 RuntimePow(UInt64 What, UInt8 By)
@@ -61,7 +64,7 @@ namespace Seed {
 
 					UInt64 result = 1;
 
-					switch (highest_bit_set[By])
+					switch (highest_bit_set[By]) //-V2520
 					{
 					case 255: //ми можем використовувати 255 як маркер переповнення
 						if (What == 1)

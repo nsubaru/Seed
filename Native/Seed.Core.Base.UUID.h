@@ -12,11 +12,19 @@ typedef struct _GUID {
 } GUID;
 #endif // __GUID_DEFINED
 
+#ifndef SeedKernelCall
+#ifdef SeedKernel
+#define SeedKernelCall __declspec(dllexport)
+#else
+#define SeedKernelCall __declspec(dllimport)
+#endif
+#endif
+
 namespace Seed {
 	inline namespace Core {
 		//Клас унікального ідентифікатора UUID сумісного з GUID
 		// який використовується в ядрі Windows
-		class UUID {
+		class SeedKernelCall UUID {
 		private:
 			//GUID для зберігання даних
 			GUID uuid;
@@ -28,7 +36,7 @@ namespace Seed {
 
 			//Вертає максимальний можливий UUID
 			__forceinline static UUID GetMaxUUID() noexcept {
-				return GUID({ 0xffffffff,0xffff,0xffff,{0xff,0xff,0xff,0xff,0xff} }); //-V112
+				return GUID({ 0xffffffff,0xffff,0xffff,{0xff,0xff,0xff,0xff,0xff} }); //-V112 //-V2523
 			}
 
 			//Пустий конструктор, генерує нульовий ідентифікатор

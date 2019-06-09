@@ -2,7 +2,7 @@
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Exceptions.h"
-#include "Seed.Core.Containers.Internals.h"
+#include "Seed.Core.Containers.Tuple.h"
 #include "typeinfo"
 
 namespace {
@@ -109,7 +109,7 @@ namespace Seed {
 			template<typename T>
 			__forceinline T GetResult()
 			{
-				return *(T*)__get_result(typeid(T));
+				return MoveRValue(*(T*)__get_result(typeid(T)));
 			}
 			//Деструктор, для коректного видалення об'єкта який наслідує цей класс
 			virtual ~FunctionObj() = 0
@@ -177,7 +177,7 @@ protected:
 	//- InvalidType якщо типи результату не коректний
 	__forceinline virtual void* __get_result(const Seed::TypeInfo& type) override final
 	{
-		if constexpr (Seed::Core::StaticAsserts::IsSame<retType, void>::State)
+		if constexpr (Seed::Core::StaticAsserts::IsSameT<retType, void>::State)
 			Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(void), type));
 		else if (result == nullptr)
 			Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
@@ -197,7 +197,7 @@ public:
 		try
 		{
 			//Умова часу компіляції, яка провіряє чи функція вертає void
-			if constexpr (!Seed::Core::StaticAsserts::IsSame<decltype(call(f, args)), void>::State)
+			if constexpr (!Seed::Core::StaticAsserts::IsSameT<decltype(call(f, args)), void>::State)
 			{
 				//Якщо ні то запамятовує результат в покажчику res
 				//В який переміщає конструктором переміщення результат
@@ -206,7 +206,7 @@ public:
 			//Якщо функція вертає void то просто викликаєм її
 			else call(f, args);
 		}
-		catch ([[maybe_unused]] Seed::InteruptException&) {
+		catch ([[maybe_unused]] Seed::InteruptException&) { //-V2010
 			isEnded = true;
 			ReThrow;
 		}
@@ -235,7 +235,7 @@ public:
 	//Деструктор, видаляє результат якщо він є
 	__forceinline ~TemplateFunctionT()
 	{
-		if constexpr (!Seed::Core::StaticAsserts::IsSame<decltype(call(f, args)), void>::State)
+		if constexpr (!Seed::Core::StaticAsserts::IsSameT<decltype(call(f, args)), void>::State)
 			if (result != nullptr)
 			{
 				delete (decltype(call(f, args))*)result;

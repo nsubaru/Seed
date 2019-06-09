@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Exceptions.Internals.h"
 
@@ -36,17 +39,23 @@ _CxxThrowException(
 			nullptr                        // Image base of thrown object
 			}                      // pThrowInfo
 	};
-	EHExceptionRecord ThisException = ExceptionTemplate;    // This exception
+	union RawExceptionInfo {
+		EXCEPTION_RECORD NtExceptionInfo;
+		EHExceptionRecord CxxExceptionInfo;
+	};
+
+	RawExceptionInfo ThisException = { 0 };
+	ThisException.CxxExceptionInfo = ExceptionTemplate;    // This exception
 
 	ThrowInfo* pTI = (ThrowInfo*)pThrowInfo;
 
 	//
 	// Fill in the blanks:
 	//
-	ThisException.params.pExceptionObject = pExceptionObject;
-	ThisException.params.pThrowInfo = pTI;
+	ThisException.CxxExceptionInfo.params.pExceptionObject = pExceptionObject;
+	ThisException.CxxExceptionInfo.params.pThrowInfo = pTI;
 	PVOID ThrowImageBase = RtlPcToFileHeader((PVOID)pTI, &ThrowImageBase);
-	ThisException.params.pThrowImageBase = ThrowImageBase;
+	ThisException.CxxExceptionInfo.params.pThrowImageBase = ThrowImageBase;
 
 	//
 	// If the throw info indicates this throw is from a pure region,
@@ -62,6 +71,6 @@ _CxxThrowException(
 	//
 	// Hand it off to the OS:
 	//
-
-	RtlRaiseException((PEXCEPTION_RECORD)& ThisException);
+	
+	RtlRaiseException(reinterpret_cast<EXCEPTION_RECORD*>(&ThisException.NtExceptionInfo));
 }

@@ -245,10 +245,7 @@ namespace Seed {
 			}
 			__forceinline constexpr Double Lg(Double X)
 			{
-				if constexpr (IS_CONSTEXPR(Internal::ConstexprLn(X)))
-					return Internal::ConstexprLn(X);
-				else
-					return Internal::RuntimeLn(X);
+				return Ln(X);
 			}
 			__forceinline constexpr Double Log2(Double X)
 			{
@@ -344,19 +341,19 @@ namespace Seed {
 #pragma region Sign
 			__forceinline constexpr Boolean Sign(Int8 Val)
 			{
-				return ((Val) & ((Seed::Int8)1 << 7));
+				return ((Val) & ((Seed::Int8)1 << 7)); //-V2533
 			}
 			__forceinline constexpr Boolean Sign(Int16 Val)
 			{
-				return ((Val) & ((Seed::Int16)1 << 15));
+				return ((Val) & ((Seed::Int16)1 << 15)); //-V2533
 			}
 			__forceinline constexpr Boolean Sign(Int32 Val)
 			{
-				return ((Val) & ((Seed::Int32)1 << 31));
+				return ((Val) & ((Seed::Int32)1 << 31)); //-V2533
 			}
 			__forceinline constexpr Boolean Sign(Int64 Val)
 			{
-				return ((Val) & ((Seed::Int64)1 << 63));
+				return ((Val) & ((Seed::Int64)1 << 63)); //-V2533
 			}
 			__forceinline constexpr Boolean Sign(Float Val)
 			{
@@ -373,9 +370,11 @@ namespace Seed {
 					return Internal::RuntimeAbs(Val);
 			}
 
-			__forceinline constexpr Boolean GetNumberByPos(const UInt64 Number, const UInt8 Pos)
+			__forceinline constexpr UInt8 GetNumberByPos(const UInt64 Number, const UInt8 Pos)
 			{
-				return Number % Pow(10ULL, static_cast<UInt8>(Pos + 1ui8)) / (10ULL, static_cast<UInt8>(Pos + 1ui8));
+				return static_cast<UInt8>(
+					Number % Pow(10ULL, static_cast<UInt8>(Pos + 1ui8)) / Pow(10ULL, static_cast<UInt8>(Pos + 1ui8)) //-V747 //-V2517
+				);
 			}
 #pragma endregion
 

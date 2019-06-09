@@ -19,7 +19,7 @@ namespace Seed {
 
 			///<summary>Копіювальний конструктор</summary>
 			///<param name = "orig">Оригинал константного рядка</param>
-			constexpr ConstAString(const ConstAString& orig) : str(orig.str), size(orig.size) {}
+			constexpr ConstAString(const ConstAString& orig) : str(orig.str), size(orig.size) {} //-V730
 
 			///<summary>Оператор копіювання</summary>
 			///<param name = "orig">Оригинал константного рядка</param>
@@ -70,7 +70,7 @@ namespace Seed {
 
 			///<summary>Копіювальний конструктор</summary>
 			///<param name = "orig">Оригинал константного рядка</param>
-			constexpr ConstString(const ConstString& orig) : str(orig.str), size(orig.size) {}
+			constexpr ConstString(const ConstString& orig) : str(orig.str), size(orig.size) {} //-V730
 
 			///<summary>Оператор копіювання</summary>
 			///<param name = "orig">Оригинал константного рядка</param>

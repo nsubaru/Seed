@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.Base.h"
 
 #include "Seed.Core.Exceptions.h"
@@ -755,7 +758,7 @@ static _RTTIBaseClassDescriptor* FindVITargetTypeInstance(
 					// of the target class derives from the source instance.
 					// First check for public visibility of the source.
 
-					if (!(pTargetBCD->attributes & BCD_HASPCHD))
+					if (!(pTargetBCD->attributes & BCD_HASPCHD)) //-V522
 					{
 						// We've got an older form of the RTTI data without the
 						// link to the class hierarchy descriptor.  We can only

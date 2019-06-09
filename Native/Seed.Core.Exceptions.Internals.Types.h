@@ -11,6 +11,8 @@
 #define EH_EXCEPTION_NUMBER	('seed' | 0xE0000000)
 #endif // PreReleaseMode || DebugMode
 
+#define EH_EXCEPTION_PARAMETERS 4
+
 typedef	int	PMFN;					// Image relative offset of Member Function
 
 //
@@ -138,6 +140,37 @@ typedef const struct _s_FuncInfo
 
 typedef void(__cdecl* unexpected_handler)();
 typedef void(__cdecl* unexpected_function)(); //-V677
+
+//
+// PMD - Pointer to Member Data: generalized pointer-to-member descriptor
+//
+typedef struct PMD
+{
+	int	mdisp;	// Offset of intended data within base
+	int	pdisp;	// Displacement to virtual base pointer
+	int	vdisp;	// Index within vbTable to offset of base
+} PMD;
+
+//
+// CatchableType - description of a type that can be caught.
+//
+// Note:  although isSimpleType can be part of ThrowInfo, it is more
+//		  convenient for the run-time to have it here.
+//
+typedef const struct _s_CatchableType {
+	unsigned int		properties;			// Catchable Type properties (Bit field)
+	int					pType;				// Image relative offset of TypeDescriptor
+	PMD 				thisDisplacement;	// Pointer to instance of catch type within thrown object.
+	int					sizeOrOffset;		// Size of simple-type object or offset into
+											//  buffer of 'this' pointer for catch object
+	PMFN				copyFunction;		// Copy constructor or CC-closure
+} CatchableType;
+
+typedef struct FrameInfo {
+	PVOID               pExceptionObject;
+	struct FrameInfo* pNext;
+} FRAMEINFO;
+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //
 // Per-thread data
@@ -157,7 +190,7 @@ typedef struct
 	int                _cxxReThrow;      // true if it's a rethrown C++ exception
 	void* _pExitContext;
 	void* _pUnwindContext;
-	void* _pFrameInfoChain;
+	FRAMEINFO* _pFrameInfoChain;
 	unsigned __int64          _ImageBase;
 	unsigned __int64          _ThrowImageBase;
 	void* _pForeignException;
@@ -167,6 +200,8 @@ typedef struct
 											 // will have been already unwound before calling the catch, so this prevents us from unwinding those states twice.
 											 // Also used if an SEH exception is thrown out of a dtor, in which case it's encoded as an offset into the UW map.
 	bool               _IsOffset;            // Whether the value in _UnwindStateorOffset is an offset from the start of the UW map or an actual state.
+	bool _isCatchBlockProceding;			//If true then now proceding catch
+	void* throwObjStorageForStoredException;
 } tls_exeption_info_t;
 
 // As magic numbers increase, we have to keep track of the versions that we are
@@ -238,7 +273,7 @@ typedef struct TypeDescriptor
 {
 	const void* pVFTable;	// Field overloaded by RTTI
 	void* spare;			// reserved, possible for RTTI
-	char			name[];			// The decorated name of the type; 0 terminated.
+	char			name[];			// The decorated name of the type; 0 terminated. //-V2504
 } TypeDescriptor;
 
 #pragma pack(pop, TypeDescriptor)
@@ -263,30 +298,7 @@ typedef const struct _s_ESTypeList
 	int				dispTypeArray;	// offset of list of types in exception specification
 }ESTypeList;
 
-//
-// PMD - Pointer to Member Data: generalized pointer-to-member descriptor
-//
-typedef struct PMD
-{
-	int	mdisp;	// Offset of intended data within base
-	int	pdisp;	// Displacement to virtual base pointer
-	int	vdisp;	// Index within vbTable to offset of base
-} PMD;
 
-//
-// CatchableType - description of a type that can be caught.
-//
-// Note:  although isSimpleType can be part of ThrowInfo, it is more
-//		  convenient for the run-time to have it here.
-//
-typedef const struct _s_CatchableType {
-	unsigned int		properties;			// Catchable Type properties (Bit field)
-	int					pType;				// Image relative offset of TypeDescriptor
-	PMD 				thisDisplacement;	// Pointer to instance of catch type within thrown object.
-	int					sizeOrOffset;		// Size of simple-type object or offset into
-											//  buffer of 'this' pointer for catch object
-	PMFN				copyFunction;		// Copy constructor or CC-closure
-} CatchableType;
 
 //
 // CatchableTypeArray - array of pointers to catchable types, with length
@@ -295,7 +307,7 @@ typedef const struct _s_CatchableType {
 #pragma warning (disable:4200)	// nonstandard extension used: array of runtime bound
 typedef const struct _s_CatchableTypeArray {
 	int	nCatchableTypes;
-	int				arrayOfCatchableTypes[];	// Image relative offset of Catchable Types
+	int				arrayOfCatchableTypes[];	// Image relative offset of Catchable Types //-V2504
 } CatchableTypeArray;
 #pragma warning (pop)
 
@@ -335,7 +347,4 @@ struct TryBlockMapIteratorPair {
 	TryBlockMapIterator end;
 };
 
-typedef struct FrameInfo {
-	PVOID               pExceptionObject;
-	struct FrameInfo* pNext;
-} FRAMEINFO;
+

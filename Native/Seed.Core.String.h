@@ -12,7 +12,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 		template<class Base>
-		class SeedKernelCall BaseString : public Memory::Allocator<Base> {
+		class SeedKernelCall BaseString : public Memory::Allocator<Base>, public IComparable<BaseString<Base>> {
 		private:
 			///<summary>Покажчик на рядковий масив</summary>
 			CharStr str;
@@ -51,18 +51,6 @@ namespace Seed {
 			BaseString(CharStr&& rawPtr, SizeT CurrentSize, SizeT ReservedSize)
 				:str(rawPtr), CurrentSize(CurrentSize), ReservedSize(ReservedSize) {
 				rawPtr = nullptr;
-			}
-
-			///<summary>Конструктор з масиву символів і його розміру. Копіює вміст і дописую нуль-термінатор</summary>
-			///<params name = "rawText">Масив символів</params>
-			///<params name = "Size">Кількість символів</params>
-			BaseString(const CharStr rawText, SizeT Size) :
-				CurrentSize(Size + 1),
-				ReservedSize(CurrentSize + CurrentSettings::Memory::GetStringReserveSpace()),
-				str((CharStr)BaseString::operator new[](ReservedSize * sizeof(Char)))
-			{
-				Memory::Copy(rawText, this->str, Size * sizeof(Char));
-				this->str[Size] = L'\0';
 			}
 
 		public:
@@ -202,6 +190,18 @@ namespace Seed {
 					this->str[i] = text[i];
 				}
 				this->str[size] = L'\0';
+			}
+
+			///<summary>Конструктор з масиву символів і його розміру. Копіює вміст і дописую нуль-термінатор</summary>
+			///<params name = "rawText">Масив символів</params>
+			///<params name = "Size">Кількість символів</params>
+			InternalApiCall BaseString(const CharStr rawText, SizeT Size) :
+				CurrentSize(Size + 1),
+				ReservedSize(CurrentSize + CurrentSettings::Memory::GetStringReserveSpace()),
+				str((CharStr)BaseString::operator new[](ReservedSize * sizeof(Char)))
+			{
+				Memory::Copy(rawText, this->str, Size * sizeof(Char));
+				this->str[Size] = L'\0';
 			}
 
 			///<summary>Конструктор з стартовим резервованим розміром</summary>
@@ -514,6 +514,41 @@ namespace Seed {
 				return *this;
 			}
 #pragma endregion
+#pragma region Comparing
+			///<summary>Порівнює рядки</summary>
+			__forceinline bool operator>(const BaseString& right) {
+				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) > 0;
+			}
+			///<summary>Порівнює рядки</summary>
+			__forceinline bool operator<(const BaseString& right) {
+				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) < 0;
+			}
+			///<summary>Порівнює рядки</summary>
+			__forceinline bool operator>=(const BaseString& right) {
+				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) >= 0;
+			}
+			///<summary>Порівнює рядки</summary>
+			__forceinline bool operator<=(const BaseString& right) {
+				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) =< 0;
+			}
+
+			///<summary>Порівнює два екземпляри типу T та вертає значення відносно поточного об'єкта</summary>
+			virtual inline Equality Compare(const BaseString& right) const override final {
+				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+				auto res = CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize);
+				if (res == 0)
+					return Equality::Equal;
+				else
+					if (res > 0)
+						return Equality::Bigger;
+					else
+						return Equality::Smaller;
+			}
+#pragma endregion
 #pragma region Add operators
 #pragma region Literals
 			///<summary>Оператор додавання рядкового літералу</summary>
@@ -683,7 +718,7 @@ namespace Seed {
 				else {
 					Memory::Copy(second.str, buf, second.CurrentSize * sizeof(Char));
 				}
-				Memory::Copy(second.str, buf + CurrentSize - 1, second.CurrentSize * sizeof(Char));
+				
 				retData.str = buf;
 				retData.CurrentSize = NewSize;
 				retData.ReservedSize = NewFullSize;
@@ -713,6 +748,7 @@ namespace Seed {
 				else {
 					Memory::Copy(second.operator const Seed::ConstCharStr(), buf, second.Size * sizeof(Char));
 				}
+
 				retData.str = buf;
 				retData.CurrentSize = NewSize;
 				retData.ReservedSize = NewFullSize;
@@ -1792,9 +1828,14 @@ namespace Seed {
 			}
 
 			///<summary>Вертає поточну довжина строки</summary>
-			SizeT GetSize() const { return CurrentSize - 1; }
+			SizeT GetSize() const { return (CurrentSize > 0) ? CurrentSize - 1 : 0; }
 			///<summary>Поточна довжина строки</summary>
 			SizeT Property(GetSize) Size;
+
+			///<summary>Вертає істину якщо рядок пустий</summary>
+			Boolean GetIsEmpty() const { return GetSize() == 0; }
+			///<summary>Вертає істину якщо рядок пустий</summary>
+			Boolean Property(GetIsEmpty) IsEmpty;
 
 			///<summary>Зміна розміру буфера рядкової зміної</summary>
 			///<param name = "NewReservedSize">Новий розмір буфера без нуль-термінатора,
@@ -1930,8 +1971,8 @@ namespace Seed {
 			}
 
 			///<summary>Перетворення байтового масиву в строку з 16 бітних символів (0-9a-f)</summary>
-			///<param name = "binaryData">Масив байтів</summary>
-			///<returns>Рядкове представлення бінарних даних</summary>
+			///<param name = "binaryData">Масив байтів</param>
+			///<returns>Рядкове представлення бінарних даних</returns>
 			static BaseString<Base> binaryToHex(const Array<Byte> & binaryData) {
 				extern __declspec(noreturn) void ThrowInvalidFormatException(
 					const Seed::ConstAString & File,
@@ -1951,9 +1992,9 @@ namespace Seed {
 				} conv;
 				if (binaryData.Count % 2 != 0)
 					ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-				auto CurrentSize = binaryData.Count * 2 * sizeof(Char) + 1;
+				auto CurrentSize = binaryData.Count * 2 + 1;
 				auto ReservedSize = CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
-				CharStr ret = (CharStr)BaseString::operator new[](ReservedSize);
+				CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 				SizeT i1 = 0, i2 = 0;
 				ret[(binaryData.Count * 2) - 1] = L'\0';
 				ret[binaryData.Count * 2] = L'\0';
@@ -1973,22 +2014,25 @@ namespace Seed {
 			///<returns>Рядкове представлення бінарних даних</returns>
 			static BaseString<Base> UInt64asHex(UInt64 Value) {
 				union ConvertT {
-					SizeT* Variable;
+					SizeT Variable;
 					struct {
 						Byte LowPart : 4;
 						Byte HighPart : 4;
 					}
 					Code[sizeof(SizeT)];
 				} Converter;
-				Converter.Variable = &Value;
-				auto CurrentSize = sizeof(SizeT) * 2 * sizeof(Char) + 1;
+				Converter.Variable = Value;
+				constexpr auto CurrentSize = (sizeof(SizeT) * 2) + 1;
 				auto ReservedSize = CurrentSize + CurrentSettings::Memory::GetStringReserveSpace();
-				CharStr ret = (CharStr)BaseString::operator new[](ReservedSize);
-				ret[CurrentSize - 1] = L'\0';
+				CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
+				ret[CurrentSize] = L'\0';
+				SizeT i2 = 0;
 				for (SizeT i = 0; i < sizeof(SizeT) * 2; i += 2)
 				{
-					ret[i] = Converter.Code[i / 2].LowPart;
-					ret[i] = Converter.Code[i / 2 + 1].HighPart;
+					ret[i2] = HexNumbers[Converter.Code[i / 2].LowPart];
+					i2++;
+					ret[i2] = HexNumbers[Converter.Code[i / 2 + 1].HighPart];
+					i2++;
 				}
 				BaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
 				return str;
@@ -2303,6 +2347,8 @@ namespace Seed {
 				str = nullptr;
 				CurrentSize = ReservedSize = 0;
 			}
+
+			//friend extern class BaseTokenizer<Base>;
 		};
 
 		///<summary>Оптимізований обмін рядками a і b</summary>
@@ -2310,7 +2356,7 @@ namespace Seed {
 		///<params name "b">Лівий рядок</params>
 		template<typename T, template<typename> typename U>
 		__forceinline void Swap(U<T> & a, U<T> & b) noexcept {
-			static_assert(StaticAsserrts::IsSame<BaseString<T>, U<T>>(), "Invalid template passed");
+			static_assert(StaticAsserrts::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
 			Seed::Swap(a.str, b.str);
 			Seed::Swap(a.CurrentSize, b.CurrentSize);
 			Seed::Swap(a.ReservedSize, b.ReservedSize);

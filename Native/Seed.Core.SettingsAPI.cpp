@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.CoreLog.h"
 
 #include "Seed.Core.Init.h"
@@ -38,7 +41,7 @@ namespace Seed {
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)& CurrentSettingsData, //-V2005
+				(void*)& CurrentSettingsData, //-V2005 //-V2533
 				sizeof(CurrentSettingsData),
 				&Offset,
 				NULL
@@ -59,7 +62,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 {
 	{
 		Char raw[sizeof(size_t) + 1024];
-		UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005
+		UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005 //-V1032 //-V2533
 		str->Length = 0;
 		str->MaximumLength = 0;
 		NtQueryInformationProcess(
@@ -74,7 +77,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 			if (str->Buffer[i] == L'\\')
 				last_dir = i;
 		}
-		str->Length = (USHORT)(last_dir + 1); //-V2005
+		str->Length = (USHORT)(last_dir + 1); //-V2005 //-V2533
 		str->Buffer[str->Length] = '\0';
 		CStr::Copy(str->Buffer, Settings::ExecutableDirectory);
 		CharStr buf = Settings::ExecutableDirectory;
@@ -84,7 +87,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 	{
 		toCoreLog(L"Ініціалізація файла конфігурацій...");
 		Char raw[sizeof(size_t) + 1024];
-		UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005
+		UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005 //-V1032 //-V2533
 		NtQueryInformationProcess(
 			NtCurrentProcess(),
 			PROCESSINFOCLASS::ProcessImageFileName,

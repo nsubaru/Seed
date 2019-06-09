@@ -39,7 +39,7 @@ namespace Seed {
 			///<param name="Dest">Рядкова зміна в яку копіюється</param>
 			__declspec(deprecated("Без гарантій щодо виходу за межі"))
 				__forceinline void Copy(CharStr Source, CharStr Dest) noexcept {
-				while (*Dest++ = *Source++);
+				while (*Dest++ = *Source++); //-V2507
 			}
 
 			///<summary>Функція копіювання с-подібних рядків
@@ -49,7 +49,7 @@ namespace Seed {
 			///<param name="Dest">Рядкова зміна в яку копіюється</param>
 			__declspec(deprecated("Без гарантій щодо виходу за межі"))
 				__forceinline void Copy(const Char * Source, CharStr Dest) noexcept {
-				while (*Dest++ = *Source++);
+				while (*Dest++ = *Source++); //-V2507
 			}
 
 			///<summary>Функція копіювання с-подібних рядків
@@ -106,8 +106,8 @@ namespace Seed {
 			///<param name="Str2">Друга рядкова змінна</param>
 			///<returns>True якщо всі символи ідендисні</returns>
 			__forceinline constexpr Boolean Compare(const AChar * Str1, const AChar * Str2) {
-				SizeT Str1Size = Size((ACharStr)Str1);
-				SizeT Str2Size = Size((ACharStr)Str2);
+				SizeT Str1Size = Size((ACharStr)Str1); //-V2533
+				SizeT Str2Size = Size((ACharStr)Str2); //-V2533
 				if (Str1Size != Str2Size) return false;
 				for (SizeT i = 0; i < Str1Size; i++)
 					if (Str1[i] != Str2[i]) return false;

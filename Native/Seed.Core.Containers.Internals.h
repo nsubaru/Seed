@@ -59,6 +59,9 @@ namespace std {
 	{	// get end of sequence
 		return (_Ilist.end());
 	}
+
+	template< class T >
+	class tuple_size;
 }
 
 namespace Seed {
@@ -93,6 +96,11 @@ namespace Seed {
 
 				template <>
 				struct make_index_sequence<1> : index_sequence<0> {};
+
+				template <>
+				struct make_index_sequence<0> {
+					using type = void;
+				};
 
 				template <SizeT, typename T>
 				struct tuple_element
@@ -211,6 +219,9 @@ namespace Seed {
 					return base.value_;
 				}
 
+				template <size_t I, typename... Types>
+				using tuple_element_t = typename tuple_element<I, Types...>::type;
+
 				/*template <SizeT I, typename ... Types>
 				__forceinline static constexpr type_at_index_t<I> const& get(tuple<Types...> const& tup) {
 					const tuple_element<I, type_at_index_t<I>>& base = tup;
@@ -263,32 +274,53 @@ namespace Seed {
 					return tuple<Types...>(ForwardReference<Types>(variables)...);
 				}
 			}
+
+			template<typename ...Types>
+			struct VariadicTypedef {};
+
+			template <template <typename ... Args> typename T, typename ... Args>
+			struct TypeWithList
+			{
+				typedef T<Args...> type;
+			};
+
+			template <template <typename ... Args> typename T, typename ... Args>
+			struct TypeWithList<T, VariadicTypedef<Args...>>
+			{
+				typedef typename TypeWithList<T, Args...>::type type;
+			};
 		}
 
-		template<typename... Types>
+		/*template<typename... Types>
 		class Tuple
 		{
 		private:
 			Internal::TupleImpl::tuple<Types...> data;
+		private:
+			
+
+			
 		public:
 			__forceinline constexpr Tuple() : data() {}
 			__forceinline constexpr Tuple(const Types& ... values)
-				: data(Internal::TupleImpl::MakeTuple<Types...>(values...)) {}
+				: data(Internal::TupleImpl::MakeTuple<const Types&...>(values...)) {}
 			__forceinline constexpr Tuple(Types&& ... values)
 				: data(Internal::TupleImpl::MakeTuple(ForwardReference<Types>(values)...)) {}
 			__forceinline constexpr Tuple(const Tuple& orig)
 				: data(orig.data) {}
 			__forceinline constexpr Tuple(Tuple&& orig)
-				: data(ForwardReference<Internal::TupleImpl::tuple<Types...>>(orig.data)) {}
+				: data(ForwardReference<Internal::TupleImpl::tuple<Types&&...>>(orig.data)) {}
 
 			__forceinline constexpr Tuple& operator=(const Tuple& orig) {
 				this->Tuple::~Tuple();
 				this->Tuple::Tuple(orig);
+				return *this;
 			}
 
 			__forceinline constexpr Tuple& operator=(Tuple&& orig) {
 				this->Tuple::~Tuple();
 				this->Tuple::Tuple(ForwardReference<Tuple<Types...>>(orig));
+				return *this;
 			}
 
 			template<SizeT Index>
@@ -302,6 +334,153 @@ namespace Seed {
 			}
 
 			__forceinline constexpr static SizeT Count() { return sizeof...(Types); }
-		};
+		};*/
+
+		//template<>
+		//class Tuple<>
+		//{
+		//private:
+		//	Internal::TupleImpl::tuple<> data;
+		//public:
+		//	__forceinline constexpr Tuple() : data() {}
+		//	__forceinline constexpr Tuple(const Tuple& orig)
+		//		: data(orig.data) {}
+
+		//	__forceinline constexpr Tuple& operator=(const Tuple& orig) {
+		//		this->Tuple::~Tuple();
+		//		this->Tuple::Tuple(orig);
+		//		return *this;
+		//	}
+
+		//	template<SizeT Index>
+		//	__forceinline constexpr auto& Get() const {
+		//		return Internal::TupleImpl::get<Index>(data);
+		//	}
+
+		//	template<SizeT Index>
+		//	__forceinline auto& Get() {
+		//		return Internal::TupleImpl::get<Index>(data);
+		//	}
+
+		//	template<size_t _Index,
+		//		class... _Types>
+		//		 constexpr const Internal::TupleImpl::tuple_element_t<_Index, Tuple<_Types...>>&&
+		//		get(const Tuple<_Types...>&& _Tuple) noexcept
+		//	{	// get const rvalue reference to _Index element of Tuple
+		//		typedef typename Internal::TupleImpl::tuple_element<_Index, Tuple<_Types...>>::type _Ttype;
+		//		typedef const Internal::TupleImpl::tuple_element_t<_Index, Tuple<_Types...>>&& _RRtype;
+		//		return (ForwardReference<_RRtype>(((_Ttype&)_Tuple)._Myfirst._Val));
+		//	}
+
+		//	// FUNCTION TEMPLATE get (by type)
+		//	template<class _Ty,
+		//		class... _Types>
+		//		 constexpr _Ty& get(Tuple<_Types...>& _Tuple) noexcept
+		//	{	// get reference to _Ty element of Tuple
+		//		typedef typename Internal::TupleImpl::tuple_element<_Ty, Tuple<_Types...>>::type _Ttype;
+		//		return (((_Ttype&)_Tuple)._Myfirst._Val);
+		//	}
+
+		//	template<class _Ty,
+		//		class... _Types>
+		//		 constexpr const _Ty& get(const Tuple<_Types...>& _Tuple) noexcept
+		//	{	// get const reference to _Ty element of Tuple
+		//		typedef typename Internal::TupleImpl::tuple_element<_Ty, Tuple<_Types...>>::type _Ttype;
+		//		return (((_Ttype&)_Tuple)._Myfirst._Val);
+		//	}
+
+		//	template<class _Ty,
+		//		class... _Types>
+		//		 constexpr _Ty&& get(Tuple<_Types...>&& _Tuple) noexcept
+		//	{	// get rvalue reference to _Ty element of Tuple
+		//		typedef typename Internal::TupleImpl::tuple_element<_Ty, Tuple<_Types...>>::type _Ttype;
+		//		return (ForwardReference<_Ty&&>(((_Ttype&)_Tuple)._Myfirst._Val));
+		//	}
+
+		//	template<class _Ty,
+		//		class... _Types>
+		//		 constexpr const _Ty&& get(const Tuple<_Types...>&& _Tuple) noexcept
+		//	{	// get const rvalue reference to _Ty element of Tuple
+		//		typedef typename Internal::TupleImpl::tuple_element<_Ty, Tuple<_Types...>>::type _Ttype;
+		//		return (ForwardReference<const _Ty&&>(((_Ttype&)_Tuple)._Myfirst._Val));
+		//	}
+
+
+		//	__forceinline constexpr static SizeT Count() { return 0; }
+		//};
 	}
+}
+
+namespace std {
+	////template< class... Types >
+	////class tuple_size<Seed::Tuple<Types...>>
+	////{
+	////public:
+	////	static constexpr Seed::SizeT value = Seed::Tuple<Types...>::Count();
+	////	typedef Seed::SizeT value_type;
+
+	////	constexpr operator value_type() const noexcept { return value; }
+	////	constexpr value_type operator()() const noexcept { return value; }
+	////};
+
+	//template<class _Ty,
+	//	_Ty _Val>
+	//	struct integral_constant
+	//{	// convenient template for integral constant types
+	//	static constexpr _Ty value = _Val;
+
+	//	using value_type = _Ty;
+	//	using type = integral_constant;
+
+	//	constexpr operator value_type() const noexcept
+	//	{	// return stored value
+	//		return (value);
+	//	}
+
+	//	[[nodiscard]] constexpr value_type operator()() const noexcept
+	//	{	// return stored value
+	//		return (value);
+	//	}
+	//};
+
+	//template<class>
+	//// false value attached to a dependent name (for static_assert)
+	//inline constexpr bool _Always_false = false;
+
+	//template<size_t _Index,
+	//	class _Tuple>
+	//	struct tuple_element;
+
+	//template<size_t _Index,
+	//	class _Tuple>
+	//	using tuple_element_t = typename tuple_element<_Index, _Tuple>::type;
+
+	//template<class... _Types>
+	//struct tuple_size<Seed::Tuple<_Types...>>
+	//	: integral_constant<size_t, sizeof...(_Types)>
+	//{	// size of tuple
+	//};
+
+	//template<size_t _Index>
+	//struct tuple_element<_Index, Seed::Tuple<>>
+	//{	// enforce bounds checking
+	//	static_assert(_Always_false<integral_constant<size_t, _Index>>,
+	//		"tuple index out of bounds");
+	//};
+
+	//template<class _This,
+	//	class... _Rest>
+	//	struct tuple_element<0, Seed::Tuple<_This, _Rest...>>
+	//{	// select first element
+	//	using type = _This;
+	//	using _Ttype = Seed::Tuple<_This, _Rest...>;
+	//};
+
+	//template<size_t _Index,
+	//	class _This,
+	//	class... _Rest>
+	//	struct tuple_element<_Index, Seed::Tuple<_This, _Rest...>>
+	//	: public tuple_element<_Index - 1, Seed::Tuple<_Rest...>>
+	//{	// recursive tuple_element definition
+	//};
 }

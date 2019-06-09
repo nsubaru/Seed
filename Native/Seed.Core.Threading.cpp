@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.Threading.h"
 
 #include "Seed.Core.Init.h"
@@ -21,7 +24,7 @@ void Seed::Core::Thread::Event::Dispose()
 		NtClose(data->handle);
 }
 
-Seed::Core::Thread::Event::Event(Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, String()))
+Seed::Core::Thread::Event::Event(Seed::Boolean IsManualReset) : data(new event_data(IsManualReset, String()))
 {
 	NTSTATUS status = NtCreateEvent(
 		&data->handle,
@@ -31,11 +34,11 @@ Seed::Core::Thread::Event::Event(Seed::Boolean IsManualReset) noexcept : data(ne
 		FALSE
 	);
 
-	if (NT_SUCCESS(status))
+	if (!NT_SUCCESS(status))
 		Throw(NtException(ExceptionPosition, status));
 }
 
-Seed::Core::Thread::Event::Event(const Seed::String & name, Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, name)) {
+Seed::Core::Thread::Event::Event(const Seed::String & name, Seed::Boolean IsManualReset) : data(new event_data(IsManualReset, name)) {
 	OBJECT_ATTRIBUTES attrbs;
 	UNICODE_STRING label;
 	RtlInitUnicodeStringEx(&label, (PWSTR)(ConstCharStr)data->Name);
@@ -49,11 +52,11 @@ Seed::Core::Thread::Event::Event(const Seed::String & name, Seed::Boolean IsManu
 		FALSE
 	);
 
-	if (NT_SUCCESS(status))
+	if (!NT_SUCCESS(status))
 		Throw(NtException(ExceptionPosition, status));
 }
 
-Seed::Core::Thread::Event::Event(Seed::String && name, Seed::Boolean IsManualReset) noexcept : data(new event_data(IsManualReset, name)) {
+Seed::Core::Thread::Event::Event(Seed::String && name, Seed::Boolean IsManualReset) : data(new event_data(IsManualReset, name)) {
 	OBJECT_ATTRIBUTES attrbs;
 	UNICODE_STRING label;
 	RtlInitUnicodeStringEx(&label, (PWSTR)(ConstCharStr)data->Name);
@@ -87,8 +90,7 @@ void Seed::Core::Thread::Event::Wait(SizeT TimeOutMs)
 
 void Seed::Core::Thread::Dispose()
 {
-	if (this->thread->EntryPoint != nullptr)
-		delete this->thread->EntryPoint;
+	delete this->thread->EntryPoint;
 }
 
 Seed::Core::Thread Seed::Core::Thread::GetThis()
@@ -280,7 +282,7 @@ void Seed::Core::Thread::ExecDelegate(Seed::Delegate && ThreadMain) {
 		Seed::Core::CurrentSettings::Threading::Thread::GetStackMaxSize(),
 		Seed::Core::CurrentSettings::Threading::Thread::GetStackStartSize(),
 		threadStartRoutineDynEntryPoint,
-		(void*)new Thread(*this),
+		(void*)new Thread(*this), //-V572
 		&thread->handle,
 		&id);
 	this->thread->state = Seed::Thread::ThreadState::Work;
@@ -289,20 +291,33 @@ void Seed::Core::Thread::ExecDelegate(Seed::Delegate && ThreadMain) {
 
 void Seed::Core::Thread::ChangeLabel(const String & NewLabel) {
 	if (thread->ID != -1) {
-		ULONG suspendCount;
-		NTSTATUS status = NtSuspendThread(thread->handle, &suspendCount);
-		if (NT_SUCCESS(status))
-			Throw(InvalidThreadObj(ExceptionPosition));
-		thread->Label = NewLabel;
-		THREAD_NAME_INFORMATION name;
-		RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)thread->Label);
-		NtSetInformationThread(
-			NtCurrentThread(),
-			THREADINFOCLASS::ThreadNameInformation,
-			&name,
-			sizeof(THREAD_NAME_INFORMATION)
-		);
-		NtResumeThread(thread->handle, &suspendCount);
+		if (this->GetTID() == thread->ID) {
+			thread->Label = NewLabel;
+			THREAD_NAME_INFORMATION name;
+			RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)thread->Label);
+			NtSetInformationThread(
+				NtCurrentThread(),
+				THREADINFOCLASS::ThreadNameInformation,
+				&name,
+				sizeof(THREAD_NAME_INFORMATION)
+			);
+		}
+		else {
+			ULONG suspendCount;
+			NTSTATUS status = NtSuspendThread(thread->handle, &suspendCount);
+			if (NT_SUCCESS(status))
+				Throw(InvalidThreadObj(ExceptionPosition));
+			thread->Label = NewLabel;
+			THREAD_NAME_INFORMATION name;
+			RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)thread->Label);
+			NtSetInformationThread(
+				NtCurrentThread(),
+				THREADINFOCLASS::ThreadNameInformation,
+				&name,
+				sizeof(THREAD_NAME_INFORMATION)
+			);
+			NtResumeThread(thread->handle, &suspendCount);
+		}
 	}
 	else
 		Throw(InvalidThreadObj(ExceptionPosition));
@@ -402,12 +417,23 @@ Seed::Core::Thread& Seed::Core::Thread::Interupt()
 	NtAlertThread(this->thread->handle);
 	return *this;
 }
-void Seed::Core::Thread::Join(SizeT Timeout) const
+
+Seed::Core::Thread& Seed::Core::Thread::Join(SizeT Timeout)
 {
 	LARGE_INTEGER delay;
 	delay.QuadPart = (Timeout > 0) ? -10000LL * Timeout : Math::Max<Int64>();
 	if (this->thread->state == ThreadState::Work)
 		NtWaitForSingleObject(this->thread->handle, TRUE, &delay);
+	return *this;
+}
+
+const Seed::Core::Thread& Seed::Core::Thread::Join(SizeT Timeout) const
+{
+	LARGE_INTEGER delay;
+	delay.QuadPart = (Timeout > 0) ? -10000LL * Timeout : Math::Max<Int64>();
+	if (this->thread->state == ThreadState::Work)
+		NtWaitForSingleObject(this->thread->handle, TRUE, &delay);
+	return *this;
 }
 
 extern void InitThreadEH();

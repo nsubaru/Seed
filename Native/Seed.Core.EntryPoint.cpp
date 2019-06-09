@@ -1,4 +1,7 @@
-#include "Seed.Core.Runtime.h"
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "Seed.Core.EntryPoint.h"
 
 #include "Seed.Core.Manage.h"
 
@@ -10,9 +13,9 @@
 Seed::List<PF>* dtorsList;
 
 #pragma section(".INIT$z",read)
-__declspec(allocate(".INIT$z")) const PF InitSegEnd = (PF)1;
+__declspec(allocate(".INIT$z")) const PF InitSegEnd = (PF)1; //-V566 //-V2533
 #pragma section(".INIT$a", read)
-__declspec(allocate(".INIT$a")) const PF InitSegStart = (PF)1;
+__declspec(allocate(".INIT$a")) const PF InitSegStart = (PF)1; //-V566 //-V2533
 
 int __cdecl RegisterStaticDtors(PF pf) {
 	dtorsList->AddLast(pf);

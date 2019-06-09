@@ -15,6 +15,14 @@ namespace Seed
 				__forceinline constexpr operator bool() { return value; }
 				static constexpr bool State = value;
 			};
+
+			///<summary>Шаблон логічної константи, використовується для логічних суджень в compile-time</summary>
+			template<typename value>
+			struct LogicConstT
+			{
+				__forceinline constexpr operator bool() { return value::State; }
+				static constexpr bool State = value::State;
+			};
 			///<summary>Логічна істина для статичних провірок</summary>
 			inline namespace { typedef LogicConst<True> LogicTrue; }
 			///<summary>Логічна хиба для статичних провірок</summary>
@@ -22,19 +30,19 @@ namespace Seed
 
 			///<summary>Знімає силку з типу</summary>
 			template<typename T>
-			struct RemoveRef { using Type = T; };
+			struct RemoveRefT { using Type = T; };
 
 			///<summary>Знімає силку з типу</summary>
 			template<typename T>
-			struct RemoveRef<T&> { using Type = T; };
+			struct RemoveRefT<T&> { using Type = T; };
 
 			///<summary>Знімає rv-силку з типу</summary>
 			template<typename T>
-			struct RemoveRef<T&&> { using Type = T; };
+			struct RemoveRefT<T&&> { using Type = T; };
 
 			///<summary>Тип без силки</summary>
 			template<typename T>
-			using RemoveRefT = typename RemoveRef<T>::Type;
+			using RemoveRefV = typename RemoveRefT<T>::Type;
 
 			// STRUCT TEMPLATE _Add_reference
 			template<class Type,
@@ -71,8 +79,8 @@ namespace Seed
 		///<param name="Obj"> lvalue-силка на об'єкт</param>
 		///<returns>rvalue силку на об'єкт</returns>
 		template <typename T>
-		constexpr typename StaticAsserts::RemoveRefT<T>&& MoveRValue(T&& arg) {
-			return static_cast<typename StaticAsserts::RemoveRefT<T>&&>(arg);
+		constexpr typename StaticAsserts::RemoveRefV<T>&& MoveRValue(T&& arg) {
+			return static_cast<typename StaticAsserts::RemoveRefV<T>&&>(arg);
 		}
 
 		///<summary>Ідеальна передача</summary>
@@ -80,7 +88,7 @@ namespace Seed
 		///<returns>RV-силку</returns>
 		template<typename Type>
 		[[nodiscard]]
-		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefT<Type>& Arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
+		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefV<Type>& Arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
 			return (static_cast<Type&&>(Arg));
 		}
 
@@ -89,7 +97,7 @@ namespace Seed
 		///<returns>RV-силку</returns>
 		template<typename Type>
 		[[nodiscard]]
-		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefT<Type>&& Arg) noexcept {	// forward an rvalue as an rvalue
+		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefV<Type>&& Arg) noexcept {	// forward an rvalue as an rvalue
 			static_assert(!StaticAsserts::IsLValueRef<Type>(), "Bad forward call");
 			return (static_cast<Type&&>(_Arg));
 		}

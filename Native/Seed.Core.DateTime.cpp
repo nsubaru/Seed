@@ -1,10 +1,12 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.DateTime.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-void ConvertDateTimeToStringImpl(Seed::Core::DateTime time, Seed::CharStr buffer) {
-	time.TimeFromStartEpoch;
+void ConvertDateTimeToStringImpl(const Seed::Core::DateTime & time, Seed::CharStr buffer) {
 	using namespace Seed;
 	LARGE_INTEGER localTimeMs;
 	TIME_FIELDS timeFields;

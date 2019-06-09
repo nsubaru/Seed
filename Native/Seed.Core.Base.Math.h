@@ -13,34 +13,34 @@ namespace Seed {
 
 			///<summary>Максимальне значення Int8</summary>
 			template<>
-			constexpr Int8 Max() { return 0x7Fi8; };
+			constexpr Int8 Max() { return 0x7Fi8; }; //-V2517
 			///<summary>Максимальне значення Int16</summary>
 			template<>
-			constexpr Int16 Max() { return 0x7FFFi16; };
+			constexpr Int16 Max() { return 0x7FFFi16; }; //-V2517
 			///<summary>Максимальне значення Int32</summary>
 			template<>
-			constexpr Int32 Max() { return 0x7FFFFFFFi32; };
+			constexpr Int32 Max() { return 0x7FFFFFFFi32; }; //-V2517
 			///<summary>Максимальне значення Int64</summary>
 			template<>
-			constexpr Int64 Max() { return 0x7FFFFFFFFFFFFFFFi64; };
+			constexpr Int64 Max() { return 0x7FFFFFFFFFFFFFFFi64; }; //-V2517
 			///<summary>Максимальне значення Float </summary>
 			template<>
-			constexpr Float Max() { return 3.4E38f; };
+			constexpr Float Max() { return 3.4E38f; }; //-V2517
 			///<summary>Максимальне значення Double</summary>
 			template<>
-			constexpr Double Max() { return (Seed::Double)1.7E308; };
+			constexpr Double Max() { return (Seed::Double)1.7E308; }; //-V2533
 			///<summary>Максимальне значення UInt8</summary>
 			template<>
-			constexpr UInt8 Max() { return 0xFFui8; };
+			constexpr UInt8 Max() { return 0xFFui8; }; //-V2517
 			///<summary>Максимальне значення UInt16</summary>
 			template<>
-			constexpr UInt16 Max() { return 0xFFFFui16; };
+			constexpr UInt16 Max() { return 0xFFFFui16; }; //-V2517
 			///<summary>Максимальне значення UInt32</summary>
 			template<>
-			constexpr UInt32 Max() { return 0xFFFFFFFFui32; };
+			constexpr UInt32 Max() { return 0xFFFFFFFFui32; }; //-V2517
 			///<summary>Максимальне значення UInt64</summary>
 			template<>
-			constexpr UInt64 Max() { return 0xFFFFFFFFFFFFFFFFui64; };
+			constexpr UInt64 Max() { return 0xFFFFFFFFFFFFFFFFui64; }; //-V2517
 
 			///<summary>Мінімальне значення типу</summary>
 			template<typename T>
@@ -51,34 +51,34 @@ namespace Seed {
 
 			///<summary>Мінімальне значення Int8</summary>
 			template<>
-			constexpr Int8 Min() { return 0x80i8; };
+			constexpr Int8 Min() { return 0x80i8; }; //-V2517
 			///<summary>Мінімальне значення Int16</summary>
 			template<>
-			constexpr Int16 Min() { return 0x8000i16; };
+			constexpr Int16 Min() { return 0x8000i16; }; //-V2517
 			///<summary>Мінімальне значення Int32</summary>
 			template<>
-			constexpr Int32 Min() { return 0x80000000i32; };
+			constexpr Int32 Min() { return 0x80000000i32; }; //-V2517
 			///<summary>Мінімальне значення Int64</summary>
 			template<>
-			constexpr Int64 Min() { return 0x8000000000000000i64; };
+			constexpr Int64 Min() { return 0x8000000000000000i64; }; //-V2517
 			///<summary>Мінімальне значення Float </summary>
 			template<>
-			constexpr Float Min() { return (Seed::Float)3.4E-38; };
+			constexpr Float Min() { return (Seed::Float)3.4E-38; }; //-V2533
 			///<summary>Мінімальне значення Double</summary>
 			template<>
 			constexpr Double Min() { return 1.7E-308; };
 			///<summary>Мінімальне значення UInt8</summary>
 			template<>
-			constexpr UInt8 Min() { return 0x00ui8; };
+			constexpr UInt8 Min() { return 0x00ui8; }; //-V2517
 			///<summary>Мінімальне значення UInt16</summary>
 			template<>
-			constexpr UInt16 Min() { return 0x0000ui16; };
+			constexpr UInt16 Min() { return 0x0000ui16; }; //-V2517
 			///<summary>Мінімальне значення UInt32</summary>
 			template<>
-			constexpr UInt32 Min() { return 0x00000000ui32; };
+			constexpr UInt32 Min() { return 0x00000000ui32; }; //-V2517
 			///<summary>Мінімальне значення UInt64</summary>
 			template<>
-			constexpr UInt64 Min() { return 0x0000000000000000ui64; };
+			constexpr UInt64 Min() { return 0x0000000000000000ui64; }; //-V2517
 
 			///<summary>Машиний епсилон(ноль) типу</summary>
 			template<typename T>

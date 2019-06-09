@@ -136,10 +136,10 @@ namespace Seed {
 		///</remarks>
 		template<typename T>
 		__forceinline void Swap(T*& First, T*& Second) noexcept {
-			Swap((UInt64&)First, (UInt64&)Second); //-V2005
+			Swap((UInt64&)First, (UInt64&)Second); //-V2005 //-V2533
 		}
 		static_assert(sizeof(void*) == sizeof(SizeT), "Помилка розмір SizeT не є рівним розміру покажчика");
-		static_assert((SizeT)(void*)(0xF0F0F0F0F) == (SizeT)0xF0F0F0F0F, "Помилка неможливо правильно перетворити адресс покажчик в SizeT"); //-V566
+		static_assert((SizeT)(void*)(0xF0F0F0F0F) == (SizeT)0xF0F0F0F0F, "Помилка неможливо правильно перетворити адресс покажчик в SizeT"); //-V566 //-V2533
 
 		///<summary>Оптимізований обмін значеннями зміних Float </summary>
 		///<param name='First'>Перше значення</param>

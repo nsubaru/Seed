@@ -98,9 +98,9 @@ namespace Seed {
 ///<param name='Text'>Покажчик на рядкову константу</param>
 ///<param name='Size'>Кількість елементів рядкового масиву</param>
 ///<returns>Константу CharStr</returns>
-__forceinline constexpr const Seed::Core::CharStr const operator "" U(const wchar_t* const Text, const Seed::SizeT Size) {
+__forceinline constexpr const Seed::Core::CharStr const operator "" U(const wchar_t* const Text, const Seed::SizeT Size) { //-V2537
 	using namespace Seed;
-	return (const CharStr const)Text;
+	return (const CharStr const)Text; //-V2533
 }
 
 __forceinline constexpr Seed::Core::Bytes operator "" Kb(unsigned long long Size) {

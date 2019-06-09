@@ -146,22 +146,30 @@ namespace Seed {
 		///<summary>Інтерфес звільнення ресурсів з класу з підрахунком силок</summary>
 		class IDisposable
 		{
-		protected:
 			///<summary>Метод для звільнення ресурсів,
 			///<para>викликається деструктором автоматично в класів з підрахунком силок</para></summary>
 			///<see><code>RefCountClass</code></see>
 			virtual void Dispose() = 0;
 		};
 
+		///<summary>Можливі варіанти порівняння</summary>
+		enum class Equality : Int8 {
+			Smaller = -1, Equal = 0, Bigger = 1, NonComparable = -127
+		};
+
+		///<summary>Інтерфейс порівнняння</summary>
 		template<typename T>
 		interface IComparable
 		{
-			UInt8 CompareTo(const T& Val);
+			///<summary>Порівнює два екземпляри типу T та вертає значення відносно поточного об'єкта</summary>
+			Equality Compare(const T& Val) const;\
 		};
 
+		///<summary>Compile-time функція пошуку максимального серед двох об'єетів</summary>
 		template<typename T>
 		__forceinline constexpr T Max(T V1, T V2) { return (V1 > V2) ? V1 : V2; }
 
+		///<summary>Compile-time функція пошуку мінімального серед двох об'єетів</summary>
 		template<typename T>
 		__forceinline constexpr T Min(T V1, T V2) { return (V1 < V2) ? V1 : V2; }
 	}
@@ -177,7 +185,7 @@ namespace Seed {
 __forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
 __forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
 __forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
-__forceinline ClassName & operator=(ClassName && From){if(this == &From) return From; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
+__forceinline ClassName & operator=(ClassName && From){if(this == &From) return *this; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
 __forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}}
 // static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");\
 

@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.CoreLog.h"
 #include "Seed.Core.CoreLog.Managed.h"
 
@@ -55,7 +58,7 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 	BOOLEAN state;
 	RtlAdjustPrivilege(SE_TIME_ZONE_PRIVILEGE, TRUE, FALSE, &state);
 	Char raw[sizeof(size_t) + 1024];
-	UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005
+	UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005 //-V1032 //-V2533
 	UNICODE_STRING name;
 	{
 		str->Length = 0;
@@ -99,7 +102,7 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 		NULL,
 		NULL,
 		&LogFile.ioBlock,
-		(void*)UTF16_MARKER, //-V2005
+		(void*)UTF16_MARKER, //-V2005 //-V2533
 		sizeof(char) * 2,
 		NULL,
 		NULL);
@@ -110,7 +113,7 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 
 SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char * Value, Seed::SizeT Lenght)
 {
-	if (Lenght > Math::Max<Int16>() - 22)
+	if (Lenght > static_cast<SizeT>(Math::Max<Int16>()) - 22ULL)
 		return false;
 	Char raw[Math::Max<Int16>()];
 	FormatCurrentTime(raw);
@@ -126,8 +129,8 @@ SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::C
 		NULL,
 		NULL,
 		&LogFile.ioBlock,
-		(void*)raw, //-V2005
-		(ULONG)size, //-V2005 //-V202
+		(void*)raw, //-V2005 //-V2533
+		(ULONG)size, //-V2005 //-V202 //-V2533
 		NULL,
 		NULL);
 	RtlLeaveCriticalSection(&LogFile.lock);
@@ -174,8 +177,8 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::ExceptionStrin
 				NULL,
 				NULL,
 				&LogFile.ioBlock,
-				(void*)(Seed::ConstCharStr) data, //-V2005
-				(ULONG)bytesCount, //-V2005 //-V202
+				(void*)(Seed::ConstCharStr) data, //-V2005 //-V2533
+				(ULONG)bytesCount, //-V2005 //-V202 //-V2533
 				NULL,
 				NULL);
 			RtlLeaveCriticalSection(&LogFile.lock);

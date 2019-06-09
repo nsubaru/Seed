@@ -12,7 +12,7 @@ namespace Seed {
 			template< class T, bool IsFunctionType = false >
 			struct AddPointer
 			{
-				using Type = typename StaticAsserts::RemoveRef<T>::Type*;
+				using Type = typename StaticAsserts::RemoveRefT<T>::Type*;
 			};
 
 			template< class T >
@@ -38,11 +38,14 @@ namespace Seed {
 		namespace StaticAsserts {
 			///<summary>Логічне суддження чи тип T1 == T2 виконується в compile-time</summary>
 			template<typename T1, typename T2>
-			struct IsSame :public LogicFalse {};
+			struct IsSameT :public LogicFalse {};
 
 			///<summary>Логічне суддження чи тип T1 == T2 виконується в compile-time</summary>
 			template<typename T>
-			struct IsSame<T, T> :public LogicTrue {};
+			struct IsSameT<T, T> :public LogicTrue {};
+
+			template<typename T1, typename T2>
+			inline constexpr bool IsSameV = IsSameT<T1, T2>::State;
 
 			///<summary>Compile-time логічне суддження, якщо Cond == True, вертає тип IfTrue, інакше IfFalse</summary>
 			template<Boolean Cond, typename IfTrue, typename IfFalse>
@@ -53,13 +56,25 @@ namespace Seed {
 			struct ConditionT<true, IfTrue, IfFalse> { using Result = IfTrue; };
 
 			template<Boolean Cond, typename IfTrue, typename IfFalse>
-			using Condition = typename ConditionT<Cond, IfTrue, IfFalse>::Result;
+			using ConditionV = typename ConditionT<Cond, IfTrue, IfFalse>::Result;
 
 			template<bool B, class T = void>
 			struct EnableIf {};
 
 			template<class T>
-			struct EnableIf<true, T> { typedef T type; };
+			struct EnableIf<true, T> { typedef T Type; };
+
+			template<typename FalseT, class T = void>
+			struct EnableIfT {};
+
+			template<class T>
+			struct EnableIfT<LogicTrue, T> { typedef T Type; };
+
+			template<bool B, class T>
+			using EnableIfV = typename EnableIf<B, T>::Type;
+
+			template<typename B, typename T>
+			using EnableIfTV = typename EnableIfT<B, T>::Type;
 
 			/////<summary>Compile-time логічне суддження, якщо T є об'єднанням то вертає True інакше False</summary>
 			/////<remarks>Спирається на реалізацію в компіляторі</remarks>
@@ -359,12 +374,12 @@ namespace Seed {
 			struct DecayStruct
 			{
 			private:
-				typedef typename RemoveRef<T>::Type U;
+				typedef RemoveRefV<T> U;
 			public:
-				typedef typename Condition<
+				typedef typename ConditionV <
 					IsCArray<U>::State,
 					typename RemoveSizeFromCArray<U>::type*,
-					typename Condition<
+					typename ConditionV<
 					IsFunction<U>::State,
 					typename AddPointer<U>,
 					typename RemoveCV<U>
@@ -374,6 +389,379 @@ namespace Seed {
 
 			template<class T>
 			using Decay = typename DecayStruct<T>::Type;
+
+			// STRUCT TEMPLATE AndT
+			template <bool _First_value, class _First,
+				class... _Rest>
+				struct AndTImpl { // handle false trait or last trait
+				using Result = _First;
+			};
+
+			template <class _True, class _Next, class... _Rest>
+			struct AndTImpl<true, _True, _Next, _Rest...> { // the first trait is true, try the next one
+				using Result = typename AndTImpl<_Next::State, _Next, _Rest...>::Result;
+			};
+
+			template <class... _Traits>
+			struct AndT : LogicTrue { // If _Traits is empty, LogicTrue
+			};
+
+			template <class _First, class... _Rest>
+			struct AndT<_First, _Rest...>
+				: AndTImpl<_First::State, _First, _Rest...>::Result { // Otherwise, if any of _Traits are false, the first false
+																		// trait Otherwise, the last trait in _Traits
+			};
+
+			template <class... _Traits>
+			constexpr bool And = AndT<_Traits...>::State;
+
+			template<class _Ty,
+				class... _Args>
+				struct IsConstructibleT
+				: LogicConst<__is_constructible(_Ty, _Args...)>
+			{	// determine whether _Ty(_Args...) is constructible
+			};
+
+			template<class _Ty,
+				class... _Args>
+				inline constexpr bool IsConstructible = __is_constructible(_Ty, _Args...);
+
+			template<class _From,
+				class _To>
+				struct IsConvertibleT
+				: LogicConst<__is_convertible_to(_From, _To)>
+			{	// determine whether _From is convertible to _To
+			};
+
+			template<class _From,
+				class _To>
+				inline constexpr bool IsConvertible = __is_convertible_to(_From, _To);
+
+			// STRUCT TEMPLATE negation
+			template<class _Trait>
+			struct NegationT
+				: LogicConst<!static_cast<bool>(_Trait::State)>
+			{	// The negated result of _Trait
+			};
+
+			template<class _Trait>
+			inline constexpr bool Negation = NegationT<_Trait>::State;
+
+
+			// NOTHROW TRAITS
+			// STRUCT TEMPLATE is_nothrow_constructible
+			template<class _Ty,
+				class... _Args>
+				struct IsNothrowConstructibleT
+				: LogicConst<__is_nothrow_constructible(_Ty, _Args...)>
+			{	// determine whether _Ty(_Args...) is nothrow constructible
+			};
+
+			template<class _Ty,
+				class... _Args>
+				inline constexpr bool IsNothrowConstructible = IsNothrowConstructibleT(_Ty, _Args...);
+
+			// STRUCT TEMPLATE is_assignable
+			template<class _To,
+				class _From>
+				struct IsAssignableT
+				: LogicConst<__is_assignable(_To, _From)>
+			{	// determine whether _From can be assigned to _To
+			};
+
+			template<class _To,
+				class _From>
+				inline constexpr bool IsAssignable = IsAssignableT(_To, _From);
+
+			// STRUCT TEMPLATE is_nothrow_assignable
+			template<class _To,
+				class _From>
+				struct IsNothrowAssignableT
+				: LogicConst<__is_nothrow_assignable(_To, _From)>
+			{	// determine whether _From can be assigned to _To, nothrow
+			};
+
+			template<class _To,
+				class _From>
+				inline constexpr bool IsNothrowAssignable = __is_nothrow_assignable(_To, _From);
+
+			// STRUCT TEMPLATE disjunction
+			template<bool _First_value,
+				class _First,
+				class... _Rest>
+				struct _Disjunction
+			{	// handle true trait or last trait
+				using type = _First;
+			};
+
+			template<class _False,
+				class _Next,
+				class... _Rest>
+				struct _Disjunction<false, _False, _Next, _Rest...>
+			{	// first trait is false, try the next trait
+				using type = typename _Disjunction<_Next::State, _Next, _Rest...>::type;
+			};
+
+			template<class... _Traits>
+			struct DisjunctionT
+				: LogicFalse
+			{	// If _Traits is empty, false_type
+			};
+
+			template<class _First,
+				class... _Rest>
+				struct DisjunctionT<_First, _Rest...>
+				: _Disjunction<_First::State, _First, _Rest...>::type
+			{	// Otherwise, if any of _Traits are true, the first true trait
+				// Otherwise, the last trait in _Traits
+			};
+
+			template<class... _Traits>
+			inline constexpr bool Disjunction = DisjunctionT<_Traits...>::State;
+
+			// STRUCT TEMPLATE is_default_constructible
+			template<class _Ty>
+			struct IsDefaultConstructibleT
+				: LogicConst<__is_constructible(_Ty)>
+			{	// determine whether _Ty has a default constructor
+			};
+
+			template<class _Ty>
+			inline constexpr bool IsDefaultConstructible = __is_constructible(_Ty);
+
+			// STRUCT TEMPLATE _Is_implicitly_default_constructible
+			template<class _Ty,
+				class = void>
+				struct IsImplicitlyDefaultConstructibleT
+				: LogicFalse
+			{	// determine whether _Ty is implicitly default constructible
+			};
+
+			template<class _Ty>
+			void _Implicitly_default_construct(const _Ty&);
+
+			template<class _Ty>
+			struct IsImplicitlyDefaultConstructibleT < _Ty, VoidT<decltype(_Implicitly_default_construct<_Ty>({})) >>
+				: LogicTrue
+			{	// determine whether _Ty is implicitly default constructible
+			};
+
+			// STRUCT TEMPLATE is_nothrow_default_constructible
+			template<class _Ty>
+			struct IsNothrowDefaultConstructibleT
+				: LogicConst<__is_nothrow_constructible(_Ty)>
+			{	// determine whether _Ty has a nothrow default constructor
+			};
+
+			template<class _Ty>
+			inline constexpr bool IsNothrowDefaultConstructible = __is_nothrow_constructible(_Ty);
+
+			// STRUCT TEMPLATE is_move_assignable
+			template<class _Ty>
+			struct IsMoveAssignableT
+				: LogicConst<__is_assignable(AddLvalueReferenceT<_Ty>, _Ty)>
+			{	// determine whether _Ty has a move assignment operator
+			};
+
+			template<class _Ty>
+			inline constexpr bool IsMoveAssignable = __is_assignable(AddLvalueReferenceT<_Ty>, _Ty);
+
+			// STRUCT TEMPLATE is_nothrow_move_assignable
+			template<class _Ty>
+			struct IsNothrowMoveAssignableT
+				: LogicConst<__is_nothrow_assignable(AddLvalueReferenceT<_Ty>, _Ty)>
+			{	// determine whether _Ty has a nothrow move assignment operator
+			};
+
+			template<class _Ty>
+			inline constexpr bool IsNothrowMoveAssignable = __is_nothrow_assignable(AddLvalueReferenceT<_Ty>, _Ty);
+		
+			// FUNCTION TEMPLATE declval
+			template<class _Ty>
+			AddRvalueReferenceT<_Ty> declval() noexcept;
+
+			// STRUCT TEMPLATE _Swappable_with_helper
+			template<class _Ty1,
+				class _Ty2,
+				class = void>
+				struct _Swappable_with_helper
+				: LogicFalse
+			{	// swap(declval<_Ty1>(), declval<_Ty2>()) is not valid
+			};
+
+			template<class _Ty1,
+				class _Ty2>
+				struct _Swappable_with_helper<_Ty1, _Ty2, VoidT<decltype(Swap(declval<_Ty1>(), declval<_Ty2>()))>>
+				: LogicTrue
+			{	// swap(declval<_Ty1>(), declval<_Ty2>()) is valid
+			};
+
+			// STRUCT TEMPLATE _Is_swappable_with
+			template<class _Ty1,
+				class _Ty2>
+				struct _Is_swappable_with
+				: LogicConst<And<
+				_Swappable_with_helper<_Ty1, _Ty2>,
+				_Swappable_with_helper<_Ty2, _Ty1>>>
+			{	// Determine if expressions with type and value category _Ty1 and _Ty2
+				// can be swapped (and vice versa)
+			};
+			
+			// STRUCT TEMPLATE _Is_swappable
+			template<class _Ty>
+			struct IsSwappable
+				: _Is_swappable_with<
+				AddLvalueReferenceT<_Ty>,
+				AddLvalueReferenceT<_Ty>>::type
+			{	// Determine if _Ty lvalues satisfy is_swappable_with
+			};
+
+			// STRUCT TEMPLATE is_void
+			template<class _Ty>
+			struct IsVoidT
+				: LogicFalse
+			{	// determine whether _Ty is void
+			};
+//#define _EMPTY_ARGUMENT	
+//#define _CLASS_DEFINE_CV(CLASS) \
+//	CLASS(_EMPTY_ARGUMENT) \
+//	CLASS(const) \
+//	CLASS(volatile) \
+//	CLASS(const volatile)
+//
+//#define _IS_VOID(CV_OPT) \
+//template<> \
+//	struct IsVoidT<CV_OPT void> \
+//		: LogicTrue \
+//	{	/* determine whether _Ty is void */ \
+//	};
+//
+//			_CLASS_DEFINE_CV(_IS_VOID)
+//#undef _IS_VOID
+//#undef _CLASS_DEFINE_CV
+//#undef _EMPTY_ARGUMENT
+			template<>
+			struct IsVoidT<void> 
+			: LogicTrue 
+			{	/* determine whether _Ty is void */ 
+			};
+
+			template<>
+			struct IsVoidT<const void>
+				: LogicTrue
+			{	/* determine whether _Ty is void */
+			};
+
+			template<>
+			struct IsVoidT<volatile void>
+				: LogicTrue
+			{	/* determine whether _Ty is void */
+			};
+
+			template<>
+			struct IsVoidT<const volatile void>
+				: LogicTrue
+			{	/* determine whether _Ty is void */
+			};
+
+			//Вертає чи даний тип є void
+			template<class _Ty>
+			inline constexpr bool IsVoidV = IsVoidT<_Ty>::State;
+
+			// Type modifiers
+			// STRUCT TEMPLATE add_const
+			template <class _Ty>
+			struct AddConstT { // add top-level const qualifier
+				using Type = const _Ty;
+			};
+
+			template <class _Ty>
+			using AddConstV = typename AddConstT<_Ty>::Type;
+
+			// STRUCT TEMPLATE add_volatile
+			template <class _Ty>
+			struct AddVolatileT { // add top-level volatile qualifier
+				using Type = volatile _Ty;
+			};
+
+			template <class _Ty>
+			using AddVolatileV = typename AddVolatileT<_Ty>::Type;
+
+			// STRUCT TEMPLATE add_cv
+			template <class _Ty>
+			struct AddCvT { // add top-level const and volatile qualifiers
+				using Type = const volatile _Ty;
+			};
+
+			template <class _Ty>
+			using AddCvV = typename AddCvT<_Ty>::Type;
+
+			// STRUCT TEMPLATE is_copy_assignable
+			template <class _Ty>
+			struct IsCopyAssignableT
+				: LogicConst<__is_assignable(AddLvalueReferenceT<_Ty>, AddLvalueReferenceT<const _Ty>)> {
+				// determine whether an lvalue const _Ty can be assigned to an lvalue _Ty
+			};
+
+			template <class _Ty>
+			inline constexpr bool IsCopyAssignableV = __is_assignable(
+				AddLvalueReferenceT<_Ty>, AddLvalueReferenceT<const _Ty>);
+
+			// STRUCT TEMPLATE _Identity
+			template <class _Ty>
+			struct IdentityT {
+				using type = _Ty;
+			};
+			template <class _Ty>
+			using IdentitV = typename IdentityT<_Ty>::type;
+
+
+			// STRUCT TEMPLATE is_empty
+			template <class _Ty>
+			struct IsEmptyT : LogicConst<__is_empty(_Ty)> {}; // determine whether _Ty is an empty class
+
+			template <class _Ty>
+			inline constexpr bool IsEmptyV = __is_empty(_Ty);
+
+			// STRUCT TEMPLATE is_final
+			template <class _Ty>
+			struct IsFinalT : LogicConst<__is_final(_Ty)> {}; // determine whether _Ty is a final class
+
+			template <class _Ty>
+			inline constexpr bool IsFinalV = __is_final(_Ty);
+
+			// STRUCT TEMPLATE is_lvalue_reference
+			template <class>
+			inline constexpr bool IsLValueReferenceV = false; // determine whether type argument is an lvalue reference
+
+			template <class _Ty>
+			inline constexpr bool IsLValueReferenceV<_Ty&> = true;
+
+			template <class _Ty>
+			struct IsLValueReferenceT : LogicConst<IsLValueReferenceV<_Ty>> {};
+
+			// STRUCT TEMPLATE is_rvalue_reference
+			template <class>
+			inline constexpr bool IsRValueReferenceV = false; // determine whether type argument is an rvalue reference
+
+			template <class _Ty>
+			inline constexpr bool IsRValueReferenceV<_Ty&&> = true;
+
+			template <class _Ty>
+			struct IsRValueReferenceT : LogicConst<IsRValueReferenceV<_Ty>> {};
+
+			// STRUCT TEMPLATE is_reference
+			template <class>
+			inline constexpr bool IsReferenceV = false; // determine whether type argument is a reference
+
+			template <class _Ty>
+			inline constexpr bool IsReferenceV<_Ty&> = true;
+
+			template <class _Ty>
+			inline constexpr bool IsReferenceV<_Ty&&> = true;
+
+			template <class _Ty>
+			struct IsReferenceT : LogicConst<IsReferenceV<_Ty>> {};
 		}
 	}
 }

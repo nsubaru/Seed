@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"
@@ -13,7 +16,7 @@
 using namespace Seed;
 
 ///<summary>≤нформац≥€ про кучу помилок</summary>
-struct
+struct ExceptionsHeapT
 {
 	///<summary>ƒескриптор куч≥</summary>
 	Seed::Handle HeapHandle;
@@ -23,7 +26,14 @@ struct
 	Seed::SizeT AllocatedMemBlksCount;
 	///<summary>‘актичне використанн€ пам'€т≥ кучею</summary>
 	Seed::SizeT CurrentHeapSize;
-} ExceptionsHeap;
+};
+
+static __forceinline ExceptionsHeapT & GetExceptionsHeap() {
+	static ExceptionsHeapT ExceptionsHeap;
+	return ExceptionsHeap;
+}
+
+#define ExceptionsHeap GetExceptionsHeap()
 
 Boolean Seed::Core::Init::Exceptions() noexcept
 {
@@ -60,6 +70,9 @@ void Seed::Core::Stop::Exceptions() noexcept
 
 SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(ExceptionsHeap.HeapHandle, 0, nullptr);
+#endif
 	//якщо розм≥р задано максимальне можливе значенн€ SizeT то це €вно помилка ≥ генеруЇм виключенн€ OutOfMemory
 	if (Size == Math::Max<SizeT>())
 		return nullptr;
@@ -83,6 +96,9 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 
 SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT Size, SizeT AllocationReq)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(ExceptionsHeap.HeapHandle, 0, nullptr);
+#endif
 	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне,
 	//а отже викликаЇм просте вид≥ленн€ пам'€т≥
 	if (AllocationReq == 0 || AllocationReq == 1)
@@ -116,6 +132,9 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT S
 
 SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Free(void* MemBlk)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(ExceptionsHeap.HeapHandle, 0, nullptr);
+#endif
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
@@ -138,6 +157,9 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Free(void* MemBlk)
 
 SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBlk, SizeT AllocationReq)
 {
+#if PreReleaseMode || DebugMode
+	RtlValidateHeap(ExceptionsHeap.HeapHandle, 0, nullptr);
+#endif
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥

@@ -39,7 +39,7 @@ namespace Seed {
 			__forceinline Array(const CRT::initializer_list<T>& list) : arr(new T[list.size()]), count(list.size()) {
 				auto it = list.begin();
 				for (SizeT i = 0; i < count; i++)
-					this->arr[i] = *it, it++; //-V108
+					this->arr[i] = *it, it++; //-V108 //-V2528
 			}
 
 			///<summary>Копіювальний конструктор з С подібного масиву і його розміру</summary>
@@ -147,7 +147,7 @@ namespace Seed {
 
 			///<summary>Зміна розміру</summary>
 			///<param name = 'NewSize'>Новий розмір масиву</param>
-			__forceinline void ReSize(SizeT NewSize) {
+			__forceinline void Resize(SizeT NewSize) {
 				T* buf = new T[NewSize];
 				SizeT CopySize = (NewSize > count) ? count : NewSize;
 #pragma warning(push)
@@ -196,14 +196,14 @@ namespace Seed {
 						__LINE__,
 						reinterpret_cast<SizeT>(this->arr + StartIndex),
 						0);
-				SizeT Count = count - StartIndex;
-				T * __array = new T[Count];
+				SizeT SliceCount = count - StartIndex;
+				T * __array = new T[SliceCount];
 
-				for (SizeT i = 0; i <= Count; i++) {
+				for (SizeT i = 0; i <= SliceCount; i++) {
 					__array[i] = arr[StartIndex + i];
 				}
 
-				return Array<T>(MoveRValue(__array), Count);
+				return Array<T>(MoveRValue(__array), SliceCount);
 			}
 
 			///<summary>Вертає підмасив який складається з Count елементів починаючи з StartIndex елемента</summary>
@@ -211,14 +211,14 @@ namespace Seed {
 			///<para>з нуля який має бути включений в Slice</para></param>
 			///<param name = 'Count'>Кількість елементів</param>
 			///<returns>Підмасив</returns>
-			Array<T> Slice(SizeT StartIndex, SizeT Count) {
+			Array<T> Slice(SizeT StartIndex, SizeT SliceCount) {
 				extern __declspec(noreturn) void ThrowNullPointException(
 					const Seed::ConstAString & File,
 					const Seed::ConstAString & Function,
 					const Seed::SizeT Line,
 					const Seed::SizeT Address,
 					const Seed::UInt8 Mode);
-				if (StartIndex + Count > count)
+				if (StartIndex + SliceCount > count)
 					ThrowNullPointException(
 						__FILE__,
 						__FUNCSIG__,
@@ -226,13 +226,13 @@ namespace Seed {
 						reinterpret_cast<SizeT>(this->arr + StartIndex + Count),
 						0);
 
-				T * __array = new T[Count];
+				T * __array = new T[SliceCount];
 
-				for (SizeT i = 0; i <= Count; i++) {
+				for (SizeT i = 0; i <= SliceCount; i++) {
 					__array[i] = arr[StartIndex + i];
 				}
 
-				return Array<T>(MoveRValue(__array), Count);
+				return Array<T>(MoveRValue(__array), SliceCount);
 			}
 
 			///<summary>Деструктор</summary>
@@ -266,5 +266,7 @@ namespace Seed {
 			orig.arr = nullptr;
 			orig.count = 0;
 		}
+
+		using Blob = Array<Byte>;
 	}
 }
