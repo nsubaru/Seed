@@ -39,6 +39,11 @@ namespace Seed {
 				MemoryManager MainMemoryManager;
 				ThreadingCfg Threading;
 			};
+
+			struct VirtualSettingData {
+				Char KernelExecutableLocation[Math::Max<Int16>()];
+				UInt64 CpuCoresCount;
+			};
 		public:
 			class Memory {
 			public:
@@ -176,6 +181,14 @@ namespace Seed {
 						CurrentSettingsData.Threading.Thread.StackMaxSize = NewThreadStackMaxSize;
 					}
 				};
+			};
+
+			class CPU {
+			public:
+				static __forceinline UInt64 GetCpuCoresCount() {
+					extern VirtualSettingData CurrentVirtualSettingsData;
+					return CurrentVirtualSettingsData.CpuCoresCount;
+				}
 			};
 
 			static void SaveCurrentSettings();

@@ -17,69 +17,71 @@ namespace {
 namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4996)
-	inline namespace Exeptions {
-		///<summary>Спроба отримати результат не виконаної ще функції</summary>
-		class SeedKernelCall CantGetResultNotInvokedFunction :public Exception
-		{
-		public:
-			///<summary>Генерація помилки спроби отримати результат не виконаної ще функції</summary>
-			///<param name = 'File'>Файл в якому згенерована помилка</param>
-			///<param name = 'FunctName'>Ім'я функції</param>
-			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-			__forceinline CantGetResultNotInvokedFunction(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-				noexcept : Exception(File, FunctName, Line, L"Не можливо отримати результат не виконаної функції")
-			{}
+	inline namespace Core {
+		inline namespace Exeptions {
+			///<summary>Спроба отримати результат не виконаної ще функції</summary>
+			class SeedKernelCall CantGetResultNotInvokedFunction :public Exception
+			{
+			public:
+				///<summary>Генерація помилки спроби отримати результат не виконаної ще функції</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				__forceinline CantGetResultNotInvokedFunction(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					noexcept : Exception(File, FunctName, Line, L"Не можливо отримати результат не виконаної функції")
+				{}
 
-			///<summary>Текстове представлення інформації про помилки помилки</summary>
-			virtual ExceptionString toString() const override final {
-				return ExceptionString(exeptionName)
-					+ ExceptionString(L". ")
-					+ Location.toString()
-					+ ExceptionString(L".");
-			}
-		};
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override final {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ Location.toString()
+						+ ExceptionString(L".");
+				}
+			};
 
-		///<summary>Спроба повторно запусти вже виконаний делегат або який виконується зараз</summary>
-		class SeedKernelCall TryReStartDelegate :public Exception
-		{
-		public:
-			///<summary>Генерація помилки спроби повторно запусти вже виконаний делегат або який виконується зараз</summary>
-			///<param name = 'File'>Файл в якому згенерована помилка</param>
-			///<param name = 'FunctName'>Ім'я функції</param>
-			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-			__forceinline TryReStartDelegate(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-				noexcept : Exception(File, FunctName, Line, L"Неможливо повторно запустити делегат на виконання")
-			{}
+			///<summary>Спроба повторно запусти вже виконаний делегат або який виконується зараз</summary>
+			class SeedKernelCall TryReStartDelegate :public Exception
+			{
+			public:
+				///<summary>Генерація помилки спроби повторно запусти вже виконаний делегат або який виконується зараз</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				__forceinline TryReStartDelegate(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					noexcept : Exception(File, FunctName, Line, L"Неможливо повторно запустити делегат на виконання")
+				{}
 
-			///<summary>Текстове представлення інформації про помилки помилки</summary>
-			virtual ExceptionString toString() const override final {
-				return ExceptionString(exeptionName)
-					+ ExceptionString(L". ")
-					+ Location.toString()
-					+ ExceptionString(L".");
-			}
-		};
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override final {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ Location.toString()
+						+ ExceptionString(L".");
+				}
+			};
 
-		///<summary>Делегат в процесі виконання</summary>
-		class SeedKernelCall AlredyExecute :public Exception
-		{
-		public:
-			///<summary>Конструктор помилки</summary>
-			///<param name = 'File'>Файл в якому згенерована помилка</param>
-			///<param name = 'FunctName'>Ім'я функції</param>
-			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-			__forceinline AlredyExecute(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-				noexcept : Exception(File, FunctName, Line, L"Неможливо отримати результат делегат в процесі його виконання")
-			{}
+			///<summary>Делегат в процесі виконання</summary>
+			class SeedKernelCall AlredyExecute :public Exception
+			{
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				__forceinline AlredyExecute(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					noexcept : Exception(File, FunctName, Line, L"Неможливо отримати результат делегат в процесі його виконання")
+				{}
 
-			///<summary>Текстове представлення інформації про помилки помилки</summary>
-			virtual ExceptionString toString() const override final {
-				return ExceptionString(exeptionName)
-					+ ExceptionString(L". ")
-					+ Location.toString()
-					+ ExceptionString(L".");
-			}
-		};
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override final {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ Location.toString()
+						+ ExceptionString(L".");
+				}
+			};
+		}
 	}
 #pragma warning(pop)
 }

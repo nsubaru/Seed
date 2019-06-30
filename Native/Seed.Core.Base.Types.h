@@ -88,6 +88,9 @@ namespace Seed {
 
 		///<summary>Тип мітка, який вказує що треба структуру\класс вирівнювати по певній границі</summary>
 		inline namespace { using AllignRequirements  = CRT::align_val_t; }
+
+		///<summary>Деталь реалізації</summary>
+		inline namespace { using ImplSpecificT = void*; }
 	}
 }
 

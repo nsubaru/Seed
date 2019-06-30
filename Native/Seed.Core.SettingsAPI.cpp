@@ -20,6 +20,7 @@ using namespace Seed;
 using namespace Seed::Settings;
 
 CurrentSettings::SettingsData CurrentSettingsData;
+CurrentSettings::VirtualSettingData CurrentVirtualSettingsData;
 
 namespace Seed {
 	inline namespace Core {
@@ -27,8 +28,6 @@ namespace Seed {
 
 		namespace Settings {
 			Handle SettingsFile;
-
-			Char ExecutableDirectory[UNICODE_STRING_MAX_CHARS];
 		}
 
 		void CurrentSettings::SaveCurrentSettings()
@@ -51,6 +50,19 @@ namespace Seed {
 			}
 		}
 	}
+}
+
+bool InitVirtualSettings() {
+	SYSTEM_BASIC_INFORMATION basic_inf;
+	NTSTATUS status = NtQuerySystemInformation(
+		SYSTEM_INFORMATION_CLASS::SystemBasicInformation,
+		&basic_inf,
+		sizeof(SYSTEM_BASIC_INFORMATION),
+		NULL);
+	if (!NT_SUCCESS(status))
+		return false;
+	CurrentVirtualSettingsData.CpuCoresCount = basic_inf.NumberOfProcessors;
+	return true;
 }
 
 Boolean Seed::Core::IsFirstStartup() noexcept
@@ -79,8 +91,8 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 		}
 		str->Length = (USHORT)(last_dir + 1); //-V2005 //-V2533
 		str->Buffer[str->Length] = '\0';
-		CStr::Copy(str->Buffer, Settings::ExecutableDirectory);
-		CharStr buf = Settings::ExecutableDirectory;
+		CStr::Copy(str->Buffer, CurrentVirtualSettingsData.KernelExecutableLocation);
+		CharStr buf = CurrentVirtualSettingsData.KernelExecutableLocation;
 		while (*buf++ = *str->Buffer++);
 	}
 	//Init setting file
@@ -96,7 +108,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 			NULL
 		);
 		Char FullSettingsFilePath[1024];
-		CharStr buf = Settings::ExecutableDirectory;
+		CharStr buf = CurrentVirtualSettingsData.KernelExecutableLocation;
 		CStr::Copy(str->Buffer, FullSettingsFilePath);
 		SizeT ExeFileNameSize = CStr::Size(str->Buffer);
 		SizeT FileNameSize = CStr::Size(Settings::SettingsFileName);
@@ -173,7 +185,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 		}
 		if (!NT_SUCCESS(status)) return false;
 	}
-	return true;
+	return InitVirtualSettings();
 }
 
 void Seed::Core::Stop::SettingsAPI() noexcept

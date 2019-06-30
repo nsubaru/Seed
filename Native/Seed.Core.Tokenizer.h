@@ -6,7 +6,7 @@
 #pragma warning(disable: 4996)
 
 namespace Seed {
-	inline namespace CoreAPI {
+	inline namespace Core {
 		class Tokenizer {
 		private:
 			struct Data;
