@@ -36,8 +36,18 @@ namespace Seed {
 					ThreadCfg Thread;
 				};
 
+				struct SevicesCfgT {
+					struct TaskShedulerCfgT {
+						Int32 DefaultTimerProximity;
+					};
+
+
+					TaskShedulerCfgT TaskSheduler;
+				};
+
 				MemoryManager MainMemoryManager;
 				ThreadingCfg Threading;
+				SevicesCfgT ServiceCfg;
 			};
 
 			struct VirtualSettingData {
@@ -179,6 +189,22 @@ namespace Seed {
 					static __forceinline void SetStackMaxSize(SizeT NewThreadStackMaxSize) {
 						extern SettingsData CurrentSettingsData;
 						CurrentSettingsData.Threading.Thread.StackMaxSize = NewThreadStackMaxSize;
+					}
+				};
+			};
+
+			class Services {
+			public:
+				class TaskSheduler {
+				public:
+					static __forceinline UInt32 GetDefaultTimerProximity() {
+						extern SettingsData CurrentSettingsData;
+						return CurrentSettingsData.ServiceCfg.TaskSheduler.DefaultTimerProximity;
+					}
+
+					static __forceinline void SetTimerDefaultProximity(UInt32 NewDefaultTimerProximity) {
+						extern SettingsData CurrentSettingsData;
+						CurrentSettingsData.ServiceCfg.TaskSheduler.DefaultTimerProximity = NewDefaultTimerProximity;
 					}
 				};
 			};

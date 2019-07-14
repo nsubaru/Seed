@@ -483,6 +483,47 @@ namespace Seed {
 				virtual ~InvalidTypeException() {}
 			};
 
+			///<summary>Невірний аргумент</summary>
+			class InvalidArgumentException : public Exception {
+			private:
+				///<summary>Ім'я аргумента</summary>
+				ConstString ArgNameValue;
+				///<summary>Додаткова інформація</summary>
+				ConstString DescriptionValue;
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				///<param name = 'ArgName'>Ім'я аргумента</param>
+				///<param name = 'Description'>Додаткова інформація</param>
+				InvalidArgumentException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString & ArgName, const ConstString& Description) :
+					Exception(File, FunctName, Line, L"Невірний аргумент"), ArgNameValue(ArgName), DescriptionValue(Description)
+				{}
+
+				///<summary>Вертає ім'я аргумента</summary>
+				const ConstString & GetArgName() { return ArgNameValue; }
+				///<summary>Вертає додаткову інформацію</summary>
+				const ConstString & GetDescription() { return DescriptionValue; }
+
+				///<summary>Ім'я аргумента</summary>
+				ConstString Property(ArgNameValue) ArgumentPosition;
+				///<summary>Додаткова інформація</summary>
+				ConstString Property(GetDescription) Description;
+
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override final {
+					return ExceptionString(exeptionName) +
+						ExceptionString(L". Невірний ") + ArgNameValue +
+						ExceptionString(L" аргумент. Додатковий опис: ") +
+						ExceptionString(DescriptionValue) + ExceptionString(L". ") +
+						location.toString() +
+						ExceptionString(L". ");
+				}
+				
+				virtual ~InvalidArgumentException() {}
+			};
+
 			///<summary>Операцію перервано</summary>
 			class SeedKernelCall InteruptException : protected Exception
 			{

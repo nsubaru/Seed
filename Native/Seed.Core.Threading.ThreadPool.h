@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Threading.h"
+#include "Seed.Core.TaskShedule.Sheduler.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -39,7 +40,7 @@ namespace Seed {
 				//Пустий конструктор
 				__forceinline Job() :This(nullptr) {};
 
-				virtual void Dispose() override final {}
+				virtual void Dispose() override final;
 			public:
 				RefCountClass(Job, This);
 

@@ -270,7 +270,7 @@ void Seed::Core::Threading::Thread::ExecDelegate(Seed::Delegate && ThreadMain) {
 	thread->EntryPoint = new Delegate(MoveRValue(ThreadMain));
 	if (this->thread->thread_list_node != nullptr)
 		Throw(ThreadAlredyStrated(ExceptionPosition));
-	toCoreLog(String(L"Запуск потоку з міткою ") + this->thread->Label + " з потоку з ID " + String::toString(Thread::GetTID()));
+	toCoreLog(String(L"Запуск потоку з міткою ") + this->thread->Label + L" з потоку з ID " + String::toString(Thread::GetTID()));
 	this->thread->thread_list_node = Threads->AddLast(*this);
 	this->thread->abortEvent = new Event();
 	CLIENT_ID id;
@@ -380,13 +380,8 @@ void Seed::Core::Threading::Thread::Kill()
 
 #pragma runtime_checks("", off)
 #pragma check_stack(off)
-__declspec(noreturn, noinline, safebuffers) void InterupThread() {
+__declspec(noreturn, noinline, safebuffers) void InteruptThread() {
 	Throw(Seed::InteruptException(ExceptionPosition));
-}
-
-__declspec(noreturn, noinline, safebuffers) void DontOptimize() {
-	volatile int i = 0;
-	if (i) InterupThread();
 }
 #pragma check_stack(on)
 #pragma runtime_checks("", restore)
@@ -411,7 +406,7 @@ Seed::Core::Threading::Thread& Seed::Core::Threading::Thread::Interupt()
 		Throw(NtException(ExceptionPosition, status));
 	}
 	DWORD64 ret_point = ctx.Rip;
-	ctx.Rip = (DWORD64)(PDWORD64)InterupThread;
+	ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
 	status = ZwSetContextThread(this->thread->handle, &ctx);
 	NtResumeThread(this->thread->handle, NULL);
 	if (!NT_SUCCESS(status))
@@ -584,12 +579,14 @@ Seed::Core::Threading::Job Seed::Core::Threading::Dispatcher::Dispatch(Seed::Cor
 }
 
 
+void Seed::Core::Threading::Job::Dispose() {}
+
 void Seed::Core::Threading::Job::Interupt()
 {
 	Handle threadHandle;
 	CLIENT_ID id;
 	id.UniqueProcess = NtCurrentProcessId();
-	id.UniqueThread = (Handle)this->This->TID;
+	id.UniqueThread = reinterpret_cast<HANDLE>(this->This->TID);
 	if (this->This->TID == 0)
 	{
 		TpReleaseWork(reinterpret_cast<PTP_WORK>(this->This->work));
@@ -608,7 +605,7 @@ void Seed::Core::Threading::Job::Interupt()
 		Throw(NtException(ExceptionPosition, status));
 	}
 	DWORD64 ret_point = ctx.Rip;
-	ctx.Rip = (DWORD64)(PDWORD64)InterupThread;
+	ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
 	status = ZwSetContextThread(threadHandle, &ctx);
 	NtResumeThread(threadHandle, NULL);
 	NtAlertThread(threadHandle);
@@ -616,7 +613,5 @@ void Seed::Core::Threading::Job::Interupt()
 		Throw(NtException(ExceptionPosition, status));
 	NtClose(threadHandle);
 }
-
-
 
 #pragma warning(pop)
