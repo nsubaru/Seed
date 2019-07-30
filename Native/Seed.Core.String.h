@@ -9,6 +9,10 @@
 
 namespace Seed {
 	inline namespace Core {
+
+		inline namespace Exceptions {
+			class IntegerOverflowException;
+		}
 #pragma warning(push)
 #pragma warning(disable: 4996)
 		template<class Base>
@@ -64,7 +68,7 @@ namespace Seed {
 			///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>
 			///<param name = "Text">Літерал рядка</param>
 			template<SizeT Size>
-			__forceinline BaseString(const wchar_t(&Text)[Size]) {
+			__forceinline BaseString(const wchar_t(&Text)[Size]) : BaseString() {
 				if constexpr (Size < 2)
 				{
 					this->str = nullptr;
@@ -516,22 +520,22 @@ namespace Seed {
 #pragma endregion
 #pragma region Comparing
 			///<summary>Порівнює рядки</summary>
-			__forceinline bool operator>(const BaseString& right) {
+			__forceinline bool operator>(const BaseString& right) const {
 				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
 				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) > 0;
 			}
 			///<summary>Порівнює рядки</summary>
-			__forceinline bool operator<(const BaseString& right) {
+			__forceinline bool operator<(const BaseString& right) const {
 				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
 				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) < 0;
 			}
 			///<summary>Порівнює рядки</summary>
-			__forceinline bool operator>=(const BaseString& right) {
+			__forceinline bool operator>=(const BaseString& right) const {
 				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
 				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) >= 0;
 			}
 			///<summary>Порівнює рядки</summary>
-			__forceinline bool operator<=(const BaseString& right) {
+			__forceinline bool operator<=(const BaseString& right) const {
 				extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
 				return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) =< 0;
 			}
@@ -548,6 +552,10 @@ namespace Seed {
 					else
 						return Equality::Smaller;
 			}
+
+			//Equality operator<=>(const BaseString& str1) {
+			//
+			//}
 #pragma endregion
 #pragma region Add operators
 #pragma region Literals
@@ -1576,7 +1584,7 @@ namespace Seed {
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
 				Math::SafeInt<UInt16> ret = 0;
-				for (i; i < CurrentSize; i++) {
+				for (i; i < Size; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
 						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 					ret += str[i] - L'0';
@@ -1609,13 +1617,14 @@ namespace Seed {
 				if (this->CurrentSize == 0)
 					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
 				if (this->CurrentSize > 20)
-					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+					throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+					//ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				Boolean sign(this->str[0] == '-');
 				SizeT i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
 				Math::SafeInt<UInt32> ret = 0;
-				for (i; i < CurrentSize; i++) {
+				for (i; i < Size; i++) {
 					if (str[i]<L'0' || str[i]>L'9')
 						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 					ret += str[i] - L'0';

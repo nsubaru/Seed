@@ -581,7 +581,7 @@ namespace Seed {
 			};
 
 			///<summary>Цілочисельне переповнення</summary>
-			class  IntegerOverflowException : public Exception {
+			class IntegerOverflowException : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>

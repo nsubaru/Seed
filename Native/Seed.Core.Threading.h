@@ -5,7 +5,7 @@
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Containers.Delegate.h"
 #include "Seed.Core.Security.h"
-#include "Seed.Core.Threading.SRWLock.h"
+#include "Seed.Core.Threading.LockPrimitives.h"
 #include "Seed.Core.CoreLog.Managed.h"
 
 namespace Seed {

@@ -71,7 +71,7 @@ Seed::Core::Threading::Thread::Event::Event(Seed::String && name, Seed::Boolean 
 		FALSE
 	);
 
-	if (NT_SUCCESS(status))
+	if (!NT_SUCCESS(status))
 		Throw(NtException(ExceptionPosition, status));
 }
 
@@ -168,19 +168,27 @@ bool Seed::Core::Threading::InitCoreThreading() noexcept
 	auto nativeMainThread = Thread(L"Native main thread");
 	THREAD_NAME_INFORMATION name;
 	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)nativeMainThread.thread->Label);
-	NtSetInformationThread(
+	NTSTATUS status = NtSetInformationThread(
 		NtCurrentThread(),
 		THREADINFOCLASS::ThreadNameInformation,
 		&name,
 		sizeof(THREAD_NAME_INFORMATION));
-	NTSTATUS status =
+	if (!NT_SUCCESS(status))
+		return false;
+	status =
 		NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &nativeMainThread.thread->handle, GENERIC_ALL, 0, 0);
 	if (!NT_SUCCESS(status))
 		return false;
 	nativeMainThread.thread->state = Thread::ThreadState::Work;
 	nativeMainThread.thread->ID = Thread::GetTID();
-	Threads = new List<Thread>();
-	*Threads += nativeMainThread;
+	try {
+		Threads = new List<Thread>();
+		*Threads += nativeMainThread;
+	}
+	catch (...) {
+		toCoreLog(L"Не вдалось ініціалізувати підсистему потоків");
+		return false;
+	}
 	return true;
 }
 
@@ -198,7 +206,7 @@ void Seed::Core::Threading::StopCoreThreading() noexcept
 	delete Threads;
 }
 
-Seed::Int32 Seed::Core::Threading::ThreadInitRoute(void* arg) noexcept {
+Seed::Int32 Seed::Core::Threading::ThreadInitRoute(void* arg) noexcept try {
 	Thread* This = static_cast<Thread*>(arg);
 	THREAD_NAME_INFORMATION name;
 	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)This->thread->Label);
@@ -253,6 +261,10 @@ Seed::Int32 Seed::Core::Threading::ThreadInitRoute(void* arg) noexcept {
 	delete This->thread->abortEvent;
 	delete This;
 	return STATUS_SUCCESS;
+}
+catch (...) {
+	toCoreLog(L"Внутрішня помилка при потоку");
+	return STATUS_UNHANDLED_EXCEPTION;
 }
 
 NTSTATUS __cdecl threadStartRoutineDynEntryPoint(PVOID args) {
@@ -354,11 +366,11 @@ void NTAPI APCDelegateExecutor(void* arg, void*, void*) {
 					ex.toString()
 				});
 		}
+		delete delegate;
 	}
-	catch (Exception & ex) {
-		toCoreLog(L"Внутрішня помилка при виконані APC", ex);
+	catch (...) {
+		toCoreLog(L"Внутрішня помилка при виконані APC");
 	}
-	delete delegate;
 }
 
 void Seed::Core::Threading::Thread::DispatchAPC(Delegate && APCDelegate) {
@@ -397,6 +409,7 @@ Seed::Core::Threading::Thread& Seed::Core::Threading::Thread::Interupt()
 		{
 			Throw(InvalidThreadObj(ExceptionPosition));
 		}
+
 	NtSuspendThread(this->thread->handle, NULL);
 	CONTEXT ctx;
 	ctx.ContextFlags = CONTEXT_ALL;
@@ -476,9 +489,9 @@ VOID NTAPI CleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
+	UNREFERENCED_PARAMETER(CleanupContext);
 	WorkData* data = reinterpret_cast<WorkData*>(ObjectContext);
 	delete data;
-	UNREFERENCED_PARAMETER(CleanupContext);
 }
 
 VOID NTAPI PoolWorkCallbak(
@@ -487,6 +500,8 @@ VOID NTAPI PoolWorkCallbak(
 	_Inout_     PTP_WORK              Work
 ) {
 	using namespace Seed;
+	if (Context == nullptr)
+		return;
 	WorkData* data = (WorkData*)Context;
 	data->Data->IsStarted = true;
 	TpCallbackSetEventOnCompletion(Instance, data->Data->event);
@@ -511,12 +526,12 @@ VOID NTAPI PoolWorkCallbak(
 				ex.toString()
 				});
 		}
+		delete data;
+		TpReleaseWork(Work);
 	}
-	catch ([[maybe_unused]] Seed::Exception& ex) {
+	catch (...) {
 		toCoreLog(L"Внутрішня помилка при роботі потоку");
 	}
-	delete data;
-	TpReleaseWork(Work);
 }
 
 void Seed::Core::Threading::Dispatcher::Dispose()
@@ -528,20 +543,25 @@ void Seed::Core::Threading::Dispatcher::Dispose()
 	delete reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->env);
 }
 
-Seed::Core::Threading::Dispatcher::Dispatcher()
+Seed::Core::Threading::Dispatcher::Dispatcher() try :
+	This(nullptr)
 {
 	This = new __dispatcher;
-	This->RefCount = 1;
 	NTSTATUS status = TpAllocPool((PTP_POOL*)& This->pool, NULL);
 	if (!NT_SUCCESS(status))
 		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(This->pool), NullPointException::Types::Write));
+
 	TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG)CurrentSettings::CPU::GetCpuCoresCount() / 2);
 	TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG)CurrentSettings::CPU::GetCpuCoresCount());
 	TP_POOL_STACK_INFORMATION info;
 	info.StackCommit = CurrentSettings::Threading::Thread::GetStackStartSize();
 	info.StackReserve = CurrentSettings::Threading::Thread::GetStackMaxSize();
 	TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info);
-	TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
+	status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
+
+	if (!NT_SUCCESS(status)) 
+		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(This->cleanupData), NullPointException::Types::Write));
+
 	This->env = new TP_CALLBACK_ENVIRON;
 	auto threadPoolEnviroment = reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->env);
 	threadPoolEnviroment->Version = 3;
@@ -554,30 +574,67 @@ Seed::Core::Threading::Dispatcher::Dispatcher()
 	threadPoolEnviroment->u.Flags = 0;
 	threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
 	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+
+}
+catch (...) {
+	if (this->This != nullptr) {
+		if (This->pool != nullptr) {
+			if (This->cleanupData != nullptr) {
+				if (This->env != nullptr) {
+					delete This->env;
+				}
+				__assume(reinterpret_cast<PTP_CLEANUP_GROUP>(This->cleanupData) != nullptr);
+				TpReleaseCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP>(This->cleanupData));
+			}
+			TpReleasePool(reinterpret_cast<PTP_POOL>(This->pool));
+		}
+		delete This;
+		This = nullptr;
+	}
+
+	ReThrow;
 }
 
-Seed::Core::Threading::Job Seed::Core::Threading::Dispatcher::Dispatch(Seed::Core::Delegate&& EntryPoint)
+Seed::Core::Threading::Job Seed::Core::Threading::Dispatcher::Dispatch(Seed::Core::Delegate&& EntryPoint) 
 {
-	PTP_WORK work = nullptr;
-	HANDLE event;
-	NTSTATUS status = NtCreateEvent(&event, GENERIC_ALL, NULL, EVENT_TYPE::NotificationEvent, FALSE);
-	if (!NT_SUCCESS(status))
-		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(event), NullPointException::Types::Write));
+	WorkData* data = nullptr;
 	Job WorkObj;
-	WorkObj.This = new Job::data(event, MoveRValue(EntryPoint), nullptr);
-	WorkData* data = new WorkData(WorkObj.This, WorkObj, WorkObj.This->delegate, WorkObj.This, This->lock);
-	status = TpAllocWork(&work, PoolWorkCallbak, data, reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->env));
-	WorkObj.This->work = work;
-	if (!NT_SUCCESS(status)) {
-		delete data;
-		delete WorkObj.This;
-		WorkObj.This = nullptr;
-		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(work), NullPointException::Types::Write));
+	PTP_WORK work = nullptr;
+	HANDLE event = nullptr;
+
+	try {
+		NTSTATUS status = NtCreateEvent(&event, GENERIC_ALL, NULL, EVENT_TYPE::NotificationEvent, FALSE);
+		if (!NT_SUCCESS(status))
+			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(event), NullPointException::Types::Write));
+		
+		WorkObj.This = new Job::data(event, MoveRValue(EntryPoint), nullptr);
+		data = new WorkData(WorkObj.This, WorkObj, WorkObj.This->delegate, WorkObj.This, This->lock);
+		status = TpAllocWork(&work, PoolWorkCallbak, data, reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->env));
+		
+		if (!NT_SUCCESS(status))
+			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(work), NullPointException::Types::Write));
+		
+		WorkObj.This->work = work;
+		TpPostWork(work);
 	}
-	TpPostWork(work);
+	catch (...) {
+		if (event != nullptr) {
+			NtClose(event);
+			if (WorkObj.This != nullptr)
+			{
+				delete WorkObj.This;
+				WorkObj.This = nullptr;
+
+				if (data != nullptr) {
+					delete data;
+					data = nullptr;
+				}
+			}
+		}
+		ReThrow;
+	}
 	return WorkObj;
 }
-
 
 void Seed::Core::Threading::Job::Dispose() {}
 

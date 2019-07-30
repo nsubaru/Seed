@@ -2,25 +2,38 @@
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Memory.h"
+#include "Seed.Core.Threading.h"
 
 namespace Seed {
 	inline namespace Core {
+		///<summary>Пріоритетна черга для обробки даних в порядку приходу з урахуванням пріоритету
+		///<para>Працює через фібоначеву кучу. Ітерація відсутня</para></summary>
 		template <class THeap, typename TPriority, typename TValue>
-		class BasePriorityQueue : public Memory::Allocator<THeap> {
+		class BasePriorityQueue : public Memory::Allocator<THeap>, IDisposable {
 		private:
+			///<summary>Внутрішня структура елемента в черзі</summary>
 			struct Node : public Memory::Allocator<THeap> {
+				///<summary>Попередній елемент</summary>
 				Node* prev;
+				///<summary>Наступний елемент</summary>
 				Node* next;
+				///<summary>Вкладений елемент</summary>
 				Node* child;
+				///<summary>Батьківський елемент</summary>
 				Node* parent;
+				///<summary>Значення пріоритету</summary>
 				TPriority priority;
+				///<summary>Значення елемента</summary>
 				TValue value;
+				///<summary></summary>
 				int degree;
+				///<summary></summary>
 				bool marked;
 
-				Node(const TValue& Key, const TPriority& Value) :
-					priority(Value),
-					value(Key),
+				///<summary>Конструктор</summary>
+				__forceinline Node(const TPriority& Key, const TValue& Value) :
+					priority(Key),
+					value(Value),
 					prev(this),
 					next(this),
 					degree(0),
@@ -29,9 +42,10 @@ namespace Seed {
 					parent(nullptr)
 				{}
 
-				Node(const TValue& Key, TPriority&& Value) :
-					priority(MoveRValue(Value)),
-					value(Key),
+				///<summary>Конструктор</summary>
+				__forceinline Node(const TPriority& Key, TValue&& Value) :
+					priority(MoveRValue(Key)),
+					value(Value),
 					prev(this),
 					next(this),
 					degree(0),
@@ -40,9 +54,10 @@ namespace Seed {
 					parent(nullptr)
 				{}
 
-				Node(TValue&& Key, const TPriority& Value) :
-					priority(MoveRValue(Value)),
-					value(Key),
+				///<summary>Конструктор</summary>
+				__forceinline Node(TPriority&& Key, const TValue& Value) :
+					priority(MoveRValue(Key)),
+					value(Value),
 					prev(this),
 					next(this),
 					degree(0),
@@ -51,9 +66,10 @@ namespace Seed {
 					parent(nullptr)
 				{}
 
-				Node(TValue&& Key, TPriority&& Value) :
-					priority(MoveRValue(Value)),
-					value(MoveRValue(Key)),
+				///<summary>Конструктор</summary>
+				__forceinline Node(TPriority&& Key, TValue&& Value) :
+					priority(MoveRValue(Key)),
+					value(MoveRValue(Value)),
 					prev(this),
 					next(this),
 					degree(0),
@@ -63,90 +79,132 @@ namespace Seed {
 				{}
 
 				friend class BasePriorityQueue<THeap, TPriority, TValue>;
-				Node* getPrev() { return prev; }
-				Node* getNext() { return next; }
-				Node* getChild() { return child; }
-				Node* getParent() { return parent; }
-				TPriority getValue() { return priority; }
-				TValue getData() { return value; }
-				bool isMarked() { return marked; }
+				
+				///Гетери
+				
+				__forceinline Node* getPrev() { return prev; }
+				__forceinline Node* getNext() { return next; }
+				__forceinline Node* getChild() { return child; }
+				__forceinline Node* getParent() { return parent; }
+				__forceinline TPriority getValue() { return priority; }
+				__forceinline TValue getData() { return value; }
+				__forceinline bool isMarked() { return marked; }
 
-				bool hasChildren() { return child; }
-				bool hasParent() { return parent; }
+				__forceinline bool hasChildren() { return child; }
+				__forceinline bool hasParent() { return parent; }
 			};
+		private:
+			struct Tree {
+				Node* heap;
+				RefCountT Count;
+				RefCountT RefCount;
+				Threading::SRWLock lock;
+				Threading::ConditionVariable condVariable;
+				Tree() : heap(nullptr), Count(0), lock(), RefCount(1) {}
+			};
+			Tree* tree;
 		protected:
-			Node* heap;
-		public:
-
-			BasePriorityQueue() {
-				heap = nullptr;
-			}
-			virtual ~BasePriorityQueue() {
-				if (heap) {
-					deleteAll(heap);
+			virtual void Dispose() final override {
+				if (tree->heap != nullptr) {
+					deleteAll(tree->heap);
+					tree->heap = nullptr;
 				}
 			}
-			Node* insert(const TPriority& priority, const TValue& key) {
-				Node* ret = new Node(priority, key);
-				heap = merge(heap, ret);
-				return ret;
-			}
-			Node* insert(const TPriority& priority, TValue&& key) {
-				Node* ret = new Node(priority, key);
-				heap = merge(heap, ret);
-				return ret;
-			}
-			Node* insert(TPriority&& priority, const TValue& key) {
-				Node* ret = new Node(priority, key);
-				heap = merge(heap, ret);
-				return ret;
-			}
-			Node* insert(TPriority&& priority, TValue&& key) {
-				Node* ret = new Node(priority, key);
-				heap = merge(heap, ret);
-				return ret;
-			}
-			void merge(BasePriorityQueue& other) {
+		public:
+			BasePriorityQueue() : tree(new Tree) {}
 
+			RefCountClass(BasePriorityQueue, tree);
+
+			void Insert(const TPriority& priority, const TValue& key) {
+				this->tree->lock.ExclusiveLock([&]() {
+					Node* ret = new Node(priority, key);
+					tree->heap = merge(tree->heap, ret);
+					tree->Count++;
+					tree->condVariable.WakeOne();
+					});
+			}
+			void Insert(const TPriority& priority, TValue&& key) {
+				this->tree->lock.ExclusiveLock([&, key = MoveRValue(key)]() mutable{
+					Node* ret = new Node(priority, key);
+					tree->heap = merge(tree->heap, ret);
+					tree->Count++;
+					tree->condVariable.WakeOne();
+				});
+			}
+			void Insert(TPriority&& priority, const TValue& key) {
+				this->tree->lock.ExclusiveLock([&, priority = MoveRValue(priority)]() mutable{
+					Node* ret = new Node(priority, key);
+					tree->heap = merge(tree->heap, ret);
+					tree->Count++;
+					tree->condVariable.WakeOne();
+				});
+			}
+			void Insert(TPriority&& priority, TValue&& key) {
+				this->tree->lock.ExclusiveLock([&, priority = MoveRValue(priority), key = MoveRValue(key)]() mutable {
+					Node* ret = new Node(priority, key);
+					tree->heap = merge(tree->heap, ret);
+					tree->Count++;
+					tree->condVariable.WakeOne();
+				});
 			}
 
-			bool isEmpty() {
-				return heap == NULL;
+			void Merge(const BasePriorityQueue& other) {
+				other.tree->lock.ExclusiveLock([&]() {
+					this->tree->lock.ExclusiveLock([&]() {
+						this->merge(this->tree->heap, other.tree->heap);
+						this->tree->Count = this->tree->Count + other.tree->Count;
+						this->tree->condVariable.WakeOne();
+						});
+					other.tree->Count = 0;
+					});
+			}
+
+			BasePriorityQueue& operator+=(BasePriorityQueue&& other) {
+				return this->tree->lock.ExclusiveLock([&, other = MoveRValue(other)]() mutable {
+					this->merge(this->tree->heap, other.tree->heap);
+					this->tree->Count = this->tree->Count + other.tree->Count;
+					this->tree->condVariable.WakeOne();
+					other.tree->heap = nullptr;
+					other.~BasePriorityQueue();
+					return *this;
+					});
+			}
+
+			bool getIsEmpty() {
+				return tree->heap == nullptr;
+			}
+
+			SizeT getCount() { 
+				return this->tree->Count; 
 			}
 
 			TPriority getFirstItemPriority() {
-				return heap->priority;
+				return tree->heap->priority;
 			}
 
+			Boolean Property(getIsEmpty) IsEmpty;
+			SizeT Property(getCount) Count;
+
 			TPriority discardFirstItem() {
-				Node* old = heap;
-				heap = removeMinimum(heap);
+				Node* old = tree->heap;
+				tree->heap = removeMinimum(tree->heap);
 				TPriority ret = old->priority;
 				delete old;
 				return ret;
 			}
 
-			TValue getFirst() {
-				Node* old = heap;
-				heap = removeMinimum(heap);
-				TValue ret = old->value;
-				delete old;
-				return ret;
+			TValue getFirstWhenAquire() {
+				if(this->tree->Count == 0)
+					tree->condVariable.Wait();
+				return tree->lock.ExclusiveLock([&]() {
+					Node* old = tree->heap;
+					tree->heap = removeMinimum(tree->heap);
+					TValue ret(MoveRValue(old->value));
+					this->tree->Count--;
+					delete old;
+					return ret;
+					});
 			}
-
-			//void decreaseKey(Node* n, TPriority priority) {
-			//	heap = decreaseKey(heap, n, priority);
-			//}
-
-			//Node* find(TPriority priority) {
-			//	return find(heap, priority);
-			//}
-
-			const BasePriorityQueue& operator+=(BasePriorityQueue&& other) {
-				heap = merge(heap, other.heap);
-				other.heap = nullptr;
-			}
-
 		private:
 			Node* merge(Node* a, Node* b) {
 				if (a == nullptr) return b;
@@ -295,5 +353,15 @@ namespace Seed {
 				return nullptr;
 			}
 		};
+
+		namespace {
+			template<typename TKey, typename TVal>
+			using SecuredPriorityQueue = BasePriorityQueue<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
+		}
+
+		namespace {
+			template<typename TKey, typename TVal>
+			using PriorityQueue = BasePriorityQueue<Seed::Core::Memory::Heap, TKey, TVal>;
+		}
 	}
 }

@@ -93,6 +93,8 @@ namespace Seed {
 					RefCountT JobsCounts;
 					//Кількість силок на даний екземаляр
 					RefCountT RefCount;
+
+					__dispatcher() :pool(nullptr), env(nullptr), cleanupData(nullptr), lock(), JobsCounts(0), RefCount(1) {}
 				};
 				//Дані даного екземаляра
 				__dispatcher* This;

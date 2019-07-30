@@ -3,7 +3,7 @@
 
 #pragma once
 #include "Seed.Core.Base.h"
-#include "Seed.Core.Threading.SRWLock.h"
+#include "Seed.Core.Threading.LockPrimitives.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
@@ -30,20 +30,20 @@ InternalApiCall OptimizeExport(extern void AcquireLockSharedSRWLock(void* PSRWLo
 );
 InternalApiCall OptimizeExport(extern void ReleaseLockSharedSRWLock(void* PSRWLock),
 	{
-	RtlReleaseSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
+		RtlReleaseSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
 	}
 );
 
 InternalApiCall OptimizeExport(extern void PulseNtEvent(void* handle),
 	{
-	LONG state;
-	NtPulseEvent(handle, &state);
+		LONG state;
+		NtPulseEvent(handle, &state);
 	}
 );
 InternalApiCall OptimizeExport(extern void SetNtEvent(void* handle),
 	{
-	LONG state;
-	NtSetEvent(handle, &state);
+		LONG state;
+		NtSetEvent(handle, &state);
 	}
 );
 InternalApiCall OptimizeExport(extern void ResetNtEvent(void* handle),
@@ -52,3 +52,29 @@ InternalApiCall OptimizeExport(extern void ResetNtEvent(void* handle),
 		NtResetEvent(handle, &state);
 	}
 );
+
+InternalApiCall OptimizeExport(extern void InitCondVal(void** handle),
+	{
+		RtlInitializeConditionVariable((PRTL_CONDITION_VARIABLE)handle);
+	}
+);
+
+InternalApiCall OptimizeExport(extern void WaitCondVal(void** condVar, void** srwLock),
+	{
+		RtlSleepConditionVariableSRW((PRTL_CONDITION_VARIABLE)&condVar, (PRTL_SRWLOCK)srwLock, NULL, 0);
+	}
+);
+
+InternalApiCall OptimizeExport(extern void WakeOneCondVal(void** condVar),
+	{
+		RtlWakeConditionVariable((PRTL_CONDITION_VARIABLE)condVar);
+	}
+);
+
+InternalApiCall OptimizeExport(extern void WakeAllCondVal(void** condVar),
+	{
+		RtlWakeAllConditionVariable((PRTL_CONDITION_VARIABLE)condVar);
+	}
+);
+
+

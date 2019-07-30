@@ -3,7 +3,7 @@
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Base.Interlocked.h"
 #include "Seed.Core.Containers.Array.h"
-#include "Seed.Core.Threading.SRWLock.h"
+#include "Seed.Core.Threading.LockPrimitives.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -416,12 +416,10 @@ namespace Seed {
 						//якщо власник ≥снуЇ то видаленн€ виконуЇтьс€ в екслюзивному блокуванн≥
 						this->This->father->lock.ExclusiveLock([&]()
 							{
+								__assume(this->This->father != nullptr);
 								if (this->This->next == nullptr && this->This->prev == nullptr)
 								{
-									if (this->This->father != nullptr)
-									{
-										this->This->father->root = this->This->father->last = nullptr;
-									}
+									this->This->father->root = this->This->father->last = nullptr;
 								}
 								else if (this->This->next != nullptr && this->This->prev != nullptr)
 								{

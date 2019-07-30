@@ -4,742 +4,206 @@
 
 namespace Seed {
 	inline namespace Core {
+		inline namespace Exceptions {
+			class IntegerOverflowException;
+			class DivideByZero;
+		}
+
 		namespace Math {
 #pragma region SafeInt
+			///<summary>Класс чисел з безпечними операціями</summary>
+			///<param name = "T">Тип який буде базою, може бути лиш unsigned int будь-яклї розрядності</param>
 			template<typename T>
 			class SafeInt {
-				//static_assert(false, "Safe int not implemented for this type");
-			};
-
-			template<>
-			class SafeInt<UInt8>
-			{
 			private:
-				UInt8 value;
+				///Тип числа
+				using Int = StaticAsserts::Unsigned<T>;
+				///<summary>Значення</summary>
+				Int value;
 			public:
-				constexpr __forceinline SafeInt(UInt8 Value = 0) : value(Value) {}; //-V730
+				///<summary>Стандартний конструктор</summary>
+				constexpr SafeInt() : value(0) {}
 
-#pragma region Simple operations
-#pragma region SafeInt arg
-				__forceinline SafeInt operator+(SafeInt second) {
-					extern bool Add(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
+				///<summary>Конструктор який приймає значення</summary>
+				constexpr SafeInt(Int value) : value(value) {}
+
+				///<summary>Додавання двох чисел</summary>
+				///<param name = "second">Лівий операнд</param>
+				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
+				///<returns>Результат операції</returns>
+				constexpr __forceinline SafeInt operator+(SafeInt second) {
+					if (static_cast<Int>(this->value + second.value) >= this->value)
+						return static_cast<Int>(this->value + second.value);
+					else
+						throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
-				__forceinline SafeInt operator-(SafeInt second) {
-					extern bool Sub(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
+				///<summary>Віднімання двох чисел</summary>
+				///<param name = "second">Лівий операнд</param>
+				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
+				///<returns>Результат операції</returns>
+				constexpr __forceinline SafeInt operator-(SafeInt second) {
+					if(this->value >= second.value)
+						return static_cast<Int>(this->value - second.value);
+					else
+						throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
-				__forceinline SafeInt operator*(SafeInt second) {
-					extern bool Mul(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
+#pragma warning(push)
+#pragma warning(disable : 4164)
+				///<summary>Множення двох чисел</summary>
+				///<param name = "second">Лівий операнд</param>
+				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
+				///<returns>Результат операції</returns>
+#pragma intrinsic(_umul128)
+				constexpr __forceinline SafeInt operator*(SafeInt second) {
+					if constexpr (StaticAsserts::IsSameV<Int, UInt8>) {
+						UInt16 res = this->value * second.value;
+						if (res > Math::Max<Int>())
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return static_cast<Int>(res);
+					}
+					if constexpr (StaticAsserts::IsSameV<Int, UInt16>) {
+						UInt32 res = this->value * second.value;
+						if (res > Math::Max<Int>())
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return static_cast<Int>(res);
+					}
+					if constexpr (StaticAsserts::IsSameV<Int, UInt32>) {
+						UInt64 res = this->value * second.value;
+						if (res > Math::Max<Int>())
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return static_cast<Int>(res);
+					}
+					if constexpr (StaticAsserts::IsSameV<Int, UInt64>) {
+						UInt64 res[2];
+						_umul128(this->value, second.value, res);
+						UInt32 res = this->value * second.value;
+						if (res[1] > 0)
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return res;
+					}
 				}
-#pragma endregion
-#pragma region Int arg
+#pragma warning(pop)
 
-				__forceinline SafeInt operator+(UInt8 second) {
-					extern bool Add(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Add(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator-(UInt8 second) {
-					extern bool Sub(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Sub(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator*(UInt8 second) {
-					extern bool Mul(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Mul(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-#pragma endregion
-#pragma endregion
-
-#pragma region Extended operations
-#pragma region SafeInt arg
-				__forceinline SafeInt& operator+=(SafeInt second) {
-					extern bool Add(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
+				///<summary>Ділення двох чисел</summary>
+				///<param name = "second">Лівий операнд</param>
+				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
+				///<returns>Результат операції</returns>
+				constexpr __forceinline SafeInt operator/(SafeInt second) {
+					if (second.value == 0)
+						throw DivideByZero(__FILE__, __FUNCSIG__, __LINE__);
+					else
+						return this->value / second.value;
 				}
 
-				__forceinline SafeInt& operator-=(SafeInt second) {
-					extern bool Sub(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
+				///<summary>Додавання до даного числа</summary>
+				///<param name = "second">Лівий операнд</param>
+				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
+				///<returns>Результат операції</returns>
+				constexpr __forceinline SafeInt operator+=(SafeInt second) {
+					if (static_cast<Int>(this->value + second.value) >= this->value)
+						return this->value = static_cast<Int>(this->value + second.value);
+					else
+						throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
-				__forceinline SafeInt& operator*=(SafeInt second) {
-					extern bool Mul(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-#pragma endregion
-#pragma region Int arg
-				__forceinline SafeInt& operator+=(UInt8 second) {
-					extern bool Add(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Add(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
+				///<summary>Віднімання від поточного числа</summary>
+				///<param name = "second">Лівий операнд</param>
+				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
+				///<returns>Результат операції</returns>
+				constexpr __forceinline SafeInt operator-=(SafeInt second) {
+					if (this->value >= second.value)
+						return this->value = static_cast<Int>(this->value - second.value);
+					else
+						throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
-				__forceinline SafeInt& operator-=(UInt8 second) {
-					extern bool Sub(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Sub(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
+#pragma warning(push)
+#pragma warning(disable : 4164)
+				///<summary>Домножування до поточного значення</summary>
+				///<param name = "second">Лівий операнд</param>
+				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
+				///<returns>Результат операції</returns>
+				constexpr __forceinline SafeInt operator*=(SafeInt second) {
+					if constexpr (StaticAsserts::IsSameV<Int, UInt8>) {
+						UInt16 res = this->value * second.value;
+						if (res > Math::Max<Int>())
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return this->value = static_cast<Int>(res);
+					}
+					if constexpr (StaticAsserts::IsSameV<Int, UInt16>) {
+						UInt32 res = this->value * second.value;
+						if (res > Math::Max<Int>())
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return this->value = static_cast<Int>(res);
+					}
+					if constexpr (StaticAsserts::IsSameV<Int, UInt32>) {
+						UInt64 res = this->value * second.value;
+						if (res > Math::Max<Int>())
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return this->value = static_cast<Int>(res);
+					}
+					if constexpr (StaticAsserts::IsSameV<Int, UInt64>) {
+						UInt64 res[2];
+						_umul128(this->value, second.value, res);
+						UInt32 res = this->value * second.value;
+						if (res[0] > 0)
+							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						else
+							return this->value = res[1];
+					}
+				}
+#pragma warning(pop)
+
+				constexpr __forceinline bool operator<(SafeInt second) {
+					return this->value < second.value;
 				}
 
-				__forceinline SafeInt& operator*=(UInt8 second) {
-					extern bool Mul(UInt8 First, UInt8 Second, UInt8 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt8 result;
-					if (!Mul(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
+				constexpr __forceinline bool operator>(SafeInt second) {
+					return this->value > second.value;
 				}
-#pragma endregion
-#pragma endregion
+				constexpr __forceinline bool operator<=(SafeInt second) {
+					return this->value <= second.value;
+				}
+				constexpr __forceinline bool operator>=(SafeInt second) {
+					return this->value >= second.value;
+				}
+				constexpr __forceinline bool operator==(SafeInt second) {
+					return this->value == second.value;
+				}
+				constexpr __forceinline bool operator!=(SafeInt second) {
+					return this->value != second.value;
+				}
 
-#pragma region Get & Set
-
-				constexpr __forceinline UInt8 Get() { return value; }
-				constexpr __forceinline void Set(UInt8 Value) { this->value = Value; } //-V688
-
-				UInt8 Property(Get, Set) Value;
-
-#pragma endregion
+				constexpr __forceinline Int GetValue() { return value; }
+				Int Property(GetValue) Value;
 			};
-
-			template<>
-			class SafeInt<UInt16>
-			{
-			private:
-				UInt16 value;
-			public:
-				constexpr __forceinline SafeInt(UInt16 Value = 0) : value(Value) {}; //-V730
-
-#pragma region Simple operations
-#pragma region SafeInt arg
-				__forceinline SafeInt operator+(SafeInt second) {
-					extern bool Add(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator-(SafeInt second) {
-					extern bool Sub(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator*(SafeInt second) {
-					extern bool Mul(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-#pragma endregion
-#pragma region Int arg
-
-				__forceinline SafeInt operator+(UInt16 second) {
-					extern bool Add(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Add(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator-(UInt16 second) {
-					extern bool Sub(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Sub(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator*(UInt16 second) {
-					extern bool Mul(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Mul(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-#pragma endregion
-#pragma endregion
-
-#pragma region Extended operations
-#pragma region SafeInt arg
-				__forceinline SafeInt& operator+=(SafeInt second) {
-					extern bool Add(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator-=(SafeInt second) {
-					extern bool Sub(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator*=(SafeInt second) {
-					extern bool Mul(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-#pragma endregion
-#pragma region Int arg
-				__forceinline SafeInt& operator+=(UInt16 second) {
-					extern bool Add(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Add(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator-=(UInt16 second) {
-					extern bool Sub(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Sub(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator*=(UInt16 second) {
-					extern bool Mul(UInt16 First, UInt16 Second, UInt16 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt16 result;
-					if (!Mul(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-#pragma endregion
-#pragma endregion
-
-#pragma region Get and Set
-
-				constexpr __forceinline UInt16 Get() { return value; }
-				constexpr __forceinline void Set(UInt16 Value) { this->value = Value; } //-V688
-
-				UInt16 Property(Get, Set) Value;
-
-#pragma endregion
-			};
-
-			template<>
-			class SafeInt<UInt32>
-			{
-			private:
-				UInt32 value;
-			public:
-				constexpr __forceinline SafeInt(UInt32 Value = 0) : value(Value) {}; //-V730
-
-#pragma region Simple operations
-#pragma region SafeInt arg
-				__forceinline SafeInt operator+(SafeInt second) {
-					extern bool Add(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator-(SafeInt second) {
-					extern bool Sub(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator*(SafeInt second) {
-					extern bool Mul(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-#pragma endregion
-#pragma region Int arg
-
-				__forceinline SafeInt operator+(UInt32 second) {
-					extern bool Add(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Add(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator-(UInt32 second) {
-					extern bool Sub(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Sub(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator*(UInt32 second) {
-					extern bool Mul(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Mul(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-#pragma endregion
-#pragma endregion
-
-#pragma region Extended operations
-#pragma region SafeInt arg
-				__forceinline SafeInt& operator+=(SafeInt second) {
-					extern bool Add(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator-=(SafeInt second) {
-					extern bool Sub(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator*=(SafeInt second) {
-					extern bool Mul(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-#pragma endregion
-#pragma region Int arg
-				__forceinline SafeInt& operator+=(UInt32 second) {
-					extern bool Add(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Add(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator-=(UInt32 second) {
-					extern bool Sub(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Sub(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator*=(UInt32 second) {
-					extern bool Mul(UInt32 First, UInt32 Second, UInt32 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt32 result;
-					if (!Mul(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-#pragma endregion
-#pragma endregion
-
-#pragma region Get and Set
-
-				constexpr __forceinline UInt32 Get() { return value; }
-				constexpr __forceinline void Set(UInt32 Value) { this->value = Value; } //-V688
-
-				UInt32 Property(Get, Set) Value;
-
-#pragma endregion
-			};
-
-			template<>
-			class SafeInt<UInt64>
-			{
-			private:
-				UInt64 value;
-			public:
-				constexpr __forceinline SafeInt(UInt64 Value = 0) : value(Value) {}; //-V730
-
-#pragma region Simple operations
-#pragma region SafeInt arg
-				__forceinline SafeInt operator+(SafeInt second) {
-					extern bool Add(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator-(SafeInt second) {
-					extern bool Sub(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator*(SafeInt second) {
-					extern bool Mul(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-#pragma endregion
-#pragma region Int arg
-
-				__forceinline SafeInt operator+(UInt64 second) {
-					extern bool Add(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Add(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator-(UInt64 second) {
-					extern bool Sub(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Sub(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-
-				__forceinline SafeInt operator*(UInt64 second) {
-					extern bool Mul(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Mul(this->value, second, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					return result;
-				}
-#pragma endregion
-#pragma endregion
-
-#pragma region Extended operations
-#pragma region SafeInt arg
-				__forceinline SafeInt& operator+=(SafeInt second) {
-					extern bool Add(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Add(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator-=(SafeInt second) {
-					extern bool Sub(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Sub(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator*=(SafeInt second) {
-					extern bool Mul(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Mul(this->value, second.value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-#pragma endregion
-#pragma region Int arg
-				__forceinline SafeInt& operator+=(UInt64 second) {
-					extern bool Add(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Add(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator-=(UInt64 second) {
-					extern bool Sub(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Sub(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-
-				__forceinline SafeInt& operator*=(UInt64 second) {
-					extern bool Mul(UInt64 First, UInt64 Second, UInt64 & Result);
-					extern __declspec(noreturn) void ThrowIntegerOverflowException(
-						const Seed::ConstAString & File,
-						const Seed::ConstAString & Function,
-						const Seed::SizeT Line);
-					UInt64 result;
-					if (!Mul(this->value, value, result))
-						ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-					this->value = result;
-					return *this;
-				}
-#pragma endregion
-#pragma endregion
-
-#pragma region Get and Set
-
-				constexpr __forceinline UInt64 Get() { return value; }
-				constexpr __forceinline void Set(UInt64 Value) { this->value = Value; } //-V688
-
-				UInt64 Property(Get, Set) Value;
-
-#pragma endregion
-			};
+			
+			///<summary>Безпечний UInt8</summary>
+			namespace { using SafeInt8 = SafeInt<UInt8>; }
+			///<summary>Безпечний UInt16</summary>
+			namespace { using SafeInt16 = SafeInt<UInt16>; }
+			///<summary>Безпечний UInt32</summary>
+			namespace { using SafeInt32 = SafeInt<UInt32>; }
+			///<summary>Безпечний UInt64</summary>
+			namespace { using SafeInt64 = SafeInt<UInt64>; }
+			
 #pragma endregion
 
 #pragma region ConvertUnsignedToSigned
 			template<typename T>
-			__forceinline StaticAsserts::Signed<T> ConvertUnsignedToSigned(StaticAsserts::Unsigned<T> From) {
-				extern bool ConvertToSigned(StaticAsserts::Unsigned<T> Value, StaticAsserts::Signed<T> & Result);
-				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
-				StaticAsserts::Signed<T> ret;
-				if (!ConvertToSigned(From, ret))
-					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-				return ret;
+			StaticAsserts::Signed<T> ConvertUnsignedToSigned(StaticAsserts::Unsigned<T> From) {
+				if (From > static_cast<StaticAsserts::Unsigned<T>>(Max<StaticAsserts::Signed<T>>()))
+					throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+				return static_cast<StaticAsserts::Signed<T>>(From);
 			}
 #pragma endregion
 		}

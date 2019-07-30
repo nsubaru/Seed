@@ -55,6 +55,7 @@ namespace Seed {
 			template<typename IfTrue, typename IfFalse>
 			struct ConditionT<true, IfTrue, IfFalse> { using Result = IfTrue; };
 
+			///<summary>Compile-time результат логічного судження</summary>
 			template<Boolean Cond, typename IfTrue, typename IfFalse>
 			using ConditionV = typename ConditionT<Cond, IfTrue, IfFalse>::Result;
 
@@ -76,7 +77,7 @@ namespace Seed {
 			template<typename B, typename T>
 			using EnableIfTV = typename EnableIfT<B, T>::Type;
 
-			/////<summary>Compile-time логічне суддження, якщо T є об'єднанням то вертає True інакше False</summary>
+			/*///<summary>Compile-time логічне суддження, якщо T є об'єднанням то вертає True інакше False</summary>*/
 			/////<remarks>Спирається на реалізацію в компіляторі</remarks>
 			//template<typename T>
 			//struct IsUnion :LogicConst<CRT::is_union<T>::value> {}; // Implementatiom defined
@@ -91,13 +92,6 @@ namespace Seed {
 			///<remarks>Спирається на реалізацію в компіляторі</remarks>
 			template<typename Base, typename Derived>
 			struct IsBasedOn :LogicConst<__is_base_of(Base, Derived)> {}; //Implementation defined
-
-			/////<summary>Compile-time логічне суддження,
-			/////<para>вертає true якщо даний тип можна скопіювати простим побітовим копіюванням</para>
-			/////</summary>
-			/////<remarks>Спирається на реалізацію в компіляторі</remarks>
-			//template<typename T>
-			//constexpr bool IsMemCopySupported() { return CRT::is_trivially_copyable<T>(); }
 
 			template<class T>
 			struct IsCArray : LogicFalse {};
@@ -157,19 +151,19 @@ namespace Seed {
 			using RemoveCV = typename RemoveCVStruct<T>::Type;
 
 #pragma region Is Function static assert
-			///<summary>primary template</summary>
+			///<summary>Compile-time перевірка чи даний тип є функцією</summary>
 			template<typename>
 			struct IsFunction : LogicFalse { };
 
-			///<summary>specialization for regular functions</summary>
+			///<summary>Compile-time перевірка чи даний тип є функцією</summary>
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args...)> : LogicTrue {};
 
-			///<summary>specialization for variadic functions such as std::printf</summary>
+			///<summary>Compile-time перевірка чи даний тип є функцією</summary>
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args..., ...)> : LogicTrue {};
 
-			///<summary>specialization for function types that have cv-qualifiers</summary>
+			///<summary>Compile-time перевірка чи даний тип є функцією</summary>
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args...) const> : LogicTrue {};
 			template<typename Ret, typename... Args>

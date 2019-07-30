@@ -18,11 +18,13 @@ struct {
 } Sheduler;
 
 VOID NTAPI TaskShedulerTaskCallback(
-	_Inout_     PTP_CALLBACK_INSTANCE Instance,
-	_Inout_opt_ PVOID                 Context,
-	_Inout_     PTP_TIMER             Timer
+	_Inout_					PTP_CALLBACK_INSTANCE Instance,
+	_Inout_ _Notnull_		PVOID                 Context,
+	_Inout_					PTP_TIMER             Timer
 ) {
 	using namespace Seed;
+	if (Context == NULL)
+		return;
 	Seed::TaskSheduler::Job::__task* This = (Seed::TaskSheduler::Job::__task*)Context;
 	This->TID = (Seed::UInt64)NtCurrentThreadId();
 
@@ -93,6 +95,8 @@ VOID NTAPI TaskShedulerCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
+	if (ObjectContext == NULL)
+		return;
 	Seed::TaskSheduler::Job::__task* This = (Seed::TaskSheduler::Job::__task*)ObjectContext;
 	if (CleanupContext == NULL) {
 		if (This != nullptr) {
@@ -113,18 +117,22 @@ VOID NTAPI TaskShedulerCleanupCallback(
 }
 
 
-bool Seed::Core::Init::TaskSheduling() noexcept {
+bool Seed::Core::Init::TaskSheduling() noexcept try {
 	NTSTATUS status = TpAllocPool(&Sheduler.TaskShedulerPool, NULL);
 	if (!NT_SUCCESS(status))
-		return false;
+		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(&Sheduler.TaskShedulerPool), NullPointException::Types::Write));
+
 	TpSetPoolMinThreads(Sheduler.TaskShedulerPool, static_cast<LONG>(CurrentSettings::CPU::GetCpuCoresCount() / 2));
 	TpSetPoolMaxThreads(Sheduler.TaskShedulerPool, static_cast<LONG>(CurrentSettings::CPU::GetCpuCoresCount()));
 	TP_POOL_STACK_INFORMATION info;
 	info.StackCommit = CurrentSettings::Threading::Thread::GetStackStartSize();
 	info.StackReserve = CurrentSettings::Threading::Thread::GetStackMaxSize();
 	TpSetPoolStackInformation(Sheduler.TaskShedulerPool, &info);
-	TpAllocCleanupGroup(&Sheduler.TaskShedulerPoolCleanupGroup);
-	
+	status = TpAllocCleanupGroup(&Sheduler.TaskShedulerPoolCleanupGroup);
+
+	if (!NT_SUCCESS(status))
+		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(Sheduler.TaskShedulerPoolCleanupGroup), NullPointException::Types::Write));
+
 	Sheduler.TaskShedulerPoolEnviroment.Version = 3;
 	Sheduler.TaskShedulerPoolEnviroment.Pool = Sheduler.TaskShedulerPool;
 	Sheduler.TaskShedulerPoolEnviroment.CleanupGroup = Sheduler.TaskShedulerPoolCleanupGroup;
@@ -136,6 +144,15 @@ bool Seed::Core::Init::TaskSheduling() noexcept {
 	Sheduler.TaskShedulerPoolEnviroment.CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
 	Sheduler.TaskShedulerPoolEnviroment.Size = sizeof(TP_CALLBACK_ENVIRON);
 	return true;
+}
+catch (...) {
+	if (Sheduler.TaskShedulerPool != nullptr) {
+		if (Sheduler.TaskShedulerPoolCleanupGroup != nullptr) {
+			TpReleaseCleanupGroup(Sheduler.TaskShedulerPoolCleanupGroup);
+		}
+		TpReleasePool(Sheduler.TaskShedulerPool);
+	}
+	return false;
 }
 
 void Seed::Core::Stop::TaskSheduling() noexcept {
@@ -262,12 +279,14 @@ Seed::Core::TaskSheduler::Job Seed::Core::TaskSheduler::Task::Shedule()
 			)
 		);
 
-	TpAllocTimer(
+	NTSTATUS status = TpAllocTimer(
 		const_cast<PTP_TIMER*>(reinterpret_cast<volatile PTP_TIMER*>(&Data->hTask)),
 		TaskShedulerTaskCallback,
 		Data,
 		&Sheduler.TaskShedulerPoolEnviroment
 	);
+	if (!NT_SUCCESS(status)) //TODO: Analyse status code to more precision exception generation
+		Throw(NtException(ExceptionPosition, status));
 
 	LARGE_INTEGER DueTime;
 

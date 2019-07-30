@@ -15,7 +15,7 @@ namespace Seed {
 
 				RTL_SRWLOCK lock;
 			public:
-				SRWLock()
+				__forceinline SRWLock()
 				{
 					extern void InitSRWLock(void*);
 					InitSRWLock(&lock);
@@ -24,7 +24,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				auto ExclusiveLock(T& Funct) -> decltype(Funct())
+				__forceinline auto ExclusiveLock(T& Funct) -> decltype(Funct())
 				{
 					extern void AcquireLockExclusiveSRWLock(void*);
 					extern void ReleaseLockExclusiveSRWLock(void*);
@@ -59,7 +59,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				auto ShareLock(T& Funct) -> decltype(Funct())
+				__forceinline auto ShareLock(T& Funct) -> decltype(Funct())
 				{
 					extern void AcquireLockSharedSRWLock(void*);
 					extern void ReleaseLockSharedSRWLock(void*);
@@ -89,6 +89,33 @@ namespace Seed {
 							throw;
 						}
 					}
+				}
+			};
+
+			class ConditionVariable {
+				ImplSpecificT variable;
+				ImplSpecificT lock;
+			public:
+				__forceinline ConditionVariable() {
+					extern void InitCondVal(void**);
+					InitCondVal(&variable);
+					extern void InitSRWLock(void*);
+					InitSRWLock(&lock);
+				}
+
+				__forceinline void Wait() {
+					extern void WaitCondVal(void**, void**);
+					WaitCondVal(&variable, &lock);
+				}
+
+				__forceinline void WakeOne() {
+					extern void WakeOneCondVal(void**);
+					WakeOneCondVal(&variable);
+				}
+
+				__forceinline void WakeAll() {
+					extern void WakeAllCondVal(void**);
+					WakeAllCondVal(&variable);
 				}
 			};
 		}

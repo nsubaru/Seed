@@ -173,7 +173,7 @@ namespace Seed {
 				{
 					for (int N = 0; N < 20; N++)
 					{
-						Res += (ConstexprPow(-1.0, N) / ConstexprFactorial(2 * N + 1)) * ConstexprPow(X, 2 * N + 1);
+						Res += (ConstexprPow(-1.0, N) / ConstexprFactorial(2ull * N + 1)) * ConstexprPow(X, 2 * N + 1);
 					}
 					return Res;
 				}
@@ -183,7 +183,7 @@ namespace Seed {
 				{
 					for (int N = 0; N < 15; N++)
 					{
-						Res += (ConstexprPow(-1.0, N) / ConstexprFactorial(2 * N)) * ConstexprPow(X, 2 * N);
+						Res += (ConstexprPow(-1.0, N) / ConstexprFactorial(2ull * N)) * ConstexprPow(X, 2 * N);
 					}
 					return Res;
 				}
@@ -206,7 +206,7 @@ namespace Seed {
 				{
 					for (int N = 0; N <= 20; N++)
 					{
-						Res += (ConstexprFactorial(2 * N) / (ConstexprPow(4.0, N) * ConstexprPow(static_cast<Double>(ConstexprFactorial(N)), 2.0) * (2 * N + 1))) * ConstexprPow(X, 2 * N + 1);
+						Res += (ConstexprFactorial(2ull * N) / (ConstexprPow(4.0, N) * ConstexprPow(static_cast<Double>(ConstexprFactorial(N)), 2.0) * (2ull * N + 1))) * ConstexprPow(X, 2 * N + 1);
 					}
 					return Res;
 				}

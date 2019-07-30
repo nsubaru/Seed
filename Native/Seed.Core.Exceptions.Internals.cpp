@@ -30,7 +30,7 @@ void* CxxCallCatchBlock(
 	return InternalCxxCallCatchBlock(pExcept);
 }
 
-extern "C" EXCEPTION_DISPOSITION __cdecl __CxxFrameHandler3(
+extern "C" EXCEPTION_DISPOSITION __cdecl __CxxFrameHandler4(
 	EHExceptionRecord* pExcept,         // Information for this exception
 	EHRegistrationNode RN,               // Dynamic information for this frame
 	CONTEXT* pContext,        // Context info
