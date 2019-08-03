@@ -1,4 +1,7 @@
 #pragma once
+//Allow complex unnamed object, unnamed object often appear as iterator 
+//or when function have side-effect for example starting thread or task
+#pragma warning(disable: 26444)
 
 #include "Seed.Core.Base.Types.h"
 #include "Seed.Core.Base.Math.h"

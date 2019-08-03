@@ -8,7 +8,8 @@ namespace Seed {
 			///<summary>Максимальне значення типу</summary>
 			template<typename T>
 			constexpr T Max() {
-				static_assert(false, "Invalid type");
+				//static_assert(false, "Invalid type");
+				throw 0;
 			};
 
 			///<summary>Максимальне значення Int8</summary>
@@ -79,6 +80,23 @@ namespace Seed {
 			///<summary>Мінімальне значення UInt64</summary>
 			template<>
 			constexpr UInt64 Min() { return 0x0000000000000000ui64; }; //-V2517
+			
+			///<summary>Максимальна кількість цифр в числовому типі</summary>
+			///<typeparam name = "T">Тип числа</typeparam>
+			template<typename T>
+			constexpr UInt8 MaxNumberCount() {
+				//Отримуєм максимальне можливе значення для даного числа
+				T value = Max<T>();
+				//Оголошуєм зміну результату
+				UInt8 result = 0;
+				//В циклі зменшуєм кількість десяткових розрядів діленням і підраховуєм кількість розрядів поки є розряди
+				do {
+					value /= 10;
+					result++;
+				} while (value > 0);
+				//Вертаєм розряди
+				return result;
+			}
 
 			///<summary>Машиний епсилон(ноль) типу</summary>
 			template<typename T>

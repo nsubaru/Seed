@@ -190,7 +190,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 
 void Seed::Core::Stop::SettingsAPI() noexcept
 {
-	CurrentSettings::SaveCurrentSettings();
+	CurrentSettings().SaveCurrentSettings();
 	NtClose(SettingsFile);
 }
 

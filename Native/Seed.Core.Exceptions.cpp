@@ -38,20 +38,21 @@ static __forceinline ExceptionsHeapT & GetExceptionsHeap() {
 Boolean Seed::Core::Init::Exceptions() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
-	auto configs = CurrentSettings::Memory::ExceptionHeap::GetConfigs();
 
-	if (configs.HEAP_ARGS_CHECK)
+	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
-	if (configs.HEAP_FREE_CHECK)
+	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapFreeCheck)
 		Flags |= FLG_HEAP_ENABLE_FREE_CHECK;
-	if (configs.HEAP_TAIL_CHECK)
-		Flags |= FLG_HEAP_ENABLE_FREE_CHECK;
+	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapTailCheck)
+		Flags |= FLG_HEAP_ENABLE_TAIL_CHECK;
+	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapValidationChecks)
+		Flags |= FLG_HEAP_VALIDATE_ALL;
 
 	ExceptionsHeap.HeapHandle = RtlCreateHeap(
 		Flags,
 		NULL,
-		CurrentSettings::Memory::ExceptionHeap::GetMaxSize(),
-		CurrentSettings::Memory::ExceptionHeap::GetStartSize(),
+		CurrentSettings().MemoryManager.ExceptionHeap.MaxSize,
+		CurrentSettings().MemoryManager.ExceptionHeap.StartSize,
 		NULL,
 		NULL);
 

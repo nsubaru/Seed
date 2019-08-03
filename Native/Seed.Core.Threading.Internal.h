@@ -53,25 +53,25 @@ InternalApiCall OptimizeExport(extern void ResetNtEvent(void* handle),
 	}
 );
 
-InternalApiCall OptimizeExport(extern void InitCondVal(void** handle),
+InternalApiCall OptimizeExport(extern void InitCondVal(void* handle),
 	{
 		RtlInitializeConditionVariable((PRTL_CONDITION_VARIABLE)handle);
 	}
 );
 
-InternalApiCall OptimizeExport(extern void WaitCondVal(void** condVar, void** srwLock),
+InternalApiCall OptimizeExport(extern void WaitCondVal(void* condVar, void* srwLock),
 	{
-		RtlSleepConditionVariableSRW((PRTL_CONDITION_VARIABLE)&condVar, (PRTL_SRWLOCK)srwLock, NULL, 0);
+		RtlSleepConditionVariableSRW((PRTL_CONDITION_VARIABLE)condVar, (PRTL_SRWLOCK)srwLock, NULL, 0);
 	}
 );
 
-InternalApiCall OptimizeExport(extern void WakeOneCondVal(void** condVar),
+InternalApiCall OptimizeExport(extern void WakeOneCondVal(void* condVar),
 	{
 		RtlWakeConditionVariable((PRTL_CONDITION_VARIABLE)condVar);
 	}
 );
 
-InternalApiCall OptimizeExport(extern void WakeAllCondVal(void** condVar),
+InternalApiCall OptimizeExport(extern void WakeAllCondVal(void* condVar),
 	{
 		RtlWakeAllConditionVariable((PRTL_CONDITION_VARIABLE)condVar);
 	}

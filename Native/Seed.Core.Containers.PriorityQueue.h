@@ -65,7 +65,9 @@ namespace Seed {
 					child(nullptr),
 					parent(nullptr)
 				{}
-
+#pragma warning(push)
+				//Visual Studio bug, next and prev init as this
+#pragma warning(disable: 25495)
 				///<summary>Конструктор</summary>
 				__forceinline Node(TPriority&& Key, TValue&& Value) :
 					priority(MoveRValue(Key)),
@@ -77,6 +79,8 @@ namespace Seed {
 					child(nullptr),
 					parent(nullptr)
 				{}
+#pragma warning(pop)
+
 
 				friend class BasePriorityQueue<THeap, TPriority, TValue>;
 				
@@ -95,79 +99,152 @@ namespace Seed {
 			};
 		private:
 			struct Tree {
-				Node* heap;
+				volatile Node* heap;
 				RefCountT Count;
 				RefCountT RefCount;
-				Threading::SRWLock lock;
-				Threading::ConditionVariable condVariable;
-				Tree() : heap(nullptr), Count(0), lock(), RefCount(1) {}
+				SizeT MaxSize;
+				struct InternalPtr { ImplSpecificT Ptr; };
+				InternalPtr Lock;
+				InternalPtr QueueNotFull;
+				InternalPtr QueueNotEmpty;
+
+				Tree(SizeT MaxSize) :
+					heap(nullptr), 
+					Count(0), 
+					RefCount(1), 
+					MaxSize(MaxSize),
+					Lock({ nullptr }), 
+					QueueNotFull({ nullptr }), 
+					QueueNotEmpty({ nullptr }) 
+				{}
 			};
 			Tree* tree;
 		protected:
-			virtual void Dispose() final override {
+			virtual void Dispose() { 
 				if (tree->heap != nullptr) {
-					deleteAll(tree->heap);
+					deleteAll(const_cast<Node*>(tree->heap));
 					tree->heap = nullptr;
 				}
 			}
 		public:
-			BasePriorityQueue() : tree(new Tree) {}
+			BasePriorityQueue() : tree(new Tree(CurrentSettings().MemoryManager.QueueMaxSize)) {
+				extern void InitSRWLock(void* PSRWLock);
+				extern void InitCondVal(void* handle);
+
+				InitSRWLock(&tree->Lock);
+				InitCondVal(&tree->QueueNotFull);
+				InitCondVal(&tree->QueueNotEmpty);
+			}
+
+			BasePriorityQueue(SizeT MaxSize) : tree(new Tree(MaxSize)) {
+				extern void InitSRWLock(void* PSRWLock);
+				extern void InitCondVal(void* handle);
+
+				InitSRWLock(&tree->Lock);
+				InitCondVal(&tree->QueueNotFull);
+				InitCondVal(&tree->QueueNotEmpty);
+			}
 
 			RefCountClass(BasePriorityQueue, tree);
 
 			void Insert(const TPriority& priority, const TValue& key) {
-				this->tree->lock.ExclusiveLock([&]() {
+				extern void AcquireLockExclusiveSRWLock(void* PSRWLock);
+				extern void ReleaseLockExclusiveSRWLock(void* PSRWLock);
+				extern void WaitCondVal(void* condVar, void* srwLock);
+				extern void WakeOneCondVal(void* condVar);
+
+				try {
+					AcquireLockExclusiveSRWLock(&this->tree->Lock);
+					if (++this->tree->Count > this->tree->MaxSize)
+						WaitCondVal(&this->tree->QueueNotFull, &this->tree->Lock);
 					Node* ret = new Node(priority, key);
-					tree->heap = merge(tree->heap, ret);
+					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
 					tree->Count++;
-					tree->condVariable.WakeOne();
-					});
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					WakeOneCondVal(&this->tree->QueueNotEmpty);
+				}
+				catch (...) {
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					ReThrow;
+				}
 			}
 			void Insert(const TPriority& priority, TValue&& key) {
-				this->tree->lock.ExclusiveLock([&, key = MoveRValue(key)]() mutable{
-					Node* ret = new Node(priority, key);
-					tree->heap = merge(tree->heap, ret);
+				extern void AcquireLockExclusiveSRWLock(void* PSRWLock);
+				extern void ReleaseLockExclusiveSRWLock(void* PSRWLock);
+				extern void WaitCondVal(void* condVar, void* srwLock);
+				extern void WakeOneCondVal(void* condVar);
+
+				try {
+					AcquireLockExclusiveSRWLock(&this->tree->Lock);
+					if (++this->tree->Count > this->tree->MaxSize)
+						WaitCondVal(&this->tree->QueueNotFull, &this->tree->Lock);
+					Node* ret = new Node(priority, MoveRValue(key));
+					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
 					tree->Count++;
-					tree->condVariable.WakeOne();
-				});
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					WakeOneCondVal(&this->tree->QueueNotEmpty);
+				}
+				catch (...) {
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					ReThrow;
+				}
 			}
 			void Insert(TPriority&& priority, const TValue& key) {
-				this->tree->lock.ExclusiveLock([&, priority = MoveRValue(priority)]() mutable{
-					Node* ret = new Node(priority, key);
-					tree->heap = merge(tree->heap, ret);
+				extern void AcquireLockExclusiveSRWLock(void* PSRWLock);
+				extern void ReleaseLockExclusiveSRWLock(void* PSRWLock);
+				extern void WaitCondVal(void* condVar, void* srwLock);
+				extern void WakeOneCondVal(void* condVar);
+
+				try {
+					AcquireLockExclusiveSRWLock(&this->tree->Lock);
+					if (++this->tree->Count > this->tree->MaxSize)
+						WaitCondVal(&this->tree->QueueNotFull, &this->tree->Lock);
+					Node* ret = new Node(MoveRValue(priority), key);
+					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
 					tree->Count++;
-					tree->condVariable.WakeOne();
-				});
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					WakeOneCondVal(&this->tree->QueueNotEmpty);
+				}
+				catch (...) {
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					ReThrow;
+				}
 			}
 			void Insert(TPriority&& priority, TValue&& key) {
-				this->tree->lock.ExclusiveLock([&, priority = MoveRValue(priority), key = MoveRValue(key)]() mutable {
-					Node* ret = new Node(priority, key);
-					tree->heap = merge(tree->heap, ret);
-					tree->Count++;
-					tree->condVariable.WakeOne();
-				});
+				extern void AcquireLockExclusiveSRWLock(void* PSRWLock);
+				extern void ReleaseLockExclusiveSRWLock(void* PSRWLock);
+				extern void WaitCondVal(void* condVar, void* srwLock);
+				extern void WakeOneCondVal(void* condVar);
+
+				try {
+					AcquireLockExclusiveSRWLock(&this->tree->Lock);
+					while (this->tree->Count == this->tree->MaxSize) {
+						WaitCondVal(&this->tree->QueueNotFull, &this->tree->Lock);
+					}					
+					Node* ret = new Node(MoveRValue(priority), MoveRValue(key));
+					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
+					this->tree->Count++;
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					WakeOneCondVal(&this->tree->QueueNotEmpty);
+				}
+				catch (...) {
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					ReThrow;
+				}
 			}
 
 			void Merge(const BasePriorityQueue& other) {
-				other.tree->lock.ExclusiveLock([&]() {
-					this->tree->lock.ExclusiveLock([&]() {
-						this->merge(this->tree->heap, other.tree->heap);
-						this->tree->Count = this->tree->Count + other.tree->Count;
-						this->tree->condVariable.WakeOne();
-						});
-					other.tree->Count = 0;
-					});
+				this->merge(const_cast<Node*>(tree->heap), const_cast<Node*>(other.tree->heap));
+				this->tree->Count = this->tree->Count + other.tree->Count;
+				other.tree->Count = 0;
 			}
 
 			BasePriorityQueue& operator+=(BasePriorityQueue&& other) {
-				return this->tree->lock.ExclusiveLock([&, other = MoveRValue(other)]() mutable {
-					this->merge(this->tree->heap, other.tree->heap);
-					this->tree->Count = this->tree->Count + other.tree->Count;
-					this->tree->condVariable.WakeOne();
-					other.tree->heap = nullptr;
-					other.~BasePriorityQueue();
-					return *this;
-					});
+				this->merge(const_cast<Node*>(tree->heap), const_cast<Node*>(other.tree->heap));
+				this->tree->Count = this->tree->Count + other.tree->Count;
+				other.tree->heap = nullptr;
+				other.~BasePriorityQueue();
+				return *this;
 			}
 
 			bool getIsEmpty() {
@@ -186,24 +263,38 @@ namespace Seed {
 			SizeT Property(getCount) Count;
 
 			TPriority discardFirstItem() {
-				Node* old = tree->heap;
-				tree->heap = removeMinimum(tree->heap);
+				volatile Node* old = tree->heap;
+				tree->heap = removeMinimum(const_cast<Node*>(tree->heap));
 				TPriority ret = old->priority;
 				delete old;
 				return ret;
 			}
 
 			TValue getFirstWhenAquire() {
-				if(this->tree->Count == 0)
-					tree->condVariable.Wait();
-				return tree->lock.ExclusiveLock([&]() {
-					Node* old = tree->heap;
-					tree->heap = removeMinimum(tree->heap);
+				extern void AcquireLockExclusiveSRWLock(void* PSRWLock);
+				extern void ReleaseLockExclusiveSRWLock(void* PSRWLock);
+				extern void WaitCondVal(void* condVar, void* srwLock);
+				extern void WakeOneCondVal(void* condVar);
+
+				try {
+					AcquireLockExclusiveSRWLock(&this->tree->Lock);
+					while (this->tree->Count == 0)
+					{
+						WaitCondVal(&this->tree->QueueNotEmpty, &this->tree->Lock);
+					}
+					Node* old = const_cast<Node*>(tree->heap);
+					tree->heap = removeMinimum(const_cast<Node*>(tree->heap));
 					TValue ret(MoveRValue(old->value));
 					this->tree->Count--;
-					delete old;
+					delete old;		
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					WakeOneCondVal(&this->tree->QueueNotFull);
 					return ret;
-					});
+				}
+				catch (...) {
+					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
+					ReThrow;
+				}
 			}
 		private:
 			Node* merge(Node* a, Node* b) {
@@ -225,9 +316,9 @@ namespace Seed {
 
 			void deleteAll(Node* n) {
 				if (n != nullptr) {
-					Node* c = n;
+					volatile  Node* c = n;
 					do {
-						Node* d = c;
+						volatile Node* d = c;
 						c = c->next;
 						deleteAll(d->child);
 						delete d;

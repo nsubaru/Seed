@@ -26,31 +26,6 @@ namespace Seed {
 			virtual ~KeyAllredyExistException(){}
 		};
 
-		///<summary>Інтерфейс пари значеннь і ключа</summary>
-		///<param name = "TKey">Тип ключа</param>
-		///<param name = "TValue">Тип значення</param>
-		template<typename TKey, typename TValue>
-		class IPair {
-		public:
-			///<summary>Вертає значення ключа</summary>
-			virtual TKey GetKey() = 0;
-			///<summary>Вертаж поточне значення</summary>
-			virtual TValue GetValue() = 0;
-			///<summary>Встановлює нове поточне значення</summary>
-			///<param name = "NewValue">Нове значення</param>
-			virtual void SetValue(const TValue& NewValue) = 0;
-			///<summary>Встановлює нове поточне значення</summary>
-			///<param name = "NewValue">Нове значення</param>
-			virtual void SetValue(TValue&& NewValue) = 0;
-
-			///<value>Ключ</value>
-			TKey Property(GetKey) Key;
-			///<value>Значення</value>
-			TValue Property(GetValue, SetValue) Value;
-
-			virtual ~IPair() = 0 {}
-		};
-
 		///<summary>Шаблон потоко захищеного асоціативного масиву
 		///<para>
 		/// Внутрішньо реалізований як червоно-чорне дерево.
@@ -69,13 +44,62 @@ namespace Seed {
 			struct Tree;
 
 			///<summary>Елемент дерева і елемент в асоціативному масиві</summary>
-			struct Node : virtual public Memory::Allocator<Heap>, public IPair<TKey, TValue>
+			struct Node : virtual public Memory::Allocator<Heap>
 			{
-				///<summary>Ключ елемента</summary>
-				TKey key;
-				///<summary>Значення елемента</summary>
-				TValue value;
+			public:
+				struct Data {
+					///<summary>Гетер ключа</summary>
+					const TKey& GetKey() { return key; }
+					///<summary>Гетер значення</summary>
+					TValue& GetValue() { return value; }
+					///<summary>Гетер значення</summary>
+					const TValue& GetValue() const { return value; }
+					///<summary>Сеттер значення</summary>
+					void SetValue(const TValue& newValue) { value = newValue; }
+					///<summary>Оптимізований сеттер значення</summary>
+					void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
+
+					///<summary>Ключ</summary>
+					TKey Property(GetKey) Key;
+					///<summary>Значення</summary>
+					TValue Property(GetValue, SetValue) Value;
+				private:
+					///<summary>Ключ елемента</summary>
+					TKey key;
+					///<summary>Значення елемента</summary>
+					TValue value;
+
+					///<summary>Конструктор копіювання ключа і значення</summary>
+					Data(const TKey& key, const TValue& value) : key(key), value(value) {}
+					///<summary>Конструктор переміщення значення і копіювання значення</summary>
+					Data(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
+					///<summary>Конструктор копіювання значення і переміщення значення</summary>
+					Data(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
+					///<summary>Конструктор переміщення і значення і ключа</summary>
+					Data(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
+
+					friend Node;
+				};
 			private:
+				///<summary>Ключ і значення елемента</summary>
+				Data data;
+
+				///<summary>Гетер ключа</summary>
+				const TKey& GetKey() const { return data.key; }
+				///<summary>Гетер значення</summary>
+				TValue& GetValue() { return data.value; }
+				///<summary>Гетер значення</summary>
+				const TValue& GetValue() const { return data.value; }
+				///<summary>Сеттер значення</summary>
+				void SetValue(const TValue& newValue) { data.value = newValue; }
+				///<summary>Оптимізований сеттер значення</summary>
+				void SetValue(TValue&& newValue) { data.value = MoveRValue(newValue); }
+
+				///<summary>Ключ</summary>
+				TKey Property(GetKey) key;
+				///<summary>Значення</summary>
+				TValue Property(GetValue, SetValue) value;
+
 				///<summary>Віддаленість елемента від корення дерева(висота)</summary>
 				UInt16 height;
 
@@ -92,31 +116,20 @@ namespace Seed {
 				RefCountT RefCount;
 
 				///<summary>Конструктор копіювання ключа і значення</summary>
-				Node(const TKey& key, const TValue& value, Node* father, Tree* tree) : key(key), value(value), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				Node(const TKey& key, const TValue& value, Node* father, Tree* tree) : data(Data(key, value)) , height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
 				{};
 
 				///<summary>Конструктор переміщення значення і копіювання значення</summary>
-				Node(TKey&& key, const TValue& value, Node* father, Tree* tree) : key(MoveRValue(key)), value(value), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
-				{};
+				Node(TKey&& key, const TValue& value, Node* father, Tree* tree) : data(Data((MoveRValue(key)), value)), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				{}
 
 				///<summary>Конструктор копіювання значення і переміщення значення</summary>
-				Node(const TKey& key, TValue&& value, Node* father, Tree* tree) : key(key), value(MoveRValue(value)), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				Node(const TKey& key, TValue&& value, Node* father, Tree* tree) : data(Data(key, MoveRValue(value))), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
 				{};
 
-				///<summary>Конструктор</summary>
-				Node(TKey&& key, TValue&& value, Node* father, Tree* tree) : key(MoveRValue(key)), value(MoveRValue(value)), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				///<summary>Конструктор переміщення і значення і ключа</summary>
+				Node(TKey&& key, TValue&& value, Node* father, Tree* tree) : data(Data(MoveRValue(key), MoveRValue(value))), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
 				{};
-			public:
-				///<summary>Вертає значення ключа</summary>
-				virtual TKey GetKey() { return key; }
-				///<summary>Вертаж поточне значення</summary>
-				virtual TValue GetValue() { return value; }
-				///<summary>Встановлює нове поточне значення</summary>
-				///<param name = "NewValue">Нове значення</param>
-				virtual void SetValue(const TValue& value) { this->value = value; }
-				///<summary>Встановлює нове поточне значення</summary>
-				///<param name = "NewValue">Нове значення</param>
-				virtual void SetValue(TValue&& value) { this->value = MoveRValue(value); }
 
 				friend BaseMap;
 				friend BaseMap::Iterator;
@@ -377,7 +390,7 @@ namespace Seed {
 			}
 
 			///<summary>Рекурсивне знищеання дерева</summary>
-			///<param name = "root">Батьківський елемент</summary>
+			///<param name = "root">Батьківський елемент</param>
 			Node* DestroyTree(Node * root) //-V688
 			{
 				if (root != nullptr)
@@ -411,8 +424,11 @@ namespace Seed {
 				if (node->tree != nullptr) {
 					return node->tree->lock.ShareLock([&]() {
 						node->RefCount--;
-						if (node->right != nullptr)
-							return FindMin(node->right);
+						if (node->right != nullptr) {
+							Node * ret = FindMin(node->right);
+							ret->RefCount++;
+							return ret;
+						}
 
 						Node* father = node->father;
 						while (father != nullptr && node == father->right)
@@ -444,8 +460,11 @@ namespace Seed {
 				if (node->tree != nullptr) {
 					return node->tree->lock.ShareLock([&]() {
 						node->RefCount--;
-						if (node->left != nullptr)
-							return FindMax(node->left);
+						if (node->left != nullptr) {
+							Node * ret = FindMax(node->left);
+							ret->RefCount++;
+							return ret;
+						}
 
 						Node* father = node->father;
 						while (father != nullptr && node == father->left)
@@ -523,27 +542,31 @@ namespace Seed {
 
 				///<summary>Операція доступу до елемента</summary>
 				///<returns>Вертає поінтер силку на елемент</returns>
-				Node* operator->()
+				auto* operator->()
 				{
-					return static_cast<IPair<TKey, TValue>*>(item);
+					return &this->item->data;
 				};
 
 				///<summary>Операція доступу до елемента</summary>
 				///<returns>Вертає поінтер силку на елемент</returns>
-				Node& operator*()
+				auto& operator*()
 				{
-					return *item;
+					return this->item->data;
 				}
 
-				/////<summary>Деструктор</summary>
-				//~Iterator(){
-				//	if (this->item != nullptr) {
-				//		if (--this->item->RefCount == 0) {
-				//			delete this->item;
-				//		}
-				//		this->item = nullptr;
-				//	}
-				//}
+				///<summary>Константна операція доступу до елемента</summary>
+				///<returns>Вертає поінтер силку на елемент</returns>
+				const auto* operator->() const
+				{
+					return &this->item->data;
+				};
+
+				///<summary>Константна операція доступу до елемента</summary>
+				///<returns>Вертає поінтер силку на елемент</returns>
+				const auto& operator*() const
+				{
+					return this->item->data;
+				}
 			};
 
 			friend Iterator;

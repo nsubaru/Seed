@@ -125,6 +125,8 @@ namespace Seed {
 
 #pragma warning(push)
 #pragma warning(disable : 4164)
+				//We check overflow so this warning not needed
+#pragma warning(disable : 26451)
 				///<summary>Домножування до поточного значення</summary>
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
@@ -145,7 +147,7 @@ namespace Seed {
 							return this->value = static_cast<Int>(res);
 					}
 					if constexpr (StaticAsserts::IsSameV<Int, UInt32>) {
-						UInt64 res = this->value * second.value;
+						UInt64 res = static_cast<UInt64>(this->value) * static_cast<UInt64>(second.value);
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else

@@ -15,7 +15,14 @@
 #include "Seed.Core.Base.NTAPI.h"
 
 #pragma warning(push)
+//This internal implementation file which can use internal API functions
 #pragma warning(disable: 4996)
+//RtlUnwingEx for unwind we return NULL as we don't know what type and value expect parent function 
+//and after unwind we jump to catch block as it's exception handling
+#pragma warning(disable: 6387)
+
+#undef Throw
+#undef throw
 
 __forceinline tls_exeption_info_t* GetThreadExceptionInfo() {
 	return (tls_exeption_info_t*)NtCurrentTeb()->TlsSlots[0];
@@ -626,7 +633,7 @@ __forceinline void* __AdjustPointer(
 
 __declspec(noreturn, noinline)
 void throwInternalError(const Seed::ConstAString & File, const Seed::ConstAString & FunctName, SizeT Line) {
-	Throw(InternalError(File, FunctName, Line));
+	throw InternalError(File, FunctName, Line);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -867,7 +874,7 @@ void FindHandlerForForeignException(
 			type = NullPointException::Types::Read;
 			break;
 		}
-		Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
+		throw Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type);
 	}
 		break;
 	default:
@@ -977,7 +984,7 @@ void FindHandler(
 		&& pExcept->params.pThrowInfo != nullptr) {
 		if (ThreadExceptionInfo->_curexception == nullptr) {
 			// Oops!  User re-threw a non-existent exception!  Let it propagate.
-			Throw(InternalError(ExceptionPosition));
+			throw InternalError(ExceptionPosition);
 		}
 
 		pExcept = (EHExceptionRecord*)ThreadExceptionInfo->_curexception;
@@ -1021,7 +1028,7 @@ void FindHandler(
 
 					__DestructExceptionObject(pExcept, TRUE, 1);   // destroy the original object
 
-					Throw(BadException(ExceptionPosition));
+					throw BadException(ExceptionPosition);
 				}
 				else
 				{
@@ -1177,7 +1184,7 @@ void FindHandler(
 				// Two choices here: we could let the new exception take over, or we could abort. 
 				// We throw internal error.
 
-				Throw(InternalError(ExceptionPosition));
+				throw InternalError(ExceptionPosition);
 			}
 		}
 	} // It wasn't our exception

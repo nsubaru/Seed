@@ -31,7 +31,7 @@ Seed::Core::Threading::Thread::Event::Event(Seed::Boolean IsManualReset) : data(
 		&data->handle,
 		GENERIC_ALL,
 		NULL,
-		(IsManualReset) ? EVENT_TYPE::SynchronizationEvent : EVENT_TYPE::NotificationEvent,
+		(IsManualReset) ? EVENT_TYPE::NotificationEvent: EVENT_TYPE::SynchronizationEvent,
 		FALSE
 	);
 
@@ -49,7 +49,7 @@ Seed::Core::Threading::Thread::Event::Event(const Seed::String & name, Seed::Boo
 		&data->handle,
 		GENERIC_ALL,
 		&attrbs,
-		(IsManualReset) ? EVENT_TYPE::SynchronizationEvent : EVENT_TYPE::NotificationEvent,
+		(IsManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
 		FALSE
 	);
 
@@ -67,7 +67,7 @@ Seed::Core::Threading::Thread::Event::Event(Seed::String && name, Seed::Boolean 
 		&data->handle,
 		GENERIC_ALL,
 		&attrbs,
-		(IsManualReset) ? EVENT_TYPE::SynchronizationEvent : EVENT_TYPE::NotificationEvent,
+		(IsManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
 		FALSE
 	);
 
@@ -226,7 +226,7 @@ Seed::Int32 Seed::Core::Threading::ThreadInitRoute(void* arg) noexcept try {
 			This->thread->state = Seed::Threading::Thread::ThreadState::Terminated;
 			NtTestAlert();
 			This->thread->ID = -1;
-			This->thread->thread_list_node.Remove();
+			Threads->Remove(This->thread->thread_list_node);
 			delete This->thread->abortEvent;
 			delete This;
 			return STATUS_THREAD_IS_TERMINATING;
@@ -238,7 +238,7 @@ Seed::Int32 Seed::Core::Threading::ThreadInitRoute(void* arg) noexcept try {
 			This->thread->state = Seed::Threading::Thread::ThreadState::ClosedByExeption;
 			NtTestAlert();
 			This->thread->ID = -1;
-			This->thread->thread_list_node.Remove();
+			Threads->Remove(This->thread->thread_list_node);
 			delete This->thread->abortEvent;
 			delete This;
 			return STATUS_UNHANDLED_EXCEPTION;
@@ -249,7 +249,7 @@ Seed::Int32 Seed::Core::Threading::ThreadInitRoute(void* arg) noexcept try {
 		This->thread->state = Seed::Threading::Thread::ThreadState::ClosedByExeption;
 		NtTestAlert();
 		This->thread->ID = -1;
-		This->thread->thread_list_node.Remove();
+		Threads->Remove(This->thread->thread_list_node);
 		delete This->thread->abortEvent;
 		delete This;
 		return STATUS_UNHANDLED_EXCEPTION;
@@ -257,7 +257,7 @@ Seed::Int32 Seed::Core::Threading::ThreadInitRoute(void* arg) noexcept try {
 	This->thread->state = Seed::Threading::Thread::ThreadState::CorrectlyEnded;
 	NtTestAlert();
 	This->thread->ID = -1;
-	This->thread->thread_list_node.Remove();
+	Threads->Remove(This->thread->thread_list_node);
 	delete This->thread->abortEvent;
 	delete This;
 	return STATUS_SUCCESS;
@@ -292,8 +292,8 @@ void Seed::Core::Threading::Thread::ExecDelegate(Seed::Delegate && ThreadMain) {
 		NULL,
 		false,
 		0,
-		Seed::Core::CurrentSettings::Threading::Thread::GetStackMaxSize(),
-		Seed::Core::CurrentSettings::Threading::Thread::GetStackStartSize(),
+		Seed::CurrentSettings().Threading.Thread.StackMaxSize,
+		Seed::CurrentSettings().Threading.Thread.StackStartSize,
 		threadStartRoutineDynEntryPoint,
 		(void*)new Thread(*this), //-V572
 		&thread->handle,
@@ -551,11 +551,11 @@ Seed::Core::Threading::Dispatcher::Dispatcher() try :
 	if (!NT_SUCCESS(status))
 		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(This->pool), NullPointException::Types::Write));
 
-	TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG)CurrentSettings::CPU::GetCpuCoresCount() / 2);
-	TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG)CurrentSettings::CPU::GetCpuCoresCount());
+	TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG)CurrentSettings().VirtualSetting.CpuCoresCount / 2);
+	TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG)CurrentSettings().VirtualSetting.CpuCoresCount);
 	TP_POOL_STACK_INFORMATION info;
-	info.StackCommit = CurrentSettings::Threading::Thread::GetStackStartSize();
-	info.StackReserve = CurrentSettings::Threading::Thread::GetStackMaxSize();
+	info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
+	info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
 	TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info);
 	status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
 
@@ -577,6 +577,8 @@ Seed::Core::Threading::Dispatcher::Dispatcher() try :
 
 }
 catch (...) {
+#pragma warning(push)
+#pragma warning(disable:6001)
 	if (this->This != nullptr) {
 		if (This->pool != nullptr) {
 			if (This->cleanupData != nullptr) {
@@ -591,7 +593,7 @@ catch (...) {
 		delete This;
 		This = nullptr;
 	}
-
+#pragma warning(pop)
 	ReThrow;
 }
 
@@ -618,6 +620,8 @@ Seed::Core::Threading::Job Seed::Core::Threading::Dispatcher::Dispatch(Seed::Cor
 		TpPostWork(work);
 	}
 	catch (...) {
+#pragma warning(push)
+#pragma warning(disable:6001)
 		if (event != nullptr) {
 			NtClose(event);
 			if (WorkObj.This != nullptr)
@@ -631,6 +635,7 @@ Seed::Core::Threading::Job Seed::Core::Threading::Dispatcher::Dispatch(Seed::Cor
 				}
 			}
 		}
+#pragma warning(pop)
 		ReThrow;
 	}
 	return WorkObj;

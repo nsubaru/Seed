@@ -364,6 +364,8 @@ namespace Seed {
 						abortEvent(nullptr),
 						EntryPoint(nullptr)
 					{};
+
+					~ThreadData() { thread_list_node.~Iterator(); }
 				};
 			private:
 				///<summary>Дані цього потоку</summary>

@@ -1,6 +1,10 @@
 #pragma once
 #include "Seed.Core.Stage1.h"
 
+//Allow complex unnamed object, unnamed object often appear as iterator 
+//or when function have side-effect for example starting thread or task
+#pragma warning(disable: 26444)
+
 namespace Seed {
 	inline namespace Core {
 		namespace TaskSheduler {
@@ -102,7 +106,7 @@ namespace Seed {
 				Task(Task&&) = default;
 				Task& operator=(Task&&) = default;
 			public:
-				Task() : Data(new Job::__task(CurrentSettings::Services::TaskSheduler::GetDefaultTimerProximity())) {}
+				Task() : Data(new Job::__task(CurrentSettings().KernelService.TaskSheduler.DefaultTimerProximity)) {}
 			public:
 				Task& SetStartTime(DateTime StartTime, Boolean IsRelative) { Data->StartTime.TimeFromStartEpoch = (IsRelative) ? (StartTime + DateTime::GetCurrentSystemTimeData()).GetMsFrom1600() : StartTime.GetMsFrom1600(); return *this; }
 				Task& SetTimerProximity(DateTime TimerProximity) { Data->TimerProximity = static_cast<Int32>(TimerProximity.GetMsFrom1600()); return *this; }
@@ -112,6 +116,7 @@ namespace Seed {
 				
 				Job Shedule();
 
+				[[maybe_unused]]
 				static Task NewTask() { return Task(); }
 			};
 		}

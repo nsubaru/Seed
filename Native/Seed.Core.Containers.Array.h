@@ -33,7 +33,9 @@ namespace Seed {
 			///<summary>Конструктор з початковим розміром, змінні не ініціалізовуються</summary>
 			///<param name = 'Count'>Кількість елементів в масиві</param>
 			__forceinline Array(SizeT Count) : arr(new T[Count]), count(Count) {}
-
+#pragma warning(push)
+			//initializer_list.Size is count of items not size of array
+#pragma warning(disable: 6386)
 			///<summary>Конструктор через list-initializer</summary>
 			///<param name = 'list'>Статичний список ініціалізація</param>
 			__forceinline Array(const CRT::initializer_list<T>& list) : arr(new T[list.size()]), count(list.size()) {
@@ -41,6 +43,7 @@ namespace Seed {
 				for (SizeT i = 0; i < count; i++)
 					this->arr[i] = *it, it++; //-V108 //-V2528
 			}
+#pragma warning(pop)
 
 			///<summary>Копіювальний конструктор з С подібного масиву і його розміру</summary>
 			///<param name = 'RawArray'>С-подібний масив</param>

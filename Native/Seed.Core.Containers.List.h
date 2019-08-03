@@ -404,7 +404,6 @@ namespace Seed {
 						const Seed::SizeT Line);
 					if (this->This == nullptr)
 						ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-					list_data * data = this->This->father;
 					if (this->This->father == nullptr)
 					{
 						if (--This->RefCount == 0)
@@ -445,6 +444,8 @@ namespace Seed {
 									auto newThis = this->This->next;
 									delete this->This;
 									this->This = newThis;
+									if(this->This != nullptr)
+										this->This->RefCount++;
 								}
 								else
 								{
@@ -1167,10 +1168,62 @@ namespace Seed {
 				return *this;
 			}
 
-			///<summary>¬идаленн€ елемента по ≥тератору</summary>
+			///<summary>¬идаленн€ елемента по ≥тератору. ≤тератор обнулюЇ</summary>
 			__forceinline void Remove(Iterator & node)
 			{
-				node.Remove();
+				extern __declspec(noreturn) void ThrowEndNodeNotDeferencable(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line);
+				if (node.This == nullptr)
+					ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
+				if (node.This->father == nullptr)
+				{
+					if (--node.This->RefCount == 0)
+						delete node.This;
+					node.This = nullptr;
+				}
+				else
+					//якщо власник ≥снуЇ то видаленн€ виконуЇтьс€ в екслюзивному блокуванн≥
+					node.This->father->lock.ExclusiveLock([&]()
+						{
+							__assume(node.This->father != nullptr);
+							if (node.This->next == nullptr && node.This->prev == nullptr)
+							{
+								node.This->father->root = node.This->father->last = nullptr;
+							}
+							else if (node.This->next != nullptr && node.This->prev != nullptr)
+							{
+								node.This->prev->next = node.This->next;
+								node.This->next->prev = node.This->prev;
+							}
+							else if (node.This->next == nullptr)
+							{
+								if (node.This->prev != nullptr)
+									node.This->prev->next = nullptr;
+								node.This->father->last = node.This->prev;
+							}
+							else if (node.This->prev == nullptr) //-V2516
+							{
+								node.This->next->prev = nullptr;
+								node.This->father->root = node.This->next;
+							}
+
+							--((node.This)->father->size);
+
+							if (--node.This->RefCount == 1)
+							{
+								auto newThis = node.This->next;
+								delete node.This;
+								node.This = nullptr;
+							}
+							else
+							{
+								node.This->next = nullptr;
+								node.This->prev = nullptr;
+								node.This = node.This->next;
+							}
+						});
 			}
 #pragma endregion
 #pragma region Sorting

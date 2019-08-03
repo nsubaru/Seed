@@ -11,7 +11,17 @@
 #include "Seed.Core.Base.NTAPI.h"
 
 #pragma warning(push)
+//This internal implementation file which can use internal API functions
 #pragma warning(disable: 4996)
+//toCoreLog always have valid text to input as it's internal API call 
+//So we ignore warning about posible realeasing unheld lock as in lock only syscall NtWriteFile
+#pragma warning(disable: 26117)
+//toCoreLog always have valid text to input as it's internal API call as in lock only syscall NtWriteFile
+//So we ignore warning about posible falling realising lock
+#pragma warning(disable: 26115)
+//toCoreLog store log msg in stack because logging start on very early startup steps and on that steps memory API not awailable 
+//so we must use stack as storage for msg
+#pragma warning(disable: 6262)
 
 struct {
 	HANDLE handle;

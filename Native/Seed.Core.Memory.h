@@ -228,11 +228,11 @@ namespace Seed {
 					heap.Free(MemBlk);
 				}
 
-					///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням</summary>
-					///<param name = "MemBlk">Ділянка пам'яті</param>
-					///<param name = "Allign">Границя вирівнювання</param>
-					///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
-					static __forceinline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirements Allign) {
+				///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням</summary>
+				///<param name = "MemBlk">Ділянка пам'яті</param>
+				///<param name = "Allign">Границя вирівнювання</param>
+				///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
+				static __forceinline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirements Allign) {
 					heap.AllignedFree(MemBlk, (SizeT)Allign);
 				}
 				///<summary>Оператор видалення масиву об'єктів з специфічним вирівннюванням</summary>

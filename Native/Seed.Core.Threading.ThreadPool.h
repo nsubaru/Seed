@@ -2,6 +2,10 @@
 #include "Seed.Core.Threading.h"
 #include "Seed.Core.TaskShedule.Sheduler.h"
 
+//Allow complex unnamed object, unnamed object often appear as iterator 
+//or when function have side-effect for example starting thread or task
+#pragma warning(disable: 26444)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
@@ -111,7 +115,7 @@ namespace Seed {
 
 				//Запускає задачу
 				//Аргументом є функція з її аргументами
-				Job Dispatch(Seed::Core::Delegate&& EntryPoint);
+				[[maybe_unused]] Job Dispatch(Seed::Core::Delegate&& EntryPoint);
 
 				//Вертає кількість задач в пулі
 				__forceinline UInt64 GetJobsCount() noexcept { return This->JobsCounts; }

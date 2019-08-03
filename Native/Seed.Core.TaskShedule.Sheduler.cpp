@@ -122,11 +122,11 @@ bool Seed::Core::Init::TaskSheduling() noexcept try {
 	if (!NT_SUCCESS(status))
 		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(&Sheduler.TaskShedulerPool), NullPointException::Types::Write));
 
-	TpSetPoolMinThreads(Sheduler.TaskShedulerPool, static_cast<LONG>(CurrentSettings::CPU::GetCpuCoresCount() / 2));
-	TpSetPoolMaxThreads(Sheduler.TaskShedulerPool, static_cast<LONG>(CurrentSettings::CPU::GetCpuCoresCount()));
+	TpSetPoolMinThreads(Sheduler.TaskShedulerPool, static_cast<LONG>(CurrentSettings().VirtualSetting.CpuCoresCount / 2));
+	TpSetPoolMaxThreads(Sheduler.TaskShedulerPool, static_cast<LONG>(CurrentSettings().VirtualSetting.CpuCoresCount));
 	TP_POOL_STACK_INFORMATION info;
-	info.StackCommit = CurrentSettings::Threading::Thread::GetStackStartSize();
-	info.StackReserve = CurrentSettings::Threading::Thread::GetStackMaxSize();
+	info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
+	info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
 	TpSetPoolStackInformation(Sheduler.TaskShedulerPool, &info);
 	status = TpAllocCleanupGroup(&Sheduler.TaskShedulerPoolCleanupGroup);
 
