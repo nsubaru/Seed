@@ -18,7 +18,7 @@ namespace Seed {
 			class SeedKernelCall SafeInt final {
 			private:
 				///Тип числа
-				using Int = StaticAsserts::Unsigned<T>;
+				using Int = TypeTraits::Unsigned<T>;
 				///<summary>Значення</summary>
 				Int value;
 			public:
@@ -58,28 +58,28 @@ namespace Seed {
 				///<returns>Результат операції</returns>
 #pragma intrinsic(_umul128)
 				constexpr __forceinline SafeInt operator*(SafeInt second) {
-					if constexpr (StaticAsserts::IsSameV<Int, UInt8>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt8>) {
 						UInt16 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
 					} else
-					if constexpr (StaticAsserts::IsSameV<Int, UInt16>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt16>) {
 						UInt32 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
 					} else
-					if constexpr (StaticAsserts::IsSameV<Int, UInt32>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt32>) {
 						UInt64 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
 					} else
-					if constexpr (StaticAsserts::IsSameV<Int, UInt64>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt64>) {
 						UInt64 res[2];
 						_umul128(this->value, second.value, res);
 						UInt32 res = this->value * second.value;
@@ -135,28 +135,28 @@ namespace Seed {
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
 				constexpr __forceinline SafeInt operator*=(SafeInt second) {
-					if constexpr (StaticAsserts::IsSameV<Int, UInt8>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt8>) {
 						UInt16 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
 					} else
-					if constexpr (StaticAsserts::IsSameV<Int, UInt16>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt16>) {
 						UInt32 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
 					} else
-					if constexpr (StaticAsserts::IsSameV<Int, UInt32>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt32>) {
 						UInt64 res = static_cast<UInt64>(this->value) * static_cast<UInt64>(second.value);
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
 					} else
-					if constexpr (StaticAsserts::IsSameV<Int, UInt64>) {
+					if constexpr (TypeTraits::IsSameV<Int, UInt64>) {
 						UInt64 res;
 						res = this->value * second.value;
 						if (__umulh(this->value, second.value) > 0)
@@ -206,10 +206,10 @@ namespace Seed {
 
 #pragma region ConvertUnsignedToSigned
 			template<typename T>
-			StaticAsserts::Signed<T> ConvertUnsignedToSigned(StaticAsserts::Unsigned<T> From) {
-				if (From > static_cast<StaticAsserts::Unsigned<T>>(Max<StaticAsserts::Signed<T>>()))
+			TypeTraits::Signed<T> ConvertUnsignedToSigned(TypeTraits::Unsigned<T> From) {
+				if (From > static_cast<TypeTraits::Unsigned<T>>(Max<TypeTraits::Signed<T>>()))
 					throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-				return static_cast<StaticAsserts::Signed<T>>(From);
+				return static_cast<TypeTraits::Signed<T>>(From);
 			}
 #pragma endregion
 		}

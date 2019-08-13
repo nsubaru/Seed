@@ -3,7 +3,7 @@ namespace Seed
 {
 	inline namespace Core
 	{
-		namespace StaticAsserts
+		namespace TypeTraits
 		{
 			template<class... _Types>
 			using VoidT = void;
@@ -79,8 +79,8 @@ namespace Seed
 		///<param name="Obj"> lvalue-силка на об'єкт</param>
 		///<returns>rvalue силку на об'єкт</returns>
 		template <typename T>
-		constexpr typename StaticAsserts::RemoveRefV<T>&& MoveRValue(T&& arg) {
-			return static_cast<typename StaticAsserts::RemoveRefV<T>&&>(arg);
+		constexpr typename TypeTraits::RemoveRefV<T>&& MoveRValue(T&& arg) {
+			return static_cast<typename TypeTraits::RemoveRefV<T>&&>(arg);
 		}
 
 		///<summary>Ідеальна передача</summary>
@@ -88,7 +88,7 @@ namespace Seed
 		///<returns>RV-силку</returns>
 		template<typename Type>
 		[[nodiscard]]
-		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefV<Type>& Arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
+		constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>& Arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
 			return (static_cast<Type&&>(Arg));
 		}
 
@@ -97,8 +97,8 @@ namespace Seed
 		///<returns>RV-силку</returns>
 		template<typename Type>
 		[[nodiscard]]
-		constexpr Type&& ForwardReference(StaticAsserts::RemoveRefV<Type>&& Arg) noexcept {	// forward an rvalue as an rvalue
-			static_assert(!StaticAsserts::IsLValueRef<Type>(), "Bad forward call");
+		constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>&& Arg) noexcept {	// forward an rvalue as an rvalue
+			static_assert(!TypeTraits::IsLValueRef<Type>(), "Bad forward call");
 			return (static_cast<Type&&>(_Arg));
 		}
 	}

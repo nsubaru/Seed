@@ -226,15 +226,15 @@ namespace {
 
 namespace Seed {
 	inline namespace Core {
-		namespace StaticAsserts {
+		namespace TypeTraits {
 			template <typename, typename = void>
 			struct ResultOf {
 				using Type = VoidT<>;
 			};
 			template <typename F, typename...Args>
 			struct ResultOf<F(Args...),
-				decltype(void(::INVOKE(StaticAsserts::DeclVal<F>(), StaticAsserts::DeclVal<Args>()...)))> {
-				using Type = decltype(::INVOKE(StaticAsserts::DeclVal<F>(), StaticAsserts::DeclVal<Args>()...));
+				decltype(void(::INVOKE(TypeTraits::DeclVal<F>(), TypeTraits::DeclVal<Args>()...)))> {
+				using Type = decltype(::INVOKE(TypeTraits::DeclVal<F>(), TypeTraits::DeclVal<Args>()...));
 			};
 
 			///<summary>Тип без силки</summary>

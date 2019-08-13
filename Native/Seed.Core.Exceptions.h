@@ -661,18 +661,18 @@ namespace Seed {
 #pragma region Throw
 ///<summary>Вертає тип або тип результату функції\методу<\summary>
 template<class Type>
-using ThrowableObj = typename Seed::Core::StaticAsserts::ConditionT <
-	Seed::Core::StaticAsserts::IsFunction<Type>::State,
-	typename Seed::Core::StaticAsserts::ResultOf<Type>::Type,
+using ThrowableObj = typename Seed::Core::TypeTraits::ConditionT <
+	Seed::Core::TypeTraits::IsFunction<Type>::State,
+	typename Seed::Core::TypeTraits::ResultOf<Type>::Type,
 	typename Type
 >::Result;
 
 ///<summary>Вертає <c>True</c> якщо цей об'єкт ж помилкою чи вертає в якості результату об'єкт помилки</summary>
 template<typename Type>
 struct IsThrowable :
-	Seed::Core::StaticAsserts::IsBasedOn<
+	Seed::Core::TypeTraits::IsBasedOn<
 	Seed::Core::Exceptions::Exception,
-	Seed::Core::StaticAsserts::RemoveRefV<ThrowableObj<Type>>
+	Seed::Core::TypeTraits::RemoveRefV<ThrowableObj<Type>>
 	>
 {};
 
@@ -687,7 +687,7 @@ InternalApiCall __forceinline void __declspec(noreturn) __cxxrethrow() { throw; 
 ///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>
 #define Throw(ExceptionObj) \
 do{ \
-	static_assert(IsThrowable<decltype(ExceptionObj)>() | Seed::StaticAsserts::IsSameV<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>, \
+	static_assert(IsThrowable<decltype(ExceptionObj)>() | Seed::TypeTraits::IsSameV<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>, \
 	"Only Seed::Exception and derived classes cant be throw as exception"); \
 	__assume(IsThrowable<decltype(ExceptionObj)>()); \
 	__pragma(warning(push)); \

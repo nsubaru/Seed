@@ -29,7 +29,7 @@ namespace Seed {
 					extern void AcquireLockExclusiveSRWLock(void*);
 					extern void ReleaseLockExclusiveSRWLock(void*);
 
-					if constexpr (StaticAsserts::IsSameT<decltype(Funct()), void>())
+					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
 						AcquireLockExclusiveSRWLock(&lock);
 						try {
@@ -64,7 +64,7 @@ namespace Seed {
 					extern void AcquireLockSharedSRWLock(void*);
 					extern void ReleaseLockSharedSRWLock(void*);
 
-					if constexpr (StaticAsserts::IsSameT<decltype(Funct()), void>())
+					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
 						AcquireLockSharedSRWLock(&lock);
 						try {

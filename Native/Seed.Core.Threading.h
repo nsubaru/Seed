@@ -225,7 +225,7 @@ namespace Seed {
 					{
 						try
 						{
-							if constexpr (Seed::Core::StaticAsserts::IsSameT<decltype(scope()), void>())
+							if constexpr (Seed::Core::TypeTraits::IsSameT<decltype(scope()), void>())
 							{
 								this->data->lock.ExclusiveLock([&]() {
 									this->data->EventHandle.Reset();

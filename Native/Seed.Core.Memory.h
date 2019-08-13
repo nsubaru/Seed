@@ -151,7 +151,7 @@ namespace Seed {
 			///</summary>
 			template<class HeapClass>
 			class SeedKernelCall Allocator {
-				static_assert(StaticAsserts::IsBasedOn<Memory::BasicHeap, HeapClass>(), L"HeapClass in not heap");
+				static_assert(TypeTraits::IsBasedOn<Memory::BasicHeap, HeapClass>(), L"HeapClass in not heap");
 			private:
 				///<value>Куча з якої відбуватиметься виділення</value>
 				inline static HeapClass heap;

@@ -1964,7 +1964,7 @@ namespace Seed {
 		class Tuple;
 
 		namespace TupleImpl {
-			using namespace StaticAsserts;
+			using namespace TypeTraits;
 
 #pragma region TupleLeaf
 			// TupleLeaf
@@ -2490,7 +2490,7 @@ namespace Seed {
 					t...) {
 			}
 
-			template <typename... Us, typename StaticAsserts::EnableIf<
+			template <typename... Us, typename TypeTraits::EnableIf<
 				sizeof...(Us) <= sizeof...(Ts_) &&
 				TupleImpl::TupleConvertible<
 				typename TupleImpl::MakeTupleTypes<Tuple<Us...>>::Type,
@@ -2508,14 +2508,14 @@ namespace Seed {
 			}
 
 
-			template <typename OtherTuple, typename StaticAsserts::EnableIf<
+			template <typename OtherTuple, typename TypeTraits::EnableIf<
 				TupleImpl::TupleConvertible<OtherTuple, Tuple>::State,
 				bool>::Type = false>
 				constexpr Tuple(OtherTuple && t)
 				: impl_(ForwardReference<OtherTuple>(t)) {
 			}
 
-			template <typename OtherTuple, typename StaticAsserts::EnableIf<
+			template <typename OtherTuple, typename TypeTraits::EnableIf<
 				TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
 				bool>::Type = false>
 				constexpr Tuple & operator=(OtherTuple && t) {
@@ -2548,13 +2548,13 @@ namespace Seed {
 			constexpr Tuple() {
 			}
 
-			template <typename OtherTuple, typename StaticAsserts::EnableIf<
+			template <typename OtherTuple, typename TypeTraits::EnableIf<
 				TupleImpl::TupleConvertible<OtherTuple, Tuple>::State,
 				bool>::Type = false>
 				constexpr Tuple(OtherTuple&&) {
 			}
 
-			template <typename OtherTuple, typename StaticAsserts::EnableIf<
+			template <typename OtherTuple, typename TypeTraits::EnableIf<
 				TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
 				bool>::Type = false>
 				constexpr Tuple & operator=(OtherTuple&&) {

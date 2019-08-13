@@ -291,12 +291,6 @@ namespace Seed {
 				}
 			}
 
-			 virtual void ExecuteInScope(Queryable::LambdaHolder<void>& lambda) override final {
-				this->data->lock.ExclusiveLock([&]() mutable {
-					lambda();
-					});
-			}
-
 			inline virtual void PrepareCopyToOrMove(SizeT NewCount) override final {
 				this->data->size = NewCount;
 			}
@@ -1848,12 +1842,12 @@ namespace Seed {
 #pragma endregion
 
 #pragma warning(pop)
-		namespace StaticAsserts {
+		namespace TypeTraits {
 			template<typename Heap, typename U>
-			struct TIsResizable<BaseList<Heap, U>> : StaticAsserts::LogicTrue {};
+			struct TIsResizable<BaseList<Heap, U>> : TypeTraits::LogicTrue {};
 
 			template<typename Heap, typename U>
-			struct TIsDynamicSize<BaseList<Heap, U>> : StaticAsserts::LogicTrue {};
+			struct TIsDynamicSize<BaseList<Heap, U>> : TypeTraits::LogicTrue {};
 		}
 	}
 }

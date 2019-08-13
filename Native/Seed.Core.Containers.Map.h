@@ -1,6 +1,7 @@
 #pragma once
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Exceptions.h"
+#include "Seed.Core.Containers.IEnumerable.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -40,16 +41,16 @@ namespace Seed {
 		///<param name = "TKey">Тип ключа</param>
 		///<param name = "TValue">Тип значення</param>
 		template<typename Heap, typename TKey, typename TValue>
-		class SeedKernelCall BaseMap final : virtual public Memory::Allocator<Heap>
+		class BaseMap final :  public Memory::Allocator<Heap>, protected IDisposable
 		{
 		private:
 			struct Tree;
 
 			///<summary>Елемент дерева і елемент в асоціативному масиві</summary>
-			struct Node : virtual public Memory::Allocator<Heap>
+			struct SeedKernelCall Node : public Memory::Allocator<Heap>
 			{
 			public:
-				struct Data {
+				struct SeedKernelCall Data final {
 					///<summary>Гетер ключа</summary>
 					const TKey& GetKey() { return key; }
 					///<summary>Гетер значення</summary>
@@ -70,7 +71,7 @@ namespace Seed {
 					TKey key;
 					///<summary>Значення елемента</summary>
 					TValue value;
-
+				public:
 					///<summary>Конструктор копіювання ключа і значення</summary>
 					Data(const TKey& key, const TValue& value) : key(key), value(value) {}
 					///<summary>Конструктор переміщення значення і копіювання значення</summary>
@@ -79,7 +80,7 @@ namespace Seed {
 					Data(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
 					///<summary>Конструктор переміщення і значення і ключа</summary>
 					Data(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
-
+				private:
 					friend Node;
 				};
 			private:
@@ -148,10 +149,19 @@ namespace Seed {
 				///</summary>
 				Threading::SRWLock lock;
 
-				Tree() : root(nullptr), count(0), lock() {}
+				RefCountT RefCount;
+
+				Tree() : root(nullptr), count(0), lock(), RefCount(1) {}
 			};
 		private:
+			///<summary>Дані об'єкта</summary>
 			Tree* tree;
+		protected:
+			virtual void Dispose() final override {
+				tree->lock.ExclusiveLock([&]() {
+					DestroyTree(tree->root);
+					});
+			}
 		private:
 			///<summary>Рекурсивний пошук елемента по ключу в дереві</summary>
 			///<param name = "node">Кореневий в якому шукає</param>
@@ -488,7 +498,7 @@ namespace Seed {
 			}
 		public:
 			///<summary>Ітератор на елемент в асоціативному масиві</summary>
-			class Iterator : IDisposable
+			class SeedKernelCall Iterator final : protected IDisposable
 			{
 			private:
 				friend BaseMap;
@@ -610,6 +620,9 @@ namespace Seed {
 			BaseMap() :tree(new Tree)
 			{}
 
+			///<summary>Оператори підтримки підрахунку силок об'єкта</summary>
+			RefCountClass(BaseMap, tree);
+
 			///<summary>Вертає кількість елементів в асоціативному масиві</summary>
 			SizeT getCount() { return tree->count; }
 			///<value>Кількість елементів в асоціативному масиві</value>
@@ -696,16 +709,6 @@ namespace Seed {
 				if (node == nullptr)
 					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read));
 				return node->value;
-			}
-
-			///<summary>Деструктор</summary>
-			~BaseMap()
-			{
-				tree->lock.ExclusiveLock([&]() {
-					DestroyTree(tree->root);
-					});
-				delete tree;
-				tree = nullptr;
 			}
 		};
 

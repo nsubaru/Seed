@@ -1387,7 +1387,7 @@ namespace Seed {
 				if (this->CurrentSize > Math::MaxNumberCount<T>())
 					throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 
-				if constexpr (StaticAsserts::IsSameV<StaticAsserts::Unsigned<T>, T>) {
+				if constexpr (TypeTraits::IsSameV<TypeTraits::Unsigned<T>, T>) {
 					Math::SafeInt<T> ret;
 					for (SizeT i = 0; i < Size; i++) {
 						if (str[i]<L'0' || str[i]>L'9')
@@ -2414,7 +2414,7 @@ namespace Seed {
 		///<params name "b">Лівий рядок</params>
 		template<typename T, template<typename> typename U>
 		__forceinline void Swap(U<T> & a, U<T> & b) noexcept {
-			static_assert(StaticAsserts::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
+			static_assert(TypeTraits::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
 			Seed::Swap(a.str, b.str);
 			Seed::Swap(a.CurrentSize, b.CurrentSize);
 			Seed::Swap(a.ReservedSize, b.ReservedSize);

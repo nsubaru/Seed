@@ -12,7 +12,7 @@ namespace Seed {
 			template< class T, bool IsFunctionType = false >
 			struct AddPointer
 			{
-				using Type = typename StaticAsserts::RemoveRefT<T>::Type*;
+				using Type = typename TypeTraits::RemoveRefT<T>::Type*;
 			};
 
 			template< class T >
@@ -35,7 +35,7 @@ namespace Seed {
 		}
 
 		///<summary>Простір імен статичних провірок</summary>
-		namespace StaticAsserts {
+		namespace TypeTraits {
 			///<summary>Логічне суддження чи тип T1 == T2 виконується в compile-time</summary>
 			template<typename T1, typename T2>
 			struct IsSameT :public LogicFalse {};
@@ -852,16 +852,16 @@ namespace Seed {
 
 				enum { Arity = sizeof...(LambdaArgs) };
 
-				using ReturnType = StaticAsserts::ConditionV<StaticAsserts::IsVoidV<Ret>, StaticAsserts::VoidT<void>, Ret>;
+				using ReturnType = TypeTraits::ConditionV<TypeTraits::IsVoidV<Ret>, TypeTraits::VoidT<void>, Ret>;
 
-				using Args = typename StaticAsserts::Pack<LambdaArgs...>;
+				using Args = typename TypeTraits::Pack<LambdaArgs...>;
 
 				template<typename ExpectedRet>
 				using IsRetTypeConvertibleTo = typename
-					StaticAsserts::ConditionT<
-						StaticAsserts::IsVoidV<ReturnType>, 
-						StaticAsserts::IsVoidT<ExpectedRet>, 
-						StaticAsserts::IsConvertibleT<ReturnType, ExpectedRet>
+					TypeTraits::ConditionT<
+						TypeTraits::IsVoidV<ReturnType>, 
+						TypeTraits::IsVoidT<ExpectedRet>, 
+						TypeTraits::IsConvertibleT<ReturnType, ExpectedRet>
 					>::Result;
 
 				//template<typename ... Params>
@@ -871,7 +871,7 @@ namespace Seed {
 			};
 		}
 
-		namespace StaticAsserts {
+		namespace TypeTraits {
 
 			template<class Ld>
 			struct LambdaType

@@ -147,7 +147,7 @@ struct call_impl<F, Tuple, true, TotalArgs, N...>
 template<typename F, typename Tuple>
 auto __forceinline call(F f, Tuple&& t)
 {
-	using type = Seed::StaticAsserts::Decay<Tuple>;
+	using type = Seed::TypeTraits::Decay<Tuple>;
 	return call_impl<F, Tuple, 0 == type::Count(),
 		type::Count()
 	>::call(f, Seed::ForwardReference<Tuple>(t));
@@ -179,7 +179,7 @@ protected:
 	//- InvalidType якщо типи результату не коректний
 	__forceinline virtual void* __get_result(const Seed::TypeInfo& type) override final
 	{
-		if constexpr (Seed::Core::StaticAsserts::IsSameT<retType, void>::State)
+		if constexpr (Seed::Core::TypeTraits::IsSameT<retType, void>::State)
 			Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(void), type));
 		else if (result == nullptr)
 			Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
@@ -199,7 +199,7 @@ public:
 		try
 		{
 			//Умова часу компіляції, яка провіряє чи функція вертає void
-			if constexpr (!Seed::Core::StaticAsserts::IsSameT<decltype(call(f, args)), void>::State)
+			if constexpr (!Seed::Core::TypeTraits::IsSameT<decltype(call(f, args)), void>::State)
 			{
 				//Якщо ні то запамятовує результат в покажчику res
 				//В який переміщає конструктором переміщення результат
@@ -237,7 +237,7 @@ public:
 	//Деструктор, видаляє результат якщо він є
 	__forceinline ~TemplateFunctionT()
 	{
-		if constexpr (!Seed::Core::StaticAsserts::IsSameT<decltype(call(f, args)), void>::State)
+		if constexpr (!Seed::Core::TypeTraits::IsSameT<decltype(call(f, args)), void>::State)
 			if (result != nullptr)
 			{
 				delete (decltype(call(f, args))*)result;

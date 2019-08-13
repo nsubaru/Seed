@@ -117,10 +117,6 @@ namespace Seed {
 				this->arr[ItemIndex] = MoveRValue(Value);
 			}
 
-			__forceinline virtual void ExecuteInScope(Queryable::LambdaHolder<void>& lambda) final override {
-				lambda();
-			}
-
 			inline virtual void PrepareCopyToOrMove(SizeT NewSize) final override {
 				this->Resize(NewSize);
 			}
@@ -452,12 +448,12 @@ namespace Seed {
 
 		using Blob = Array<Byte>;
 
-		namespace StaticAsserts {
+		namespace TypeTraits {
 			template<typename U>
-			struct TIsResizable<Array<U>> : StaticAsserts::LogicTrue {};
+			struct TIsResizable<Array<U>> : TypeTraits::LogicTrue {};
 
 			template<typename U>
-			struct TIsDynamicSize<Array<U>> : StaticAsserts::LogicFalse {};
+			struct TIsDynamicSize<Array<U>> : TypeTraits::LogicFalse {};
 		}
 	}
 }
