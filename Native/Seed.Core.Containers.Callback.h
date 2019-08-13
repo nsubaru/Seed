@@ -6,7 +6,7 @@
 namespace Seed {
 	inline namespace Core {
 		///<summary>Класс контейнер для об'єкта функтора</summary>
-		template<typename Heap, typename Callback>
+		/*template<typename Heap, typename Callback>
 		class BaseCallbackContainer : public IDisposable, virtual public Memory::Allocator<Heap> {
 			struct Data : virtual public Memory::Allocator<Heap> {
 				RefCountT RefCount;
@@ -36,6 +36,6 @@ namespace Seed {
 		using Callback = BaseCallbackContainer<Seed::Core::Memory::Heap, Signature>;
 
 		template<typename Signature>
-		using SensitiveCallback = BaseCallbackContainer<Seed::Core::Memory::SensitiveDataHeap, Signature>;
+		using SensitiveCallback = BaseCallbackContainer<Seed::Core::Memory::SensitiveDataHeap, Signature>;*/
 	}
 }

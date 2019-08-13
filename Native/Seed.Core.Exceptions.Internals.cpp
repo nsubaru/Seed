@@ -1,5 +1,5 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Exceptions.h"
@@ -16,7 +16,7 @@ extern void* InternalCxxCallCatchBlock(
 	EXCEPTION_RECORD* pExcept
 );
 
-extern EXCEPTION_DISPOSITION InternalCxxFrameHandler3(
+extern SeedKernelCall EXCEPTION_DISPOSITION InternalCxxFrameHandler3(
 	EHExceptionRecord* pExcept,         // Information for this exception
 	EHRegistrationNode RN,               // Dynamic information for this frame
 	CONTEXT* pContext,        // Context info
@@ -30,7 +30,7 @@ void* CxxCallCatchBlock(
 	return InternalCxxCallCatchBlock(pExcept);
 }
 
-extern "C" EXCEPTION_DISPOSITION __cdecl __CxxFrameHandler3(
+extern "C" SeedKernelCall EXCEPTION_DISPOSITION __cdecl __CxxFrameHandler3(
 	EHExceptionRecord* pExcept,         // Information for this exception
 	EHRegistrationNode RN,               // Dynamic information for this frame
 	CONTEXT* pContext,        // Context info

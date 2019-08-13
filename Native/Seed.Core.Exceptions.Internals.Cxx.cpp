@@ -1,5 +1,5 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Exceptions.h"
@@ -357,7 +357,8 @@ int TypeMatch(
 	// names are identical.
 	auto typeCatch = GetByOffset<TypeDescriptor>(ImageBase, pCatch->dispType);
 	auto typeCatchable = GetByOffset<TypeDescriptor>(ImageBase, pCatchable->pType);
-	if (typeCatch != typeCatchable && CStr::Compare(typeCatch->name, typeCatchable->name))
+	toCoreLog(L"Matching catch closure. TypeCatch: \"" + String(typeCatch->name) + L"\" TypeCatchable: \"" + String(typeCatchable->name) + L"\"");
+	if (typeCatch != typeCatchable && !CStr::Compare(typeCatch->name, typeCatchable->name))
 		return FALSE;
 
 	// Basic types match.  The actual conversion is valid if:

@@ -1,26 +1,24 @@
 #pragma once
 #include "Seed.Core.Base.h"
 
-
-
 namespace Seed {
 	inline namespace Core {
 		///<summary>Сінглтон татичний класс поточних настройок</summary>
-		class CurrentSettings {
+		class SeedKernelCall CurrentSettings {
 		public:
 			///<summary>Дані налаштувань</summary>
-			struct SettingsData {
+			struct SeedKernelCall SettingsData {
 				///<summary>Налаштування менеджера пам'яті</summary>
-				struct MemoryManager {
+				struct SeedKernelCall MemoryManager {
 					///<summary>Налаштування кучі</summary>
-					struct HeapCfg {
+					struct SeedKernelCall HeapCfg {
 						///<summary>Стартовий розмір кучі</summary>
 						Bytes StartSize;
 						///<summary>Максимальний розмір кучі</summary>
 						Bytes MaxSize;
 
 						///<summary>Додаткові флаги кучі</summary>
-						struct PosibleAdditionalСhecks {
+						struct SeedKernelCall PosibleAdditionalСhecks {
 							///<summary>Провірка при вивільнені пам'яті</summary>
 							UInt8 HEAP_FREE_CHECK : 1;
 							///<summary>Провірка хвоста кучі</summary>
@@ -51,9 +49,9 @@ namespace Seed {
 				};
 
 				///<summary>Налаштування багатопотоковості</summary>
-				struct ThreadingCfg {
+				struct SeedKernelCall ThreadingCfg {
 					///<summary>Налаштування потоків</summary>
-					struct ThreadCfg {
+					struct SeedKernelCall ThreadCfg {
 						///<summary>Стартовий розмір стеку потоків</summary>
 						SizeT StackMaxSize;
 						///<summary>Максиальний розмір стеку потоків</summary>
@@ -64,9 +62,9 @@ namespace Seed {
 				};
 
 				///<summary>Налаштування сервісів ядра</summary>
-				struct KernelServiceConfigT {
+				struct SeedKernelCall KernelServiceConfigT {
 					///<summary>Налаштування планувальника задач</summary>
-					struct TaskShedulerCfgT {
+					struct SeedKernelCall TaskShedulerCfgT {
 						///<summary>Стандартна роздільна здатність таймера для задач в планувальнику задач</summary>
 						Int32 DefaultTimerProximity;
 					};
@@ -83,18 +81,18 @@ namespace Seed {
 			};
 
 			///<summary>Налаштування середовища</summary>
-			struct VirtualSettingData {
+			struct SeedKernelCall VirtualSettingData {
 				///<summary>Розташування виконавчого файла ядра</summary>
 				Char KernelExecutableLocation[Math::Max<Int16>()];
 				///<summary>Кількість ядер в хост ситема ядра</summary>
 				UInt64 CpuCoresCount;
 			};
 		public:
-			class MemoryManagerT {
+			class SeedKernelCall MemoryManagerT {
 			public:
-				class DefaultHeapT {
+				class SeedKernelCall DefaultHeapT {
 				public:
-					DefaultHeapT() {}
+					DefaultHeapT() {} //-V730
 				public:
 					SizeT GetStartSize() {
 						extern SettingsData CurrentSettingsData;
@@ -107,11 +105,11 @@ namespace Seed {
 
 					SizeT GetMaxSize() {
 						extern SettingsData CurrentSettingsData;
-						return CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize;
+						return CurrentSettingsData.MainMemoryManager.DefaultHeap.MaxSize;
 					}
 					void SetMaxSize(SizeT NewSize) {
 						extern SettingsData CurrentSettingsData;
-						CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize = NewSize;
+						CurrentSettingsData.MainMemoryManager.DefaultHeap.MaxSize = NewSize;
 					}
 
 					Boolean GetHeapFreeCheck() {
@@ -179,9 +177,9 @@ namespace Seed {
 					Boolean Property(GetHeapAllocsLogging, SetHeapAllocsLogging) HeapAllocsLogging;
 				};
 
-				class SensitiveDataHeapT {
+				class SeedKernelCall SensitiveDataHeapT {
 				public:
-					SensitiveDataHeapT() {}
+					SensitiveDataHeapT() {} //-V730
 				public:
 					SizeT GetStartSize() {
 						extern SettingsData CurrentSettingsData;
@@ -194,11 +192,11 @@ namespace Seed {
 
 					SizeT GetMaxSize() {
 						extern SettingsData CurrentSettingsData;
-						return CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.StartSize;
+						return CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.MaxSize;
 					}
 					void SetMaxSize(SizeT NewSize) {
 						extern SettingsData CurrentSettingsData;
-						CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.StartSize = NewSize;
+						CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.MaxSize = NewSize;
 					}
 
 					Boolean GetHeapFreeCheck() {
@@ -266,9 +264,9 @@ namespace Seed {
 					Boolean Property(GetHeapAllocsLogging, SetHeapAllocsLogging) HeapAllocsLogging;
 				};
 
-				class ExceptionHeapT {
+				class SeedKernelCall ExceptionHeapT {
 				public:
-					ExceptionHeapT() {}
+					ExceptionHeapT() {} //-V730
 				public:
 					SizeT GetStartSize() {
 						extern SettingsData CurrentSettingsData;
@@ -281,11 +279,11 @@ namespace Seed {
 
 					SizeT GetMaxSize() {
 						extern SettingsData CurrentSettingsData;
-						return CurrentSettingsData.MainMemoryManager.ExceptionHeap.StartSize;
+						return CurrentSettingsData.MainMemoryManager.ExceptionHeap.MaxSize;
 					}
 					void SetMaxSize(SizeT NewSize) {
 						extern SettingsData CurrentSettingsData;
-						CurrentSettingsData.MainMemoryManager.ExceptionHeap.StartSize = NewSize;
+						CurrentSettingsData.MainMemoryManager.ExceptionHeap.MaxSize = NewSize;
 					}
 
 					Boolean GetHeapFreeCheck() {
@@ -383,28 +381,28 @@ namespace Seed {
 				SizeT Property(GetQueueMaxSize, SetQueueMaxSize) QueueMaxSize;
 			};
 			
-			class ThreadingCfgT {
+			class SeedKernelCall ThreadingCfgT {
 			public:
-				class ThreadCfg {
+				class SeedKernelCall ThreadCfg {
 				public:
 					ThreadCfg() {}
 
 					SizeT GetStackStartSize() {
 						extern SettingsData CurrentSettingsData;
-						return CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize;
+						return CurrentSettingsData.Threading.Thread.StackStartSize;
 					}
 					void SetStackStartSize(SizeT NewSize) {
 						extern SettingsData CurrentSettingsData;
-						CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize = NewSize;
+						CurrentSettingsData.Threading.Thread.StackStartSize = NewSize;
 					}
 
 					SizeT GetStackMaxSize() {
 						extern SettingsData CurrentSettingsData;
-						return CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize;
+						return CurrentSettingsData.Threading.Thread.StackMaxSize;
 					}
 					void SetStackMaxSize(SizeT NewSize) {
 						extern SettingsData CurrentSettingsData;
-						CurrentSettingsData.MainMemoryManager.DefaultHeap.StartSize = NewSize;
+						CurrentSettingsData.Threading.Thread.StackMaxSize = NewSize;
 					}
 				public:
 					///<summary>Стартовий розмір стеку у потоків</summary>
@@ -422,11 +420,11 @@ namespace Seed {
 				ThreadCfg Property(GetThread, SetThread) Thread;
 			};
 
-			class KernelServiceConfigT {
+			class SeedKernelCall KernelServiceConfigT {
 			public:
-				class TaskShedulerCfgT {
+				class SeedKernelCall TaskShedulerCfgT {
 				public:
-					TaskShedulerCfgT() {}
+					TaskShedulerCfgT() {} //-V730
 
 					Int32 GetDefaultTimerProximity() {
 						extern SettingsData CurrentSettingsData;
@@ -448,11 +446,11 @@ namespace Seed {
 				TaskShedulerCfgT Property(GetTaskSheduler, SetTaskSheduler) TaskSheduler;
 			};
 
-			class VirtualSettingDataT {
+			class SeedKernelCall VirtualSettingDataT {
 			public:
 				typedef const Char(&KernelExcecutableLocationT)[Math::Max<Int16>()];
 			public:
-				VirtualSettingDataT() {}
+				VirtualSettingDataT() {} //-V730
 
 				KernelExcecutableLocationT GetKernelExcecutableLocation() {
 					extern VirtualSettingData CurrentVirtualSettingsData;

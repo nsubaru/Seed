@@ -7,7 +7,7 @@
 
 namespace Seed {
 	inline namespace Core {
-		class Tokenizer {
+		class SeedKernelCall Tokenizer final {
 		private:
 			struct Data;
 		public:
@@ -42,7 +42,7 @@ namespace Seed {
 				}
 			};
 
-			class Token {
+			class SeedKernelCall Token final {
 				Tokenizer* Text;
 				SizeT OffSet;
 				SizeT Size;
@@ -57,16 +57,18 @@ namespace Seed {
 					:Text(Text), OffSet(OffSet), Size(Size), DelimIndex(DelimIndex)
 				{}
 			public:
-				Token(const Token& orig) : Text(new Tokenizer(*Text)), OffSet(OffSet), Size(Size), DelimIndex(DelimIndex) {};
-				Token(Token&& from) : Text(from.Text), OffSet(OffSet), Size(Size), DelimIndex(DelimIndex) { from.Text = nullptr; from.OffSet = from.Size = from.DelimIndex = 0; };
+				Token(const Token& orig) : Text(new Tokenizer(*orig.Text)), OffSet(orig.OffSet), Size(orig.Size), DelimIndex(orig.DelimIndex) {};
+				Token(Token&& from) : Text(from.Text), OffSet(from.OffSet), Size(from.Size), DelimIndex(from.DelimIndex) { from.Text = nullptr; from.OffSet = from.Size = from.DelimIndex = 0; };
 				Token& operator=(const Token& orig) {
 					this->~Token();
 					this->Token::Token(orig);
+					return *this;
 				}
 
 				Token& operator=(Token&& from) {
 					this->~Token();
 					this->Token::Token(MoveRValue(from));
+					return *this;
 				}
 
 				bool operator!=(const Token& other) {
@@ -92,7 +94,7 @@ namespace Seed {
 
 					extern Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
 
-					auto [OffSet, Size, DelimIndex] =
+					auto [NewOffSet, NewSize, NewDelimIndex] = //-V688
 						GetNextToken(
 							this->Text->GetCharStr(),
 							this->Text->GetCharStrSize(),
@@ -102,16 +104,16 @@ namespace Seed {
 							this->OffSet + this->Size + this->Text->data->DelimsSize[this->DelimIndex]
 						);
 
-					if (OffSet == 0 && Size == 0)
+					if (NewOffSet == 0 && NewSize == 0)
 					{
 						delete this->Text;
 						this->Text = nullptr;
 						this->DelimIndex = this->OffSet = this->Size = 0;
 					}
 					else {
-						this->OffSet = OffSet;
-						this->Size = Size;
-						this->DelimIndex = DelimIndex;
+						this->OffSet = NewOffSet;
+						this->Size = NewSize;
+						this->DelimIndex = NewDelimIndex;
 					}
 
 					return *this;

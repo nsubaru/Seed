@@ -2148,6 +2148,9 @@ namespace Seed {
 				constexpr ValueType operator()() const noexcept { return Value; } //since c++14
 			};
 
+			template <typename TupleIndexes_, typename... Ts_>
+			struct TupleImpl;
+
 			// specialization for Tuple
 
 			template <typename... Ts_>
@@ -2169,7 +2172,7 @@ namespace Seed {
 			template <SizeT I_>
 			class TupleElement<I_, TupleTypes<>> {
 			public:
-				static_assert(I_ != I_, "tuple_element index out of range");
+				static_assert(I_ != I_, "tuple_element index out of range"); //-V501
 			};
 
 			template <typename H_, typename... Ts_>
@@ -2248,9 +2251,6 @@ namespace Seed {
 			void swallow(Ts&& ...) {
 			}
 
-			template <typename TupleIndexes_, typename... Ts_>
-			struct TupleImpl;
-
 			template <SizeT... Indexes_, typename... Ts_>
 			struct TupleImpl<TupleIndexes<Indexes_...>, Ts_...>
 				: public TupleLeaf<Indexes_, Ts_>... {
@@ -2275,10 +2275,9 @@ namespace Seed {
 
 				template <typename OtherTuple>
 				constexpr TupleImpl& operator=(OtherTuple&& t) {
-					swallow(TupleLeaf<Indexes_, Ts_>::operator=(forward<
-						typename TupleElement<Indexes_,
-						typename MakeTupleTypes<OtherTuple>::Type>::Type
-					>(t.Get<Indexes_>()))...);
+					//swallow(TupleLeaf<Indexes_, Ts_>::operator=(ForwardReference<decltype(t.Get<Indexes_>())>(t.Get<Indexes_>()))...);
+					this->~TupleImpl();
+					this->TupleImpl::TupleImpl(MoveRValue(t));
 					return *this;
 				}
 
@@ -2483,7 +2482,7 @@ namespace Seed {
 				get(Tuple<Ts...>&& t);
 
 		public:
-			constexpr explicit Tuple(const Ts_& ... t)
+			constexpr Tuple(const Ts_& ... t)
 				: impl_(typename TupleImpl::MakeTupleIndexes<sizeof...(Ts_)>::Type(),
 					typename TupleImpl::MakeTupleTypes<Tuple, sizeof...(Ts_)>::Type(),
 					typename TupleImpl::MakeTupleIndexes<0>::Type(),

@@ -4,7 +4,7 @@
 namespace Seed {
 	inline namespace Core {
 		///<summary>Константний ASCII рядок який пам'ятає свій розмір</summary>
-		class SeedKernelCall ConstAString {
+		class SeedKernelCall ConstAString final {
 		private:
 			///<summary>Покажчик на текст</summary>
 			const AChar* str;
@@ -55,7 +55,7 @@ namespace Seed {
 		};
 
 		///<summary>Константний рядок який пам'ятає свій розмір</summary>
-		class SeedKernelCall ConstString {
+		class SeedKernelCall ConstString final {
 		private:
 			///<summary>Покажчик на текст</summary>
 			const Char* str;

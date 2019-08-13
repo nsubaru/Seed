@@ -35,8 +35,10 @@ namespace Seed {
 			constexpr DateTime() = default;//-V730
 			//Конструктор з задаванням 100 наносекндних інтервалах
 			constexpr DateTime(UInt64 time) :time_ms(time) {}; //-V730
-			//Копіювальний конструктор
-			constexpr DateTime(const DateTime& orig) :time_ms(orig.time_ms) {}; //-V730
+			////Копіювальний конструктор
+			//constexpr DateTime(const DateTime& orig) :time_ms(orig.time_ms) {}; //-V730
+			////Оператор копіювання
+			//constexpr DateTime& operator=(const DateTime& orig) { this->time_ms = orig.time_ms; return *this; }
 			//Оператор присвоєння
 			//constexpr DateTime& operator=(const DateTime& from) { this->time_ms = from.time_ms; return *this; }
 			//Оператор додавання до

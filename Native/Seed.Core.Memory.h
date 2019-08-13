@@ -42,7 +42,7 @@ namespace Seed {
 			};
 
 			///<summary>Загальна куча</summary>
-			class SeedKernelCall Heap : public BasicHeap {
+			class SeedKernelCall Heap final : public BasicHeap {
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -100,7 +100,7 @@ namespace Seed {
 
 			///<summary>Захищена куча</summary>
 			///<remarks>Перед виділенням і після звільнення відбувається обнулення пам'яті</remarks>
-			class SeedKernelCall SensitiveDataHeap : public BasicHeap {
+			class SeedKernelCall SensitiveDataHeap final : public BasicHeap {
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -197,12 +197,12 @@ namespace Seed {
 					return heap.Allocate(Size);
 				}
 
-					///<summary>Оператор виділення одиночного об'єкта з специфічним вирівнюванням</summary>
-					///<param name = "Size">Розмір ділянки пам'яті</param>
-					///<param name = "Allign">Границя вирівнювання</param>
-					///<exception cref = "Seed::Core::Exceptions::OutOfMemory">Якщо неможливо виділити пам'ять</exception>
-					///<returns>Вертає ділянку пам'яті</returns>
-					static __forceinline void* operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
+				///<summary>Оператор виділення одиночного об'єкта з специфічним вирівнюванням</summary>
+				///<param name = "Size">Розмір ділянки пам'яті</param>
+				///<param name = "Allign">Границя вирівнювання</param>
+				///<exception cref = "Seed::Core::Exceptions::OutOfMemory">Якщо неможливо виділити пам'ять</exception>
+				///<returns>Вертає ділянку пам'яті</returns>
+				static __forceinline void* operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
 					return heap.AllignedAllocate(Size, (Seed::SizeT)Allign);
 				}
 
@@ -215,10 +215,10 @@ namespace Seed {
 					return heap.AllignedAllocate(Size, (Seed::SizeT)Allign);
 				}
 
-					///<summary>Оператор видалення одиночного об'єкту</summary>
-					///<param name = "MemBlk">Ділянка пам'яті</param>
-					///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
-					static __forceinline void operator delete(void* MemBlk) {
+				///<summary>Оператор видалення одиночного об'єкту</summary>
+				///<param name = "MemBlk">Ділянка пам'яті</param>
+				///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
+				static __forceinline void operator delete(void* MemBlk) {
 					heap.Free(MemBlk);
 				}
 				///<summary>Оператор видалення масиву об'єктів</summary>
@@ -330,14 +330,14 @@ inline void* __cdecl operator new[](Seed::SizeT Size, Seed::AllignRequirements A
 ///<summary>Оператор видалення одиночного об'єкту</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
-__forceinline void __cdecl operator delete(void* MemBlk) {
+inline void __cdecl operator delete(void* MemBlk) {
 	extern void* GenericFree(void* MemBlk);
 	GenericFree(MemBlk);
 }
 ///<summary>Оператор видалення масиву об'єктів</summary>
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
-__forceinline void __cdecl operator delete[](void* MemBlk) {
+inline void __cdecl operator delete[](void* MemBlk) {
 	extern void* GenericFree(void* MemBlk);
 	GenericFree(MemBlk);
 }
@@ -345,7 +345,7 @@ __forceinline void __cdecl operator delete[](void* MemBlk) {
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Allign">Границя вирівнювання</param>
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
-__forceinline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirements Allign) {
+inline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirements Allign) {
 	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
 	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
 }
@@ -353,7 +353,7 @@ __forceinline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirement
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Allign">Границя вирівнювання</param>
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
-__forceinline void __cdecl operator delete[](void* MemBlk, Seed::AllignRequirements Allign) {
+inline void __cdecl operator delete[](void* MemBlk, Seed::AllignRequirements Allign) {
 	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
 	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
 }
@@ -361,7 +361,7 @@ __forceinline void __cdecl operator delete[](void* MemBlk, Seed::AllignRequireme
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
-__forceinline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size) {
+inline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size) {
 	extern void* GenericFree(void* MemBlk);
 	GenericFree(MemBlk);
 }
@@ -369,7 +369,7 @@ __forceinline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size) {
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
-__forceinline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size) {
+inline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size) {
 	extern void* GenericFree(void* MemBlk);
 	GenericFree(MemBlk);
 }
@@ -378,7 +378,7 @@ __forceinline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size) {
 ///<param name = "Allign">Границя вирівнювання</param>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
-__forceinline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size, Seed::AllignRequirements Allign) {
+inline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size, Seed::AllignRequirements Allign) {
 	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
 	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
 }
@@ -387,7 +387,7 @@ __forceinline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size, Seed:
 ///<param name = "Allign">Границя вирівнювання</param>
 ///<exception cref = "Seed::Core::Exceptions::NullPointException">Якщо передана не існуюча ділянка пам'яті</exception>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
-__forceinline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size, Seed::AllignRequirements Allign) {
+inline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size, Seed::AllignRequirements Allign) {
 	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
 	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
 }

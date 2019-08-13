@@ -1,9 +1,11 @@
 #pragma once
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Memory.h"
+#include "Seed.Core.ConstString.h"
 #include "Seed.Core.Base.Interlocked.h"
 #include "Seed.Core.Containers.Array.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
+#include "Seed.Core.Containers.IEnumerable.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -19,7 +21,7 @@ namespace Seed {
 		///<param name = "Heap">Класс кучі з якої буде алокуватись пам'ять для елементів ліста</param>
 		///<param name = "T">Тип значеннь</param>
 		template<typename Heap, typename T>
-		class BaseList : virtual public Memory::Allocator<Heap>
+		class SeedKernelCall BaseList final : public Memory::Allocator<Heap>, public Queryable::IEnumerable<BaseList<Heap, T>, T>, public IDisposable
 		{
 		private:
 			///<summary>Дані списку</summary>
@@ -99,18 +101,339 @@ namespace Seed {
 			struct list_data : virtual public Memory::Allocator<Heap>
 			{
 				///<summary>Покажчик на перший  елемент</summary>
-				elem* root = nullptr;
+				elem* root;
 				///<summary>Покажчик на останй елемент</summary>
-				elem* last = nullptr;
+				elem* last;
 				///<summary>Кількість елементів</summary>
-				RefCountT size = 0;
+				RefCountT size;
+				//Кількість силок на даний екземпляр списку
+				RefCountT RefCount;
 				///<summary>RWLock - для синхронізації читання запису
 				///<para>Він захищає структуру списка, а не значення елемента</para>
 				///</summary>
 				Threading::SRWLock lock;
+
+				///<summary>Конструктор, заповнює початкові дані</summary>
+				list_data() :
+					root(nullptr), 
+					last(nullptr), 
+					size(0), 
+					RefCount(1), 
+					lock()
+				{}
 			};
 			///<summary>Об'єкти списку</summary>
 			list_data* data;
+		private:
+			elem* RemoveByElemPtr(elem* it, SizeT MinCountRef) {
+				elem* tmp;
+				if (it->next == nullptr && it->prev == nullptr)
+				{
+					data->root = nullptr;
+					data->last = nullptr;
+					tmp = nullptr;
+				}
+				else if (it->next == nullptr)
+				{
+					tmp = nullptr;
+					it->prev->next = nullptr;  //-V522
+					data->last = it->prev;
+				}
+				else if (it->prev == nullptr)
+				{
+					tmp = it->next;
+					it->next->prev = nullptr;
+					data->root = it->next;
+				}
+				else
+				{
+					tmp = it->next;
+					tmp->prev = it->prev;
+					it->prev->next = tmp;
+				}
+				--it->RefCount;
+				if (it->RefCount == MinCountRef)
+				{
+					delete it;
+				}
+				--data->size;
+				it = tmp;
+				return it;
+			}
+		protected:
+			virtual void Dispose() override final {
+				this->data->lock.ExclusiveLock([&]()
+					{
+						elem* node;
+						while (this->data->root != nullptr)
+						{
+							node = this->data->root;
+							this->data->root = data->root->next;
+							if (--node->RefCount == 0)
+							{
+								delete node;
+								continue;
+							}
+							node->next = nullptr;
+							node->father = nullptr;
+							node->prev = nullptr;
+						}
+					});
+			}
+		protected:
+			 virtual BaseList & ForEachImpl(Queryable::LambdaHolder<void, T&>& lambda) override final {
+				this->data->lock.ShareLock([&]() mutable {
+					auto node = this->data->root;
+					while (node != nullptr) {
+						lambda(node->value);
+						node = node->next;
+					}
+					});
+				return *this;
+			}
+
+			 virtual BaseList & ForEachImpl(Queryable::LambdaHolder<void, T&, SizeT>& lambda) override final {
+				this->data->lock.ShareLock([&]() {
+					auto node = this->data->root;
+					SizeT i = 0;
+					while (node != nullptr) {
+						lambda(node->value, ForwardReference<SizeT&&>(i)); i++;
+						node = node->next;
+					}
+					});
+				return *this;
+			}
+
+			 virtual BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) override final {
+				this->data->lock.ShareLock([&]() mutable {
+					auto node = this->data->root;
+					while (node != nullptr) {
+						lambda(node->value);
+						node = node->next;
+					}
+					});
+				return *this;
+			}
+
+			 virtual BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) override final {
+				this->data->lock.ShareLock([&]() {
+					auto node = this->data->root;
+					SizeT i = 0;
+					while (node != nullptr) {
+						lambda(node->value, ForwardReference<SizeT&&>(i)); i++;
+						node = node->next;
+					}
+					});
+				return *this;
+			}
+
+			 virtual const BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) const override final {
+				this->data->lock.ShareLock([&]() mutable {
+					auto node = this->data->root;
+					while (node != nullptr) {
+						lambda(node->value);
+						node = node->next;
+					}
+					});
+				return *this;
+			}
+
+			 virtual const BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) const override final {
+				this->data->lock.ShareLock([&]() {
+					auto node = this->data->root;
+					SizeT i = 0;
+					while (node != nullptr) {
+						lambda(node->value, ForwardReference<SizeT&&>(i)); i++;
+						node = node->next;
+					}
+					});
+				return *this;
+			}
+
+			virtual BaseList& FillImpl(Queryable::LambdaHolder<T>& lambda, SizeT ItemsCount) override final {
+				if (ItemsCount == 0)
+					return *this;
+				if (this->data->size == 0) {
+					this->data->last = this->data->root = new elem(lambda(), this->data);
+					if (ItemsCount != 1) {
+						for (SizeT i = 1; i < ItemsCount; i++) {
+							this->data->last = this->data->last->next = new elem(lambda(), this->data, this->data->last);
+						}
+					}
+					this->data->size = ItemsCount;
+					return *this;
+				}
+				return *this;
+			}
+
+			virtual BaseList& FillImpl(Queryable::LambdaHolder<T, SizeT>& lambda, SizeT ItemsCount) override final {
+				if (ItemsCount == 0)
+					return *this;
+				if (this->data->size == 0) {
+					this->data->last = this->data->root = new elem(lambda(0), this->data);
+					if (ItemsCount != 1) {
+						for (SizeT i = 1; i < ItemsCount; i++) {
+							this->data->last = this->data->last->next = new elem(lambda(ForwardReference<SizeT&&>(i)), this->data, this->data->last);
+						}
+					}
+					this->data->size = ItemsCount;
+					return *this;
+				}
+				return *this;
+			}
+
+			 virtual void TransferTo(T&& Value, [[maybe_unused]] SizeT Index) override final{
+				if (this->data->root == nullptr) {
+					this->data->root = this->data->last = new elem(MoveRValue(Value), this->data);
+				}
+				else {
+					this->data->last = this->data->last->next = new elem(MoveRValue(Value), this->data, this->data->last);
+				}
+			}
+
+			 virtual void ExecuteInScope(Queryable::LambdaHolder<void>& lambda) override final {
+				this->data->lock.ExclusiveLock([&]() mutable {
+					lambda();
+					});
+			}
+
+			inline virtual void PrepareCopyToOrMove(SizeT NewCount) override final {
+				this->data->size = NewCount;
+			}
+
+			 virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&>& lambda) override final {
+				this->data->lock.ExclusiveLock([&]() {
+					elem* item = this->data->root;
+					elem* tmp = item;
+					while (item != nullptr) {
+						tmp = item;
+						item = item->next;
+						lambda(MoveRValue(tmp->value));
+						if (--tmp->RefCount == 0) {
+							delete tmp;
+						}
+						else {
+							tmp->next = tmp->prev = nullptr;
+							tmp->father = nullptr;
+						}
+					}
+					this->data->root = this->data->last = nullptr;
+					this->data->size = 0;
+				});
+			}
+
+			 virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&, SizeT>& lambda) override final {
+				this->data->lock.ExclusiveLock([&]() {
+					elem* item = this->data->root;
+					elem* tmp = item;
+					SizeT Index = 0;
+					while (item != nullptr) {
+						tmp = item;
+						item = item->next;
+						lambda(MoveRValue(tmp->value), ForwardReference<SizeT&&>(Index));
+						if (--tmp->RefCount == 0) {
+							delete tmp;
+						}
+						else {
+							tmp->next = tmp->prev = nullptr;
+							tmp->father = nullptr;
+						}
+						Index++;
+					}
+					this->data->root = this->data->last = nullptr;
+					this->data->size = 0;
+				});
+			}
+
+			 virtual BaseList& SortImpl(Queryable::LambdaHolder<bool, const T&, const T&>& lambda, bool IsAscendingOrder) override final  {
+				this->data->lock.ExclusiveLock([&]()
+					{
+						if (IsAscendingOrder)
+							MergeSort(&data->root, [&](const T& V1, const T& V2)
+								{
+									return lambda(V1, V2) == true;
+								});
+						else
+							MergeSort(&data->root, [&](const T& V1, const T& V2)
+								{
+									return lambda(V1, V2) == false;
+								});
+						data->last = data->root;
+						while (data->last->next != nullptr) data->last = data->last->next;
+					});
+				return *this;
+			}
+
+			 virtual BaseList& RemoveIfImpl(Queryable::LambdaHolder<bool, const T&>& lambda) override final {
+				this->data->lock.ExclusiveLock([&]() {
+					elem* item = this->data->root;
+					while (item != nullptr) {
+						if (!lambda(item->value)) {
+							item = RemoveByElemPtr(item, 1);
+							--this->data->size;
+						}
+						else {
+							item = item->next;
+						}
+					}
+					this->data->root = this->data->last = nullptr;
+					this->data->size = 0;
+				});
+				return *this;
+			}
+
+			 virtual BaseList& RemoveIfImpl(Queryable::LambdaHolder<bool, const T&, SizeT>& lambda) override final {
+				this->data->lock.ExclusiveLock([&]() {
+					elem* item = this->data->root;
+					SizeT Index = 0;
+					while (item != nullptr) {
+						if (!lambda(item->value, ForwardReference<SizeT&&>(Index))) {
+							item = RemoveByElemPtr(item, 1);
+							--this->data->size;
+						}
+						else {
+							item = item->next;
+						}
+						Index++;
+					}
+					this->data->root = this->data->last = nullptr;
+					this->data->size = 0;
+				});
+				return *this;
+			}
+		public:
+			virtual BaseList& RemoveAll() {
+				this->data->lock.ExclusiveLock([&]() {
+					elem* item = this->data->root;
+					elem* tmp;
+					while (item != nullptr) {
+						if (--item->RefCount == 0) {
+							tmp = item;
+							item = item->next;
+							delete tmp;
+						}
+						else {
+							tmp = item;
+							item = item->next;
+							tmp->next = tmp->prev = nullptr;
+							tmp->father = nullptr;
+						}
+					}
+				});
+				return *this;
+			}
+			virtual BaseList& Reverse() {
+				this->data->lock.ExclusiveLock([&]() {
+					if (this->data->size == 0 || this->data->size == 1)
+						return;
+					elem* first = this->data->root;
+					elem* last = this->data->last;
+					while (first != last || first->next != last) {
+						Swap(first->value, last->value);
+					}
+				});
+				return *this;
+			}
 		public:
 			///<summary>Ітератор
 			///<para> Особливістю ітератора в списку є те що елементи існуватимуть
@@ -118,7 +441,7 @@ namespace Seed {
 			///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
 			///</para>
 			///</summary>
-			class Iterator : virtual public Memory::Allocator<Heap>
+			class Iterator
 			{
 				friend BaseList;
 			private:
@@ -445,7 +768,7 @@ namespace Seed {
 									delete this->This;
 									this->This = newThis;
 									if(this->This != nullptr)
-										this->This->RefCount++;
+										++this->This->RefCount;
 								}
 								else
 								{
@@ -517,7 +840,7 @@ namespace Seed {
 					if (This->father == nullptr)
 						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 					//Виконується в екслюзивному блокуванні
-					return This->father->lock.ExclusiveLock([&]() mutable
+					return This->father->lock.ExclusiveLock([&, Value = MoveRValue(Value)] () mutable
 						{
 							//Створення нового елемента
 							auto newAfter = new elem(MoveRValue(Value), This->father, This, this->This->next);
@@ -620,26 +943,24 @@ namespace Seed {
 			friend Iterator;
 #pragma region Ctors
 			///<summary>Пустий конструктор</summary>
-			__forceinline BaseList() noexcept :data(nullptr)
+			__forceinline BaseList() :data(new list_data)
 			{};
-			///<summary>Конструктор з значенням першого елемента</summary>
-			///<param name = "Value">Значення першого елемента</summary>
-			__forceinline BaseList(const T & Value)
-			{
-				data = new list_data;
-				data->root = new elem(Value, data);
-				data->last = data->root;
-				data->size = 1;
-			}
-			///<summary>Конструктор з значенням першого елемента</summary>
-			///<param name = "Value">rvalue силка на перший елемент</summary>
-			__forceinline BaseList(T && Value)
-			{
-				data = new list_data;
-				data->root = new elem(MoveRValue(Value), data);
-				data->last = data->root;
-				data->size = 1;
-			}
+			/////<summary>Конструктор з значенням першого елемента</summary>
+			/////<param name = "Value">Значення першого елемента</summary>
+			//__forceinline BaseList(const T & Value)
+			//{
+			//	data = new list_data;
+			//	data->last = data->root = new elem(Value, data);
+			//	data->size = 1;
+			//}
+			/////<summary>Конструктор з значенням першого елемента</summary>
+			/////<param name = "Value">rvalue силка на перший елемент</summary>
+			//__forceinline BaseList(T && Value)
+			//{
+			//	data = new list_data;
+			//	data->last = data->root = new elem(MoveRValue(Value), data);
+			//	data->size = 1;
+			//}
 			///<summary>Конструктор з масиву та його розміру</summary>
 			///<param name = "Array">С-подібний масив</summary>
 			///<param name = "Count">Кількість елементів в ньому</summary>
@@ -708,59 +1029,62 @@ namespace Seed {
 				}
 			}
 
-			///<summary>Копіювальний конструктор</sumary>
-			///<param name = "orig">Оригінал списку</param>
-			BaseList(const BaseList & orig);
-			///<summary>Конструктор переміщення</sumary>
-			///<param name = "orig">Оригінал списку</param>
-			BaseList(BaseList && orig) noexcept;
+			/////<summary>Копіювальний конструктор</sumary>
+			/////<param name = "orig">Оригінал списку</param>
+			//BaseList(const BaseList & orig);
+			/////<summary>Конструктор переміщення</sumary>
+			/////<param name = "orig">Оригінал списку</param>
+			//BaseList(BaseList && orig) noexcept;
+
+			RefCountClass(BaseList, data);
+
 #pragma endregion
 #pragma region Operators
-			///<summary>Оператор присвоєння, виконує копіювання елементів списку</sumary>
-			///<param name = "orig">Оригінал списку</param>
-			BaseList& operator=(const BaseList & Orig)
-			{
-				if (this->data == Orig.data) return *this;
-				this->~BaseList();
-				if (Orig.data == nullptr)
-				{
-					this->data = nullptr;
-					return *this;
-				}
-				//Виконується в спільній блокировці оригиналу
-				return Orig.data->lock.ShareLock([&]()
-					{
-						this->data = new list_data;
-						this->data->size = Orig.data->size;
-						elem* root_orig = Orig.data->root;
-						this->data->root = new elem(root_orig->value, data);
-						this->data->last = this->data->root;
-						root_orig = root_orig->next;
-						if (root_orig == nullptr)
-						{
-							this->data->root->next = nullptr;
-							return *this;
-						}
-						while (root_orig != nullptr)
-						{
-							this->data->last->next = new elem(root_orig->value, data, this->data->last);
-							this->data->last = this->data->last->next;
-							root_orig = root_orig->next;
-						}
-						this->data->last->next = nullptr;
-						return *this;
-					});
-			}
-			///<summary>Оператор переміщення, виконує переміщення об'єкта списку</sumary>
-			///<param name = "orig">Оригінал списку</param>
-			__forceinline BaseList& operator=(BaseList && Orig) noexcept
-			{
-				if (this->data == Orig.data) return *this;
-				this->~BaseList();
-				this->data = Orig.data;
-				Orig.data = nullptr;
-				return *this;
-			}
+			/////<summary>Оператор присвоєння, виконує копіювання елементів списку</sumary>
+			/////<param name = "orig">Оригінал списку</param>
+			//BaseList& operator=(const BaseList & Orig)
+			//{
+			//	if (this->data == Orig.data) return *this;
+			//	this->~BaseList();
+			//	if (Orig.data == nullptr)
+			//	{
+			//		this->data = nullptr;
+			//		return *this;
+			//	}
+			//	//Виконується в спільній блокировці оригиналу
+			//	return Orig.data->lock.ShareLock([&]()
+			//		{
+			//			this->data = new list_data;
+			//			this->data->size = Orig.data->size;
+			//			elem* root_orig = Orig.data->root;
+			//			this->data->root = new elem(root_orig->value, data);
+			//			this->data->last = this->data->root;
+			//			root_orig = root_orig->next;
+			//			if (root_orig == nullptr)
+			//			{
+			//				this->data->root->next = nullptr;
+			//				return *this;
+			//			}
+			//			while (root_orig != nullptr)
+			//			{
+			//				this->data->last->next = new elem(root_orig->value, data, this->data->last);
+			//				this->data->last = this->data->last->next;
+			//				root_orig = root_orig->next;
+			//			}
+			//			this->data->last->next = nullptr;
+			//			return *this;
+			//		});
+			//}
+			/////<summary>Оператор переміщення, виконує переміщення об'єкта списку</sumary>
+			/////<param name = "orig">Оригінал списку</param>
+			//__forceinline BaseList& operator=(BaseList && Orig) noexcept
+			//{
+			//	if (this->data == Orig.data) return *this;
+			//	this->~BaseList();
+			//	this->data = Orig.data;
+			//	Orig.data = nullptr;
+			//	return *this;
+			//}
 
 			///<summary>Оператор додавання значення в кінець списку</summary>
 			///<param name = "Value">Значення нового елемента</param>
@@ -796,13 +1120,13 @@ namespace Seed {
 #pragma endregion
 #pragma region Item count methods
 			///<summary>Вертає true якщо список пустий</summary>
-			__forceinline Boolean IsEmpty() const noexcept
+			__forceinline Boolean IsEmpty() const
 			{
 				return (this->data == nullptr || this->data->size == 0);
 			}
 
 			///<summary>Вертає кількість елементів в списку</summary>
-			__forceinline SizeT GetCount() const noexcept
+			virtual inline SizeT GetCount() const
 			{
 				return IsEmpty() ? 0ull : (SizeT)data->size; //-V2517
 			}
@@ -1305,7 +1629,7 @@ namespace Seed {
 				/* answer = merge the two sorted lists together */
 				*headRef = SortedMerge(a, b, cmp);
 			}
-		public:
+
 			///<summary>Функція сортування списку</summary>
 			///<param name = "Comparator">Фукція\лямбда яка приймає дві константні силки
 			///на значення і вертає true якщо перше значення більше другого</param>
@@ -1322,14 +1646,15 @@ namespace Seed {
 					});
 				return *this;
 			}
+		public:
 			///<summary>Функція сортування списку</summary>
 			///<param name = "Ascend">Якщо true то сортування відбувається по зростанню</param>
 			///<returns>Силку на список</returns>
-			BaseList& Sort(bool Ascend = true)
+			virtual BaseList& Sort(bool IsAscendingOrder = true) override final
 			{
 				this->data->lock.ExclusiveLock([&]()
 					{
-						if (Ascend)
+						if (IsAscendingOrder)
 							MergeSort(&data->root, [](const T & V1, const T & V2)
 								{
 									return V1 >= V2;
@@ -1344,7 +1669,6 @@ namespace Seed {
 					});
 				return *this;
 			}
-
 #pragma endregion
 #pragma region Search
 
@@ -1421,78 +1745,78 @@ namespace Seed {
 #pragma endregion
 #pragma region Dtor
 
-			///<summary>Деструктор звільняє пам'ять виділену під елементи
-			///<para>Але якщо елемент використовується через ітератор
-			///то його знищення оминається але елемент втрачає покажчик на сусідні елементи
-			///</para></summary>
-			~BaseList()
-			{
-				if (this->data == nullptr) return;
-				this->data->lock.ExclusiveLock([&]()
-					{
-						elem* node;
-						while (this->data->root != nullptr)
-						{
-							node = this->data->root;
-							this->data->root = data->root->next;
-							if (--node->RefCount == 0)
-							{
-								delete node;
-								continue;
-							}
-							node->next = nullptr;
-							node->father = nullptr;
-							node->prev = nullptr;
-						}
-						this->data->last = nullptr;
-						this->data->size = 0;
-						delete data;
-						this->data = nullptr;
-					});
-			}
+			/////<summary>Деструктор звільняє пам'ять виділену під елементи
+			/////<para>Але якщо елемент використовується через ітератор
+			/////то його знищення оминається але елемент втрачає покажчик на сусідні елементи
+			/////</para></summary>
+			//~BaseList()
+			//{
+			//	if (this->data == nullptr) return;
+			//	this->data->lock.ExclusiveLock([&]()
+			//		{
+			//			elem* node;
+			//			while (this->data->root != nullptr)
+			//			{
+			//				node = this->data->root;
+			//				this->data->root = data->root->next;
+			//				if (--node->RefCount == 0)
+			//				{
+			//					delete node;
+			//					continue;
+			//				}
+			//				node->next = nullptr;
+			//				node->father = nullptr;
+			//				node->prev = nullptr;
+			//			}
+			//			this->data->last = nullptr;
+			//			this->data->size = 0;
+			//			delete data;
+			//			this->data = nullptr;
+			//		});
+			//}
 #pragma endregion
 		};
 #pragma region Copy & move ctors implementation
-		///<summary>Копіювальний конструктор</sumary>
-		///<param name = "orig">Оригінал списку<</param>
-		template<typename Allocator, typename T>
-		inline BaseList<Allocator, T>::BaseList(const BaseList & Orig)
-		{
-			if (this == &Orig)return;
-			if (Orig.data == nullptr)
-			{
-				this->data = nullptr;
-				return;
-			}
-			Orig.data->lock.ShareLock([&]()
-				{
-					this->data = new list_data;
-					this->data->size = Orig.data->size;
-					elem* root_orig = Orig.data->root;
-					this->data->root = new elem(root_orig->value, this->data);
-					this->data->last = this->data->root;
-					root_orig = root_orig->next;
-					if (root_orig == nullptr)
-					{
-						this->data->root->next = nullptr;
-						return;
-					}
-					while (root_orig != nullptr)
-					{
-						this->data->last->next = new elem(root_orig->value, this->data, this->data->last);
-						this->data->last = this->data->last->next;
-						root_orig = root_orig->next;
-					}
-					this->data->last->next = nullptr;
-				});
-		}
-		///<summary>Конструктор переміщення</sumary>
-		///<param name = "orig">Оригінал списку<</param>
-		template<typename Allocator, typename T>
-		__forceinline BaseList<Allocator, T>::BaseList(BaseList && Orig) noexcept
-		{
-			this->data = Orig.data; Orig.data = nullptr;
-		}
+		/////<summary>Копіювальний конструктор</sumary>
+		/////<param name = "orig">Оригінал списку<</param>
+		//template<typename Allocator, typename T>
+		//inline BaseList<Allocator, T>::BaseList(const BaseList & Orig)
+		//{
+		//	if (this == &Orig)return;
+		//	if (Orig.data == nullptr)
+		//	{
+		//		this->data = nullptr;
+		//		return;
+		//	}
+		//	Orig.data->lock.ShareLock([&]()
+		//		{
+		//			this->data = new list_data;
+		//			this->data->size = Orig.data->size;
+		//			elem* root_orig = Orig.data->root;
+		//			this->data->root = new elem(root_orig->value, this->data);
+		//			this->data->last = this->data->root;
+		//			root_orig = root_orig->next;
+		//			if (root_orig == nullptr)
+		//			{
+		//				this->data->root->next = nullptr;
+		//				return;
+		//			}
+		//			while (root_orig != nullptr)
+		//			{
+		//				this->data->last->next = new elem(root_orig->value, this->data, this->data->last);
+		//				this->data->last = this->data->last->next;
+		//				root_orig = root_orig->next;
+		//			}
+		//			this->data->last->next = nullptr;
+		//		});
+		//}
+		/////<summary>Конструктор переміщення</sumary>
+		/////<param name = "orig">Оригінал списку<</param>
+		//template<typename Allocator, typename T>
+		//__forceinline BaseList<Allocator, T>::BaseList(BaseList && Orig) noexcept
+		//{
+		//	this->data = Orig.data; Orig.data = nullptr;
+		//}
 #pragma endregion
 #pragma region Partical implementation for default and sensitive heaps
 
@@ -1524,5 +1848,12 @@ namespace Seed {
 #pragma endregion
 
 #pragma warning(pop)
+		namespace StaticAsserts {
+			template<typename Heap, typename U>
+			struct TIsResizable<BaseList<Heap, U>> : StaticAsserts::LogicTrue {};
+
+			template<typename Heap, typename U>
+			struct TIsDynamicSize<BaseList<Heap, U>> : StaticAsserts::LogicTrue {};
+		}
 	}
 }

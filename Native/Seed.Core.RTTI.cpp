@@ -1,5 +1,5 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Base.h"
 
@@ -16,9 +16,12 @@
 
 typedef TypeDescriptor _RTTITypeDescriptor;
 
-static bool TypeidsEqual(const _RTTITypeDescriptor* const lhs, const _RTTITypeDescriptor* const rhs) noexcept
+static bool TypeidsEqual(const _RTTITypeDescriptor* const lhs, const _RTTITypeDescriptor* const rhs) noexcept try 
 {
-	return lhs == rhs || !Seed::CStr::Compare(lhs->name, rhs->name);
+	return lhs == rhs || !Seed::CStr::Compare(lhs->name, rhs->name); //-V509
+}
+catch (...) {
+	return false;
 }
 
 #if _RTTI_RELATIVE_TYPEINFO

@@ -16,7 +16,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 		template<class Base>
-		class SeedKernelCall BaseString : public Memory::Allocator<Base>, public IComparable<BaseString<Base>> {
+		class SeedKernelCall BaseString final : public Memory::Allocator<Base>, public IComparable<BaseString<Base>> {
 		private:
 			///<summary>Покажчик на рядковий масив</summary>
 			CharStr str;
@@ -933,8 +933,9 @@ namespace Seed {
 			template<SizeT ExpectedStringSize>
 			__forceinline bool IsStartWith(const wchar_t(&ExpectedString)[ExpectedStringSize]) const {
 				if (this->CurrentSize < ExpectedStringSize) return false;
-				for (SizeT i = 0; i < ExpectedStringSize; i++)
+				for (SizeT i = 0; i < ExpectedStringSize - 1; i++) {
 					if (this->str[i] != ExpectedString[i]) return false;
+				}
 				return true;
 			}
 
@@ -1842,7 +1843,7 @@ namespace Seed {
 			///<summary>Перетворення часу і дати в строкове представлення</summary>
 			static BaseString<Base> toString(Seed::Core::DateTime time) {
 				Char buffer[22];
-				extern void ConvertDateTimeToStringImpl(Seed::Core::DateTime time, Seed::CharStr buffer);
+				extern void ConvertDateTimeToStringImpl(const Seed::Core::DateTime & time, Seed::CharStr buffer);
 				ConvertDateTimeToStringImpl(time, buffer);
 				return buffer;
 			}
@@ -2413,7 +2414,7 @@ namespace Seed {
 		///<params name "b">Лівий рядок</params>
 		template<typename T, template<typename> typename U>
 		__forceinline void Swap(U<T> & a, U<T> & b) noexcept {
-			static_assert(StaticAsserrts::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
+			static_assert(StaticAsserts::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
 			Seed::Swap(a.str, b.str);
 			Seed::Swap(a.CurrentSize, b.CurrentSize);
 			Seed::Swap(a.ReservedSize, b.ReservedSize);

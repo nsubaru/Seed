@@ -7,6 +7,7 @@ namespace Seed {
 		inline namespace Exceptions {
 			class IntegerOverflowException;
 			class DivideByZero;
+			class InternalError;
 		}
 
 		namespace Math {
@@ -14,7 +15,7 @@ namespace Seed {
 			///<summary>Класс чисел з безпечними операціями</summary>
 			///<param name = "T">Тип який буде базою, може бути лиш unsigned int будь-яклї розрядності</param>
 			template<typename T>
-			class SafeInt {
+			class SeedKernelCall SafeInt final {
 			private:
 				///Тип числа
 				using Int = StaticAsserts::Unsigned<T>;
@@ -63,21 +64,21 @@ namespace Seed {
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
-					}
+					} else
 					if constexpr (StaticAsserts::IsSameV<Int, UInt16>) {
 						UInt32 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
-					}
+					} else
 					if constexpr (StaticAsserts::IsSameV<Int, UInt32>) {
 						UInt64 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
-					}
+					} else
 					if constexpr (StaticAsserts::IsSameV<Int, UInt64>) {
 						UInt64 res[2];
 						_umul128(this->value, second.value, res);
@@ -87,6 +88,8 @@ namespace Seed {
 						else
 							return res;
 					}
+					//Unreacheable code
+					throw InternalError(_FILE_, __FUNCSIG__, __LINE__);
 				}
 #pragma warning(pop)
 
@@ -138,30 +141,31 @@ namespace Seed {
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
-					}
+					} else
 					if constexpr (StaticAsserts::IsSameV<Int, UInt16>) {
 						UInt32 res = this->value * second.value;
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
-					}
+					} else
 					if constexpr (StaticAsserts::IsSameV<Int, UInt32>) {
 						UInt64 res = static_cast<UInt64>(this->value) * static_cast<UInt64>(second.value);
 						if (res > Math::Max<Int>())
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
-					}
+					} else
 					if constexpr (StaticAsserts::IsSameV<Int, UInt64>) {
-						UInt64 res[2];
-						_umul128(this->value, second.value, res);
-						UInt32 res = this->value * second.value;
-						if (res[0] > 0)
+						UInt64 res;
+						res = this->value * second.value;
+						if (__umulh(this->value, second.value) > 0)
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
-							return this->value = res[1];
+							return this->value = res;
 					}
+					//Unreacheable code
+					throw InternalError(__FILE__, __FUNCSIG__, __LINE__);
 				}
 #pragma warning(pop)
 

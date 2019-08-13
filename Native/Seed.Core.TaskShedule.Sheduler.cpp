@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.TaskShedule.Sheduler.h"
 
 #include "Seed.Core.Threading.h"
@@ -33,7 +36,7 @@ VOID NTAPI TaskShedulerTaskCallback(
 			This->IsExcecute = true;
 			This->What->Execute(Seed::Core::DateTime::GetCurrentSystemTimeData());
 			This->IsExcecute = false;
-			This->ExucutedCount++;
+			++This->ExucutedCount;
 			if (--This->PeriodsCount == 0) {
 				TpReleaseTimer(Timer);
 				This->hTask = 0;
@@ -47,7 +50,7 @@ VOID NTAPI TaskShedulerTaskCallback(
 		catch ([[maybe_unused]] InteruptException& ex) {
 			toCoreLog(L"Задача в планувальнику задач в потоці з ID " + String::toString(This->TID) + "перервано");
 			This->IsExcecute = false;
-			This->ExucutedCount++;
+			++This->ExucutedCount;
 			if (--This->PeriodsCount == 0) {
 				TpReleaseTimer(Timer);
 				This->hTask = 0;
@@ -63,7 +66,7 @@ VOID NTAPI TaskShedulerTaskCallback(
 					ex.toString()
 				});
 			This->IsExcecute = false;
-			This->ExucutedCount++;
+			++This->ExucutedCount;
 			if (--This->PeriodsCount == 0) {
 				TpReleaseTimer(Timer);
 				This->hTask = 0;
@@ -78,7 +81,7 @@ VOID NTAPI TaskShedulerTaskCallback(
 	catch (Exception& ex) {
 		toCoreLog(L"Внутрішня помилка при потоку", ex);
 		This->IsExcecute = false;
-		This->ExucutedCount++;
+		++This->ExucutedCount;
 		if (--This->PeriodsCount == 0) {
 			TpReleaseTimer(Timer);
 			This->hTask = 0;
@@ -99,13 +102,11 @@ VOID NTAPI TaskShedulerCleanupCallback(
 		return;
 	Seed::TaskSheduler::Job::__task* This = (Seed::TaskSheduler::Job::__task*)ObjectContext;
 	if (CleanupContext == NULL) {
-		if (This != nullptr) {
-			if (--This->RefCount == 0) {
-				TpReleaseTimer(reinterpret_cast<PTP_TIMER>(This->hTask));
-				This->hTask = nullptr;
-				delete This->What;
-				delete This;
-			}
+		if (--This->RefCount == 0) {
+			TpReleaseTimer(reinterpret_cast<PTP_TIMER>(This->hTask));
+			This->hTask = nullptr;
+			delete This->What;
+			delete This;
 		}
 	}
 	else {
@@ -202,9 +203,9 @@ void Seed::Core::TaskSheduler::Job::Dispose()
 {
 }
 
-void Seed::Core::TaskSheduler::Job::SetPeriodLenght(DateTime PeriodLenght)
+void Seed::Core::TaskSheduler::Job::SetPeriodLenght(const DateTime & NewPeriodLenght)
 {
-	This->PeriodLenght = static_cast<Int32>(PeriodLenght.TimeFromStartEpoch);
+	This->PeriodLenght = static_cast<Int32>(NewPeriodLenght.TimeFromStartEpoch);
 
 	LARGE_INTEGER DueTime;
 
@@ -218,7 +219,7 @@ void Seed::Core::TaskSheduler::Job::SetPeriodLenght(DateTime PeriodLenght)
 	);
 }
 
-void Seed::Core::TaskSheduler::Job::SetTimerProximity(DateTime NewTimerProximity)
+void Seed::Core::TaskSheduler::Job::SetTimerProximity(const DateTime & NewTimerProximity)
 {
 	This->TimerProximity = static_cast<Int32>(NewTimerProximity.TimeFromStartEpoch);
 
@@ -299,7 +300,9 @@ Seed::Core::TaskSheduler::Job Seed::Core::TaskSheduler::Task::Shedule()
 		static_cast<Int32>(Data->TimerProximity)
 	);
 
-	return Job(Data);
+	auto jobData = Data; Data = nullptr;
+
+	return Job(jobData);
 }
 
 #pragma warning(pop)

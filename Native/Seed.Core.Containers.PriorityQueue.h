@@ -9,7 +9,7 @@ namespace Seed {
 		///<summary>Пріоритетна черга для обробки даних в порядку приходу з урахуванням пріоритету
 		///<para>Працює через фібоначеву кучу. Ітерація відсутня</para></summary>
 		template <class THeap, typename TPriority, typename TValue>
-		class BasePriorityQueue : public Memory::Allocator<THeap>, IDisposable {
+		class SeedKernelCall BasePriorityQueue final : public Memory::Allocator<THeap>, IDisposable {
 		private:
 			///<summary>Внутрішня структура елемента в черзі</summary>
 			struct Node : public Memory::Allocator<THeap> {
@@ -67,7 +67,7 @@ namespace Seed {
 				{}
 #pragma warning(push)
 				//Visual Studio bug, next and prev init as this
-#pragma warning(disable: 25495)
+#pragma warning(disable: 26495)
 				///<summary>Конструктор</summary>
 				__forceinline Node(TPriority&& Key, TValue&& Value) :
 					priority(MoveRValue(Key)),
@@ -98,7 +98,7 @@ namespace Seed {
 				__forceinline bool hasParent() { return parent; }
 			};
 		private:
-			struct Tree {
+			struct Tree : public Memory::Allocator<THeap> {
 				volatile Node* heap;
 				RefCountT Count;
 				RefCountT RefCount;
@@ -127,7 +127,7 @@ namespace Seed {
 				}
 			}
 		public:
-			BasePriorityQueue() : tree(new Tree(CurrentSettings().MemoryManager.QueueMaxSize)) {
+			BasePriorityQueue() : tree(new Tree(CurrentSettings().MemoryManager.QueueMaxSize)) { //-V730
 				extern void InitSRWLock(void* PSRWLock);
 				extern void InitCondVal(void* handle);
 
@@ -136,7 +136,7 @@ namespace Seed {
 				InitCondVal(&tree->QueueNotEmpty);
 			}
 
-			BasePriorityQueue(SizeT MaxSize) : tree(new Tree(MaxSize)) {
+			BasePriorityQueue(SizeT MaxSize) : tree(new Tree(MaxSize)) { //-V730
 				extern void InitSRWLock(void* PSRWLock);
 				extern void InitCondVal(void* handle);
 
@@ -145,7 +145,7 @@ namespace Seed {
 				InitCondVal(&tree->QueueNotEmpty);
 			}
 
-			RefCountClass(BasePriorityQueue, tree);
+			RefCountClass(BasePriorityQueue, tree); //-V730
 
 			void Insert(const TPriority& priority, const TValue& key) {
 				extern void AcquireLockExclusiveSRWLock(void* PSRWLock);
@@ -159,7 +159,7 @@ namespace Seed {
 						WaitCondVal(&this->tree->QueueNotFull, &this->tree->Lock);
 					Node* ret = new Node(priority, key);
 					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
-					tree->Count++;
+					++tree->Count;
 					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
 					WakeOneCondVal(&this->tree->QueueNotEmpty);
 				}
@@ -180,7 +180,7 @@ namespace Seed {
 						WaitCondVal(&this->tree->QueueNotFull, &this->tree->Lock);
 					Node* ret = new Node(priority, MoveRValue(key));
 					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
-					tree->Count++;
+					++tree->Count;
 					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
 					WakeOneCondVal(&this->tree->QueueNotEmpty);
 				}
@@ -201,7 +201,7 @@ namespace Seed {
 						WaitCondVal(&this->tree->QueueNotFull, &this->tree->Lock);
 					Node* ret = new Node(MoveRValue(priority), key);
 					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
-					tree->Count++;
+					++tree->Count;
 					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
 					WakeOneCondVal(&this->tree->QueueNotEmpty);
 				}
@@ -223,7 +223,7 @@ namespace Seed {
 					}					
 					Node* ret = new Node(MoveRValue(priority), MoveRValue(key));
 					tree->heap = merge(const_cast<Node*>(tree->heap), ret);
-					this->tree->Count++;
+					++this->tree->Count;
 					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
 					WakeOneCondVal(&this->tree->QueueNotEmpty);
 				}
@@ -285,7 +285,7 @@ namespace Seed {
 					Node* old = const_cast<Node*>(tree->heap);
 					tree->heap = removeMinimum(const_cast<Node*>(tree->heap));
 					TValue ret(MoveRValue(old->value));
-					this->tree->Count--;
+					--this->tree->Count;
 					delete old;		
 					ReleaseLockExclusiveSRWLock(&this->tree->Lock);
 					WakeOneCondVal(&this->tree->QueueNotFull);
@@ -393,9 +393,9 @@ namespace Seed {
 				}
 				Node* min = n;
 				do {
-					if (n->priority < min->priority)min = n;
+					if (n->priority < min->priority) min = n;
 					n = n->next;
-				} while (n != n);
+				} while (min != n);
 				return min;
 			}
 

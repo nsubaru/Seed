@@ -251,7 +251,7 @@ namespace Seed {
 		//Делегат це об'єкт який інкапсулює, функцію з аргументами,
 		//тим самим дозволяючи її відкладено виконати,
 		//навіть в іншому потоці, apc якогось потоку чи пулі потоків
-		class SeedKernelCall Delegate : protected IDisposable
+		class SeedKernelCall Delegate final : protected IDisposable
 		{
 		private:
 			//Внутрішня структура в які дані делегата

@@ -11,7 +11,7 @@ namespace Seed {
 		namespace Threading {
 			//Клас роботи
 			// екземпляри роботи виконуються в пулі потоків
-			class SeedKernelCall Job : protected IDisposable {
+			class SeedKernelCall Job final : protected IDisposable {
 			public:
 				//Дані задачі
 				struct data {
@@ -81,7 +81,7 @@ namespace Seed {
 			//Диспетчер пула потоків
 			//Метод Dispatch запускає делегат в пулі потоків
 			//Деструктор останього екземпляра буде очікувати на завершення всіх задач в пулі потоків
-			class SeedKernelCall Dispatcher : protected IDisposable {
+			class SeedKernelCall Dispatcher final : protected IDisposable {
 			private:
 				//Дані диспетчера 
 				struct __dispatcher {

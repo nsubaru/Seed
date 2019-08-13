@@ -402,7 +402,7 @@ namespace Seed {
 
 			template <class _First, class... _Rest>
 			struct AndT<_First, _Rest...>
-				: AndTImpl<_First::State, _First, _Rest...>::Result { // Otherwise, if any of _Traits are false, the first false
+				: LogicConstT<typename AndTImpl<_First::State, _First, _Rest...>::Result> { // Otherwise, if any of _Traits are false, the first false
 																		// trait Otherwise, the last trait in _Traits
 			};
 
@@ -497,21 +497,21 @@ namespace Seed {
 			};
 
 			template<class... _Traits>
-			struct DisjunctionT
+			struct OrT
 				: LogicFalse
 			{	// If _Traits is empty, false_type
 			};
 
 			template<class _First,
 				class... _Rest>
-				struct DisjunctionT<_First, _Rest...>
+				struct OrT<_First, _Rest...>
 				: _Disjunction<_First::State, _First, _Rest...>::type
 			{	// Otherwise, if any of _Traits are true, the first true trait
 				// Otherwise, the last trait in _Traits
 			};
 
 			template<class... _Traits>
-			inline constexpr bool Disjunction = DisjunctionT<_Traits...>::State;
+			inline constexpr bool Or = OrT<_Traits...>::State;
 
 			// STRUCT TEMPLATE is_default_constructible
 			template<class _Ty>
@@ -569,7 +569,7 @@ namespace Seed {
 
 			template<class _Ty>
 			inline constexpr bool IsNothrowMoveAssignable = __is_nothrow_assignable(AddLvalueReferenceT<_Ty>, _Ty);
-		
+
 			// FUNCTION TEMPLATE declval
 			template<class _Ty>
 			AddRvalueReferenceT<_Ty> declval() noexcept;
@@ -600,7 +600,7 @@ namespace Seed {
 			{	// Determine if expressions with type and value category _Ty1 and _Ty2
 				// can be swapped (and vice versa)
 			};
-			
+
 			// STRUCT TEMPLATE _Is_swappable
 			template<class _Ty>
 			struct IsSwappable
@@ -616,28 +616,28 @@ namespace Seed {
 				: LogicFalse
 			{	// determine whether _Ty is void
 			};
-//#define _EMPTY_ARGUMENT	
-//#define _CLASS_DEFINE_CV(CLASS) \
-//	CLASS(_EMPTY_ARGUMENT) \
-//	CLASS(const) \
-//	CLASS(volatile) \
-//	CLASS(const volatile)
-//
-//#define _IS_VOID(CV_OPT) \
-//template<> \
-//	struct IsVoidT<CV_OPT void> \
-//		: LogicTrue \
-//	{	/* determine whether _Ty is void */ \
-//	};
-//
-//			_CLASS_DEFINE_CV(_IS_VOID)
-//#undef _IS_VOID
-//#undef _CLASS_DEFINE_CV
-//#undef _EMPTY_ARGUMENT
+			//#define _EMPTY_ARGUMENT	
+			//#define _CLASS_DEFINE_CV(CLASS) \
+			//	CLASS(_EMPTY_ARGUMENT) \
+			//	CLASS(const) \
+			//	CLASS(volatile) \
+			//	CLASS(const volatile)
+			//
+			//#define _IS_VOID(CV_OPT) \
+			//template<> \
+			//	struct IsVoidT<CV_OPT void> \
+			//		: LogicTrue \
+			//	{	/* determine whether _Ty is void */ \
+			//	};
+			//
+			//			_CLASS_DEFINE_CV(_IS_VOID)
+			//#undef _IS_VOID
+			//#undef _CLASS_DEFINE_CV
+			//#undef _EMPTY_ARGUMENT
 			template<>
-			struct IsVoidT<void> 
-			: LogicTrue 
-			{	/* determine whether _Ty is void */ 
+			struct IsVoidT<void>
+				: LogicTrue
+			{	/* determine whether _Ty is void */
 			};
 
 			template<>
@@ -756,6 +756,203 @@ namespace Seed {
 
 			template <class _Ty>
 			struct IsReferenceT : LogicConst<IsReferenceV<_Ty>> {};
+
+			//Пакет типів. Спеціальна кострукція для перелічування пакету параметрів
+			template<typename ... T>
+			struct PackItems {};
+
+			template<SizeT I, typename T>
+			struct PackItem {
+				static inline constexpr SizeT Index = I;
+				using Type = T;
+			};
+
+			template<SizeT I>
+			struct PackItem<I, PackItems<>> {
+				static_assert(I != I, "Invalid index"); //-V501
+			};
+
+			template<typename T, typename ...Types>
+			struct PackItem<0, PackItems<T, Types...>> {
+				typedef T Type;
+			};
+
+			template<SizeT I, typename T, typename ... Types>
+			struct PackItem<I, PackItems<T, Types...>> {
+				typedef typename PackItem<I - 1, Types...>::Type Type;
+			};
+
+			//Indexator
+
+			template<SizeT ...>
+			struct Indexator {};
+
+			template<SizeT Start, typename IndexatorT, SizeT End>
+			struct IndexerImpl;
+
+			template<SizeT End, SizeT ... I>
+			struct IndexerImpl<End, Indexator<I...>, End> {
+				typedef typename Indexator<I...> Type;
+			};
+
+			template<SizeT Start, SizeT ... I, SizeT End>
+			struct IndexerImpl<Start, Indexator<I...>, End> {
+				typedef typename IndexerImpl<Start + 1, Indexator<Start, I...>, End>::Type Type;
+			};
+
+			template<SizeT End, SizeT Start = 0>
+			struct Indexer {
+				typedef typename IndexerImpl<Start, Indexator<>, End>::Type Type;
+			};
+
+			template<typename Indexator, typename ... Types>
+			struct PackIndexator;
+
+			template<SizeT ...I, typename ...Types>
+			struct PackIndexator<Indexator<I...>, Types...> : PackItem<I, Types>... {};
+
+			template<SizeT Count, typename ... Types>
+			struct PackImpl {
+				typedef PackIndexator<typename Indexer<Count>::Type, Types...> Items;
+			};
+
+			template<typename ... Types>
+			struct Pack
+			{
+				typedef typename PackImpl<sizeof...(Types), Types...>::Items Items;
+				static inline constexpr SizeT Count = sizeof...(Types);
+
+				template<typename ...Args>
+				struct IsConvertibleFromTypePackT : 
+					ConditionT<
+						sizeof...(Types) == sizeof...(Args),
+						LogicConst<AndT<IsConvertibleT<Types, Args>...>::State>,
+						LogicFalse
+					>::Result
+				{};
+
+				template<typename ...Args>
+				static inline constexpr Boolean IsConvertibleFromTypePackV = IsConvertibleFromTypePackT<Args...>::State;
+				
+			};
+
+			
+
+
+			
+		}
+
+		namespace Details {
+
+
+			template<class Ret, class Cls, class IsMutable, class... LambdaArgs>
+			struct Lambda
+			{
+				using isMutable = IsMutable;
+
+				enum { Arity = sizeof...(LambdaArgs) };
+
+				using ReturnType = StaticAsserts::ConditionV<StaticAsserts::IsVoidV<Ret>, StaticAsserts::VoidT<void>, Ret>;
+
+				using Args = typename StaticAsserts::Pack<LambdaArgs...>;
+
+				template<typename ExpectedRet>
+				using IsRetTypeConvertibleTo = typename
+					StaticAsserts::ConditionT<
+						StaticAsserts::IsVoidV<ReturnType>, 
+						StaticAsserts::IsVoidT<ExpectedRet>, 
+						StaticAsserts::IsConvertibleT<ReturnType, ExpectedRet>
+					>::Result;
+
+				//template<typename ... Params>
+				//using CanCallWith = typename StaticAsserts::Pack<LambdaArgs...>::IsConvertibleFromTypePackT<Params...>;
+				/*template<typename Expected, typename ... Params>
+				using IsConvertible = StaticAsserts::AndT<IsRetTypeConvertibleTo<Expected>, CanCallWith<Params...>>;*/
+			};
+		}
+
+		namespace StaticAsserts {
+
+			template<class Ld>
+			struct LambdaType
+				: LambdaType<decltype(&Ld::operator())>
+			{};
+
+			template<class Ret, class Cls, class... Args>
+			struct LambdaType<Ret(Cls::*)(Args...)>
+				: Details::Lambda<Ret, Cls, LogicTrue, Args...>
+			{};
+
+			template<class Ret, class Cls, class... Args>
+			struct LambdaType<Ret(Cls::*)(Args...) const>
+				: Details::Lambda<Ret, Cls, LogicFalse, Args...>
+			{};
+
+			constexpr inline auto var = [](int, int)->int {};
+
+			template<class Ld, typename Ret, typename ... Params>
+			struct IsLambdaConvertible
+				:LogicConst<
+					AndT<
+						IsSameT<typename LambdaType<Ld>::ReturnType, Ret>, 
+						IsSameT<typename LambdaType<Ld>::Args, Pack<Params...>>
+					>::State
+				> {};
+					//,
+
+			//private:
+			//	using Lambda = typename LambdaType<Ld>;
+			//	using LambdaArgs = typename Lambda::Args;
+			//	template<typename ... Args>
+			//	using IsArgsConvertibleFrom = typename LambdaArgs::IsConvertibleFromTypePackT<Args...>;
+			//public:
+			//	__forceinline constexpr operator bool() { return IsArgsConvertibleFrom<Params...>::State; }
+			//	static constexpr bool State = IsArgsConvertibleFrom<Params...>::State;
+
+
+			/*template<class Ld, typename Ret, typename ... Params>
+			struct IsLambdaConvertible {
+			private:
+				using IsRetTypeSameT = ConditionT<
+					IsVoidV<Ret>,
+					IsVoidT<typename LambdaType<Ld>::ReturnType>,
+					typename ConditionT<IsVoidV<typename LambdaType<Ld>::ReturnType>, LogicFalse, 
+						
+					IsConvertibleT<typename LambdaType<Ld>::ReturnType, Ret>>::Result
+				>::Result;
+
+				static constexpr bool IsRetTypeSame() {
+					if constexpr (IsVoidV<Ret>) {
+						if constexpr (IsVoidV<typename LambdaType<Ld>::ReturnType>) {
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else {
+						if constexpr (IsVoidV<typename LambdaType<Ld>::ReturnType>) {
+							return false;
+						}
+						else {
+							if constexpr (IsConvertibleV<typename LambdaType<Ld>::ReturnType, Ret>) {
+								return true;
+							}
+							else {
+								return false;
+							}
+						}
+					}
+				}
+				using LambdaArgs = typename LambdaType<Ld>::Args;
+				
+				using IsParamsSame = typename LambdaArgs::IsConvertibleFromTypePackT<Params...>;
+			public:
+				__forceinline constexpr operator bool() { return And<LogicConst<IsRetTypeSame()>, IsParamsSame>; }
+				static constexpr bool State = And<LogicConst<IsRetTypeSame()>, IsParamsSame>;
+			};*/
+
+			//constexpr bool var2 = IsLambdaConvertible<decltype(var), void, int, SizeT>::State;
 		}
 	}
 }

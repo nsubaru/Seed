@@ -113,12 +113,12 @@ namespace Seed {
 		}
 		namespace Threading {
 			///<summary>Керований рантаймом потік</summary>
-			class SeedKernelCall Thread : protected IDisposable
+			class SeedKernelCall Thread final : protected IDisposable
 			{
 			public:
 				///<summary>Подія NT
 				///<para>Об'єкт синхронізації потоків</para></summary>
-				class SeedKernelCall Event : protected IDisposable
+				class SeedKernelCall Event final : protected IDisposable
 				{
 					///<summary>Дані події</summary>
 					struct event_data
@@ -184,7 +184,7 @@ namespace Seed {
 				///Також методом IsFree можна провірити чи зараз відбувається виконання
 				///А методом GetGuardedScopesCount отримати кількість поточних операцій,
 				///виконуються в блоці Guard</para></summary>
-				class SeedKernelCall GuardLock : protected IDisposable
+				class SeedKernelCall GuardLock final : protected IDisposable
 				{
 				private:
 					///<summary>Дані блокувальника</summary>

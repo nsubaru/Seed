@@ -279,37 +279,37 @@ namespace Seed {
 					return ((*D.I) & ((Seed::Int64)1 << 63)); //-V2533
 				}
 
-				Double RuntimePow(Double What, Double By);
-				UInt64 RuntimePow(UInt64 What, UInt8 By);
+				Double SeedKernelCall RuntimePow(Double What, Double By);
+				UInt64 SeedKernelCall RuntimePow(UInt64 What, UInt8 By);
 
-				Double RuntimeLn(Double X);
-				Double RuntimeLog10(Double X);
-				Double RuntimeLog2(Double X);
+				Double SeedKernelCall RuntimeLn(Double X);
+				Double SeedKernelCall RuntimeLog10(Double X);
+				Double SeedKernelCall RuntimeLog2(Double X);
 
-				Double RuntimeExp(Double X);
+				Double SeedKernelCall RuntimeExp(Double X);
 
-				Double RuntimeSin(Double X);
+				Double SeedKernelCall RuntimeSin(Double X);
 
-				Double RuntimeCos(Double X);
+				Double SeedKernelCall RuntimeCos(Double X);
 
-				Double RuntimeTan(Double X);
+				Double SeedKernelCall RuntimeTan(Double X);
 
-				Double RuntimeCtan(Double X);
+				Double SeedKernelCall RuntimeCtan(Double X);
 
-				Double RuntimeASin(Double X);
+				Double SeedKernelCall RuntimeASin(Double X);
 
-				Double RuntimeACos(Double X);
+				Double SeedKernelCall RuntimeACos(Double X);
 
-				Double RuntimeATan(Double X);
+				Double SeedKernelCall RuntimeATan(Double X);
 
-				Double RuntimeACtan(Double X);
+				Double SeedKernelCall RuntimeACtan(Double X);
 
-				Double RuntimeSqrt(Double X);
+				Double SeedKernelCall RuntimeSqrt(Double X);
 #pragma endregion
 
-				Float ModD(Float X, Float & intPart);
+				Float SeedKernelCall ModD(Float X, Float & intPart);
 
-				Double ModD(Double X, Double & intPart);
+				Double SeedKernelCall ModD(Double X, Double & intPart);
 			}
 		}
 	}

@@ -9,7 +9,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace TaskSheduler {
 			///<summary>Інтерфейс задачі в планувальнику задач</summary>
-			interface ITask
+			interface SeedKernelCall ITask
 			{
 				///<summary>Метод який викличеться при наступлені часу</summary>
 				///<param name = "Now">Час виклику</param>
@@ -17,7 +17,7 @@ namespace Seed {
 			};
 			//Задача в планувальнику задач
 			//При завершені роботи всі задачі автоматично знищаться
-			class SeedKernelCall Job : protected IDisposable {
+			class SeedKernelCall Job final : protected IDisposable {
 			public:
 				//Дані задачі
 				struct __task {
@@ -69,9 +69,9 @@ namespace Seed {
 				DateTime GetLastStartTime() { return const_cast<DateTime&>(This->LastStartTime); }
 				
 				DateTime GetPeriodLenght() { return This->PeriodLenght * DateTime::SecondInNtTime; }
-				void SetPeriodLenght(DateTime PeriodLenght);
+				void SetPeriodLenght(const DateTime & PeriodLenght);
 				DateTime GetTimerProximity() { return This->TimerProximity; }
-				void SetTimerProximity(DateTime NewTimerProximity);
+				void SetTimerProximity(const DateTime & NewTimerProximity);
 				
 				Int64 GetPeriodsCount() { return This->PeriodsCount; }
 				void SetPeriodsCount(Int32 NewPeriodsCount);
@@ -91,13 +91,10 @@ namespace Seed {
 				//Скасовує задачу
 				void Cancel();
 				
-				friend class Task;
-
-				// Inherited via IDisposable
-				
+				friend class Task;				
 			};
 
-			class Task {
+			class SeedKernelCall Task final {
 			private:
 				Job::__task * Data;
 			public:
@@ -109,15 +106,17 @@ namespace Seed {
 				Task() : Data(new Job::__task(CurrentSettings().KernelService.TaskSheduler.DefaultTimerProximity)) {}
 			public:
 				Task& SetStartTime(DateTime StartTime, Boolean IsRelative) { Data->StartTime.TimeFromStartEpoch = (IsRelative) ? (StartTime + DateTime::GetCurrentSystemTimeData()).GetMsFrom1600() : StartTime.GetMsFrom1600(); return *this; }
-				Task& SetTimerProximity(DateTime TimerProximity) { Data->TimerProximity = static_cast<Int32>(TimerProximity.GetMsFrom1600()); return *this; }
-				Task& SetTimerPeriods(DateTime PeriodLenght) { Data->PeriodLenght = static_cast<Int32>(PeriodLenght.GetMsFrom1600()); return *this; }
-				Task& SetTimerPeriods(DateTime PeriodLenght, Int32 PeriodsCount) { Data->PeriodLenght = static_cast<Int32>(PeriodLenght.GetMsFrom1600()); Data->PeriodsCount = PeriodsCount; return *this; }
-				Task& SetTask(ITask*&& Task) { if (Data->What != nullptr) delete Data->What; Data->What = Task; Task = nullptr; return *this; }
+				Task& SetTimerProximity(const DateTime & TimerProximity) { Data->TimerProximity = static_cast<Int32>(TimerProximity.GetMsFrom1600()); return *this; }
+				Task& SetTimerPeriods(const DateTime & PeriodLenght) { Data->PeriodLenght = static_cast<Int32>(PeriodLenght.GetMsFrom1600()); return *this; }
+				Task& SetTimerPeriods(const DateTime & PeriodLenght, Int32 PeriodsCount) { Data->PeriodLenght = static_cast<Int32>(PeriodLenght.GetMsFrom1600()); Data->PeriodsCount = PeriodsCount; return *this; }
+				Task& SetTask(ITask*&& Task) { if (Data->What != nullptr) delete Data->What; Data->What = Task; Task = nullptr; return *this; } //-V809
 				
 				Job Shedule();
 
 				[[maybe_unused]]
 				static Task NewTask() { return Task(); }
+
+				~Task() { if (Data != nullptr) delete Data; Data = nullptr; } //-V809
 			};
 		}
 	}

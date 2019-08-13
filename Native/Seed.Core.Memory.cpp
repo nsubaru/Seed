@@ -99,20 +99,22 @@ Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapArgsCheck)
+	auto& cfg = CurrentSettings().MemoryManager.DefaultHeap;
+
+	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapFreeCheck)
+	if (cfg.HeapFreeCheck)
 		Flags |= FLG_HEAP_ENABLE_FREE_CHECK;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapTailCheck)
+	if (cfg.HeapTailCheck)
 		Flags |= FLG_HEAP_ENABLE_TAIL_CHECK;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapValidationChecks)
+	if (cfg.HeapValidationChecks)
 		Flags |= FLG_HEAP_VALIDATE_ALL;
 
 	HeapData.HeapHandle = RtlCreateHeap(
 		Flags,
 		NULL,
-		10 * 1024 * 1024,
-		0,
+		cfg.StartSize,
+		cfg.MaxSize,
 		NULL,
 		NULL);
 	if (HeapData.HeapHandle == nullptr)
@@ -275,20 +277,22 @@ Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapArgsCheck)
+	auto& cfg = CurrentSettings().MemoryManager.SensitiveDataHeap;
+
+	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapFreeCheck)
+	if (cfg.HeapFreeCheck)
 		Flags |= FLG_HEAP_ENABLE_FREE_CHECK;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapTailCheck)
+	if (cfg.HeapTailCheck)
 		Flags |= FLG_HEAP_ENABLE_TAIL_CHECK;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapValidationChecks)
+	if (cfg.HeapValidationChecks)
 		Flags |= FLG_HEAP_VALIDATE_ALL;
 
 	SecureHeapData.HeapHandle = RtlCreateHeap(
 		Flags,
 		NULL,
-		2 * 1024 * 1024,
-		0,
+		cfg.StartSize,
+		cfg.MaxSize,
 		NULL,
 		NULL);
 	if (SecureHeapData.HeapHandle == nullptr)

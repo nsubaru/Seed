@@ -5,7 +5,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			///<summary>Примітив синхронізації який дозволяє одночасне читання і есклюзивний запис</summary>
-			class SRWLock
+			class SeedKernelCall SRWLock final
 			{
 			private:
 				typedef struct _RTL_SRWLOCK

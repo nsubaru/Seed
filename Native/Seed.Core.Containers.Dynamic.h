@@ -40,7 +40,7 @@ namespace Seed {
 			virtual ~DynamicImp() override final {};
 		};
 
-		class Dynamic : IDisposable {
+		class SeedKernelCall Dynamic final : protected IDisposable {
 		private:
 			struct data {
 				IDynamicImpl* pack;

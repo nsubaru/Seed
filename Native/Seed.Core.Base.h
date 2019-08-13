@@ -68,7 +68,7 @@ namespace Seed {
 	///<summary>Простір імен функцій ядра Рем</summary>
 	inline namespace Core {
 		///<summary>Атомарний лічильник<para>Використовує функції InterlockedXXX</para></summary>
-		class SeedKernelCall RefCountT {
+		class SeedKernelCall RefCountT final {
 		private:
 			///<summary>Містить значення</summary>
 			volatile SizeT count;
@@ -165,7 +165,7 @@ namespace Seed {
 		interface IComparable
 		{
 			///<summary>Порівнює два екземпляри типу T та вертає значення відносно поточного об'єкта</summary>
-			Equality Compare(const T& Val) const;\
+			Equality Compare(const T& Val) const;
 		};
 
 		///<summary>Compile-time функція пошуку максимального серед двох об'єетів</summary>
@@ -189,8 +189,8 @@ __forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCo
 __forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
 __forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
 __forceinline ClassName & operator=(ClassName && From){if(this == &From) return *this; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
-__forceinline ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}}
-// static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");\
+__forceinline virtual ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}} 
+//static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");
 
 namespace {
 	template <class F, class... Args>

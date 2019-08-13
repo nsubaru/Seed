@@ -19,7 +19,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.DefaultHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
 						DefaultSettings.MainMemoryManager.DefaultHeap.Additional—hecks = { 0xf };
-						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = true;
+						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
 						DefaultSettings.MainMemoryManager.DefaultHeap.Additional—hecks = { 0xf };
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = true;
@@ -32,7 +32,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks = { 0xf };
-						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = true;
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks = { 0xf };
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = true;
@@ -45,7 +45,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.ExceptionHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
 						DefaultSettings.MainMemoryManager.ExceptionHeap.Additional—hecks = { 0xf };
-						DefaultSettings.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree = true;
+						DefaultSettings.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
 						DefaultSettings.MainMemoryManager.ExceptionHeap.Additional—hecks = { 0xf };
 						DefaultSettings.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree = true;

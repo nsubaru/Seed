@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Tokenizer.h"
 
 using namespace Seed;
@@ -13,7 +16,7 @@ Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr* Delim
 				Boolean Found = true;
 
 				if (DelimSizes[j] > 1) {
-					for (i; i < Pos + DelimSizes[j]; i++);
+					for (i; i < Pos + DelimSizes[j]; i++)
 					{
 						if (Text[i] != Delims[j][i - Pos]) {
 							Found = false;

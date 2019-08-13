@@ -1,5 +1,5 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Init.h"
@@ -12,6 +12,8 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
+//RtlValidateHeap param 3 == null then check all heap memory
+#pragma warning(disable: 6387)
 
 using namespace Seed;
 
@@ -39,20 +41,22 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapArgsCheck)
+	auto& cfg = CurrentSettings().MemoryManager.ExceptionHeap;
+
+	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapFreeCheck)
+	if (cfg.HeapFreeCheck)
 		Flags |= FLG_HEAP_ENABLE_FREE_CHECK;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapTailCheck)
+	if (cfg.HeapTailCheck)
 		Flags |= FLG_HEAP_ENABLE_TAIL_CHECK;
-	if (CurrentSettings().MemoryManager.ExceptionHeap.HeapValidationChecks)
+	if (cfg.HeapValidationChecks)
 		Flags |= FLG_HEAP_VALIDATE_ALL;
 
 	ExceptionsHeap.HeapHandle = RtlCreateHeap(
 		Flags,
 		NULL,
-		CurrentSettings().MemoryManager.ExceptionHeap.MaxSize,
-		CurrentSettings().MemoryManager.ExceptionHeap.StartSize,
+		cfg.MaxSize,
+		cfg.StartSize,
 		NULL,
 		NULL);
 

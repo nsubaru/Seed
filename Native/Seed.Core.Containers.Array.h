@@ -2,21 +2,191 @@
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Containers.Internals.h"
+#include "Seed.Core.Containers.IEnumerable.h"
 
 namespace Seed {
 	inline namespace Core {
 		///<summary>Класс динамічного масиву</summary>
 		template<typename T>
-		class Array {
+		class SeedKernelCall Array final : public Queryable::IIndexable<Array<T>, T> {
 		private:
 			///<summary>Масив</summary>
 			T* arr;
 			///<summary>Розмір</summary>
 			SizeT count;
+		private:
+			// Function to run quicksort on an array
+			// l is the leftmost starting index, which begins at 0
+			// r is the rightmost starting index, which begins at array length - 1
+			template<typename Lambda>
+			void Quicksort(T arr[], SizeT l, SizeT r, Lambda & lambda) //-V688
+			{
+				// Base case: No need to sort arrays of length <= 1
+				if (l >= r)
+				{
+					return;
+				}
+
+				// Choose pivot to be the last element in the subarray
+				T pivot = arr[r];
+
+				// Index indicating the "split" between elements smaller than pivot and 
+				// elements greater than pivot
+				SizeT cnt = l;
+
+				// Traverse through array from l to r
+				for (SizeT i = l; i <= r; i++)
+				{
+					// If an element less than or equal to the pivot is found...
+					if (lambda(arr[i], pivot))
+					{
+						// Then swap arr[cnt] and arr[i] so that the smaller element arr[i] 
+						// is to the left of all elements greater than pivot
+						Swap(arr[cnt], arr[i]);
+
+						// Make sure to increment cnt so we can keep track of what to swap
+						// arr[i] with
+						cnt++;
+					}
+				}
+
+				// NOTE: cnt is currently at one plus the pivot's index 
+				// (Hence, the cnt-2 when recursively sorting the left side of pivot)
+				Quicksort(arr, l, cnt - 2, lambda); // Recursively sort the left side of pivot
+				Quicksort(arr, cnt, r, lambda);   // Recursively sort the right side of pivot
+			}
+		protected:
+			__forceinline virtual Array & ForEachImpl(Queryable::LambdaHolder<void, T&>& lambda) final override {
+				for (SizeT i = 0; i < count; i++) {
+					lambda(ForwardReference<T&>(arr[i]));
+				}
+				return *this;
+			}
+			__forceinline virtual Array & ForEachImpl(Queryable::LambdaHolder<void, T&, SizeT>& lambda) final override {
+				for (SizeT i = 0; i < count; i++) {
+					lambda(ForwardReference<T&>(arr[i]), ForwardReference<SizeT&&>(i));
+				}
+				return *this;
+			}
+			__forceinline virtual Array & ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) final override {
+				for (SizeT i = 0; i < count; i++) {
+					lambda(arr[i]);
+				}
+				return *this;
+			}
+			__forceinline virtual Array & ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) final override {
+				for (SizeT i = 0; i < count; i++) {
+					lambda(arr[i], ForwardReference<SizeT&&>(i));
+				}
+				return *this;
+			}
+			__forceinline virtual const Array& ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) const final override {
+				for (SizeT i = 0; i < count; i++) {
+					lambda(arr[i]);
+				}
+				return *this;
+			}
+			__forceinline virtual const Array& ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) const final override {
+				for (SizeT i = 0; i < count; i++) {
+					lambda(arr[i], ForwardReference<SizeT&&>(i));
+				}
+				return *this;
+			}
+			__forceinline virtual Array & FillImpl(Queryable::LambdaHolder<T>& lambda, SizeT ReqCount) final override {
+				if (ReqCount != count) 
+					Resize(ReqCount);
+
+				for (SizeT i = 0; i < count; i++) {
+					arr[i] = MoveRValue(lambda());
+				}
+
+				return *this;
+			}
+			__forceinline virtual Array& FillImpl(Queryable::LambdaHolder<T, SizeT>& lambda, SizeT ReqCount) final override {
+				if (ReqCount != count)
+					Resize(ReqCount);
+
+				for (SizeT i = 0; i < count; i++) {
+					arr[i] = MoveRValue(lambda(ForwardReference<SizeT&&>(i)));
+				}
+
+				return *this;
+			}
+
+			__forceinline virtual void TransferTo(T&& Value, SizeT ItemIndex) final override {
+				this->arr[ItemIndex] = MoveRValue(Value);
+			}
+
+			__forceinline virtual void ExecuteInScope(Queryable::LambdaHolder<void>& lambda) final override {
+				lambda();
+			}
+
+			inline virtual void PrepareCopyToOrMove(SizeT NewSize) final override {
+				this->Resize(NewSize);
+			}
+
+			virtual Array& SortImpl(Queryable::LambdaHolder<bool, const T&, const T&>& lambda, bool IsAscendingOrder) final override {
+				if (IsAscendingOrder) {
+					Quicksort(this->arr, 0, this->count - 1,
+						[&](const T& Item1, const T& Item2) {
+							return lambda(Item1, Item2);
+						});
+				}
+				else {
+					Quicksort(this->arr, 0, this->count - 1,
+						[&](const T& Item1, const T& Item2) {
+							return !lambda(Item1, Item2);
+						});
+				}
+				return *this;
+			}
+
+			virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&>& lambda) final override {
+				for (SizeT i = 0; i < count; i++)
+				{
+					lambda(MoveRValue(arr[i]));
+				}
+				delete[] arr;
+				arr = nullptr;
+				count = 0;
+			}
+			virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&, SizeT>& lambda) final override {
+				for (SizeT i = 0; i < count; i++)
+				{
+					lambda(ForwardReference<T&&>(arr[i]), ForwardReference<SizeT&&>(i));
+				}
+				delete[] arr;
+				arr = nullptr;
+				count = 0;
+			}
+			virtual Array& RemoveAll() final override {
+				delete[] arr;
+				arr = nullptr;
+				count = 0;
+				return *this;
+			}
+
+
+		public:
+			virtual Array& Sort(bool IsAscendingOrder = true) final override {
+				if (IsAscendingOrder) {
+					Quicksort(this->arr, 0, this->count - 1,
+						[&](const T& Item1, const T& Item2) {
+							return Item1 >= Item2;
+						});
+				}
+				else {
+					Quicksort(this->arr, 0, this->count - 1,
+						[&](const T& Item1, const T& Item2) {
+							return Item1 <= Item2;
+						});
+				}
+				return *this;
+			}
 		public:
 			///<summary>Кількість елементів</summary>
 			///<returns>Кількість елементів</returns>
-			__forceinline SizeT GetCount() const { return count; }
+			inline virtual SizeT GetCount() const { return count; }
 
 			///<summary>Вертає покажчик на масив</summary>
 			///<returns>Вертає покажчик на масив</returns>
@@ -82,7 +252,7 @@ namespace Seed {
 			///<summary>Оператор переміщення</summary>
 			///<param name = 'From'>Оригинал який буде обнулено після виклику конструктора</param>
 			///<returns>Силка на копію масиву</returns>
-			__forceinline Array<T>& operator=(Array<T> && From) noexcept {
+			__forceinline Array<T>& operator=(Array<T> && From) {
 				this->count = From.count;
 				this->arr = From.arr;
 				From.arr = nullptr;
@@ -93,7 +263,7 @@ namespace Seed {
 			///<summary>Оператор доступу по індексу</summary>
 			///<param name = 'Index'>Індекс елемент</param>
 			///<returns>Силка на елемент</returns>
-			__forceinline T& operator[](SizeT Index) {
+			__forceinline virtual T& operator[](SizeT Index) final override {
 				extern __declspec(noreturn) void ThrowIndexOutOfRange(
 					const Seed::ConstAString & File,
 					const Seed::ConstAString & Function,
@@ -109,7 +279,7 @@ namespace Seed {
 			///<summary>Констатний оператор доступу по індексу</summary>
 			///<param name = 'Index'>Індекс елемент</param>
 			///<returns>Константа силка на елемент</returns>
-			__forceinline const T& operator[](SizeT index) const {
+			__forceinline virtual const T& operator[](SizeT index) const final override {
 				extern __declspec(noreturn) void ThrowIndexOutOfRange(
 					const Seed::ConstAString & File,
 					const Seed::ConstAString & Function,
@@ -150,16 +320,24 @@ namespace Seed {
 
 			///<summary>Зміна розміру</summary>
 			///<param name = 'NewSize'>Новий розмір масиву</param>
-			__forceinline void Resize(SizeT NewSize) {
-				T* buf = new T[NewSize];
-				SizeT CopySize = (NewSize > count) ? count : NewSize;
-#pragma warning(push)
-#pragma warning(disable: 4996)
-				Memory::Copy(this->arr, buf, CopySize);
-#pragma warning(pop)
-				delete[] this->arr;
-				count = NewSize;
-				this->arr = buf;
+			__forceinline Array& Resize(SizeT NewSize) {
+				if (this->arr == nullptr || this->count == 0)
+				{
+					this->arr = new T[NewSize];
+					this->count = NewSize;
+				}
+				else {
+					T* buf = new T[NewSize];
+					SizeT CopySize = (NewSize > count) ? count : NewSize;
+					for (SizeT i = 0; i < CopySize; i++)
+					{
+						buf[i] = MoveRValue(this->arr[i]);
+					}
+					delete[] this->arr;
+					count = NewSize;
+					this->arr = buf;
+				}
+				return *this;
 			}
 
 			///<summary>Оптимізований обмін динамічних масивів</summary>
@@ -172,7 +350,7 @@ namespace Seed {
 
 			///<summary>Перевертає елементи масиву</summary>
 			///<returns>Силку на поточний масив після зміни порядку елементів</returns>
-			__forceinline Array<T>& Reverse() {
+			__forceinline virtual Array<T>& Reverse() final override {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 				Seed::Reverse(arr, count);
@@ -185,7 +363,7 @@ namespace Seed {
 			///<param name = 'StartIndex'>Номер першого елемента починаючи
 			///<para>з нуля який має бути включений в Slice</para></param>
 			///<returns>Підмасив</returns>
-			Array<T> Slice(SizeT StartIndex) {
+			virtual Array<T> Slice(SizeT StartIndex) final override {
 				extern __declspec(noreturn) void ThrowNullPointException(
 					const Seed::ConstAString & File,
 					const Seed::ConstAString & Function,
@@ -202,7 +380,7 @@ namespace Seed {
 				SizeT SliceCount = count - StartIndex;
 				T * __array = new T[SliceCount];
 
-				for (SizeT i = 0; i <= SliceCount; i++) {
+				for (SizeT i = 0; i < SliceCount; i++) {
 					__array[i] = arr[StartIndex + i];
 				}
 
@@ -214,13 +392,14 @@ namespace Seed {
 			///<para>з нуля який має бути включений в Slice</para></param>
 			///<param name = 'Count'>Кількість елементів</param>
 			///<returns>Підмасив</returns>
-			Array<T> Slice(SizeT StartIndex, SizeT SliceCount) {
+			virtual Array<T> Slice(SizeT StartIndex, SizeT SliceCount) final override {
 				extern __declspec(noreturn) void ThrowNullPointException(
 					const Seed::ConstAString & File,
 					const Seed::ConstAString & Function,
 					const Seed::SizeT Line,
 					const Seed::SizeT Address,
 					const Seed::UInt8 Mode);
+				SliceCount++;
 				if (StartIndex + SliceCount > count)
 					ThrowNullPointException(
 						__FILE__,
@@ -228,10 +407,11 @@ namespace Seed {
 						__LINE__,
 						reinterpret_cast<SizeT>(this->arr + StartIndex + Count),
 						0);
+				
 
 				T * __array = new T[SliceCount];
 
-				for (SizeT i = 0; i <= SliceCount; i++) {
+				for (SizeT i = 0; i < SliceCount; i++) {
 					__array[i] = arr[StartIndex + i];
 				}
 
@@ -271,5 +451,13 @@ namespace Seed {
 		}
 
 		using Blob = Array<Byte>;
+
+		namespace StaticAsserts {
+			template<typename U>
+			struct TIsResizable<Array<U>> : StaticAsserts::LogicTrue {};
+
+			template<typename U>
+			struct TIsDynamicSize<Array<U>> : StaticAsserts::LogicFalse {};
+		}
 	}
 }

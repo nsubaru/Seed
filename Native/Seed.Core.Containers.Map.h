@@ -4,27 +4,29 @@
 
 namespace Seed {
 	inline namespace Core {
-		///<summary>Ключ вжк існує</summary>
-		class KeyAllredyExistException : Exception {
-		public:
-			///<summary>Конструктор помилки</summary>
-			///<param name = 'File'>Файл в якому згенерована помилка</param>
-			///<param name = 'FunctName'>Ім'я функції</param>
-			///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-			KeyAllredyExistException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-				:Exception(File, FunctName, Line, L"Ключ вже існує")
-			{}
+		inline namespace Exceptions {
+			///<summary>Ключ вжк існує</summary>
+			class SeedKernelCall KeyAllredyExistException : Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				KeyAllredyExistException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					:Exception(File, FunctName, Line, L"Ключ вже існує")
+				{}
 
-			///<summary>Текстове представлення інформації про помилки помилки</summary>
-			virtual ExceptionString toString() const override final {
-				return ExceptionString(exeptionName)
-					+ ExceptionString(L". ")
-					+ location.toString()
-					+ ExceptionString(L". ");
-			}
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override final {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ location.toString()
+						+ ExceptionString(L". ");
+				}
 
-			virtual ~KeyAllredyExistException(){}
-		};
+				virtual ~KeyAllredyExistException() {}
+			};
+		}
 
 		///<summary>Шаблон потоко захищеного асоціативного масиву
 		///<para>
@@ -38,7 +40,7 @@ namespace Seed {
 		///<param name = "TKey">Тип ключа</param>
 		///<param name = "TValue">Тип значення</param>
 		template<typename Heap, typename TKey, typename TValue>
-		class BaseMap : virtual public Memory::Allocator<Heap>
+		class SeedKernelCall BaseMap final : virtual public Memory::Allocator<Heap>
 		{
 		private:
 			struct Tree;
@@ -423,10 +425,10 @@ namespace Seed {
 					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(node), NullPointException::Types::Read));
 				if (node->tree != nullptr) {
 					return node->tree->lock.ShareLock([&]() {
-						node->RefCount--;
+						--node->RefCount;
 						if (node->right != nullptr) {
 							Node * ret = FindMin(node->right);
-							ret->RefCount++;
+							++ret->RefCount++;
 							return ret;
 						}
 
@@ -437,7 +439,7 @@ namespace Seed {
 							father = father->father;
 						}
 						if(father != nullptr)
-							father->RefCount++;
+							++father->RefCount;
 						return father;
 						});
 				}
@@ -459,10 +461,10 @@ namespace Seed {
 					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(node), NullPointException::Types::Read));
 				if (node->tree != nullptr) {
 					return node->tree->lock.ShareLock([&]() {
-						node->RefCount--;
+						--node->RefCount;
 						if (node->left != nullptr) {
 							Node * ret = FindMax(node->left);
-							ret->RefCount++;
+							++ret->RefCount;
 							return ret;
 						}
 
@@ -472,7 +474,8 @@ namespace Seed {
 							node = father;
 							father = father->father;
 						}
-						father->RefCount++;
+						if(father != nullptr)
+							++father->RefCount;
 						return father;
 						});
 				}
@@ -492,7 +495,7 @@ namespace Seed {
 				///<summary>Покажчик на елемент</summary>
 				Node* item;
 				///<summary>Конструктор з елемента</summary>
-				Iterator(Node* item) : item(item) { if(item != nullptr ) item->RefCount++; };
+				Iterator(Node* item) : item(item) { if(item != nullptr ) ++item->RefCount; };
 			protected:
 				virtual void Dispose() {}
 			public:
@@ -620,7 +623,7 @@ namespace Seed {
 			{
 				tree->lock.ExclusiveLock([&]() {
 					tree->root = Insert(tree->root, key, value, nullptr);
-					tree->count++;
+					++tree->count;
 					});
 			}
 
@@ -632,7 +635,7 @@ namespace Seed {
 			{
 				tree->lock.ExclusiveLock([&, key = MoveRValue(key)]() mutable {
 					tree->root = Insert(tree->root, MoveRValue(key), value, nullptr);
-					tree->count++;
+					++tree->count;
 					});
 			}
 
@@ -644,7 +647,7 @@ namespace Seed {
 			{
 				tree->lock.ExclusiveLock([&, value = MoveRValue(value)]() mutable {
 					tree->root = Insert(tree->root, key, MoveRValue(value), nullptr);
-					tree->count++;
+					++tree->count;
 					});
 			}
 
@@ -656,7 +659,7 @@ namespace Seed {
 			{
 				tree->lock.ExclusiveLock([&, key = MoveRValue(key), value = MoveRValue(value)]() mutable {
 					tree->root = Insert(tree->root, MoveRValue(key), MoveRValue(value), nullptr);
-					tree->count++;
+					++tree->count;
 					});
 			}
 			
@@ -665,7 +668,7 @@ namespace Seed {
 			void Delete(TKey key)
 			{
 				tree->lock.ExclusiveLock([&]() {
-					tree->count--;
+					--tree->count;
 					tree->root = Remove(tree->root, key);
 					});
 			}
@@ -686,8 +689,8 @@ namespace Seed {
 			///<param name = "key">Ключ по якому шукатиме значення</param>
 			///<returns>Константна силка на значення</returns>
 			///<exception cref = "Seed::NullPointException">За заданим ключом немає значення в масиві</exception>
-			const TValue& operator[](const TKey& key) const {
-				Node* node = tree->lock.ShareLock([&]() mutable {
+			const TValue& operator[](const TKey& key) const { //-V659
+				Node* node = tree->lock.ShareLock([&]() {
 					return Find(tree->root, key); });
 
 				if (node == nullptr)

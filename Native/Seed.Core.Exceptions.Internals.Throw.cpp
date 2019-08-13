@@ -1,5 +1,5 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Exceptions.Internals.h"
@@ -22,7 +22,7 @@
 // Returns:
 //      NEVER.  (until we implement resumable exceptions, that is)
 //
-extern "C" __declspec(noreturn) void __stdcall
+ extern "C" __declspec(noreturn) void __stdcall
 _CxxThrowException(
 	void* pExceptionObject,   // The object thrown
 	_ThrowInfo* pThrowInfo          // Everything we need to know about it

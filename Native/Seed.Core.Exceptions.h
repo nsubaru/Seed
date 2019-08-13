@@ -119,7 +119,7 @@ namespace Seed {
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
 				virtual ~Exception() {}
 			public:
-				class RawException {
+				class SeedKernelCall RawException final {
 				private:
 					void* ptr;
 				private:
@@ -135,6 +135,7 @@ namespace Seed {
 					RawException& operator=(RawException&& orig) {
 						this->ptr = orig.ptr;
 						orig.ptr = nullptr;
+						return *this;
 					}
 
 					~RawException();
@@ -484,7 +485,7 @@ namespace Seed {
 			};
 
 			///<summary>Невірний аргумент</summary>
-			class InvalidArgumentException : public Exception {
+			class SeedKernelCall InvalidArgumentException : public Exception {
 			private:
 				///<summary>Ім'я аргумента</summary>
 				ConstString ArgNameValue;
@@ -525,7 +526,7 @@ namespace Seed {
 			};
 
 			///<summary>Операцію перервано</summary>
-			class SeedKernelCall InteruptException : protected Exception
+			class SeedKernelCall InteruptException final : protected Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -581,7 +582,7 @@ namespace Seed {
 			};
 
 			///<summary>Цілочисельне переповнення</summary>
-			class IntegerOverflowException : public Exception {
+			class SeedKernelCall IntegerOverflowException : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -600,7 +601,7 @@ namespace Seed {
 			};
 
 			///<summary>Ітератор на кінець не є визначеним</summary>
-			class EndNodeNotDeferencable : public Exception
+			class SeedKernelCall EndNodeNotDeferencable : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -620,7 +621,7 @@ namespace Seed {
 				}
 			};
 
-			class NtException : public Exception {
+			class SeedKernelCall NtException : public Exception {
 			private:
 				///<summary>NtStatus code операції</summary>
 				Int64 statusCode;

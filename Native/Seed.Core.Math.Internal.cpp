@@ -1,10 +1,12 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Math.Internal.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
+
+extern double asin(double x);
 
 namespace Seed {
 	inline namespace Core {
@@ -74,7 +76,7 @@ namespace Seed {
 
 						if (What == -1)
 						{
-							return 1 - 2 * (By & 1);
+							return 1ull - 2ull* (By & 1ull);
 						}
 
 						return 0;
