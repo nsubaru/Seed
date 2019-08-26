@@ -1,6 +1,8 @@
 #pragma once
 #include "Seed.Core.Base.h"
 
+#include "Seed.Core.Exceptions.h"
+
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
@@ -176,33 +178,33 @@ typedef struct FrameInfo {
 // Per-thread data
 //
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-typedef struct
+struct ExceptionInfoT : Seed::Core::Memory::Allocator<Seed::Core::Memory::ExceptionHeap>
 {
 	// C++ Exception Handling (EH) state
-	unsigned long      _NLG_dwCode;      // Required by NLG routines
-	unexpected_handler _unexpected;      // unexpected() routine
-	void* _translator;      // S.E. translator
-	void* _purecall;        // called when pure virtual happens
-	void* _curexception;    // current exception
-	void* _curcontext;      // current exception context
-	int                _ProcessingThrow; // for uncaught_exception
-	void* _curexcspec;      // for handling exceptions thrown from std::unexpected
-	int                _cxxReThrow;      // true if it's a rethrown C++ exception
-	void* _pExitContext;
-	void* _pUnwindContext;
-	FRAMEINFO* _pFrameInfoChain;
-	unsigned __int64          _ImageBase;
-	unsigned __int64          _ThrowImageBase;
-	void* _pForeignException;
-	int                _HandlerSearchState;  // Used when exceptions occur in catch funclets in Pass 1 of SEH handling, represents a state in the throwing catch funclet
+	unsigned long      _NLG_dwCode = 0;      // Required by NLG routines
+	unexpected_handler _unexpected = 0;      // unexpected() routine
+	void* _translator = 0;      // S.E. translator
+	void* _purecall = 0;        // called when pure virtual happens
+	void* _curexception = 0;    // current exception
+	void* _curcontext = 0;      // current exception context
+	int                _ProcessingThrow = 0; // for uncaught_exception
+	void* _curexcspec = 0;      // for handling exceptions thrown from std::unexpected
+	int                _cxxReThrow = 0;      // true if it's a rethrown C++ exception
+	void* _pExitContext = 0;
+	void* _pUnwindContext = 0;
+	FRAMEINFO* _pFrameInfoChain = 0;
+	unsigned __int64          _ImageBase  = 0;
+	unsigned __int64          _ThrowImageBase = 0;
+	void* _pForeignException = 0;
+	int                _HandlerSearchState = 0;  // Used when exceptions occur in catch funclets in Pass 1 of SEH handling, represents a state in the throwing catch funclet
 											 // so unwind can properly search through parent catch funclets.
-	__int64          _UnwindStateorOffset; // In Pass 2 of SEH handling, represents the start state of the try enclosing the catch funclet. All states within the try
+	__int64          _UnwindStateorOffset = 0; // In Pass 2 of SEH handling, represents the start state of the try enclosing the catch funclet. All states within the try
 											 // will have been already unwound before calling the catch, so this prevents us from unwinding those states twice.
 											 // Also used if an SEH exception is thrown out of a dtor, in which case it's encoded as an offset into the UW map.
-	bool               _IsOffset;            // Whether the value in _UnwindStateorOffset is an offset from the start of the UW map or an actual state.
-	bool _isCatchBlockProceding;			//If true then now proceding catch
-	void* throwObjStorageForStoredException;
-} tls_exeption_info_t;
+	bool               _IsOffset = 0;            // Whether the value in _UnwindStateorOffset is an offset from the start of the UW map or an actual state.
+	bool _isCatchBlockProceding = 0;			//If true then now proceding catch
+	void* throwObjStorageForStoredException = 0;
+};
 
 // As magic numbers increase, we have to keep track of the versions that we are
 // backwards compatible with.  The top 3 bits of the magic number DWORD are

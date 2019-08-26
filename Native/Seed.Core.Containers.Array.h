@@ -92,25 +92,21 @@ namespace Seed {
 				}
 				return *this;
 			}
-			__forceinline virtual Array & FillImpl(Queryable::LambdaHolder<T>& lambda, SizeT ReqCount) final override {
+			__forceinline virtual void FillImpl(Queryable::LambdaHolder<T>& lambda, SizeT ReqCount) final override {
 				if (ReqCount != count) 
 					Resize(ReqCount);
 
 				for (SizeT i = 0; i < count; i++) {
 					arr[i] = MoveRValue(lambda());
 				}
-
-				return *this;
 			}
-			__forceinline virtual Array& FillImpl(Queryable::LambdaHolder<T, SizeT>& lambda, SizeT ReqCount) final override {
+			__forceinline virtual void FillImpl(Queryable::LambdaHolder<T, SizeT>& lambda, SizeT ReqCount) final override {
 				if (ReqCount != count)
 					Resize(ReqCount);
 
 				for (SizeT i = 0; i < count; i++) {
 					arr[i] = MoveRValue(lambda(ForwardReference<SizeT&&>(i)));
 				}
-
-				return *this;
 			}
 
 			__forceinline virtual void TransferTo(T&& Value, SizeT ItemIndex) final override {
@@ -137,7 +133,7 @@ namespace Seed {
 				return *this;
 			}
 
-			virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&>& lambda) final override {
+			virtual Array& RemoveAllImpl(Queryable::LambdaHolder<void, T&&>& lambda) final override {
 				for (SizeT i = 0; i < count; i++)
 				{
 					lambda(MoveRValue(arr[i]));
@@ -145,8 +141,9 @@ namespace Seed {
 				delete[] arr;
 				arr = nullptr;
 				count = 0;
+				return *this;
 			}
-			virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&, SizeT>& lambda) final override {
+			virtual Array& RemoveAllImpl(Queryable::LambdaHolder<void, T&&, SizeT>& lambda) final override {
 				for (SizeT i = 0; i < count; i++)
 				{
 					lambda(ForwardReference<T&&>(arr[i]), ForwardReference<SizeT&&>(i));
@@ -154,29 +151,12 @@ namespace Seed {
 				delete[] arr;
 				arr = nullptr;
 				count = 0;
+				return *this;
 			}
 			virtual Array& RemoveAll() final override {
 				delete[] arr;
 				arr = nullptr;
 				count = 0;
-				return *this;
-			}
-
-
-		public:
-			virtual Array& Sort(bool IsAscendingOrder = true) final override {
-				if (IsAscendingOrder) {
-					Quicksort(this->arr, 0, this->count - 1,
-						[&](const T& Item1, const T& Item2) {
-							return Item1 >= Item2;
-						});
-				}
-				else {
-					Quicksort(this->arr, 0, this->count - 1,
-						[&](const T& Item1, const T& Item2) {
-							return Item1 <= Item2;
-						});
-				}
 				return *this;
 			}
 		public:
@@ -346,11 +326,15 @@ namespace Seed {
 
 			///<summary>Перевертає елементи масиву</summary>
 			///<returns>Силку на поточний масив після зміни порядку елементів</returns>
-			__forceinline virtual Array<T>& Reverse() final override {
+			virtual Array<T>& Reverse() final override {
 #pragma warning(push)
 #pragma warning(disable: 4996)
-				Seed::Reverse(arr, count);
+				//Seed::Reverse(arr, count);
 #pragma warning(pop)
+
+				for (SizeT i = 0; i < count / 2; i++) {
+					Swap(arr[i], arr[(count - 1) - i]);
+				}
 				return *this;
 			}
 

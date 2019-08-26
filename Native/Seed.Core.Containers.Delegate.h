@@ -221,7 +221,7 @@ public:
 		isEnded = true;
 	}
 	//Конструктор, ініціалізує тупл з аргументами, обнулює покажчик на результат, і запам'ятовує функцію
-	__forceinline TemplateFunctionT(F f, Args... args) :args(args...), result(nullptr), f(f)
+	__forceinline TemplateFunctionT(F f, Args&&... args) :args(Seed::ForwardReference<Args&&>(args)...), result(nullptr), f(f)
 	{}
 	//Вертає true якщо функція запущена була
 	__forceinline virtual bool IsStarted() const noexcept override final
@@ -273,7 +273,7 @@ namespace Seed {
 		public:
 			//Конструктор з функції F і набору аргументів Args(може бути і без аргументів)
 			template<typename F, typename ... Args>
-			__forceinline Delegate(F f, Args... args) : data(new delegate(new TemplateFunctionT<F, Args...>(f, args...)))
+			__forceinline Delegate(F f, Args&&... args) : data(new delegate(new TemplateFunctionT<F, Args...>(f, ForwardReference<Args&&>(args)...)))
 			{};
 
 			RefCountClass(Delegate, data);
@@ -300,7 +300,7 @@ namespace Seed {
 			//генерує наступні помилки:
 			//- NullPointExeption якщо дані делегата силаються на nullptr
 			//- AlredyExecuteOrExecuteEnded якщо делегат виконувався або виконується
-			__forceinline void Init()
+			__forceinline void Init() volatile
 			{
 				if (this->data == nullptr)
 					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this->data), NullPointException::Types::Read));
@@ -342,6 +342,16 @@ namespace Seed {
 				if (this->data->function->IsStarted() && !this->data->function->IsEnded())
 					Throw(AlredyExecute(ExceptionPosition));
 				return this->data->function->GetResult<T>();
+			}
+
+			volatile Delegate& operator()() volatile {
+				this->Init();
+				return *this;
+			}
+
+			Delegate& operator()() {
+				this->Init();
+				return *this;
 			}
 		};
 		//Створює делегат з функцією F і аргументами Args(може бути і без аргументів)

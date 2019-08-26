@@ -196,6 +196,16 @@ namespace Seed {
 					:Exception(File, FunctName, Line, L"Помилка доступу до пам'яті"), Addr(Addr), Type(Type)
 				{}
 
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				///<param name = 'Addr'>Адрес комірки пам'яті яка згенерувала помилку</param>
+				///<param mame = 'Type'>Тип доступу до комірки який згенерував помилку</param>
+				NullPointException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					:Exception(File, FunctName, Line, L"Помилка доступу до пам'яті"), Addr(0x0), Type(Types::Read)
+				{}
+
 				///<summary>Адрес комірки пам'яті яка згенерувала помилку</summary>
 				SizeT GetMemoryAddress() const { return Addr; }
 				///<summary>Тип доступу до комірки який згенерував помилку</summary>
@@ -402,6 +412,28 @@ namespace Seed {
 				}
 
 				virtual ~InvalidFormatException() {}
+			};
+
+			///<summary>Невірний формат</summary>
+			class SeedKernelCall NotImplemented : public Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				NotImplemented(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					:Exception(File, FunctName, Line, L"Функція\\метод не реалізовані")
+				{}
+
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override final {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ location.toString()
+						+ ExceptionString(L". ");
+				}
+
+				virtual ~NotImplemented() {}
 			};
 
 			///<summary>Доступ до елемента який знаходится за межею розмірів</summary>

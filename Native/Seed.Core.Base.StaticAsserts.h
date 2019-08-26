@@ -898,61 +898,6 @@ namespace Seed {
 						IsSameT<typename LambdaType<Ld>::Args, Pack<Params...>>
 					>::State
 				> {};
-					//,
-
-			//private:
-			//	using Lambda = typename LambdaType<Ld>;
-			//	using LambdaArgs = typename Lambda::Args;
-			//	template<typename ... Args>
-			//	using IsArgsConvertibleFrom = typename LambdaArgs::IsConvertibleFromTypePackT<Args...>;
-			//public:
-			//	__forceinline constexpr operator bool() { return IsArgsConvertibleFrom<Params...>::State; }
-			//	static constexpr bool State = IsArgsConvertibleFrom<Params...>::State;
-
-
-			/*template<class Ld, typename Ret, typename ... Params>
-			struct IsLambdaConvertible {
-			private:
-				using IsRetTypeSameT = ConditionT<
-					IsVoidV<Ret>,
-					IsVoidT<typename LambdaType<Ld>::ReturnType>,
-					typename ConditionT<IsVoidV<typename LambdaType<Ld>::ReturnType>, LogicFalse, 
-						
-					IsConvertibleT<typename LambdaType<Ld>::ReturnType, Ret>>::Result
-				>::Result;
-
-				static constexpr bool IsRetTypeSame() {
-					if constexpr (IsVoidV<Ret>) {
-						if constexpr (IsVoidV<typename LambdaType<Ld>::ReturnType>) {
-							return true;
-						}
-						else {
-							return false;
-						}
-					}
-					else {
-						if constexpr (IsVoidV<typename LambdaType<Ld>::ReturnType>) {
-							return false;
-						}
-						else {
-							if constexpr (IsConvertibleV<typename LambdaType<Ld>::ReturnType, Ret>) {
-								return true;
-							}
-							else {
-								return false;
-							}
-						}
-					}
-				}
-				using LambdaArgs = typename LambdaType<Ld>::Args;
-				
-				using IsParamsSame = typename LambdaArgs::IsConvertibleFromTypePackT<Params...>;
-			public:
-				__forceinline constexpr operator bool() { return And<LogicConst<IsRetTypeSame()>, IsParamsSame>; }
-				static constexpr bool State = And<LogicConst<IsRetTypeSame()>, IsParamsSame>;
-			};*/
-
-			//constexpr bool var2 = IsLambdaConvertible<decltype(var), void, int, SizeT>::State;
 		}
 	}
 }

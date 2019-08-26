@@ -9,7 +9,7 @@ namespace Seed {
 		///<summary>Пріоритетна черга для обробки даних в порядку приходу з урахуванням пріоритету
 		///<para>Працює через фібоначеву кучу. Ітерація відсутня</para></summary>
 		template <class THeap, typename TPriority, typename TValue>
-		class SeedKernelCall BasePriorityQueue final : public Memory::Allocator<THeap>, IDisposable {
+		class SeedKernelCall BasePriorityQueue final : public Memory::Allocator<THeap>, protected IDisposable {
 		private:
 			///<summary>Внутрішня структура елемента в черзі</summary>
 			struct Node : public Memory::Allocator<THeap> {

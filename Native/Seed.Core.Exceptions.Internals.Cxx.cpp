@@ -11,6 +11,8 @@
 
 #include "typeinfo"
 
+#include "Seed.Core.Threading.Impl.h"
+
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
@@ -21,11 +23,10 @@
 //and after unwind we jump to catch block as it's exception handling
 #pragma warning(disable: 6387)
 
-#undef Throw
 #undef throw
 
-__forceinline tls_exeption_info_t* GetThreadExceptionInfo() {
-	return (tls_exeption_info_t*)NtCurrentTeb()->TlsSlots[0];
+__forceinline ExceptionInfoT* GetThreadExceptionInfo() {
+	return &Seed::Core::Threading::GetTLS()->ExceptionInfo;
 }
 
 #define ThreadExceptionInfo GetThreadExceptionInfo()
@@ -875,7 +876,7 @@ void FindHandlerForForeignException(
 			type = NullPointException::Types::Read;
 			break;
 		}
-		throw Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type);
+		Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
 	}
 		break;
 	default:
@@ -1838,16 +1839,6 @@ Seed::Core::Exceptions::Exception::RawException::~RawException()
 		data->CxxExceptionInfo.params.pExceptionObject = InternalHeapFree(data->CxxExceptionInfo.params.pExceptionObject);
 		this->ptr = InternalHeapFree(this->ptr);
 	}
-}
-
-void InitThreadEH() {
-	NtCurrentTeb()->TlsSlots[0] = InternalHeapAllocate(sizeof(tls_exeption_info_t));
-	RtlSecureZeroMemory(NtCurrentTeb()->TlsSlots[0], sizeof(tls_exeption_info_t));
-}
-
-void StopThreadEH() {
-	InternalHeapFree(ThreadExceptionInfo->throwObjStorageForStoredException);
-	InternalHeapFree(NtCurrentTeb()->TlsSlots[0]);
 }
 
 #pragma warning(pop)

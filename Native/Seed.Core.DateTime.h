@@ -55,7 +55,7 @@ namespace Seed {
 			//Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 			UInt64 Property(GetMsFrom1600, SetMsFrom1600) TimeFromStartEpoch;
 			//Вертає кількість 100 наносекудних інтервалів
-			constexpr UInt64 GetAsRelativeTime() const { return -static_cast<Int64>(time_ms); }
+			constexpr UInt64 GetAsRelativeTime() const volatile { return -static_cast<Int64>(time_ms); }
 			//Кількість 100 наносекудних інтервалів
 			UInt64 Property(GetAsRelativeTime) RelativeTime;
 			//Вертає поточний системний час

@@ -90,6 +90,31 @@ namespace Seed {
 						}
 					}
 				}
+
+				template<typename T>
+				Boolean TryInShareLock(T& Funct) {
+					extern bool TryAcquireLockSharedSRWLock(void*);
+					extern void ReleaseLockSharedSRWLock(void*);
+
+					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
+					{
+						if(!TryAcquireLockSharedSRWLock(&lock)) 
+							return false;
+						try {
+							Funct();
+						}
+						catch (...) {
+							ReleaseLockSharedSRWLock(&lock);
+							throw;
+						}
+						ReleaseLockSharedSRWLock(&lock);
+						return true;
+					}
+					else
+					{
+						static_assert(false, "Try acquire can use only with void return function\\lambda");
+					}
+				}
 			};
 		}
 	}

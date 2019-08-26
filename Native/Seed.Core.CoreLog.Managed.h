@@ -35,7 +35,7 @@ namespace Seed {
 		///<param name = "ex">Об'єкт помилки</param>
 		///<returns><c>True</c> якщо запис в логи було проведено успішно</returns>
 		template<typename Heap>
-		__forceinline bool toCoreLog(const BaseString<Heap>& Msg, const Seed::Exception& ex)
+		__forceinline bool toCoreLog(const BaseString<Heap>& Msg, const Exception& ex)
 		{
 			return Seed::Core::toCoreLog({ Msg, ex.toString() });
 		}
@@ -46,7 +46,7 @@ namespace Seed {
 		///<param name = "ex">Об'єкт помилки</param>
 		///<returns><c>True</c> якщо запис в логи було проведено успішно</returns>
 		template<SizeT Lenght>
-		__forceinline bool toCoreLog(const wchar_t(&Msg)[Lenght], const Seed::Exception& ex)
+		__forceinline bool toCoreLog(const wchar_t(&Msg)[Lenght], const Exception& ex)
 		{
 			return Seed::Core::toCoreLog({ Msg, ex.toString() });
 		}

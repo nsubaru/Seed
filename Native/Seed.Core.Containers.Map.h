@@ -29,6 +29,54 @@ namespace Seed {
 			};
 		}
 
+		template<typename Heap, typename TKey, typename TValue>
+		class BaseMap;
+
+		template<typename TKey, typename TValue> 
+		struct SeedKernelCall Pair final {
+			///<summary>Гетер ключа</summary>
+			const TKey& GetKey() const { return key; }
+			///<summary>Гетер значення</summary>
+			TValue& GetValue() { return value; }
+			///<summary>Гетер значення</summary>
+			const TValue& GetValue() const { return value; }
+			///<summary>Сеттер значення</summary>
+			void SetValue(const TValue& newValue) { value = newValue; }
+			///<summary>Оптимізований сеттер значення</summary>
+			void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
+
+			///<summary>Ключ</summary>
+			TKey Property(GetKey) Key;
+			///<summary>Значення</summary>
+			TValue Property(GetValue, SetValue) Value;
+		private:
+			///<summary>Ключ елемента</summary>
+			TKey key;
+			///<summary>Значення елемента</summary>
+			TValue value;
+		public:
+			///<summary>Конструктор копіювання ключа і значення</summary>
+			Pair(const TKey& key, const TValue& value) : key(key), value(value) {}
+			///<summary>Конструктор переміщення значення і копіювання значення</summary>
+			Pair(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
+			///<summary>Конструктор копіювання значення і переміщення значення</summary>
+			Pair(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
+			///<summary>Конструктор переміщення і значення і ключа</summary>
+			Pair(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
+		public:
+			template<typename Heap, typename TKey, typename TValue>
+			friend class BaseMap;
+		};
+
+		namespace TypeTraits {
+			template<typename TKey, typename TValue>
+			struct PairTypes<Pair<TKey,TValue>> : LogicTrue {
+				using Key = TKey;
+				using Value = TValue;
+			};
+		}
+
+
 		///<summary>Шаблон потоко захищеного асоціативного масиву
 		///<para>
 		/// Внутрішньо реалізований як червоно-чорне дерево.
@@ -41,7 +89,7 @@ namespace Seed {
 		///<param name = "TKey">Тип ключа</param>
 		///<param name = "TValue">Тип значення</param>
 		template<typename Heap, typename TKey, typename TValue>
-		class BaseMap final :  public Memory::Allocator<Heap>, protected IDisposable
+		class BaseMap final :  public Memory::Allocator<Heap>, protected IDisposable, public Queryable::IAssociable<BaseMap<Heap, TKey, TValue>, Pair<TKey,TValue>, TKey, TValue>
 		{
 		private:
 			struct Tree;
@@ -49,54 +97,20 @@ namespace Seed {
 			///<summary>Елемент дерева і елемент в асоціативному масиві</summary>
 			struct SeedKernelCall Node : public Memory::Allocator<Heap>
 			{
-			public:
-				struct SeedKernelCall Data final {
-					///<summary>Гетер ключа</summary>
-					const TKey& GetKey() { return key; }
-					///<summary>Гетер значення</summary>
-					TValue& GetValue() { return value; }
-					///<summary>Гетер значення</summary>
-					const TValue& GetValue() const { return value; }
-					///<summary>Сеттер значення</summary>
-					void SetValue(const TValue& newValue) { value = newValue; }
-					///<summary>Оптимізований сеттер значення</summary>
-					void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
-
-					///<summary>Ключ</summary>
-					TKey Property(GetKey) Key;
-					///<summary>Значення</summary>
-					TValue Property(GetValue, SetValue) Value;
-				private:
-					///<summary>Ключ елемента</summary>
-					TKey key;
-					///<summary>Значення елемента</summary>
-					TValue value;
-				public:
-					///<summary>Конструктор копіювання ключа і значення</summary>
-					Data(const TKey& key, const TValue& value) : key(key), value(value) {}
-					///<summary>Конструктор переміщення значення і копіювання значення</summary>
-					Data(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
-					///<summary>Конструктор копіювання значення і переміщення значення</summary>
-					Data(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
-					///<summary>Конструктор переміщення і значення і ключа</summary>
-					Data(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
-				private:
-					friend Node;
-				};
 			private:
 				///<summary>Ключ і значення елемента</summary>
-				Data data;
+				Pair<TKey,TValue> data;
 
 				///<summary>Гетер ключа</summary>
-				const TKey& GetKey() const { return data.key; }
+				const TKey& GetKey() const { return data.Key; }
 				///<summary>Гетер значення</summary>
-				TValue& GetValue() { return data.value; }
+				TValue& GetValue() { return data.Value; }
 				///<summary>Гетер значення</summary>
-				const TValue& GetValue() const { return data.value; }
+				const TValue& GetValue() const { return data.Value; }
 				///<summary>Сеттер значення</summary>
-				void SetValue(const TValue& newValue) { data.value = newValue; }
+				void SetValue(const TValue& newValue) { data.Value = newValue; }
 				///<summary>Оптимізований сеттер значення</summary>
-				void SetValue(TValue&& newValue) { data.value = MoveRValue(newValue); }
+				void SetValue(TValue&& newValue) { data.Value = MoveRValue(newValue); }
 
 				///<summary>Ключ</summary>
 				TKey Property(GetKey) key;
@@ -119,19 +133,19 @@ namespace Seed {
 				RefCountT RefCount;
 
 				///<summary>Конструктор копіювання ключа і значення</summary>
-				Node(const TKey& key, const TValue& value, Node* father, Tree* tree) : data(Data(key, value)) , height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				Node(const TKey& key, const TValue& value, Node* father, Tree* tree) : data(Pair(key, value)) , height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
 				{};
 
 				///<summary>Конструктор переміщення значення і копіювання значення</summary>
-				Node(TKey&& key, const TValue& value, Node* father, Tree* tree) : data(Data((MoveRValue(key)), value)), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				Node(TKey&& key, const TValue& value, Node* father, Tree* tree) : data(Pair((MoveRValue(key)), value)), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
 				{}
 
 				///<summary>Конструктор копіювання значення і переміщення значення</summary>
-				Node(const TKey& key, TValue&& value, Node* father, Tree* tree) : data(Data(key, MoveRValue(value))), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				Node(const TKey& key, TValue&& value, Node* father, Tree* tree) : data(Pair(key, MoveRValue(value))), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
 				{};
 
 				///<summary>Конструктор переміщення і значення і ключа</summary>
-				Node(TKey&& key, TValue&& value, Node* father, Tree* tree) : data(Data(MoveRValue(key), MoveRValue(value))), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
+				Node(TKey&& key, TValue&& value, Node* father, Tree* tree) : data(Pair(MoveRValue(key), MoveRValue(value))), height(1), father(father), tree(tree), right(nullptr), left(nullptr), RefCount(1)
 				{};
 
 				friend BaseMap;
@@ -161,6 +175,109 @@ namespace Seed {
 				tree->lock.ExclusiveLock([&]() {
 					DestroyTree(tree->root);
 					});
+			}
+		protected:
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual BaseMap& ForEachImpl(Queryable::LambdaHolder<void, Pair<TKey, TValue>&>& lambda) {
+				ForEachLoop(lambda, this->tree->root);
+				return *this;
+			}
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual BaseMap& ForEachImpl(Queryable::LambdaHolder<void, const Pair<TKey, TValue>&>& lambda) {
+				ForEachLoop(lambda, this->tree->root);
+				return *this;
+			}
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual const BaseMap& ForEachImpl(Queryable::LambdaHolder<void, const Pair<TKey, TValue>&>& lambda) const {
+				ForEachLoop(lambda, this->tree->root);
+				return *this;
+			}
+		private:
+			void ForEachLoop(Queryable::LambdaHolder<void, Pair<TKey, TValue>&>& lambda, Node * node) {
+				if (node != nullptr) {
+					ForEachLoop(lambda, node->left);
+					lambda(node->data);
+					ForEachLoop(lambda, node->right);
+				}
+			}
+
+			void ForEachLoop(Queryable::LambdaHolder<void, const Pair<TKey, TValue>&>& lambda, Node* node) const {
+				if (node != nullptr) {
+					ForEachLoop(lambda, node->left);
+					lambda(node->data);
+					ForEachLoop(lambda, node->right);
+				}
+			}
+		protected:
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual BaseMap& ForEachKeyImpl(Queryable::LambdaHolder<void, const TKey&>& lambda) {
+				ForEachKeyLoop(lambda, this->tree->root);
+				return *this;
+			}
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual const BaseMap& ForEachKeyImpl(Queryable::LambdaHolder<void, const TKey&>& lambda) const {
+				ForEachKeyLoop(lambda, this->tree->root);
+				return *this;
+			}
+		private:
+			void ForEachKeyLoop(Queryable::LambdaHolder<void, const TKey&>& lambda, Node* node) const {
+				if (node != nullptr) {
+					ForEachKeyLoop(lambda, node->left);
+					lambda(node->key);
+					ForEachKeyLoop(lambda, node->right);
+				}
+			}
+		protected:
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual BaseMap& ForEachValueImpl(Queryable::LambdaHolder<void, TValue&>& lambda) {
+				ForEachValueLoop(lambda, this->tree->root);
+				return *this;
+			}
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual BaseMap& ForEachValueImpl(Queryable::LambdaHolder<void, const TValue&>& lambda) {
+				ForEachValueLoop(lambda, this->tree->root);
+				return *this;
+			}
+			///<summary>Імплементація обходу колекція</summary>
+			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+			///<returns>Силку на поточний контейнер</returns>
+			virtual const BaseMap& ForEachValueImpl(Queryable::LambdaHolder<void, const TValue&>& lambda) const {
+				ForEachValueLoop(lambda, this->tree->root);
+				return *this;
+			}
+		private:
+			void ForEachValueLoop(Queryable::LambdaHolder<void, TValue&>& lambda, Node* node) {
+				if (node != nullptr) {
+					ForEachValueLoop(lambda, node->left);
+					lambda(node->value);
+					ForEachValueLoop(lambda, node->right);
+				}
+			}
+
+			void ForEachValueLoop(Queryable::LambdaHolder<void, const TValue&>& lambda, Node* node) const {
+				if (node != nullptr) {
+					ForEachValueLoop(lambda, node->left);
+					lambda(node->value);
+					ForEachValueLoop(lambda, node->right);
+				}
+			}
+		protected:
+			virtual void TransferToAsPair(Pair<TKey, TValue> && pair) {
+				Insert(MoveRValue(pair.key), MoveRValue(pair.value));
 			}
 		private:
 			///<summary>Рекурсивний пошук елемента по ключу в дереві</summary>

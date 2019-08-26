@@ -78,3 +78,10 @@ InternalApiCall OptimizeExport(extern void WakeAllCondVal(void* condVar),
 );
 
 
+InternalApiCall OptimizeExport(extern bool TryAcquireLockSharedSRWLock(void* PSRWLock),
+	{
+		return RtlTryAcquireSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock)) == TRUE;
+	}
+);
+
+

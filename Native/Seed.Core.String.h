@@ -501,7 +501,7 @@ namespace Seed {
 			}
 
 			///<summary>Оператор оптимізованого присвоєння</summary>
-			///<param name = "orig">RValue силка на оригинал</summary>
+			///<param name = "orig">RValue силка на оригинал</param>
 			///<returns>Посилання на поточну зміну</returns>
 			///<remarks>Викликається деструктор для поточного рядка.
 			///Копіються поля з оригинала. І накінець поля в оригинала обнулюються</remarks>
@@ -1369,7 +1369,7 @@ namespace Seed {
 			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
 			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
 			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-			template<typename T>
+			template<typename T = Seed::Int32>
 			T toInt() const {
 				extern __declspec(noreturn) void ThrowNullPointException(
 					const Seed::ConstAString & File,
@@ -2395,8 +2395,11 @@ namespace Seed {
 			///<summary>Оптимізований обмін рядками a і b</summary>
 			///<params name "a">Правий рядок</params>
 			///<params name "b">Лівий рядок</params>
-			template<typename T, template<typename> typename U>
-			friend __forceinline void Swap(U<T> & a, U<T> & b) noexcept;
+			__forceinline friend void Swap(BaseString& a, BaseString& b) noexcept {
+				Seed::Swap(a.str, b.str);
+				Seed::Swap(a.CurrentSize, b.CurrentSize);
+				Seed::Swap(a.ReservedSize, b.ReservedSize);
+			}
 
 			///<summary>Деструктор</summary>
 			__forceinline ~BaseString() {
@@ -2412,13 +2415,14 @@ namespace Seed {
 		///<summary>Оптимізований обмін рядками a і b</summary>
 		///<params name "a">Правий рядок</params>
 		///<params name "b">Лівий рядок</params>
-		template<typename T, template<typename> typename U>
-		__forceinline void Swap(U<T> & a, U<T> & b) noexcept {
-			static_assert(TypeTraits::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
-			Seed::Swap(a.str, b.str);
-			Seed::Swap(a.CurrentSize, b.CurrentSize);
-			Seed::Swap(a.ReservedSize, b.ReservedSize);
-		}
+		////template<typename T, template<typename> typename U, TypeTraits::EnableIfTV<TypeTraits::IsSameT<BaseString<T>, U<T>>, bool> = true>
+		////inline void Swap(U<T> & a, U<T> & b) noexcept {
+		////	static_assert(TypeTraits::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
+		////	Seed::Swap(a.str, b.str);
+		////	Seed::Swap(a.CurrentSize, b.CurrentSize);
+		////	Seed::Swap(a.ReservedSize, b.ReservedSize);
+		////}
+
 		///<summary>Тип кінця рядка</summary>
 		namespace { typedef const Char(&EndLineT)[3]; }
 		///<summary>Позначка переходу на новий рядок, використовується CRLF режим</summary>

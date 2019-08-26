@@ -1,22 +1,92 @@
 #pragma once
-#include "Seed.Core.Threading.h"
-#include "Seed.Core.TaskShedule.Sheduler.h"
-
-//Allow complex unnamed object, unnamed object often appear as iterator 
-//or when function have side-effect for example starting thread or task
-#pragma warning(disable: 26444)
+#include "Seed.Core.Threading.Base.h"
+#include "Seed.Core.Threading.LockPrimitives.h"
+#include "Seed.Core.Containers.Delegate.h"
 
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			//Клас роботи
-			// екземпляри роботи виконуються в пулі потоків
-			class SeedKernelCall Job final : protected IDisposable {
+			class JobPool;
+			class ThreadPool;
+
+			class SeedKernelCall ThreadPool final: IDisposable {
+			private:
+				//Дані диспетчера 
+				struct dispatcher {
+					//Керуюча структура пула потоків
+					ImplSpecificT pool;
+					//Настройки середовищп для пула потоків
+					ImplSpecificT env;
+
+					ImplSpecificT cleanupData;
+					//Синхронізація задач з деструктором і підрахунок активних задач
+					SRWLock lock;
+					//Кількість задач в пулі
+					RefCountT JobsCounts;
+
+					RefCountT JobIndex;
+					//Кількість силок на даний екземаляр
+					RefCountT RefCount;
+
+					Boolean IsTerminating;
+
+					String Name;
+
+					dispatcher(const String& Name) :
+						Name(Name), 
+						pool(nullptr), 
+						env(nullptr), 
+						cleanupData(nullptr), 
+						lock(), 
+						JobsCounts(0), 
+						JobIndex(0),
+						RefCount(1),
+						IsTerminating(false)
+					{}
+
+					dispatcher(String&& Name) :
+						Name(MoveRValue(Name)), 
+						pool(nullptr), 
+						env(nullptr), 
+						cleanupData(nullptr), 
+						lock(), 
+						JobsCounts(0), 
+						JobIndex(0),
+						RefCount(1),
+						IsTerminating(false)
+					{}
+				};
+			private:
+				//Дані даного екземаляра
+				dispatcher* This;
+			protected:
+				virtual void Dispose() override final;
+			private:
+				void InitThreadPool();
+				ThreadPool(dispatcher* This) : This(This) { This->RefCount++; }
+			private:
+				friend SRWLock GetPoolLock(JobPool* thread);
+				friend Boolean IsPoolTerminating(JobPool* thread);
 			public:
-				//Дані задачі
-				struct data {
-					//Чи задача запущена
-					bool IsStarted;
+				ThreadPool() : This(new dispatcher("Unnamed Thread Pool")) { InitThreadPool(); }
+				ThreadPool(const String& Name) : This(new dispatcher(Name)) { InitThreadPool(); }
+				ThreadPool(String&& Name) : This(new dispatcher(MoveRValue(Name))) { InitThreadPool(); }
+			public:
+				JobPool Dispatch(const String& Name, Delegate&& delegate);
+				JobPool Dispatch(String&& Name, Delegate&& delegate);
+				JobPool Dispatch(Delegate&& delegate);
+			public:
+				SizeT GetTasksCount() { return This->JobsCounts; }
+			public:
+				friend class JobPool;
+			public:
+				RefCountClass(ThreadPool, This)
+			};
+
+			class SeedKernelCall JobPool final :IDisposable{
+			private:
+				struct Data {
+					volatile EThreadabledStates State;
 					//Івент який буде переведено в сигнальний стан лиш коли задача завершиться
 					Handle event;
 					//Дескриптор задачі в пулі потоків NT
@@ -27,102 +97,98 @@ namespace Seed {
 					Delegate delegate;
 					//ID потоку в якому виконується задача
 					SizeT TID;
+					//Ім'я
+					String Name;
+
+					Handle hThread;
+
+					RefCountT JobIndex;
+
+					ThreadPool::dispatcher* Parrent;
+
+					SensitiveList<SmartPtr<IThreadable>>::Iterator This;
 					//Конструктор
-					data(Handle event, Delegate&& delegate, ImplSpecificT work)
-						:
-						event(event),
-						work(work),
+					Data(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) :
+						State(EThreadabledStates::NotStarted),
 						delegate(MoveRValue(delegate)),
+						Parrent(Parrent.This),
+						JobIndex(Parrent.This->JobIndex++),
+						event(nullptr),
+						work(nullptr),
+						hThread(nullptr),
+						This(),
+						Name(Name),
 						RefCount(1),
-						IsStarted(false),
-						TID(0) {}
+						TID(0)
+					{}
+					//Конструктор
+					Data(Delegate&& delegate, String&& Name, const ThreadPool& Parrent) :
+						State(EThreadabledStates::NotStarted),
+						delegate(MoveRValue(delegate)),
+						Parrent(Parrent.This),
+						JobIndex(Parrent.This->JobIndex++),
+						event(nullptr),
+						work(nullptr),
+						hThread(nullptr),
+						This(),
+						Name(MoveRValue(Name)),
+						RefCount(1),
+						TID(0)
+					{}
 				};
 			private:
-				//Покажчик на дані екземляра задачі
-				data* This;
+				Data* This;
 			private:
-				//Пустий конструктор
-				__forceinline Job() :This(nullptr) {};
-
-				virtual void Dispose() override final;
-			public:
-				RefCountClass(Job, This);
-
-				//Очікує на завершення події
-				__forceinline void Wait() {}
-
-				////Вертає чи запущена задача
-				//__forceinline Boolean IsStarted() {}
-
-				////Вертає чи завершена задача
-				//__forceinline Boolean IsEnded() {}
-
-				//Перериває роботу
-				void Interupt();
-
-				//Вертає результат задачі,
-				//генерує NullPointExeption якщо задача 
-				//не запущена або об'єкт не ініціалізований 
-				template<typename T>
-				__forceinline T GetResult() {
-					if (Data == nullptr)
-						Throw(NullPointException(
-							ExceptionPosition,
-							reinterpret_cast<SizeT>(Data),
-							NullPointException::Types::Read)
-						);
-					Wait();
-					return Data->delegate.GetResult<T>();
-				}
-
-				friend class Dispatcher;
-			};
-
-			//Диспетчер пула потоків
-			//Метод Dispatch запускає делегат в пулі потоків
-			//Деструктор останього екземпляра буде очікувати на завершення всіх задач в пулі потоків
-			class SeedKernelCall Dispatcher final : protected IDisposable {
+				friend void RegisterThread(JobPool* thread);
+				friend void UnRegisterThread(JobPool* thread);
+				friend Delegate& GetJobEntryPoint(JobPool* thread);
+				friend void SetEventOnJobEnd(JobPool* thread, void* callbackObj);
+				friend SRWLock GetPoolLock(JobPool* thread);
+				friend Boolean IsPoolTerminating(JobPool* thread);
+				friend class ThreadableJobPool;
 			private:
-				//Дані диспетчера 
-				struct __dispatcher {
-					//Керуюча структура пула потоків
-					ImplSpecificT pool;
-					//Настройки середовищп для пула потоків
-					ImplSpecificT env;
-
-					ImplSpecificT cleanupData;
-					//Синхронізація задач з деструктором і підрахунок активних задач
-					Thread::GuardLock lock;
-					//Кількість задач в пулі
-					RefCountT JobsCounts;
-					//Кількість силок на даний екземаляр
-					RefCountT RefCount;
-
-					__dispatcher() :pool(nullptr), env(nullptr), cleanupData(nullptr), lock(), JobsCounts(0), RefCount(1) {}
-				};
-				//Дані даного екземаляра
-				__dispatcher* This;
+				JobPool(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) : This(new Data(MoveRValue(delegate), Name, Parrent)) {}
+				JobPool(Delegate&& delegate, String&& Name, const ThreadPool& Parrent) : This(new Data(MoveRValue(delegate), MoveRValue(Name), Parrent)) {}
+			private:
+				JobPool& Dispatch();
 			protected:
-				virtual void Dispose() override final;
+				virtual void Dispose() override final { This->Parrent = nullptr; }
 			public:
-				RefCountClass(Dispatcher, This);
-				//Конструктор диспетчера пула потоків
-				//Створює новий пул потоків
-				//Стартова кількість потоків рівна настройці THREAD_POOL_THREADS_MIN_COUNT
-				//Максимальна кількість потоків відповідно THREAD_POOL_THREADS_MAX_COUNT
-				//Стартовий і максимальний розмір стеку рівний відповідним параметрам потоків
-				Dispatcher();
-
-				//Запускає задачу
-				//Аргументом є функція з її аргументами
-				[[maybe_unused]] Job Dispatch(Seed::Core::Delegate&& EntryPoint);
-
-				//Вертає кількість задач в пулі
-				__forceinline UInt64 GetJobsCount() noexcept { return This->JobsCounts; }
-
-				//Вертає кількіть активних задач
-				__forceinline UInt64 GetActiveJobCount() noexcept { return This->lock.GetGuardedScopesCount(); }
+				ThreadPool GetThreadPool() { return ThreadPool(This->Parrent); }
+				EThreadabledStates GetCurrentState() { return This->State; }
+				JobPool& Interupt();
+				JobPool& Join();
+				JobPool& Suspend();
+				JobPool& Join(DateTime timeOut);
+				Boolean IsValid() { return This != nullptr; }
+			public:
+				const String& GetName() { return This->Name; }
+				void SetName(const String& NewName) { This->Name = NewName; }
+				void SetName(String&& NewName) { This->Name = MoveRValue(NewName); }
+			public:
+				RefCountClass(JobPool, This)
+			public:
+				friend class ThreadPool;
 			};
+
+			inline JobPool ThreadPool::Dispatch(const String& Name, Delegate&& delegate)
+			{
+				auto obj = JobPool(MoveRValue(delegate), Name, *this);
+				obj.Dispatch();
+				return obj;
+			}
+
+			inline JobPool ThreadPool::Dispatch(String&& Name, Delegate&& delegate) {
+				auto obj = JobPool(MoveRValue(delegate), MoveRValue(Name), *this);
+				obj.Dispatch();
+				return obj;
+			}
+
+			inline JobPool ThreadPool::Dispatch(Delegate&& delegate) {
+				auto obj = JobPool(MoveRValue(delegate), L"Unnamed job", *this);
+				obj.Dispatch();
+				return obj;
+			}
 		}
 	}
 }

@@ -215,7 +215,7 @@ namespace Seed {
 				return *this;
 			}
 
-			 virtual BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) override final {
+			virtual BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) override final {
 				this->data->lock.ShareLock([&]() {
 					auto node = this->data->root;
 					SizeT i = 0;
@@ -227,7 +227,7 @@ namespace Seed {
 				return *this;
 			}
 
-			 virtual const BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) const override final {
+			virtual const BaseList& ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) const override final {
 				this->data->lock.ShareLock([&]() mutable {
 					auto node = this->data->root;
 					while (node != nullptr) {
@@ -250,9 +250,9 @@ namespace Seed {
 				return *this;
 			}
 
-			virtual BaseList& FillImpl(Queryable::LambdaHolder<T>& lambda, SizeT ItemsCount) override final {
+			virtual void FillImpl(Queryable::LambdaHolder<T>& lambda, SizeT ItemsCount) override final {
 				if (ItemsCount == 0)
-					return *this;
+					return;
 				if (this->data->size == 0) {
 					this->data->last = this->data->root = new elem(lambda(), this->data);
 					if (ItemsCount != 1) {
@@ -261,14 +261,14 @@ namespace Seed {
 						}
 					}
 					this->data->size = ItemsCount;
-					return *this;
+					return;
 				}
-				return *this;
+				return;
 			}
 
-			virtual BaseList& FillImpl(Queryable::LambdaHolder<T, SizeT>& lambda, SizeT ItemsCount) override final {
+			virtual void FillImpl(Queryable::LambdaHolder<T, SizeT>& lambda, SizeT ItemsCount) override final {
 				if (ItemsCount == 0)
-					return *this;
+					return;
 				if (this->data->size == 0) {
 					this->data->last = this->data->root = new elem(lambda(0), this->data);
 					if (ItemsCount != 1) {
@@ -277,9 +277,9 @@ namespace Seed {
 						}
 					}
 					this->data->size = ItemsCount;
-					return *this;
+					return;
 				}
-				return *this;
+				return;
 			}
 
 			 virtual void TransferTo(T&& Value, [[maybe_unused]] SizeT Index) override final{
@@ -295,7 +295,7 @@ namespace Seed {
 				this->data->size = NewCount;
 			}
 
-			 virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&>& lambda) override final {
+			 virtual BaseList& RemoveAllImpl(Queryable::LambdaHolder<void, T&&>& lambda) override final {
 				this->data->lock.ExclusiveLock([&]() {
 					elem* item = this->data->root;
 					elem* tmp = item;
@@ -314,9 +314,10 @@ namespace Seed {
 					this->data->root = this->data->last = nullptr;
 					this->data->size = 0;
 				});
-			}
+				return *this;
+			}	
 
-			 virtual void RemoveAllImpl(Queryable::LambdaHolder<void, T&&, SizeT>& lambda) override final {
+			 virtual BaseList& RemoveAllImpl(Queryable::LambdaHolder<void, T&&, SizeT>& lambda) override final {
 				this->data->lock.ExclusiveLock([&]() {
 					elem* item = this->data->root;
 					elem* tmp = item;
@@ -337,6 +338,7 @@ namespace Seed {
 					this->data->root = this->data->last = nullptr;
 					this->data->size = 0;
 				});
+				return *this;
 			}
 
 			 virtual BaseList& SortImpl(Queryable::LambdaHolder<bool, const T&, const T&>& lambda, bool IsAscendingOrder) override final  {
@@ -422,8 +424,9 @@ namespace Seed {
 						return;
 					elem* first = this->data->root;
 					elem* last = this->data->last;
-					while (first != last || first->next != last) {
+					while (first != last && first->next != last) {
 						Swap(first->value, last->value);
+						first = first->next; last = last->prev;
 					}
 				});
 				return *this;
@@ -1030,7 +1033,7 @@ namespace Seed {
 			/////<param name = "orig">Оригінал списку</param>
 			//BaseList(BaseList && orig) noexcept;
 
-			RefCountClass(BaseList, data);
+			RefCountClass(BaseList, data)
 
 #pragma endregion
 #pragma region Operators
@@ -1371,8 +1374,6 @@ namespace Seed {
 				return *this;
 			}
 
-			////TODO: Write removing all with speicific function which execute for each item
-
 			///<summary>Видалення елементів які задовільняють умову функції Comp</summary>
 			///<param name = "Filter">Функція-фільтр якщо вертає true то елемент видаляється</param>
 			///<returns>Силку на список</returns>
@@ -1641,28 +1642,28 @@ namespace Seed {
 				return *this;
 			}
 		public:
-			///<summary>Функція сортування списку</summary>
-			///<param name = "Ascend">Якщо true то сортування відбувається по зростанню</param>
-			///<returns>Силку на список</returns>
-			virtual BaseList& Sort(bool IsAscendingOrder = true) override final
-			{
-				this->data->lock.ExclusiveLock([&]()
-					{
-						if (IsAscendingOrder)
-							MergeSort(&data->root, [](const T & V1, const T & V2)
-								{
-									return V1 >= V2;
-								});
-						else
-							MergeSort(&data->root, [](const T & V1, const T & V2)
-								{
-									return V1 <= V2;
-								});
-						data->last = data->root;
-						while (data->last->next != nullptr) data->last = data->last->next;
-					});
-				return *this;
-			}
+			///////<summary>Функція сортування списку</summary>
+			///////<param name = "Ascend">Якщо true то сортування відбувається по зростанню</param>
+			///////<returns>Силку на список</returns>
+			////virtual BaseList& Sort(bool IsAscendingOrder = true) override final
+			////{
+			////	this->data->lock.ExclusiveLock([&]()
+			////		{
+			////			if (IsAscendingOrder)
+			////				MergeSort(&data->root, [](const T & V1, const T & V2)
+			////					{
+			////						return V1 >= V2;
+			////					});
+			////			else
+			////				MergeSort(&data->root, [](const T & V1, const T & V2)
+			////					{
+			////						return V1 <= V2;
+			////					});
+			////			data->last = data->root;
+			////			while (data->last->next != nullptr) data->last = data->last->next;
+			////		});
+			////	return *this;
+			////}
 #pragma endregion
 #pragma region Search
 
