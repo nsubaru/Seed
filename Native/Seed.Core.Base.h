@@ -62,6 +62,8 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 ///<summary>Властивість яку можна читати або читати якщо дано лиш гетер і записувати якщо є гетер і сетер</summary>
 ///<param name = '__VA_ARGS__'>Гетер або гетер і сетер</param>
 #define Property(...) EXPAND_VA_ARGS(__Property_GET_MACRO(__VA_ARGS__, __Property2, __Property1)(__VA_ARGS__))
+///<summary>Інформує що змінна може бути проігнорована</summary>
+#define UnusedData [[maybe_unused]]
 
 ///<summary>Головний простір імен</summary>
 namespace Seed {

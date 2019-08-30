@@ -192,6 +192,34 @@ namespace Seed {
 				this->str[size] = L'\0';
 			}
 
+			///<summary>Конструктор з готового масиву букв який закінчується нуль-термінатором
+			///<para>Суто для внутрішнього використання</para></summary>
+			///<param name = "Text">Масив букв</param>
+			///<param name = "Size">Кількість символів разом з нуль-термінатором</summary>
+			///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
+			InternalApiCall BaseString(const AChar* text, SizeT Size) {
+				extern __declspec(noreturn) void ThrowStringToLong(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT RequiredSize);
+				SizeT size = Size;
+				if (size == 0) {
+					this->str = nullptr;
+					this->CurrentSize = this->ReservedSize = 0;
+					return;
+				}
+				CurrentSize = size + 1;
+				if (CurrentSize > Math::Max<SizeT>())
+					ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
+				ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
+				for (SizeT i = 0; i < size; i++) {
+					this->str[i] = text[i];
+				}
+				this->str[size] = L'\0';
+			}
+
 			///<summary>Конструктор з масиву символів і його розміру. Копіює вміст і дописую нуль-термінатор</summary>
 			///<params name = "rawText">Масив символів</params>
 			///<params name = "Size">Кількість символів</params>

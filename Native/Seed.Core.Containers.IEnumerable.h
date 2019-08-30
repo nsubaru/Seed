@@ -898,6 +898,10 @@ namespace Seed {
 					}
 				}
 
+				//TODO: Implement IsContaine
+				///<summary>Вертає true якщо такий ітем є</summary>
+				//bool IsContaine(const T& Item) = 0;
+
 				///<summary>Видалія всі елементи з колекції. Але перед видаленням викликає лямбду для кожного</summary>
 				///<param name = "lambda">Лямбда вираз який отрмає кожен елемент перед видаленням</param>
 				template<typename Lambda,
@@ -1151,6 +1155,19 @@ namespace Seed {
 				///<summary>Функція перенесення значення в асоціативний масив як пари ключ <-> значення</summary>
 				///<param name = "pair">Пара ключ <-> значення</param>
 				virtual void TransferToAsPair(Pair&& pair) = 0;
+			protected:
+				///<summary>Реалізація знищенння всіх елементів з викликом лямбди</summary>
+				///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+				///<returns>Силку на поточний контейнер</returns>
+				virtual Container& RemoveAllWithImpl(LambdaHolder<void, TKey &&, TValue &&> lambda) = 0;
+				///<summary>Реалізація знищенння всіх елементів з викликом лямбди</summary>
+				///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+				///<returns>Силку на поточний контейнер</returns>
+				virtual Container& RemoveAllWithValueImpl(LambdaHolder<void, TValue &&> lambda) = 0;
+				///<summary>Реалізація знищенння всіх елементів з викликом лямбди</summary>
+				///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
+				///<returns>Силку на поточний контейнер</returns>
+				virtual Container& RemoveAllWithKeyImpl(LambdaHolder<void, TKey &&> lambda) = 0;
 			public:
 				virtual ~IAssociable() = 0 {}
 			public:
@@ -1384,14 +1401,44 @@ namespace Seed {
 					> = true
 				>
 					const Container & ForEachValue(Lambda lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, const TValue&>) {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const TValue&>) {
 						return ForEachValueImpl(LambdaHolderImpl<decltype(lambda), void, const TValue&>(lambda));
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, const TValue&, SizeT>) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const TValue&, SizeT>) {
 						return ForEachValueImpl(LambdaHolderImpl<decltype(lambda), void, const TValue&, SizeT>(lambda));
 					}
 					else {
 						static_assert(false, "Invalid lambda in IQueryable::ForEach const specific");
+					}
+				}
+
+#pragma endregion
+#pragma region Miscenelious methods
+				///<summary>Вертає чи є елемент з заданим ключом</summary>
+				///<param name = "key">Шуканий ключ</param>
+				virtual bool IsContaine(const TKey& key) const = 0;
+
+				///<summary>Видаляє всі елементи</summary>
+				virtual Container& RemoveAll() = 0;
+
+				///<summary>Видаляє всі елементи. Перед видаленням викликає Lambda для кожного елемента</summary>
+				///<param name = "lambda">Лямбда вираз який може приймати RValue силку на ключ і значення або на щось одне</param>
+				///<returns>Силку на даний контейнер</returns>
+				template<typename Lambda,
+					TypeTraits::EnableIfTV<TypeTraits::LogicConst<
+					TypeTraits::IsLambdaConvertibleV<Lambda, void, TValue&&, TKey&&> ||
+					TypeTraits::IsLambdaConvertibleV<Lambda, void, TValue&&> ||
+					TypeTraits::IsLambdaConvertibleV<Lambda, void, TKey&&>
+					>, bool> = true>
+				Container& RemoveAllWith(Lambda lambda) {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, TValue&&, TKey&&>) {
+						return RemoveAllWithImpl(LambdaHolderImpl<decltype(lambda), void, TValue&&, TKey&&>(MoveRValue(lambda)));
+					}
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, TValue&&>) {
+						return RemoveAllWithValueImpl(LambdaHolderImpl<decltype(lambda), void, TValue&&>(MoveRValue(lambda)));
+					}
+					else {
+						return RemoveAllWithKeyImpl(LambdaHolderImpl<decltype(lambda), void,  TKey&&>(MoveRValue(lambda)));
 					}
 				}
 

@@ -181,21 +181,21 @@ namespace Seed {
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual BaseMap& ForEachImpl(Queryable::LambdaHolder<void, Pair<TKey, TValue>&>& lambda) {
-				ForEachLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachLoop(lambda, this->tree->root); });
 				return *this;
 			}
 			///<summary>Імплементація обходу колекція</summary>
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual BaseMap& ForEachImpl(Queryable::LambdaHolder<void, const Pair<TKey, TValue>&>& lambda) {
-				ForEachLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachLoop(lambda, this->tree->root); });
 				return *this;
 			}
 			///<summary>Імплементація обходу колекція</summary>
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual const BaseMap& ForEachImpl(Queryable::LambdaHolder<void, const Pair<TKey, TValue>&>& lambda) const {
-				ForEachLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachLoop(lambda, this->tree->root); });
 				return *this;
 			}
 		private:
@@ -219,14 +219,14 @@ namespace Seed {
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual BaseMap& ForEachKeyImpl(Queryable::LambdaHolder<void, const TKey&>& lambda) {
-				ForEachKeyLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachKeyLoop(lambda, this->tree->root); });
 				return *this;
 			}
 			///<summary>Імплементація обходу колекція</summary>
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual const BaseMap& ForEachKeyImpl(Queryable::LambdaHolder<void, const TKey&>& lambda) const {
-				ForEachKeyLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachKeyLoop(lambda, this->tree->root); });
 				return *this;
 			}
 		private:
@@ -242,25 +242,25 @@ namespace Seed {
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual BaseMap& ForEachValueImpl(Queryable::LambdaHolder<void, TValue&>& lambda) {
-				ForEachValueLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachValueLoop(lambda, this->tree->root); });
 				return *this;
 			}
 			///<summary>Імплементація обходу колекція</summary>
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual BaseMap& ForEachValueImpl(Queryable::LambdaHolder<void, const TValue&>& lambda) {
-				ForEachValueLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachValueLoop(lambda, this->tree->root); });
 				return *this;
 			}
 			///<summary>Імплементація обходу колекція</summary>
 			///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 			///<returns>Силку на поточний контейнер</returns>
 			virtual const BaseMap& ForEachValueImpl(Queryable::LambdaHolder<void, const TValue&>& lambda) const {
-				ForEachValueLoop(lambda, this->tree->root);
+				this->tree->lock.ShareLock([&]() { ForEachValueLoop(lambda, this->tree->root); });
 				return *this;
 			}
 		private:
-			void ForEachValueLoop(Queryable::LambdaHolder<void, TValue&>& lambda, Node* node) {
+			virtual void ForEachValueLoop(Queryable::LambdaHolder<void, TValue&>& lambda, Node* node) {
 				if (node != nullptr) {
 					ForEachValueLoop(lambda, node->left);
 					lambda(node->value);
@@ -268,7 +268,7 @@ namespace Seed {
 				}
 			}
 
-			void ForEachValueLoop(Queryable::LambdaHolder<void, const TValue&>& lambda, Node* node) const {
+			virtual void ForEachValueLoop(Queryable::LambdaHolder<void, const TValue&>& lambda, Node* node) const {
 				if (node != nullptr) {
 					ForEachValueLoop(lambda, node->left);
 					lambda(node->value);
@@ -278,6 +278,19 @@ namespace Seed {
 		protected:
 			virtual void TransferToAsPair(Pair<TKey, TValue> && pair) {
 				Insert(MoveRValue(pair.key), MoveRValue(pair.value));
+			}
+		protected:
+			virtual BaseMap& RemoveAllWithImpl(Queryable::LambdaHolder<void, TKey &&, TValue &&> lambda) {
+				this->tree->lock.ExclusiveLock([&]() { DestroyTreeWithLambdaPair(this->tree->root, lambda); });
+				return *this;
+			}
+			virtual BaseMap& RemoveAllWithValueImpl(Queryable::LambdaHolder<void, TValue &&> lambda) {
+				this->tree->lock.ExclusiveLock([&]() { DestroyTreeWithLambdaValue(this->tree->root, lambda); });
+				return *this;
+			}
+			virtual BaseMap& RemoveAllWithKeyImpl(Queryable::LambdaHolder<void, TKey &&> lambda) {
+				this->tree->lock.ExclusiveLock([&]() { DestroyTreeWithLambdaKey(this->tree->root, lambda); });
+				return *this;
 			}
 		private:
 			///<summary>Рекурсивний пошук елемента по ключу в дереві</summary>
@@ -497,7 +510,7 @@ namespace Seed {
 			///<param name = "node">Батьківський елемент</summary>
 			///<param name = "key">Ключ</param>
 			///<returns>Батьківський елемент</returns>
-			Node* Remove(Node * node, TKey key)
+			Node* Remove(Node * node, const TKey & key)
 			{
 				if (!node) return nullptr;
 				if (key < node->key)
@@ -533,6 +546,81 @@ namespace Seed {
 						root->right = DestroyTree(root->right);
 					}
 					if(--root->RefCount == 0)
+						delete root;
+					else {
+						root->father = root->left = root->right = nullptr;
+						root->tree = nullptr;
+					}
+				}
+				return nullptr;
+			}
+		private:
+			///<summary>Рекурсивне знищеання дерева</summary>
+			///<param name = "root">Батьківський елемент</param>
+			Node* DestroyTreeWithLambdaPair(Node* root, Queryable::LambdaHolder<void, TKey &&, TValue &&> & lambda) //-V688
+			{
+				if (root != nullptr)
+				{
+					if (root->left != nullptr)
+					{
+						root->left = DestroyTreeWithLambdaPair(root->left, lambda);
+					}
+					if (root->right != nullptr)
+					{
+						root->right = DestroyTreeWithLambdaPair(root->right, lambda);
+					}
+					lambda(MoveRValue(root->data.key), MoveRValue(root->data.value));
+					if (--root->RefCount == 0)
+						delete root;
+					else {
+						root->father = root->left = root->right = nullptr;
+						root->tree = nullptr;
+					}
+				}
+				return nullptr;
+			}
+
+			///<summary>Рекурсивне знищеання дерева</summary>
+			///<param name = "root">Батьківський елемент</param>
+			Node* DestroyTreeWithLambdaValue(Node* root, Queryable::LambdaHolder<void, TValue &&>& lambda) //-V688
+			{
+				if (root != nullptr)
+				{
+					if (root->left != nullptr)
+					{
+						root->left = DestroyTreeWithLambdaValue(root->left, lambda);
+					}
+					if (root->right != nullptr)
+					{
+						root->right = DestroyTreeWithLambdaValue(root->right, lambda);
+					}
+					lambda(MoveRValue(root->data.value));
+					if (--root->RefCount == 0)
+						delete root;
+					else {
+						root->father = root->left = root->right = nullptr;
+						root->tree = nullptr;
+					}
+				}
+				return nullptr;
+			}
+
+			///<summary>Рекурсивне знищеання дерева</summary>
+			///<param name = "root">Батьківський елемент</param>
+			Node* DestroyTreeWithLambdaKey(Node* root, Queryable::LambdaHolder<void, TKey &&>& lambda) //-V688
+			{
+				if (root != nullptr)
+				{
+					if (root->left != nullptr)
+					{
+						root->left = DestroyTreeWithLambdaKey(root->left, lambda);
+					}
+					if (root->right != nullptr)
+					{
+						root->right = DestroyTreeWithLambdaKey(root->right, lambda);
+					}
+					lambda(MoveRValue(root->data.key));
+					if (--root->RefCount == 0)
 						delete root;
 					else {
 						root->father = root->left = root->right = nullptr;
@@ -795,7 +883,7 @@ namespace Seed {
 			
 			///<summary>Видалення елемента по значенню</summary>
 			///<param name = "key">Ключ по якому відбуватиметься видалення</param>
-			void Delete(TKey key)
+			void Delete(const TKey & key)
 			{
 				tree->lock.ExclusiveLock([&]() {
 					--tree->count;
@@ -826,6 +914,18 @@ namespace Seed {
 				if (node == nullptr)
 					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read));
 				return node->value;
+			}
+
+			///<summary>Видаляє всі елементи</summary>
+			virtual BaseMap& RemoveAll() override final { this->Dispose(); return *this; }
+
+			///<summary>Провірка чи ключ міститься в колекції</summary>
+			///<param name = "key">Ключ який шукатиме в колекції</summary>
+			virtual bool IsContaine(const TKey & key) const override final {
+				Node* node = tree->lock.ShareLock([&]() {
+					return Find(tree->root, key); });
+
+				return node != nullptr;
 			}
 		};
 

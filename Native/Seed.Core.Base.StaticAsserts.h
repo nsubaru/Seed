@@ -888,8 +888,6 @@ namespace Seed {
 				: Details::Lambda<Ret, Cls, LogicFalse, Args...>
 			{};
 
-			constexpr inline auto var = [](int, int)->int {};
-
 			template<class Ld, typename Ret, typename ... Params>
 			struct IsLambdaConvertible
 				:LogicConst<
@@ -898,6 +896,15 @@ namespace Seed {
 						IsSameT<typename LambdaType<Ld>::Args, Pack<Params...>>
 					>::State
 				> {};
+
+			template<class Ld, typename Ret, typename ... Params>
+			constexpr bool IsLambdaConvertibleV = IsLambdaConvertible<Ld, Ret, Params...>::State;
+
+			template<typename T>
+			struct IsPodT : LogicConst<__is_pod(T)> {};
+
+			template<typename T>
+			constexpr bool IsPodV = IsPodT<T>::State;
 		}
 	}
 }
