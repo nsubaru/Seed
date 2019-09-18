@@ -9,7 +9,7 @@
 namespace Seed {
 	inline namespace Core {
 		template<typename THeap, typename T>
-		class SeedKernelCall BaseStack final : public Memory::Allocator<THeap>, protected IDisposable {
+		class SeedKernelCall BaseStackList final : public Memory::Allocator<THeap>, protected IDisposable {
 		private:
 			struct Node {
 				T Value;
@@ -37,9 +37,9 @@ namespace Seed {
 				}
 			}
 		public:
-			BaseStack(): data(new Data) {}
+			BaseStackList(): data(new Data) {}
 
-			RefCountClass(BaseStack, data);
+			RefCountClass(BaseStackList, data);
 
 			void Push(const T & Value) {
 				this->data->Lock.ExclusiveLock([&]() {
@@ -61,6 +61,7 @@ namespace Seed {
 						const Seed::SizeT Line,
 						const Seed::SizeT Address,
 						const Seed::UInt8 Mode);
+
 					if(this->data->Top == nullptr)
 						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					auto node = this->data->Top;
@@ -80,6 +81,7 @@ namespace Seed {
 						const Seed::SizeT Line,
 						const Seed::SizeT Address,
 						const Seed::UInt8 Mode);
+
 					if (this->data->Top == nullptr)
 						ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					return this->data->Top->Value;
@@ -91,12 +93,12 @@ namespace Seed {
 
 		namespace {
 			template<typename T>
-			using Stack = BaseStack<Seed::Core::Memory::Heap, T>;
+			using Stack = BaseStackList<Seed::Core::Memory::Heap, T>;
 		}
 
 		namespace {
 			template<typename T>
-			using SensitiveStack = BaseStack<Seed::Core::Memory::SensitiveDataHeap, T>;
+			using SensitiveStack = BaseStackList<Seed::Core::Memory::SensitiveDataHeap, T>;
 		}
 	}
 }

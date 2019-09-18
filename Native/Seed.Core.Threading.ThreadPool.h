@@ -63,7 +63,7 @@ namespace Seed {
 				virtual void Dispose() override final;
 			private:
 				void InitThreadPool();
-				ThreadPool(dispatcher* This) : This(This) { This->RefCount++; }
+				ThreadPool(dispatcher* This) : This(This) { ++This->RefCount; }
 			private:
 				friend SRWLock GetPoolLock(JobPool* thread);
 				friend Boolean IsPoolTerminating(JobPool* thread);

@@ -1096,6 +1096,51 @@ namespace Seed {
 				this->AddLast(Value); return *this;
 			}
 
+			///<summary>Додавання елементів списку OtherList в кінець цього списку</summary>
+			///<param name = "OtherList">Другий список</param>
+			///<returns>Силку на поточний список</returns>
+			__forceinline BaseList& operator+=(const BaseList& OtherList) {
+				if (OtherList.data == this->data)
+					return *this;
+
+				if (OtherList.data->size == 0)
+					return *this;
+				this->data->lock.ExclusiveLock([&]() {
+					OtherList.data->lock.ShareLock([&]() {
+						auto node = OtherList.data->root;
+						while (node != nullptr) {
+							this->data->last->next = new elem(node->value, this->data, this->data->last);
+							this->data->last = this->data->last->next;
+							node = node->next;
+						}
+						this->data->size = this->data->size + OtherList.data->size;
+						});
+					});
+				return *this;
+			}
+
+			///<summary>Оптимізована додавання елементів до даного списку</summary>
+			///<param name = "OtherList">Другий список</param>
+			///<returns>Силку на поточний список</returns>
+			__forceinline BaseList& operator+=(BaseList&& OtherList) {
+				if (OtherList.data == this->data)
+					return *this;
+
+				if (OtherList.data->RefCount == 1) {
+					this->data->lock.ExclusiveLock([&]() {
+						this->data->last->next = OtherList.data->root;
+						OtherList.data->root->prev = this->data->last;
+						this->data->size = this->data->size + OtherList.data->size;
+						OtherList.data->root = OtherList.data->last = nullptr;
+						OtherList.data->size = 0;
+						});
+				}
+				else {
+					return *this += OtherList;
+				}
+				return *this;
+			}
+
 			Boolean operator==(const BaseList& second) {
 				if (this->Count == second.Count) {
 					return this->data->lock.ShareLock([&]()
@@ -1218,7 +1263,7 @@ namespace Seed {
 
 			///<summary>Оптимізоване додавання елемента до списку</summary>
 			///<param name = "Value">rvalue силка на значення нового елемента</param>
-			Iterator AddLast(const T && Value)
+			Iterator AddLast(T && Value)
 			{
 				if (data == nullptr)
 				{

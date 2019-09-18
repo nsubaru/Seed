@@ -67,3 +67,11 @@ using namespace Seed;
 	{
 	Throw(EndNodeNotDeferencable(File, Function, Line));
 	}
+
+	extern __declspec(noreturn) void ThrowNotImplemented(
+		const Seed::ConstAString& File,
+		const Seed::ConstAString& Function,
+		const Seed::SizeT Line)
+	{
+		Throw(NotImplemented(File, Function, Line));
+	}

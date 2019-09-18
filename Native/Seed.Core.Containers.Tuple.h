@@ -2527,15 +2527,18 @@ namespace Seed {
 				impl_.Swap(t.impl_);
 			}
 
+			//template<SizeT Index>
+			//constexpr auto& Get() {
+			//	return get<Index>(*this);
+			//}
+
 			template<SizeT Index>
-			auto& Get() {
+			constexpr auto& Get() {
 				return get<Index>(*this);
 			}
 
 			template<SizeT Index>
-			constexpr const auto& Get() const {
-				return get<Index>(*this);
-			}
+			using Item = typename TupleImpl::TupleElement<Index, Tuple>::Type;
 
 			constexpr static SizeT Count() { return sizeof...(Ts_); }
 		};

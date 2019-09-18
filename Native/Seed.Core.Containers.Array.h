@@ -3,6 +3,7 @@
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Containers.Internals.h"
 #include "Seed.Core.Containers.IEnumerable.h"
+#include "Seed.Core.Containers.SliceList.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -406,6 +407,9 @@ namespace Seed {
 					this->arr = nullptr;
 				}
 			}
+		public:
+			template<typename THeap, typename T>
+			friend class BaseSlicesList;
 		};
 
 		///<summary>Копіювальний конструктор</summary>
@@ -438,6 +442,413 @@ namespace Seed {
 
 			template<typename U>
 			struct TIsDynamicSize<Array<U>> : TypeTraits::LogicFalse {};
+		}
+
+		template<typename THeap, typename T>
+		class BaseSlicesList : Seed::IDisposable, Memory::Allocator<THeap>, Queryable::IQueryable<BaseSlicesList<THeap, T>, T> {
+		private:
+			struct list : Memory::Allocator<THeap> {
+				SizeT Size;
+				T* Data;
+				list* next;
+
+				list(T* Data, SizeT Size) : Size(Size), Data(Data), next(nullptr) {}
+			};
+
+			struct Data : Memory::Allocator<THeap> {
+				Seed::RefCountT RefCount;
+				SizeT Size;
+				list* root;
+				list* last;
+
+				Data() : RefCount(1), Size(0), root(nullptr), last(nullptr) {}
+			};
+		private:
+			Data* This;
+		protected:
+			virtual void Dispose() override {
+				auto node = This->root;
+				list* cp;
+				while (node != nullptr) {
+					delete[] node->Data;
+					cp = node;
+					node = node->next;
+					delete cp;
+				}
+			}
+		private:
+			void AddNewSliceImpl(T* Slice, SizeT size) {
+				if (This->Size == 0) {
+					This->root = This->last = new list(Slice, size);
+				}
+				else {
+					This->last = This->last->next = new list(Slice, size);
+				}
+				This->Size += size;
+			}
+
+		public:
+			BaseSlicesList() : This(new Data) {}
+			//BaseSlicesList()
+		public:
+			BaseSlicesList& AddNewSlice(Array<T> slice) {
+				SizeT count = slice.count;
+				T* arr = new T[count];
+				T* old = slice.arr;
+				for (SizeT i = 0; i < count; i++)
+				{
+					arr[i] = old[i];
+				}
+				AddNewSliceImpl(arr, count);
+				return *this;
+			}
+
+			BaseSlicesList& operator+=(Array<T>&& blob) {
+				AddNewSliceImpl(blob.arr, blob.count);
+				blob.arr = nullptr; blob.count = 0;
+				return *this;
+			}
+
+			///<summary>Отримати колекцію яка міститиме всі елементи від елемента з номером StartIndex до останього включно</summary>
+			///<param name = "StartIndex">Номер першого елемента який включається в нову колекцію. Індексація з нуля</param>
+			///<returns>Нову колекцію з відповідними елементами</returns>
+			virtual BaseSlicesList Slice(SizeT StartIndex) {
+				if (StartIndex > This->Size) {
+					extern __declspec(noreturn) void ThrowIndexOutOfRange(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line,
+						const Seed::SizeT Required,
+						const Seed::SizeT MaxAllowed);
+					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartIndex, This->Size);
+				}
+				auto node = This->root;
+				SizeT NodeStartIndex = 0;
+				while (node != nullptr) {
+					if (NodeStartIndex + node->Size > StartIndex) {
+						break;
+					}
+					else {
+						NodeStartIndex += node->Size;
+						node = node->next;
+					}
+				}
+				BaseSlicesList newSlicesList;
+				T* arr = new T[node->Size];
+				SizeT FirstSliceOffset = StartIndex - NodeStartIndex;
+				for (SizeT i = FirstSliceOffset; i < node->Size; i++) {
+					arr[i - FirstSliceOffset] = node->Data[i];
+				}
+				newSlicesList.AddNewSliceImpl(arr, node->Size);
+				node = node->next;
+				while (node != nullptr) {
+					T* arr = new T[node->Size];
+					for (SizeT i = 0; i < node->Size; i++)
+					{
+						arr[i] = node->Data[i];
+					}
+					newSlicesList.AddNewSliceImpl(arr, node->Size);
+					node = node->next;
+				}
+				return newSlicesList;
+			}
+			///<summary>Отримати колекцію яка міститиме Count елементів від елемента з номером StartIndex</summary>
+			///<param name = "StartIndex">Номер першого елемента який включається в нову колекцію. Індексація з нуля</param>
+			///<param name = "Count">Кількість елементів які потрібно скопіювати в нову колекцію</param>
+			///<returns>Нову колекцію з відповідними елементами</returns>
+			virtual BaseSlicesList Slice(SizeT StartIndex, SizeT Count) {
+				if (StartIndex + Count > This->Size) {
+					extern __declspec(noreturn) void ThrowIndexOutOfRange(
+						const Seed::ConstAString & File,
+						const Seed::ConstAString & Function,
+						const Seed::SizeT Line,
+						const Seed::SizeT Required,
+						const Seed::SizeT MaxAllowed);
+					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartIndex + Count, This->Size);
+				}
+				auto node = This->root;
+				SizeT NodeStartIndex = 0;
+				while (node != nullptr) {
+					if (NodeStartIndex + node->Size >= StartIndex) {
+						break;
+					}
+					else {
+						NodeStartIndex += node->Size;
+						node = node->next;
+					}
+				}
+				BaseSlicesList newSlicesList;
+				if((StartIndex - NodeStartIndex ) + Count >= node->Size) {
+					T* arr = new T[Count];
+					SizeT FirstSliceOffset = StartIndex - NodeStartIndex;
+					for (SizeT i = FirstSliceOffset; i < FirstSliceOffset + Count; i++) {
+						arr[i - FirstSliceOffset] = node->Data[i];
+					}
+					newSlicesList.AddNewSliceImpl(arr, Count);
+				}
+				else {
+					T* arr = new T[node->Size];
+					SizeT FirstSliceOffset = StartIndex - NodeStartIndex;
+					for (SizeT i = FirstSliceOffset; i < node->Size; i++) {
+						arr[i - FirstSliceOffset] = node->Data[i];
+					}
+					SizeT CopiedCount = node->Size;
+					newSlicesList.AddNewSliceImpl(arr, node->Size);
+					node = node->next;
+
+					while (node != nullptr) {
+						if (CopiedCount + node->Size > Count) {
+							SizeT arrSize = node->Size - ((CopiedCount + node->Size) - Count);
+							T* arr = new T[arrSize];
+							for (SizeT i = 0; i < node->Size; i++)
+							{
+								arr[i] = node->Data[i];
+							}
+							newSlicesList.AddNewSliceImpl(arr, arrSize);
+							break;
+						}
+						else {
+							T* arr = new T[node->Size];
+							for (SizeT i = 0; i < node->Size; i++)
+							{
+								arr[i] = node->Data[i];
+							}
+							newSlicesList.AddNewSliceImpl(arr, node->Size);
+							node = node->next;
+							NodeStartIndex += node->Size;
+							CopiedCount += node->Size;
+						}
+					}
+				}
+				return newSlicesList;
+			}
+			///<summary>Оператор доступу до елемента по номеру</summary>
+			///<param name = "Index">Індекс елемента</param>
+			///<returns>Силку на елемент в масиву</returns>
+			virtual T& operator[](SizeT Index) {
+				auto node = This->root;
+				SizeT NodeStartIndex = 0;
+				while (node != nullptr) {
+					if (NodeStartIndex + node->Size > Index) {
+						return node->Data[Index - NodeStartIndex];
+					}
+					else {
+						NodeStartIndex += node->Size;
+						node = node->next;
+					}
+				}
+				extern __declspec(noreturn) void ThrowIndexOutOfRange(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT Required,
+					const Seed::SizeT MaxAllowed);
+				ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, Count);
+			}
+			///<summary>Константний оператор доступу до елемента по номеру</summary>
+			///<param name = "Index">Індекс елемента</param>
+			///<returns>Константна cилка на елемент в масиву</returns>
+			virtual const T& operator[](SizeT Index) const {
+				auto node = This->root;
+				SizeT NodeStartIndex = 0;
+				while (node != nullptr) {
+					if (NodeStartIndex + node->Size > Index) {
+						return node->Data[Index - NodeStartIndex];
+					}
+					else {
+						NodeStartIndex += node->Size;
+						node = node->next;
+					}
+				}
+				extern __declspec(noreturn) void ThrowIndexOutOfRange(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT Required,
+					const Seed::SizeT MaxAllowed);
+				ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, Count);
+			}
+		protected:
+			/*///<summary>Реалізація сортування</summary>
+			///<param name = "lambda">Лямбда вираз порівняння елементів</param>
+			///<param name = "IsAscendingOrder">Якщо true то сортування в порядку спадання</param>
+			///<returns>Силка на колекцію</returns>
+			virtual Container& SortImpl(Queryable::LambdaHolder<bool, const T&, const T&>& lambda, bool IsAscendingOrder) {
+				extern __declspec(noreturn) void ThrowNotImplemented(
+					const Seed::ConstAString & File,
+					const Seed::ConstAString & Function,
+					const Seed::SizeT Line);
+				ThrowNotImplemented(__FILE__, __FUNCSIG__, __LINE__);
+			}
+			///<summary>Реалізація наповнення колекції елементами</summary>
+			///<param name = "lambda">Лямбда вираз який вертає значення елементів</param>
+			///<param name = "Count">Кількість елементів які будуть створенні</param>
+			///<returns>Силка на колекцію</returns>
+			virtual void FillImpl(Queryable::LambdaHolder<T>& lambda, SizeT Count) {
+				T* arr = new T[Count];
+				for (SizeT i = 0; i < Count; i++)
+				{
+					arr[i] = lambda();
+				}
+			}
+			///<summary>Реалізація наповнення колекції елементами</summary>
+			///<param name = "lambda">Лямбда вираз який вертає значення елементів</param>
+			///<param name = "Count">Кількість елементів які будуть створенні</param>
+			///<returns>Силка на колекцію</returns>
+			virtual void FillImpl(Queryable::LambdaHolder<T, SizeT>& lambda, SizeT Count) {
+				T* arr = new T[Count];
+				for (SizeT i = 0; i < Count; i++)
+				{
+					arr[i] = lambda(i);
+				}
+			}*/
+
+			__forceinline virtual BaseSlicesList& ForEachImpl(Queryable::LambdaHolder<void, T&>& lambda) final override {
+				auto item = This->root;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(item->Data[i]);
+					}
+				}
+				return *this;
+			}
+			__forceinline virtual BaseSlicesList& ForEachImpl(Queryable::LambdaHolder<void, T&, SizeT>& lambda) final override {
+				auto item = This->root;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(item->Data[i], ForwardReference<SizeT&&>(i));
+					}
+				}
+				return *this;
+			}
+			__forceinline virtual BaseSlicesList& ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) final override {
+				auto item = This->root;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(item->Data[i]);
+					}
+				}
+				return *this;
+			}
+			__forceinline virtual BaseSlicesList& ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) final override {
+				auto item = This->root;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(item->Data[i], ForwardReference<SizeT&&>(i));
+					}
+				}
+				return *this;
+			}
+			__forceinline virtual const BaseSlicesList& ForEachImpl(Queryable::LambdaHolder<void, const T&>& lambda) const final override {
+				auto item = This->root;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(item->Data[i]);
+					}
+				}
+				return *this;
+			}
+			__forceinline virtual const BaseSlicesList& ForEachImpl(Queryable::LambdaHolder<void, const T&, SizeT>& lambda) const final override {
+				auto item = This->root;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(item->Data[i], ForwardReference<SizeT&&>(i));
+					}
+				}
+				return *this;
+			}
+
+			__forceinline virtual void TransferTo(T&& Value, SizeT ItemIndex) final override {
+				This->root->Data[ItemIndex] = MoveRValue(Value);
+			}
+
+			__forceinline virtual void PrepareCopyToOrMove(SizeT NewSize) final override {
+				AddNewSliceImpl(new T[NewSize], NewSize);
+			}
+
+			virtual BaseSlicesList& RemoveAllImpl(Queryable::LambdaHolder<void, T&&>& lambda) final override {
+				auto item = This->root;
+				auto cp = item;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(MoveRValue(item->Data[i]));
+					}
+					delete cp;
+					cp = item;
+					item = item->next;
+				}
+				This->root = This->last = nullptr;
+				This->Size = 0;
+				return *this;
+			}
+			virtual BaseSlicesList& RemoveAllImpl(Queryable::LambdaHolder<void, T&&, SizeT>& lambda) final override {
+				auto item = This->root;
+				auto cp = item;
+				while (item != nullptr) {
+					for (SizeT i = 0; i < item->Size; i++)
+					{
+						lambda(MoveRValue(item->Data[i]), ForwardReference<SizeT&&>(i));
+					}
+					delete cp;
+					cp = item;
+					item = item->next;
+				}
+				This->root = This->last = nullptr;
+				This->Size = 0;
+				return *this;
+			}
+		public:
+			virtual BaseSlicesList& RemoveAll() final override {
+				auto item = This->root;
+				auto cp = item;
+				while (item != nullptr) {
+					delete cp;
+					cp = item;
+					item = item->next;
+				}
+				This->root = This->last = nullptr;
+				This->Size = 0;
+				return *this;
+			}
+
+			virtual SizeT GetCount() const { return This->Size; }
+			Property(GetCount) SizeT Count;
+		public:
+			RefCountClass(BaseSlicesList, This);
+		};
+
+
+		///<summary>Список кусків масиву
+		///<para>
+		/// Для кожного елемента відбувається підрахунок силок,
+		/// що дозволяє корректно його знищити навіть
+		/// якщо десь використовується ітератор на елемент
+		///</para>
+		///</summary>
+		///<param name = "T">Тип значеннь</param>
+		namespace {
+			template<typename T>
+			using SlicesList = BaseSlicesList<Seed::Core::Memory::Heap, T>;
+		}
+
+		///<summary>Список кусків масиву з захищеним алокатором
+		///<para>
+		/// Для кожного елемента відбувається підрахунок силок,
+		/// що дозволяє корректно його знищити навіть
+		/// якщо десь використовується ітератор на елемент
+		///</para>
+		///</summary>
+		///<param name = "T">Тип значеннь</param>
+		namespace {
+			template<typename T>
+			using SensitiveSlicesList = BaseSlicesList<Seed::Core::Memory::SensitiveDataHeap, T>;
 		}
 	}
 }

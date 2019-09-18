@@ -1159,15 +1159,15 @@ namespace Seed {
 				///<summary>Реалізація знищенння всіх елементів з викликом лямбди</summary>
 				///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 				///<returns>Силку на поточний контейнер</returns>
-				virtual Container& RemoveAllWithImpl(LambdaHolder<void, TKey &&, TValue &&> lambda) = 0;
+				virtual Container& RemoveAllWithImpl(LambdaHolder<void, TKey &&, TValue &&>& lambda) = 0;
 				///<summary>Реалізація знищенння всіх елементів з викликом лямбди</summary>
 				///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 				///<returns>Силку на поточний контейнер</returns>
-				virtual Container& RemoveAllWithValueImpl(LambdaHolder<void, TValue &&> lambda) = 0;
+				virtual Container& RemoveAllWithValueImpl(LambdaHolder<void, TValue &&>& lambda) = 0;
 				///<summary>Реалізація знищенння всіх елементів з викликом лямбди</summary>
 				///<param name = "lambda">Лямбда вираз який викличеться для кожного елемента</param>
 				///<returns>Силку на поточний контейнер</returns>
-				virtual Container& RemoveAllWithKeyImpl(LambdaHolder<void, TKey &&> lambda) = 0;
+				virtual Container& RemoveAllWithKeyImpl(LambdaHolder<void, TKey &&>& lambda) = 0;
 			public:
 				virtual ~IAssociable() = 0 {}
 			public:
@@ -1313,8 +1313,8 @@ namespace Seed {
 					> = true
 				>
 					const Container & ForEach(Lambda lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, const Pair&>) {
-						return ForEachImpl(LambdaHolderImpl<decltype(lambda), void, const Pair&>(lambda));
+					if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, const Pair&>::State) {
+						return ForEachImpl(LambdaHolderImpl<decltype(lambda), void, const Pair&>(MoveRValue(lambda)));
 					}
 					else {
 						static_assert(false, "Invalid lambda in IQueryable::ForEach const specific");

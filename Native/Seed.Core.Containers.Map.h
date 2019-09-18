@@ -280,15 +280,15 @@ namespace Seed {
 				Insert(MoveRValue(pair.key), MoveRValue(pair.value));
 			}
 		protected:
-			virtual BaseMap& RemoveAllWithImpl(Queryable::LambdaHolder<void, TKey &&, TValue &&> lambda) {
-				this->tree->lock.ExclusiveLock([&]() { DestroyTreeWithLambdaPair(this->tree->root, lambda); });
+			virtual BaseMap& RemoveAllWithImpl(Queryable::LambdaHolder<void, TKey &&, TValue &&>& lambda) override {
+				this->tree->lock.ExclusiveLock([&]() { DestroyTreeWithLambdaPairValues(this->tree->root, lambda); });
 				return *this;
 			}
-			virtual BaseMap& RemoveAllWithValueImpl(Queryable::LambdaHolder<void, TValue &&> lambda) {
+			virtual BaseMap& RemoveAllWithValueImpl(Queryable::LambdaHolder<void, TValue &&>& lambda) override {
 				this->tree->lock.ExclusiveLock([&]() { DestroyTreeWithLambdaValue(this->tree->root, lambda); });
 				return *this;
 			}
-			virtual BaseMap& RemoveAllWithKeyImpl(Queryable::LambdaHolder<void, TKey &&> lambda) {
+			virtual BaseMap& RemoveAllWithKeyImpl(Queryable::LambdaHolder<void, TKey &&>& lambda) override {
 				this->tree->lock.ExclusiveLock([&]() { DestroyTreeWithLambdaKey(this->tree->root, lambda); });
 				return *this;
 			}
@@ -557,17 +557,17 @@ namespace Seed {
 		private:
 			///<summary>Рекурсивне знищеання дерева</summary>
 			///<param name = "root">Батьківський елемент</param>
-			Node* DestroyTreeWithLambdaPair(Node* root, Queryable::LambdaHolder<void, TKey &&, TValue &&> & lambda) //-V688
+			Node* DestroyTreeWithLambdaPairValues(Node* root, Queryable::LambdaHolder<void, TKey &&, TValue &&> & lambda) //-V688
 			{
 				if (root != nullptr)
 				{
 					if (root->left != nullptr)
 					{
-						root->left = DestroyTreeWithLambdaPair(root->left, lambda);
+						root->left = DestroyTreeWithLambdaPairValues(root->left, lambda);
 					}
 					if (root->right != nullptr)
 					{
-						root->right = DestroyTreeWithLambdaPair(root->right, lambda);
+						root->right = DestroyTreeWithLambdaPairValues(root->right, lambda);
 					}
 					lambda(MoveRValue(root->data.key), MoveRValue(root->data.value));
 					if (--root->RefCount == 0)
@@ -829,7 +829,7 @@ namespace Seed {
 			RefCountClass(BaseMap, tree);
 
 			///<summary>Вертає кількість елементів в асоціативному масиві</summary>
-			SizeT getCount() { return tree->count; }
+			SizeT getCount() const { return tree->count; }
 			///<value>Кількість елементів в асоціативному масиві</value>
 			SizeT Property(getCount) Count;
 

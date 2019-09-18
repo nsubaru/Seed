@@ -270,45 +270,45 @@ namespace Seed {
 
 #pragma region Signed type converter helpers
 			template<typename>
-			struct MakeSigned {};
+			struct MakeSigned : LogicFalse {};
 
 			template<>
-			struct MakeSigned<unsigned __int8> {
+			struct MakeSigned<unsigned __int8> : LogicTrue {
 				using Type = signed __int8;
 			};
 
 			template<>
-			struct MakeSigned<unsigned __int16> {
+			struct MakeSigned<unsigned __int16> : LogicTrue {
 				using Type = signed __int16;
 			};
 
 			template<>
-			struct MakeSigned<unsigned __int32> {
+			struct MakeSigned<unsigned __int32> : LogicTrue {
 				using Type = signed __int32;
 			};
 
 			template<>
-			struct MakeSigned<unsigned __int64> {
+			struct MakeSigned<unsigned __int64> : LogicTrue {
 				using Type = signed __int64;
 			};
 
 			template<>
-			struct MakeSigned<signed __int8> {
+			struct MakeSigned<signed __int8> : LogicTrue {
 				using Type = signed __int8;
 			};
 
 			template<>
-			struct MakeSigned<signed __int16> {
+			struct MakeSigned<signed __int16> : LogicTrue {
 				using Type = signed __int16;
 			};
 
 			template<>
-			struct MakeSigned<signed __int32> {
+			struct MakeSigned<signed __int32> : LogicTrue {
 				using Type = signed __int32;
 			};
 
 			template<>
-			struct MakeSigned<signed __int64> {
+			struct MakeSigned<signed __int64> : LogicTrue {
 				using Type = signed __int64;
 			};
 #pragma endregion
@@ -316,53 +316,59 @@ namespace Seed {
 			template<typename Int>
 			using Signed = typename MakeSigned<Int>::Type;
 
+			template<typename Int>
+			constexpr auto IsSigned = MakeSigned<Int>::State;
+
 #pragma region Unsigned type converter helpers
 			template<typename>
-			struct MakeUnsigned {};
+			struct MakeUnsigned : LogicFalse {};
 
 			template<>
-			struct MakeUnsigned<signed __int8> {
+			struct MakeUnsigned<signed __int8> : LogicTrue {
 				using Type = unsigned __int8;
 			};
 
 			template<>
-			struct MakeUnsigned<signed __int16> {
+			struct MakeUnsigned<signed __int16> : LogicTrue {
 				using Type = unsigned __int16;
 			};
 
 			template<>
-			struct MakeUnsigned<signed __int32> {
+			struct MakeUnsigned<signed __int32> : LogicTrue {
 				using Type = unsigned __int32;
 			};
 
 			template<>
-			struct MakeUnsigned<signed __int64> {
+			struct MakeUnsigned<signed __int64> : LogicTrue {
 				using Type = unsigned __int64;
 			};
 
 			template<>
-			struct MakeUnsigned<unsigned __int8> {
+			struct MakeUnsigned<unsigned __int8> : LogicTrue {
 				using Type = unsigned __int8;
 			};
 
 			template<>
-			struct MakeUnsigned<unsigned __int16> {
+			struct MakeUnsigned<unsigned __int16> : LogicTrue {
 				using Type = unsigned __int16;
 			};
 
 			template<>
-			struct MakeUnsigned<unsigned __int32> {
+			struct MakeUnsigned<unsigned __int32> : LogicTrue {
 				using Type = unsigned __int32;
 			};
 
 			template<>
-			struct MakeUnsigned<unsigned __int64> {
+			struct MakeUnsigned<unsigned __int64> : LogicTrue {
 				using Type = unsigned __int64;
 			};
 #pragma endregion
 
 			template<typename Int>
 			using Unsigned = typename MakeUnsigned<Int>::Type;
+
+			template<typename Int>
+			constexpr auto IsUnsigned = MakeUnsigned<Int>::State;
 
 			template< class T >
 			struct DecayStruct
@@ -891,10 +897,10 @@ namespace Seed {
 			template<class Ld, typename Ret, typename ... Params>
 			struct IsLambdaConvertible
 				:LogicConst<
-					AndT<
-						IsSameT<typename LambdaType<Ld>::ReturnType, Ret>, 
-						IsSameT<typename LambdaType<Ld>::Args, Pack<Params...>>
-					>::State
+				AndT<
+				IsSameT<typename LambdaType<Ld>::ReturnType, Ret>,
+				IsSameT<typename LambdaType<Ld>::Args, Pack<Params...>>
+				>::State
 				> {};
 
 			template<class Ld, typename Ret, typename ... Params>
@@ -905,6 +911,23 @@ namespace Seed {
 
 			template<typename T>
 			constexpr bool IsPodV = IsPodT<T>::State;
+
+			template<typename T>
+			constexpr bool IsNumeric = 
+				TypeTraits::IsSigned<T> || 
+				TypeTraits::IsUnsigned<T> ||
+				TypeTraits::IsSameT<T, Float>::State ||
+				TypeTraits::IsSameT<T, Double>::State;
+
+#pragma warning(push)
+			//VS bug char and wchar_t trait as equal
+#pragma warning(disable: 6287)
+			template<typename T>
+			constexpr bool IsCharacter = TypeTraits::IsSameT<T, AChar>() || TypeTraits::IsSameT<T, UChar>();
+#pragma warning(pop)
+
+			template<typename T>
+			constexpr bool IsBoolean = TypeTraits::IsSameT<T, bool>();
 		}
 	}
 }

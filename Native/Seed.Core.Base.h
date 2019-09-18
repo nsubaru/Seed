@@ -65,6 +65,9 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 ///<summary>Інформує що змінна може бути проігнорована</summary>
 #define UnusedData [[maybe_unused]]
 
+#define StructOffsetOfMember(s,memb) \
+    ((size_t)((char *)&((s *)0)->memb - (char *)0))
+
 ///<summary>Головний простір імен</summary>
 namespace Seed {
 	///<summary>Простір імен функцій ядра Рем</summary>

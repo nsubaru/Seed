@@ -60,7 +60,7 @@ namespace Seed {
 				Data* This;
 			private:
 				void InitTaskSheduler();
-				TaskSheduler(Data* This) :This(This) { This->RefCount++; }
+				TaskSheduler(Data* This) :This(This) { ++This->RefCount; }
 			private:
 				friend SRWLock GetPoolLock(SheduledJob* thread);
 				friend Boolean IsPoolTerminating(SheduledJob* thread);
@@ -136,7 +136,7 @@ namespace Seed {
 			private:
 				Data* This;
 			private:
-				SheduledJob(Data* This) : This(This) { This->RefCount++; }
+				SheduledJob(Data* This) : This(This) { ++This->RefCount; }
 			private:
 				friend void RegisterThread(SheduledJob* thread);
 				friend void UnRegisterThread(SheduledJob* thread);

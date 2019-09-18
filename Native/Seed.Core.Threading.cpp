@@ -465,7 +465,7 @@ void Seed::Core::Threading::RegisterThread(JobPool* thread)
 void Seed::Core::Threading::UnRegisterThread(JobPool* thread)
 {
 	AllActiveThreadable->Remove(thread->This->This);
-	thread->This->Parrent->JobsCounts--;
+	--thread->This->Parrent->JobsCounts;
 	ReSetName(thread->This->hThread);
 	NtClose(thread->This->hThread);
 	DestroyTls();
@@ -578,7 +578,7 @@ JobPool& Seed::Core::Threading::JobPool::Dispatch()
 		if (!NT_SUCCESS(status))
 			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(work), NullPointException::Types::Write));
 			
-		This->Parrent->JobsCounts++;
+		++This->Parrent->JobsCounts;
 		This->event = event;
 		This->work = work;
 		TpPostWork(work);

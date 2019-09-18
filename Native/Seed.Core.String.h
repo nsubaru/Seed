@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.h"
+#include "Seed.Core.CTTI.CompileStringView.h"
 #include "Seed.Core.Math.h"
 #include "Seed.Core.SettingsAPI.h"
 #include "Seed.Core.Memory.h"
@@ -249,6 +250,16 @@ namespace Seed {
 				this->CurrentSize = 1;
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 				this->str[0] = L'\0';
+			}
+
+			template<SizeT N>
+			BaseString(CTTI::ConstexprArray<char, N> & item) {
+				this->CurrentSize = N;
+				this->ReservedSize = this->CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
+				for (SizeT i = 0; i < N; i++) {
+					str[i] = item[i];
+				}
 			}
 
 			///<summary>Копіювальний конструктор</summary>
@@ -2126,7 +2137,7 @@ namespace Seed {
 
 			///<summary>Конвертація в масив байт. Якщо рядок пустий верне пустий масив</summary>
 			///<returns>Масив байт який є копією вмісту рядка</returns>
-			operator Array<Byte>() const {
+			operator Blob() const {
 				if (this->str == nullptr || this->CurrentSize == 0)
 					return Array<Byte>();
 				CharStr data = (CharStr)BaseString::operator new[](this->CurrentSize * sizeof(Char));

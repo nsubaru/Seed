@@ -1,6 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.h"
-#include "Seed.Core.String.h"
+#include "Seed.Core.CTTI.TypeString.h"
 
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
@@ -9,10 +9,6 @@
 namespace Seed {
 	inline namespace Core {
 		namespace CTTI {
-
-			template<typename T, SizeT Size>
-			class ConstexprArray;
-
 			class CompileStringView {
 			private:
 				const AChar* ptr;
@@ -22,9 +18,9 @@ namespace Seed {
 					:ptr(ptr), size(CStr::Size(ptr))
 				{}
 
-				template<SizeT N>
-				constexpr CompileStringView(ConstexprArray<char, N> arr)
-					: ptr(arr.arr), size(N)
+				template<char ... Chars>
+				constexpr CompileStringView(TypeString<Chars...>)
+					: ptr(TypeString<Chars...>::Data()), size(sizeof...(Chars))
 				{}
 
 				constexpr CompileStringView Offset(SizeT Size) {
@@ -43,13 +39,8 @@ namespace Seed {
 				constexpr CompileStringView& operator=(const CompileStringView&) = default;
 				constexpr CompileStringView& operator=(CompileStringView&&) = default;
 
-				template<typename THeap>
-				BaseString<THeap> toString() {
-					return BaseString<THeap>(ptr, size + 1);
-				}
-
 				template<SizeT N>
-				constexpr ConstexprArray<char, N> AsArray() {
+				constexpr auto AsArray() {
 					ConstexprArray<char, N> ret;
 					for (SizeT i = 0; i < N; i++)
 						ret[i] = ptr[i];
@@ -57,7 +48,7 @@ namespace Seed {
 				}
 
 				constexpr SizeT Find(char ch) {
-					for (SizeT i = 0; i < size; i++)
+					for (SizeT i = 0ui64; i < size; i++)
 						if (ptr[i] == ch)
 							return i;
 					return static_cast<SizeT>(-1);
@@ -81,13 +72,29 @@ namespace Seed {
 			private:
 				T arr[Size];
 			public:
+				template<typename C1, typename ...C>
+				friend constexpr auto Fill(ConstexprArray This, C1 c1, C ... c) {
+					This.arr[sizeof...(C)] = c1;
+					return Fill(This, c...);
+				}
+				template<typename C1>
+				friend constexpr auto Fill(ConstexprArray This, C1 c1) {
+					This.arr[0] = c1;
+					return This;
+				}
+			public:
 				constexpr ConstexprArray() : arr() {}
+
+				template<typename ... T>
+				constexpr ConstexprArray(T ... t) : arr{ t... } {
+				}
+
 				constexpr T& operator[](SizeT Index) {
 					return arr[Index];
 				}
 
 				template<SizeT N>
-				constexpr ConstexprArray<T, Size + N> operator+(ConstexprArray<T, N> second) {
+				constexpr ConstexprArray<T, Size + N> operator+(ConstexprArray<T, N> second) const {
 					ConstexprArray<T, Size + N> ret;
 					for (SizeT i = 0; i < Size; i++)
 						ret[i] = arr[i];
@@ -97,62 +104,102 @@ namespace Seed {
 				}
 
 				template<SizeT NewSize>
-				constexpr ConstexprArray<T, NewSize> Resize() {
+				constexpr ConstexprArray<T, NewSize> Resize() const {
 					ConstexprArray<T, NewSize> ret;
-					SizeT CopySize = Min(Size, NewSize);
+					constexpr SizeT CopySize = Min(Size, NewSize);
 					for (SizeT i = 0; i < CopySize; i++)
 						ret[i] = arr[i];
 					return ret;
 				}
-			};
 
-			template<SizeT Size>
-			class ConstexprString{
-			private:
-				const char(&text)[Size];
-			public:
-				constexpr ConstexprString(const char(&text)[Size]) :text(text) {}
-			public:
-				constexpr ConstexprArray<char, Size> AsArray() {
-					ConstexprArray<char, Size> ret;
-					for (SizeT i = 0; i < Size; i++)
-						ret[i] = text[i];
+				template<SizeT NewSize>
+				constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
+					if constexpr (NewSize >= Size)
+						static_assert(false);
+					ConstexprArray<T, NewSize> ret;
+					constexpr SizeT Delta = Size - NewSize;
+					for (SizeT i = 0; i < NewSize; i++)
+						ret[i] = arr[i + Delta];
 					return ret;
 				}
+
+				constexpr const T* Raw() { return arr; }
+
+				static constexpr SizeT Count = Size;
+
+				constexpr ConstexprArray Reverse() {
+					SizeT j = Size - 1;
+					for (SizeT i = 0; i < Size / 2; i++,j--) {
+						T t = arr[i];
+						arr[i] = arr[j];
+						arr[j] = t;
+					}
+					return *this;
+				}
+
+				template<typename T2, SizeT N>
+				friend class ConstexprArray;
 			};
 
-			template<SizeT N>
-			constexpr ConstexprString<N> MakeConstexprString(const char(&text)[N]) {
-				return ConstexprString<N>(text);
+			template<char ... Chars>
+			constexpr auto TypeStringToArray(TypeString<Chars...>) {
+				return CompileStringView(TypeString<Chars...>()).AsArray<TypeString<Chars...>::Size()>();
 			}
 
-
-
-			constexpr CompileStringView OffsetStringView(CompileStringView text) {
-				text.Offset(2);
-				return text;
-			}
-
-			constexpr auto v = CompileStringView("test").Offset(2).Shrink(1);
-
-			template <typename T>
-			constexpr auto type_name()
-			{
-				constexpr auto prefix = CStr::Size("auto Seed::Core::CTTI::type_name(");
-				constexpr auto suffix = CStr::Size(">()");
-				return CompileStringView(__FUNCSIG__).Offset(prefix).Shrink(suffix);
+			namespace Details {
+				template <typename U>
+				static constexpr auto type_name()
+				{
+					SizeT prefix = 0;
+					while (true) {
+						if (__FUNCSIG__[prefix] == '<')
+							break;
+						prefix++;
+					}
+					prefix++;
+					SizeT suffix = CStr::Size(__FUNCSIG__) - 1;
+					while (true) {
+						if (__FUNCSIG__[suffix] == '>')
+							break;
+						suffix--;
+					}
+					suffix = CStr::Size(__FUNCSIG__) - suffix;
+					return CompileStringView(__FUNCSIG__).Offset(prefix).Shrink(suffix);
+				}
 			}
 
 			template<typename T>
 			constexpr auto TypeName() {
-				return (type_name<int>().AsArray<type_name<int>().Size()>()).Resize<type_name<int>().Size() + 1>();
+				return (Details::type_name<T>().AsArray<Details::type_name<T>().Size()>()).Resize<Details::type_name<T>().Size() + 1>();
 			}
 
-			constexpr auto v2 = MakeConstexprString("text").AsArray().Resize<4>() + MakeConstexprString("text").AsArray();
+			template<SizeT I>
+			constexpr auto ToCharStr() {
+				constexpr SizeT N = []() {
+					SizeT i = I; SizeT Count = 0;
+					while (i > 0)
+					{
+						Count++; i /= 10;
+					}
+					return Count;
+				}();
+				ConstexprArray<char, N> ret;
+				SizeT i = I; SizeT Pos = 0;
+				while (i > 0)
+				{
+					ret[Pos] = '0' + i % 10;
+					Pos++; i /= 10;
+				}
+				return ret.Reverse();
+			}
 
-			constexpr auto v3 = (type_name<int>().AsArray<type_name<int>().Size()>()).Resize<type_name<int>().Size() + 1>();
+			constexpr auto v = ConstexprArray<char, 3>('1', '2', '3').Count;
 
-			constexpr auto v4 = TypeName<int>();
+			constexpr auto v2 = ToCharStr<72>();
+
+			constexpr auto v3 = TypeName<int>();
+
+			constexpr auto v4 = TypeStringToArray(GenTypeString("Text 1")());
 		}
 	}
 }
