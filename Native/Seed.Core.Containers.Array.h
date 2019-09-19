@@ -3,7 +3,6 @@
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Containers.Internals.h"
 #include "Seed.Core.Containers.IEnumerable.h"
-#include "Seed.Core.Containers.SliceList.h"
 
 namespace Seed {
 	inline namespace Core {
