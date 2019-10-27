@@ -40,7 +40,7 @@ namespace Seed {
 		///<summary>Один байт</summary>
 		inline namespace { using Byte = unsigned char; }
 		///<summary>Масив байтів</summary>
-		inline namespace { using ByteArray = Byte *; }
+		inline namespace { using ByteArray = Byte*; }
 
 		///<summary>Розмірний тип</summary>
 		inline namespace { using SizeT = size_t; }
@@ -55,22 +55,17 @@ namespace Seed {
 		inline namespace { using AChar = char; }
 
 		///<summary>Покажчик на масив символів в кодуванні UTF-16LE</summary>
-		inline namespace { using CharStr = Char *; using UCharStr = UChar *; }
+		inline namespace { using CharStr = Char*; using UCharStr = UChar*; }
 		///<summary>Покажчик на масив символів в кодуванні ASCII</summary>
-		inline namespace { using ACharStr = AChar *; }
+		inline namespace { using ACharStr = AChar*; }
 
 		///<summary>Покажчик на статичний масив символів в кодуванні ASCII</summary>
 		inline namespace { using ConstACharStr = const AChar* const; }
 		///<summary>Покажчик на статичний масив символів в кодуванні UTF-16LE</summary>
-		inline namespace { using ConstCharStr = const Char* const; using UConstCharStr = UChar *; }
+		inline namespace { using ConstCharStr = const Char* const; using UConstCharStr = UChar*; }
 
 		///<summary>Логічний тип</summary>
 		inline namespace { using Boolean = bool; }
-
-		///<summary>Логічна істина</summary>
-		constexpr Boolean True = true;
-		///<summary>Логічна хиба</summary>
-		constexpr Boolean False = false;
 
 		///<summary>Тип для ідентифікацій</summary>
 		inline namespace { using ID = UInt64; }
@@ -87,7 +82,7 @@ namespace Seed {
 		inline namespace { using Handle = void*; }
 
 		///<summary>Тип мітка, який вказує що треба структуру\класс вирівнювати по певній границі</summary>
-		inline namespace { using AllignRequirements  = CRT::align_val_t; }
+		inline namespace { using AllignRequirements = CRT::align_val_t; }
 
 		///<summary>Деталь реалізації</summary>
 		inline namespace { using ImplSpecificT = void*; }

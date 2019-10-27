@@ -51,7 +51,7 @@ Seed::Boolean InitModuleFilter() {
 	RtlInitUnicodeStringEx(&ntdll, (PWSTR)AllowedDLL[0]); //-V2533
 	RtlInitAnsiStringEx(&func_name, (PCSZ)"LdrRegisterDllNotification"); //-V2533
 	LdrGetDllHandle(NULL, NULL, &ntdll, &ntdllHandle);
-	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)& pLdrRegisterDllNotification); //-V2533
+	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)&pLdrRegisterDllNotification); //-V2533
 	status = pLdrRegisterDllNotification(0, LdrDllNotification, NULL, &LdrDllNotificationHandleCokies);
 	return NT_SUCCESS(status);
 }
@@ -59,7 +59,7 @@ Seed::Boolean InitModuleFilter() {
 void StopModuleFilter() noexcept {
 	ANSI_STRING func_name;
 	RtlInitAnsiStringEx(&func_name, (PCSZ)"LdrUnregisterDllNotification"); //-V2533
-	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)& pLdrUnregisterDllNotification); //-V2533
+	LdrGetProcedureAddress(ntdllHandle, &func_name, NULL, (void**)&pLdrUnregisterDllNotification); //-V2533
 	pLdrUnregisterDllNotification(LdrDllNotificationHandleCokies);
 }
 

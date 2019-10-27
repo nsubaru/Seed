@@ -76,7 +76,7 @@ namespace Seed {
 
 						if (What == -1)
 						{
-							return 1ull - 2ull* (By & 1ull);
+							return 1ull - 2ull * (By & 1ull);
 						}
 
 						return 0;
@@ -220,13 +220,13 @@ namespace Seed {
 					return floor(X);
 				}
 
-				Seed::Float ModD(Seed::Float In, Seed::Float & Part)
+				Seed::Float ModD(Seed::Float In, Seed::Float& Part)
 				{
 					Part = static_cast<Float>(floor(In));
 					return RuntimeAbs(Part - In);
 				}
 
-				Seed::Double ModD(Seed::Double In, Seed::Double & Part)
+				Seed::Double ModD(Seed::Double In, Seed::Double& Part)
 				{
 					Part = floor(In);
 					return RuntimeAbs(Part - In);

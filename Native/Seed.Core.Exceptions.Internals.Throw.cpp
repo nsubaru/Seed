@@ -22,10 +22,10 @@
 // Returns:
 //      NEVER.  (until we implement resumable exceptions, that is)
 //
- extern "C" __declspec(noreturn) void __stdcall
+extern "C" __declspec(noreturn) void __stdcall
 _CxxThrowException(
 	void* pExceptionObject,   // The object thrown
-	_ThrowInfo* pThrowInfo          // Everything we need to know about it
+	_ThrowInfo * pThrowInfo          // Everything we need to know about it
 ) {
 	static const EHExceptionRecord ExceptionTemplate = { // A generic exception record
 		EH_EXCEPTION_NUMBER,            // Exception number
@@ -71,6 +71,6 @@ _CxxThrowException(
 	//
 	// Hand it off to the OS:
 	//
-	
+
 	RtlRaiseException(reinterpret_cast<EXCEPTION_RECORD*>(&ThisException.NtExceptionInfo));
 }

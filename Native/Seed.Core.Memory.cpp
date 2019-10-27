@@ -19,7 +19,7 @@
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
 #pragma warning(disable: 4996)
-//RtlValidateHeap - if BaseAddr == nullptr then RtlValidateHeap validate all heap chunks. 
+//RtlValidateHeap - if BaseAddr == nullptr then RtlValidateHeap validate all heap chunks.
 //But this option not documented and VS warn as 3 param of RtlValidateHeap is invalid
 #pragma warning(disable: 6387)
 //This file use SAL annotation which invisible for Seed C++ Runtime API
@@ -118,9 +118,9 @@ Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 		NULL,
 		NULL);
 	if (HeapData.HeapHandle == nullptr)
-		return False;
+		return false;
 	HeapData.AllocatedMemBlksCount = HeapData.AllocatedMemory = HeapData.CurrentHeapSize = 0;
-	return True;
+	return true;
 }
 
 void Seed::Core::Memory::Heap::Stop() noexcept
@@ -146,7 +146,7 @@ void* GenericAllocate(Seed::SizeT Size)
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі
-	SizeT * obj = (SizeT*)RtlAllocateHeap(HeapData.HeapHandle, 0, FullSize);
+	SizeT* obj = (SizeT*)RtlAllocateHeap(HeapData.HeapHandle, 0, FullSize);
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
@@ -189,7 +189,7 @@ void* GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 	//Вираховуєм точний адресс початку ділянки
 	SizeT AllignedAddress = Math::RoundToUpper(Address, AllocationReq) * AllocationReq;
 	//Отримуєм заголовок ділянки пам'яті
-	SizeT * RealPtr = (SizeT*)(AllignedAddress - 2);
+	SizeT* RealPtr = (SizeT*)(AllignedAddress - 2);
 	//Записуєм реальний початок ділянки пам'яті
 	RealPtr[0] = (SizeT)obj;
 	//Та розмір даних
@@ -207,7 +207,7 @@ void* GenericFree(void* MemBlk)
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
-	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
+	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//Отримуєм розмір ділянки пам'яті
 	SizeT DataSize = RealPtr[0];
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
@@ -220,8 +220,8 @@ void* GenericFree(void* MemBlk)
 	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//Якщо вдало то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)& HeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)& HeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
@@ -233,7 +233,7 @@ void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq)
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
-	SizeT * Header = ((SizeT*)MemBlk) - 2;
+	SizeT* Header = ((SizeT*)MemBlk) - 2;
 	//Отримуєм розмір даних в ділянці пам'яті
 	SizeT DataSize = Header[0];
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
@@ -248,8 +248,8 @@ void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq)
 	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//Якшо успішно то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)& HeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)& HeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
@@ -296,9 +296,9 @@ Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 		NULL,
 		NULL);
 	if (SecureHeapData.HeapHandle == nullptr)
-		return False;
+		return false;
 	SecureHeapData.AllocatedMemBlksCount = SecureHeapData.AllocatedMemory = SecureHeapData.CurrentHeapSize = 0;
-	return True;
+	return true;
 }
 
 void Seed::Core::Memory::SensitiveDataHeap::Stop() noexcept
@@ -324,7 +324,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі і вказуєм системі обнулити ділянку пам'яті
-	SizeT * obj = (SizeT*)RtlAllocateHeap(SecureHeapData.HeapHandle, HEAP_ZERO_MEMORY, FullSize);
+	SizeT* obj = (SizeT*)RtlAllocateHeap(SecureHeapData.HeapHandle, HEAP_ZERO_MEMORY, FullSize);
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
@@ -368,7 +368,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	//Вираховуєм точний адресс початку ділянки
 	SizeT AllignedAddress = Math::RoundToUpper(Address, AllocationReq) * AllocationReq;
 	//Отримуєм заголовок ділянки пам'яті
-	SizeT * RealPtr = (SizeT*)(AllignedAddress)-2;
+	SizeT* RealPtr = (SizeT*)(AllignedAddress)-2;
 	//Записуєм реальний початок ділянки пам'яті
 	RealPtr[0] = (SizeT)obj;
 	//Та розмір даних
@@ -386,7 +386,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
-	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
+	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//Отримуєм розмір ділянки пам'яті
 	SizeT DataSize = RealPtr[0];
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
@@ -401,8 +401,8 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//Якщо вдало то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)& SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)& SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
@@ -414,7 +414,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
-	SizeT * Header = ((SizeT*)MemBlk) - 2;
+	SizeT* Header = ((SizeT*)MemBlk) - 2;
 	//Отрмуєм покажчик на початок ділянки пам'яті
 	void* RealPtr = (void*)Header[0];
 	//Отримуєм розмір даних в ділянці пам'яті
@@ -431,8 +431,8 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//Якшо успішно то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)& SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)& SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
@@ -466,7 +466,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapFree(void* Me
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
-	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
+	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//Отримуєм розмір ділянки пам'яті
 	SizeT DataSize = RealPtr[0];
 	//Обчислюєм повний розмір ділянки пам'яті
@@ -477,8 +477,8 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapFree(void* Me
 	if (RtlFreeHeap(RtlProcessHeap(), 0, RealPtr)) {
 		//Якщо вдало то оновлюєм статистику
 		InterlockedDecrementSizeTNoFence(&InternalHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)& InternalHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)& InternalHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)&InternalHeapData.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&InternalHeapData.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//Якщо ні то генеруєм помилку NullPointException
@@ -499,7 +499,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//Пробуєм виділити ділянку пам'яті з кучі і вказуєм системі обнулити ділянку пам'яті
-	SizeT * obj = (SizeT*)RtlAllocateHeap(RtlProcessHeap(), 0, FullSize);
+	SizeT* obj = (SizeT*)RtlAllocateHeap(RtlProcessHeap(), 0, FullSize);
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
 	//Відповідно генеруєм виключення OutOfMemory
 	if (obj == nullptr)
@@ -559,7 +559,6 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::Copy(
 {
 	memcpy(Destination, Source, Size);
 }
-
 
 #pragma intrinsic(memset)
 DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::MemBlkFill(

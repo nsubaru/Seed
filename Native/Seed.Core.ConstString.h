@@ -3,6 +3,63 @@
 
 namespace Seed {
 	inline namespace Core {
+		class SeedKernelCall ConstAString;
+		class SeedKernelCall ConstString;
+
+		namespace Internals {
+			namespace Exceptions {
+				__declspec(noreturn) void ThrowNullPointException(
+					const ConstAString& File,
+					const ConstAString& FunctName,
+					SizeT Line,
+					SizeT Addr,
+					UInt8 Type);
+
+				__declspec(noreturn) void ThrowStringToLong(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT RequiredSize);
+
+				__declspec(noreturn) void ThrowNullPointException(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
+				__declspec(noreturn) void ThrowIntegerOverflowException(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
+				__declspec(noreturn) void ThrowInvalidFormatException(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
+				__declspec(noreturn) void ThrowIndexOutOfRange(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line,
+					const Seed::SizeT Required,
+					const Seed::SizeT MaxAllowed);
+
+				__declspec(noreturn) void ThrowEndNodeNotDeferencable(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
+				__declspec(noreturn) void ThrowNotImplemented(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
+				__declspec(noreturn) void ThrowKeyAlredyExist(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+			}
+		}
+
 		///<summary>Константний ASCII рядок який пам'ятає свій розмір</summary>
 		class SeedKernelCall ConstAString final {
 		private:
@@ -30,14 +87,8 @@ namespace Seed {
 			///<param name = "Index>Індекс символа в рядку</param>
 			///<returns>Константна силка на літеру</returns>
 			const AChar& operator[](SizeT Index) const {
-				extern __declspec(noreturn) void ThrowIndexOutOfRange(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Required,
-					const Seed::SizeT MaxAllowed);
 				if (Index >= size)
-					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, size);
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, size);
 				return str[Index];
 			}
 
@@ -81,14 +132,8 @@ namespace Seed {
 			///<param name = "Index>Індекс символа в рядку</param>
 			///<returns>Константна силка на літеру</returns>
 			const Char& operator[](SizeT Index) const {
-				extern __declspec(noreturn) void ThrowIndexOutOfRange(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Required,
-					const Seed::SizeT MaxAllowed);
 				if (Index >= size)
-					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, size);
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, size);
 				return str[Index];
 			}
 

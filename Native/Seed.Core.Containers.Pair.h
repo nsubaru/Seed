@@ -1,0 +1,82 @@
+#pragma once
+#include "Seed.Core.Base.h"
+#include "Seed.Core.Containers.TypeTraits.h"
+#include "Seed.Core.Containers.API.LINQ.h"
+#include "Seed.Core.Memory.h"
+
+namespace Seed {
+	inline namespace Core {
+		namespace Containers {
+			template<typename THeap, typename TKey, typename TValue>
+			class SeedKernelCall BasePair : 
+				public Memory::Allocator<THeap>, 
+				public LINQ::TPairLinq<BasePair<THeap, TKey, TValue>, THeap, TKey, TValue, false> 
+			{
+			public:
+				BasePair() : key(), value() {}
+
+				BasePair(const TKey& key, const TValue& value) : key(key), value(value) {}
+				BasePair(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
+				BasePair(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
+				BasePair(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
+
+				BasePair(const BasePair& other) : key(other.key), value(other.value) {}
+				BasePair(BasePair&& other) : key(MoveRValue(other.key)), value(MoveRValue(other.value)) {}
+
+				BasePair& operator=(const BasePair& other) {
+					this->~BasePair();
+					this->BasePair::BasePair(other);
+				}
+
+				BasePair& operator=(BasePair&& other) {
+					this->~BasePair();
+					this->BasePair::BasePair(MoveRValue(other));
+				}
+
+				const TKey& GetKey() const { return key; }
+
+				TValue& GetValue() { return value; }
+				const TValue& GetValue() const { return value; }
+
+				void SetValue(const TValue& newValue) { value = newValue; }
+				void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
+
+				template<typename T>
+				friend void Swap(T& a, T& b);
+			public:
+				TKey Property(GetKey) Key;
+				TValue Property(GetValue, SetValue) Value;
+			private:
+				TKey key;
+				TValue value;
+			};
+
+			namespace {
+				template<typename TKey, typename TValue>
+				using Pair = BasePair<Memory::Heap, TKey, TValue>;
+			}
+
+			namespace {
+				template<typename TKey, typename TValue>
+				using SensitivePair = BasePair<Memory::SensitiveDataHeap, TKey, TValue>;
+			}
+
+			template<typename THeap, typename TKey, typename TValue>
+			void Swap(BasePair<THeap, TKey, TValue>& a, BasePair<THeap, TKey, TValue>& b) {
+				Swap(a.key, b.key);
+				Swap(a.value, b.value);
+			}
+		}
+
+		namespace TypeTraits {
+			namespace Collection {
+				template<typename THeap, typename TKey, typename TValue>
+				struct IsPairT<Seed::Core::Containers::BasePair<THeap, TKey, TValue>> : LogicTrue {
+					using Heap = THeap;
+					using Key = TKey;
+					using Value = TValue;
+				};
+			}
+		}
+	}
+}

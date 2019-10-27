@@ -44,7 +44,7 @@ namespace Seed {
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
 				constexpr __forceinline SafeInt operator-(SafeInt second) {
-					if(this->value >= second.value)
+					if (this->value >= second.value)
 						return static_cast<Int>(this->value - second.value);
 					else
 						throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
@@ -64,30 +64,33 @@ namespace Seed {
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
-					} else
-					if constexpr (TypeTraits::IsSameV<Int, UInt16>) {
-						UInt32 res = this->value * second.value;
-						if (res > Math::Max<Int>())
-							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-						else
-							return static_cast<Int>(res);
-					} else
-					if constexpr (TypeTraits::IsSameV<Int, UInt32>) {
-						UInt64 res = this->value * second.value;
-						if (res > Math::Max<Int>())
-							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-						else
-							return static_cast<Int>(res);
-					} else
-					if constexpr (TypeTraits::IsSameV<Int, UInt64>) {
-						UInt64 res[2];
-						_umul128(this->value, second.value, res);
-						UInt32 res = this->value * second.value;
-						if (res[1] > 0)
-							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-						else
-							return res;
 					}
+					else
+						if constexpr (TypeTraits::IsSameV<Int, UInt16>) {
+							UInt32 res = this->value * second.value;
+							if (res > Math::Max<Int>())
+								throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							else
+								return static_cast<Int>(res);
+						}
+						else
+							if constexpr (TypeTraits::IsSameV<Int, UInt32>) {
+								UInt64 res = this->value * second.value;
+								if (res > Math::Max<Int>())
+									throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+								else
+									return static_cast<Int>(res);
+							}
+							else
+								if constexpr (TypeTraits::IsSameV<Int, UInt64>) {
+									UInt64 res[2];
+									_umul128(this->value, second.value, res);
+									UInt32 res = this->value * second.value;
+									if (res[1] > 0)
+										throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+									else
+										return res;
+								}
 					//Unreacheable code
 					throw InternalError(_FILE_, __FUNCSIG__, __LINE__);
 				}
@@ -141,29 +144,32 @@ namespace Seed {
 							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
-					} else
-					if constexpr (TypeTraits::IsSameV<Int, UInt16>) {
-						UInt32 res = this->value * second.value;
-						if (res > Math::Max<Int>())
-							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-						else
-							return this->value = static_cast<Int>(res);
-					} else
-					if constexpr (TypeTraits::IsSameV<Int, UInt32>) {
-						UInt64 res = static_cast<UInt64>(this->value) * static_cast<UInt64>(second.value);
-						if (res > Math::Max<Int>())
-							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-						else
-							return this->value = static_cast<Int>(res);
-					} else
-					if constexpr (TypeTraits::IsSameV<Int, UInt64>) {
-						UInt64 res;
-						res = this->value * second.value;
-						if (__umulh(this->value, second.value) > 0)
-							throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-						else
-							return this->value = res;
 					}
+					else
+						if constexpr (TypeTraits::IsSameV<Int, UInt16>) {
+							UInt32 res = this->value * second.value;
+							if (res > Math::Max<Int>())
+								throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							else
+								return this->value = static_cast<Int>(res);
+						}
+						else
+							if constexpr (TypeTraits::IsSameV<Int, UInt32>) {
+								UInt64 res = static_cast<UInt64>(this->value)* static_cast<UInt64>(second.value);
+								if (res > Math::Max<Int>())
+									throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+								else
+									return this->value = static_cast<Int>(res);
+							}
+							else
+								if constexpr (TypeTraits::IsSameV<Int, UInt64>) {
+									UInt64 res;
+									res = this->value * second.value;
+									if (__umulh(this->value, second.value) > 0)
+										throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+									else
+										return this->value = res;
+								}
 					//Unreacheable code
 					throw InternalError(__FILE__, __FUNCSIG__, __LINE__);
 				}
@@ -192,7 +198,7 @@ namespace Seed {
 				constexpr __forceinline Int GetValue() { return value; }
 				Int Property(GetValue) Value;
 			};
-			
+
 			///<summary>Безпечний UInt8</summary>
 			namespace { using SafeInt8 = SafeInt<UInt8>; }
 			///<summary>Безпечний UInt16</summary>
@@ -201,7 +207,7 @@ namespace Seed {
 			namespace { using SafeInt32 = SafeInt<UInt32>; }
 			///<summary>Безпечний UInt64</summary>
 			namespace { using SafeInt64 = SafeInt<UInt64>; }
-			
+
 #pragma endregion
 
 #pragma region ConvertUnsignedToSigned

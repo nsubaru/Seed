@@ -31,7 +31,7 @@ using namespace Seed::Threading;
 
 #pragma region Generic API
 
-static SensitiveList<SmartPtr<IThreadable>> * AllActiveThreadable;
+static Containers::SensitiveConcurencyList<SmartPtr<IThreadable>>* AllActiveThreadable;
 
 __forceinline IThreadable* GetThisThreadable() {
 	return Seed::Core::Threading::GetTLS()->Threadable;
@@ -51,9 +51,9 @@ SizeT Seed::Core::Threading::GetThreadableCount(Boolean WithPseudoThreadable)
 		return AllActiveThreadable->Count;
 }
 
-List<SmartPtr<IThreadable>> Seed::Core::Threading::GetAllThreadable()
+Containers::ConcurencyList<SmartPtr<IThreadable>> Seed::Core::Threading::GetAllThreadable()
 {
-	return AllActiveThreadable->CopyTo<List>();
+	return AllActiveThreadable->CopyTo<Containers::ConcurencyList>();
 }
 
 IThreadable& Seed::Core::Threading::GetThis()
@@ -73,6 +73,28 @@ void Seed::Core::Threading::Sleep(DateTime time, Boolean IsRelative) //-V813
 	NtDelayExecution(TRUE, &delay);
 }
 
+void SetName(const String& NewName, Handle hThread) {
+	THREAD_NAME_INFORMATION name;
+	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)const_cast<String&>(NewName));
+	NtSetInformationThread(
+		hThread,
+		THREADINFOCLASS::ThreadNameInformation,
+		&name,
+		sizeof(THREAD_NAME_INFORMATION)
+	);
+}
+
+void ReSetName(Handle hThread) {
+	THREAD_NAME_INFORMATION name;
+	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)L"");
+	NtSetInformationThread(
+		hThread,
+		THREADINFOCLASS::ThreadNameInformation,
+		&name,
+		sizeof(THREAD_NAME_INFORMATION)
+	);
+}
+
 #pragma endregion
 
 #pragma region Internal API
@@ -84,7 +106,7 @@ namespace Seed {
 			private:
 				friend void RegisterThread(Thread* thread);
 			private:
-				Thread * thread;
+				Thread* thread;
 			private:
 				ThreadableThread(Thread* thread) : thread(thread) {}
 			public:
@@ -96,7 +118,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::Thread; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -131,7 +153,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::JobTask; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -150,7 +172,7 @@ namespace Seed {
 				}
 			};
 
-			class ThreadableSheduledTask final: public Seed::Core::Threading::IThreadable {
+			class ThreadableSheduledTask final : public Seed::Core::Threading::IThreadable {
 			private:
 				friend void RegisterThread(SheduledJob* thread);
 			private:
@@ -166,7 +188,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::SheduledTask; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -194,10 +216,12 @@ void Seed::Core::Threading::RegisterThread(Thread* thread)
 	ConfigureTls(new ThreadableThread(thread), &thread->This->State);
 	thread->This->State = EThreadabledStates::Executing;
 	thread->This->AbortEvent->Set();
+	SetName(const_cast<const String&>(thread->This->name), thread->This->hThread);
 }
 
 void Seed::Core::Threading::UnRegisterThread(Thread* thread)
 {
+	ReSetName(thread->This->hThread);
 	AllActiveThreadable->Remove(thread->This->This);
 	DestroyTls();
 }
@@ -208,22 +232,22 @@ volatile Delegate& Seed::Core::Threading::ThreadEntryPoint(Thread* thread)
 }
 
 template<typename EntryPointT, typename ThreadableType>
-static NTSTATUS EntryPoint(EntryPointT&& entryPoint, ThreadableType * thread) noexcept {
+static NTSTATUS EntryPoint(EntryPointT&& entryPoint, ThreadableType* thread) noexcept {
 	using namespace Seed;
 
 	NTSTATUS status = STATUS_SUCCESS;
-	
+
 	try {
 		try {
 			RegisterThread(thread);
 			entryPoint();
 			UnRegisterThread(thread);
 		}
-		catch ([[maybe_unused]] Exceptions::InteruptException& er) {
+		catch ([[maybe_unused]] Exceptions::InteruptException & er) {
 			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()));
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
-		catch (Exceptions::Exception& ex) {
+		catch (Exceptions::Exception & ex) {
 			toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
 			status = STATUS_UNHANDLED_EXCEPTION;
 		}
@@ -244,28 +268,6 @@ __declspec(noreturn, noinline, safebuffers) void InteruptThread() {
 #pragma check_stack(on)
 #pragma runtime_checks("", restore)
 
-void SetName(const String& NewName, Handle hThread) {
-	THREAD_NAME_INFORMATION name;
-	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)const_cast<String&>(NewName));
-	NtSetInformationThread(
-		hThread,
-		THREADINFOCLASS::ThreadNameInformation,
-		&name,
-		sizeof(THREAD_NAME_INFORMATION)
-	);
-}
-
-void ReSetName(Handle hThread) {
-	THREAD_NAME_INFORMATION name;
-	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)L"");
-	NtSetInformationThread(
-		hThread,
-		THREADINFOCLASS::ThreadNameInformation,
-		&name,
-		sizeof(THREAD_NAME_INFORMATION)
-	);
-}
-
 #pragma endregion
 #pragma region Thread
 
@@ -276,7 +278,7 @@ NTSTATUS __cdecl threadStartRoutineDynEntryPoint(PVOID args) noexcept {
 
 bool Seed::Core::Threading::MainThread(Delegate&& delegate)
 {
-	AllActiveThreadable = new SensitiveList<SmartPtr<IThreadable>>();
+	AllActiveThreadable = new Containers::SensitiveConcurencyList<SmartPtr<IThreadable>>();
 	HANDLE threadHandle;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &threadHandle, GENERIC_ALL, 0, 0);
 	Thread* MainThread = new Thread("Main thread", MoveRValue(delegate));
@@ -289,11 +291,10 @@ bool Seed::Core::Threading::MainThread(Delegate&& delegate)
 		toCoreLog(L"Попередження: Об'єкт з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
 		thread->Interupt();
 		});
-	AllActiveThreadable->RemoveAllWith([](SmartPtr<IThreadable>&& thread) {thread->Join(); });
+	AllActiveThreadable->RemoveAll([](SmartPtr<IThreadable>&& thread) {thread->Join(); });
 	delete AllActiveThreadable;
 	return true;
 }
-
 
 void Seed::Core::Threading::Thread::RefreshName()
 {
@@ -353,9 +354,9 @@ Thread& Seed::Core::Threading::Thread::Join(DateTime timeOut) //-V813
 {
 	LARGE_INTEGER delay;
 	delay.QuadPart = timeOut.TimeFromStartEpoch;
-	if (This->State == EThreadabledStates::Starting || 
-		This->State == EThreadabledStates::Executing || 
-		This->State == EThreadabledStates::ExceptionProcessing || 
+	if (This->State == EThreadabledStates::Starting ||
+		This->State == EThreadabledStates::Executing ||
+		This->State == EThreadabledStates::ExceptionProcessing ||
 		This->State == EThreadabledStates::Paused)
 		NtWaitForSingleObject(This->hThread, TRUE, &delay);
 	return *this;
@@ -368,7 +369,7 @@ Thread& Seed::Core::Threading::Thread::Interupt()
 	case EThreadabledStates::NotStarted: break;
 	case EThreadabledStates::Interupted: break;
 	case EThreadabledStates::Unknown: break;
-	case EThreadabledStates::Starting: 
+	case EThreadabledStates::Starting:
 		This->AbortEvent->Wait();
 	default:
 		switch (This->State)
@@ -408,7 +409,7 @@ Thread& Seed::Core::Threading::Thread::Suspend()
 	case EThreadabledStates::NotStarted: break;
 	case EThreadabledStates::Interupted: break;
 	case EThreadabledStates::Unknown: break;
-	case EThreadabledStates::Starting: 
+	case EThreadabledStates::Starting:
 		This->AbortEvent->Wait();
 	case EThreadabledStates::Executing:
 	case EThreadabledStates::ExceptionProcessing: {
@@ -503,18 +504,18 @@ VOID NTAPI PoolWorkCallbak(
 	if (!IsPoolTerminating(thread)) {
 		SetEventOnJobEnd(thread, Instance);
 		SRWLock lock = GetPoolLock(thread);
-		if(!lock.TryInShareLock([&]() { EntryPoint(GetJobEntryPoint(thread), thread); }))
+		if (!lock.TryInShareLock([&]() { EntryPoint(GetJobEntryPoint(thread), thread); }))
 			delete thread;
 	}
 	else {
-		//delete thread;
+		delete thread;
 	}
 	TpReleaseWork(Work);
 }
 
 void Seed::Core::Threading::ThreadPool::InitThreadPool() try
 {
-	NTSTATUS status = TpAllocPool((PTP_POOL*)& This->pool, NULL);
+	NTSTATUS status = TpAllocPool((PTP_POOL*)&This->pool, NULL);
 	if (!NT_SUCCESS(status))
 		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(This->pool), NullPointException::Types::Write));
 
@@ -526,7 +527,7 @@ void Seed::Core::Threading::ThreadPool::InitThreadPool() try
 	TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info);
 	status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
 
-	if (!NT_SUCCESS(status)) 
+	if (!NT_SUCCESS(status))
 		Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(This->cleanupData), NullPointException::Types::Write));
 
 	This->env = new TP_CALLBACK_ENVIRON;
@@ -567,17 +568,17 @@ JobPool& Seed::Core::Threading::JobPool::Dispatch()
 {
 	PTP_WORK work = nullptr;
 	HANDLE event = nullptr;
-	
+
 	try {
 		NTSTATUS status = NtCreateEvent(&event, GENERIC_ALL, NULL, EVENT_TYPE::NotificationEvent, FALSE);
 		if (!NT_SUCCESS(status))
 			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(event), NullPointException::Types::Write));
-			
+
 		status = TpAllocWork(&work, PoolWorkCallbak, new JobPool(*this), reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->Parrent->env));
-			
+
 		if (!NT_SUCCESS(status))
 			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(work), NullPointException::Types::Write));
-			
+
 		++This->Parrent->JobsCounts;
 		This->event = event;
 		This->work = work;
@@ -660,7 +661,7 @@ JobPool& Seed::Core::Threading::JobPool::Suspend()
 {
 	switch (This->State)
 	{
-	case EThreadabledStates::NotStarted: 
+	case EThreadabledStates::NotStarted:
 		TpReleaseWork(reinterpret_cast<PTP_WORK>(this->This->work));
 	case EThreadabledStates::Interupted: break;
 	case EThreadabledStates::Unknown: break;
@@ -705,7 +706,7 @@ void Seed::Core::Threading::RegisterThread(SheduledJob* thread)
 	HANDLE threadHandle;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &threadHandle, GENERIC_ALL, 0, 0);
 	thread->This->hThread = threadHandle;
-	ConfigureTls(new ThreadableSheduledTask(thread), &thread->This->State);
+	ConfigureTls(new ThreadableSheduledTask(new SheduledJob(*thread)), &thread->This->State);
 	SetName(thread->This->Name, threadHandle);
 	thread->This->State = EThreadabledStates::Executing;
 }
@@ -715,6 +716,8 @@ void Seed::Core::Threading::UnRegisterThread(SheduledJob* thread)
 	AllActiveThreadable->Remove(thread->This->This);
 	ReSetName(thread->This->hThread);
 	NtClose(thread->This->hThread);
+	if(thread->This->RemainingPeriodsCount == 0 && thread->This->PeriodsCount != 1)
+		TpReleaseTimer(reinterpret_cast<PTP_TIMER>(thread->This->hTask));
 	DestroyTls();
 }
 
@@ -744,10 +747,11 @@ VOID NTAPI TaskShedulerTaskCallback(
 	SheduledJob* thread = (SheduledJob*)Context;
 	if (!IsPoolTerminating(thread)) {
 		SRWLock lock = GetPoolLock(thread);
-		if (!lock.TryInShareLock([&]() { 
-				EntryPoint([&]() {GetJobEntryPoint(thread).Execute(DateTime::GetCurrentSystemTimeData()); }, thread); }
-		))
+		if (!lock.TryInShareLock([&]() {
+			EntryPoint([&]() {GetJobEntryPoint(thread).Execute(DateTime::GetCurrentSystemTimeData()); }, thread); }
+		)) {
 			delete thread;
+		}
 	}
 	else {
 		delete thread;
@@ -756,7 +760,7 @@ VOID NTAPI TaskShedulerTaskCallback(
 
 VOID NTAPI TaskShedulerCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
-	_Inout_opt_ PVOID CleanupContext
+	_Inout_opt_ PVOID CleanupContext	
 ) {
 	if (ObjectContext == NULL)
 		return;
@@ -852,7 +856,8 @@ SheduledJob Seed::Core::Threading::SheduledJobBuilder::Shedule()
 void Seed::Core::Threading::SheduledJob::Dispose()
 {
 	if (This->hTask != nullptr) {
-		TpReleaseTimer(reinterpret_cast<PTP_TIMER>(This->hTask));
+		if(This->RemainingPeriodsCount != 0 && This->PeriodsCount != 1)
+			TpReleaseTimer(reinterpret_cast<PTP_TIMER>(This->hTask));
 		delete This->Task;
 	}
 }

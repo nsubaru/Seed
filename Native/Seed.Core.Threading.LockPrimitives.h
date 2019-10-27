@@ -8,12 +8,19 @@ namespace Seed {
 			class SeedKernelCall SRWLock final
 			{
 			private:
-				typedef struct _RTL_SRWLOCK
-				{
-					void* Ptr;
-				} RTL_SRWLOCK, * PRTL_SRWLOCK;
+				struct ImplT {
+					void* _;
+				};
 
-				RTL_SRWLOCK lock;
+				ImplT lock;
+			private:
+				friend void AcquireLockExclusiveSRWLock(void* PSRWLock);
+				friend void ReleaseLockExclusiveSRWLock(void* PSRWLock);
+				friend void AcquireLockSharedSRWLock(void* PSRWLock);
+				friend void ReleaseLockSharedSRWLock(void* PSRWLock);
+				friend bool TryAcquireLockSharedSRWLock(void* PSRWLock);
+			private:
+				friend _declspec(noreturn) void __rethrow();
 			public:
 				__forceinline SRWLock()
 				{
@@ -24,11 +31,8 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				__forceinline auto ExclusiveLock(T& Funct) -> decltype(Funct())
+				__forceinline decltype(auto) ExclusiveLock(T& Funct)
 				{
-					extern void AcquireLockExclusiveSRWLock(void*);
-					extern void ReleaseLockExclusiveSRWLock(void*);
-
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
 						AcquireLockExclusiveSRWLock(&lock);
@@ -37,7 +41,7 @@ namespace Seed {
 						}
 						catch (...) {
 							ReleaseLockExclusiveSRWLock(&lock);
-							throw;
+							__rethrow();
 						}
 						ReleaseLockExclusiveSRWLock(&lock);
 					}
@@ -45,13 +49,13 @@ namespace Seed {
 					{
 						AcquireLockExclusiveSRWLock(&lock);
 						try {
-							auto ret(Funct());
+							decltype(Funct()) ret(Funct());
 							ReleaseLockExclusiveSRWLock(&lock);
 							return ret;
 						}
 						catch (...) {
 							ReleaseLockExclusiveSRWLock(&lock);
-							throw;
+							__rethrow();
 						}
 					}
 				}
@@ -59,11 +63,8 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				__forceinline auto ShareLock(T& Funct) -> decltype(Funct())
+				__forceinline decltype(auto) ShareLock(T& Funct)
 				{
-					extern void AcquireLockSharedSRWLock(void*);
-					extern void ReleaseLockSharedSRWLock(void*);
-
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
 						AcquireLockSharedSRWLock(&lock);
@@ -72,7 +73,7 @@ namespace Seed {
 						}
 						catch (...) {
 							ReleaseLockSharedSRWLock(&lock);
-							throw;
+							__rethrow();
 						}
 						ReleaseLockSharedSRWLock(&lock);
 					}
@@ -80,32 +81,29 @@ namespace Seed {
 					{
 						AcquireLockSharedSRWLock(&lock);
 						try {
-							auto ret(Funct());
+							decltype(Funct()) ret(Funct());
 							ReleaseLockSharedSRWLock(&lock);
 							return ret;
 						}
 						catch (...) {
 							ReleaseLockSharedSRWLock(&lock);
-							throw;
+							__rethrow();
 						}
 					}
 				}
 
 				template<typename T>
 				Boolean TryInShareLock(T& Funct) {
-					extern bool TryAcquireLockSharedSRWLock(void*);
-					extern void ReleaseLockSharedSRWLock(void*);
-
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
-						if(!TryAcquireLockSharedSRWLock(&lock)) 
+						if (!TryAcquireLockSharedSRWLock(&lock))
 							return false;
 						try {
 							Funct();
 						}
 						catch (...) {
 							ReleaseLockSharedSRWLock(&lock);
-							throw;
+							__rethrow();
 						}
 						ReleaseLockSharedSRWLock(&lock);
 						return true;

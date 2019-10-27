@@ -66,10 +66,10 @@ namespace Seed {
 	__GetTypeStringHelp2(text, 192 + n) \
 
 #define __GetTypeStringHelp4(text, n) \
-	__GetTypeStringHelp2(text, 0 + n) \
-	__GetTypeStringHelp2(text, 256 + n) \
-	__GetTypeStringHelp2(text, 512 + n) \
-	__GetTypeStringHelp2(text, 768 + n) \
+	__GetTypeStringHelp3(text, 0 + n) \
+	__GetTypeStringHelp3(text, 256 + n) \
+	__GetTypeStringHelp3(text, 512 + n) \
+	__GetTypeStringHelp3(text, 768 + n) \
 
 #define GenTypeString(text) \
 	Seed::Core::CTTI::TypeString<\

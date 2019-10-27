@@ -6,7 +6,7 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-void ConvertDateTimeToStringImpl(const Seed::Core::DateTime & time, Seed::CharStr buffer) {
+void ConvertDateTimeToStringImpl(const Seed::Core::DateTime& time, Seed::CharStr buffer) {
 	using namespace Seed;
 	LARGE_INTEGER localTimeMs;
 	TIME_FIELDS timeFields;

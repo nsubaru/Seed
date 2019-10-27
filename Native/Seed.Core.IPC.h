@@ -4,7 +4,6 @@
 namespace Seed {
 	inline namespace Core {
 		namespace IPC {
-
 		}
 	}
 }

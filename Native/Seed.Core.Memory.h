@@ -42,7 +42,7 @@ namespace Seed {
 			};
 
 			///<summary>Загальна куча</summary>
-			class SeedKernelCall Heap final : public BasicHeap {
+			class SeedKernelCall Heap final : public BasicHeap{
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -100,7 +100,7 @@ namespace Seed {
 
 			///<summary>Захищена куча</summary>
 			///<remarks>Перед виділенням і після звільнення відбувається обнулення пам'яті</remarks>
-			class SeedKernelCall SensitiveDataHeap final : public BasicHeap {
+			class SeedKernelCall SensitiveDataHeap final : public BasicHeap{
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>

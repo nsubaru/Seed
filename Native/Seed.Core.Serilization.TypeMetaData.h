@@ -3,23 +3,22 @@
 
 namespace Seed {
 	inline namespace Core {
-
 		namespace Serlization {
 			template<typename THeap>
 			class BaseMemoryStream : Seed::IDisposable, Memory::Allocator<THeap> {
 			private:
 				struct Data : Memory::Allocator<THeap> {
-					BaseSlicesList<THeap, Byte> buffer;
+					Containers::BaseVList<THeap, Byte> buffer;
 					Seed::RefCountT RefCount;
 					Data() : RefCount(1) {}
 				};
 			private:
 				Data* This;
 			protected:
-				virtual void Dispose() override {}
+				virtual void Dispose() override final {}
 			private:
 				template<typename T, typename Tuple, SizeT I = 0>
-				static BaseMemoryStream & FieldsMetaData(const T & Struct, BaseMemoryStream& stream) {
+				static BaseMemoryStream& FieldsMetaData(const T& Struct, BaseMemoryStream& stream) {
 					if constexpr (I == Tuple::Count())
 						return stream;
 					else
@@ -27,7 +26,7 @@ namespace Seed {
 						if constexpr (I + 1 == Tuple::Count()) {
 							using FieldMetaData = typename Tuple::Item<I>;
 							using FieldType = typename FieldMetaData::FieldType;
-							auto ptr = reinterpret_cast<const Byte*>(&Struct) + FieldMetaData::FieldOffset; 
+							auto ptr = reinterpret_cast<const Byte*>(&Struct) + FieldMetaData::FieldOffset;
 							return SerilizeImpl(reinterpret_cast<const FieldMetaData::FieldType&>(*ptr), stream);
 						}
 						else {
@@ -45,7 +44,7 @@ namespace Seed {
 						TypeTraits::Types::MetaData<T>::NativeType == TypeTraits::Types::ENativeTypes::Primitive ||
 						TypeTraits::Types::MetaData<T>::NativeType == TypeTraits::Types::ENativeTypes::Pod
 						) {
-						stream.This->buffer.AddNewSlice(Blob(reinterpret_cast<const Byte*>(&Value), sizeof(T)));
+						stream.This->buffer += (Blob(reinterpret_cast<const Byte*>(&Value), sizeof(T)));
 						return stream;
 					}
 					else if constexpr (
@@ -53,7 +52,7 @@ namespace Seed {
 						TypeTraits::Types::MetaData<T>::DataType == TypeTraits::Types::EDataClasses::Character
 						)
 					{
-						stream.This->buffer.AddNewSlice((Blob)Value);
+						//stream.This->buffer.AddNewSlice((Blob)Value);
 						return stream;
 					}
 					else if constexpr (
@@ -76,7 +75,7 @@ namespace Seed {
 						) {
 						using DataType = typename TypeTraits::Types::MetaData<T>::Type;
 						return FieldsMetaData<DataType, typename TypeTraits::Types::MetaData<T>::AdditionalData::Fields>
-							((DataType&)*(DataType*)((TypeTraits::Types::ISerilizable&)Value).GetDataPtr(), stream);
+							((DataType&) * (DataType*)((TypeTraits::Types::ISerilizable&)Value).GetDataPtr(), stream);
 					}
 					else if constexpr (
 						TypeTraits::Types::MetaData<T>::NativeType == TypeTraits::Types::ENativeTypes::Dynamic
@@ -92,7 +91,7 @@ namespace Seed {
 
 			public:
 				template<typename T>
-				BaseMemoryStream & Serilize(const T& Value) {
+				BaseMemoryStream& Serilize(const T& Value) {
 					return SerilizeImpl(Value, *this);
 				}
 			public:

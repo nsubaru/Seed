@@ -24,6 +24,7 @@ namespace Seed {
 
 			virtual ~IDynamicImpl() = 0 {};
 		};
+		//TODO: Move it to namespace
 		template<typename ... Types>
 		class DynamicImp : public IDynamicImpl {
 		private:
@@ -36,11 +37,11 @@ namespace Seed {
 				return reinterpret_cast<void*>(&data);
 			}
 		public:
-			DynamicImp(Types... types): data(types...) {}
+			DynamicImp(Types... types) : data(types...) {}
 			virtual ~DynamicImp() override final {};
 		};
 
-		class SeedKernelCall Dynamic final : protected IDisposable {
+		class SeedKernelCall Dynamic final : protected IDisposable{
 		private:
 			struct data {
 				IDynamicImpl* pack;

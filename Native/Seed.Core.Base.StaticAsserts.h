@@ -93,6 +93,9 @@ namespace Seed {
 			template<typename Base, typename Derived>
 			struct IsBasedOn :LogicConst<__is_base_of(Base, Derived)> {}; //Implementation defined
 
+			template<typename Base, typename Derived>
+			constexpr Boolean IsBasedOnV = __is_base_of(Base, Derived);
+
 			template<class T>
 			struct IsCArray : LogicFalse {};
 
@@ -181,35 +184,35 @@ namespace Seed {
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args...)&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const &> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) volatile &> : LogicTrue {};
+			struct IsFunction<Ret(Args...) volatile&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const volatile &> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const volatile&> : LogicTrue {};
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args..., ...)&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const &> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) volatile &> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) volatile&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const volatile &> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const volatile&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) && > : LogicTrue {};
+			struct IsFunction<Ret(Args...)&& > : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const &&> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const&&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) volatile &&> : LogicTrue {};
+			struct IsFunction<Ret(Args...) volatile&&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const volatile &&> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const volatile&&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) && > : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...)&& > : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const &&> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const&&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) volatile &&> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) volatile&&> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const volatile &&> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const volatile&&> : LogicTrue {};
 
 			///<summary>specializations for noexcept versions of all the above (C++17 and later)</summary>
 			template<typename Ret, typename... Args>
@@ -231,35 +234,35 @@ namespace Seed {
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args...) & noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const & noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) volatile & noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args...) volatile& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const volatile & noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const volatile& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args..., ...) & noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const & noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) volatile & noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) volatile& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const volatile & noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const volatile& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args...) && noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const && noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const&& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) volatile && noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args...) volatile&& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args...) const volatile && noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args...) const volatile&& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
 			struct IsFunction<Ret(Args..., ...) && noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const && noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const&& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) volatile && noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) volatile&& noexcept> : LogicTrue {};
 			template<typename Ret, typename... Args>
-			struct IsFunction<Ret(Args..., ...) const volatile && noexcept> : LogicTrue {};
+			struct IsFunction<Ret(Args..., ...) const volatile&& noexcept> : LogicTrue {};
 #pragma endregion
 
 			template<typename T >
@@ -447,7 +450,6 @@ namespace Seed {
 			template<class _Trait>
 			inline constexpr bool Negation = NegationT<_Trait>::State;
 
-
 			// NOTHROW TRAITS
 			// STRUCT TEMPLATE is_nothrow_constructible
 			template<class _Ty,
@@ -622,7 +624,7 @@ namespace Seed {
 				: LogicFalse
 			{	// determine whether _Ty is void
 			};
-			//#define _EMPTY_ARGUMENT	
+			//#define _EMPTY_ARGUMENT
 			//#define _CLASS_DEFINE_CV(CLASS) \
 			//	CLASS(_EMPTY_ARGUMENT) \
 			//	CLASS(const) \
@@ -714,7 +716,6 @@ namespace Seed {
 			};
 			template <class _Ty>
 			using IdentitV = typename IdentityT<_Ty>::type;
-
 
 			// STRUCT TEMPLATE is_empty
 			template <class _Ty>
@@ -829,28 +830,20 @@ namespace Seed {
 				static inline constexpr SizeT Count = sizeof...(Types);
 
 				template<typename ...Args>
-				struct IsConvertibleFromTypePackT : 
+				struct IsConvertibleFromTypePackT :
 					ConditionT<
-						sizeof...(Types) == sizeof...(Args),
-						LogicConst<AndT<IsConvertibleT<Types, Args>...>::State>,
-						LogicFalse
+					sizeof...(Types) == sizeof...(Args),
+					LogicConst<AndT<IsConvertibleT<Types, Args>...>::State>,
+					LogicFalse
 					>::Result
 				{};
 
 				template<typename ...Args>
 				static inline constexpr Boolean IsConvertibleFromTypePackV = IsConvertibleFromTypePackT<Args...>::State;
-				
 			};
-
-			
-
-
-			
 		}
 
 		namespace Details {
-
-
 			template<class Ret, class Cls, class IsMutable, class... LambdaArgs>
 			struct Lambda
 			{
@@ -865,9 +858,9 @@ namespace Seed {
 				template<typename ExpectedRet>
 				using IsRetTypeConvertibleTo = typename
 					TypeTraits::ConditionT<
-						TypeTraits::IsVoidV<ReturnType>, 
-						TypeTraits::IsVoidT<ExpectedRet>, 
-						TypeTraits::IsConvertibleT<ReturnType, ExpectedRet>
+					TypeTraits::IsVoidV<ReturnType>,
+					TypeTraits::IsVoidT<ExpectedRet>,
+					TypeTraits::IsConvertibleT<ReturnType, ExpectedRet>
 					>::Result;
 
 				//template<typename ... Params>
@@ -878,7 +871,6 @@ namespace Seed {
 		}
 
 		namespace TypeTraits {
-
 			template<class Ld>
 			struct LambdaType
 				: LambdaType<decltype(&Ld::operator())>
@@ -913,8 +905,8 @@ namespace Seed {
 			constexpr bool IsPodV = IsPodT<T>::State;
 
 			template<typename T>
-			constexpr bool IsNumeric = 
-				TypeTraits::IsSigned<T> || 
+			constexpr bool IsNumeric =
+				TypeTraits::IsSigned<T> ||
 				TypeTraits::IsUnsigned<T> ||
 				TypeTraits::IsSameT<T, Float>::State ||
 				TypeTraits::IsSameT<T, Double>::State;

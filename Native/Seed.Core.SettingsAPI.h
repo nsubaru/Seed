@@ -45,7 +45,11 @@ namespace Seed {
 					///<summary>Розмір резервування для рядків у кількості рядки</summary>
 					SizeT StringReserveSize;
 					///<summary>Стандартна максимальна кількість елементів чергів</summary>
-					SizeT QueueMaxSize;
+					SizeT DefaultPriorityQueueMaxSize;
+					///<summary>Розмір резервування для стеку у кількості елементів</summary>
+					SizeT DynamicStackReserveSize;
+					///<summary>Розмір резурвування для черги у кількіоті елементів</summary>
+					SizeT DynamicQueueReserveSize;
 				};
 
 				///<summary>Налаштування багатопотоковості</summary>
@@ -159,8 +163,8 @@ namespace Seed {
 				public:
 					///<summary>Стартовий розмір кучі</summary>
 					SizeT Property(GetStartSize, SetStartSize) StartSize;
-					///<summary>Максимальний розмір кучі 
-					///<para>0 - значить без обмежень</para>	
+					///<summary>Максимальний розмір кучі
+					///<para>0 - значить без обмежень</para>
 					///</summary>
 					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
@@ -246,8 +250,8 @@ namespace Seed {
 				public:
 					///<summary>Стартовий розмір кучі</summary>
 					SizeT Property(GetStartSize, SetStartSize) StartSize;
-					///<summary>Максимальний розмір кучі 
-					///<para>0 - значить без обмежень</para>	
+					///<summary>Максимальний розмір кучі
+					///<para>0 - значить без обмежень</para>
 					///</summary>
 					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
@@ -324,8 +328,8 @@ namespace Seed {
 				public:
 					///<summary>Стартовий розмір кучі</summary>
 					SizeT Property(GetStartSize, SetStartSize) StartSize;
-					///<summary>Максимальний розмір кучі 
-					///<para>0 - значить без обмежень</para>	
+					///<summary>Максимальний розмір кучі
+					///<para>0 - значить без обмежень</para>
 					///</summary>
 					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
@@ -359,13 +363,31 @@ namespace Seed {
 					CurrentSettingsData.MainMemoryManager.StringReserveSize = NewSize;
 				}
 
-				SizeT GetQueueMaxSize() {
+				SizeT GetDefaultPriorityQueueMaxSize() {
 					extern SettingsData CurrentSettingsData;
-					return CurrentSettingsData.MainMemoryManager.QueueMaxSize;
+					return CurrentSettingsData.MainMemoryManager.DefaultPriorityQueueMaxSize;
 				}
-				void SetQueueMaxSize(SizeT NewSize) {
+				void SetDefaultPriorityQueueMaxSize(SizeT NewSize) {
 					extern SettingsData CurrentSettingsData;
-					CurrentSettingsData.MainMemoryManager.QueueMaxSize = NewSize;
+					CurrentSettingsData.MainMemoryManager.DefaultPriorityQueueMaxSize = NewSize;
+				}
+
+				SizeT GetStackReserveSize() {
+					extern SettingsData CurrentSettingsData;
+					return CurrentSettingsData.MainMemoryManager.DynamicStackReserveSize;
+				}
+				void SetStackReserveSize(SizeT NewSize) {
+					extern SettingsData CurrentSettingsData;
+					CurrentSettingsData.MainMemoryManager.DynamicStackReserveSize = NewSize;
+				}
+
+				SizeT GetQueueReserveSize() {
+					extern SettingsData CurrentSettingsData;
+					return CurrentSettingsData.MainMemoryManager.DynamicQueueReserveSize;
+				}
+				void SetQueueReserveSize(SizeT NewSize) {
+					extern SettingsData CurrentSettingsData;
+					CurrentSettingsData.MainMemoryManager.DynamicQueueReserveSize = NewSize;
 				}
 			public:
 				///<summary>Налаштування стандартної кучі пам'яті</summary>
@@ -378,9 +400,13 @@ namespace Seed {
 				///<summary>Розмір резервування дял рядкової зміної в кількості символів</summary>
 				SizeT Property(GetStringReserveSize, SetStringReserveSize) StringReserveSize;
 				///<summary>Стандартна максимальна кількість елементів чергів</summary>
-				SizeT Property(GetQueueMaxSize, SetQueueMaxSize) QueueMaxSize;
+				SizeT Property(GetDefaultPriorityQueueMaxSize, SetDefaultPriorityQueueMaxSize) DefaultPriorityQueueMaxSize;
+				///<summary>Розмір резервування для стеку у кількості елементів</summary>
+				SizeT Property(GetStackReserveSize, SetStackReserveSize) StackReserveSize;
+				///<summary>Розмір резервування для черги у кількості елементів</summary>
+				SizeT Property(GetQueueReserveSize, SetQueueReserveSize) QueueReserveSize;
 			};
-			
+
 			class SeedKernelCall ThreadingCfgT {
 			public:
 				class SeedKernelCall ThreadCfg {
@@ -472,7 +498,7 @@ namespace Seed {
 
 			VirtualSettingDataT GetVirtualSettingData() { return VirtualSettingDataT(); }
 			void SetVirtualSettingDataT(VirtualSettingDataT) {}
-			
+
 			MemoryManagerT GetMemoryManager() { return MemoryManagerT(); }
 			void SetMemoryManager(MemoryManagerT) {}
 
@@ -493,7 +519,5 @@ namespace Seed {
 		public:
 			void SaveCurrentSettings();
 		};
-
-
 	}
 }

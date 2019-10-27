@@ -151,13 +151,13 @@ namespace Seed {
 
 				DataTypes DataType;
 
-				Array<String> Delims;
-				Array<CharStr> DelimsRaw;
-				Array<SizeT> DelimsSize;
+				Containers::Array<String> Delims;
+				Containers::Array<CharStr> DelimsRaw;
+				Containers::Array<SizeT> DelimsSize;
 
 				SizeT RefCount;
 
-				Data(const String& Text, const Array<String>& Delims) :
+				Data(const String& Text, const Containers::Array<String>& Delims) :
 					DataType(DataTypes::String),
 					Text(Text), Delims(Delims),
 					DelimsRaw(Delims.Count),
@@ -167,7 +167,7 @@ namespace Seed {
 					LoadCachesData();
 				}
 
-				Data(const Token& ParentToken, const Array<String>& Delims) :
+				Data(const Token& ParentToken, const Containers::Array<String>& Delims) :
 					DataType(DataTypes::ParentToken),
 					ParentToken(ParentToken, ParentToken.Text->GetCharStr(), ParentToken.Text->GetCharStrSize()),
 					Delims(Delims),
@@ -227,8 +227,8 @@ namespace Seed {
 				__assume(false);
 			}
 		public:
-			Tokenizer(const String& Text, const Array<String>& Delims) : data(new Data(Text, Delims)) {}
-			Tokenizer(const Token& ParentToken, const Array<String>& Delims) : data(new Data(ParentToken, Delims)) {}
+			Tokenizer(const String& Text, const Containers::Array<String>& Delims) : data(new Data(Text, Delims)) {}
+			Tokenizer(const Token& ParentToken, const Containers::Array<String>& Delims) : data(new Data(ParentToken, Delims)) {}
 
 			Token begin() {
 				extern Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);

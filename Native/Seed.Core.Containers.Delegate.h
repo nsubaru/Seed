@@ -5,15 +5,6 @@
 #include "Seed.Core.Containers.Tuple.h"
 #include "typeinfo"
 
-namespace {
-	////Структура для збереження результату і його типу
-	////struct variadic_data{
-	////	void * data;
-	////	size_t type_hash;
-	////	__forceinline variadic_data(void *&& data, size_t type_hash) noexcept :data(data), type_hash(type_hash) {}
-	////};
-}
-
 namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4996)

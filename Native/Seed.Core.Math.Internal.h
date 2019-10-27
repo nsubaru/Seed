@@ -307,9 +307,9 @@ namespace Seed {
 				Double SeedKernelCall RuntimeSqrt(Double X);
 #pragma endregion
 
-				Float SeedKernelCall ModD(Float X, Float & intPart);
+				Float SeedKernelCall ModD(Float X, Float& intPart);
 
-				Double SeedKernelCall ModD(Double X, Double & intPart);
+				Double SeedKernelCall ModD(Double X, Double& intPart);
 			}
 		}
 	}

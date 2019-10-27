@@ -66,7 +66,7 @@ namespace Seed {
 				return *this;
 			}
 			//Постфіксний інкремент
-			__forceinline UUID & operator++() noexcept {
+			__forceinline UUID& operator++() noexcept {
 				if (uuid.Data4[3] == Seed::Math::Max<UInt8>())
 					if (uuid.Data4[2] == Seed::Math::Max<UInt8>())
 						if (uuid.Data4[1] == Seed::Math::Max<UInt8>())
@@ -124,7 +124,7 @@ namespace Seed {
 			}
 
 			//Провірка на рівність
-			__forceinline friend Boolean operator==(const UUID & a, const UUID & b) noexcept {
+			__forceinline friend Boolean operator==(const UUID& a, const UUID& b) noexcept {
 				if (a.uuid.Data4[3] == b.uuid.Data4[3])
 					if (a.uuid.Data4[2] == b.uuid.Data4[2])
 						if (a.uuid.Data4[1] == b.uuid.Data4[1])
@@ -137,11 +137,11 @@ namespace Seed {
 			}
 
 			//Провірка на нерівність
-			__forceinline friend Boolean operator!=(const UUID & a, const UUID & b) noexcept {
+			__forceinline friend Boolean operator!=(const UUID& a, const UUID& b) noexcept {
 				return !(a == b);
 			}
 			//Провірка a < b
-			__forceinline friend Boolean operator<(const UUID & a, const UUID & b) noexcept {
+			__forceinline friend Boolean operator<(const UUID& a, const UUID& b) noexcept {
 				if (a.uuid.Data4[3] < b.uuid.Data4[3])
 					if (a.uuid.Data4[2] < b.uuid.Data4[2])
 						if (a.uuid.Data4[1] < b.uuid.Data4[1])
@@ -153,7 +153,7 @@ namespace Seed {
 				return false;
 			}
 			//Провірка a > b
-			__forceinline friend Boolean operator>(const UUID & a, const UUID & b) noexcept {
+			__forceinline friend Boolean operator>(const UUID& a, const UUID& b) noexcept {
 				if (a.uuid.Data4[3] > b.uuid.Data4[3])
 					if (a.uuid.Data4[2] > b.uuid.Data4[2])
 						if (a.uuid.Data4[1] > b.uuid.Data4[1])
@@ -165,9 +165,9 @@ namespace Seed {
 				return false;
 			}
 			//Провірка a>=b
-			__forceinline friend Boolean operator>=(const UUID & a, const UUID & b) noexcept { return a == b || a > b; }
+			__forceinline friend Boolean operator>=(const UUID& a, const UUID& b) noexcept { return a == b || a > b; }
 			//Провірка a<=b
-			__forceinline friend Boolean operator<=(const UUID & a, const UUID & b) noexcept { return a == b || a < b; }
+			__forceinline friend Boolean operator<=(const UUID& a, const UUID& b) noexcept { return a == b || a < b; }
 		};
 	}
 }

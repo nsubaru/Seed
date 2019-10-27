@@ -1,7 +1,6 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
-
 #include "Seed.Core.CoreLog.h"
 #include "Seed.Core.CoreLog.Managed.h"
 
@@ -14,13 +13,13 @@
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
 #pragma warning(disable: 4996)
-//toCoreLog always have valid text to input as it's internal API call 
+//toCoreLog always have valid text to input as it's internal API call
 //So we ignore warning about posible realeasing unheld lock as in lock only syscall NtWriteFile
 #pragma warning(disable: 26117)
 //toCoreLog always have valid text to input as it's internal API call as in lock only syscall NtWriteFile
 //So we ignore warning about posible falling realising lock
 #pragma warning(disable: 26115)
-//toCoreLog store log msg in stack because logging start on very early startup steps and on that steps memory API not awailable 
+//toCoreLog store log msg in stack because logging start on very early startup steps and on that steps memory API not awailable
 //so we must use stack as storage for msg
 #pragma warning(disable: 6262)
 
@@ -122,11 +121,11 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 	return Seed::Core::toCoreLog(L"Запуск ядра...");
 }
 
-SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char * Value, Seed::SizeT Lenght)
+SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char* Value, Seed::SizeT Lenght)
 {
 	if (Lenght > static_cast<SizeT>(Math::Max<Int16>()) - 22ULL)
 		return false;
-	Char raw[Math::Max<Int16>()];
+	Char raw[Math::Max<Int16>()] = { 0 };
 	FormatCurrentTime(raw);
 	raw[21] = L' ';
 	CStr::Copy(Value, raw + 22);
@@ -156,7 +155,7 @@ void Seed::Core::Stop::Loging() noexcept
 	RtlDeleteCriticalSection(&LogFile.lock);
 }
 
-bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Array<Seed::ExceptionString> & lines)
+bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::ExceptionString>& lines)
 {
 	if (lines.Count == 0) return true;
 	try

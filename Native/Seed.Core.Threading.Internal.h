@@ -3,10 +3,12 @@
 
 #pragma once
 #include "Seed.Core.Base.h"
-#include "Seed.Core.Threading.LockPrimitives.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
+
+//TODO: Remove this hack
+//HACK: Using optmized exports. it's incompatable with dll exporting and preprocessor macorses hard debug
 
 InternalApiCall OptimizeExport(extern void InitSRWLock(void* PSRWLock),
 	{
@@ -77,11 +79,8 @@ InternalApiCall OptimizeExport(extern void WakeAllCondVal(void* condVar),
 	}
 );
 
-
 InternalApiCall OptimizeExport(extern bool TryAcquireLockSharedSRWLock(void* PSRWLock),
 	{
 		return RtlTryAcquireSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock)) == TRUE;
 	}
 );
-
-

@@ -40,7 +40,7 @@ namespace Seed {
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)& CurrentSettingsData, //-V2005 //-V2533
+				(void*)&CurrentSettingsData, //-V2005 //-V2533
 				sizeof(CurrentSettingsData),
 				&Offset,
 				NULL
@@ -158,7 +158,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)& CurrentSettingsData, //-V2005
+				(void*)&CurrentSettingsData, //-V2005
 				sizeof(CurrentSettingsData),
 				NULL,
 				NULL
@@ -177,7 +177,7 @@ Boolean Seed::Core::Init::SettingsAPI() noexcept
 				NULL,
 				NULL,
 				&io_blk,
-				(void*)& CurrentSettingsData, //-V2005
+				(void*)&CurrentSettingsData, //-V2005
 				sizeof(CurrentSettingsData),
 				NULL,
 				NULL

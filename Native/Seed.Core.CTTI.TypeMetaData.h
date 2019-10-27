@@ -6,6 +6,8 @@
 namespace Seed {
 	inline namespace Core {
 		namespace CTTI {
+#pragma warning(push)
+#pragma warning(disable: 4996)
 			struct TypeMetaData {
 				SizeT FullRecordSize;
 				SizeT DataSize;
@@ -18,7 +20,7 @@ namespace Seed {
 			};
 
 			template<typename T>
-			static __forceinline List<SmartPtr<TypeMetaData>> GetTypeMetaData() {
+			static __forceinline Containers::List<SmartPtr<TypeMetaData>> GetTypeMetaData() {
 				struct InternalHelper {
 					static SmartPtr<TypeMetaData> BuildTypeMetaData() {
 						constexpr SizeT MetDataSize = sizeof(TypeMetaData) + SimplTypeName<T>().Count;
@@ -36,27 +38,28 @@ namespace Seed {
 					}
 				};
 
-				List<SmartPtr<TypeMetaData>> ret;
+				Containers::List<SmartPtr<TypeMetaData>> ret;
 
-				if constexpr (TypeTraits::IsSimpleType<T>) {
+				if constexpr (TypeTraits::IsSimpleType<T> || TypeTraits::Collection::IsString<T>) {
 					ret += InternalHelper::BuildTypeMetaData();
 					return ret;
 				}
-				else if constexpr (TypeTraits::IsPair<T>) {
+				else if constexpr (TypeTraits::Collection::IsPair<T>) {
 					ret += InternalHelper::BuildTypeMetaData();
-					ret += GetTypeMetaData<TypeTraits::PairTypes<T>::Key>();
-					ret += GetTypeMetaData<TypeTraits::PairTypes<T>::Value>();
+					ret += GetTypeMetaData<typename T::KeyType>();
+					ret += GetTypeMetaData<typename T::ValueType>();
 					return ret;
 				}
-				else if constexpr (TypeTraits::IsContainer<T>) {
+				else if constexpr (TypeTraits::IsCollection<T>) {
 					ret += InternalHelper::BuildTypeMetaData();
-					ret += GetTypeMetaData<TypeTraits::ContainerSubType<T>>();
+					ret += GetTypeMetaData<typename T::DataType>();
 					return ret;
 				}
 				else
 				{
 					Throw(NotImplemented(ExceptionPosition));
 				}
+#pragma warning(pop)
 			}
 		}
 	}

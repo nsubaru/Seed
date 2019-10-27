@@ -19,9 +19,11 @@
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
 #pragma warning(disable: 4996)
-//RtlUnwingEx for unwind we return NULL as we don't know what type and value expect parent function 
+//RtlUnwingEx for unwind we return NULL as we don't know what type and value expect parent function
 //and after unwind we jump to catch block as it's exception handling
 #pragma warning(disable: 6387)
+//Using old(C) style enum
+#pragma warning(disable: 26812)
 
 #undef throw
 
@@ -39,7 +41,7 @@ using namespace Seed;
 
 extern "C" void* __cdecl _CallSettingFrame(
 	void* handler,
-	EHRegistrationNode* pEstablisher,
+	EHRegistrationNode * pEstablisher,
 	ULONG               NLG_CODE);
 
 [[noreturn]] InternalApiCall void EmergencyShutdown(const ConstAString& File, const ConstAString& Function, UInt64 Line, const ConstString& Reason) {
@@ -54,7 +56,7 @@ __forceinline T* GetByOffset(const SizeT Base, const SizeT Offset) {
 	return reinterpret_cast<T*>(Base + Offset);
 }
 
-int StateFromIp(FuncInfo * pFuncInfo, DISPATCHER_CONTEXT * pDC) {
+int StateFromIp(FuncInfo* pFuncInfo, DISPATCHER_CONTEXT* pDC) {
 	unsigned int        index;          //  loop control variable
 
 	UInt64 Ip = pDC->ControlPc;
@@ -87,19 +89,19 @@ int StateFromIp(FuncInfo * pFuncInfo, DISPATCHER_CONTEXT * pDC) {
 	return GetByOffset<IptoStateMapEntry>(pDC->ImageBase, pFuncInfo->dispIPtoStateMap)[index - 1].State;
 }
 
-__forceinline int StateFromControlPc(FuncInfo * pFuncInfo, DISPATCHER_CONTEXT * pDC) {
+__forceinline int StateFromControlPc(FuncInfo* pFuncInfo, DISPATCHER_CONTEXT* pDC) {
 	return StateFromIp(pFuncInfo, pDC);
 }
 
-__forceinline void SetState(EHRegistrationNode * pRN, FuncInfo * pFuncInfo, __ehstate_t newState) {
-	*(DWORD*)(pFuncInfo->dispUwindHelp + (size_t)* pRN) = newState;
+__forceinline void SetState(EHRegistrationNode* pRN, FuncInfo* pFuncInfo, __ehstate_t newState) {
+	*(DWORD*)(pFuncInfo->dispUwindHelp + (size_t)*pRN) = newState;
 }
 
-__ehstate_t GetCurrentState(EHRegistrationNode * pRN, DISPATCHER_CONTEXT * pDC, FuncInfo * pFuncInfo) {
-	if (*(__ehstate_t*)(pFuncInfo->dispUwindHelp + (SizeT)* pRN) == -2)
+__ehstate_t GetCurrentState(EHRegistrationNode* pRN, DISPATCHER_CONTEXT* pDC, FuncInfo* pFuncInfo) {
+	if (*(__ehstate_t*)(pFuncInfo->dispUwindHelp + (SizeT)*pRN) == -2)
 		return StateFromControlPc(pFuncInfo, pDC);
 	else
-		return *(__ehstate_t*)(pFuncInfo->dispUwindHelp + (SizeT)* pRN);
+		return *(__ehstate_t*)(pFuncInfo->dispUwindHelp + (SizeT)*pRN);
 }
 
 __int64 __fastcall FrameUnwindFilter(PEXCEPTION_POINTERS pExPtrs)
@@ -142,15 +144,15 @@ __int64 __fastcall FrameUnwindFilter(PEXCEPTION_POINTERS pExPtrs)
 //      phase (targetState = -1), and to do partial unwinding when the current
 //      frame has an appropriate catch.
 void FrameUnwindToState(
-	EHRegistrationNode * pRN,            // Registration node for subject
+	EHRegistrationNode* pRN,            // Registration node for subject
 										//   function
-	DISPATCHER_CONTEXT * pDC,             // Context within subject frame
-	FuncInfo * pFuncInfo,                // Static information for subject
+	DISPATCHER_CONTEXT* pDC,             // Context within subject frame
+	FuncInfo* pFuncInfo,                // Static information for subject
 										//   function
 	__ehstate_t targetState             // State to unwind to
 )
 {
-	typedef void(__cdecl * action)(void);
+	typedef void(__cdecl* action)(void);
 
 	UInt64 UnwindImageBase = ThreadExceptionInfo->_ImageBase;
 	__ehstate_t curState = GetCurrentState(pRN, pDC, pFuncInfo);
@@ -197,10 +199,10 @@ void FrameUnwindToState(
 // Returns the establisher frame pointers. For catch handlers it is the parent's frame pointer.
 //
 EHRegistrationNode* GetEstablisherFrame(
-	EHRegistrationNode * pRN,
-	DISPATCHER_CONTEXT * pDC,
-	FuncInfo * pFuncInfo,
-	EHRegistrationNode * pEstablisher
+	EHRegistrationNode* pRN,
+	DISPATCHER_CONTEXT* pDC,
+	FuncInfo* pFuncInfo,
+	EHRegistrationNode* pEstablisher
 )
 {
 	TryBlockMapEntry* pEntry;
@@ -214,7 +216,7 @@ EHRegistrationNode* GetEstablisherFrame(
 	*pEstablisher = *pRN;
 	for (index = num_of_try_blocks; index > 0; index--) {
 		pEntry = &(GetByOffset<TryBlockMapEntry>(pDC->ImageBase, pFuncInfo->dispTryBlockMap)[index - 1]);
-		if (curState > pEntry->tryHigh && curState <= pEntry->catchHigh) {
+		if (curState > pEntry->tryHigh&& curState <= pEntry->catchHigh) {
 			// Get target function begin address
 			HandlerAdd = RtlLookupFunctionEntry(pDC->ControlPc, (PDWORD64)ThreadExceptionInfo->_ImageBase, nullptr)->BeginAddress;
 			// Get catch handler address.
@@ -224,7 +226,7 @@ EHRegistrationNode* GetEstablisherFrame(
 				static_cast<ULONG_PTR>(pHandler[i].dispOfHandler) != HandlerAdd
 				; i++);
 			if (i < (unsigned)pEntry->nCatches) {
-				*pEstablisher = GetByOffset<EHRegistrationNode>((SizeT)* pRN, pHandler[i].dispFrame);
+				*pEstablisher = GetByOffset<EHRegistrationNode>((SizeT)*pRN, pHandler[i].dispFrame);
 				break;
 			}
 		}
@@ -235,7 +237,7 @@ EHRegistrationNode* GetEstablisherFrame(
 // This function returns the try block for the given state if the state is in a
 // catch; otherwise, nullptr is returned.
 TryBlockMapEntry* CatchTryBlock(
-	FuncInfo * pFuncInfo,
+	FuncInfo* pFuncInfo,
 	__ehstate_t         curState
 ) {
 	TryBlockMapEntry* pEntry;
@@ -244,7 +246,7 @@ TryBlockMapEntry* CatchTryBlock(
 
 	for (index = num_of_try_blocks; index > 0; index--) {
 		pEntry = &(GetByOffset<TryBlockMapEntry>(ThreadExceptionInfo->_ImageBase, pFuncInfo->dispTryBlockMap)[index - 1]);
-		if (curState > pEntry->tryHigh && curState <= pEntry->catchHigh) {
+		if (curState > pEntry->tryHigh&& curState <= pEntry->catchHigh) {
 			return pEntry;
 		}
 	}
@@ -267,9 +269,9 @@ TryBlockMapEntry* CatchTryBlock(
 // __FrameUnwindToState will be 2 not -1. This way we are able to unwind the stack block
 // by block not the whole function in single call.
 void FrameUnwindToEmptyState(
-	EHRegistrationNode * pRN,
-	DISPATCHER_CONTEXT * pDC,
-	FuncInfo * pFuncInfo
+	EHRegistrationNode* pRN,
+	DISPATCHER_CONTEXT* pDC,
+	FuncInfo* pFuncInfo
 )
 {
 	__ehstate_t         stateFromControlPC;
@@ -288,21 +290,21 @@ void FrameUnwindToEmptyState(
 		pEntry == nullptr ? EH_EMPTY_STATE : pEntry->tryHigh);
 }
 
-__forceinline ESTypeList* getESTypes(FuncInfo * pFuncInfo)
+__forceinline ESTypeList* getESTypes(FuncInfo* pFuncInfo)
 {
 	if (pFuncInfo->dispESTypeList == 0)
 		return nullptr;
 	return GetByOffset<ESTypeList>(ThreadExceptionInfo->_ImageBase, pFuncInfo->dispESTypeList);
 }
 
-__forceinline bool isNoExcept(FuncInfo * pFuncInfo) {
+__forceinline bool isNoExcept(FuncInfo* pFuncInfo) {
 	return (pFuncInfo->EHFlags & 4) != 0;
 }
 
 __forceinline __ehstate_t GetUnwindTryBlock(
-	EHRegistrationNode * pRN,
-	DISPATCHER_CONTEXT * pDC,
-	FuncInfo * pFuncInfo
+	EHRegistrationNode* pRN,
+	DISPATCHER_CONTEXT* pDC,
+	FuncInfo* pFuncInfo
 )
 {
 	EHRegistrationNode pEstablisher;
@@ -312,16 +314,16 @@ __forceinline __ehstate_t GetUnwindTryBlock(
 		+ 4);
 }
 
-__forceinline void SetUnwindTryBlock(EHRegistrationNode * pRN, DISPATCHER_CONTEXT * pDC, FuncInfo * pFuncInfo, __ehstate_t curState) {
+__forceinline void SetUnwindTryBlock(EHRegistrationNode* pRN, DISPATCHER_CONTEXT* pDC, FuncInfo* pFuncInfo, __ehstate_t curState) {
 	EHRegistrationNode pEstablisher = *GetEstablisherFrame(pRN, pDC, pFuncInfo, &pEstablisher);
-	if (curState > (Int64) * (DWORD*)((SizeT)pEstablisher + pFuncInfo->dispUwindHelp + 4))
-		* (DWORD*)((SizeT)pEstablisher + pFuncInfo->dispUwindHelp + 4) = curState;
+	if (curState > (Int64)* (DWORD*)((SizeT)pEstablisher + pFuncInfo->dispUwindHelp + 4))
+		*(DWORD*)((SizeT)pEstablisher + pFuncInfo->dispUwindHelp + 4) = curState;
 }
 
 __forceinline __ehstate_t GetHandlerSearchState(
-	EHRegistrationNode * pRN,
-	DISPATCHER_CONTEXT * pDC,
-	FuncInfo * pFuncInfo
+	EHRegistrationNode* pRN,
+	DISPATCHER_CONTEXT* pDC,
+	FuncInfo* pFuncInfo
 )
 {
 	__ehstate_t curState = StateFromControlPc(pFuncInfo, pDC);
@@ -339,9 +341,9 @@ __forceinline __ehstate_t GetHandlerSearchState(
 }
 
 int TypeMatch(
-	HandlerType * pCatch,                  // Type of the 'catch' clause
-	CatchableType * pCatchable,  // Type conversion under consideration
-	ThrowInfo * pThrow, // General information about the thrown type.
+	HandlerType* pCatch,                  // Type of the 'catch' clause
+	CatchableType* pCatchable,  // Type conversion under consideration
+	ThrowInfo* pThrow, // General information about the thrown type.
 	size_t ImageBase
 ) {
 	// First, check for match with ellipsis:
@@ -378,9 +380,9 @@ int TypeMatch(
 //                     list. Returns TRUE if it does, otherwise FALSE
 //
 static BOOLEAN IsInExceptionSpec(
-	EHExceptionRecord * pExcept,         // Information for this (logical)
+	EHExceptionRecord* pExcept,         // Information for this (logical)
 										//   exception
-	ESTypeList * pESTypeList             // Static information for subject frame
+	ESTypeList* pESTypeList             // Static information for subject frame
 )
 {
 	//DASSERT(pESTypeList != nullptr);
@@ -426,7 +428,7 @@ static BOOLEAN IsInExceptionSpec(
 //////////////////////////////////////////////////////////////////////////////////
 // Is_bad_exception_allowed - checks if BadException belongs to the list
 //
-BOOLEAN Is_bad_exception_allowed(ESTypeList * pESTypeList, size_t ImageBase)
+BOOLEAN Is_bad_exception_allowed(ESTypeList* pESTypeList, size_t ImageBase)
 {
 	for (int i = 0; i < pESTypeList->nCount; i++)
 	{
@@ -444,7 +446,7 @@ __forceinline void _CallMemberFunction0(void* const pthis, void* const pmfn)
 }
 
 void __cdecl __DestructExceptionObject(
-	EHExceptionRecord * pExcept,
+	EHExceptionRecord* pExcept,
 	BOOLEAN fThrowNotAllowed,
 	Int64 arg
 ) {
@@ -466,7 +468,7 @@ void __cdecl __DestructExceptionObject(
 		{
 			auto v3 = *(Int64*)pExcept->params.pExceptionObject;
 			if (v3)
-				(*(void(__fastcall * *)(__int64, __int64, __int64))(*(Int64*)v3 + 16i64))(v3, fThrowNotAllowed, arg);
+				(*(void(__fastcall**)(__int64, __int64, __int64))(*(Int64*)v3 + 16i64))(v3, fThrowNotAllowed, arg);
 		}
 	}
 }
@@ -476,7 +478,7 @@ struct __range {
 	unsigned int end;
 }
 GetRangeOfTrysToCheck(
-	TryBlockMap & tryBlockMap,
+	TryBlockMap& tryBlockMap,
 	__ehstate_t    curState,
 	int            /*CatchDepth*/
 )
@@ -494,7 +496,7 @@ GetRangeOfTrysToCheck(
 	unsigned end = start;
 	pEntry = GetByOffset<TryBlockMapEntry>(pDC->ImageBase, pFuncInfo->dispTryBlockMap);
 	for (index = num_of_try_blocks; index > 0; index--) {
-		if (ipState > pEntry[index].tryHigh && ipState <= pEntry[index].catchHigh) {
+		if (ipState > pEntry[index].tryHigh&& ipState <= pEntry[index].catchHigh) {
 			break;
 		}
 	}
@@ -529,16 +531,16 @@ GetRangeOfTrysToCheck(
 
 __declspec(noreturn)
 void UnwindNestedFrames( //-V2537
-	EHRegistrationNode * pFrame,            // Unwind up to (but not including) this frame
-	EHExceptionRecord * pExcept,           // The exception that initiated this unwind
-	CONTEXT * pContext,          // Context info for current exception
-	EHRegistrationNode * pEstablisher,
+	EHRegistrationNode* pFrame,            // Unwind up to (but not including) this frame
+	EHExceptionRecord* pExcept,           // The exception that initiated this unwind
+	CONTEXT* pContext,          // Context info for current exception
+	EHRegistrationNode* pEstablisher,
 	void* Handler,
-	FuncInfo * pFuncInfo,
+	FuncInfo* pFuncInfo,
 	__ehstate_t         TargetUnwindState,
 	__ehstate_t         CatchState,
-	HandlerType * pCatch,
-	DISPATCHER_CONTEXT * pDC,
+	HandlerType* pCatch,
+	DISPATCHER_CONTEXT* pDC,
 	BOOLEAN             recursive
 )
 {
@@ -582,7 +584,7 @@ void UnwindNestedFrames( //-V2537
 	// Used in __InternalCxxFrameHandler to detected if it's being
 	// called from _UnwindNestedFrames.
 
-	RtlUnwindEx((void*)* pFrame,
+	RtlUnwindEx((void*)*pFrame,
 		(void*)pDC->ControlPc,    // Address where control left function
 		&ExceptionRecord,
 		NULL,
@@ -594,8 +596,8 @@ void UnwindNestedFrames( //-V2537
 // This routine returns TRUE if we are executing from within a catch.  Otherwise, FALSE is returned.
 //
 __forceinline bool ExecutionInCatch(
-	DISPATCHER_CONTEXT * pDC,
-	FuncInfo * pFuncInfo
+	DISPATCHER_CONTEXT* pDC,
+	FuncInfo* pFuncInfo
 )
 {
 	__ehstate_t curState = StateFromControlPc(pFuncInfo, pDC);
@@ -614,7 +616,7 @@ __forceinline bool ExecutionInCatch(
 //     NONE.
 __forceinline void* __AdjustPointer(
 	void* pThis,                        // Address point of exception object
-	const PMD & pmd                      // Generalized pointer-to-member
+	const PMD& pmd                      // Generalized pointer-to-member
 										//   descriptor
 ) {
 	char* pRet = (char*)pThis + pmd.mdisp;
@@ -634,7 +636,7 @@ __forceinline void* __AdjustPointer(
 }
 
 __declspec(noreturn, noinline)
-void throwInternalError(const Seed::ConstAString & File, const Seed::ConstAString & FunctName, SizeT Line) {
+void throwInternalError(const Seed::ConstAString& File, const Seed::ConstAString& FunctName, SizeT Line) {
 	throw InternalError(File, FunctName, Line);
 }
 
@@ -653,14 +655,14 @@ void throwInternalError(const Seed::ConstAString & File, const Seed::ConstAStrin
 // Open issues:
 //     What happens if the constructor throws?  (or faults?)
 int BuildCatchObjectHelperInternal(
-	EHExceptionRecord * pExcept, // Original exception thrown
+	EHExceptionRecord* pExcept, // Original exception thrown
 	void* pRN,                  // This is a pointer to the object
 								// that we want to build while doing
 								// COM+ eh. If we are in our own eh,
 								// then this is a Registration node of
 								// catching function
-	HandlerType * pCatch,        // The catch clause that got it
-	CatchableType * pConv        // The conversion to use
+	HandlerType* pCatch,        // The catch clause that got it
+	CatchableType* pConv        // The conversion to use
 )
 {
 	int retval = 0;
@@ -720,10 +722,10 @@ __forceinline void  _CallMemberFunction2(void* const pthis, void* const pmfn, vo
 }
 
 inline void BuildCatchObject(
-	EHExceptionRecord * pExcept,
+	EHExceptionRecord* pExcept,
 	void* pRN,
-	HandlerType * pCatch,
-	CatchableType * pConv
+	HandlerType* pCatch,
+	CatchableType* pConv
 )
 {
 	void** pCatchBuffer;
@@ -753,16 +755,16 @@ inline void BuildCatchObject(
 // Returns:
 //     No return value.  Returns iff handler re-throws.
 void __cdecl CatchIt( //-V2537
-	DISPATCHER_CONTEXT * pDC,               // Context within subject frame
-	EHExceptionRecord * pExcept,           // The exception thrown
-	EHRegistrationNode * pRN,              // Dynamic info of function with catch
-	CONTEXT * pContext,                    // Context info
-	FuncInfo * pFuncInfo,      // Static info of function with catch
-	HandlerType * pCatch,      // The catch clause selected
-	CatchableType * pConv,                 // The rules for making the conversion
-	TryBlockMapEntry * pEntry, // Description of the try block
+	DISPATCHER_CONTEXT* pDC,               // Context within subject frame
+	EHExceptionRecord* pExcept,           // The exception thrown
+	EHRegistrationNode* pRN,              // Dynamic info of function with catch
+	CONTEXT* pContext,                    // Context info
+	FuncInfo* pFuncInfo,      // Static info of function with catch
+	HandlerType* pCatch,      // The catch clause selected
+	CatchableType* pConv,                 // The rules for making the conversion
+	TryBlockMapEntry* pEntry, // Description of the try block
 	int CatchDepth,                       // How many catches are we nested in?
-	EHRegistrationNode * pMarkerRN,        // Special node if nested in catch
+	EHRegistrationNode* pMarkerRN,        // Special node if nested in catch
 	BOOLEAN IsRethrow,                     // Is this a rethrow ?
 	BOOLEAN recursive
 ) {
@@ -822,16 +824,16 @@ void __cdecl CatchIt( //-V2537
 // Assumptions:
 //     Only called if there are handlers in this function.
 void FindHandlerForForeignException(
-	EHExceptionRecord * pExcept,         // Information for this (logical)
+	EHExceptionRecord* pExcept,         // Information for this (logical)
 										//   exception
-	EHRegistrationNode * pRN,            // Dynamic information for subject frame
-	CONTEXT * pContext,                  // Context info
-	DISPATCHER_CONTEXT * pDC,             // Context within subject frame
-	FuncInfo * pFuncInfo,    // Static information for subject frame
+	EHRegistrationNode* pRN,            // Dynamic information for subject frame
+	CONTEXT* pContext,                  // Context info
+	DISPATCHER_CONTEXT* pDC,             // Context within subject frame
+	FuncInfo* pFuncInfo,    // Static information for subject frame
 	__ehstate_t curState,               // Current state
 	int catchDepth,                     // Level of nested catch that is being
 										//   checked
-	EHRegistrationNode * pMarkerRN       // Extra marker RN for nested catch
+	EHRegistrationNode* pMarkerRN       // Extra marker RN for nested catch
 										//   handling
 )
 {
@@ -859,7 +861,7 @@ void FindHandlerForForeignException(
 #if (PreReleaseMode || DebugMode)
 		__debugbreak();
 #endif
-		EXCEPTION_RECORD * sehException = (EXCEPTION_RECORD*)pExcept; //-V1027
+		EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)pExcept; //-V1027
 		NullPointException::Types type;
 		switch (sehException->ExceptionInformation[0])
 		{
@@ -878,7 +880,7 @@ void FindHandlerForForeignException(
 		}
 		Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
 	}
-		break;
+	break;
 	default:
 		Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
 		str +=
@@ -953,17 +955,17 @@ void FindHandlerForForeignException(
 }
 
 void FindHandler(
-	EHExceptionRecord * pExcept,         // Information for this (logical)
+	EHExceptionRecord* pExcept,         // Information for this (logical)
 										//   exception
-	EHRegistrationNode * pRN,            // Dynamic information for subject frame
-	CONTEXT * pContext,                  // Context info
-	DISPATCHER_CONTEXT * pDC,             // Context within subject frame
-	typename FuncInfo * pFuncInfo,    // Static information for subject frame
+	EHRegistrationNode* pRN,            // Dynamic information for subject frame
+	CONTEXT* pContext,                  // Context info
+	DISPATCHER_CONTEXT* pDC,             // Context within subject frame
+	typename FuncInfo* pFuncInfo,    // Static information for subject frame
 	BOOLEAN recursive,                  // TRUE if we're handling the
 										//   translation
 	int CatchDepth,                     // Level of nested catch that is being
 										//   checked
-	EHRegistrationNode * pMarkerRN       // Extra marker RN for nested catch
+	EHRegistrationNode* pMarkerRN       // Extra marker RN for nested catch
 										//   handling
 )
 {
@@ -1057,8 +1059,8 @@ void FindHandler(
 			// Scan the try blocks in the function:
 			for (auto iter = startStop.start; iter < startStop.end; ++iter) {
 				auto tryBlock = GetByOffset<TryBlockMapEntry>(pDC->ImageBase, pFuncInfo->dispTryBlockMap + sizeof(TryBlockMapEntry) * iter);
-				CatchableType * pCatchable;
-				CatchableTypeArray * ppCatchable;
+				CatchableType* pCatchable;
+				CatchableTypeArray* ppCatchable;
 
 				if (tryBlock->tryLow > curState || curState > tryBlock->tryHigh) {
 					continue;
@@ -1183,7 +1185,7 @@ void FindHandler(
 				// We're recursive, and the exception wasn't a C++ EH!
 				// Translator threw something uninteligable.
 
-				// Two choices here: we could let the new exception take over, or we could abort. 
+				// Two choices here: we could let the new exception take over, or we could abort.
 				// We throw internal error.
 
 				throw InternalError(ExceptionPosition);
@@ -1195,13 +1197,13 @@ void FindHandler(
 }
 
 __forceinline EXCEPTION_DISPOSITION InternalLanguageSpecficHandle(
-	EHExceptionRecord * pExcept,        // Information for this exception
-	EHRegistrationNode * pRN,            // Dynamic information for this frame
-	CONTEXT * pContext,                  // Context info
-	DISPATCHER_CONTEXT * pDC,             // Context within subject frame
-	FuncInfo * pFuncInfo,    // Static information for this frame
+	EHExceptionRecord* pExcept,        // Information for this exception
+	EHRegistrationNode* pRN,            // Dynamic information for this frame
+	CONTEXT* pContext,                  // Context info
+	DISPATCHER_CONTEXT* pDC,             // Context within subject frame
+	FuncInfo* pFuncInfo,    // Static information for this frame
 	int CatchDepth,                     // How deeply nested are we?
-	EHRegistrationNode * pMarkerRN,      // Marker node for when checking inside
+	EHRegistrationNode* pMarkerRN,      // Marker node for when checking inside
 										//  catch block
 	BOOLEAN recursive                   // Are we handling a translation?
 ) {
@@ -1240,7 +1242,7 @@ __forceinline EXCEPTION_DISPOSITION InternalLanguageSpecficHandle(
 
 __forceinline
 FRAMEINFO* __cdecl _CreateFrameInfo(
-	FRAMEINFO * pFrameInfo,
+	FRAMEINFO* pFrameInfo,
 	PVOID       pExceptionObject
 ) {
 	ThreadExceptionInfo->_pFrameInfoChain = nullptr;
@@ -1261,8 +1263,8 @@ FRAMEINFO* __cdecl _CreateFrameInfo(
 // Side-effects: sets rethrow = TRUE if exception objects of the two Exception matches
 //__declspec(guard(ignore))
 int ExFilterRethrow(
-	EXCEPTION_POINTERS * pExPtrs,
-	EHExceptionRecord * pOldExcept,
+	EXCEPTION_POINTERS* pExPtrs,
+	EHExceptionRecord* pOldExcept,
 	int* rethrow
 ) {
 	// Get the exception record thrown (don't care about other info)
@@ -1273,7 +1275,7 @@ int ExFilterRethrow(
 			|| pExcept->params.magicNumber == EH_MAGIC_NUMBER2
 			|| pExcept->params.magicNumber == EH_MAGIC_NUMBER3) &&
 		pExcept->params.pThrowInfo == pOldExcept->params.pThrowInfo)
-		* rethrow = 1;
+		*rethrow = 1;
 	// Check if it's ours and it's has no exception information.
 	if (pExcept->ExceptionCode == EH_EXCEPTION_NUMBER && pExcept->NumberParameters == 3
 		&& (pExcept->params.magicNumber == EH_MAGIC_NUMBER1
@@ -1291,7 +1293,7 @@ int ExFilterRethrow(
 }
 
 __forceinline __declspec(noreturn)
-void __RethrowException(EHExceptionRecord * pThisException)
+void __RethrowException(EHExceptionRecord* pThisException)
 {
 	EXCEPTION_RECORD record = { 0 };
 	record.ExceptionCode = pThisException->ExceptionCode; //-V522
@@ -1325,7 +1327,7 @@ bool _IsExceptionObjectToBeDestroyed(void* pExceptionObject)
 //  case.
 //
 void _FindAndUnlinkFrame(
-	FRAMEINFO * pFrameInfo
+	FRAMEINFO* pFrameInfo
 ) {
 	//DASSERT(pFrameInfo == pFrameInfoChain);
 
@@ -1342,7 +1344,7 @@ void _FindAndUnlinkFrame(
 	EmergencyShutdown(ExceptionPosition, L"Список покажчиків на помилки пошкоджений");
 }
 
-void ThrowBadException(const ConstAString & File, const ConstAString & Function, UInt64 Line) {
+void ThrowBadException(const ConstAString& File, const ConstAString& Function, UInt64 Line) {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 	___cxxthrow(Exceptions::BadException(File, Function, Line));
@@ -1350,7 +1352,7 @@ void ThrowBadException(const ConstAString & File, const ConstAString & Function,
 }
 
 void* InternalCxxCallCatchBlock(
-	EXCEPTION_RECORD * pExcept
+	EXCEPTION_RECORD* pExcept
 )
 {
 	int rethrow = 0, TranslatedCatch = 0;
@@ -1376,7 +1378,6 @@ void* InternalCxxCallCatchBlock(
 
 	ThreadExceptionInfo->_curcontext = pContext;
 	ThreadExceptionInfo->_curexception = pThisException;
-
 
 	FRAMEINFO* pFrameInfo = _CreateFrameInfo(&FrameInfo,
 		(void*)((EHExceptionRecord*)ThreadExceptionInfo->_curexception)->params.pExceptionObject);
@@ -1439,10 +1440,10 @@ void* InternalCxxCallCatchBlock(
 }
 
 EXCEPTION_DISPOSITION InternalCxxFrameHandler3(
-	EHExceptionRecord * pExcept,         // Information for this exception
+	EHExceptionRecord* pExcept,         // Information for this exception
 	EHRegistrationNode RN,               // Dynamic information for this frame
-	CONTEXT * pContext,        // Context info
-	DISPATCHER_CONTEXT * pDC              // More dynamic info for this frame
+	CONTEXT* pContext,        // Context info
+	DISPATCHER_CONTEXT* pDC              // More dynamic info for this frame
 ) {
 	ThreadExceptionInfo->_ImageBase = pDC->ImageBase;
 	ThreadExceptionInfo->_ThrowImageBase = (UInt64)pExcept->params.pThrowImageBase;
@@ -1454,9 +1455,9 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler3(
 #define CALLTYPE __clrcall
 #define CALEETYPE __clrcall
 #define __RELIABILITY_CONTRACT \
-    [System::Runtime::ConstrainedExecution::ReliabilityContract( \
-        System::Runtime::ConstrainedExecution::Consistency::WillNotCorruptState, \
-        System::Runtime::ConstrainedExecution::Cer::Success)]
+	[System::Runtime::ConstrainedExecution::ReliabilityContract( \
+		System::Runtime::ConstrainedExecution::Consistency::WillNotCorruptState, \
+		System::Runtime::ConstrainedExecution::Cer::Success)]
 #define ASSERT_UNMANAGED_CODE_ATTRIBUTE [System::Security::Permissions::SecurityPermissionAttribute(System::Security::Permissions::SecurityAction::Assert, UnmanagedCode = true)]
 #define SECURITYCRITICAL_ATTRIBUTE [System::Security::SecurityCritical]
 #define SECURITYSAFECRITICAL_ATTRIBUTE [System::Security::SecuritySafeCritical]
@@ -1476,7 +1477,7 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler3(
 __RELIABILITY_CONTRACT
 ASSERT_UNMANAGED_CODE_ATTRIBUTE
 SECURITYCRITICAL_ATTRIBUTE
-static int ArrayUnwindFilter(EXCEPTION_POINTERS * pExPtrs)
+static int ArrayUnwindFilter(EXCEPTION_POINTERS* pExPtrs)
 {
 	EHExceptionRecord* pExcept = (EHExceptionRecord*)pExPtrs->ExceptionRecord;
 
@@ -1500,7 +1501,7 @@ void CALEETYPE __ArrayUnwind(
 	void* ptr,                // Pointer to array to destruct
 	size_t      size,               // Size of each element (including padding)
 	int         count,              // Number of elements in the array
-	void(CALLTYPE * pDtor)(void*)    // The destructor to call
+	void(CALLTYPE* pDtor)(void*)    // The destructor to call
 )
 {
 	// 'unwind' rest of array
@@ -1524,8 +1525,8 @@ inline void CALEETYPE __ehvec_ctor(
 	void* ptr,                // Pointer to array to destruct
 	size_t      size,               // Size of each element (including padding)
 	size_t      count,              // Number of elements in the array
-	void(CALLTYPE * pCtor)(void*),   // Constructor to call
-	void(CALLTYPE * pDtor)(void*)    // Destructor to call should exception be thrown
+	void(CALLTYPE* pCtor)(void*),   // Constructor to call
+	void(CALLTYPE* pDtor)(void*)    // Destructor to call should exception be thrown
 )
 {
 	size_t i = 0;      // Count of elements constructed
@@ -1555,7 +1556,7 @@ inline void CALEETYPE __ehvec_dtor(
 	size_t      size,               // Size of each element (including padding)
 	//  int         count,              // Number of elements in the array
 	size_t      count,              // Number of elements in the array
-	void(CALLTYPE * pDtor)(void*)    // The destructor to call
+	void(CALLTYPE* pDtor)(void*)    // The destructor to call
 )
 {
 	_Analysis_assume_(count > 0);
@@ -1593,7 +1594,7 @@ union RawExceptionInfo {
 	EHExceptionRecord CxxExceptionInfo;
 };
 
-void NtStatusExceptionMethodsCallsLogging(ConstAString & FuncName) {
+void NtStatusExceptionMethodsCallsLogging(ConstAString& FuncName) {
 	toCoreLog(L"NtException copy ctor" + String(FuncName));
 }
 
@@ -1612,7 +1613,7 @@ void ShowExData(void* ptr, ConstString Label) {
 // the passed info throw info and determine the type of exception.  If it's a simple type
 // it calls memcpy.  It's a UDT with copy-ctor, it uses the copy-ctor.
 //
-void _CallCopyCtor(_Out_writes_bytes_(size) void* dst, _In_reads_bytes_(size) void* src, size_t size, _In_ const CatchableType * const pType, void* ThrowImageBase)
+void _CallCopyCtor(_Out_writes_bytes_(size) void* dst, _In_reads_bytes_(size) void* src, size_t size, _In_ const CatchableType* const pType, void* ThrowImageBase)
 {
 	if (pType->properties & CT_IsSimpleType || // this is a simple type
 		pType->copyFunction == NULL    // this is a user defined type without copy ctor
@@ -1663,7 +1664,7 @@ extern "C" extern void __chkstk();
 // This function returns the static copy of exception_ptr which points to a
 // std::bad_alloc exception in out-of-memory situation.
 //
-void _CopyException(RawExceptionInfo * orig, RawExceptionInfo * copy)
+void _CopyException(RawExceptionInfo* orig, RawExceptionInfo* copy)
 {
 	//copying the _EXCEPTION_RECORD (for SEH exceptions)
 	copy->NtExceptionInfo.ExceptionCode = orig->NtExceptionInfo.ExceptionCode;
@@ -1695,7 +1696,6 @@ void _CopyException(RawExceptionInfo * orig, RawExceptionInfo * copy)
 		// nulling out the Exception object pointer, because we haven't copied it yet
 		copy->CxxExceptionInfo.params.pExceptionObject = NULL;
 
-
 		ThrowInfo* pThrow = orig->CxxExceptionInfo.params.pThrowInfo;
 		if (orig->CxxExceptionInfo.params.pExceptionObject == NULL ||
 			pThrow == NULL ||
@@ -1717,7 +1717,7 @@ void _CopyException(RawExceptionInfo * orig, RawExceptionInfo * copy)
 //		const auto typeInfo2 = ;
 //		const auto typeInfo = (CatchableType*)(*(int*)
 //			GetByOffset<CatchableTypeArray>(
-//			(SizeT)orig->CxxExceptionInfo.params.pThrowImageBase, 
+//			(SizeT)orig->CxxExceptionInfo.params.pThrowImageBase,
 //				pThrow->pCatchableTypeArray
 //				) + (SizeT)orig->CxxExceptionInfo.params.pThrowImageBase);
 		void* pExceptionBuffer = NULL;
@@ -1749,13 +1749,13 @@ void ThrowExceptionFromExceptionStorage(EXCEPTION_RECORD record) {
 	RtlRaiseException(&record);
 }
 
-void Seed::Core::Exceptions::Exception::ThrowRawException(RawException && exception)
+void Seed::Core::Exceptions::Exception::ThrowRawException(RawException&& exception)
 {
 	if (exception.ptr == nullptr)
 		___cxxthrow(Exceptions::NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
 	EXCEPTION_RECORD record = { 0 };
-	EXCEPTION_RECORD * ex = (EXCEPTION_RECORD*)exception.ptr;
-	auto copy = (RawExceptionInfo*)& record;
+	EXCEPTION_RECORD* ex = (EXCEPTION_RECORD*)exception.ptr;
+	auto copy = (RawExceptionInfo*)&record;
 	auto orig = (RawExceptionInfo*)ex;
 
 	//copying the _EXCEPTION_RECORD (for SEH exceptions)
@@ -1788,7 +1788,6 @@ void Seed::Core::Exceptions::Exception::ThrowRawException(RawException && except
 		// nulling out the Exception object pointer, because we haven't copied it yet
 		copy->CxxExceptionInfo.params.pExceptionObject = NULL;
 
-
 		ThrowInfo* pThrow = orig->CxxExceptionInfo.params.pThrowInfo;
 		if (orig->CxxExceptionInfo.params.pExceptionObject == NULL ||
 			pThrow == NULL ||
@@ -1810,7 +1809,7 @@ void Seed::Core::Exceptions::Exception::ThrowRawException(RawException && except
 		//		const auto typeInfo2 = ;
 		//		const auto typeInfo = (CatchableType*)(*(int*)
 		//			GetByOffset<CatchableTypeArray>(
-		//			(SizeT)orig->CxxExceptionInfo.params.pThrowImageBase, 
+		//			(SizeT)orig->CxxExceptionInfo.params.pThrowImageBase,
 		//				pThrow->pCatchableTypeArray
 		//				) + (SizeT)orig->CxxExceptionInfo.params.pThrowImageBase);
 		void* pExceptionBuffer = NULL;

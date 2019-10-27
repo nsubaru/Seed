@@ -374,7 +374,7 @@ namespace Seed {
 			{
 				return static_cast<UInt8>(
 					Number % Pow(10ULL, static_cast<UInt8>(Pos + 1ui8)) / Pow(10ULL, static_cast<UInt8>(Pos + 1ui8)) //-V747 //-V2517
-				);
+					);
 			}
 #pragma endregion
 
@@ -386,11 +386,11 @@ namespace Seed {
 					return Internal::RuntimeExp(X);
 			}
 
-			__forceinline Double ModD(Double X, Double & Y) {
+			__forceinline Double ModD(Double X, Double& Y) {
 				return Internal::ModD(X, Y);
 			}
 
-			__forceinline Float ModD(Float X, Float & Y) {
+			__forceinline Float ModD(Float X, Float& Y) {
 				return Internal::ModD(X, Y);
 			}
 		}

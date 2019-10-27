@@ -1,23 +1,29 @@
 #pragma once
 #include "Seed.Core.Base.h"
+#include "Seed.Core.Containers.TypeTraits.h"
+#include "Seed.Core.Containers.API.LINQ.IString.h"
 #include "Seed.Core.CTTI.CompileStringView.h"
 #include "Seed.Core.Math.h"
 #include "Seed.Core.SettingsAPI.h"
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.DateTime.h"
-#include "Seed.Core.Containers.Array.h"
-#include "Seed.Core.Containers.List.h"
+#include "Seed.Core.Containers.NonConcurency.Array.h"
+#include "Seed.Core.Containers.NonConcurency.List.h"
+#include "Seed.Core.Containers.NonConcurency.Map.h"
 
 namespace Seed {
 	inline namespace Core {
-
 		inline namespace Exceptions {
 			class IntegerOverflowException;
 		}
 #pragma warning(push)
 #pragma warning(disable: 4996)
-		template<class Base>
-		class SeedKernelCall BaseString final : public Memory::Allocator<Base>, public IComparable<BaseString<Base>> {
+		template<class THeap>
+		class SeedKernelCall BaseString final : 
+			public Memory::Allocator<THeap>, 
+			public IComparable<BaseString<THeap>>,
+			public Containers::LINQ::IString<BaseString,THeap,UChar,false>
+			{
 		private:
 			///<summary>Покажчик на рядковий масив</summary>
 			CharStr str;
@@ -77,7 +83,7 @@ namespace Seed {
 				}
 				else {
 					CurrentSize = Size;
-					ReservedSize = CurrentSize +  CurrentSettings().MemoryManager.StringReserveSize;
+					ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 					this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 					Memory::Copy(Text, this->str, Size * sizeof(Char));
 				}
@@ -91,7 +97,7 @@ namespace Seed {
 				if constexpr (!(Size < 2))
 				{
 					CurrentSize = Size;
-					ReservedSize = CurrentSize +  CurrentSettings().MemoryManager.StringReserveSize;
+					ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 					this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 					CharStr temp_str = this->str;
 					ACharStr text = (ACharStr)Text;
@@ -104,7 +110,7 @@ namespace Seed {
 
 			///<summary>Конструктор з готової константного рядка</summary>
 			///<param name = "Text">Літерал рядка</param>
-			__forceinline BaseString(const ConstString & Text) {
+			__forceinline BaseString(const ConstString& Text) {
 				if (Text.Size < 2)
 				{
 					this->str = nullptr;
@@ -112,7 +118,7 @@ namespace Seed {
 				}
 				else {
 					CurrentSize = Text.Size;
-					ReservedSize = CurrentSize +  CurrentSettings().MemoryManager.StringReserveSize;
+					ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 					this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 					Memory::Copy(Text.Str, this->str, Text.Size * sizeof(Char));
 				}
@@ -120,7 +126,7 @@ namespace Seed {
 
 			///<summary>Конструктор з готової константного ASCII рядка</summary>
 			///<param name = "str">Константний рядок</param>
-			BaseString(const ConstAString & str) {
+			BaseString(const ConstAString& str) {
 				if (str.Size < 2)
 				{
 					this->str = nullptr;
@@ -128,7 +134,7 @@ namespace Seed {
 				}
 				else {
 					CurrentSize = str.Size;
-					ReservedSize = CurrentSize +  CurrentSettings().MemoryManager.StringReserveSize;
+					ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 					this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 					CharStr temp_str = this->str;
 					ACharStr text = (ACharStr)str.Str;
@@ -143,12 +149,7 @@ namespace Seed {
 			///<para>Суто для внутрішнього використання</para></summary>
 			///<param name = "Text">Масив букв</param>
 			///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-			InternalApiCall BaseString(Char * text) {
-				extern __declspec(noreturn) void ThrowStringToLong(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT RequiredSize);
+			InternalApiCall BaseString(Char* text) {
 				SizeT size = CStr::Size(text);
 				if (size == 0) {
 					this->str = nullptr;
@@ -157,8 +158,8 @@ namespace Seed {
 				}
 				CurrentSize = size + 1;
 				if (CurrentSize > Math::Max<SizeT>())
-					ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
-				ReservedSize = CurrentSize +  CurrentSettings().MemoryManager.StringReserveSize;
+					Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
+				ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 				for (SizeT i = 0; i < size; i++) {
 					this->str[i] = text[i];
@@ -170,12 +171,7 @@ namespace Seed {
 			///<para>Суто для внутрішнього використання</para></summary>
 			///<param name = "Text">Масив букв</param>
 			///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-			InternalApiCall BaseString(AChar * text) {
-				extern __declspec(noreturn) void ThrowStringToLong(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT RequiredSize);
+			InternalApiCall BaseString(AChar* text) {
 				SizeT size = CStr::Size(text);
 				if (size == 0) {
 					this->str = nullptr;
@@ -184,8 +180,8 @@ namespace Seed {
 				}
 				CurrentSize = size + 1;
 				if (CurrentSize > Math::Max<SizeT>())
-					ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
-				ReservedSize = CurrentSize +  CurrentSettings().MemoryManager.StringReserveSize;
+					Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
+				ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 				for (SizeT i = 0; i < size; i++) {
 					this->str[i] = text[i];
@@ -199,11 +195,6 @@ namespace Seed {
 			///<param name = "Size">Кількість символів разом з нуль-термінатором</summary>
 			///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
 			InternalApiCall BaseString(const AChar* text, SizeT Size) {
-				extern __declspec(noreturn) void ThrowStringToLong(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT RequiredSize);
 				SizeT size = Size;
 				if (size == 0) {
 					this->str = nullptr;
@@ -212,7 +203,7 @@ namespace Seed {
 				}
 				CurrentSize = size + 1;
 				if (CurrentSize > Math::Max<SizeT>())
-					ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
+					Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
 				ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
 				for (SizeT i = 0; i < size; i++) {
@@ -237,13 +228,8 @@ namespace Seed {
 			///<param name = "StartSize">Стартовий розмір в кількості символів без нуль-термінатора</param>
 			///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
 			BaseString(SizeT StartSize) {
-				extern __declspec(noreturn) void ThrowStringToLong(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT RequiredSize);
 				if (StartSize > Math::Max<SizeT>())
-					ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize);
+					Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize);
 				if (StartSize == 0 || StartSize < CurrentSettings().MemoryManager.StringReserveSize)
 					StartSize = CurrentSettings().MemoryManager.StringReserveSize;
 				this->ReservedSize = StartSize + 1;
@@ -253,7 +239,7 @@ namespace Seed {
 			}
 
 			template<SizeT N>
-			BaseString(CTTI::ConstexprArray<char, N> & item) {
+			BaseString(CTTI::ConstexprArray<char, N>& item) {
 				this->CurrentSize = N;
 				this->ReservedSize = this->CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 				this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
@@ -265,7 +251,7 @@ namespace Seed {
 			///<summary>Копіювальний конструктор</summary>
 			///<remarks>Виділить пам'ять лише при потребі</remarks>
 			///<param name = "from">Оригинал рядка</param>
-			BaseString(const BaseString & from) {
+			BaseString(const BaseString& from) {
 				if (from.str != nullptr) {
 					this->CurrentSize = from.CurrentSize;
 					this->ReservedSize = from.ReservedSize;
@@ -279,7 +265,7 @@ namespace Seed {
 			}
 			///<summary>Оптимізований конструктор</summary>
 			///<param name = "from">RValue силка на оригинал</param>
-			__forceinline BaseString(BaseString && from) noexcept {
+			__forceinline BaseString(BaseString&& from) noexcept {
 				this->str = from.str; from.str = nullptr;
 				this->CurrentSize = from.CurrentSize; from.CurrentSize = 0;
 				this->ReservedSize = from.ReservedSize; from.ReservedSize = 0;
@@ -291,7 +277,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline Boolean operator==(const BaseString & second) const noexcept {
+			__forceinline Boolean operator==(const BaseString& second) const noexcept {
 				if (this->CurrentSize != second.CurrentSize) return false;
 				if (this->str == second.str) return true;
 				for (SizeT i = 0; i < CurrentSize; i++) {
@@ -305,7 +291,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки не рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline Boolean operator!=(const BaseString & second) const noexcept {
+			__forceinline Boolean operator!=(const BaseString& second) const noexcept {
 				return !this->operator==(second);
 			}
 #pragma endregion
@@ -417,7 +403,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline Boolean operator==(const ConstString & second) const noexcept {
+			__forceinline Boolean operator==(const ConstString& second) const noexcept {
 				if (this->CurrentSize != second.Size) return false;
 				for (SizeT i = 0; i < CurrentSize; i++) {
 					if (this->str[i] != second[i]) return false;
@@ -430,7 +416,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки не рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline Boolean operator!=(const ConstString & second) const noexcept {
+			__forceinline Boolean operator!=(const ConstString& second) const noexcept {
 				return !this->operator==(second);
 			}
 
@@ -440,7 +426,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline friend Boolean operator==(const ConstString & second, BaseString first) noexcept {
+			__forceinline friend Boolean operator==(const ConstString& second, BaseString first) noexcept {
 				return first.operator==(second)
 			}
 
@@ -450,7 +436,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки не рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline friend Boolean operator!=(const ConstString & second, BaseString first) noexcept {
+			__forceinline friend Boolean operator!=(const ConstString& second, BaseString first) noexcept {
 				return first.operator!=(second);
 			}
 #pragma endregion
@@ -461,7 +447,7 @@ namespace Seed {
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
 			template<SizeT Size>
-			__forceinline Boolean operator==(const ConstAString & second) const noexcept {
+			__forceinline Boolean operator==(const ConstAString& second) const noexcept {
 				if (this->CurrentSize != second.Size) return false;
 				for (SizeT i = 0; i < CurrentSize; i++) {
 					if (this->str[i] != second[i]) return false;
@@ -474,7 +460,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки не рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline Boolean operator!=(const ConstAString & second) const noexcept {
+			__forceinline Boolean operator!=(const ConstAString& second) const noexcept {
 				return !this->operator==(second);
 			}
 
@@ -485,7 +471,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline friend Boolean operator==(const ConstAString & second, BaseString first) noexcept {
+			__forceinline friend Boolean operator==(const ConstAString& second, BaseString first) noexcept {
 				return first.operator==(second)
 			}
 
@@ -496,7 +482,7 @@ namespace Seed {
 			///<returns><c>True</c> якщо рядки не рівні</returns>
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
-			__forceinline friend Boolean operator!=(const ConstAString & second, BaseString first) noexcept {
+			__forceinline friend Boolean operator!=(const ConstAString& second, BaseString first) noexcept {
 				return first.operator!=(second);
 			}
 #pragma endregion
@@ -507,7 +493,7 @@ namespace Seed {
 			///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
 			///якщо хоч одна умова не виконується то рядки різні</remarks>
 			template<typename OtherBase>
-			__forceinline Boolean operator==(const BaseString<OtherBase> & OtherString) const noexcept {
+			__forceinline Boolean operator==(const BaseString<OtherBase>& OtherString) const noexcept {
 				if (this->CurrentSize != OtherString.Size()) return false;
 				for (SizeT i = 0; i < CurrentSize; i++) {
 					if (this->str[i] != OtherString[i]) return false;
@@ -522,7 +508,7 @@ namespace Seed {
 			///<returns>Посилання на поточну зміну</returns>
 			///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
 			///Текст просто копіюється по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
-			BaseString& operator=(const BaseString & orig) {
+			BaseString& operator=(const BaseString& orig) {
 				if (*this == orig) return *this;
 				if (this->ReservedSize >= orig.CurrentSize) {
 					Memory::Copy(orig.str, this->str, orig.CurrentSize * sizeof(Char));
@@ -531,7 +517,7 @@ namespace Seed {
 				else {
 					BaseString::operator delete[](this->str);
 					this->str = nullptr;
-					this->str = (CharStr)BaseString::operator new[](sizeof(Char) * orig.ReservedSize);
+					this->str = (CharStr)BaseString::operator new[](sizeof(Char)* orig.ReservedSize);
 					Memory::Copy(orig.str, this->str, orig.CurrentSize * sizeof(Char));
 					this->CurrentSize = orig.CurrentSize;
 					this->ReservedSize = orig.ReservedSize;
@@ -544,7 +530,7 @@ namespace Seed {
 			///<returns>Посилання на поточну зміну</returns>
 			///<remarks>Викликається деструктор для поточного рядка.
 			///Копіються поля з оригинала. І накінець поля в оригинала обнулюються</remarks>
-			__forceinline BaseString& operator=(BaseString && orig) noexcept {
+			__forceinline BaseString& operator=(BaseString&& orig) noexcept {
 				if (orig.str == this->str) return *this;
 				this->~BaseString();
 				this->str = orig.str; orig.str = nullptr;
@@ -605,7 +591,7 @@ namespace Seed {
 				BaseString ret_data;
 				SizeT NewSize = CurrentSize + Size - 1;
 				SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char) * NewFullSize);
+				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
 				if (this->str != nullptr) {
 					Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
 					Memory::Copy(Text, ret_data.str + this->CurrentSize - 1, Size * sizeof(Char));
@@ -624,7 +610,7 @@ namespace Seed {
 			///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
 			///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
 			template<SizeT Size>
-			__forceinline friend BaseString operator+(const Char(&Text)[Size], const BaseString & Right) {
+			__forceinline friend BaseString operator+(const Char(&Text)[Size], const BaseString& Right) {
 				if constexpr (Size < 2)
 					return Right;
 				BaseString ret_data(Text);
@@ -643,7 +629,7 @@ namespace Seed {
 				BaseString ret_data;
 				SizeT NewSize = CurrentSize + Size - 1;
 				SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char) * NewFullSize); //-V2005
+				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
 				if (this->str != nullptr)
 					Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
 				CharStr temp_str = ret_data.str + this->CurrentSize;
@@ -662,7 +648,7 @@ namespace Seed {
 			///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
 			///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
 			template<SizeT Size>
-			__forceinline friend BaseString operator+(const AChar(&Text)[Size], const BaseString & Right) {
+			__forceinline friend BaseString operator+(const AChar(&Text)[Size], const BaseString& Right) {
 				if constexpr (Size < 2)
 					return Right;
 				BaseString ret_data(Text);
@@ -674,13 +660,13 @@ namespace Seed {
 			///<summary>Оператор додавання рядкового літералу</summary>
 			///<param name = "Text">Рядковий літерал</param>
 			///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-			__forceinline BaseString operator+(const ConstString & Text) const {
+			__forceinline BaseString operator+(const ConstString& Text) const {
 				if (Text.Size < 2)
 					return *this;
 				BaseString ret_data;
 				SizeT NewSize = CurrentSize + Text.Size - 1;
 				SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char) * NewFullSize);
+				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
 				if (this->str != nullptr) {
 					Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
 					Memory::Copy(Text.Str, ret_data.str + this->CurrentSize - 1, Text.Size * sizeof(Char));
@@ -697,7 +683,7 @@ namespace Seed {
 			///<param name = "Text">Рядковий літерал</param>
 			///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
 			///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-			__forceinline friend BaseString operator+(const ConstString & Text, const BaseString & Right) {
+			__forceinline friend BaseString operator+(const ConstString& Text, const BaseString& Right) {
 				if (Text.Size < 2)
 					return Right;
 				BaseString ret_data(Text);
@@ -708,13 +694,13 @@ namespace Seed {
 			///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
 			///<param name = "Text">Рядковий літерал</param>
 			///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-			BaseString operator+(const ConstAString & Text) const {
+			BaseString operator+(const ConstAString& Text) const {
 				if (Text.Size < 2)
 					return *this;
 				BaseString ret_data;
 				SizeT NewSize = CurrentSize + Text.Size - 1;
 				SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char) * NewFullSize); //-V2005
+				ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
 				if (this->str != nullptr)
 					Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
 				CharStr temp_str = ret_data.str + this->CurrentSize;
@@ -731,7 +717,7 @@ namespace Seed {
 			///<param name = "Text">Рядковий літерал ASCII символів</param>
 			///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
 			///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-			__forceinline friend BaseString operator+(const ConstAString & Text, const BaseString & Right) {
+			__forceinline friend BaseString operator+(const ConstAString& Text, const BaseString& Right) {
 				if (Text.Size < 2)
 					return Right;
 				BaseString ret_data(Text);
@@ -742,7 +728,7 @@ namespace Seed {
 			///<summary>Оператор сумування двох рядків</summary>
 			///<param name = "second">Правий рядковий об'єкт</param>
 			///<returns>Суму рядкових зміних</returns>
-			BaseString<Base> operator+(const BaseString & second) const {
+			BaseString<THeap> operator+(const BaseString& second) const {
 				if (this->CurrentSize == 0)
 					return second;
 				SizeT NewSize = this->CurrentSize;
@@ -753,7 +739,7 @@ namespace Seed {
 
 				SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
 				BaseString retData;
-				CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char) * NewFullSize); //-V2005
+				CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
 				if (this->str != nullptr) {
 					Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
 					Memory::Copy(second.str, buf + this->CurrentSize - 1, second.CurrentSize * sizeof(Char));
@@ -761,7 +747,7 @@ namespace Seed {
 				else {
 					Memory::Copy(second.str, buf, second.CurrentSize * sizeof(Char));
 				}
-				
+
 				retData.str = buf;
 				retData.CurrentSize = NewSize;
 				retData.ReservedSize = NewFullSize;
@@ -772,7 +758,7 @@ namespace Seed {
 			///<param name = "second">Правий рядковий об'єкт</param>
 			///<returns>Суму рядкових зміних з алокатором лівого елемента</returns>
 			template<typename OtherBase>
-			BaseString<Base> operator+(const BaseString<OtherBase> & second) const {
+			BaseString<THeap> operator+(const BaseString<OtherBase>& second) const {
 				if (this->CurrentSize == 0)
 					return second;
 				SizeT NewSize = this->CurrentSize;
@@ -783,7 +769,7 @@ namespace Seed {
 
 				SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
 				BaseString retData;
-				CharStr buf = (CharStr)BaseString<Base>::operator new[](sizeof(Char) * NewFullSize); //-V2005
+				CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
 				if (this->str != nullptr) {
 					Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
 					Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->CurrentSize - 1, (second.Size + 1) * sizeof(Char));
@@ -805,11 +791,11 @@ namespace Seed {
 			///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
 			///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
 			template<SizeT StrSize>
-			BaseString<Base>& operator+=(const wchar_t(&Text)[StrSize]) {
+			BaseString<THeap>& operator+=(const wchar_t(&Text)[StrSize]) {
 				SizeT NewSize = CurrentSize + StrSize - 1;
 				if (NewSize > ReservedSize) {
 					SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-					CharStr buf = (CharStr)BaseString<Base>::operator new[](sizeof(Char) * NewFullSize); //-V2005
+					CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
 					if (this->str != nullptr) {
 						Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
 						Memory::Copy(Text, buf + this->CurrentSize - 1, StrSize * sizeof(Char));
@@ -836,15 +822,15 @@ namespace Seed {
 			///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
 			///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
 			template<SizeT StrSize>
-			BaseString<Base>& operator+=(const char(&Text)[StrSize]) {
+			BaseString<THeap>& operator+=(const char(&Text)[StrSize]) {
 				SizeT NewSize = (CurrentSize - 1) + StrSize;
 				if (NewSize > ReservedSize) {
 					SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-					CharStr buf = (CharStr)BaseString<Base>::operator new[](sizeof(Char) * NewFullSize); //-V2005
+					CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
 					if (this->str != nullptr) {
 						Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
 					}
-					CharStr temp_str = ret_data.str + this->CurrentSize;
+					CharStr temp_str = this->str + this->CurrentSize;
 					ACharStr second = (ACharStr)Text;
 					{
 						while (*temp_str++ = *second++);
@@ -871,7 +857,7 @@ namespace Seed {
 			///<returns>Силку на лівий аргумент який є сумою двох рядків</returns>
 			///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
 			///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
-			BaseString& operator+=(const BaseString & second) {
+			BaseString& operator+=(const BaseString& second) {
 				SizeT NewSize = this->CurrentSize + second.CurrentSize - 1;
 				if (NewSize < this->ReservedSize) {
 					Memory::Copy(second.str, this->str + this->CurrentSize - 1, second.CurrentSize * sizeof(Char));
@@ -880,7 +866,7 @@ namespace Seed {
 				}
 				else {
 					ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-					CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char) * ReservedSize);
+					CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* ReservedSize);
 					if (this->str != nullptr) {
 						Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
 						Memory::Copy(second.str, buf + this->CurrentSize - 1, second.CurrentSize * sizeof(Char));
@@ -901,7 +887,7 @@ namespace Seed {
 			///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
 			///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
 			template<typename OtherBase>
-			BaseString& operator+=(const BaseString<OtherBase> & orig) {
+			BaseString& operator+=(const BaseString<OtherBase>& orig) {
 				SizeT NewSize = this->CurrentSize + orig.Size - 1;
 				if (NewSize < this->ReservedSize) {
 					Memory::Copy(orig.operator const Seed::ConstCharStr(), this->str + this->CurrentSize - 1, (orig.Size + 1) * sizeof(Char));
@@ -910,7 +896,7 @@ namespace Seed {
 				}
 				else {
 					ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;;
-					CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char) * ReservedSize); //-V2005
+					CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* ReservedSize); //-V2005
 					if (this->str != nullptr) {
 						Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
 						Memory::Copy(orig.operator const Seed::ConstCharStr(), buf + this->CurrentSize - 1, (orig.Size + 1) * sizeof(Char));
@@ -929,37 +915,25 @@ namespace Seed {
 			///<param name = "Index">Індекс елемента з нуля до нуль-термінатора не включно</param>
 			///<returns>Силка на елемент рядка</returns>
 			__forceinline Char& operator[](SizeT index) {
-				extern __declspec(noreturn) void ThrowIndexOutOfRange(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Required,
-					const Seed::SizeT MaxAllowed);
 				if (index < CurrentSize)
 					return str[index];
 				else
-					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, index, CurrentSize);
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, index, CurrentSize);
 			}
 			///<summary>Констатний оператор доступу до символів рядка
 			///<param name = "Index">Індекс елемента з нуля до нуль-термінатора не включно</param>
 			///<returns>Константна силка на елемент рядка</returns>
 			__forceinline const Char& operator[](SizeT index) const {
-				extern __declspec(noreturn) void ThrowIndexOutOfRange(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Required,
-					const Seed::SizeT MaxAllowed);
 				if (index < CurrentSize)
 					return str[index];
 				else
-					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, index, CurrentSize);
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, index, CurrentSize);
 			}
 
 			///<summary>Вертає чи строка починається з строки ExpectedString</summary>
 			///<param name = "ExpectedString">Рядок з якого має починатись поточний рядок</param>
 			///<results><c>True</c> якщо рядок поточний рядок починається ExpectedString</results>
-			__forceinline bool IsStartWith(const BaseString & ExpectedString) const {
+			__forceinline bool IsStartWith(const BaseString& ExpectedString) const {
 				if (this->CurrentSize < ExpectedString.CurrentSize) return false;
 				for (SizeT i = 0; i < ExpectedString.CurrentSize; i++)
 					if (this->str[i] != ExpectedString.str[i]) return false;
@@ -1006,7 +980,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				Reverse(str.str, str.CurrentSize - 1);
 				return str;
@@ -1034,7 +1008,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				Reverse(str.str, str.CurrentSize - 1);
 				return str;
@@ -1062,9 +1036,9 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-				Reverse(str.str, str.CurrentSize - 1);
+				Seed::Core::Reverse(str.str, str.CurrentSize - 1);
 				return str;
 			}
 			///<summary>Конвертація цілого числа типу Int64 до рядка</summary>
@@ -1089,7 +1063,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				Reverse(str.str, str.CurrentSize - 1);
 				return str;
@@ -1112,7 +1086,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				Reverse(str.str, str.CurrentSize - 1);
 				return str;
@@ -1134,7 +1108,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				Reverse(str.str, str.CurrentSize - 1);
 				return str;
@@ -1156,7 +1130,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				Reverse(str.str, str.CurrentSize - 1);
 				return str;
@@ -1178,9 +1152,9 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = i;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-				Reverse(str.str, str.CurrentSize - 1);
+				Seed::Core::Reverse(str.str, str.CurrentSize - 1);
 				return str;
 			}
 #pragma endregion
@@ -1196,7 +1170,7 @@ namespace Seed {
 			///<params name = "IfTrue">Рядок який верне якщо <c>val == true</c></params>
 			///<params name = "IfFalse">Рядок який верне якщо <c>val == false</c></params>
 			///<returns><c>IfTrue</c> або <c>IfFalse</c> залежно від значення <c>val</c></returns>
-			__forceinline static BaseString toString(Boolean val, const BaseString & IfTrue, const BaseString & IfFalse) {
+			__forceinline static BaseString toString(Boolean val, const BaseString& IfTrue, const BaseString& IfFalse) {
 				if (val) return IfTrue; else return IfFalse;
 			}
 #pragma endregion
@@ -1244,7 +1218,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = size;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				return str;
 			}
@@ -1293,7 +1267,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = size;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				return str;
 			}
@@ -1346,7 +1320,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = size;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				return str;
 			}
@@ -1395,7 +1369,7 @@ namespace Seed {
 				BaseString str;
 				str.CurrentSize = size;
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString::operator new[](sizeof(Char) * str.ReservedSize); //-V2005
+				str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
 				Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
 				return str;
 			}
@@ -1410,27 +1384,16 @@ namespace Seed {
 			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
 			template<typename T = Seed::Int32>
 			T toInt() const {
-				extern __declspec(noreturn) void ThrowNullPointException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Address,
-					const Seed::UInt8 Mode);
-				extern __declspec(noreturn) void ThrowInvalidFormatException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
-
 				if (this->CurrentSize == 0 || this->Size == 0)
-					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
 				if (this->CurrentSize > Math::MaxNumberCount<T>())
 					throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 
 				if constexpr (TypeTraits::IsSameV<TypeTraits::Unsigned<T>, T>) {
 					Math::SafeInt<T> ret;
 					for (SizeT i = 0; i < Size; i++) {
-						if (str[i]<L'0' || str[i]>L'9')
-							ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+						if (str[i] < L'0' || str[i]>L'9')
+							Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 						ret += static_cast<UInt8>(str[i] - L'0');
 						if (i < CurrentSize - 2)
 							ret *= 10;
@@ -1444,8 +1407,8 @@ namespace Seed {
 						i = 1;
 					Math::SafeInt<T> ret = 0;
 					for (i; i < Size; i++) {
-						if (str[i]<L'0' || str[i]>L'9')
-							ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+						if (str[i] < L'0' || str[i]>L'9')
+							Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 						ret += str[i] - L'0';
 						if (i < CurrentSize - 2)
 							ret *= 10;
@@ -1453,348 +1416,27 @@ namespace Seed {
 					return Math::ConvertUnsignedToSigned<T>(ret.Value) * ((sign) ? -1 : 1);
 				}
 			}
-
-//			///<summary>Перетворення рядка в ціле число типу UInt8</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			UInt8 toUInt8() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 3)
-//					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Math::SafeInt<UInt8> ret;
-//				for (SizeT i = 0; i < CurrentSize; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += static_cast<UInt8>(str[i] - L'0');
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return ret.Value;
-//			}
-//
-//			///<summary>Перетворення рядка в ціле число типу UInt16</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			UInt16 toUInt16() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 5)
-//					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Math::SafeInt<UInt16> ret = 0;
-//				for (SizeT i = 0; i < CurrentSize; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += str[i] - L'0';
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return ret.Value;
-//			}
-//
-//			///<summary>Перетворення рядка в ціле число типу UInt32</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			UInt32 toUInt32() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 10)
-//					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Math::SafeInt<UInt32> ret = 0;
-//				for (SizeT i = 0; i < CurrentSize; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += str[i] - L'0';
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return ret.Value;
-//			}
-//
-//			///<summary>Перетворення рядка в ціле число типу UInt64</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			UInt64 toUInt64() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 20)
-//					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Math::SafeInt<UInt64> ret = 0;
-//				for (SizeT i = 0; i < CurrentSize; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += str[i] - L'0';
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return ret.Value;
-//			}
-//
-//			///<summary>Перетворення рядка в ціле число типу SizeT</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			__forceinline SizeT toSizeT() {
-//				return toUInt64();
-//			}
-//#pragma endregion
-//#pragma region Convert to signed int types
-//			///<summary>Перетворення рядка в ціле число типу Int8 на початку може стояти символ '+' або '-'</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			Int8 toInt8() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 20)
-//					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Boolean sign(this->str[0] == '-');
-//				SizeT i = 0;
-//				if (str[0] == L'-' || str[0] == L'+')
-//					i = 1;
-//				Math::SafeInt<UInt8> ret = 0;
-//				for (i; i < CurrentSize; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += str[i] - L'0';
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return Math::ConvertUnsignedToSigned<UInt8>(ret.Value);
-//			}
-//
-//			///<summary>Перетворення рядка в ціле число типу Int16 на початку може стояти символ '+' або '-'</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			Int16 toInt16() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 20)
-//					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Boolean sign(this->str[0] == '-');
-//				SizeT i = 0;
-//				if (str[0] == L'-' || str[0] == L'+')
-//					i = 1;
-//				Math::SafeInt<UInt16> ret = 0;
-//				for (i; i < Size; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += str[i] - L'0';
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return Math::ConvertUnsignedToSigned<UInt16>(ret.Value);
-//			}
-//
-//			///<summary>Перетворення рядка в ціле число типу Int32 на початку може стояти символ '+' або '-'</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			Int32 toInt32() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 20)
-//					throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//					//ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Boolean sign(this->str[0] == '-');
-//				SizeT i = 0;
-//				if (str[0] == L'-' || str[0] == L'+')
-//					i = 1;
-//				Math::SafeInt<UInt32> ret = 0;
-//				for (i; i < Size; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += str[i] - L'0';
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return Math::ConvertUnsignedToSigned<UInt32>(ret.Value);
-//			}
-//
-//			///<summary>Перетворення рядка в ціле число типу Int64 на початку може стояти символ '+' або '-'</summary>
-//			///<returns>Числове представлення</returns>
-//			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
-//			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо число є завеликим</exception>
-//			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
-//			Int64 toInt64() {
-//				extern __declspec(noreturn) void ThrowNullPointException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line,
-//					const Seed::SizeT Address,
-//					const Seed::UInt8 Mode);
-//				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				extern __declspec(noreturn) void ThrowInvalidFormatException(
-//					const Seed::ConstAString & File,
-//					const Seed::ConstAString & Function,
-//					const Seed::SizeT Line);
-//				if (this->CurrentSize == 0)
-//					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-//				if (this->CurrentSize > 20)
-//					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
-//				Boolean sign(this->str[0] == '-');
-//				SizeT i = 0;
-//				if (str[0] == L'-' || str[0] == L'+')
-//					i = 1;
-//				Math::SafeInt<UInt64> ret = 0;
-//				for (i; i < CurrentSize; i++) {
-//					if (str[i]<L'0' || str[i]>L'9')
-//						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-//					ret += str[i] - L'0';
-//					if (i != CurrentSize - 1)
-//						ret *= 10;
-//				}
-//				return Math::ConvertUnsignedToSigned<UInt64>(ret.Value);
-//			}
-#pragma endregion
-#pragma endregion
-#pragma region Converting to float point types
+			#pragma endregion
+			#pragma endregion
+			#pragma region Converting to float point types
 			///<summary>Перетворення тексту в дійсне число Float. На початку може стояти символ '+' або '-'</summary>
 			///<returns>Числове представлення</returns>
 			///<exception cref="Seed::Exceptions::NullPointException">якщо рядок пустий</exception>
 			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо кількість цифр є більшою ніж можу вмістити число Float</exception>
 			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в строці є відміні від цифр і одної крапки символи</exception>
 			Float toFloat() {
-				extern __declspec(noreturn) void ThrowNullPointException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Address,
-					const Seed::UInt8 Mode);
-				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
-				extern __declspec(noreturn) void ThrowInvalidFormatException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
 				if (this->CurrentSize == 0)
-					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
 				if (this->CurrentSize > 9)
-					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+					Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				Boolean sign(this->str[0] == '-');
 				size_t i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
 				Float int_part = 0.0, double_part = 0.0;
 				for (i; i < CurrentSize && this->str[i] != L'.'; i++) {
-					if (str[i]<L'0' || str[i]>L'9')
-						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+					if (str[i] < L'0' || str[i]>L'9')
+						Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 					int_part += this->str[i] - L'0';
 					int_part *= 10;
 				}
@@ -1802,8 +1444,8 @@ namespace Seed {
 				if (i != CurrentSize) {
 					i++;
 					for (size_t j = CurrentSize - 1; j >= i; j--) {
-						if (str[i]<L'0' || str[i]>L'9')
-							ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+						if (str[i] < L'0' || str[i]>L'9')
+							Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 						double_part += this->str[j] - L'0';
 						double_part /= 10;
 					}
@@ -1818,32 +1460,18 @@ namespace Seed {
 			///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо кількість цифр є більшою ніж можу вмістити число Double</exception>
 			///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в строці є відміні від цифр і одної крапки символи</exception>
 			Double toDouble() {
-				extern __declspec(noreturn) void ThrowNullPointException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Address,
-					const Seed::UInt8 Mode);
-				extern __declspec(noreturn) void ThrowIntegerOverflowException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
-				extern __declspec(noreturn) void ThrowInvalidFormatException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
 				if (this->CurrentSize == 0)
-					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
 				if (this->CurrentSize > 18)
-					ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+					Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				Boolean sign(this->str[0] == '-');
 				size_t i = 0;
 				if (str[0] == L'-' || str[0] == L'+')
 					i = 1;
 				Double int_part = 0.0, double_part = 0.0;
 				for (i; i < CurrentSize && this->str[i] != L'.'; i++) {
-					if (str[i]<L'0' || str[i]>L'9')
-						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+					if (str[i] < L'0' || str[i]>L'9')
+						Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 					int_part += this->str[i] - L'0';
 					int_part *= 10;
 				}
@@ -1851,8 +1479,8 @@ namespace Seed {
 				if (i != CurrentSize) {
 					i++;
 					for (size_t j = CurrentSize - 1; j >= i; j--) {
-						if (str[i]<L'0' || str[i]>L'9')
-							ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+						if (str[i] < L'0' || str[i]>L'9')
+							Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 						double_part += this->str[j] - L'0';
 						double_part /= 10;
 					}
@@ -1863,16 +1491,16 @@ namespace Seed {
 #pragma endregion
 			///<summary>Вертає рядкове представлення UUID</summary>
 			///<returns>Рядкове представлення UUID в вигляді {????????-????-????-????????????????}</returns>
-			static BaseString<Base> toString(const UUID & id) {
+			static BaseString<THeap> toString(const UUID& id) {
 				auto ReservedSize = sizeof(UUID::UUIDStringWildCard) + CurrentSettings().MemoryManager.StringReserveSize;
-				CharStr buffer = reinterpret_cast<CharStr>(BaseString<Base>::operator new[](sizeof(UUID::UUIDStringWildCard)));
+				CharStr buffer = reinterpret_cast<CharStr>(BaseString<THeap>::operator new[](sizeof(UUID::UUIDStringWildCard)));
 				extern void ConvertUUIDtoCharStr(const Seed::Core::UUID & id, Seed::CharStr buffer);
 				ConvertUUIDtoCharStr(id, buffer);
-				return BaseString<Base>(MoveRValue(buffer), sizeof(UUID::UUIDStringWildCard), ReservedSize);
+				return BaseString<THeap>(MoveRValue(buffer), sizeof(UUID::UUIDStringWildCard), ReservedSize);
 			}
 
 			///<summary>Перетворення дати і часу в строкове представлення</summary>
-			static BaseString<Base> toString(Seed::Core::Date date) {
+			static BaseString<THeap> toString(Seed::Core::Date date) {
 				Char buffer[22];
 				extern void ConvertDateToStringImpl(Seed::Core::Date date, Seed::Core::CharStr buffer);
 				ConvertDateToStringImpl(date, buffer);
@@ -1880,7 +1508,7 @@ namespace Seed {
 			}
 
 			///<summary>Перетворення часу і дати в строкове представлення</summary>
-			static BaseString<Base> toString(Seed::Core::DateTime time) {
+			static BaseString<THeap> toString(Seed::Core::DateTime time) {
 				Char buffer[22];
 				extern void ConvertDateTimeToStringImpl(const Seed::Core::DateTime & time, Seed::CharStr buffer);
 				ConvertDateTimeToStringImpl(time, buffer);
@@ -1890,11 +1518,11 @@ namespace Seed {
 			///<summary>Приведення бінарного тексту до рядкової зміної</summary>
 			///<params name = "array">Масив букв</params>
 			///<returns>Рядок з текстом з масиву</returns>
-			InternalApiCall static BaseString<Base> toString(const Seed::Core::Array<Seed::Byte> & array) {
-				BaseString<Base> str;
+			InternalApiCall static BaseString<THeap> toString(const Containers::BaseArray<THeap, Seed::Byte>& array) {
+				BaseString<THeap> str;
 				str.CurrentSize = array.Count / sizeof(Char);
 				str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-				str.str = (CharStr)BaseString<Base>::operator new[](str.ReservedSize * sizeof(Char));//new Char[str.CurrentSize + 1];
+				str.str = (CharStr)BaseString<THeap>::operator new[](str.ReservedSize * sizeof(Char));//new Char[str.CurrentSize + 1];
 				Memory::Copy(array.Raw, str.str, array.Count);
 				str.str[str.CurrentSize] = L'\0';
 				return str;
@@ -1904,22 +1532,12 @@ namespace Seed {
 			///<summary>Конвертація з рядкового в бінарне представлення UUID </summary>
 			///<returns>UUID</returns>
 			UUID toUUID() {
-				extern __declspec(noreturn) void ThrowNullPointException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Address,
-					const Seed::UInt8 Mode);
-				extern __declspec(noreturn) void ThrowInvalidFormatException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
 				if (this->str == nullptr || this->CurrentSize == 0)
-					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
 				UUID res;
 				extern bool ConvertCharStrToUUID(Seed::Core::CharStr str, Seed::Core::UUID & uuid);
 				if (!ConvertCharStrToUUID(this->str, res)) {
-					ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+					Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 				return res;
 			}
@@ -1941,7 +1559,7 @@ namespace Seed {
 			BaseString& Reserve(SizeT NewReservedSize) {
 				if (this->str == nullptr)
 				{
-					this->str = static_cast<CharStr>(this->operator new[](sizeof(Char) * NewReservedSize));
+					this->str = static_cast<CharStr>(this->operator new[](sizeof(Char)* NewReservedSize));
 					this->str[0] = L'\0';
 					this->CurrentSize = 1;
 					this->ReservedSize = NewReservedSize;
@@ -1950,7 +1568,7 @@ namespace Seed {
 				if (CurrentSize > NewReservedSize)
 					str[NewReservedSize] = L'\0';
 				NewReservedSize++;
-				CharStr buf = static_cast<CharStr>(this->operator new[](sizeof(Char) * NewReservedSize));
+				CharStr buf = static_cast<CharStr>(this->operator new[](sizeof(Char)* NewReservedSize));
 				if (CurrentSize > NewReservedSize) {
 					Memory::Copy(str, buf, NewReservedSize * sizeof(Char));
 					ReservedSize = CurrentSize = NewReservedSize;
@@ -2020,7 +1638,7 @@ namespace Seed {
 			///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
 			///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
 			///<returns>Індекс першого входження або -1 якщо не знайдено</retutns>
-			SizeT Find(const BaseString & Str, SizeT StartPos = 0, SizeT EndPos = -1) noexcept {
+			SizeT Find(const BaseString& Str, SizeT StartPos = 0, SizeT EndPos = -1) noexcept {
 				if (CurrentSize == -1) return -1;
 				if (StartPos == -1) StartPos = 0; else if (StartPos > CurrentSize) return -1;
 				if (EndPos == -1) EndPos = CurrentSize;  else if (EndPos < StartPos) return -1;
@@ -2043,13 +1661,13 @@ namespace Seed {
 			///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
 			///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
 			///<returns>Список підрядків</returns>
-			BaseList<Base, BaseString> Split(const Char Delim, SizeT StartPos = 0, SizeT EndPos = -1) const {
+			Containers::BaseList<THeap, BaseString> Split(const Char Delim, SizeT StartPos = 0, SizeT EndPos = -1) const {
 				if (this->str == nullptr)
-					return BaseList<Base, BaseString>();
+					return Containers::BaseList<THeap, BaseString>();
 				if (this->CurrentSize == 0)
-					return BaseList<Base, BaseString>();
+					return Containers::BaseList<THeap, BaseString>();
 				if (EndPos == -1) EndPos = this->CurrentSize;
-				BaseList<Base, BaseString> list;
+				Containers::BaseList<THeap, BaseString> list;
 				SizeT StartPartPos = 0;
 				Boolean flag = false;
 				for (SizeT i = StartPos; i < EndPos; i++) {
@@ -2070,11 +1688,7 @@ namespace Seed {
 			///<summary>Перетворення байтового масиву в строку з 16 бітних символів (0-9a-f)</summary>
 			///<param name = "binaryData">Масив байтів</param>
 			///<returns>Рядкове представлення бінарних даних</returns>
-			static BaseString<Base> binaryToHex(const Array<Byte> & binaryData) {
-				extern __declspec(noreturn) void ThrowInvalidFormatException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
+			static BaseString<THeap> binaryToHex(const Containers::BaseArray<THeap, Byte>& binaryData) {
 				//Bite <-> 2 hex digits
 				union {
 					//1 Byte (8 bits)
@@ -2088,7 +1702,7 @@ namespace Seed {
 					} *Hex;
 				} conv;
 				if (binaryData.Count % 2 != 0)
-					ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+					Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 				auto CurrentSize = binaryData.Count * 2 + 1;
 				auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
 				CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
@@ -2109,7 +1723,7 @@ namespace Seed {
 			///<summary>Шістнадцятиричне представлення UInt64</summary>
 			///<param name = "Value">Вхідне значення</param>
 			///<returns>Рядкове представлення бінарних даних</returns>
-			static BaseString<Base> UInt64asHex(UInt64 Value) {
+			static BaseString<THeap> UInt64asHex(UInt64 Value) {
 				union ConvertT {
 					SizeT Variable;
 					struct {
@@ -2137,12 +1751,12 @@ namespace Seed {
 
 			///<summary>Конвертація в масив байт. Якщо рядок пустий верне пустий масив</summary>
 			///<returns>Масив байт який є копією вмісту рядка</returns>
-			operator Blob() const {
+			operator Containers::Blob() const {
 				if (this->str == nullptr || this->CurrentSize == 0)
-					return Array<Byte>();
+					return Containers::Blob();
 				CharStr data = (CharStr)BaseString::operator new[](this->CurrentSize * sizeof(Char));
 				Memory::Copy(this->str, data, CurrentSize * sizeof(Char));
-				return Array<Byte>((Byte * &&)data, this->CurrentSize * sizeof(Char));
+				return Containers::Array<Byte>((Byte*&&)data, this->CurrentSize * sizeof(Char));
 			}
 
 			///<summary>Конвертаця строки шістнадцятиричних символів в байтовий масив</summary>
@@ -2150,21 +1764,11 @@ namespace Seed {
 			///<returns>Масив байт</returns>
 			///<exception cref="Seed::Exceptions::NullPointException">Якщо рядок пустий</exception>
 			///<exception cref="Seed::Exceptions::InvalidFormatException">Якщо рядок містить не коректні символи або його розмір не кратний 2</exception>
-			static Array<Byte> hexToBinary(const BaseString & stringData) {
-				extern __declspec(noreturn) void ThrowNullPointException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Address,
-					const Seed::UInt8 Mode);
-				extern __declspec(noreturn) void ThrowInvalidFormatException(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line);
+			static Containers::BaseArray<THeap, Byte> hexToBinary(const BaseString& stringData) {
 				if (stringData.Size == 0)
-					ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(&stringData), 0);
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(&stringData), 0);
 				if (stringData.Size % 2)
-					ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+					Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 
 				SizeT Size = stringData.Size / 2;
 				SizeT i1 = 0, i2 = 0;
@@ -2298,7 +1902,7 @@ namespace Seed {
 						conv.Hex->bit0 = 0xf;
 						break;
 					default:
-						ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
+						Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 					}
 					i2++;
 				}
@@ -2308,7 +1912,7 @@ namespace Seed {
 			///<summary>Перетворення числа, структури, класу чи покажчика в hex рядок</summary>
 			///<param name = "Data">Дані які перетворить в шістнадцятиричне представлення</param>
 			template<typename T>
-			static BaseString toHexString(const T & Data) {
+			static BaseString toHexString(const T& Data) {
 				return binaryToHex(Array<Byte>((const Byte*)(&Data), sizeof(T)));
 			}
 
@@ -2316,25 +1920,26 @@ namespace Seed {
 			//Може згенерувати помилку IndexOutOfRange, якщо
 			//- StartPos більша ніж кількість символів в рядку
 			//- StartPos більша ніж EndPos
-			//TODO: Write Dictionary<TKey, TValue>
-			//BaseString & Replace(
-			//	Array<Pair<Char, Char>> ReplaceTable,
-			//	SizeT StartPos = 0,
-			//	SizeT EndPos = Seed::Math::Max::SizeT
-			//) {
-			//	if (StartPos > this->CurrentSize)
-			//		Throw(IndexOutOfRange(ExceptionPosition, StartPos, this->CurrentSize));
-			//	if (StartPos > EndPos)
-			//		Throw(IndexOutOfRange(ExceptionPosition, StartPos, EndPos));
-			//	if (EndPos > this->CurrentSize) EndPos = this->CurrentSize;
-			//	for (SizeT i = StartPos; i < EndPos; i++) {
-			//		for (SizeT j = 0; j < ReplaceTable.Count; j++) {
-			//			if (this->str[i] == ReplaceTable[j].key)
-			//				this->str[i] = ReplaceTable[j].value;
-			//		}
-			//	}
-			//	return *this;
-			//}
+			BaseString & Replace(
+				Containers::BaseMap<THeap, Char, Char> ReplaceTable,
+				SizeT StartPos = 0,
+				SizeT EndPos = Seed::Math::Max::SizeT
+			) {
+				if (StartPos > this->CurrentSize)
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartPos, this->CurrentSize);
+				if (StartPos > EndPos)
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartPos, EndPos);
+				if (EndPos > this->CurrentSize) EndPos = this->CurrentSize;
+				ReplaceTable.ForEach([&](const Containers::BasePair<THeap, Char, Char> pair) {
+					for (SizeT i = StartPos; i < EndPos; i++) {
+						for (SizeT j = 0; j < ReplaceTable.Count; j++) {
+							if (this->str[i] == ReplaceTable[j].Key)
+								this->str[i] = ReplaceTable[j].Value;
+						}
+					}
+					})
+				return *this;
+			}
 
 			//Заміна всіх входжень символа What на символ To
 			//Може згенерувати помилку IndexOutOfRange, якщо
@@ -2353,16 +1958,10 @@ namespace Seed {
 				SizeT StartPos = 0,
 				SizeT EndPos = Seed::Math::Max<SizeT>()
 			) {
-				extern __declspec(noreturn) void ThrowIndexOutOfRange(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Required,
-					const Seed::SizeT MaxAllowed);
 				if (StartPos > this->CurrentSize)
-					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartPos, this->CurrentSize);
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartPos, this->CurrentSize);
 				if (StartPos > EndPos)
-					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartPos, EndPos);
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartPos, EndPos);
 				if (EndPos > this->CurrentSize) EndPos = this->CurrentSize;
 				for (SizeT i = StartPos; i < EndPos; i++) {
 					if (this->str[i] == What)
@@ -2394,14 +1993,8 @@ namespace Seed {
 			///<returns>Силку на поточний рядок після розширення</returns>
 			///<exception cref="Seed::Exceptions::IndexOutOfRange">NewSize менший ніж кількість символів в рядку</exception>
 			BaseString& Extend(Char Filler, SizeT NewSize) {
-				extern __declspec(noreturn) void ThrowIndexOutOfRange(
-					const Seed::ConstAString & File,
-					const Seed::ConstAString & Function,
-					const Seed::SizeT Line,
-					const Seed::SizeT Required,
-					const Seed::SizeT MaxAllowed);
 				if (this->CurrentSize > NewSize)
-					ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, NewSize, this->CurrentSize);
+					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, NewSize, this->CurrentSize);
 				if (this->CurrentSize == NewSize)
 					return *this;
 
@@ -2428,39 +2021,168 @@ namespace Seed {
 			///<returns>Копія рядка алокована алокатором NewBase</returns>
 			template<typename NewBase>
 			operator BaseString<NewBase>() const {
-				return BaseString<NewBase>((const CharStr)(ConstCharStr)* this);
+				return BaseString<NewBase>((const CharStr)(ConstCharStr)*this);
 			}
 
 			///<summary>Оптимізований обмін рядками a і b</summary>
 			///<params name "a">Правий рядок</params>
 			///<params name "b">Лівий рядок</params>
-			__forceinline friend void Swap(BaseString& a, BaseString& b) noexcept {
+			friend void Swap(BaseString& a, BaseString& b) {
 				Seed::Swap(a.str, b.str);
 				Seed::Swap(a.CurrentSize, b.CurrentSize);
 				Seed::Swap(a.ReservedSize, b.ReservedSize);
 			}
 
 			///<summary>Деструктор</summary>
-			__forceinline ~BaseString() {
+			__forceinline virtual ~BaseString() override {
 				if (str == nullptr) return;
 				BaseString::operator delete[](str);
 				str = nullptr;
 				CurrentSize = ReservedSize = 0;
 			}
+		protected:
+			template<template<typename THeap> typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
+			friend class Containers::LINQ::IStringCollectionBaseLinq;
+			template<template<typename THeap> typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
+			friend class Containers::LINQ::IString;
+		protected:
+			template<typename LambdaT>
+			__forceinline BaseString& ForEachImpl(LambdaT&& lambda) {
+				if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&>) {
+					for (SizeT i = 0; i < this->Size; i++)
+					{
+						lambda(this->str[i]);
+					}
+					return *this;
+				}
+				else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&, SizeT>) {
+					for (SizeT i = 0; i < this->Size; i++)
+					{
+						lambda(this->str[i], i);
+					}
+					return *this;
+				}
+				else {
+					static_assert(false);
+				}
+			}
 
-			//friend extern class BaseTokenizer<Base>;
+			template<typename LambdaT>
+			__forceinline const BaseString& ForEachImpl(LambdaT&& lambda) const {
+				if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
+					for (SizeT i = 0; i < this->Size; i++)
+					{
+						lambda(this->str[i]);
+					}
+					return *this;
+				}
+				else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&, SizeT>) {
+					for (SizeT i = 0; i < this->Size; i++)
+					{
+						lambda(this->str[i], i);
+					}
+					return *this;
+				}
+				else {
+					static_assert(false);
+				}
+			}
+
+			template<typename LambdaT>
+			__forceinline BaseString& ForEachImpl(LambdaT&& lambda, SizeT count) {
+				if (count > this->Count)
+					count = this->Count;
+				if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&>) {
+					for (SizeT i = 0; i < count; i++)
+					{
+						lambda(this->str[i]);
+					}
+					return *this;
+				}
+				else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&, SizeT>) {
+					for (SizeT i = 0; i < count; i++)
+					{
+						lambda(this->str[i], i);
+					}
+					return *this;
+				}
+				else {
+					static_assert(false);
+				}
+			}
+
+			template<typename LambdaT>
+			__forceinline const BaseString& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+				if (count > this->Size)
+					count = this->Size;
+				if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
+					for (SizeT i = 0; i < count; i++)
+					{
+						lambda(this->str[i]);
+					}
+					return *this;
+				}
+				else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&, SizeT>) {
+					for (SizeT i = 0; i < count; i++)
+					{
+						lambda(this->str[i], i);
+					}
+					return *this;
+				}
+				else {
+					static_assert(false);
+				}
+			}
+		protected:
+			bool AnyImpl() const { return this->Size > 0; }
+
+			template<typename Lambda>
+			__forceinline bool AnyImpl(Lambda&& lambda) const {
+				for (SizeT i = 0; i < this->Size; i++)
+				{
+					if (lambda(this->str[i]))
+						return true;
+				}
+				return false;
+			}
+
+			template<typename Lambda>
+			__forceinline bool AllImpl(Lambda&& lambda) const {
+				for (SizeT i = 0; i < this->Size; i++)
+				{
+					if (!lambda(this->str[i]))
+						return false;
+				}
+				return true;
+			}
+
+			BaseString& ReverseImpl() {
+				for (SizeT i = 0; i < this->Size / 2; i++) {
+					Swap(this->str[i], this->str[(this->Size - 1) - i]);
+				}
+				return *this;
+			}
+
+			__forceinline void UnsafeSet(const UChar& Value, SizeT Index) {
+				This->str[Index] = Value;
+			}
+
+			__forceinline BaseString& RemoveAllImpl() {
+				this->~BaseString();
+				return *this;
+			}
+
+			template<typename Lambda>
+			__forceinline BaseString& RemoveAllImpl(Lambda&& lambda) {
+				for (SizeT i = 0; i < CurrentSize; i++) {
+					lambda(MoveRValue(this->str[i]));
+				}
+				this->~BaseString();
+			}
 		};
 
-		///<summary>Оптимізований обмін рядками a і b</summary>
-		///<params name "a">Правий рядок</params>
-		///<params name "b">Лівий рядок</params>
-		////template<typename T, template<typename> typename U, TypeTraits::EnableIfTV<TypeTraits::IsSameT<BaseString<T>, U<T>>, bool> = true>
-		////inline void Swap(U<T> & a, U<T> & b) noexcept {
-		////	static_assert(TypeTraits::IsSameT<BaseString<T>, U<T>>(), "Invalid template passed");
-		////	Seed::Swap(a.str, b.str);
-		////	Seed::Swap(a.CurrentSize, b.CurrentSize);
-		////	Seed::Swap(a.ReservedSize, b.ReservedSize);
-		////}
+		//template<typename THeap>
+		//__forceinline void Swap(BaseString<THeap>& a, BaseString<THeap>& b) 
 
 		///<summary>Тип кінця рядка</summary>
 		namespace { typedef const Char(&EndLineT)[3]; }
@@ -2474,5 +2196,12 @@ namespace Seed {
 		///<summary>Рядок для збереження конфіденційної інформації</summary>
 		namespace { using SecuredString = BaseString<Memory::SensitiveDataHeap>; }
 #pragma warning(pop)
+
+		namespace TypeTraits {
+			namespace Collection {
+				template<typename THeap>
+				struct IsStringT<BaseString<THeap>> : LogicTrue {};
+			}
+		}
 	}
 }

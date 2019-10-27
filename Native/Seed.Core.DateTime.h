@@ -19,10 +19,11 @@ namespace Seed {
 				noexcept :Year(Year), Month(Month), Week(Week), Day(Day),
 				Hour(Hour), Minutes(Minutes), Second(Seconds), MiliSecond(MiliSeconds) {};
 
+			//TODO: Implement it
 			//Конструктор з об'єкта клас час
-			Date(const DateTime& time) noexcept;
+			Date(const DateTime& time);
 			//Конвертація в час
-			operator DateTime() const noexcept;
+			operator DateTime() const;
 			~Date() {};
 		};
 
@@ -46,9 +47,9 @@ namespace Seed {
 			//Оператор віднімання від
 			constexpr DateTime& operator-=(const DateTime& time) { this->time_ms -= time.time_ms; return *this; }
 			//Оператор додавання
-			constexpr friend DateTime operator+(const DateTime & time1, const DateTime & time2) { return time1.time_ms + time2.time_ms; }
+			constexpr friend DateTime operator+(const DateTime& time1, const DateTime& time2) { return time1.time_ms + time2.time_ms; }
 			//Оператор віднімання
-			constexpr friend DateTime operator-(const DateTime & time1, const DateTime & time2) { return time1.time_ms - time2.time_ms; }
+			constexpr friend DateTime operator-(const DateTime& time1, const DateTime& time2) { return time1.time_ms - time2.time_ms; }
 			//Вертає кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 			constexpr UInt64 GetMsFrom1600() const volatile { return time_ms; }
 			constexpr void SetMsFrom1600(UInt64 AbsoluteTime) volatile { this->time_ms = AbsoluteTime; }
@@ -65,7 +66,7 @@ namespace Seed {
 			//в часовому поясі користувача чи системи
 			static DateTime GetCurrentLocalTimeData();
 			//Конвертуючий конструктор
-			friend Date::Date(const DateTime& time) noexcept;
+			friend Date::Date(const DateTime& time);
 
 			volatile DateTime& operator=(const volatile DateTime& NewValue) volatile { this->time_ms = NewValue.time_ms; return *this; }
 

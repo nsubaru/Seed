@@ -9,9 +9,9 @@ namespace Seed {
 			class JobPool;
 			class ThreadPool;
 
-			class SeedKernelCall ThreadPool final: IDisposable {
+			class SeedKernelCall ThreadPool final: IDisposable{
 			private:
-				//Дані диспетчера 
+				//Дані диспетчера
 				struct dispatcher {
 					//Керуюча структура пула потоків
 					ImplSpecificT pool;
@@ -33,24 +33,24 @@ namespace Seed {
 					String Name;
 
 					dispatcher(const String& Name) :
-						Name(Name), 
-						pool(nullptr), 
-						env(nullptr), 
-						cleanupData(nullptr), 
-						lock(), 
-						JobsCounts(0), 
+						Name(Name),
+						pool(nullptr),
+						env(nullptr),
+						cleanupData(nullptr),
+						lock(),
+						JobsCounts(0),
 						JobIndex(0),
 						RefCount(1),
 						IsTerminating(false)
 					{}
 
 					dispatcher(String&& Name) :
-						Name(MoveRValue(Name)), 
-						pool(nullptr), 
-						env(nullptr), 
-						cleanupData(nullptr), 
-						lock(), 
-						JobsCounts(0), 
+						Name(MoveRValue(Name)),
+						pool(nullptr),
+						env(nullptr),
+						cleanupData(nullptr),
+						lock(),
+						JobsCounts(0),
 						JobIndex(0),
 						RefCount(1),
 						IsTerminating(false)
@@ -106,7 +106,7 @@ namespace Seed {
 
 					ThreadPool::dispatcher* Parrent;
 
-					SensitiveList<SmartPtr<IThreadable>>::Iterator This;
+					Containers::SensitiveConcurencyList<SmartPtr<IThreadable>>::Iterator This;
 					//Конструктор
 					Data(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) :
 						State(EThreadabledStates::NotStarted),

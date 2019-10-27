@@ -24,9 +24,9 @@ namespace Seed
 				static constexpr bool State = value::State;
 			};
 			///<summary>Логічна істина для статичних провірок</summary>
-			inline namespace { typedef LogicConst<True> LogicTrue; }
+			inline namespace { typedef LogicConst<true> LogicTrue; }
 			///<summary>Логічна хиба для статичних провірок</summary>
-			inline namespace { typedef LogicConst<False> LogicFalse; }
+			inline namespace { typedef LogicConst<false> LogicFalse; }
 
 			///<summary>Знімає силку з типу</summary>
 			template<typename T>
@@ -56,8 +56,8 @@ namespace Seed
 			template<class Type>
 			struct AddReference<Type, VoidT<Type&>>
 			{	// add reference
-				using Lvalue = Type &;
-				using Rvalue = Type &&;
+				using Lvalue = Type&;
+				using Rvalue = Type&&;
 			};
 
 			template<class Type>
@@ -79,7 +79,7 @@ namespace Seed
 		///<param name="Obj"> lvalue-силка на об'єкт</param>
 		///<returns>rvalue силку на об'єкт</returns>
 		template <typename T>
-		constexpr typename TypeTraits::RemoveRefV<T>&& MoveRValue(T&& arg) {
+		__forceinline constexpr typename TypeTraits::RemoveRefV<T>&& MoveRValue(T&& arg) {
 			return static_cast<typename TypeTraits::RemoveRefV<T>&&>(arg);
 		}
 
@@ -88,7 +88,7 @@ namespace Seed
 		///<returns>RV-силку</returns>
 		template<typename Type>
 		[[nodiscard]]
-		constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>& Arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
+		__forceinline constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>& Arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
 			return (static_cast<Type&&>(Arg));
 		}
 
@@ -97,9 +97,9 @@ namespace Seed
 		///<returns>RV-силку</returns>
 		template<typename Type>
 		[[nodiscard]]
-		constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>&& Arg) noexcept {	// forward an rvalue as an rvalue
+		__forceinline constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>&& Arg) noexcept {	// forward an rvalue as an rvalue
 			static_assert(!TypeTraits::IsLValueRef<Type>(), "Bad forward call");
-			return (static_cast<Type&&>(_Arg));
+			return (static_cast<Type&&>(Arg));
 		}
 	}
 }

@@ -1,8 +1,7 @@
 #pragma once
 #include "Seed.Core.Exceptions.h"
-#include "Seed.Core.Containers.Array.h"
-#include "Seed.Core.Containers.List.h"
-#include "Seed.Core.Containers.List.h"
+#include "Seed.Core.Containers.NonConcurency.Array.h"
+#include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.CoreLog.h"
 #include "Seed.Core.String.h"
 
@@ -11,7 +10,7 @@ namespace Seed {
 		///<summary>Вивід в логи складеного повідомлення в логи, кожен елемент масиву окремий рядок</summary>
 		///<param name = "lines">Список рядків</param>
 		///<returns><c>True</c> якщо запис в логи було проведено успішно</returns>
-		bool SeedKernelCall toCoreLog(const Array<ExceptionString>& lines);
+		bool SeedKernelCall toCoreLog(const Containers::Array<ExceptionString>& lines);
 
 		///<summary>Вивід в логи рядка з повідомленням</summary>
 		///<param name = "msg">Повідомлення</param>

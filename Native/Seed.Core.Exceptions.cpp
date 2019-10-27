@@ -32,7 +32,7 @@ struct ExceptionsHeapT
 	Seed::SizeT CurrentHeapSize;
 };
 
-static __forceinline ExceptionsHeapT & GetExceptionsHeap() {
+static __forceinline ExceptionsHeapT& GetExceptionsHeap() {
 	static ExceptionsHeapT ExceptionsHeap;
 	return ExceptionsHeap;
 }
@@ -66,7 +66,7 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 		return false;
 
 	ExceptionsHeap.AllocatedMemBlksCount = ExceptionsHeap.AllocatedMemory = 0;
-	
+
 	Threading::InitMinTls();
 
 	return true;
@@ -89,7 +89,7 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 	//ќбчислюЇм повний розм≥р д≥л€нки пам'€т≥
 	SizeT FullSize = sizeof(SizeT) + Size;
 	//ѕробуЇм вид≥лити д≥л€нку пам'€т≥ з куч≥
-	SizeT * obj = (SizeT*)RtlAllocateHeap(ExceptionsHeap.HeapHandle, 0, FullSize);
+	SizeT* obj = (SizeT*)RtlAllocateHeap(ExceptionsHeap.HeapHandle, 0, FullSize);
 	//якщо покажчик р≥вний nullptr то це значить що не можливо вид≥лити пам'€ть, а це значить що не достатньо пам'€т≥ в систем≥
 	//¬≥дпов≥дно генеруЇм виключенн€ OutOfMemory
 	if (obj == nullptr)
@@ -127,7 +127,7 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT S
 	//¬ираховуЇм точний адресс початку д≥л€нки
 	SizeT AllignedAddress = Math::RoundToUpper(Address, AllocationReq) * AllocationReq;
 	//ќтримуЇм заголовок д≥л€нки пам'€т≥
-	SizeT * RealPtr = (SizeT*)(AllignedAddress - 2);
+	SizeT* RealPtr = (SizeT*)(AllignedAddress - 2);
 	//«аписуЇм реальний початок д≥л€нки пам'€т≥
 	RealPtr[0] = (SizeT)obj;
 	//“а розм≥р даних
@@ -148,7 +148,7 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Free(void* MemBlk)
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
-	SizeT * RealPtr = ((SizeT*)MemBlk) - 1;
+	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//ќтримуЇм розм≥р д≥л€нки пам'€т≥
 	SizeT DataSize = RealPtr[0];
 	//ќбчислюЇм повний розм≥р д≥л€нки пам'€т≥
@@ -157,8 +157,8 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Free(void* MemBlk)
 	if (RtlFreeHeap(ExceptionsHeap.HeapHandle, 0, RealPtr)) {
 		//якщо вдало то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//якщо н≥ то вертаЇм об'Їкт
@@ -173,7 +173,7 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBl
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
-	SizeT * Header = ((SizeT*)MemBlk) - 2;
+	SizeT* Header = ((SizeT*)MemBlk) - 2;
 	//ќтримуЇм розм≥р даних в д≥л€нц≥ пам'€т≥
 	SizeT DataSize = Header[0];
 	//ќтрмуЇм покажчик на початок д≥л€нки пам'€т≥
@@ -184,8 +184,8 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBl
 	if (RtlFreeHeap(ExceptionsHeap.HeapHandle, 0, RealPtr)) {
 		//якшо усп≥шно то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)& ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
+		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
 		return nullptr;
 	}
 	//якщо н≥ то вертаЇм об'Їкт

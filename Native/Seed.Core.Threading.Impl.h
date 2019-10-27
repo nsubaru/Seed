@@ -18,15 +18,14 @@ namespace Seed {
 				IThreadable* Threadable;
 				volatile EThreadabledStates* State;
 				ExceptionInfoT ExceptionInfo;
-
 			};
 
 			static_assert(sizeof(TEB::TlsSlots) >= sizeof(TLS), "Seed TLS to big");
 
 			InternalApiCall __forceinline TLS* GetTLS() { return reinterpret_cast<TLS*>(NtCurrentTeb()->TlsSlots); }
 
-			InternalApiCall __forceinline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates * State) {
-				TLS* thisTLS = GetTLS();	
+			InternalApiCall __forceinline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates* State) {
+				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 				thisTLS->State = State;
 				thisTLS->Threadable = Threadable;

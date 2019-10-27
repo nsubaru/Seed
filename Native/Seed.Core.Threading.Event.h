@@ -43,8 +43,8 @@ namespace Seed {
 
 			RefCountClass(Event, data)
 
-			///<summary>Очікування на подію</summary>
-			void Wait();
+				///<summary>Очікування на подію</summary>
+				void Wait();
 			///<summary>Очікування з таймаутом</summary>
 			void Wait(SizeT TimeOutMs);
 

@@ -91,7 +91,6 @@ namespace Seed {
 				//__forceinline Exception(const Exception& orig)
 				//	: location(orig.location), exeptionName(orig.exeptionName) {}
 
-
 				///<summary>Вертає користувальницьку назву помилки</summary>
 				__forceinline const ConstString& GetExceptioName() const
 				{
@@ -127,7 +126,7 @@ namespace Seed {
 				public:
 					RawException() :ptr(nullptr) {};
 					RawException(RawException&) = delete;
-					RawException(RawException&& orig) : ptr(orig.ptr) 
+					RawException(RawException&& orig) : ptr(orig.ptr)
 					{
 						orig.ptr = nullptr;
 					}
@@ -289,6 +288,28 @@ namespace Seed {
 				}
 
 				virtual ~BadPureCall() {}
+			};
+
+			///<summary>Ключ вжк існує</summary>
+			class SeedKernelCall KeyAllredyExistException : Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				KeyAllredyExistException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					:Exception(File, FunctName, Line, L"Ключ вже існує")
+				{}
+
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override final {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ location.toString()
+						+ ExceptionString(L". ");
+				}
+
+				virtual ~KeyAllredyExistException() {}
 			};
 
 			///<summary>Некоректний тип помилки</summary>
@@ -530,14 +551,14 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'ArgName'>Ім'я аргумента</param>
 				///<param name = 'Description'>Додаткова інформація</param>
-				InvalidArgumentException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString & ArgName, const ConstString& Description) :
+				InvalidArgumentException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& ArgName, const ConstString& Description) :
 					Exception(File, FunctName, Line, L"Невірний аргумент"), ArgNameValue(ArgName), DescriptionValue(Description)
 				{}
 
 				///<summary>Вертає ім'я аргумента</summary>
-				const ConstString & GetArgName() { return ArgNameValue; }
+				const ConstString& GetArgName() { return ArgNameValue; }
 				///<summary>Вертає додаткову інформацію</summary>
-				const ConstString & GetDescription() { return DescriptionValue; }
+				const ConstString& GetDescription() { return DescriptionValue; }
 
 				///<summary>Ім'я аргумента</summary>
 				ConstString Property(ArgNameValue) ArgumentPosition;
@@ -553,7 +574,7 @@ namespace Seed {
 						location.toString() +
 						ExceptionString(L". ");
 				}
-				
+
 				virtual ~InvalidArgumentException() {}
 			};
 
@@ -565,7 +586,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline InteruptException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				__forceinline InteruptException(const ConstAString & File, const ConstAString & FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Операція перервана")
 				{};
 
@@ -715,32 +736,35 @@ template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___
 ///<summary>Внутрішня функція пркидування поточної помилки</summary>
 InternalApiCall __forceinline void __declspec(noreturn) __cxxrethrow() { throw; } //-V667
 
-///<summary>Генерація помилки з провіркою типу</summary>
-///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>
-#define Throw(ExceptionObj) \
-do{ \
-	static_assert(IsThrowable<decltype(ExceptionObj)>() | Seed::TypeTraits::IsSameV<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>, \
-	"Only Seed::Exception and derived classes cant be throw as exception"); \
-	__assume(IsThrowable<decltype(ExceptionObj)>()); \
+#ifndef CXXTHROWAPI
+	///<summary>Генерація помилки з провіркою типу</summary>
+	///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>
+	#define Throw(ExceptionObj) \
+	do{ \
+		static_assert(IsThrowable<decltype(ExceptionObj)>() | Seed::TypeTraits::IsSameV<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>, \
+		"Only Seed::Exception and derived classes cant be throw as exception"); \
+		__assume(IsThrowable<decltype(ExceptionObj)>()); \
+		__pragma(warning(push)); \
+		__pragma(warning(disable: 4996)); \
+		___cxxthrow(ExceptionObj);\
+		__pragma(warning(pop)); \
+	 }while(false)
+
+	#define ReThrow \
+	do{\
 	__pragma(warning(push)); \
 	__pragma(warning(disable: 4996)); \
-	___cxxthrow(ExceptionObj);\
+	__cxxrethrow(); \
 	__pragma(warning(pop)); \
- }while(false)
+	} while(false)
 
-#define ReThrow \
-do{\
-__pragma(warning(push)); \
-__pragma(warning(disable: 4996)); \
-__cxxrethrow(); \
-__pragma(warning(pop)); \
-} while(false)
+	///<summary>Заборона використання <c>throw</c> без провірок на тип об'єкта помилки</summary>
+	#define throw static_cast(false, "Use Throw insted")
 
-///<summary>Заборона використання <c>throw</c> без провірок на тип об'єкта помилки</summary>
-#define throw static_cast("Use Throw insted")
+	///<summary>Макрос локалізації помилки</summary>
+	#define ExceptionPosition __FILE__, __FUNCSIG__, __LINE__
+#endif // !CXXTHROWAPI
 
-///<summary>Макрос локалізації помилки</summary>
-#define ExceptionPosition __FILE__, __FUNCSIG__, __LINE__
 #pragma endregion
 
 #pragma warning(pop)

@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.h"
+#include "Seed.Core.Containers.TypeTraits.h"
 #include "Seed.Core.Containers.Tuple.h"
 #include "Seed.Core.CTTI.TypeNames.h"
 
@@ -7,6 +8,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace TypeTraits {
 			namespace Types {
+				//TODO: Refactore it
 #pragma region Data and type classification
 				///<summary>Типи даних</summary>
 				enum class EDataClasses : UInt8 {
@@ -77,62 +79,62 @@ namespace Seed {
 #pragma endregion
 #pragma region Collection
 				template<typename T>
-				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::IsArray<T>, bool>>
+				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::Collection::IsArray<T>, bool>>
 				{
 					using Type = T;
 					static constexpr SizeT Size = sizeof(T);
 					static constexpr EDataClasses DataType = EDataClasses::Composite;
 					static constexpr ENativeTypes NativeType = ENativeTypes::Collection;
-					using ItemsType = TypeTraits::ContainerSubType<T>;
+					using ItemsType = typename T::DataType;
 
 					static SizeT GetDynamicTypesCount() { return 0 + MetaData<ItemsType>::GetDynamicTypesCount(); }
 				};
 
 				template<typename T>
-				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::IsList<T>, bool>>
+				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::Collection::IsList<T>, bool>>
 				{
 					using Type = T;
 					static constexpr SizeT Size = sizeof(T);
 					static constexpr EDataClasses DataType = EDataClasses::Composite;
 					static constexpr ENativeTypes NativeType = ENativeTypes::Collection;
-					using ItemsType = TypeTraits::ContainerSubType<T>;
+					using ItemsType = typename T::DataType;
 
 					static SizeT GetDynamicTypesCount() { return 0 + MetaData<ItemsType>::GetDynamicTypesCount(); }
 				};
-				
+
 				template<typename T>
-				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::IsString<T>, bool>>
+				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::Collection::IsString<T>, bool>>
 				{
 					using Type = T;
 					static constexpr SizeT Size = sizeof(T);
 					static constexpr EDataClasses DataType = EDataClasses::Character;
 					static constexpr ENativeTypes NativeType = ENativeTypes::Collection;
-					using ItemsType = TypeTraits::ContainerSubType<T>;
+					using ItemsType = typename T::DataType;
 
 					static SizeT GetDynamicTypesCount() { return 0 + MetaData<ItemsType>::GetDynamicTypesCount(); }
 				};
 
 				template<typename T>
-				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::IsPair<T>, bool>>
+				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::Collection::IsPair<T>, bool>>
 				{
 					using Type = T;
 					static constexpr SizeT Size = sizeof(T);
 					static constexpr EDataClasses DataType = EDataClasses::Binnary;
 					static constexpr ENativeTypes NativeType = ENativeTypes::StaticStruct;
-					using Key = typename PairTypes<T>::Key;
-					using Value = typename PairTypes<T>::Value;
+					using Key = typename T::KeyType;
+					using Value = typename T::ValueType;
 
 					static SizeT GetDynamicTypesCount() { return 0 + MetaData<Key>::GetDynamicTypesCount() + MetaData<Value>::GetDynamicTypesCount(); }
 				};
 
 				template<typename T>
-				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::IsMap<T>, bool>>
+				struct MetaData<T, typename TypeTraits::EnableIfV<TypeTraits::Collection::IsMap<T>, bool>>
 				{
 					using Type = T;
 					static constexpr SizeT Size = sizeof(T);
 					static constexpr EDataClasses DataType = EDataClasses::Composite;
 					static constexpr ENativeTypes NativeType = ENativeTypes::Collection;
-					using ItemsType = TypeTraits::ContainerSubType<T>;
+					using ItemsType = typename T::DataType;
 
 					static SizeT GetDynamicTypesCount() { return 0 + MetaData<ItemsType>::GetDynamicTypesCount(); }
 				};

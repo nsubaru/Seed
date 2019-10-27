@@ -26,11 +26,11 @@ Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr* Delim
 				}
 
 				if (Found)
-					return Tuple<SizeT, SizeT, SizeT>( StartSize, Pos - StartSize, j );
+					return Tuple<SizeT, SizeT, SizeT>(StartSize, Pos - StartSize, j);
 				else
 					i = Pos;
 			}
 		}
 	}
-	return Tuple<SizeT, SizeT, SizeT>(StartSize, Size - StartSize, Seed::Math::Max<SizeT>() );
+	return Tuple<SizeT, SizeT, SizeT>(StartSize, Size - StartSize, Seed::Math::Max<SizeT>());
 }

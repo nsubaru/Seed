@@ -16,7 +16,7 @@
 
 typedef TypeDescriptor _RTTITypeDescriptor;
 
-static bool TypeidsEqual(const _RTTITypeDescriptor* const lhs, const _RTTITypeDescriptor* const rhs) noexcept try 
+static bool TypeidsEqual(const _RTTITypeDescriptor* const lhs, const _RTTITypeDescriptor* const rhs) noexcept try
 {
 	return lhs == rhs || !Seed::CStr::Compare(lhs->name, rhs->name); //-V509
 }
@@ -335,9 +335,9 @@ static void* FindCompleteObject(void* inptr)           // Pointer to polymorphic
 //
 
 static _RTTIBaseClassDescriptor* FindSITargetTypeInstance(
-	_RTTICompleteObjectLocator * const pCOLocator, // pointer to Locator of complete object
-	_RTTITypeDescriptor * const pSrcTypeID,        // pointer to TypeDescriptor of source object
-	_RTTITypeDescriptor * const pTargetTypeID      // pointer to TypeDescriptor of result of cast
+	_RTTICompleteObjectLocator* const pCOLocator, // pointer to Locator of complete object
+	_RTTITypeDescriptor* const pSrcTypeID,        // pointer to TypeDescriptor of source object
+	_RTTITypeDescriptor* const pTargetTypeID      // pointer to TypeDescriptor of result of cast
 	IMAGEBASE_PARAMETER
 )
 {
@@ -470,10 +470,10 @@ static _RTTIBaseClassDescriptor* FindSITargetTypeInstance(
 
 static _RTTIBaseClassDescriptor* FindMITargetTypeInstance(
 	void* pCompleteObject,                 // pointer to complete object
-	_RTTICompleteObjectLocator * pCOLocator, // pointer to Locator of complete object
-	_RTTITypeDescriptor * pSrcTypeID,        // pointer to TypeDescriptor of source object
+	_RTTICompleteObjectLocator* pCOLocator, // pointer to Locator of complete object
+	_RTTITypeDescriptor* pSrcTypeID,        // pointer to TypeDescriptor of source object
 	ptrdiff_t SrcOffset,                    // offset of source object in complete object
-	_RTTITypeDescriptor * pTargetTypeID      // pointer to TypeDescriptor of result of cast
+	_RTTITypeDescriptor* pTargetTypeID      // pointer to TypeDescriptor of result of cast
 	IMAGEBASE_PARAMETER
 )
 {
@@ -513,7 +513,7 @@ static _RTTIBaseClassDescriptor* FindMITargetTypeInstance(
 		// the type-id check while walking through any base classes of the
 		// target class.
 
-		if (i - iTarget > nTargetBases &&
+		if (i - iTarget > nTargetBases&&
 			TypeidsEqual(BCD_PTD(*pBCD), pTargetTypeID))
 		{
 			// If we've already found the source class instance, then we must
@@ -664,10 +664,10 @@ static _RTTIBaseClassDescriptor* FindMITargetTypeInstance(
 
 static _RTTIBaseClassDescriptor* FindVITargetTypeInstance(
 	void* pCompleteObject,                 // pointer to complete object
-	_RTTICompleteObjectLocator * pCOLocator, // pointer to Locator of complete object
-	_RTTITypeDescriptor * pSrcTypeID,        // pointer to TypeDescriptor of source object
+	_RTTICompleteObjectLocator* pCOLocator, // pointer to Locator of complete object
+	_RTTITypeDescriptor* pSrcTypeID,        // pointer to TypeDescriptor of source object
 	ptrdiff_t SrcOffset,                    // offset of source object in complete object
-	_RTTITypeDescriptor * pTargetTypeID      // pointer to TypeDescriptor of result of cast
+	_RTTITypeDescriptor* pTargetTypeID      // pointer to TypeDescriptor of result of cast
 	IMAGEBASE_PARAMETER
 )
 {
@@ -717,7 +717,7 @@ static _RTTIBaseClassDescriptor* FindVITargetTypeInstance(
 		// the type-id check while walking through any base classes of the
 		// target class.
 
-		if (i - iTarget > nTargetBases &&
+		if (i - iTarget > nTargetBases&&
 			TypeidsEqual(BCD_PTD(*pBCD), pTargetTypeID))
 		{
 			// If this target instance is public and unambiguous within the
@@ -933,7 +933,7 @@ static _RTTIBaseClassDescriptor* FindVITargetTypeInstance(
 
 static ptrdiff_t PMDtoOffset(
 	void* pThis,           // ptr to complete object
-	const PMD & pmd)         // pointer-to-member-data structure
+	const PMD& pmd)         // pointer-to-member-data structure
 {
 	ptrdiff_t RetOff = 0;
 

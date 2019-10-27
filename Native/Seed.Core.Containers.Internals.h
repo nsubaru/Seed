@@ -297,9 +297,7 @@ namespace Seed {
 		private:
 			Internal::TupleImpl::tuple<Types...> data;
 		private:
-			
 
-			
 		public:
 			__forceinline constexpr Tuple() : data() {}
 			__forceinline constexpr Tuple(const Types& ... values)
@@ -404,7 +402,6 @@ namespace Seed {
 		//		typedef typename Internal::TupleImpl::tuple_element<_Ty, Tuple<_Types...>>::type _Ttype;
 		//		return (ForwardReference<const _Ty&&>(((_Ttype&)_Tuple)._Myfirst._Val));
 		//	}
-
 
 		//	__forceinline constexpr static SizeT Count() { return 0; }
 		//};

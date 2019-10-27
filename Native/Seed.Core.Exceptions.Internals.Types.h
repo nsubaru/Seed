@@ -193,7 +193,7 @@ struct ExceptionInfoT : Seed::Core::Memory::Allocator<Seed::Core::Memory::Except
 	void* _pExitContext = 0;
 	void* _pUnwindContext = 0;
 	FRAMEINFO* _pFrameInfoChain = 0;
-	unsigned __int64          _ImageBase  = 0;
+	unsigned __int64          _ImageBase = 0;
 	unsigned __int64          _ThrowImageBase = 0;
 	void* _pForeignException = 0;
 	int                _HandlerSearchState = 0;  // Used when exceptions occur in catch funclets in Pass 1 of SEH handling, represents a state in the throwing catch funclet
@@ -300,8 +300,6 @@ typedef const struct _s_ESTypeList
 	int				dispTypeArray;	// offset of list of types in exception specification
 }ESTypeList;
 
-
-
 //
 // CatchableTypeArray - array of pointers to catchable types, with length
 //
@@ -348,5 +346,3 @@ struct TryBlockMapIteratorPair {
 	TryBlockMapIterator start;
 	TryBlockMapIterator end;
 };
-
-

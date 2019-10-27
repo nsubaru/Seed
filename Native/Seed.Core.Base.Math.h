@@ -80,7 +80,7 @@ namespace Seed {
 			///<summary>Мінімальне значення UInt64</summary>
 			template<>
 			constexpr UInt64 Min() { return 0x0000000000000000ui64; }; //-V2517
-			
+
 			///<summary>Максимальна кількість цифр в числовому типі</summary>
 			///<typeparam name = "T">Тип числа</typeparam>
 			template<typename T>

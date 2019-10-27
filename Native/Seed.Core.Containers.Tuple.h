@@ -140,7 +140,7 @@
 ////	template<size_t _Index,
 ////		class _Tuple>
 ////		using tuple_element_t = typename tuple_element<_Index, _Tuple>::type;
-////	
+////
 ////	// STRUCT TEMPLATE _Tuple_implicit_val
 ////	template<bool _Same,
 ////	class _Dest,
@@ -1393,7 +1393,7 @@
 //			public:
 //				TupleLeaf() {
 //				}
-//				
+//
 //				TupleLeaf(const TupleLeaf& t)
 //					: ValueType_(t.get()) {
 //					static_assert(!StaticAsserts::IsRValueReferenceV<ValueType_>,
@@ -1563,7 +1563,7 @@
 //					typename StaticAsserts::ConditionT<StaticAsserts::IsLValueReferenceV<Tuple_>,
 //					// append ref if Tuple_ is ref
 //					typename TupleElement<Start_, TupleType>::Type&,
-//					// append non-ref otherwise 
+//					// append non-ref otherwise
 //					typename TupleElement<Start_, TupleType>::Type>::Type>,
 //					Tuple_, Start_ + 1, End_>::Type  Type;
 //			};
@@ -1914,7 +1914,7 @@
 //			return static_cast<Type&&>(static_cast<TupleImpl::TupleLeaf<I, Type>&&>(t.impl_).get());
 //		}
 //
-//		// swap 
+//		// swap
 //
 //		template <typename... Ts>
 //		inline
@@ -2005,8 +2005,8 @@ namespace Seed {
 					: value_(ForwardReference<T>(t)) {
 					static_assert(!IsReferenceV<ValueType_> ||
 						IsLValueReferenceV<ValueType_> ||
-							(IsRValueReferenceV<ValueType_> &&
-								!IsLValueReferenceV<T>),
+						(IsRValueReferenceV<ValueType_> &&
+							!IsLValueReferenceV<T>),
 						"Attempted to construct a reference element in a tuple with an rvalue");
 				}
 
@@ -2042,7 +2042,6 @@ namespace Seed {
 			template <SizeT I_, typename ValueType_>
 			class TupleLeaf<I_, ValueType_, true>
 				: private ValueType_ {
-
 				TupleLeaf& operator=(const TupleLeaf&) = delete;
 			public:
 				constexpr TupleLeaf() {
@@ -2154,7 +2153,7 @@ namespace Seed {
 			// specialization for Tuple
 
 			template <typename... Ts_>
-			struct TupleSize<Tuple<Ts_...>>  {
+			struct TupleSize<Tuple<Ts_...>> {
 				static constexpr size_t Value = sizeof...(Ts_);
 				typedef SizeT ValueType;
 				typedef TupleSize Type; // using injected-class-name
@@ -2226,7 +2225,7 @@ namespace Seed {
 					typename ConditionT<IsLValueReferenceT<Tuple_>::State,
 					// append ref if Tuple_ is ref
 					typename TupleElement<Start_, TupleType>::Type&,
-					// append non-ref otherwise 
+					// append non-ref otherwise
 					typename TupleElement<Start_, TupleType>::Type>::Result>,
 					Tuple_, Start_ + 1, End_>::Type  Type;
 			};
@@ -2340,7 +2339,7 @@ namespace Seed {
 				struct TupleConvertibleImpl<true, TupleTypes<From0_, FromRest_...>,
 				TupleTypes<To0_, ToRest_...>>
 				: public LogicConst<
-				IsConvertibleT<From0_, To0_>::State&&
+				IsConvertibleT<From0_, To0_>::State &&
 				TupleConvertibleImpl<true, TupleTypes<FromRest_...>,
 				TupleTypes<ToRest_...>>::State> {
 			};
@@ -2379,7 +2378,7 @@ namespace Seed {
 				struct TupleAssignableImpl<true, TupleTypes<Target0_, TargetRest_...>,
 				TupleTypes<From0_, FromRest_...>>
 				: public LogicConst<
-				IsAssignableT<Target0_, From0_>::State&&
+				IsAssignableT<Target0_, From0_>::State &&
 				TupleAssignableImpl<true, TupleTypes<TargetRest_...>,
 				TupleTypes<FromRest_...>>::State> {
 			};
@@ -2507,18 +2506,17 @@ namespace Seed {
 					ForwardReference<Us>(u)...) {
 			}
 
-
 			template <typename OtherTuple, typename TypeTraits::EnableIf<
 				TupleImpl::TupleConvertible<OtherTuple, Tuple>::State,
 				bool>::Type = false>
-				constexpr Tuple(OtherTuple && t)
+				constexpr Tuple(OtherTuple&& t)
 				: impl_(ForwardReference<OtherTuple>(t)) {
 			}
 
 			template <typename OtherTuple, typename TypeTraits::EnableIf<
 				TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
 				bool>::Type = false>
-				constexpr Tuple & operator=(OtherTuple && t) {
+				constexpr Tuple& operator=(OtherTuple&& t) {
 				impl_.operator=(ForwardReference<OtherTuple>(t));
 				return *this;
 			}
@@ -2560,7 +2558,7 @@ namespace Seed {
 			template <typename OtherTuple, typename TypeTraits::EnableIf<
 				TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
 				bool>::Type = false>
-				constexpr Tuple & operator=(OtherTuple&&) {
+				constexpr Tuple& operator=(OtherTuple&&) {
 				return *this;
 			}
 
@@ -2596,7 +2594,7 @@ namespace Seed {
 			return static_cast<Type&&>(static_cast<TupleImpl::TupleLeaf<I, Type>&&>(t.impl_).get());
 		}
 
-		// swap 
+		// swap
 
 		template <typename... Ts>
 		constexpr inline
@@ -2717,5 +2715,4 @@ namespace std {
 	};
 
 	using Seed::Core::get;
-
 } // namespace std

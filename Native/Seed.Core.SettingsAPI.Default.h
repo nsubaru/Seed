@@ -26,7 +26,7 @@ namespace Seed {
 #else
 						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalСhecks = { 0 };
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = false;
-#endif			
+#endif
 						//Секція захищеного алокатора пам'яті
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.StartSize = 1Mb;
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = 0Mb;
@@ -57,7 +57,11 @@ namespace Seed {
 						//Cекція резервування пам'яті для буфера рядків
 						DefaultSettings.MainMemoryManager.StringReserveSize = 50;
 						//Секція стандатного максимального розміру черги
-						DefaultSettings.MainMemoryManager.QueueMaxSize = 64;
+						DefaultSettings.MainMemoryManager.DefaultPriorityQueueMaxSize = 64;
+						//Секція резервування пам'яті для буфера динамічних стек
+						DefaultSettings.MainMemoryManager.DynamicStackReserveSize = 100;
+						//Секція резервування пам'яті для буфера динамічних черг
+						DefaultSettings.MainMemoryManager.DynamicQueueReserveSize = 100;
 					}
 
 					//Багатопотоковість

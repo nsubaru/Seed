@@ -129,7 +129,7 @@ namespace Seed {
 
 				constexpr ConstexprArray Reverse() {
 					SizeT j = Size - 1;
-					for (SizeT i = 0; i < Size / 2; i++,j--) {
+					for (SizeT i = 0; i < Size / 2; i++, j--) {
 						T t = arr[i];
 						arr[i] = arr[j];
 						arr[j] = t;
@@ -192,14 +192,6 @@ namespace Seed {
 				}
 				return ret.Reverse();
 			}
-
-			constexpr auto v = ConstexprArray<char, 3>('1', '2', '3').Count;
-
-			constexpr auto v2 = ToCharStr<72>();
-
-			constexpr auto v3 = TypeName<int>();
-
-			constexpr auto v4 = TypeStringToArray(GenTypeString("Text 1")());
 		}
 	}
 }

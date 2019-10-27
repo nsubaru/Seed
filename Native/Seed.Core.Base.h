@@ -1,5 +1,5 @@
 #pragma once
-//Allow complex unnamed object, unnamed object often appear as iterator 
+//Allow complex unnamed object, unnamed object often appear as iterator
 //or when function have side-effect for example starting thread or task
 #pragma warning(disable: 26444)
 
@@ -194,7 +194,7 @@ __forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCo
 __forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
 __forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
 __forceinline ClassName & operator=(ClassName && From){if(this == &From) return *this; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
-__forceinline virtual ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}} 
+__forceinline virtual ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}}
 //static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");
 
 namespace {

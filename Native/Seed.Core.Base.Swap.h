@@ -64,6 +64,7 @@ namespace Seed {
 		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
 		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
 		///</remarks>
+		template<>
 		__forceinline void Swap(Int16& First, Int16& Second) noexcept { First ^= Second; Second ^= First; First ^= Second; }
 
 		///<summary>Оптимізований обмін значеннями зміних Int32</summary>
