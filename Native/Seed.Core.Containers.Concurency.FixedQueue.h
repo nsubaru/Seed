@@ -184,10 +184,10 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
-						T result = T();
+						U result = U();
 
 						if (This->count == 0) {
 							return MoveRValue(result);
@@ -202,10 +202,10 @@ namespace Seed {
 						});
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const T& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					return This->flowControler.SharedLock([&]() {
-						T result = Value;
+						U result = Value;
 						if (This->count == 0) {
 							ReleaseLockSharedSRWLock(&This->Lock);
 							return MoveRValue(result);
@@ -220,10 +220,10 @@ namespace Seed {
 						});
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, T&& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return This->flowControler.SharedLock([&, Value = MoveRValue(Value)]() mutable {
-						T result = MoveRValue(Value);
+						U result = MoveRValue(Value);
 
 						if (This->count == 0)
 							return MoveRValue(result);

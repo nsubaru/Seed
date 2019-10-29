@@ -161,9 +161,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
-					T result = T();
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+					U result = U();
 
 					if (This->count == 0) {
 						return MoveRValue(result);
@@ -177,9 +177,9 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const T& Value) const {
-					T result = Value;
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+					U result = Value;
 					if (This->count == 0) {
 						ReleaseLockSharedSRWLock(&This->Lock);
 						return MoveRValue(result);
@@ -193,9 +193,9 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, T&& Value) const {
-					T result = MoveRValue(Value);
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+					U result = MoveRValue(Value);
 
 					if (This->count == 0)
 						return MoveRValue(result);

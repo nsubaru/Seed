@@ -137,19 +137,19 @@ namespace Seed {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
 					}
 				public:
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, T&, const T&>::State>, bool> = true>
-					__forceinline T Aggregate(Lambda&& lambda) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl(MoveRValue(lambda));
+					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, U&, const T&>::State>, bool> = true>
+					__forceinline U Aggregate(Lambda&& lambda) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda));
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, T&, const T&>::State>, bool> = true>
-					__forceinline T Aggregate(Lambda&& lambda, const T& StartValue) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl(MoveRValue(lambda), StartValue);
+					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, U&, const T&>::State>, bool> = true>
+					__forceinline U Aggregate(Lambda&& lambda, const U& StartValue) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), StartValue);
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, T&, const T&>::State>, bool> = true>
-					__forceinline T Aggregate(Lambda&& lambda, T&& StartValue) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl(MoveRValue(lambda), MoveRValue(StartValue));
+					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, U&, const T&>::State>, bool> = true>
+					__forceinline U Aggregate(Lambda&& lambda, U&& StartValue) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(StartValue));
 					}
 
 					__forceinline bool Any() const {

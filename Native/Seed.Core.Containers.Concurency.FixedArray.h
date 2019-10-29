@@ -121,10 +121,10 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
-						T val = 0;
+						U val = U();
 						for (SizeT i = 0; i < TSize; i++)
 						{
 							lambda(val, This->array[i]);
@@ -133,10 +133,10 @@ namespace Seed {
 						}));
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const T& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
-						T result = Value;
+						U result = Value;
 						for (SizeT i = 0; i < TSize; i++)
 						{
 							lambda(result, This->array[i]);
@@ -145,8 +145,8 @@ namespace Seed {
 						}));
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, T&& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						for (SizeT i = 0; i < TSize; i++)
 						{

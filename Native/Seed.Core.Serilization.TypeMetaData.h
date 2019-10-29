@@ -11,6 +11,8 @@ namespace Seed {
 					Containers::BaseVList<THeap, Byte> buffer;
 					Seed::RefCountT RefCount;
 					Data() : RefCount(1) {}
+					Data(const Containers::BaseVList<THeap, Byte>& buffer) : Data(), buffer(buffer) {}
+					Data(Containers::BaseVList<THeap, Byte>&& buffer) : Data(), buffer(MoveRValue(buffer)) {}
 				};
 			private:
 				Data* This;
@@ -44,7 +46,7 @@ namespace Seed {
 						TypeTraits::Types::MetaData<T>::NativeType == TypeTraits::Types::ENativeTypes::Primitive ||
 						TypeTraits::Types::MetaData<T>::NativeType == TypeTraits::Types::ENativeTypes::Pod
 						) {
-						stream.This->buffer += (Blob(reinterpret_cast<const Byte*>(&Value), sizeof(T)));
+						stream.This->buffer += (Containers::Blob(reinterpret_cast<const Byte*>(&Value), sizeof(T)));
 						return stream;
 					}
 					else if constexpr (
@@ -52,7 +54,7 @@ namespace Seed {
 						TypeTraits::Types::MetaData<T>::DataType == TypeTraits::Types::EDataClasses::Character
 						)
 					{
-						//stream.This->buffer.AddNewSlice((Blob)Value);
+						stream.This->buffer += (Containers::Blob)Value;
 						return stream;
 					}
 					else if constexpr (
@@ -88,7 +90,8 @@ namespace Seed {
 				}
 			public:
 				BaseMemoryStream() : This(new Data) {}
-
+				BaseMemoryStream(const Containers::BaseVList<THeap, Byte>& vlist) : This(new Data(vlist)) {}
+				BaseMemoryStream(Containers::BaseVList<THeap, Byte>&& vlist) : This(new Data(MoveRValue(vlist))) {}
 			public:
 				template<typename T>
 				BaseMemoryStream& Serilize(const T& Value) {

@@ -150,11 +150,11 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda) const {
 					if (This->count == 0)
-						return T();
-					T result = T();
+						return U();
+					U result = U();
 					SizeT i = This->count;
 					do {
 						i--;
@@ -163,9 +163,11 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const T& Value) const {
-					T result = Value;
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+					U result = Value;
+					if (This->count == 0)
+						return result;
 					SizeT i = This->count;
 					do {
 						i--;
