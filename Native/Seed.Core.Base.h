@@ -68,119 +68,122 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 #define StructOffsetOfMember(s,memb) \
     ((size_t)((char *)&((s *)0)->memb - (char *)0))
 
+///<summary>Примусовий інлайнинг функцій</summary>
+#define forceinline __forceinline
+
 ///<summary>Головний простір імен</summary>
 namespace Seed {
-	///<summary>Простір імен функцій ядра Рем</summary>
-	inline namespace Core {
-		///<summary>Атомарний лічильник<para>Використовує функції InterlockedXXX</para></summary>
-		class SeedKernelCall RefCountT final {
-		private:
-			///<summary>Містить значення</summary>
-			volatile SizeT count;
-		protected:
-		public:
-			///<summary>Гетер</summary>
-			///<returns>Значення лічильника</returns>
-			SizeT GetValue() { return count; }
-			///<summary>Поточне значення лічильника</summary>
-			///<value>Значення лічильника</value>
-			Property(GetValue) SizeT Count;
-			///<summary>Конструктор з <code>SizeT</code></summary>
-			///<param name='Count'>Початкове значення</param>
-			__forceinline RefCountT(SizeT Count = 0) noexcept :
-				count(Count) {};
+    ///<summary>Простір імен функцій ядра Рем</summary>
+    inline namespace Core {
+        ///<summary>Атомарний лічильник<para>Використовує функції InterlockedXXX</para></summary>
+        class SeedKernelCall RefCountT final {
+        private:
+            ///<summary>Містить значення</summary>
+            volatile SizeT count;
+        protected:
+        public:
+            ///<summary>Гетер</summary>
+            ///<returns>Значення лічильника</returns>
+            SizeT GetValue() { return count; }
+            ///<summary>Поточне значення лічильника</summary>
+            ///<value>Значення лічильника</value>
+            Property(GetValue) SizeT Count;
+            ///<summary>Конструктор з <code>SizeT</code></summary>
+            ///<param name='Count'>Початкове значення</param>
+            __forceinline RefCountT(SizeT Count = 0) noexcept :
+                count(Count) {};
 
-			///<summary>Префіксний інкремент
-			///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
-			///</summary>
-			///<returns>Вертає силку на елемент після інкременту</returns>
-			__forceinline RefCountT& operator++() {
-				this->count++;
-				return *this;
-			}
+            ///<summary>Префіксний інкремент
+            ///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
+            ///</summary>
+            ///<returns>Вертає силку на елемент після інкременту</returns>
+            __forceinline RefCountT& operator++() {
+                this->count++;
+                return *this;
+            }
 
-			///<summary>Постфіксний інкремент
-			///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
-			///</summary>
-			///<returns>Вертає копію об'єкта до інкремента</returns>
-			__forceinline RefCountT operator++(int) {
-				auto cp = *this;
-				++this->count;
-				return cp;
-			}
+            ///<summary>Постфіксний інкремент
+            ///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
+            ///</summary>
+            ///<returns>Вертає копію об'єкта до інкремента</returns>
+            __forceinline RefCountT operator++(int) {
+                auto cp = *this;
+                ++this->count;
+                return cp;
+            }
 
-			///<summary>Префіксний декремент
-			///<para>Використовує функцію <code>InterlockedDecrementSizeTNoFence</code> для декременту</para>
-			///</summary>
-			///<returns>Вертає силку на елемент після декременту</returns>
-			__forceinline RefCountT& operator--() {
-				this->count--;
-				return *this;
-			}
+            ///<summary>Префіксний декремент
+            ///<para>Використовує функцію <code>InterlockedDecrementSizeTNoFence</code> для декременту</para>
+            ///</summary>
+            ///<returns>Вертає силку на елемент після декременту</returns>
+            __forceinline RefCountT& operator--() {
+                this->count--;
+                return *this;
+            }
 
-			///<summary>Постфіксний декремент
-			///<para>Використовує функцію <code>InterlockedDecrementSizeTNoFence</code> для декременту</para>
-			///</summary>
-			///<returns>Вертає копію об'єкта до декременту</returns>
-			__forceinline RefCountT operator--(int) {
-				auto cp = *this;
-				this->count--;
-				return cp;
-			}
+            ///<summary>Постфіксний декремент
+            ///<para>Використовує функцію <code>InterlockedDecrementSizeTNoFence</code> для декременту</para>
+            ///</summary>
+            ///<returns>Вертає копію об'єкта до декременту</returns>
+            __forceinline RefCountT operator--(int) {
+                auto cp = *this;
+                this->count--;
+                return cp;
+            }
 
-			///<summary>Вертає значення в вигляді <code>SizeT</code> змінної</summary>
-			///<returns>Поточне значення об'єкта</returns>
-			__forceinline operator SizeT() const { return this->count; }
-		};
+            ///<summary>Вертає значення в вигляді <code>SizeT</code> змінної</summary>
+            ///<returns>Поточне значення об'єкта</returns>
+            __forceinline operator SizeT() const { return this->count; }
+        };
 
-		///<summary>Змінює порядок елементів в масиву Array</summary>
-		///<param name='Array'>Масив</param>
-		///<param name='Size'>Кількість елементів</param>
-		template<typename T>
-		DeprecatedCall("Робота з с-подібнимим масивами") __forceinline void Reverse(T* Array, SizeT size) {
-			for (size_t i = 0; i < size / 2; i++) {
-				Swap(Array[i], Array[(size - 1) - i]);
-			}
-		}
+        ///<summary>Змінює порядок елементів в масиву Array</summary>
+        ///<param name='Array'>Масив</param>
+        ///<param name='Size'>Кількість елементів</param>
+        template<typename T>
+        DeprecatedCall("Робота з с-подібнимим масивами") __forceinline void Reverse(T* Array, SizeT size) {
+            for (size_t i = 0; i < size / 2; i++) {
+                Swap(Array[i], Array[(size - 1) - i]);
+            }
+        }
 
-		///<summary>Інтерфейс клонування</summary>
-		template<typename T>
-		interface IClonable
-		{
-			///<summary>Метод клонуванння</summary>
-			T Clone();
-		};
+        ///<summary>Інтерфейс клонування</summary>
+        template<typename T>
+        interface IClonable
+        {
+            ///<summary>Метод клонуванння</summary>
+            T Clone() const;
+        };
 
-		///<summary>Інтерфес звільнення ресурсів з класу з підрахунком силок</summary>
-		class IDisposable
-		{
-			///<summary>Метод для звільнення ресурсів,
-			///<para>викликається деструктором автоматично в класів з підрахунком силок</para></summary>
-			///<see><code>RefCountClass</code></see>
-			virtual void Dispose() = 0;
-		};
+        ///<summary>Інтерфес звільнення ресурсів з класу з підрахунком силок</summary>
+        class IDisposable
+        {
+            ///<summary>Метод для звільнення ресурсів,
+            ///<para>викликається деструктором автоматично в класів з підрахунком силок</para></summary>
+            ///<see><code>RefCountClass</code></see>
+            virtual void Dispose() = 0;
+        };
 
-		///<summary>Можливі варіанти порівняння</summary>
-		enum class Equality : Int8 {
-			Smaller = -1, Equal = 0, Bigger = 1, NonComparable = -127
-		};
+        ///<summary>Можливі варіанти порівняння</summary>
+        enum class Equality : Int8 {
+            Smaller = -1, Equal = 0, Bigger = 1, NonComparable = -127
+        };
 
-		///<summary>Інтерфейс порівнняння</summary>
-		template<typename T>
-		interface IComparable
-		{
-			///<summary>Порівнює два екземпляри типу T та вертає значення відносно поточного об'єкта</summary>
-			Equality Compare(const T& Val) const;
-		};
+        ///<summary>Інтерфейс порівнняння</summary>
+        template<typename T>
+        interface IComparable
+        {
+            ///<summary>Порівнює два екземпляри типу T та вертає значення відносно поточного об'єкта</summary>
+            Equality Compare(const T& Val) const;
+        };
 
-		///<summary>Compile-time функція пошуку максимального серед двох об'єетів</summary>
-		template<typename T>
-		__forceinline constexpr T Max(T V1, T V2) { return (V1 > V2) ? V1 : V2; }
+        ///<summary>Compile-time функція пошуку максимального серед двох об'єетів</summary>
+        template<typename T>
+        __forceinline constexpr T Max(T V1, T V2) { return (V1 > V2) ? V1 : V2; }
 
-		///<summary>Compile-time функція пошуку мінімального серед двох об'єетів</summary>
-		template<typename T>
-		__forceinline constexpr T Min(T V1, T V2) { return (V1 < V2) ? V1 : V2; }
-	}
+        ///<summary>Compile-time функція пошуку мінімального серед двох об'єетів</summary>
+        template<typename T>
+        __forceinline constexpr T Min(T V1, T V2) { return (V1 < V2) ? V1 : V2; }
+    }
 }
 
 ///<summary>Якщо <code>RefCountClass</code> вставлено в тіло класу в .h файлі то даних клас автоматично отримує підрахунок силок</summary>
@@ -198,53 +201,53 @@ __forceinline virtual ~ClassName(){if (This != nullptr) {if (--This->RefCount ==
 //static_assert(Seed::Core::StaticAsserts::IsBasedOn<Seed::IDisposable, ClassName>(),"RefClass must implement IDisposable interface");
 
 namespace {
-	template <class F, class... Args>
-	inline auto INVOKE(F&& f, Args&& ... args) ->
-		decltype(Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...)) {
-		return Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...);
-	}
+    template <class F, class... Args>
+    inline auto INVOKE(F&& f, Args&& ... args) ->
+        decltype(Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...)) {
+        return Seed::ForwardReference<F>(f)(Seed::ForwardReference<Args>(args)...);
+    }
 
-	template <class Base, class T, class Derived>
-	inline auto INVOKE(T Base::* pmd, Derived&& ref) ->
-		decltype(Seed::ForwardReference<Derived>(ref).*pmd) {
-		return Seed::ForwardReference<Derived>(ref).*pmd;
-	}
+    template <class Base, class T, class Derived>
+    inline auto INVOKE(T Base::* pmd, Derived&& ref) ->
+        decltype(Seed::ForwardReference<Derived>(ref).*pmd) {
+        return Seed::ForwardReference<Derived>(ref).*pmd;
+    }
 
-	template <class PMD, class Pointer>
-	inline auto INVOKE(PMD&& pmd, Pointer&& ptr) ->
-		decltype((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMD>(pmd)) {
-		return (*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMD>(pmd);
-	}
+    template <class PMD, class Pointer>
+    inline auto INVOKE(PMD&& pmd, Pointer&& ptr) ->
+        decltype((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMD>(pmd)) {
+        return (*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMD>(pmd);
+    }
 
-	template <class Base, class T, class Derived, class... Args>
-	inline auto INVOKE(T Base::* pmf, Derived&& ref, Args&& ... args) ->
-		decltype((Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...)) {
-		return (Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...);
-	}
+    template <class Base, class T, class Derived, class... Args>
+    inline auto INVOKE(T Base::* pmf, Derived&& ref, Args&& ... args) ->
+        decltype((Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...)) {
+        return (Seed::ForwardReference<Derived>(ref).*pmf)(Seed::ForwardReference<Args>(args)...);
+    }
 
-	template <class PMF, class Pointer, class... Args>
-	inline auto INVOKE(PMF&& pmf, Pointer&& ptr, Args&& ... args) ->
-		decltype(((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...)) {
-		return ((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...);
-	}
+    template <class PMF, class Pointer, class... Args>
+    inline auto INVOKE(PMF&& pmf, Pointer&& ptr, Args&& ... args) ->
+        decltype(((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...)) {
+        return ((*Seed::ForwardReference<Pointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<Args>(args)...);
+    }
 }
 
 namespace Seed {
-	inline namespace Core {
-		namespace TypeTraits {
-			template <typename, typename = void>
-			struct ResultOf {
-				using Type = VoidT<>;
-			};
-			template <typename F, typename...Args>
-			struct ResultOf<F(Args...),
-				decltype(void(::INVOKE(TypeTraits::DeclVal<F>(), TypeTraits::DeclVal<Args>()...)))> {
-				using Type = decltype(::INVOKE(TypeTraits::DeclVal<F>(), TypeTraits::DeclVal<Args>()...));
-			};
+    inline namespace Core {
+        namespace TypeTraits {
+            template <typename, typename = void>
+            struct ResultOf {
+                using Type = VoidT<>;
+            };
+            template <typename F, typename...Args>
+            struct ResultOf<F(Args...),
+                decltype(void(::INVOKE(TypeTraits::DeclVal<F>(), TypeTraits::DeclVal<Args>()...)))> {
+                using Type = decltype(::INVOKE(TypeTraits::DeclVal<F>(), TypeTraits::DeclVal<Args>()...));
+            };
 
-			///<summary>Тип без силки</summary>
-			template<typename T>
-			using ResultOfT = typename ResultOf<T>::Type;
-		}
-	}
+            ///<summary>Тип без силки</summary>
+            template<typename T>
+            using ResultOfT = typename ResultOf<T>::Type;
+        }
+    }
 }

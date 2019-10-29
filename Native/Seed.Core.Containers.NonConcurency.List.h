@@ -1054,9 +1054,9 @@ namespace Seed {
 
 			protected:
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
-					T value;
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+					U value;
 					auto node = this->This->root;
 					SizeT index = 0;
 					while (node != nullptr) {
@@ -1067,10 +1067,10 @@ namespace Seed {
 					return MoveRValue(value);
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const T& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					auto node = this->This->root;
-					T result = Value;
+					U result = Value;
 					SizeT index = 0;
 					while (node != nullptr) {
 						lambda(result, node->value);
@@ -1080,8 +1080,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, T&& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					auto node = this->This->root;
 					SizeT index = 0;
 					while (node != nullptr) {

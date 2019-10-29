@@ -1144,10 +1144,10 @@ namespace Seed {
 
 			protected:
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda) const {
 					return this->This->lock.ShareLock([&]() {
-						T value;
+						U value;
 						auto node = this->This->root;
 						SizeT index = 0;
 						while (node != nullptr) {
@@ -1159,11 +1159,11 @@ namespace Seed {
 						});
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const T& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline T AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					return this->This->lock.ShareLock([&]() {
 						auto node = this->This->root;
-						T result = Value;
+						U result = Value;
 						SizeT index = 0;
 						while (node != nullptr) {
 							lambda(result, node->value);
@@ -1174,8 +1174,8 @@ namespace Seed {
 						});
 				}
 
-				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, T&& Value) const {
+				template<typename U, typename LambdaT>
+				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return this->This->lock.ShareLock([&]() {
 						auto node = this->This->root;
 						SizeT index = 0;
