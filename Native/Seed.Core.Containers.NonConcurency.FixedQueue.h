@@ -11,7 +11,8 @@ namespace Seed {
 			template<typename THeap, SizeT TSize, typename T>
 			class SeedKernelCall BaseFixedQueue :
 				public LINQ::IFixedQueue<BaseFixedQueue, THeap, T, TSize, true>,
-				public IDisposable
+				public IDisposable,
+				public IClonable<BaseFixedQueue<THeap, TSize, T>>
 			{
 			private:
 				struct Data {
@@ -30,7 +31,7 @@ namespace Seed {
 						rear(0),
 						count(0),
 						RefCount(1),
-						queue({})
+						queue{}
 					{}
 				};
 			private:
@@ -90,13 +91,23 @@ namespace Seed {
 					return This->queue[This->front];
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseFixedQueue& A, BaseFixedQueue& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				SizeT GetCount() { return This->count; }
 				SizeT Property(GetCount) Count;
+
+				virtual BaseFixedQueue Clone() const override final {
+					BaseFixedQueue result;
+					result.This->front = This->front;
+					result.This->rear = This->rear;
+					result.This->count = This->count;
+					for (SizeT i = 0; i < This->count; i++)
+					{
+						(*result.This)[i] = (*This)[i];
+					}
+					return result;
+				}
 
 				RefCountClass(BaseFixedQueue, This)
 			protected:
@@ -281,7 +292,7 @@ namespace Seed {
 				BaseFixedQueue& ReverseImpl() {
 					for (SizeT i = 0; i < This->count / 2; i++)
 					{
-						Swap((*This)[i], (*This)[(This->count - 1) - i]);
+						Seed::Swap((*This)[i], (*This)[(This->count - 1) - i]);
 					}
 					return *this;
 				}
@@ -316,11 +327,6 @@ namespace Seed {
 				}
 			};
 
-			template<typename THeap, SizeT TSize, typename T>
-			__forceinline void Swap(BaseFixedQueue<THeap, TSize, T>& A, BaseFixedQueue<THeap, TSize, T>& B) {
-				Swap(A.This, B.This);
-			}
-
 			namespace {
 				template<SizeT TSize, typename T>
 				using FixedQueue = BaseFixedQueue<Seed::Core::Memory::Heap, TSize, T>;
@@ -337,6 +343,11 @@ namespace Seed {
 				template<typename THeap, SizeT TSize, typename T>
 				struct IsFixedQueueT<Seed::Core::Containers::BaseFixedQueue<THeap, TSize, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, SizeT TSize, typename T>
+		__forceinline void Swap(Containers::BaseFixedQueue<THeap, TSize, T>& A, Containers::BaseFixedQueue<THeap, TSize, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

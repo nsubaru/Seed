@@ -273,19 +273,29 @@ namespace Seed {
 				constexpr const T& operator[](SizeT Index) const {
 					return This->array[Index];
 				}
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseFixedArray& A, BaseFixedArray& B);
+
+#pragma warning(push)
+#pragma warning(disable : 4996)
+				virtual BaseFixedArray Clone() const override final {
+					BaseFixedArray result;
+					if constexpr (TypeTraits::IsPodV<T>) {
+						Memory::Copy(This->array, result.This->array, TSize * sizeof(T));
+					}
+					else {
+						for (SizeT i = 0; i < TSize; i++)
+						{
+							result.This->array[i] = This->array[i];
+						}
+					}
+					return result;
+				}
+#pragma warning(pop)
+				
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 			public:
 				RefCountClass(BaseFixedArray, This)
 			};
-
-			template<typename THeap, SizeT TSize, typename T>
-			__forceinline void Swap(BaseFixedArray<THeap, TSize, T>& A, BaseFixedArray<THeap, TSize, T>& B) {
-				//TODO: Interlocked Exchange
-				Swap(A.This, B.This);
-			}
 
 			namespace {
 				template<SizeT TSize, typename T>
@@ -303,6 +313,11 @@ namespace Seed {
 				template<typename THeap, SizeT TSize, typename T>
 				struct IsFixedArrayT<Seed::Core::Containers::BaseFixedArray<THeap, TSize, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, SizeT TSize, typename T>
+		__forceinline void Swap(Containers::BaseFixedArray<THeap, TSize, T>& A, Containers::BaseFixedArray<THeap, TSize, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

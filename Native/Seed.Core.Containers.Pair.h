@@ -42,7 +42,7 @@ namespace Seed {
 				void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
 
 				template<typename T>
-				friend void Swap(T& a, T& b);
+				friend void Seed::Core::Swap(T& a, T& b);
 			public:
 				TKey Property(GetKey) Key;
 				TValue Property(GetValue, SetValue) Value;
@@ -60,12 +60,6 @@ namespace Seed {
 				template<typename TKey, typename TValue>
 				using SensitivePair = BasePair<Memory::SensitiveDataHeap, TKey, TValue>;
 			}
-
-			template<typename THeap, typename TKey, typename TValue>
-			void Swap(BasePair<THeap, TKey, TValue>& a, BasePair<THeap, TKey, TValue>& b) {
-				Swap(a.key, b.key);
-				Swap(a.value, b.value);
-			}
 		}
 
 		namespace TypeTraits {
@@ -77,6 +71,13 @@ namespace Seed {
 					using Value = TValue;
 				};
 			}
+		}
+
+
+		template<typename THeap, typename TKey, typename TValue>
+		void Swap(Containers::BasePair<THeap, TKey, TValue>& a, Containers::BasePair<THeap, TKey, TValue>& b) {
+			Swap(a.key, b.key);
+			Swap(a.value, b.value);
 		}
 	}
 }

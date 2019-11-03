@@ -10,7 +10,8 @@ namespace Seed {
 			template<typename THeap, typename TKey, typename TValue>
 			class SeedKernelCall BaseMap :
 				public LINQ::IAssociableCollection<BaseMap, THeap, TKey, TValue, BasePair<THeap, TKey, TValue>, true>,
-				protected IDisposable
+				protected IDisposable,
+				public IClonable<BaseMap<THeap, TKey, TValue>>
 			{
 				struct Tree;
 
@@ -396,6 +397,21 @@ namespace Seed {
 					}
 					return nullptr;
 				}
+
+				///<summary>Рекурсивне копіювання дерева</summary>
+				///<param name = "node">Елемент старого дерева</param>
+				///<param name = "parrent">Батьківський елемент в новому дереві</param>
+				///<param name = "owner">Поінтеер на нове дерево</param>
+				///<returns>Поінтер на новий елемент з під елементами</returns>
+				Node* copyTree(Node* node, Node* parrent, Tree* owner) const {
+					Node* newNode = new Node(node->key, node->value, parrent, owner);
+					newNode->height = node->height;
+					if (node->left != nullptr)
+						newNode->left = copyTree(node->left, newNode, owner);
+					if (node->right != nullptr)
+						newNode->right = copyTree(node->right, newNode, owner);
+					return newNode;
+				}
 			private:
 				///<summary>Наступний елемент</summary>
 				///<param name = "node">Поточний елемент</param>
@@ -549,7 +565,8 @@ namespace Seed {
 						return this->item->data;
 					}
 
-					friend void Swap(Iterator& A, Iterator& B);
+					template<typename U>
+					friend void Seed::Core::Swap(U& A, U& B);
 				};
 
 				friend Iterator;
@@ -592,16 +609,14 @@ namespace Seed {
 					}
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseMap& A, BaseMap& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				///<summary>Оператори підтримки підрахунку силок об'єкта</summary>
-				RefCountClass(BaseMap, This)
+				RefCountClass(BaseMap, This);
 
-					///<summary>Вертає кількість елементів в асоціативному масиві</summary>
-					SizeT getCount() const { return This->count; }
+				///<summary>Вертає кількість елементів в асоціативному масиві</summary>
+				SizeT getCount() const { return This->count; }
 				///<value>Кількість елементів в асоціативному масиві</value>
 				SizeT Property(getCount) Count;
 
@@ -700,6 +715,13 @@ namespace Seed {
 
 				bool IsExist(TKey&& key) const {
 					return Find(This->root, key) != nullptr;
+				}
+
+				virtual BaseMap Clone() const override final {
+					BaseMap result;
+					result.This->count = This->count;
+					result.This->root = copyTree(This->root, nullptr, result.This);
+					return result;
 				}
 			protected:
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
@@ -955,16 +977,6 @@ namespace Seed {
 				}
 			};
 
-			//template<typename THeap, typename TKey, typename TVal>
-			//__forceinline void Swap(BaseMap<THeap, TKey, TVal>::Iterator& A, BaseMap<THeap, TKey, TVal>::Iterator& B) {
-			//	Swap(A.item, B.item);
-			//}
-
-			template<typename THeap, typename TKey, typename TVal>
-			__forceinline void Swap(BaseMap<THeap, TKey, TVal>& A, BaseMap<THeap, TKey, TVal>& B) {
-				Swap(A.This, B.This);
-			}
-
 			///<summary>Шаблон потоко захищеного асоціативного масиву з обнулючим алокатором
 			///<para>
 			/// Внутрішньо реалізований як червоно-чорне дерево.
@@ -1000,6 +1012,16 @@ namespace Seed {
 				template<typename THeap, typename TKey, typename TVal>
 				struct IsMapT<Seed::Core::Containers::BaseMap<THeap, TKey, TVal>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename TKey, typename TVal>
+		__forceinline void Swap(Containers::BaseMap<THeap, TKey, TVal>& A, Containers::BaseMap<THeap, TKey, TVal>& B) {
+			Swap(A.This, B.This);
+		}
+
+		template<typename THeap, typename TKey, typename TVal>
+		__forceinline void Swap(typename Containers::BaseMap<THeap, TKey, TVal>::Iterator& A, typename Containers::BaseMap<THeap, TKey, TVal>::Iterator& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

@@ -14,7 +14,8 @@ namespace Seed {
 			class SeedKernelCall BaseDictionary :
 				public Memory::Allocator<THeap>,
 				public LINQ::IDictionary<BaseDictionary, THeap, TString, TData, BasePair<THeap, TString, TData>, true>,
-				public IDisposable
+				public IDisposable,
+				public IClonable<BaseDictionary<THeap, TString, TData>>
 			{
 				static_assert(TypeTraits::IsSameV<TString, BaseString<THeap>>, "BaseDictionary key must be BaseString<THeap>");
 			private:
@@ -275,7 +276,7 @@ namespace Seed {
 				RootNode* This;
 			private:
 				//Копіювання елементів піддерева
-				NodeSym* create_lex_copy(NodeSym*& orig) {
+				NodeSym* create_lex_copy(NodeSym*& orig) const {
 					NodeSym* copy = new NodeSym(orig->key);
 					if (orig->data != nullptr) copy->data = create_lex_copy(orig->data);
 					if (orig->left != nullptr) copy->left = create_lex_copy(orig->left);
@@ -284,7 +285,7 @@ namespace Seed {
 					return copy;
 				}
 				//Копіювання піддерева
-				NodeLex* create_lex_copy(NodeLex*& orig) {
+				NodeLex* create_lex_copy(NodeLex*& orig) const {
 					NodeLex* copy = new NodeLex(orig->count);
 					if (orig->node_root != nullptr) copy->node_root = create_lex_copy(orig->node_root);
 					if (orig->data != nullptr) {
@@ -293,7 +294,7 @@ namespace Seed {
 					return copy;
 				}
 				//Копіювання системи дерев
-				RootNode* create_lex_copy(RootNode* This) { //-V688
+				RootNode* create_lex_copy(RootNode* This) const { //-V688
 					if (This == nullptr) return nullptr;
 					RootNode* copy = new RootNode();
 					if (This->node != nullptr) copy->node = create_lex_copy(This->node);
@@ -463,10 +464,15 @@ namespace Seed {
 					return ret_val;
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseDictionary& A, BaseDictionary& B);
+				virtual BaseDictionary Clone() const override {
+					BaseDictionary result;
+					result.This->node = create_lex_copy(This->node);
+					result.This->count = This->count;
+					return result;
+				}
+
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				RefCountClass(BaseDictionary, This)
 			protected:
@@ -821,11 +827,6 @@ namespace Seed {
 #pragma endregion
 			};
 
-			template<typename THeap, typename TString, typename T>
-			__forceinline void Swap(BaseDictionary<THeap, TString, T>& A, BaseDictionary<THeap, TString, T>& B) {
-				Swap(A.This, B.This);
-			}
-
 			//Швидкісний словник з стандартним алокатором пам'яті
 			template<typename T>
 			using Dictionary = BaseDictionary<Memory::Heap, BaseString<Memory::Heap>, T>;
@@ -840,6 +841,11 @@ namespace Seed {
 				template<typename THeap, typename TString, typename T>
 				struct IsDictionaryT<Seed::Core::Containers::BaseDictionary<THeap, TString, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename TString, typename T>
+		__forceinline void Swap(Containers::BaseDictionary<THeap, TString, T>& A, Containers::BaseDictionary<THeap, TString, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

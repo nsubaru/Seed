@@ -10,8 +10,9 @@ namespace Seed {
 		namespace Containers {
 			template<typename THeap, typename T>
 			class SeedKernelCall BaseDynamicStack :
-				public LINQ::IDynamicStack<BaseDynamicStack, THeap, T, true>,
-				public IDisposable
+				public LINQ::IDynamicStack<BaseDynamicStack, THeap, T, false>,
+				public IDisposable,
+				public IClonable<BaseDynamicStack<THeap, T>>
 			{
 			private:
 				struct Data {
@@ -96,10 +97,20 @@ namespace Seed {
 					This->bufferSize = This->count;
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseDynamicStack& A, BaseDynamicStack& B);
+				virtual BaseDynamicStack Clone() const override final {
+					BaseDynamicStack result;
+					result.This->bufferSize = This->bufferSize;
+					result.This->count = This->count;
+					result.This->stack = new T[This->bufferSize];
+					for (SizeT i = 0; i < This->count; i++)
+					{
+						result.This->stack[i] = This->stack[i];
+					}
+					return result;
+				}
+
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				SizeT GetCount() { return This->count; }
 				SizeT Property(GetCount) Count;
@@ -341,11 +352,6 @@ namespace Seed {
 				}
 			};
 
-			template<typename THeap, typename T>
-			__forceinline void Swap(BaseDynamicStack<THeap, T>& A, BaseDynamicStack<THeap, T>& B) {
-				Swap(A.This, B.This);
-			}
-
 
 			namespace {
 				template<typename T>
@@ -363,6 +369,11 @@ namespace Seed {
 				template<typename THeap, typename T>
 				struct IsDynamicStackT<Seed::Core::Containers::BaseDynamicStack<THeap, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseDynamicStack<THeap, T>& A, Containers::BaseDynamicStack<THeap, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

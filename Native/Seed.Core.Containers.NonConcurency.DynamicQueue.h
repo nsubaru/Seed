@@ -11,7 +11,8 @@ namespace Seed {
 			template<typename THeap, typename T>
 			class SeedKernelCall BaseDynamicQueue :
 				public LINQ::IDynamicStack<BaseDynamicQueue, THeap, T, true>,
-				public IDisposable
+				public IDisposable,
+				public IClonable<BaseDynamicQueue<THeap, T>>
 			{
 			private:
 				struct Data {
@@ -31,8 +32,7 @@ namespace Seed {
 						rear(0),
 						count(0),
 						RefCount(1),
-						queue(),
-						flowControler()
+						queue()
 					{}
 				};
 			private:
@@ -59,8 +59,8 @@ namespace Seed {
 
 				void Enqueue(const T& Value, bool IsResizeIfFull = false) {
 					if (++This->count > This->bufferSize) {
-						if (!IsResizeIfFull)
-							This->flowControler.WaitForConcumer();
+						if (IsResizeIfFull)
+							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
 						else
 							Throw(NullPointException(ExceptionPosition));
 					}
@@ -72,8 +72,8 @@ namespace Seed {
 
 				void Enqueue(T&& Value, bool IsResizeIfFull = false) {
 					if (++This->count > This->bufferSize) {
-						if (!IsResizeIfFull)
-							This->flowControler.WaitForConcumer();
+						if (IsResizeIfFull)
+							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
 						else
 							Throw(NullPointException(ExceptionPosition));
 					}
@@ -122,13 +122,25 @@ namespace Seed {
 					This->queue = newBuffer;
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseDynamicQueue& A, BaseDynamicQueue& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				SizeT GetCount() { return This->count; }
 				SizeT Property(GetCount) Count;
+
+				virtual BaseDynamicQueue Clone() const override final {
+					BaseDynamicQueue result;
+					result.This->queue = new T[This->bufferSize];
+					result.This->front = This->front;
+					result.This->rear = This->rear;
+					result.This->count = This->count;
+					result.This->bufferSize = This->bufferSize;
+					for (SizeT i = 0; i < This->count; i++)
+					{
+						(*result.This)[i] = (*This)[i];
+					}
+					return result;
+				}
 
 				RefCountClass(BaseDynamicQueue, This)
 			private:
@@ -360,12 +372,6 @@ namespace Seed {
 				}
 			};
 
-			template<typename THeap, typename T>
-			__forceinline void Swap(BaseDynamicQueue<THeap, T>& A, BaseDynamicQueue<THeap, T>& B) {
-				//TODO: Interlocked Exchange
-				Swap(A.This, B.This);
-			}
-
 			namespace {
 				template<typename T>
 				using DynamicQueue = BaseDynamicQueue<Seed::Core::Memory::Heap, T>;
@@ -382,6 +388,11 @@ namespace Seed {
 				template<typename THeap, typename T>
 				struct IsDynamicQueueT<Seed::Core::Containers::BaseDynamicQueue<THeap, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseDynamicQueue<THeap, T>& A, Containers::BaseDynamicQueue<THeap, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

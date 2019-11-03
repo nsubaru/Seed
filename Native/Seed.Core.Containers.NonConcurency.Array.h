@@ -389,18 +389,14 @@ namespace Seed {
 				///<summary>Оптимізований обмін</summary>
 				///<param name = 'A'>Перший елемент</param>
 				///<param name = 'B'>Другий елемент</param>
-				friend void Swap(BaseArray& A, BaseArray& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 			public:
 				SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 			public:
 				RefCountClass(BaseArray, This);
 			};
-
-			template<typename THeap, typename T>
-			__forceinline void Swap(BaseArray<THeap, T>& A, BaseArray<THeap, T>) {
-				Swap(A.This, B.This);
-			}
 
 			namespace {
 				template<typename T>
@@ -481,7 +477,7 @@ namespace Seed {
 					}
 				}
 				BaseVList(const BaseArray<THeap, T>& array) : This(nullptr) {
-					this->This = new Data(array.This->count, static_cast<const T*&>(array.This->array));
+					this->This = new Data(array.This->count, static_cast<T*&>(array.This->array));
 				}
 				BaseVList(BaseArray<THeap, T>&& array) : This(nullptr) {
 					if (--array.This->RefCount == 0) {
@@ -539,9 +535,9 @@ namespace Seed {
 				BaseVList& operator+=(BaseArray<THeap, T>&& array) {
 					if (array.This->RefCount == 1) {
 						if(This->root == nullptr)
-							This->last = This->root = new Node(array.This->count, array.This->array);
+							This->last = This->root = new Node(array.This->count, MoveRValue(array.This->array));
 						else
-							This->last = This->last->next = new Node(array.This->count, array.This->array);
+							This->last = This->last->next = new Node(array.This->count, MoveRValue(array.This->array));
 						This->count = array.This->count;
 						array.This->array = nullptr;
 						array.This->count = 0;
@@ -596,6 +592,9 @@ namespace Seed {
 			public:
 				SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
+
+				template<typename U>
+				friend void Seed::Core::Swap(U& a, U& b);
 			protected:
 				virtual void Dispose() override final {
 					Node* node = This->root;
@@ -949,16 +948,8 @@ namespace Seed {
 				}
 #pragma warning(pop)
 			public:
-				friend void Swap(BaseVList& A, BaseVList& B);
-			public:
 				RefCountClass(BaseVList, This)
 			};
-
-			template<typename THeap, typename T>
-			void Swap(BaseVList<THeap, T>& A, BaseVList<THeap, T>& B) {
-				//TODO: Interlocked exchange
-				Swap(A.This, B.This);
-			}
 
 			namespace {
 				template<typename T>
@@ -979,6 +970,16 @@ namespace Seed {
 				template<typename THeap, typename T>
 				struct IsVListT<Seed::Core::Containers::BaseVList<THeap, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseArray<THeap, T>& A, Containers::BaseArray<THeap, T>) {
+			Swap(A.This, B.This);
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseVList<THeap, T>& A, Containers::BaseVList<THeap, T>) {
+			Swap(A.This, B.This);
 		}
 	}
 }

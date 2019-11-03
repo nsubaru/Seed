@@ -74,13 +74,26 @@ namespace Seed {
 					return This->stack[This->count];
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseFixedStack& A, BaseFixedStack& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				SizeT GetCount() { return This->count; }
 				SizeT Property(GetCount) Count;
+
+				virtual BaseFixedStack Clone() const override final {
+					BaseFixedStack result;
+					result.This->count = This->count;
+					if constexpr (TypeTraits::IsPodV<T>) {
+						Memory::Copy(This->stack, result.This->stack, sizeof(T) * This->count);
+					}
+					else {
+						for (SizeT i = 0; i < This->count; i++)
+						{
+							result.This->stack[i] = This->stack[i];
+						}
+					}
+					return result;
+				}
 
 				RefCountClass(BaseFixedStack, This)
 			protected:
@@ -311,11 +324,6 @@ namespace Seed {
 				}
 			};
 
-			template<typename THeap, SizeT TSize, typename T>
-			__forceinline void Swap(BaseFixedStack<THeap, TSize, T>& A, BaseFixedStack<THeap, TSize, T>& B) {
-				Swap(A.This, B.This);
-			}
-
 			namespace {
 				template<SizeT TSize, typename T>
 				using FixedStack = BaseFixedStack<Seed::Core::Memory::Heap, TSize, T>;
@@ -332,6 +340,11 @@ namespace Seed {
 				template<typename THeap, SizeT TSize, typename T>
 				struct IsFixedStackT<Seed::Core::Containers::BaseFixedStack<THeap, TSize, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, SizeT TSize, typename T>
+		__forceinline void Swap(Containers::BaseFixedStack<THeap, TSize, T>& A, Containers::BaseFixedStack<THeap, TSize, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

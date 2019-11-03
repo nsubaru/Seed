@@ -12,7 +12,8 @@ namespace Seed {
 			template<typename THeap, SizeT TSize, typename T>
 			class SeedKernelCall BaseConcurencyFixedStack :
 				public LINQ::IFixedStack<BaseConcurencyFixedStack, THeap, T, TSize, true>,
-				public IDisposable
+				public IDisposable,
+				public IClonable<BaseConcurencyFixedStack<THeap, TSize, T>>
 			{
 			private:
 				struct Data {
@@ -87,13 +88,28 @@ namespace Seed {
 						});
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseConcurencyFixedStack& A, BaseConcurencyFixedStack& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				SizeT GetCount() { return This->count; }
 				SizeT Property(GetCount) Count;
+
+				virtual BaseConcurencyFixedStack Clone() const override final {
+					return This->lock.ShareLock([&]() {
+						BaseConcurencyFixedStack result;
+						result.This->count = This->count;
+						if constexpr (TypeTraits::IsPodV<T>) {
+							Memory::Copy(This->stack, result.This->stack, sizeof(T) * This->count);
+						}
+						else {
+							for (SizeT i = 0; i < This->count; i++)
+							{
+								result.This->stack[i] = This->stack[i];
+							}
+						}
+						return result;
+						});
+				}
 
 				RefCountClass(BaseConcurencyFixedStack, This)
 			protected:
@@ -323,7 +339,7 @@ namespace Seed {
 				BaseConcurencyFixedStack& ReverseImpl() {
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& {
 						for (SizeT i = 0; i < This->count / 2; i++) {
-							Swap(This->stack[i], This->stack[(This->count - 1) - i]);
+							Seed::Swap(This->stack[i], This->stack[(This->count - 1) - i]);
 						}
 						return *this;
 						});
@@ -357,11 +373,6 @@ namespace Seed {
 				}
 			};
 
-			template<typename THeap, SizeT TSize, typename T>
-			__forceinline void Swap(BaseConcurencyFixedStack<THeap, TSize, T>& A, BaseConcurencyFixedStack<THeap, TSize, T>& B) {
-				Swap(A.This, B.This);
-			}
-
 			namespace {
 				template<SizeT TSize, typename T>
 				using ConcurencyFixedStack = BaseConcurencyFixedStack<Seed::Core::Memory::Heap, TSize, T>;
@@ -378,6 +389,11 @@ namespace Seed {
 				template<typename THeap, SizeT TSize, typename T>
 				struct IsFixedStackT<Seed::Core::Containers::BaseConcurencyFixedStack<THeap, TSize, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, SizeT TSize, typename T>
+		__forceinline void Swap(Containers::BaseConcurencyFixedStack<THeap, TSize, T>& A, Containers::BaseConcurencyFixedStack<THeap, TSize, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

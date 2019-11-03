@@ -31,7 +31,7 @@ namespace Seed {
 				Data* This;
 			protected:
 				virtual void Dispose() override {
-					delete This->array;
+					delete[] This->array;
 				}
 			private:
 				template<typename Lambda>
@@ -448,19 +448,14 @@ namespace Seed {
 				///<summary>Оптимізований обмін</summary>
 				///<param name = 'A'>Перший елемент</param>
 				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseConcurencyArray& A, BaseConcurencyArray& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 			public:
 				SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 			public:
 				RefCountClass(BaseConcurencyArray, This);
 			};
-
-			template<typename THeap, typename T>
-			__forceinline void Swap(BaseConcurencyArray<THeap, T>& A, BaseConcurencyArray<THeap, T>) {
-				//TODO: Interlocked Exchange
-				Swap(A.This, B.This);
-			}
 
 			namespace {
 				template<typename T>
@@ -487,6 +482,17 @@ namespace Seed {
 					forceinline Node(SizeT size) : size(size), arr(new T[size]), next(nullptr) {}
 					forceinline Node(SizeT size, T*&& arr) : size(size), arr(arr), next(nullptr) {}
 					forceinline Node(SizeT size, const T*& arr) : size(size), arr(new T[size]), next(nullptr) {
+						if constexpr (TypeTraits::IsPodV<T>) {
+							Memory::Copy(arr, this->arr, sizeof(T) * size);
+						}
+						else {
+							for (SizeT i = 0; i < size; i++)
+							{
+								this->arr[i] = arr[i];
+							}
+						}
+					}
+					forceinline Node(SizeT size, T*& arr) : size(size), arr(new T[size]), next(nullptr) {
 						if constexpr (TypeTraits::IsPodV<T>) {
 							Memory::Copy(arr, this->arr, sizeof(T) * size);
 						}
@@ -605,9 +611,9 @@ namespace Seed {
 						else {
 							return array.This->lock.ShareLock([&]() -> BaseConcurencyVList& {
 								if (This->root == nullptr)
-									This->root = This->last = new Node(array.This->count, static_cast<const T*&>(array.This->array));
+									This->root = This->last = new Node(array.This->count, static_cast<T*&>(array.This->array));
 								else
-									This->last = This->last->next = new Node(array.This->count, static_cast<const T*&>(array.This->array));
+									This->last = This->last->next = new Node(array.This->count, static_cast<T*&>(array.This->array));
 								This->count = This->count + array.This->count;
 								return *this;
 								});
@@ -652,6 +658,9 @@ namespace Seed {
 						return result;
 						});
 				}
+			public:
+				template<typename U>
+				friend void Seed::Core::Swap(U& a, U& b);
 			protected:
 				virtual void Dispose() override final {
 					This->lock.ExclusiveLock([&]() {
@@ -1086,6 +1095,18 @@ namespace Seed {
 				template<typename THeap, typename T>
 				struct IsVListT<Seed::Core::Containers::BaseConcurencyVList<THeap, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseConcurencyArray<THeap, T>& A, Containers::BaseConcurencyArray<THeap, T>) {
+			//TODO: Interlocked Exchange
+			Swap(A.This, B.This);
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseConcurencyVList<THeap, T>& A, Containers::BaseConcurencyVList<THeap, T>) {
+			//TODO: Interlocked Exchange
+			Swap(A.This, B.This);
 		}
 	}
 }

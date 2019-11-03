@@ -13,7 +13,8 @@ namespace Seed {
 			template<typename THeap, typename T>
 			class SeedKernelCall BaseConcurencyDynamicStack :
 				public LINQ::IDynamicStack<BaseConcurencyDynamicStack, THeap, T, true>,
-				public IDisposable
+				public IDisposable,
+				public IClonable<BaseConcurencyDynamicStack<THeap, T>>
 			{
 			private:
 				struct Data {
@@ -116,10 +117,25 @@ namespace Seed {
 				///<summary>Оптимізований обмін</summary>
 				///<param name = 'A'>Перший елемент</param>
 				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseConcurencyDynamicStack& A, BaseConcurencyDynamicStack& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 
 				SizeT GetCount() { return This->count; }
 				SizeT Property(GetCount) Count;
+
+				virtual BaseConcurencyDynamicStack Clone() const override final {
+					return This->lock.ShareLock([&]() {
+						BaseConcurencyDynamicStack result;
+						result.This->bufferSize = This->bufferSize;
+						result.This->count = This->count;
+						result.This->stack = new T[This->bufferSize];
+						for (SizeT i = 0; i < This->count; i++)
+						{
+							result.This->stack[i] = This->stack[i];
+						}
+						return result;
+						});
+				}
 
 				RefCountClass(BaseConcurencyDynamicStack, This)
 			private:
@@ -236,7 +252,7 @@ namespace Seed {
 						}));
 				}
 
-				template<typename LambdaT>
+				template<typename U, typename LambdaT>
 				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						if (This->count == 0)
@@ -407,12 +423,6 @@ namespace Seed {
 				}
 			};
 
-			template<typename THeap, typename T>
-			__forceinline void Swap(BaseConcurencyDynamicStack<THeap, T>& A, BaseConcurencyDynamicStack<THeap, T>& B) {
-				Swap(A.This, B.This);
-			}
-
-
 			namespace {
 				template<typename T>
 				using ConcurencyDynamicStack = BaseConcurencyDynamicStack<Seed::Core::Memory::Heap, TSize, T>;
@@ -430,5 +440,11 @@ namespace Seed {
 				struct IsDynamicStackT<Seed::Core::Containers::BaseConcurencyDynamicStack<THeap, T>> : LogicTrue {};
 			}
 		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap<Containers::BaseConcurencyDynamicStack<THeap, T>>(Containers::BaseConcurencyDynamicStack<THeap, T>& A, Containers::BaseConcurencyDynamicStack<THeap, T>& B) {
+			Swap(A.This, B.This);
+		}
 	}
 }
+

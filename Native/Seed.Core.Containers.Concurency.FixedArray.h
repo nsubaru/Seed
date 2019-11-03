@@ -14,7 +14,9 @@ namespace Seed {
 			class SeedKernelCall BaseConcurencyFixedArray final :
 				Seed::IDisposable,
 				public LINQ::IFixedArray<BaseConcurencyFixedArray, THeap, T, TSize, true>,
-				public Memory::Allocator<THeap> {
+				public Memory::Allocator<THeap>,
+				public IClonable<BaseConcurencyFixedArray<THeap, TSize, T>>
+				{
 			private:
 				struct Data : public Memory::Allocator<THeap> {
 					Seed::RefCountT RefCount;
@@ -303,28 +305,38 @@ namespace Seed {
 #pragma warning(pop)
 			public:
 				constexpr T& operator[](SizeT Index) {
-					return This->lock.SharedLock([&]() -> T& {
+					return This->lock.ShareLock([&]() -> T& {
 						return This->array[Index];
 						});
 				}
 				constexpr const T& operator[](SizeT Index) const {
-					return This->lock.SharedLock([&]() -> const T& {
+					return This->lock.ShareLock([&]() -> const T& {
 						return This->array[Index];
 						});
 				}
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseConcurencyFixedArray& A, BaseConcurencyFixedArray& B);
+#pragma warning(push)
+#pragma warning(disable : 4996)
+				virtual BaseConcurencyFixedArray Clone() const override final {
+					return This->lock.ShareLock([&]() {
+						BaseConcurencyFixedArray result;
+						if constexpr (TypeTraits::IsPodV<T>) {
+							Memory::Copy(This->array, result.This->array, TSize * sizeof(T));
+						}
+						else {
+							for (SizeT i = 0; i < TSize; i++)
+							{
+								result.This->array[i] = This->array[i];
+							}
+						}
+						return result;
+						});
+				}
+#pragma warning(pop)
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 			public:
 				RefCountClass(BaseConcurencyFixedArray, This)
 			};
-
-			template<typename THeap, SizeT TSize, typename T>
-			__forceinline void Swap(BaseConcurencyFixedArray<THeap, TSize, T>& A, BaseConcurencyFixedArray<THeap, TSize, T>& B) {
-				//TODO: Interlocked Exchange
-				Swap(A.This, B.This);
-			}
 
 			namespace {
 				template<SizeT TSize, typename T>
@@ -342,6 +354,12 @@ namespace Seed {
 				template<typename THeap, SizeT TSize, typename T>
 				struct IsFixedArrayT<Seed::Core::Containers::BaseConcurencyFixedArray<THeap, TSize, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, SizeT TSize, typename T>
+		__forceinline void Swap(Containers::BaseConcurencyFixedArray<THeap, TSize, T>& A, Containers::BaseConcurencyFixedArray<THeap, TSize, T>& B) {
+			//TODO: Interlocked Exchange
+			Swap(A.This, B.This);
 		}
 	}
 }

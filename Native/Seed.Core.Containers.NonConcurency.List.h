@@ -12,7 +12,8 @@ namespace Seed {
 			class SeedKernelCall BaseList final :
 				protected IDisposable,
 				public Memory::Allocator<THeap>,
-				public LINQ::IList<BaseList, THeap, T, true>
+				public LINQ::IList<BaseList, THeap, T, true>,
+				public IClonable<BaseList<THeap, T>>
 			{
 			private:
 #pragma region Internal storage struct
@@ -545,11 +546,8 @@ namespace Seed {
 					}
 #pragma endregion
 #pragma endregion
-
-					///<summary>ќптим≥зований обм≥н</summary>
-					///<param name = 'A'>ѕерший елемент</param>
-					///<param name = 'B'>ƒругий елемент</param>
-					__forceinline friend void Swap(Iterator& A, Iterator& B);
+					template<typename U>
+					friend void Seed::Core::Swap(U& A, U& B);
 
 					///<summary>ƒеструктор ≥тератора
 					///<para>якщо елемент Ї останьою силкою на об'Їкт то в≥дбуваЇтьс€ знищенн€ об'Їкта
@@ -867,15 +865,28 @@ namespace Seed {
 					}
 				}
 
-				///<summary>ќптим≥зований обм≥н</summary>
-				///<param name = 'A'>ѕерший елемент</param>
-				///<param name = 'B'>ƒругий елемент</param>
-				__forceinline friend void Swap(BaseList& A, BaseList& B);
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 			public:
 				RefCountClass(BaseList, This)
 			public:
 				SizeT getCount() { return This->size; }
 				SizeT Property(getCount) Count;
+			public:
+				virtual BaseList Clone() const override final {
+					BaseList result;
+					result.This->size = This->size;
+					elem* node = This->root;
+					if (node != nullptr) {
+						This->root = This->last = new elem(node->value, result.This);
+						node = node->next;
+						while (node != nullptr) {
+							This->last = This->last->prev = new elem(node->value, result.This, This->last);
+							node = node->next;
+						}
+					}
+					return result;
+				}
 			protected:
 				template<template<typename, typename> typename, typename, typename, Boolean, Boolean>
 				friend class LINQ::ICollection;
@@ -1203,7 +1214,7 @@ namespace Seed {
 						current->next = temp;
 						current = current->prev;
 					}
-					Swap(This->root, This->last);
+					Seed::Swap(This->root, This->last);
 					return *this;
 				}
 
@@ -1474,16 +1485,6 @@ namespace Seed {
 #pragma warning(pop)
 			};
 
-			//template<typename THeap, typename T>
-			//__forceinline void Swap(BaseList<THeap, T>::Iterator& A, BaseList<THeap, T>::Iterator& B) {
-			//	Swap(A.This, B.This);
-			//}
-
-			template<typename THeap, typename T>
-			__forceinline void Swap(BaseList<THeap, T>& A, BaseList<THeap, T>& B) {
-				Swap(A.This, B.This);
-			}
-
 #pragma endregion
 #pragma region Partical implementation for default and sensitive heaps
 
@@ -1520,6 +1521,16 @@ namespace Seed {
 				template<typename THeap, typename T>
 				struct IsListT<Seed::Core::Containers::BaseList<THeap, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseList<THeap, T>& A, Containers::BaseList<THeap, T>& B) {
+			Swap(A.This, B.This);
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(typename Containers::BaseList<THeap, T>::Iterator& A, typename Containers::BaseList<THeap, T>::Iterator& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

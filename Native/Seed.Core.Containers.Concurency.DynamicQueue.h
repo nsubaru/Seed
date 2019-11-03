@@ -13,7 +13,8 @@ namespace Seed {
 			template<typename THeap, typename T>
 			class SeedKernelCall BaseConcurencyDynamicQueue :
 				public LINQ::IDynamicStack<BaseConcurencyDynamicQueue, THeap, T, true>,
-				public IDisposable
+				public IDisposable,
+				public IClonable<BaseConcurencyDynamicQueue<THeap, T>>
 			{
 			private:
 				struct Data {
@@ -141,10 +142,27 @@ namespace Seed {
 				///<summary>Оптимізований обмін</summary>
 				///<param name = 'A'>Перший елемент</param>
 				///<param name = 'B'>Другий елемент</param>
-				__forceinline friend void Swap(BaseConcurencyDynamicQueue& A, BaseConcurencyDynamicQueue& B);
+				template<typename U>
+				__forceinline friend void Seed::Core::Swap(U& A, U& B);
 
 				SizeT GetCount() { return This->count; }
 				SizeT Property(GetCount) Count;
+
+				virtual BaseConcurencyDynamicQueue Clone() const override final {
+					return This->flowControler.SharedLock([&]() {
+						BaseConcurencyDynamicQueue result;
+						result.This->queue = new T[This->bufferSize];
+						result.This->front = This->front;
+						result.This->rear = This->rear;
+						result.This->count = This->count;
+						result.This->bufferSize = This->bufferSize;
+						for (SizeT i = 0; i < This->count; i++)
+						{
+							(*result.This)[i] = (*This)[i];
+						}
+						return result;
+						});
+				}
 
 				RefCountClass(BaseConcurencyDynamicQueue, This)
 			private:
@@ -370,7 +388,7 @@ namespace Seed {
 					return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
 						for (SizeT i = 0; i < This->count / 2; i++)
 						{
-							Swap((*This)[i], (*This)[(This->count - 1) - i]);
+							Seed::Swap((*This)[i], (*This)[(This->count - 1) - i]);
 						}
 						return *this;
 						});
@@ -425,12 +443,6 @@ namespace Seed {
 				}
 			};
 
-			template<typename THeap, typename T>
-			__forceinline void Swap(BaseConcurencyDynamicQueue<THeap, T>& A, BaseConcurencyDynamicQueue<THeap, T>& B) {
-				//TODO: Interlocked Exchange
-				Swap(A.This, B.This);
-			}
-
 			namespace {
 				template<typename T>
 				using ConcurencyDynamicQueue = BaseConcurencyDynamicQueue<Seed::Core::Memory::Heap, T>;
@@ -447,6 +459,12 @@ namespace Seed {
 				template<typename THeap, typename T>
 				struct IsDynamicQueueT<Seed::Core::Containers::BaseConcurencyDynamicQueue<THeap, T>> : LogicTrue {};
 			}
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseConcurencyDynamicQueue<THeap, T>& A, Containers::BaseConcurencyDynamicQueue<THeap, T>& B) {
+			//TODO: Interlocked Exchange
+			Swap(A.This, B.This);
 		}
 	}
 }
