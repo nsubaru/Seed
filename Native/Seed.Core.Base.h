@@ -4,6 +4,7 @@
 #pragma warning(disable: 26444)
 
 #include "Seed.Core.Base.Types.h"
+#include "Seed.Core.Base.Interlocked.h"
 #include "Seed.Core.Base.Math.h"
 #include "Seed.Core.Base.BitOperations.h"
 #include "Seed.Core.Base.CStr.h"
@@ -94,40 +95,40 @@ namespace Seed {
                 count(Count) {};
 
             ///<summary>Префіксний інкремент
-            ///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
+            ///<para>Використовує функцію <code>InterlockedIncrement</code> для інкременту</para>
             ///</summary>
             ///<returns>Вертає силку на елемент після інкременту</returns>
             __forceinline RefCountT& operator++() {
-                this->count++;
+                Interlocked::Increment(static_cast<volatile SizeT&>(this->count));
                 return *this;
             }
 
             ///<summary>Постфіксний інкремент
-            ///<para>Використовує функцію <code>InterlockedIncrementSizeTNoFence</code> для інкременту</para>
+            ///<para>Використовує функцію <code>InterlockedIncrement</code> для інкременту</para>
             ///</summary>
             ///<returns>Вертає копію об'єкта до інкремента</returns>
             __forceinline RefCountT operator++(int) {
                 auto cp = *this;
-                ++this->count;
+                Interlocked::Increment(static_cast<volatile SizeT&>(this->count));
                 return cp;
             }
 
             ///<summary>Префіксний декремент
-            ///<para>Використовує функцію <code>InterlockedDecrementSizeTNoFence</code> для декременту</para>
+            ///<para>Використовує функцію <code>InterlockedDecrement/code> для декременту</para>
             ///</summary>
             ///<returns>Вертає силку на елемент після декременту</returns>
             __forceinline RefCountT& operator--() {
-                this->count--;
+                Interlocked::Decrement(static_cast<volatile SizeT&>(this->count));
                 return *this;
             }
 
             ///<summary>Постфіксний декремент
-            ///<para>Використовує функцію <code>InterlockedDecrementSizeTNoFence</code> для декременту</para>
+            ///<para>Використовує функцію <code>InterlockedDecrementSize</code> для декременту</para>
             ///</summary>
             ///<returns>Вертає копію об'єкта до декременту</returns>
             __forceinline RefCountT operator--(int) {
                 auto cp = *this;
-                this->count--;
+                Interlocked::Decrement(static_cast<volatile SizeT&>(this->count));
                 return cp;
             }
 
