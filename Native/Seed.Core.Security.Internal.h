@@ -94,16 +94,16 @@
 //
 //				interface ISecurityAuthority
 //				{
-//					Token Login(const SecuredString & UserName, const Array<Byte> & PswdHash);
-//					Token RestricedLogin(const SecuredString & UserName, const Array<Byte> & PswdHash, SystemRightsMask Restriction);
+//					Token Login(const SensitiveString & UserName, const Array<Byte> & PswdHash);
+//					Token RestricedLogin(const SensitiveString & UserName, const Array<Byte> & PswdHash, SystemRightsMask Restriction);
 //
 //					void Logoff(Token && token);
 //
 //					IInternalUser & GetUserByID(const UserIDType & userID);
-//					IInternalUser & GetUserByName(const SecuredString & userName);
+//					IInternalUser & GetUserByName(const SensitiveString & userName);
 //
 //					IInternalGroup & GetGroupByID(const UserIDType & userID);
-//					IInternalGroup & GetGroupByName(const SecuredString & userName);
+//					IInternalGroup & GetGroupByName(const SensitiveString & userName);
 //
 //					Boolean AddUserToGroup(UserIDType user, GroupIDType & group);
 //					Boolean RemoveUserFromGroup(UserIDType user, GroupIDType & group);
@@ -115,8 +115,8 @@
 //
 //					Boolean IsUserInGroup(IUser & user, IGroup & group);
 //
-//					Boolean CreateUser(SecuredString & name, SecuredString & fullName, Array<GroupIDType> groups, Array<Byte> HashPswd);
-//					Boolean CreateGroup(SecuredString & name, SecuredString & fullName, Array<GroupIDType> groups, Array<UserIDType> members);
+//					Boolean CreateUser(SensitiveString & name, SensitiveString & fullName, Array<GroupIDType> groups, Array<Byte> HashPswd);
+//					Boolean CreateGroup(SensitiveString & name, SensitiveString & fullName, Array<GroupIDType> groups, Array<UserIDType> members);
 //
 //					Boolean DeleteUser(UserIDType id);
 //					Boolean DeleteGroup(GroupIDType id);

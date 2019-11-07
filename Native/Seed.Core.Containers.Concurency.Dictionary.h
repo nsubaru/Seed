@@ -902,7 +902,7 @@ namespace Seed {
 
 			//Швидкісний словник з захищеним алокатором пам'яті
 			template<typename T>
-			using SecuredConcurencyDictionary = BaseConcurencyDictionary<Memory::SensitiveDataHeap, BaseString<Memory::Heap>, T>;
+			using ConcurencySensitiveDictionary = BaseConcurencyDictionary<Memory::SensitiveDataHeap, BaseString<Memory::Heap>, T>;
 		}
 
 		namespace TypeTraits {

@@ -464,7 +464,7 @@ namespace Seed {
 
 			namespace {
 				template<typename T>
-				using SensitiveConcurencyArray = BaseConcurencyArray<Seed::Core::Memory::SensitiveDataHeap, T>;
+				using ConcurencySensitiveArray = BaseConcurencyArray<Seed::Core::Memory::SensitiveDataHeap, T>;
 			}
 
 			template<typename THeap, typename T>

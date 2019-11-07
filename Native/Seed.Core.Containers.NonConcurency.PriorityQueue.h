@@ -56,7 +56,7 @@ namespace Seed {
 #pragma warning(push)
 //Visual Studio bug, next and prev init as this
 #pragma warning(disable: 26495)
-					Node(Pair&& data) :
+					__forceinline Node(Pair&& data) :
 						data(MoveRValue(data)),
 						prev(this),
 						next(this),
@@ -66,7 +66,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					Node(const Pair& data) :
+					__forceinline Node(const Pair& data) :
 						data(data),
 						prev(this),
 						next(this),
@@ -76,7 +76,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					Node(const Pair& data, Node* prev) :
+					__forceinline Node(const Pair& data, Node* prev) :
 						data(data),
 						prev(prev),
 						next(this),
@@ -86,7 +86,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					Node(Pair&& data, Node* prev) :
+					__forceinline Node(Pair&& data, Node* prev) :
 						data(MoveRValue(data)),
 						prev(prev),
 						next(this),
@@ -104,7 +104,7 @@ namespace Seed {
 					RefCountT RefCount;
 					SizeT MaxSize;
 
-					Tree(SizeT MaxSize) :
+					__forceinline Tree(SizeT MaxSize) :
 						heap(nullptr),
 						Count(0),
 						RefCount(1),
@@ -113,7 +113,7 @@ namespace Seed {
 				};
 				Tree* This;
 			protected:
-				virtual void Dispose() {
+				__forceinline virtual void Dispose() {
 					if (This->heap != nullptr) {
 						deleteAll(const_cast<Node*>(This->heap));
 						This->heap = nullptr;
@@ -121,23 +121,23 @@ namespace Seed {
 					}
 				}
 			public:
-				BasePriorityQueue() : This(new Tree(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)) {}
-				BasePriorityQueue(SizeT MaxSize) : This(new Tree(MaxSize)) {}
-				BasePriorityQueue(InitilizerList<Pair>&& list) : 
+				__forceinline BasePriorityQueue() : This(new Tree(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)) {}
+				__forceinline BasePriorityQueue(SizeT MaxSize) : This(new Tree(MaxSize)) {}
+				__forceinline BasePriorityQueue(InitilizerList<Pair>&& list) :
 					BasePriorityQueue(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize + list.size()){
 					for (auto&& item : list) {
 						This->heap = merge(This->heap, new Node(MoveRValue(item)));
 					}
 					This->Count = list.size();
 				}
-				BasePriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : BasePriorityQueue(MaxSize) {
+				__forceinline BasePriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : BasePriorityQueue(MaxSize) {
 					for (auto&& item : list) {
 						This->heap = merge(This->heap, new Node(MoveRValue(item)));
 					}
 					This->Count = list.size();
 				}
 
-				void Insert(const TPriority& priority, const TValue& key) {
+				__forceinline void Insert(const TPriority& priority, const TValue& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(priority, key));
@@ -145,7 +145,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				void Insert(TPriority&& priority, const TValue& key) {
+				__forceinline void Insert(TPriority&& priority, const TValue& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(MoveRValue(priority), key));
@@ -153,7 +153,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				void Insert(const TPriority& priority, TValue&& key) {
+				__forceinline void Insert(const TPriority& priority, TValue&& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(priority, MoveRValue(key)));
@@ -161,7 +161,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				void Insert(TPriority&& priority, TValue&& key) {
+				__forceinline void Insert(TPriority&& priority, TValue&& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(MoveRValue(priority), MoveRValue(key)));
@@ -169,7 +169,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				void Insert(const Pair& itemValue) {
+				__forceinline void Insert(const Pair& itemValue) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(itemValue));
@@ -177,7 +177,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				void Insert(Pair&& itemValue) {
+				__forceinline void Insert(Pair&& itemValue) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(MoveRValue(itemValue));
@@ -185,19 +185,19 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				bool getIsEmpty() {
+				__forceinline bool getIsEmpty() {
 					return This->heap == nullptr;
 				}
 
-				SizeT getCount() {
+				__forceinline SizeT getCount() {
 					return this->This->Count;
 				}
 
-				const TPriority& getFirstItemPriority() {
+				__forceinline const TPriority& getFirstItemPriority() {
 					return This->heap->data.Key;
 				}
 
-				const TPriority& discardFirstItem() {
+				__forceinline const TPriority& discardFirstItem() {
 					Node* old = This->heap;
 					This->heap = removeMinimum(This->heap);
 					const TPriority& ret = old->data.Key;
@@ -205,7 +205,7 @@ namespace Seed {
 					return ret;
 				}
 
-				TValue Dequeu() {
+				__forceinline TValue Dequeu() {
 					while (this->This->Count == 0) {
 						Throw(NullPointException(ExceptionPosition));
 					}
@@ -220,7 +220,7 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
-				virtual BasePriorityQueue Clone() const override final {
+				__forceinline virtual BasePriorityQueue Clone() const override final {
 					BasePriorityQueue result;
 
 					result.This->Count = This->Count;
@@ -233,7 +233,7 @@ namespace Seed {
 				Boolean Property(getIsEmpty) IsEmpty;
 				SizeT Property(getCount) Count;
 			private:
-				Node* merge(Node* a, Node* b) {
+				__forceinline Node* merge(Node* a, Node* b) {
 					if (a == nullptr) return b;
 					if (b == nullptr) return a;
 					if (a->data.Key > b->data.Key) {
@@ -250,7 +250,7 @@ namespace Seed {
 					return a;
 				}
 
-				static void deleteAll(Node* n) {
+				__forceinline static void deleteAll(Node* n) {
 					if (n != nullptr) {
 						Node* c = n;
 						do {
@@ -262,14 +262,14 @@ namespace Seed {
 					}
 				}
 
-				void addChild(Node* parent, Node* child) {
+				__forceinline void addChild(Node* parent, Node* child) {
 					child->prev = child->next = child;
 					child->parent = parent;
 					parent->degree++;
 					parent->child = merge(parent->child, child);
 				}
 
-				void _unMarkAndUnParentAll(Node* n) {
+				__forceinline void _unMarkAndUnParentAll(Node* n) {
 					if (n == nullptr)return;
 					Node* c = n;
 					do {
@@ -279,7 +279,7 @@ namespace Seed {
 					} while (c != n);
 				}
 
-				Node* removeMinimum(Node* n) {
+				__forceinline Node* removeMinimum(Node* n) {
 					_unMarkAndUnParentAll(n->child);
 					if (n->next == n) {
 						n = n->child;
@@ -335,7 +335,7 @@ namespace Seed {
 					return min;
 				}
 
-				Node* cut(Node* heap, Node* n) {
+				__forceinline Node* cut(Node* heap, Node* n) {
 					if (n->next == n) {
 						n->parent->child = nullptr;
 					}
@@ -349,7 +349,7 @@ namespace Seed {
 					return merge(heap, n);
 				}
 
-				Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
+				__forceinline Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
 					if (n->data.Key < priority)return heap;
 					n->data = Pair(priority, MoveRValue(n->data.Value));
 					if (n->data.Key < n->parent->data.Key) {
@@ -368,7 +368,7 @@ namespace Seed {
 					return heap;
 				}
 
-				Node* find(Node* heap, const TPriority& priority) {
+				__forceinline Node* find(Node* heap, const TPriority& priority) {
 					Node* n = heap;
 					if (n == nullptr) return nullptr;
 					do {
@@ -380,7 +380,7 @@ namespace Seed {
 					return nullptr;
 				}
 
-				Node* copyTree(Node* orig, Node* parrent) const {
+				__forceinline Node* copyTree(Node* orig, Node* parrent) const {
 					Node* newNode = nullptr;
 					Node* newNodeFirst = nullptr;
 					try {
@@ -643,7 +643,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				void deleteAll(Node* n, Lambda& lambda) {
+				__forceinline void deleteAll(Node* n, Lambda& lambda) {
 					if (n != nullptr) {
 						Node* c = n;
 						do {
@@ -676,7 +676,7 @@ namespace Seed {
 
 			namespace {
 				template<typename TKey, typename TVal>
-				using SecuredPriorityQueue = BasePriorityQueue<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
+				using SensitivePriorityQueue = BasePriorityQueue<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
 			}
 
 			namespace {

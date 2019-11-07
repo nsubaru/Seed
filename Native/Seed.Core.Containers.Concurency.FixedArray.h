@@ -345,7 +345,7 @@ namespace Seed {
 
 			namespace {
 				template<SizeT TSize, typename T>
-				using SensitiveConcurencyFixedArray = BaseConcurencyFixedArray<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
+				using ConcurencySensitiveFixedArray = BaseConcurencyFixedArray<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
 			}
 		}
 

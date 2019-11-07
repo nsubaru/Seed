@@ -2194,7 +2194,7 @@ namespace Seed {
 		///<summary>Простий рядок</summary>
 		namespace { using String = BaseString<Memory::Heap>; }
 		///<summary>Рядок для збереження конфіденційної інформації</summary>
-		namespace { using SecuredString = BaseString<Memory::SensitiveDataHeap>; }
+		namespace { using SensitiveString = BaseString<Memory::SensitiveDataHeap>; }
 #pragma warning(pop)
 
 		namespace TypeTraits {

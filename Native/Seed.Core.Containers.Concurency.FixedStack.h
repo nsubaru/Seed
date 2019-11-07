@@ -380,7 +380,7 @@ namespace Seed {
 
 			namespace {
 				template<SizeT TSize, typename T>
-				using SensitiveConcurencyFixedStack = BaseConcurencyFixedStack<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
+				using ConcurencySensitiveFixedStack = BaseConcurencyFixedStack<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
 			}
 		}
 

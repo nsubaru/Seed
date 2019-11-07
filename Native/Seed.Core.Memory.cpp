@@ -34,11 +34,11 @@ static struct HeapDataT
 	///<summary>ƒескриптор куч≥</summary>
 	Handle HeapHandle;
 	///<summary>ѕоточне використанн€ куч≥</summary>
-	SizeT AllocatedMemory;
+	volatile SizeT AllocatedMemory;
 	///<summary>ѕоточна к≥льк≥сть вид≥лених блок≥в</summary>
-	SizeT AllocatedMemBlksCount;
+	volatile SizeT AllocatedMemBlksCount;
 	///<summary>‘актичне використанн€ пам'€т≥ кучею</summary>
-	SizeT CurrentHeapSize;
+	volatile SizeT CurrentHeapSize;
 } HeapData, SecureHeapData;
 
 __forceinline static HeapDataT& GetInternalHeapData() {
@@ -220,8 +220,8 @@ void* GenericFree(void* MemBlk)
 	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//якщо вдало то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&HeapData.AllocatedMemory), -static_cast<LONG64>(DataSize));
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&HeapData.CurrentHeapSize), -static_cast<LONG64>(FullSize));
 		return nullptr;
 	}
 	//якщо н≥ то генеруЇм помилку NullPointException
@@ -248,8 +248,8 @@ void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq)
 	if (RtlFreeHeap(HeapData.HeapHandle, 0, RealPtr)) {
 		//якшо усп≥шно то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&HeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&HeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&HeapData.AllocatedMemory), -static_cast<LONG64>(DataSize));
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&HeapData.CurrentHeapSize), -static_cast<LONG64>(FullSize));
 		return nullptr;
 	}
 	//якщо н≥ то генеруЇм помилку NullPointException
@@ -401,8 +401,8 @@ DeprecatedCall("Ќизькор≥внева робота з пам'€тю") void* Seed::Core::Memory::Sensi
 	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//якщо вдало то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&SecureHeapData.AllocatedMemory), -static_cast<LONG64>(DataSize));
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&SecureHeapData.CurrentHeapSize), -static_cast<LONG64>(FullSize));
 		return nullptr;
 	}
 	//якщо н≥ то генеруЇм помилку NullPointException
@@ -431,8 +431,8 @@ DeprecatedCall("Ќизькор≥внева робота з пам'€тю") void* Seed::Core::Memory::Sensi
 	if (RtlFreeHeap(SecureHeapData.HeapHandle, 0, RealPtr)) {
 		//якшо усп≥шно то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&SecureHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&SecureHeapData.AllocatedMemory), -static_cast<LONG64>(DataSize));
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&SecureHeapData.CurrentHeapSize), -static_cast<LONG64>(FullSize));
 		return nullptr;
 	}
 	//якщо н≥ то генеруЇм помилку NullPointException
@@ -477,8 +477,8 @@ DeprecatedCall("Ќизькор≥внева робота з пам'€тю") void* InternalHeapFree(void* Me
 	if (RtlFreeHeap(RtlProcessHeap(), 0, RealPtr)) {
 		//якщо вдало то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&InternalHeapData.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&InternalHeapData.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&InternalHeapData.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&InternalHeapData.AllocatedMemory), -static_cast<LONG64>(DataSize));
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&InternalHeapData.CurrentHeapSize), -static_cast<LONG64>(FullSize));
 		return nullptr;
 	}
 	//якщо н≥ то генеруЇм помилку NullPointException

@@ -1960,678 +1960,757 @@
 
 namespace Seed {
 	inline namespace Core {
-		template <typename... Ts_>
-		class Tuple;
+		namespace Containers
+		{
+			template <typename... Ts_>
+			class Tuple;
 
-		namespace TupleImpl {
-			using namespace TypeTraits;
+			namespace TupleImpl
+			{
+				using namespace TypeTraits;
 
 #pragma region TupleLeaf
-			// TupleLeaf
+				// TupleLeaf
 
-			template <size_t I_, typename ValueType_,
-				bool IsEmpty_ = IsEmptyV<ValueType_>
-				&& !IsFinalV<ValueType_>
-			>
-				class TupleLeaf;
+				template <size_t I_, typename ValueType_,
+					bool IsEmpty_ = IsEmptyV<ValueType_>
+					&& !IsFinalV<ValueType_>
+				>
+					class TupleLeaf;
 
-			template <SizeT I, typename ValueType, bool IsEmpty>
-			constexpr inline void Swap(TupleLeaf<I, ValueType, IsEmpty>& a,
-				TupleLeaf<I, ValueType, IsEmpty>& b) {
-				Swap(a.get(), b.get());
-			}
-
-			template <SizeT I_, typename ValueType_, bool IsEmpty_>
-			class TupleLeaf {
-				ValueType_ value_;
-
-				TupleLeaf& operator=(const TupleLeaf&) = delete;
-			public:
-				constexpr TupleLeaf()
-					: value_() {
-					static_assert(!IsReferenceV<ValueType_>,
-						"Attempt to default construct a reference element in a tuple");
+				template <SizeT I, typename ValueType, bool IsEmpty>
+				constexpr inline void Swap(TupleLeaf<I, ValueType, IsEmpty>& a,
+										   TupleLeaf<I, ValueType, IsEmpty>& b)
+				{
+					Swap(a.get(), b.get());
 				}
 
-				constexpr TupleLeaf(const TupleLeaf& t)
-					: value_(t.get()) {
-					static_assert(!IsRValueReferenceV<ValueType_>,
-						"Can not copy a tuple with rvalue reference member");
-				}
+				template <SizeT I_, typename ValueType_, bool IsEmpty_>
+				class TupleLeaf
+				{
+					ValueType_ value_;
 
-				template <typename T, typename = typename EnableIfT<
-					IsConstructibleT<ValueType_, T>>>
-					constexpr explicit TupleLeaf(T&& t)
-					: value_(ForwardReference<T>(t)) {
-					static_assert(!IsReferenceV<ValueType_> ||
-						IsLValueReferenceV<ValueType_> ||
-						(IsRValueReferenceV<ValueType_> &&
-							!IsLValueReferenceV<T>),
-						"Attempted to construct a reference element in a tuple with an rvalue");
-				}
+					TupleLeaf& operator=(const TupleLeaf&) = delete;
+				public:
+					constexpr TupleLeaf()
+						: value_()
+					{
+						static_assert(!IsReferenceV<ValueType_>,
+									  "Attempt to default construct a reference element in a tuple");
+					}
 
-				template <typename T>
-				constexpr explicit TupleLeaf(const TupleLeaf<I_, T>& t)
-					: value_(t.get()) {
-				}
+					constexpr TupleLeaf(const TupleLeaf& t)
+						: value_(t.get())
+					{
+						static_assert(!IsRValueReferenceV<ValueType_>,
+									  "Can not copy a tuple with rvalue reference member");
+					}
 
-				template <typename T>
-				constexpr TupleLeaf& operator=(T&& t) {
-					value_ = ForwardReference<T>(t);
-					return *this;
-				}
+					template <typename T, typename = typename EnableIfT<
+						IsConstructibleT<ValueType_, T>>>
+						constexpr explicit TupleLeaf(T&& t)
+						: value_(ForwardReference<T>(t))
+					{
+						static_assert(!IsReferenceV<ValueType_> ||
+									  IsLValueReferenceV<ValueType_> ||
+									  (IsRValueReferenceV<ValueType_> &&
+									   !IsLValueReferenceV<T>),
+									  "Attempted to construct a reference element in a tuple with an rvalue");
+					}
 
-				constexpr int Swap(TupleLeaf& t) {
-					Swap(*this, t);
-					return 0;
-				}
+					template <typename T>
+					constexpr explicit TupleLeaf(const TupleLeaf<I_, T>& t)
+						: value_(t.get())
+					{}
 
-				ValueType_& get() {
-					return value_;
-				}
+					template <typename T>
+					constexpr TupleLeaf& operator=(T&& t)
+					{
+						value_ = ForwardReference<T>(t);
+						return *this;
+					}
 
-				constexpr const ValueType_& get() const {
-					return value_;
-				}
-			};
+					constexpr int Swap(TupleLeaf& t)
+					{
+						Swap(*this, t);
+						return 0;
+					}
+
+					ValueType_& get()
+					{
+						return value_;
+					}
+
+					constexpr const ValueType_& get() const
+					{
+						return value_;
+					}
+				};
 #pragma endregion
 
 #pragma region TupleLeaf with EmptyBaseOptimization
-			// TupleLeaf specialization in case we can use Empty Base Class Optimization:
+				// TupleLeaf specialization in case we can use Empty Base Class Optimization:
 
-			template <SizeT I_, typename ValueType_>
-			class TupleLeaf<I_, ValueType_, true>
-				: private ValueType_ {
-				TupleLeaf& operator=(const TupleLeaf&) = delete;
-			public:
-				constexpr TupleLeaf() {
-				}
+				template <SizeT I_, typename ValueType_>
+				class TupleLeaf<I_, ValueType_, true>
+					: private ValueType_
+				{
+					TupleLeaf& operator=(const TupleLeaf&) = delete;
+				public:
+					constexpr TupleLeaf()
+					{}
 
-				constexpr TupleLeaf(const TupleLeaf& t)
-					: ValueType_(t.get()) {
-					static_assert(!IsRValueReferenceV<ValueType_>,
-						"Can not copy a tuple with rvalue reference member");
-				}
+					constexpr TupleLeaf(const TupleLeaf& t)
+						: ValueType_(t.get())
+					{
+						static_assert(!IsRValueReferenceV<ValueType_>,
+									  "Can not copy a tuple with rvalue reference member");
+					}
 
-				template <typename T, typename = typename EnableIfT<
-					IsConstructibleT<ValueType_, T>>>
-					constexpr explicit TupleLeaf(T&& t)
-					: ValueType_(ForwardReference<T>(t)) {
-				}
+					template <typename T, typename = typename EnableIfT<
+						IsConstructibleT<ValueType_, T>>>
+						constexpr explicit TupleLeaf(T&& t)
+						: ValueType_(ForwardReference<T>(t))
+					{}
 
-				template <typename T>
-				constexpr explicit TupleLeaf(const TupleLeaf<I_, T>& t)
-					: ValueType_(t.get()) {
-				}
+					template <typename T>
+					constexpr explicit TupleLeaf(const TupleLeaf<I_, T>& t)
+						: ValueType_(t.get())
+					{}
 
-				template <typename T>
-				constexpr TupleLeaf& operator=(T&& t) {
-					ValueType_::operator=(ForwardReference<T>(t));
-					return *this;
-				}
+					template <typename T>
+					constexpr TupleLeaf& operator=(T&& t)
+					{
+						ValueType_::operator=(ForwardReference<T>(t));
+						return *this;
+					}
 
-				constexpr int Swap(TupleLeaf& t) {
-					Swap(*this, t);
-					return 0;
-				}
+					constexpr int Swap(TupleLeaf& t)
+					{
+						Swap(*this, t);
+						return 0;
+					}
 
-				ValueType_& get() {
-					return static_cast<ValueType_&>(*this);
-				}
+					ValueType_& get()
+					{
+						return static_cast<ValueType_&>(*this);
+					}
 
-				constexpr const ValueType_& get() const {
-					return static_cast<const ValueType_&>(*this);
-				}
-			};
+					constexpr const ValueType_& get() const
+					{
+						return static_cast<const ValueType_&>(*this);
+					}
+				};
 #pragma endregion
 #pragma region TupleIndexes
-			// TupleIndexes
+				// TupleIndexes
 
-			template <SizeT... Is_>
-			struct TupleIndexes {
-			};
+				template <SizeT... Is_>
+				struct TupleIndexes
+				{};
 
-			template <SizeT Start_, typename TupleIndexes_, SizeT End_>
-			struct MakeTupleIndexesImpl;
+				template <SizeT Start_, typename TupleIndexes_, SizeT End_>
+				struct MakeTupleIndexesImpl;
 
-			template <SizeT Start_, SizeT... Indexes_, SizeT End_>
-			struct MakeTupleIndexesImpl<Start_, TupleIndexes<Indexes_...>, End_> {
-				typedef typename MakeTupleIndexesImpl<Start_ + 1,
-					TupleIndexes<Indexes_..., Start_>, End_>::Type Type;
-			};
+				template <SizeT Start_, SizeT... Indexes_, SizeT End_>
+				struct MakeTupleIndexesImpl<Start_, TupleIndexes<Indexes_...>, End_>
+				{
+					typedef typename MakeTupleIndexesImpl<Start_ + 1,
+						TupleIndexes<Indexes_..., Start_>, End_>::Type Type;
+				};
 
-			template <SizeT End_, SizeT... Indexes_>
-			struct MakeTupleIndexesImpl<End_, TupleIndexes<Indexes_...>, End_> {
-				typedef TupleIndexes<Indexes_...> Type;
-			};
+				template <SizeT End_, SizeT... Indexes_>
+				struct MakeTupleIndexesImpl<End_, TupleIndexes<Indexes_...>, End_>
+				{
+					typedef TupleIndexes<Indexes_...> Type;
+				};
 
-			template <SizeT End_, SizeT Start_ = 0>
-			struct MakeTupleIndexes {
-				static_assert(Start_ <= End_, "MakeTupleIndexes: invalid parameters");
-				typedef typename MakeTupleIndexesImpl<Start_, TupleIndexes<>, End_>::Type Type;
-			};
+				template <SizeT End_, SizeT Start_ = 0>
+				struct MakeTupleIndexes
+				{
+					static_assert(Start_ <= End_, "MakeTupleIndexes: invalid parameters");
+					typedef typename MakeTupleIndexesImpl<Start_, TupleIndexes<>, End_>::Type Type;
+				};
 #pragma endregion
 #pragma region Type Holder
-			// TupleTypes
+				// TupleTypes
 
-			template <typename... Ts_>
-			struct TupleTypes {
-			};
+				template <typename... Ts_>
+				struct TupleTypes
+				{};
 
-			// TupleSize
+				// TupleSize
 
-			template <typename T_>
-			struct TupleSize;
+				template <typename T_>
+				struct TupleSize;
 
-			template <typename T_>
-			struct TupleSize<const T_>
-				: public TupleSize<T_> {
-			};
+				template <typename T_>
+				struct TupleSize<const T_>
+					: public TupleSize<T_>
+				{};
 
-			template <typename T_>
-			struct TupleSize<volatile T_>
-				: public TupleSize<T_> {
-			};
+				template <typename T_>
+				struct TupleSize<volatile T_>
+					: public TupleSize<T_>
+				{};
 
-			template <typename T_>
-			struct TupleSize<const volatile T_>
-				: public TupleSize<T_> {
-			};
+				template <typename T_>
+				struct TupleSize<const volatile T_>
+					: public TupleSize<T_>
+				{};
 
-			template <typename... Ts_>
-			struct TupleSize<TupleTypes<Ts_...>> {
-				static constexpr size_t Value = sizeof...(Ts_);
-				typedef SizeT ValueType;
-				typedef TupleSize Type; // using injected-class-name
-				constexpr operator ValueType() const noexcept { return Value; }
-				constexpr ValueType operator()() const noexcept { return Value; } //since c++14
-			};
+				template <typename... Ts_>
+				struct TupleSize<TupleTypes<Ts_...>>
+				{
+					static constexpr size_t Value = sizeof...(Ts_);
+					typedef SizeT ValueType;
+					typedef TupleSize Type; // using injected-class-name
+					constexpr operator ValueType() const noexcept
+					{
+						return Value;
+					}
+					constexpr ValueType operator()() const noexcept
+					{
+						return Value;
+					} //since c++14
+				};
 
-			template <typename TupleIndexes_, typename... Ts_>
-			struct TupleImpl;
+				template <typename TupleIndexes_, typename... Ts_>
+				struct TupleImpl;
 
-			// specialization for Tuple
+				// specialization for Tuple
 
-			template <typename... Ts_>
-			struct TupleSize<Tuple<Ts_...>> {
-				static constexpr size_t Value = sizeof...(Ts_);
-				typedef SizeT ValueType;
-				typedef TupleSize Type; // using injected-class-name
-				constexpr operator ValueType() const noexcept { return Value; }
-				constexpr ValueType operator()() const noexcept { return Value; } //since c++14
-			};
+				template <typename... Ts_>
+				struct TupleSize<Tuple<Ts_...>>
+				{
+					static constexpr size_t Value = sizeof...(Ts_);
+					typedef SizeT ValueType;
+					typedef TupleSize Type; // using injected-class-name
+					constexpr operator ValueType() const noexcept
+					{
+						return Value;
+					}
+					constexpr ValueType operator()() const noexcept
+					{
+						return Value;
+					} //since c++14
+				};
 #pragma endregion
 #pragma region Tuple Element
-			// TupleElement
+				// TupleElement
 
-			template <SizeT I_, typename T_>
-			class TupleElement /*: public tuple_element<I_, T_> {
-			}*/;
+				template <SizeT I_, typename T_>
+				class TupleElement /*: public tuple_element<I_, T_> {
+				}*/;
 
-			template <SizeT I_>
-			class TupleElement<I_, TupleTypes<>> {
-			public:
-				static_assert(I_ != I_, "tuple_element index out of range"); //-V501
-			};
+				template <SizeT I_>
+				class TupleElement<I_, TupleTypes<>>
+				{
+				public:
+					static_assert(I_ != I_, "tuple_element index out of range"); //-V501
+				};
 
-			template <typename H_, typename... Ts_>
-			class TupleElement<0, TupleTypes<H_, Ts_...>> {
-			public:
-				typedef H_ Type;
-			};
+				template <typename H_, typename... Ts_>
+				class TupleElement<0, TupleTypes<H_, Ts_...>>
+				{
+				public:
+					typedef H_ Type;
+				};
 
-			template <SizeT I_, typename H_, typename... Ts_>
-			class TupleElement<I_, TupleTypes<H_, Ts_...>> {
-			public:
-				typedef typename TupleElement<I_ - 1, TupleTypes<Ts_...>>::Type Type;
-			};
+				template <SizeT I_, typename H_, typename... Ts_>
+				class TupleElement<I_, TupleTypes<H_, Ts_...>>
+				{
+				public:
+					typedef typename TupleElement<I_ - 1, TupleTypes<Ts_...>>::Type Type;
+				};
 
-			// specialization for Tuple
+				// specialization for Tuple
 
-			template <size_t I_, typename... Ts_>
-			class TupleElement<I_, Tuple<Ts_...>> {
-			public:
-				typedef typename TupleElement<I_, TupleTypes<Ts_...>>::Type Type;
-			};
+				template <size_t I_, typename... Ts_>
+				class TupleElement<I_, Tuple<Ts_...>>
+				{
+				public:
+					typedef typename TupleElement<I_, TupleTypes<Ts_...>>::Type Type;
+				};
 
-			template <size_t I_, typename... Ts_>
-			class TupleElement<I_, const Tuple<Ts_...>> {
-			public:
-				typedef typename AddConstT<typename TupleElement<I_, TupleTypes<Ts_...>>::type>::Type Type;
-			};
+				template <size_t I_, typename... Ts_>
+				class TupleElement<I_, const Tuple<Ts_...>>
+				{
+				public:
+					typedef typename AddConstT<typename TupleElement<I_, TupleTypes<Ts_...>>::type>::Type Type;
+				};
 
-			template <size_t I_, typename... Ts_>
-			class TupleElement<I_, volatile Tuple<Ts_...>> {
-			public:
-				typedef typename AddVolatileT<typename TupleElement<I_, TupleTypes<Ts_...>>::type>::Type Type;
-			};
+				template <size_t I_, typename... Ts_>
+				class TupleElement<I_, volatile Tuple<Ts_...>>
+				{
+				public:
+					typedef typename AddVolatileT<typename TupleElement<I_, TupleTypes<Ts_...>>::type>::Type Type;
+				};
 
-			template <size_t I_, typename... Ts_>
-			class TupleElement<I_, const volatile Tuple<Ts_...>> {
-			public:
-				typedef typename AddCvT<typename TupleElement<I_, TupleTypes<Ts_...>>::type>::Type Type;
-			};
+				template <size_t I_, typename... Ts_>
+				class TupleElement<I_, const volatile Tuple<Ts_...>>
+				{
+				public:
+					typedef typename AddCvT<typename TupleElement<I_, TupleTypes<Ts_...>>::type>::Type Type;
+				};
 #pragma endregion
 #pragma region Make Tuple helper
-			// MakeTupleTypes
+				// MakeTupleTypes
 
-			template <typename TupleTypes_, typename Tuple_, size_t Start_, size_t End_>
-			struct MakeTupleTypesImpl;
+				template <typename TupleTypes_, typename Tuple_, size_t Start_, size_t End_>
+				struct MakeTupleTypesImpl;
 
-			template <typename... Types_, typename Tuple_, size_t Start_, size_t End_>
-			struct MakeTupleTypesImpl<TupleTypes<Types_...>, Tuple_, Start_, End_> {
-				typedef typename RemoveRefT<Tuple_>::Type TupleType;
-				typedef typename MakeTupleTypesImpl<TupleTypes<Types_...,
-					typename ConditionT<IsLValueReferenceT<Tuple_>::State,
-					// append ref if Tuple_ is ref
-					typename TupleElement<Start_, TupleType>::Type&,
-					// append non-ref otherwise
-					typename TupleElement<Start_, TupleType>::Type>::Result>,
-					Tuple_, Start_ + 1, End_>::Type  Type;
-			};
+				template <typename... Types_, typename Tuple_, size_t Start_, size_t End_>
+				struct MakeTupleTypesImpl<TupleTypes<Types_...>, Tuple_, Start_, End_>
+				{
+					typedef typename RemoveRefT<Tuple_>::Type TupleType;
+					typedef typename MakeTupleTypesImpl<TupleTypes<Types_...,
+						typename ConditionT<IsLValueReferenceT<Tuple_>::State,
+						// append ref if Tuple_ is ref
+						typename TupleElement<Start_, TupleType>::Type&,
+						// append non-ref otherwise
+						typename TupleElement<Start_, TupleType>::Type>::Result>,
+						Tuple_, Start_ + 1, End_>::Type  Type;
+				};
 
-			template <typename... Types_, typename Tuple_, SizeT End_>
-			struct MakeTupleTypesImpl<TupleTypes<Types_...>, Tuple_, End_, End_> {
-				typedef TupleTypes<Types_...> Type;
-			};
+				template <typename... Types_, typename Tuple_, SizeT End_>
+				struct MakeTupleTypesImpl<TupleTypes<Types_...>, Tuple_, End_, End_>
+				{
+					typedef TupleTypes<Types_...> Type;
+				};
 
-			template <typename Tuple_,
-				size_t End_ = TupleSize<typename RemoveRefT<Tuple_>::Type>::Value,
-				size_t Start_ = 0>
-				struct MakeTupleTypes {
-				static_assert(Start_ <= End_, "MakeTupleTypes: invalid parameters");
-				typedef typename MakeTupleTypesImpl<TupleTypes<>, Tuple_, Start_, End_>::Type Type;
-			};
+				template <typename Tuple_,
+					size_t End_ = TupleSize<typename RemoveRefT<Tuple_>::Type>::Value,
+					size_t Start_ = 0>
+					struct MakeTupleTypes
+				{
+					static_assert(Start_ <= End_, "MakeTupleTypes: invalid parameters");
+					typedef typename MakeTupleTypesImpl<TupleTypes<>, Tuple_, Start_, End_>::Type Type;
+				};
 #pragma endregion
 #pragma region TupleImpl and swallow
-			// TupleImpl
+				// TupleImpl
 
-			template <typename... Ts>
-			void swallow(Ts&& ...) {
-			}
+				template <typename... Ts>
+				void swallow(Ts&& ...)
+				{}
 
-			template <SizeT... Indexes_, typename... Ts_>
-			struct TupleImpl<TupleIndexes<Indexes_...>, Ts_...>
-				: public TupleLeaf<Indexes_, Ts_>... {
-				template <SizeT... FirstIndexes, typename... FirstTypes,
-					SizeT... LastIndexes, typename... LastTypes,
-					typename... ValueTypes>
-					constexpr explicit TupleImpl(
-						TupleIndexes<FirstIndexes...>, TupleTypes<FirstTypes...>,
-						TupleIndexes<LastIndexes...>, TupleTypes<LastTypes...>,
-						ValueTypes&& ... values)
-					: TupleLeaf<FirstIndexes,
-					FirstTypes>(ForwardReference<ValueTypes>(values))...,
-					TupleLeaf<LastIndexes, LastTypes>()... {
-				}
+				template <SizeT... Indexes_, typename... Ts_>
+				struct TupleImpl<TupleIndexes<Indexes_...>, Ts_...>
+					: public TupleLeaf<Indexes_, Ts_>... {
+					template <SizeT... FirstIndexes, typename... FirstTypes,
+						SizeT... LastIndexes, typename... LastTypes,
+						typename... ValueTypes>
+						constexpr explicit TupleImpl(
+							TupleIndexes<FirstIndexes...>, TupleTypes<FirstTypes...>,
+							TupleIndexes<LastIndexes...>, TupleTypes<LastTypes...>,
+							ValueTypes&& ... values)
+						: TupleLeaf<FirstIndexes,
+						FirstTypes>(ForwardReference<ValueTypes>(values))...,
+						TupleLeaf<LastIndexes, LastTypes>()... {
+					}
 
-				template <typename OtherTuple>
-				constexpr TupleImpl(OtherTuple&& t)
-					: TupleLeaf<Indexes_, Ts_>(ForwardReference<
-						typename TupleElement<Indexes_, typename MakeTupleTypes<OtherTuple>::Type>::Type
-					>(t.Get<Indexes_>()))... {
-				}
+					template <typename OtherTuple>
+					constexpr TupleImpl(OtherTuple&& t)
+						: TupleLeaf<Indexes_, Ts_>(ForwardReference<
+												   typename TupleElement<Indexes_, typename MakeTupleTypes<OtherTuple>::Type>::Type
+						>(t.Get<Indexes_>()))... {
+					}
 
-				template <typename OtherTuple>
-				constexpr TupleImpl& operator=(OtherTuple&& t) {
-					//swallow(TupleLeaf<Indexes_, Ts_>::operator=(ForwardReference<decltype(t.Get<Indexes_>())>(t.Get<Indexes_>()))...);
-					this->~TupleImpl();
-					this->TupleImpl::TupleImpl(MoveRValue(t));
-					return *this;
-				}
+					template <typename OtherTuple>
+					constexpr TupleImpl& operator=(OtherTuple&& t)
+					{
+						//swallow(TupleLeaf<Indexes_, Ts_>::operator=(ForwardReference<decltype(t.Get<Indexes_>())>(t.Get<Indexes_>()))...);
+						this->~TupleImpl();
+						this->TupleImpl::TupleImpl(MoveRValue(t));
+						return *this;
+					}
 
-				constexpr TupleImpl& operator=(const TupleImpl& t) {
-					swallow(TupleLeaf<Indexes_, Ts_>::operator=(static_cast<
-						const TupleLeaf<Indexes_, Ts_>&>(t).get())...);
-					return *this;
-				}
+					constexpr TupleImpl& operator=(const TupleImpl& t)
+					{
+						swallow(TupleLeaf<Indexes_, Ts_>::operator=(static_cast<
+																	const TupleLeaf<Indexes_, Ts_>&>(t).get())...);
+						return *this;
+					}
 
-				constexpr void Swap(TupleImpl& t) {
-					swallow(TupleLeaf<Indexes_, Ts_>::Swap(
-						static_cast<TupleLeaf<Indexes_, Ts_>&>(t))...);
-				}
-			};
+					constexpr void Swap(TupleImpl& t)
+					{
+						swallow(TupleLeaf<Indexes_, Ts_>::Swap(
+							static_cast<TupleLeaf<Indexes_, Ts_>&>(t))...);
+					}
+				};
 #pragma endregion
 #pragma region SFINAE helpers
 #pragma region Tuple Like
-			// TupleLike
+				// TupleLike
 
-			template <typename T_>
-			struct TupleLike
-				: public LogicFalse {
-			};
+				template <typename T_>
+				struct TupleLike
+					: public LogicFalse
+				{};
 
-			template <typename T_>
-			struct TupleLike<const T_>
-				: public TupleLike<T_> {
-			};
+				template <typename T_>
+				struct TupleLike<const T_>
+					: public TupleLike<T_>
+				{};
 
-			template <typename T_>
-			struct TupleLike<volatile T_>
-				: public TupleLike<T_> {
-			};
+				template <typename T_>
+				struct TupleLike<volatile T_>
+					: public TupleLike<T_>
+				{};
 
-			template <typename T_>
-			struct TupleLike<const volatile T_>
-				: public TupleLike<T_> {
-			};
+				template <typename T_>
+				struct TupleLike<const volatile T_>
+					: public TupleLike<T_>
+				{};
 
-			template <typename... Ts_>
-			struct TupleLike<Tuple<Ts_...>>
-				: public LogicTrue {
-			};
+				template <typename... Ts_>
+				struct TupleLike<Tuple<Ts_...>>
+					: public LogicTrue
+				{};
 
-			template <typename... Ts_>
-			struct TupleLike<TupleTypes<Ts_...>>
-				: public LogicTrue {
-			};
+				template <typename... Ts_>
+				struct TupleLike<TupleTypes<Ts_...>>
+					: public LogicTrue
+				{};
 #pragma endregion
 #pragma region Tuple Convertible
-			// TupleConvertible
+				// TupleConvertible
 
-			template <bool IsSameSize_, typename From_, typename To_>
-			struct TupleConvertibleImpl
-				: public LogicFalse {
-			};
+				template <bool IsSameSize_, typename From_, typename To_>
+				struct TupleConvertibleImpl
+					: public LogicFalse
+				{};
 
-			template <typename From0_, typename... FromRest_,
-				typename To0_, typename... ToRest_>
-				struct TupleConvertibleImpl<true, TupleTypes<From0_, FromRest_...>,
-				TupleTypes<To0_, ToRest_...>>
-				: public LogicConst<
-				IsConvertibleT<From0_, To0_>::State &&
-				TupleConvertibleImpl<true, TupleTypes<FromRest_...>,
-				TupleTypes<ToRest_...>>::State> {
-			};
+				template <typename From0_, typename... FromRest_,
+					typename To0_, typename... ToRest_>
+					struct TupleConvertibleImpl<true, TupleTypes<From0_, FromRest_...>,
+					TupleTypes<To0_, ToRest_...>>
+					: public LogicConst<
+					IsConvertibleT<From0_, To0_>::State &&
+					TupleConvertibleImpl<true, TupleTypes<FromRest_...>,
+					TupleTypes<ToRest_...>>::State> {
+				};
 
-			template <>
-			struct TupleConvertibleImpl<true, TupleTypes<>, TupleTypes<>>
-				: public LogicTrue {
-			};
+				template <>
+				struct TupleConvertibleImpl<true, TupleTypes<>, TupleTypes<>>
+					: public LogicTrue
+				{};
 
-			template <typename From_, typename To_,
-				bool = TupleLike<typename RemoveRefT<From_>::Type>::State,
-				bool = TupleLike<typename RemoveRefT<To_>::Type>::State>
-				struct TupleConvertible
-				: public LogicFalse {
-			};
+				template <typename From_, typename To_,
+					bool = TupleLike<typename RemoveRefT<From_>::Type>::State,
+					bool = TupleLike<typename RemoveRefT<To_>::Type>::State>
+					struct TupleConvertible
+					: public LogicFalse
+				{};
 
-			template<typename From_, typename To_>
-			struct TupleConvertible<From_, To_, true, true>
-				: public TupleConvertibleImpl<
-				TupleSize<typename RemoveRefT<From_>::Type>::Value
-				== TupleSize<typename RemoveRefT<To_>::Type>::Value,
-				typename MakeTupleTypes<From_>::Type,
-				typename MakeTupleTypes<To_>::Type> {
-			};
+				template<typename From_, typename To_>
+				struct TupleConvertible<From_, To_, true, true>
+					: public TupleConvertibleImpl<
+					TupleSize<typename RemoveRefT<From_>::Type>::Value
+					== TupleSize<typename RemoveRefT<To_>::Type>::Value,
+					typename MakeTupleTypes<From_>::Type,
+					typename MakeTupleTypes<To_>::Type>
+				{};
 #pragma endregion
 #pragma region Tuple Assignable
-			// TupleAssignable
+				// TupleAssignable
 
-			template <bool IsSameSize_, typename Target_, typename From_>
-			struct TupleAssignableImpl
-				: public LogicFalse {
-			};
+				template <bool IsSameSize_, typename Target_, typename From_>
+				struct TupleAssignableImpl
+					: public LogicFalse
+				{};
 
-			template <typename Target0_, typename... TargetRest_,
-				typename From0_, typename... FromRest_>
-				struct TupleAssignableImpl<true, TupleTypes<Target0_, TargetRest_...>,
-				TupleTypes<From0_, FromRest_...>>
-				: public LogicConst<
-				IsAssignableT<Target0_, From0_>::State &&
-				TupleAssignableImpl<true, TupleTypes<TargetRest_...>,
-				TupleTypes<FromRest_...>>::State> {
-			};
+				template <typename Target0_, typename... TargetRest_,
+					typename From0_, typename... FromRest_>
+					struct TupleAssignableImpl<true, TupleTypes<Target0_, TargetRest_...>,
+					TupleTypes<From0_, FromRest_...>>
+					: public LogicConst<
+					IsAssignableT<Target0_, From0_>::State &&
+					TupleAssignableImpl<true, TupleTypes<TargetRest_...>,
+					TupleTypes<FromRest_...>>::State> {
+				};
 
-			template <>
-			struct TupleAssignableImpl<true, TupleTypes<>, TupleTypes<>>
-				: public LogicTrue {
-			};
+				template <>
+				struct TupleAssignableImpl<true, TupleTypes<>, TupleTypes<>>
+					: public LogicTrue
+				{};
 
-			template <typename Target_, typename From_,
-				bool = TupleLike<typename RemoveRefT<Target_>::Type>::State,
-				bool = TupleLike<typename RemoveRefT<From_>::Type>::State>
-				struct TupleAssignable
-				: public LogicFalse {
-			};
+				template <typename Target_, typename From_,
+					bool = TupleLike<typename RemoveRefT<Target_>::Type>::State,
+					bool = TupleLike<typename RemoveRefT<From_>::Type>::State>
+					struct TupleAssignable
+					: public LogicFalse
+				{};
 
-			template<typename Target_, typename From_>
-			struct TupleAssignable<Target_, From_, true, true>
-				: public TupleAssignableImpl<
-				TupleSize<typename RemoveRefT<Target_>::Type>::Value
-				== TupleSize<typename RemoveRefT<From_>::Type>::Value,
-				typename MakeTupleTypes<Target_>::Type,
-				typename MakeTupleTypes<From_>::Type> {
-			};
+				template<typename Target_, typename From_>
+				struct TupleAssignable<Target_, From_, true, true>
+					: public TupleAssignableImpl<
+					TupleSize<typename RemoveRefT<Target_>::Type>::Value
+					== TupleSize<typename RemoveRefT<From_>::Type>::Value,
+					typename MakeTupleTypes<Target_>::Type,
+					typename MakeTupleTypes<From_>::Type>
+				{};
 #pragma endregion
 #pragma region Tuple Order helpers
-			// TupleEqueal
+				// TupleEqueal
 
-			template <SizeT I_>
-			struct TupleEqual {
-				template <typename Tuple1_, typename Tuple2_>
-				bool operator()(const Tuple1_& t1, const Tuple2_& t2) {
-					return TupleEqual<I_ - 1>()(t1, t2) &&
-						get<I_ - 1>(t1) == get<I_ - 1>(t2);
-				}
-			};
+				template <SizeT I_>
+				struct TupleEqual
+				{
+					template <typename Tuple1_, typename Tuple2_>
+					bool operator()(const Tuple1_& t1, const Tuple2_& t2)
+					{
+						return TupleEqual<I_ - 1>()(t1, t2) &&
+							get<I_ - 1>(t1) == get<I_ - 1>(t2);
+					}
+				};
 
-			template<>
-			struct TupleEqual<0> {
-				template <typename Tuple1_, typename Tuple2_>
-				bool operator()(const Tuple1_&, const Tuple2_&) {
-					return true;
-				}
-			};
+				template<>
+				struct TupleEqual<0>
+				{
+					template <typename Tuple1_, typename Tuple2_>
+					bool operator()(const Tuple1_&, const Tuple2_&)
+					{
+						return true;
+					}
+				};
 
-			// TupleLess
+				// TupleLess
 
-			template <SizeT I_>
-			struct TupleLess {
-				template <typename Tuple1_, typename Tuple2_>
-				bool operator()(const Tuple1_& t1, const Tuple2_& t2) {
-					return TupleLess<I_ - 1>()(t1, t2) ||
-						(!TupleLess<I_ - 1>()(t2, t1) && get<I_ - 1>(t1) < get<I_ - 1>(t2));
-				}
-			};
+				template <SizeT I_>
+				struct TupleLess
+				{
+					template <typename Tuple1_, typename Tuple2_>
+					bool operator()(const Tuple1_& t1, const Tuple2_& t2)
+					{
+						return TupleLess<I_ - 1>()(t1, t2) ||
+							(!TupleLess<I_ - 1>()(t2, t1) && get<I_ - 1>(t1) < get<I_ - 1>(t2));
+					}
+				};
 
-			template<>
-			struct TupleLess<0> {
-				template <typename Tuple1_, typename Tuple2_>
-				bool operator()(const Tuple1_&, const Tuple2_&) {
-					return false;
-				}
-			};
+				template<>
+				struct TupleLess<0>
+				{
+					template <typename Tuple1_, typename Tuple2_>
+					bool operator()(const Tuple1_&, const Tuple2_&)
+					{
+						return false;
+					}
+				};
 #pragma endregion
 #pragma endregion
-		}
+			}
 #pragma region Tuple
-		// tuple_size
+			// tuple_size
 
-		template <typename Tuple_>
-		class tuple_size : public TupleImpl::TupleSize<Tuple_> {
-		};
+			template <typename Tuple_>
+			class tuple_size : public TupleImpl::TupleSize<Tuple_>
+			{};
 
-		// tuple_element
+			// tuple_element
 
-		template <size_t I_, typename Tuple_>
-		class tuple_element : public TupleImpl::TupleElement<I_, Tuple_> {
-		};
+			template <size_t I_, typename Tuple_>
+			class tuple_element : public TupleImpl::TupleElement<I_, Tuple_>
+			{};
 
-		// Tuple
+			// Tuple
 
-		template <typename... Ts_>
-		class Tuple {
-			typedef TupleImpl::TupleImpl<typename TupleImpl::MakeTupleIndexes<sizeof...(Ts_)>::Type, Ts_...> Impl;
-			Impl impl_;
+			template <typename... Ts_>
+			class Tuple
+			{
+				typedef TupleImpl::TupleImpl<typename TupleImpl::MakeTupleIndexes<sizeof...(Ts_)>::Type, Ts_...> Impl;
+				Impl impl_;
+
+				template <SizeT I, typename... Ts>
+				friend
+					typename tuple_element<I, Tuple<Ts...>>::Type&
+					get(Tuple<Ts...>& t);
+
+				template <size_t I, typename... Ts>
+				friend
+					constexpr const typename tuple_element<I, Tuple<Ts...>>::Type&
+					get(const Tuple<Ts...>& t);
+
+				template <size_t I, typename... Ts>
+				friend
+					typename tuple_element<I, Tuple<Ts...>>::Type&&
+					get(Tuple<Ts...>&& t);
+
+			public:
+				constexpr Tuple(const Ts_& ... t)
+					: impl_(typename TupleImpl::MakeTupleIndexes<sizeof...(Ts_)>::Type(),
+							typename TupleImpl::MakeTupleTypes<Tuple, sizeof...(Ts_)>::Type(),
+							typename TupleImpl::MakeTupleIndexes<0>::Type(),
+							typename TupleImpl::MakeTupleTypes<Tuple, 0>::Type(),
+							t...)
+				{}
+
+				template <typename... Us, typename TypeTraits::EnableIf<
+					sizeof...(Us) <= sizeof...(Ts_) &&
+					TupleImpl::TupleConvertible<
+					typename TupleImpl::MakeTupleTypes<Tuple<Us...>>::Type,
+					typename TupleImpl::MakeTupleTypes<Tuple,
+					sizeof...(Us) < sizeof...(Ts_)
+					? sizeof...(Us)
+					: sizeof...(Ts_) > ::Type>::State,
+					bool>::Type = false>
+					constexpr explicit Tuple(Us && ... u)
+					: impl_(typename TupleImpl::MakeTupleIndexes<sizeof...(Us)>::Type(),
+							typename TupleImpl::MakeTupleTypes<Tuple, sizeof...(Us)>::Type(),
+							typename TupleImpl::MakeTupleIndexes<sizeof...(Ts_), sizeof...(Us)>::Type(),
+							typename TupleImpl::MakeTupleTypes<Tuple, sizeof...(Ts_), sizeof...(Us)>::Type(),
+							ForwardReference<Us>(u)...)
+				{}
+
+				template <typename OtherTuple, typename TypeTraits::EnableIf<
+					TupleImpl::TupleConvertible<OtherTuple, Tuple>::State,
+					bool>::Type = false>
+					constexpr Tuple(OtherTuple&& t)
+					: impl_(ForwardReference<OtherTuple>(t))
+				{}
+
+				template <typename OtherTuple, typename TypeTraits::EnableIf<
+					TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
+					bool>::Type = false>
+					constexpr Tuple& operator=(OtherTuple&& t)
+				{
+					impl_.operator=(ForwardReference<OtherTuple>(t));
+					return *this;
+				}
+
+				constexpr void Swap(Tuple& t)
+				{
+					impl_.Swap(t.impl_);
+				}
+
+				//template<SizeT Index>
+				//constexpr auto& Get() {
+				//	return get<Index>(*this);
+				//}
+
+				template<SizeT Index>
+				constexpr auto& Get()
+				{
+					return get<Index>(*this);
+				}
+
+				template<SizeT Index>
+				using Item = typename TupleImpl::TupleElement<Index, Tuple>::Type;
+
+				constexpr static SizeT Count()
+				{
+					return sizeof...(Ts_);
+				}
+			};
+
+			// Empty Tuple
+
+			template <>
+			class Tuple<>
+			{
+			public:
+				constexpr Tuple()
+				{}
+
+				template <typename OtherTuple, typename TypeTraits::EnableIf<
+					TupleImpl::TupleConvertible<OtherTuple, Tuple>::State,
+					bool>::Type = false>
+					constexpr Tuple(OtherTuple&&)
+				{}
+
+				template <typename OtherTuple, typename TypeTraits::EnableIf<
+					TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
+					bool>::Type = false>
+					constexpr Tuple& operator=(OtherTuple&&)
+				{
+					return *this;
+				}
+
+				constexpr void Swap(Tuple&)
+				{}
+
+				constexpr static SizeT Count()
+				{
+					return 0;
+				}
+			};
+
+			// get
 
 			template <SizeT I, typename... Ts>
-			friend
+			inline
 				typename tuple_element<I, Tuple<Ts...>>::Type&
-				get(Tuple<Ts...>& t);
+				get(Tuple<Ts...>& t)
+			{
+				typedef typename tuple_element<I, Tuple<Ts...>>::Type Type;
+				return static_cast<TupleImpl::TupleLeaf<I, Type>&>(t.impl_).get();
+			}
 
 			template <size_t I, typename... Ts>
-			friend
+			inline
 				constexpr const typename tuple_element<I, Tuple<Ts...>>::Type&
-				get(const Tuple<Ts...>& t);
+				get(const Tuple<Ts...>& t)
+			{
+				typedef typename tuple_element<I, Tuple<Ts...>>::Type Type;
+				return static_cast<const TupleImpl::TupleLeaf<I, Type>&>(t.impl_).get();
+			}
 
-			template <size_t I, typename... Ts>
-			friend
+			template <SizeT I, typename... Ts>
+			inline
 				typename tuple_element<I, Tuple<Ts...>>::Type&&
-				get(Tuple<Ts...>&& t);
-
-		public:
-			constexpr Tuple(const Ts_& ... t)
-				: impl_(typename TupleImpl::MakeTupleIndexes<sizeof...(Ts_)>::Type(),
-					typename TupleImpl::MakeTupleTypes<Tuple, sizeof...(Ts_)>::Type(),
-					typename TupleImpl::MakeTupleIndexes<0>::Type(),
-					typename TupleImpl::MakeTupleTypes<Tuple, 0>::Type(),
-					t...) {
+				get(Tuple<Ts...>&& t)
+			{
+				typedef typename tuple_element<I, Tuple<Ts...>>::Type Type;
+				return static_cast<Type&&>(static_cast<TupleImpl::TupleLeaf<I, Type>&&>(t.impl_).get());
 			}
 
-			template <typename... Us, typename TypeTraits::EnableIf<
-				sizeof...(Us) <= sizeof...(Ts_) &&
-				TupleImpl::TupleConvertible<
-				typename TupleImpl::MakeTupleTypes<Tuple<Us...>>::Type,
-				typename TupleImpl::MakeTupleTypes<Tuple,
-				sizeof...(Us) < sizeof...(Ts_)
-				? sizeof...(Us)
-				: sizeof...(Ts_) > ::Type>::State,
-				bool>::Type = false>
-				constexpr explicit Tuple(Us && ... u)
-				: impl_(typename TupleImpl::MakeTupleIndexes<sizeof...(Us)>::Type(),
-					typename TupleImpl::MakeTupleTypes<Tuple, sizeof...(Us)>::Type(),
-					typename TupleImpl::MakeTupleIndexes<sizeof...(Ts_), sizeof...(Us)>::Type(),
-					typename TupleImpl::MakeTupleTypes<Tuple, sizeof...(Ts_), sizeof...(Us)>::Type(),
-					ForwardReference<Us>(u)...) {
+			// swap
+
+			template <typename... Ts>
+			constexpr inline
+				void swap(Tuple<Ts...>& a, Tuple<Ts...>& b)
+			{
+				a.swap(b);
 			}
 
-			template <typename OtherTuple, typename TypeTraits::EnableIf<
-				TupleImpl::TupleConvertible<OtherTuple, Tuple>::State,
-				bool>::Type = false>
-				constexpr Tuple(OtherTuple&& t)
-				: impl_(ForwardReference<OtherTuple>(t)) {
+			// relational operators
+
+			template <typename... T1s_, typename... T2s_>
+			inline bool operator==(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2)
+			{
+				return TupleImpl::TupleEqual<sizeof...(T1s_)>()(t1, t2);
 			}
 
-			template <typename OtherTuple, typename TypeTraits::EnableIf<
-				TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
-				bool>::Type = false>
-				constexpr Tuple& operator=(OtherTuple&& t) {
-				impl_.operator=(ForwardReference<OtherTuple>(t));
-				return *this;
+			template <typename... T1s_, typename... T2s_>
+			inline bool operator!=(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2)
+			{
+				return !(t1 == t2);
 			}
 
-			constexpr void Swap(Tuple& t) {
-				impl_.Swap(t.impl_);
+			template <typename... T1s_, typename... T2s_>
+			inline bool operator<(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2)
+			{
+				return TupleImpl::TupleLess<sizeof...(T1s_)>()(t1, t2);
 			}
 
-			//template<SizeT Index>
-			//constexpr auto& Get() {
-			//	return get<Index>(*this);
-			//}
-
-			template<SizeT Index>
-			constexpr auto& Get() {
-				return get<Index>(*this);
+			template <typename... T1s_, typename... T2s_>
+			inline bool operator>(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2)
+			{
+				return t2 < t1;
 			}
 
-			template<SizeT Index>
-			using Item = typename TupleImpl::TupleElement<Index, Tuple>::Type;
-
-			constexpr static SizeT Count() { return sizeof...(Ts_); }
-		};
-
-		// Empty Tuple
-
-		template <>
-		class Tuple<> {
-		public:
-			constexpr Tuple() {
+			template <typename... T1s_, typename... T2s_>
+			inline bool operator<=(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2)
+			{
+				return !(t2 < t1);
 			}
 
-			template <typename OtherTuple, typename TypeTraits::EnableIf<
-				TupleImpl::TupleConvertible<OtherTuple, Tuple>::State,
-				bool>::Type = false>
-				constexpr Tuple(OtherTuple&&) {
+			template <typename... T1s_, typename... T2s_>
+			inline bool operator>=(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2)
+			{
+				return !(t1 < t2);
 			}
-
-			template <typename OtherTuple, typename TypeTraits::EnableIf<
-				TupleImpl::TupleAssignable<Tuple, OtherTuple>::State,
-				bool>::Type = false>
-				constexpr Tuple& operator=(OtherTuple&&) {
-				return *this;
-			}
-
-			constexpr void Swap(Tuple&) {
-			}
-
-			constexpr static SizeT Count() { return 0; }
-		};
-
-		// get
-
-		template <SizeT I, typename... Ts>
-		inline
-			typename tuple_element<I, Tuple<Ts...>>::Type&
-			get(Tuple<Ts...>& t) {
-			typedef typename tuple_element<I, Tuple<Ts...>>::Type Type;
-			return static_cast<TupleImpl::TupleLeaf<I, Type>&>(t.impl_).get();
-		}
-
-		template <size_t I, typename... Ts>
-		inline
-			constexpr const typename tuple_element<I, Tuple<Ts...>>::Type&
-			get(const Tuple<Ts...>& t) {
-			typedef typename tuple_element<I, Tuple<Ts...>>::Type Type;
-			return static_cast<const TupleImpl::TupleLeaf<I, Type>&>(t.impl_).get();
-		}
-
-		template <SizeT I, typename... Ts>
-		inline
-			typename tuple_element<I, Tuple<Ts...>>::Type&&
-			get(Tuple<Ts...>&& t) {
-			typedef typename tuple_element<I, Tuple<Ts...>>::Type Type;
-			return static_cast<Type&&>(static_cast<TupleImpl::TupleLeaf<I, Type>&&>(t.impl_).get());
-		}
-
-		// swap
-
-		template <typename... Ts>
-		constexpr inline
-			void swap(Tuple<Ts...>& a, Tuple<Ts...>& b) {
-			a.swap(b);
-		}
-
-		// relational operators
-
-		template <typename... T1s_, typename... T2s_>
-		inline bool operator==(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2) {
-			return TupleImpl::TupleEqual<sizeof...(T1s_)>()(t1, t2);
-		}
-
-		template <typename... T1s_, typename... T2s_>
-		inline bool operator!=(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2) {
-			return !(t1 == t2);
-		}
-
-		template <typename... T1s_, typename... T2s_>
-		inline bool operator<(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2) {
-			return TupleImpl::TupleLess<sizeof...(T1s_)>()(t1, t2);
-		}
-
-		template <typename... T1s_, typename... T2s_>
-		inline bool operator>(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2) {
-			return t2 < t1;
-		}
-
-		template <typename... T1s_, typename... T2s_>
-		inline bool operator<=(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2) {
-			return !(t2 < t1);
-		}
-
-		template <typename... T1s_, typename... T2s_>
-		inline bool operator>=(const Tuple<T1s_...>& t1, const Tuple<T2s_...>& t2) {
-			return !(t1 < t2);
 		}
 #pragma endregion
 	}
@@ -2642,8 +2721,8 @@ namespace std {
 	// tuple_size
 
 	template <typename... Ts_>
-	class tuple_size<Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_size<Seed::Core::Tuple<Ts_...>> {
+	class tuple_size<Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_size<Seed::Core::Containers::Tuple<Ts_...>> {
 	public:
 		static constexpr SizeT value = Value;
 		typedef SizeT value_type;
@@ -2653,8 +2732,8 @@ namespace std {
 	};
 
 	template <typename... Ts_>
-	class tuple_size<const Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_size<const Seed::Core::Tuple<Ts_...>> {
+	class tuple_size<const Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_size<const Seed::Core::Containers::Tuple<Ts_...>> {
 	public:
 		static constexpr SizeT value = Value;
 		typedef SizeT value_type;
@@ -2664,8 +2743,8 @@ namespace std {
 	};
 
 	template <typename... Ts_>
-	class tuple_size<volatile Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_size<volatile Seed::Core::Tuple<Ts_...>> {
+	class tuple_size<volatile Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_size<volatile Seed::Core::Containers::Tuple<Ts_...>> {
 	public:
 		static constexpr SizeT value = Value;
 		typedef SizeT value_type;
@@ -2675,8 +2754,8 @@ namespace std {
 	};
 
 	template <typename... Ts_>
-	class tuple_size<const volatile Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_size<const volatile Seed::Core::Tuple<Ts_...>> {
+	class tuple_size<const volatile Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_size<const volatile Seed::Core::Containers::Tuple<Ts_...>> {
 	public:
 		static constexpr SizeT value = Value;
 		typedef SizeT value_type;
@@ -2691,28 +2770,28 @@ namespace std {
 	class tuple_element;
 
 	template <SizeT I_, typename... Ts_>
-	class tuple_element<I_, Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_element<I_, Seed::Core::Tuple<Ts_...>> {
-		using type = typename Seed::Core::tuple_element<I_, Seed::Core::Tuple<Ts_...>>::Type;
+	class tuple_element<I_, Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_element<I_, Seed::Core::Containers::Tuple<Ts_...>> {
+		using type = typename Seed::Core::Containers::tuple_element<I_, Seed::Core::Containers::Tuple<Ts_...>>::Type;
 	};
 
 	template <SizeT I_, typename... Ts_>
-	class tuple_element<I_, const Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_element<I_, const Seed::Core::Tuple<Ts_...>> {
-		using type = typename Seed::Core::tuple_element<I_, Seed::Core::Tuple<Ts_...>>::Type;
+	class tuple_element<I_, const Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_element<I_, const Seed::Core::Containers::Tuple<Ts_...>> {
+		using type = typename Seed::Core::Containers::tuple_element<I_, Seed::Core::Containers::Tuple<Ts_...>>::Type;
 	};
 
 	template <SizeT I_, typename... Ts_>
-	class tuple_element<I_, volatile Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_element<I_, volatile Seed::Core::Tuple<Ts_...>> {
-		using type = typename Seed::Core::tuple_element<I_, Seed::Core::Tuple<Ts_...>>::Type;
+	class tuple_element<I_, volatile Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_element<I_, volatile Seed::Core::Containers::Tuple<Ts_...>> {
+		using type = typename Seed::Core::Containers::tuple_element<I_, Seed::Core::Containers::Tuple<Ts_...>>::Type;
 	};
 
 	template <SizeT I_, typename... Ts_>
-	class tuple_element<I_, const volatile Seed::Core::Tuple<Ts_...>>
-		: public Seed::Core::tuple_element<I_, const volatile Seed::Core::Tuple<Ts_...>> {
-		using type = typename Seed::Core::tuple_element<I_, Seed::Core::Tuple<Ts_...>>::Type;
+	class tuple_element<I_, const volatile Seed::Core::Containers::Tuple<Ts_...>>
+		: public Seed::Core::Containers::tuple_element<I_, const volatile Seed::Core::Containers::Tuple<Ts_...>> {
+		using type = typename Seed::Core::Containers::tuple_element<I_, Seed::Core::Containers::Tuple<Ts_...>>::Type;
 	};
 
-	using Seed::Core::get;
+	using Seed::Core::Containers::get;
 } // namespace std

@@ -450,7 +450,7 @@ namespace Seed {
 
 			namespace {
 				template<typename T>
-				using SensitiveConcurencyDynamicQueue = BaseConcurencyDynamicQueue<Seed::Core::Memory::SensitiveDataHeap, T>;
+				using ConcurencySensitiveDynamicQueue = BaseConcurencyDynamicQueue<Seed::Core::Memory::SensitiveDataHeap, T>;
 			}
 		}
 

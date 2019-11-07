@@ -78,9 +78,11 @@ namespace Seed {
     inline namespace Core {
         ///<summary>Атомарний лічильник<para>Використовує функції InterlockedXXX</para></summary>
         class SeedKernelCall RefCountT final {
+        public:
+            using CounterType = SizeT;
         private:
             ///<summary>Містить значення</summary>
-            volatile SizeT count;
+            volatile CounterType count;
         protected:
         public:
             ///<summary>Гетер</summary>
@@ -91,7 +93,7 @@ namespace Seed {
             Property(GetValue) SizeT Count;
             ///<summary>Конструктор з <code>SizeT</code></summary>
             ///<param name='Count'>Початкове значення</param>
-            __forceinline RefCountT(SizeT Count = 0) noexcept :
+            __forceinline RefCountT(SizeT Count = 0) :
                 count(Count) {};
 
             ///<summary>Префіксний інкремент

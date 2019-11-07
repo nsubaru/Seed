@@ -425,12 +425,12 @@ namespace Seed {
 
 			namespace {
 				template<typename T>
-				using ConcurencyDynamicStack = BaseConcurencyDynamicStack<Seed::Core::Memory::Heap, TSize, T>;
+				using ConcurencyDynamicStack = BaseConcurencyDynamicStack<Seed::Core::Memory::Heap, T>;
 			}
 
 			namespace {
 				template<typename T>
-				using SensitiveConcurencyDynamicStack = BaseConcurencyDynamicStack<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
+				using ConcurencySensitiveDynamicStack = BaseConcurencyDynamicStack<Seed::Core::Memory::SensitiveDataHeap, T>;
 			}
 		}
 
@@ -442,7 +442,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap<Containers::BaseConcurencyDynamicStack<THeap, T>>(Containers::BaseConcurencyDynamicStack<THeap, T>& A, Containers::BaseConcurencyDynamicStack<THeap, T>& B) {
+		__forceinline void Swap(Containers::BaseConcurencyDynamicStack<THeap, T>& A, Containers::BaseConcurencyDynamicStack<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

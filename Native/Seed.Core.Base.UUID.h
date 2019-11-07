@@ -1,5 +1,6 @@
 #pragma once
-#include "Seed.Core.Base.h"
+#include "Seed.Core.Base.Types.h"
+#include "Seed.Core.Base.Math.h"
 
 #ifndef __GUID_DEFINED
 #define __GUID_DEFINED

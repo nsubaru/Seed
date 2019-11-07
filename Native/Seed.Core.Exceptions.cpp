@@ -25,11 +25,11 @@ struct ExceptionsHeapT
 	///<summary>ƒескриптор куч≥</summary>
 	Seed::Handle HeapHandle;
 	///<summary>ѕоточне використанн€ куч≥</summary>
-	Seed::SizeT AllocatedMemory;
+	volatile Seed::SizeT AllocatedMemory;
 	///<summary>ѕоточна к≥льк≥сть вид≥лених блок≥в</summary>
-	Seed::SizeT AllocatedMemBlksCount;
+	volatile Seed::SizeT AllocatedMemBlksCount;
 	///<summary>‘актичне використанн€ пам'€т≥ кучею</summary>
-	Seed::SizeT CurrentHeapSize;
+	volatile Seed::SizeT CurrentHeapSize;
 };
 
 static __forceinline ExceptionsHeapT& GetExceptionsHeap() {
@@ -157,8 +157,8 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Free(void* MemBlk)
 	if (RtlFreeHeap(ExceptionsHeap.HeapHandle, 0, RealPtr)) {
 		//якщо вдало то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&ExceptionsHeap.AllocatedMemory), -static_cast<LONG64>(DataSize));
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&ExceptionsHeap.CurrentHeapSize), -static_cast<LONG64>(FullSize));
 		return nullptr;
 	}
 	//якщо н≥ то вертаЇм об'Їкт
@@ -184,8 +184,8 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBl
 	if (RtlFreeHeap(ExceptionsHeap.HeapHandle, 0, RealPtr)) {
 		//якшо усп≥шно то оновлюЇм статистику
 		InterlockedDecrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.AllocatedMemory, -(LONG64)DataSize);
-		InterlockedAddNoFence64((LONG64*)&ExceptionsHeap.CurrentHeapSize, -(LONG64)FullSize);
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&ExceptionsHeap.AllocatedMemory), -static_cast<LONG64>(DataSize));
+		InterlockedAddNoFence64(reinterpret_cast<volatile LONG64*>(&ExceptionsHeap.CurrentHeapSize), -static_cast<LONG64>(FullSize));
 		return nullptr;
 	}
 	//якщо н≥ то вертаЇм об'Їкт

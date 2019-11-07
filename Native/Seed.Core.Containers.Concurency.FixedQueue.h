@@ -381,7 +381,7 @@ namespace Seed {
 
 			namespace {
 				template<SizeT TSize, typename T>
-				using SensitiveConcurencyFixedQueue = BaseConcurencyFixedQueue<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
+				using ConcurencySensitiveFixedQueue = BaseConcurencyFixedQueue<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
 			}
 		}
 

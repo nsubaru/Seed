@@ -161,7 +161,7 @@ namespace Seed {
 					static constexpr SizeT GetFieldsSize = [&]() { SizeT result = 0; for (auto s : { TFields::FieldSize... }) result += s; return result; }();
 					static SizeT GetDynamicTypesCount() { return TFields::GetDynamicTypesCount() + ...; }
 
-					using Fields = typename Tuple<TFields...>;
+					using Fields = typename Containers::Tuple<TFields...>;
 				};
 
 				template<typename T>

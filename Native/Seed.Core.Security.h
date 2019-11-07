@@ -149,27 +149,27 @@
 //
 //			interface IUser
 //			{
-//				SecuredString GetName();
-//				SecuredString GetFullName();
+//				SensitiveString GetName();
+//				SensitiveString GetFullName();
 //				Array<GroupIDType> GetMemberGroups();
 //				Boolean GetState();
 //
-//				SecuredString Property(GetName) Name;
-//				SecuredString Property(GetFullName) FullName;
+//				SensitiveString Property(GetName) Name;
+//				SensitiveString Property(GetFullName) FullName;
 //				Array<GroupIDType> Property(GetMemberGroups) MemberGroups;
 //				Boolean Property(GetState) IsDisabled;
 //			};
 //
 //			interface IGroup
 //			{
-//				SecuredString GetName();
-//				SecuredString GetFullName();
+//				SensitiveString GetName();
+//				SensitiveString GetFullName();
 //				Array<GroupIDType> GetMemberGroups();
 //				Array<UserIDType> GetMemberUsers();
 //				Boolean GetState();
 //
-//				SecuredString Property(GetName) Name;
-//				SecuredString Property(GetFullName) FullName;
+//				SensitiveString Property(GetName) Name;
+//				SensitiveString Property(GetFullName) FullName;
 //				Array<GroupIDType> Property(GetMemberGroups) MemberGroups;
 //				Array<UserIDType> Property(GetMemberGroups) MemberUsers;
 //				Boolean Property(GetState) IsDisabled;
@@ -307,7 +307,7 @@
 //
 //			Boolean RightCheck(SystemRights requiredRight);
 //
-//			Boolean Login(SecuredString & userName, Array<Byte> pswdHash);
+//			Boolean Login(SensitiveString & userName, Array<Byte> pswdHash);
 //			Boolean Logoff();
 //
 //			UserIDType GetActiveUser();

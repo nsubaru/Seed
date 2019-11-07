@@ -1660,7 +1660,7 @@ namespace Seed {
 			///<param name = "T">Тип значеннь</param>
 			namespace {
 				template<typename T>
-				using SensitiveConcurencyList = BaseConcurencyList<Seed::Core::Memory::SensitiveDataHeap, T>;
+				using ConcurencySensitiveList = BaseConcurencyList<Seed::Core::Memory::SensitiveDataHeap, T>;
 			}
 #pragma endregion
 		}

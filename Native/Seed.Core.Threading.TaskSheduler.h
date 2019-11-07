@@ -102,7 +102,7 @@ namespace Seed {
 
 					volatile ID TID;
 
-					Containers::SensitiveConcurencyList<SmartPtr<IThreadable>>::Iterator This;
+					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;
 
 					TaskSheduler::Data* sheduler;
 

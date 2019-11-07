@@ -106,7 +106,7 @@ namespace Seed {
 
 					ThreadPool::dispatcher* Parrent;
 
-					Containers::SensitiveConcurencyList<SmartPtr<IThreadable>>::Iterator This;
+					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;
 					//Конструктор
 					Data(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) :
 						State(EThreadabledStates::NotStarted),

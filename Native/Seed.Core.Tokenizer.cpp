@@ -5,7 +5,7 @@
 
 using namespace Seed;
 
-Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr* Delims, SizeT* DelimSizes, SizeT DelimsCount, SizeT StartSize)
+Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr* Delims, SizeT* DelimSizes, SizeT DelimsCount, SizeT StartSize)
 {
 	for (SizeT i = StartSize + 1; i < Size; i++)
 	{
@@ -26,11 +26,11 @@ Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr* Delim
 				}
 
 				if (Found)
-					return Tuple<SizeT, SizeT, SizeT>(StartSize, Pos - StartSize, j);
+					return Containers::Tuple<SizeT, SizeT, SizeT>(StartSize, Pos - StartSize, j);
 				else
 					i = Pos;
 			}
 		}
 	}
-	return Tuple<SizeT, SizeT, SizeT>(StartSize, Size - StartSize, Seed::Math::Max<SizeT>());
+	return Containers::Tuple<SizeT, SizeT, SizeT>(StartSize, Size - StartSize, Seed::Math::Max<SizeT>());
 }

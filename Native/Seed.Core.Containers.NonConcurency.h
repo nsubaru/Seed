@@ -3,6 +3,8 @@
 #include "Seed.Core.Containers.NonConcurency.FixedQueue.h"
 #include "Seed.Core.Containers.NonConcurency.FixedArray.h"
 #include "Seed.Core.Containers.NonConcurency.Array.h"
+#include "Seed.Core.Containers.NonConcurency.DynamicQueue.h"
+#include "Seed.Core.Containers.NonConcurency.DynamicStack.h"
 #include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.Containers.NonConcurency.Map.h"
 #include "Seed.Core.Containers.NonConcurency.Dictionary.h"

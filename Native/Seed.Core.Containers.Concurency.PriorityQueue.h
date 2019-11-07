@@ -57,7 +57,7 @@ namespace Seed {
 #pragma warning(push)
 //Visual Studio bug, next and prev init as this
 #pragma warning(disable: 26495)
-					Node(Pair&& data) :
+					__forceinline Node(Pair&& data) :
 						data(MoveRValue(data)),
 						prev(this),
 						next(this),
@@ -67,7 +67,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					Node(const Pair& data) :
+					__forceinline Node(const Pair& data) :
 						data(data),
 						prev(this),
 						next(this),
@@ -77,7 +77,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					Node(const Pair& data, Node * prev) :
+					__forceinline Node(const Pair& data, Node * prev) :
 						data(data),
 						prev(prev),
 						next(this),
@@ -87,7 +87,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					Node(Pair&& data, Node* prev) :
+					__forceinline Node(Pair&& data, Node* prev) :
 						data(MoveRValue(data)),
 						prev(prev),
 						next(this),
@@ -106,7 +106,7 @@ namespace Seed {
 					SizeT MaxSize;
 					Threading::DataFlowControler flowControler;
 
-					Tree(SizeT MaxSize) :
+					__forceinline Tree(SizeT MaxSize) :
 						heap(nullptr),
 						Count(0),
 						RefCount(1),
@@ -116,7 +116,7 @@ namespace Seed {
 				};
 				Tree* This;
 			protected:
-				virtual void Dispose() {
+				__forceinline virtual void Dispose() {
 					if (This->heap != nullptr) {
 						deleteAll(This->heap);
 						This->heap = nullptr;
@@ -124,16 +124,16 @@ namespace Seed {
 					}
 				}
 			public:
-				BaseConcurencyPriorityQueue() : This(new Tree(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)) {}
-				BaseConcurencyPriorityQueue(SizeT MaxSize) : This(new Tree(MaxSize)) {}
-				BaseConcurencyPriorityQueue(InitilizerList<Pair>&& list) : 
+				__forceinline BaseConcurencyPriorityQueue() : This(new Tree(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)) {}
+				__forceinline BaseConcurencyPriorityQueue(SizeT MaxSize) : This(new Tree(MaxSize)) {}
+				__forceinline BaseConcurencyPriorityQueue(InitilizerList<Pair>&& list) :
 					BaseConcurencyPriorityQueue(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize + list.size()) {
 					for (auto&& item : list) {
 						This->heap = merge(This->heap, new Node(MoveRValue(item)));
 					}
 					This->Count = list.size();
 				}
-				BaseConcurencyPriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : BaseConcurencyPriorityQueue(MaxSize) {
+				__forceinline BaseConcurencyPriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : BaseConcurencyPriorityQueue(MaxSize) {
 					for (auto&& item : list) {
 						This->heap = merge(This->heap, new Node(MoveRValue(item)));
 					}
@@ -141,7 +141,7 @@ namespace Seed {
 				}
 
 
-				void Insert(const TPriority& priority, const TValue& key) {
+				__forceinline void Insert(const TPriority& priority, const TValue& key) {
 					This->flowControler.Produce([&]() {
 						if (this->This->Count == this->This->MaxSize)
 							This->flowControler.WaitForConcumer();
@@ -151,7 +151,7 @@ namespace Seed {
 						});
 				}
 
-				void Insert(TPriority&& priority, const TValue& key) {
+				__forceinline void Insert(TPriority&& priority, const TValue& key) {
 					This->flowControler.Produce([&]() {
 						if (this->This->Count == this->This->MaxSize)
 							This->flowControler.WaitForConcumer();
@@ -161,7 +161,7 @@ namespace Seed {
 						});
 				}
 
-				void Insert(const TPriority& priority, TValue&& key) {
+				__forceinline void Insert(const TPriority& priority, TValue&& key) {
 					This->flowControler.Produce([&]() {
 						if (this->This->Count == this->This->MaxSize)
 							This->flowControler.WaitForConcumer();
@@ -171,7 +171,7 @@ namespace Seed {
 						});
 				}
 
-				void Insert(TPriority&& priority, TValue&& key) {
+				__forceinline void Insert(TPriority&& priority, TValue&& key) {
 					This->flowControler.Produce([&]() {
 						if (this->This->Count == this->This->MaxSize)
 							This->flowControler.WaitForConcumer();
@@ -181,7 +181,7 @@ namespace Seed {
 						});
 				}
 
-				void Insert(const Pair& itemValue) {
+				__forceinline void Insert(const Pair& itemValue) {
 					This->flowControler.Produce([&]() {
 						if (this->This->Count == this->This->MaxSize)
 							This->flowControler.WaitForConcumer();
@@ -191,7 +191,7 @@ namespace Seed {
 						});
 				}
 
-				void Insert(Pair&& itemValue) {
+				__forceinline void Insert(Pair&& itemValue) {
 					This->flowControler.Produce([&]() {
 						if (this->This->Count == this->This->MaxSize)
 							This->flowControler.WaitForConcumer();
@@ -201,19 +201,19 @@ namespace Seed {
 						});
 				}
 
-				bool getIsEmpty() {
+				__forceinline bool getIsEmpty() {
 					return This->heap == nullptr;
 				}
 
-				SizeT getCount() {
+				__forceinline SizeT getCount() {
 					return this->This->Count;
 				}
 
-				const TPriority& getFirstItemPriority() {
+				__forceinline const TPriority& getFirstItemPriority() {
 					return This->flowControler.SharedLock([&]() {return This->heap->data.Key; });
 				}
 
-				const TPriority& discardFirstItem() {
+				__forceinline const TPriority& discardFirstItem() {
 					return This->flowControler.ExclusiveLock([&]() -> const TPriority& {
 						Node* old = This->heap;
 						This->heap = removeMinimum(This->heap);
@@ -223,7 +223,7 @@ namespace Seed {
 						});
 				}
 
-				TValue Dequeu() {
+				__forceinline TValue Dequeu() {
 					return This->flowControler.Concume([&]() {
 						while (this->This->Count == 0) {
 							This->flowControler.WaitForProducer();
@@ -241,7 +241,7 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
-				virtual BaseConcurencyPriorityQueue Clone() const override final {
+				__forceinline virtual BaseConcurencyPriorityQueue Clone() const override final {
 					return This->flowControler.SharedLock([&]() {
 						BaseConcurencyPriorityQueue result;
 
@@ -256,7 +256,7 @@ namespace Seed {
 				Boolean Property(getIsEmpty) IsEmpty;
 				SizeT Property(getCount) Count;
 			private:
-				Node* merge(Node* a, Node* b) {
+				__forceinline Node* merge(Node* a, Node* b) {
 					if (a == nullptr) return b;
 					if (b == nullptr) return a;
 					if (a->data.Key > b->data.Key) {
@@ -271,7 +271,7 @@ namespace Seed {
 					return a;
 				}
 
-				static void deleteAll(Node* n) {
+				__forceinline static void deleteAll(Node* n) {
 					if (n != nullptr) {
 						Node* c = n;
 						do {
@@ -283,14 +283,14 @@ namespace Seed {
 					}
 				}
 
-				void addChild(Node* parent, Node* child) {
+				__forceinline void addChild(Node* parent, Node* child) {
 					child->prev = child->next = child;
 					child->parent = parent;
 					parent->degree++;
 					parent->child = merge(parent->child, child);
 				}
 
-				void _unMarkAndUnParentAll(Node* n) {
+				__forceinline void _unMarkAndUnParentAll(Node* n) {
 					if (n == nullptr)return;
 					Node* c = n;
 					do {
@@ -300,7 +300,7 @@ namespace Seed {
 					} while (c != n);
 				}
 
-				Node* removeMinimum(Node* n) {
+				__forceinline Node* removeMinimum(Node* n) {
 					_unMarkAndUnParentAll(n->child);
 					if (n->next == n) {
 						n = n->child;
@@ -356,7 +356,7 @@ namespace Seed {
 					return min;
 				}
 
-				Node* cut(Node* heap, Node* n) {
+				__forceinline Node* cut(Node* heap, Node* n) {
 					if (n->next == n) {
 						n->parent->child = nullptr;
 					}
@@ -370,7 +370,7 @@ namespace Seed {
 					return merge(heap, n);
 				}
 
-				Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
+				__forceinline Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
 					if (n->data.Key < priority)return heap;
 					n->data = Pair(priority, MoveRValue(n->data.Value));
 					if (n->data.Key < n->parent->data.Key) {
@@ -389,7 +389,7 @@ namespace Seed {
 					return heap;
 				}
 
-				Node* find(Node* heap, const TPriority& priority) {
+				__forceinline Node* find(Node* heap, const TPriority& priority) {
 					Node* n = heap;
 					if (n == nullptr) return nullptr;
 					do {
@@ -401,7 +401,7 @@ namespace Seed {
 					return nullptr;
 				}
 
-				Node* copyTree(Node* orig, Node* parrent) const {
+				__forceinline Node* copyTree(Node* orig, Node* parrent) const {
 					Node* newNode = nullptr;
 					Node* newNodeFirst = nullptr;
 					try {
@@ -687,7 +687,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				void deleteAll(Node* n, Lambda& lambda) {
+				__forceinline void deleteAll(Node* n, Lambda& lambda) {
 					if (n != nullptr) {
 						Node* c = n;
 						do {
@@ -722,7 +722,7 @@ namespace Seed {
 
 			namespace {
 				template<typename TKey, typename TVal>
-				using SecuredConcurencyPriorityQueue = BaseConcurencyPriorityQueue<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
+				using ConcurencySensitivePriorityQueue = BaseConcurencyPriorityQueue<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
 			}
 
 			namespace {
@@ -737,6 +737,7 @@ namespace Seed {
 				struct IsPriorityQueueT<Seed::Core::Containers::BaseConcurencyPriorityQueue<THeap, TKey, TVal>> : LogicTrue {};
 			}
 		}
+
 
 		template<typename THeap, typename TKey, typename TVal>
 		__forceinline void Swap(Containers::BaseConcurencyPriorityQueue<THeap, TKey, TVal>& A, Containers::BaseConcurencyPriorityQueue<THeap, TKey, TVal>& B) {

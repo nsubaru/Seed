@@ -920,6 +920,29 @@ namespace Seed {
 
 			template<typename T>
 			constexpr bool IsBoolean = TypeTraits::IsSameT<T, bool>();
+
+			template<typename T>
+			struct IsConstT : LogicFalse
+			{};
+
+			template<typename T>
+			struct IsConstT<const T> : LogicTrue
+			{};
+
+			template<typename T>
+			constexpr Boolean IsConst = IsConstT<T>::State;
+
+
+			template<typename T>
+			struct IsVolatileT : LogicFalse
+			{};
+
+			template<typename T>
+			struct IsVolatileT<volatile T> : LogicTrue
+			{};
+
+			template<typename T>
+			constexpr Boolean IsVolatile = IsVolatileT<T>::State;
 		}
 	}
 }

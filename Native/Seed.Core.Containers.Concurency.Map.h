@@ -1047,7 +1047,7 @@ namespace Seed {
 			///<param name = "TValue">Тип значення</param>
 			namespace {
 				template<typename TKey, typename TVal>
-				using SecuredConcurencyMap = BaseConcurencyMap<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
+				using ConcurencySensitiveMap = BaseConcurencyMap<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
 			}
 			///<summary>Шаблон потоко захищеного асоціативного масиву
 			///<para>

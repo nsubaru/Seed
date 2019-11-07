@@ -7,17 +7,17 @@
 //			namespace Manage {
 //				namespace User {
 //					void CreateUser(
-//						const SecuredString & Name,
-//						const SecuredString & FullName,
+//						const SensitiveString & Name,
+//						const SensitiveString & FullName,
 //						Array<GroupIDType> MemberGroups,
 //						Array<Byte> HashedPswd
 //					);
 //
 //					void AddUserToGroup(UserIDType User, GroupIDType Group);
 //
-//					void ChangeUserName(UserIDType User, SecuredString & NewName);
+//					void ChangeUserName(UserIDType User, SensitiveString & NewName);
 //
-//					void ChangeFullUserName(UserIDType User, SecuredString & NewFullName);
+//					void ChangeFullUserName(UserIDType User, SensitiveString & NewFullName);
 //
 //					void DisableUser(UserIDType User);
 //
@@ -26,17 +26,17 @@
 //
 //				namespace Group {
 //					void CreateGroup(
-//						const SecuredString & Name,
-//						const SecuredString & FullName,
+//						const SensitiveString & Name,
+//						const SensitiveString & FullName,
 //						Array<GroupIDType> MemberOfGroups,
 //						Array<UserIDType> Members
 //					);
 //
 //					void AddGroupToGroup(GroupIDType MemberGroup, GroupIDType Group);
 //
-//					void ChangeGroupName(GroupIDType Group, SecuredString & NewName);
+//					void ChangeGroupName(GroupIDType Group, SensitiveString & NewName);
 //
-//					void ChangeFullGroupName(GroupIDType Group, SecuredString & NewFullName);
+//					void ChangeFullGroupName(GroupIDType Group, SensitiveString & NewFullName);
 //
 //					void DisableGroup(GroupIDType Group);
 //

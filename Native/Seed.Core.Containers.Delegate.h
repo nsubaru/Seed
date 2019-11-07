@@ -156,7 +156,7 @@ class TemplateFunctionT :public Seed::Core::FunctionObj
 	//Контейнер для результату
 	void* result;
 	//Контейнер для аргументів
-	Seed::Tuple<Args...> args;
+	Seed::Containers::Tuple<Args...> args;
 	//Флаг завершення виконання функції
 	volatile bool isEnded = false;
 	//Флаг запуску функції
@@ -335,12 +335,12 @@ namespace Seed {
 				return this->data->function->GetResult<T>();
 			}
 
-			volatile Delegate& operator()() volatile {
+			__forceinline volatile Delegate& operator()() volatile {
 				this->Init();
 				return *this;
 			}
 
-			Delegate& operator()() {
+			__forceinline Delegate& operator()() {
 				this->Init();
 				return *this;
 			}

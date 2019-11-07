@@ -92,7 +92,7 @@ namespace Seed {
 						return *this;
 					}
 
-					extern Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
+					extern Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
 
 					auto [NewOffSet, NewSize, NewDelimIndex] = //-V688
 						GetNextToken(
@@ -231,7 +231,7 @@ namespace Seed {
 			Tokenizer(const Token& ParentToken, const Containers::Array<String>& Delims) : data(new Data(ParentToken, Delims)) {}
 
 			Token begin() {
-				extern Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
+				extern Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
 
 				auto [OffSet, Size, DelimIndex] =
 					GetNextToken(

@@ -31,7 +31,7 @@ using namespace Seed::Threading;
 
 #pragma region Generic API
 
-static Containers::SensitiveConcurencyList<SmartPtr<IThreadable>>* AllActiveThreadable;
+static Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>* AllActiveThreadable;
 
 __forceinline IThreadable* GetThisThreadable() {
 	return Seed::Core::Threading::GetTLS()->Threadable;
@@ -278,7 +278,7 @@ NTSTATUS __cdecl threadStartRoutineDynEntryPoint(PVOID args) noexcept {
 
 bool Seed::Core::Threading::MainThread(Delegate&& delegate)
 {
-	AllActiveThreadable = new Containers::SensitiveConcurencyList<SmartPtr<IThreadable>>();
+	AllActiveThreadable = new Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>();
 	HANDLE threadHandle;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &threadHandle, GENERIC_ALL, 0, 0);
 	Thread* MainThread = new Thread("Main thread", MoveRValue(delegate));

@@ -3,6 +3,8 @@
 #include "Seed.Core.Containers.Concurency.FixedQueue.h"
 #include "Seed.Core.Containers.Concurency.FixedArray.h"
 #include "Seed.Core.Containers.Concurency.Array.h"
+#include "Seed.Core.Containers.Concurency.DynamicStack.h"
+#include "Seed.Core.Containers.Concurency.DynamicQueue.h"
 #include "Seed.Core.Containers.Concurency.List.h"
 #include "Seed.Core.Containers.Concurency.Map.h"
 #include "Seed.Core.Containers.Concurency.Dictionary.h"

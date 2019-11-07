@@ -989,7 +989,7 @@ namespace Seed {
 			///<param name = "TValue">Тип значення</param>
 			namespace {
 				template<typename TKey, typename TVal>
-				using SecuredMap = BaseMap<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
+				using SensitiveMap = BaseMap<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
 			}
 			///<summary>Шаблон потоко захищеного асоціативного масиву
 			///<para>

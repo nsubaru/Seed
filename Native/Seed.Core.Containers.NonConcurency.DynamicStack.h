@@ -218,7 +218,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, Y&& Value) const {
+				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					if (This->count == 0)
 						return Value;
 					SizeT i = This->count;

@@ -833,7 +833,7 @@ namespace Seed {
 
 			//Швидкісний словник з захищеним алокатором пам'яті
 			template<typename T>
-			using SecuredDictionary = BaseDictionary<Memory::SensitiveDataHeap, BaseString<Memory::Heap>, T>;
+			using SensitiveDictionary = BaseDictionary<Memory::SensitiveDataHeap, BaseString<Memory::Heap>, T>;
 		}
 
 		namespace TypeTraits {

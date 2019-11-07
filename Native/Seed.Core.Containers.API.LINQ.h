@@ -10,6 +10,7 @@
 #include "Seed.Core.Containers.API.LINQ.IList.h"
 #include "Seed.Core.Containers.API.LINQ.IVList.h"
 #include "Seed.Core.Containers.API.LINQ.IArray.h"
+#include "Seed.Core.Containers.API.LINQ.IBitMapT.h"
 #include "Seed.Core.Containers.API.LINQ.IFixedArray.h"
 #include "Seed.Core.Containers.API.LINQ.IFixedStack.h"
 #include "Seed.Core.Containers.API.LINQ.IDynamicStack.h"
