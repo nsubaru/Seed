@@ -252,7 +252,7 @@ namespace Seed {
 						}));
 				}
 
-				template<typename LambdaT>
+				template<typename U, typename LambdaT>
 				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						if (This->count == 0)

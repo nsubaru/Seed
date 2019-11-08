@@ -1751,12 +1751,12 @@ namespace Seed {
 
 			///<summary>Конвертація в масив байт. Якщо рядок пустий верне пустий масив</summary>
 			///<returns>Масив байт який є копією вмісту рядка</returns>
-			operator Containers::Blob() const {
+			operator Containers::BaseArray<THeap, Byte>() const {
 				if (this->str == nullptr || this->CurrentSize == 0)
-					return Containers::Blob();
+					return Containers::BaseArray<THeap, Byte>();
 				CharStr data = (CharStr)BaseString::operator new[](this->CurrentSize * sizeof(Char));
 				Memory::Copy(this->str, data, CurrentSize * sizeof(Char));
-				return Containers::Array<Byte>((Byte*&&)data, this->CurrentSize * sizeof(Char));
+				return Containers::BaseArray<THeap, Byte>(MoveRValue((Byte*&&)data), this->CurrentSize * sizeof(Char));
 			}
 
 			///<summary>Конвертаця строки шістнадцятиричних символів в байтовий масив</summary>
