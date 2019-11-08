@@ -154,7 +154,7 @@ namespace Seed
 #pragma region Associable Collection
 					//Base implementation
 
-					template<typename THeap, typename TCollection, typename TPair, typename TKey, typename TValue, bool TIsConst, bool TIsVolatile>
+					template<typename THeap, typename TCollection, typename TPair, typename TKey, typename TValue, bool TIsConcurencySupport, bool TIsConst, bool TIsVolatile>
 					struct BaseLINQAssociableCollection :
 						BaseICollection<THeap, TCollection, TPair, TIsConcurencySupport, EType::Collection, TIsConst, TIsVolatile>
 					{
