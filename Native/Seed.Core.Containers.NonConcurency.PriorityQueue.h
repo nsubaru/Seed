@@ -41,22 +41,22 @@ namespace Seed {
 
 					///Гетери
 
-					__forceinline Node* getPrev() { return prev; }
-					__forceinline Node* getNext() { return next; }
-					__forceinline Node* getChild() { return child; }
-					__forceinline Node* getParent() { return parent; }
-					__forceinline const TPriority& getValue() { return data.Key; }
-					__forceinline TValue& getData() { return data.Value; }
-					__forceinline bool isMarked() { return marked; }
+					forceinline Node* getPrev() { return prev; }
+					forceinline Node* getNext() { return next; }
+					forceinline Node* getChild() { return child; }
+					forceinline Node* getParent() { return parent; }
+					forceinline const TPriority& getValue() { return data.Key; }
+					forceinline TValue& getData() { return data.Value; }
+					forceinline bool isMarked() { return marked; }
 
-					__forceinline bool hasChildren() { return child; }
-					__forceinline bool hasParent() { return parent; }
+					forceinline bool hasChildren() { return child; }
+					forceinline bool hasParent() { return parent; }
 
 					//Конструктори
 #pragma warning(push)
 //Visual Studio bug, next and prev init as this
 #pragma warning(disable: 26495)
-					__forceinline Node(Pair&& data) :
+					forceinline Node(Pair&& data) :
 						data(MoveRValue(data)),
 						prev(this),
 						next(this),
@@ -66,7 +66,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					__forceinline Node(const Pair& data) :
+					forceinline Node(const Pair& data) :
 						data(data),
 						prev(this),
 						next(this),
@@ -76,7 +76,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					__forceinline Node(const Pair& data, Node* prev) :
+					forceinline Node(const Pair& data, Node* prev) :
 						data(data),
 						prev(prev),
 						next(this),
@@ -86,7 +86,7 @@ namespace Seed {
 						parent(nullptr)
 					{}
 
-					__forceinline Node(Pair&& data, Node* prev) :
+					forceinline Node(Pair&& data, Node* prev) :
 						data(MoveRValue(data)),
 						prev(prev),
 						next(this),
@@ -104,7 +104,7 @@ namespace Seed {
 					RefCountT RefCount;
 					SizeT MaxSize;
 
-					__forceinline Tree(SizeT MaxSize) :
+					forceinline Tree(SizeT MaxSize) :
 						heap(nullptr),
 						Count(0),
 						RefCount(1),
@@ -113,7 +113,7 @@ namespace Seed {
 				};
 				Tree* This;
 			protected:
-				__forceinline virtual void Dispose() {
+				forceinline virtual void Dispose() {
 					if (This->heap != nullptr) {
 						deleteAll(const_cast<Node*>(This->heap));
 						This->heap = nullptr;
@@ -121,23 +121,23 @@ namespace Seed {
 					}
 				}
 			public:
-				__forceinline BasePriorityQueue() : This(new Tree(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)) {}
-				__forceinline BasePriorityQueue(SizeT MaxSize) : This(new Tree(MaxSize)) {}
-				__forceinline BasePriorityQueue(InitilizerList<Pair>&& list) :
+				forceinline BasePriorityQueue() : This(new Tree(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)) {}
+				forceinline BasePriorityQueue(SizeT MaxSize) : This(new Tree(MaxSize)) {}
+				forceinline BasePriorityQueue(InitilizerList<Pair>&& list) :
 					BasePriorityQueue(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize + list.size()){
 					for (auto&& item : list) {
 						This->heap = merge(This->heap, new Node(MoveRValue(item)));
 					}
 					This->Count = list.size();
 				}
-				__forceinline BasePriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : BasePriorityQueue(MaxSize) {
+				forceinline BasePriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : BasePriorityQueue(MaxSize) {
 					for (auto&& item : list) {
 						This->heap = merge(This->heap, new Node(MoveRValue(item)));
 					}
 					This->Count = list.size();
 				}
 
-				__forceinline void Insert(const TPriority& priority, const TValue& key) {
+				forceinline void Insert(const TPriority& priority, const TValue& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(priority, key));
@@ -145,7 +145,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				__forceinline void Insert(TPriority&& priority, const TValue& key) {
+				forceinline void Insert(TPriority&& priority, const TValue& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(MoveRValue(priority), key));
@@ -153,7 +153,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				__forceinline void Insert(const TPriority& priority, TValue&& key) {
+				forceinline void Insert(const TPriority& priority, TValue&& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(priority, MoveRValue(key)));
@@ -161,7 +161,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				__forceinline void Insert(TPriority&& priority, TValue&& key) {
+				forceinline void Insert(TPriority&& priority, TValue&& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(MoveRValue(priority), MoveRValue(key)));
@@ -169,7 +169,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				__forceinline void Insert(const Pair& itemValue) {
+				forceinline void Insert(const Pair& itemValue) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(Pair(itemValue));
@@ -177,7 +177,7 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				__forceinline void Insert(Pair&& itemValue) {
+				forceinline void Insert(Pair&& itemValue) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
 					Node* ret = new Node(MoveRValue(itemValue));
@@ -185,19 +185,19 @@ namespace Seed {
 					++this->This->Count;
 				}
 
-				__forceinline bool getIsEmpty() {
-					return This->heap == nullptr;
+				forceinline bool getIsEmpty() const {
+					return this->This->heap == nullptr || this->This->Count == 0;
 				}
 
-				__forceinline SizeT getCount() {
+				forceinline SizeT getCount() const {
 					return this->This->Count;
 				}
 
-				__forceinline const TPriority& getFirstItemPriority() {
+				forceinline const TPriority& getFirstItemPriority() {
 					return This->heap->data.Key;
 				}
 
-				__forceinline const TPriority& discardFirstItem() {
+				forceinline const TPriority& discardFirstItem() {
 					Node* old = This->heap;
 					This->heap = removeMinimum(This->heap);
 					const TPriority& ret = old->data.Key;
@@ -205,7 +205,7 @@ namespace Seed {
 					return ret;
 				}
 
-				__forceinline TValue Dequeu() {
+				forceinline TValue Dequeu() {
 					while (this->This->Count == 0) {
 						Throw(NullPointException(ExceptionPosition));
 					}
@@ -220,7 +220,7 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
-				__forceinline virtual BasePriorityQueue Clone() const override final {
+				forceinline virtual BasePriorityQueue Clone() const override final {
 					BasePriorityQueue result;
 
 					result.This->Count = This->Count;
@@ -233,7 +233,7 @@ namespace Seed {
 				Boolean Property(getIsEmpty) IsEmpty;
 				SizeT Property(getCount) Count;
 			private:
-				__forceinline Node* merge(Node* a, Node* b) {
+				forceinline Node* merge(Node* a, Node* b) {
 					if (a == nullptr) return b;
 					if (b == nullptr) return a;
 					if (a->data.Key > b->data.Key) {
@@ -250,7 +250,7 @@ namespace Seed {
 					return a;
 				}
 
-				__forceinline static void deleteAll(Node* n) {
+				forceinline static void deleteAll(Node* n) {
 					if (n != nullptr) {
 						Node* c = n;
 						do {
@@ -262,14 +262,14 @@ namespace Seed {
 					}
 				}
 
-				__forceinline void addChild(Node* parent, Node* child) {
+				forceinline void addChild(Node* parent, Node* child) {
 					child->prev = child->next = child;
 					child->parent = parent;
 					parent->degree++;
 					parent->child = merge(parent->child, child);
 				}
 
-				__forceinline void _unMarkAndUnParentAll(Node* n) {
+				forceinline void _unMarkAndUnParentAll(Node* n) {
 					if (n == nullptr)return;
 					Node* c = n;
 					do {
@@ -279,7 +279,7 @@ namespace Seed {
 					} while (c != n);
 				}
 
-				__forceinline Node* removeMinimum(Node* n) {
+				forceinline Node* removeMinimum(Node* n) {
 					_unMarkAndUnParentAll(n->child);
 					if (n->next == n) {
 						n = n->child;
@@ -335,7 +335,7 @@ namespace Seed {
 					return min;
 				}
 
-				__forceinline Node* cut(Node* heap, Node* n) {
+				forceinline Node* cut(Node* heap, Node* n) {
 					if (n->next == n) {
 						n->parent->child = nullptr;
 					}
@@ -349,7 +349,7 @@ namespace Seed {
 					return merge(heap, n);
 				}
 
-				__forceinline Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
+				forceinline Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
 					if (n->data.Key < priority)return heap;
 					n->data = Pair(priority, MoveRValue(n->data.Value));
 					if (n->data.Key < n->parent->data.Key) {
@@ -368,7 +368,7 @@ namespace Seed {
 					return heap;
 				}
 
-				__forceinline Node* find(Node* heap, const TPriority& priority) {
+				forceinline Node* find(Node* heap, const TPriority& priority) {
 					Node* n = heap;
 					if (n == nullptr) return nullptr;
 					do {
@@ -380,7 +380,7 @@ namespace Seed {
 					return nullptr;
 				}
 
-				__forceinline Node* copyTree(Node* orig, Node* parrent) const {
+				forceinline Node* copyTree(Node* orig, Node* parrent) const {
 					Node* newNode = nullptr;
 					Node* newNodeFirst = nullptr;
 					try {
@@ -420,17 +420,18 @@ namespace Seed {
 					}
 				}
 			protected:
-			protected:
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
 				friend class LINQ::IAssociableCollection;
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
 				friend class LINQ::IPriorityQueue;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 #pragma region ForEach Pair
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					Node* it = node;
 					do {
-						lambda(it->data, Index); Index++:
+						lambda(it->data, Index); Index++;
 						if (it->child != nullptr)
 							ForEachImplWithIndex(it->child, Index, lambda);
 						it = it->next;
@@ -438,10 +439,10 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
 					Node* it = node;
 					do {
-						lambda(it->data, Index);
+						lambda(it->data);
 						if (it->child != nullptr)
 							ForEachImplWithoutIndex(it->child, lambda);
 						it = it->next;
@@ -449,17 +450,17 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BasePriorityQueue& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BasePriorityQueue& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TPriority, TValue>&>) {
-						auto node = this->This->root;
-						if (node == nullptr)
+						auto node = this->This->heap;
+						if (node != nullptr)
 						{
 							ForEachImplWithoutIndex(node, lambda);
 						}
 						return *this;
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TPriority, TValue>&, SizeT>) {
-						auto node = this->This->root;
+						auto node = this->This->heap;
 						if (node != nullptr)
 						{
 							SizeT index = 0;
@@ -473,11 +474,11 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BasePriorityQueue& ForEachImpl(LambdaT&& lambda) {
+				forceinline BasePriorityQueue& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TPriority, TValue>&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TPriority, TValue>&>) {
 							auto node = this->This->heap;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachImplWithoutIndex(node, lambda);
 							}
@@ -500,10 +501,10 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Key
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					Node* it = node;
 					do{
-						lambda(it->data.Key, Index); Index++:
+						lambda(it->data.Key, Index); Index++;
 						if (it->child != nullptr)
 							ForEachKeyImplWithIndex(it->child, Index, lambda);
 						it = it->next;
@@ -511,7 +512,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
 					Node* it = node;
 					do {
 						lambda(it->data.Key);
@@ -522,10 +523,10 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BasePriorityQueue& ForEachKeyImpl(LambdaT&& lambda) {
+				forceinline BasePriorityQueue& ForEachKeyImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TPriority&>) {
 						auto node = this->This->heap;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachKeyImplWithoutIndex(node, lambda);
 						}
@@ -546,10 +547,10 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BasePriorityQueue& ForEachKeyImpl(LambdaT&& lambda) const {
+				forceinline const BasePriorityQueue& ForEachKeyImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TPriority&>) {
 						auto node = this->This->heap;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachKeyImplWithoutIndex(node, lambda);
 						}
@@ -571,10 +572,10 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Value
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda, Node* startNode = nullptr) {
+				forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda, Node* startNode = nullptr) {
 					Node* it = node;
 					do {
-						lambda(it->data.Value, Index); Index++:
+						lambda(it->data.Value, Index); Index++;
 						if (it->child != nullptr)
 							ForEachValueImplWithIndex(it->child, Index, lambda);
 						it = it->next;
@@ -582,7 +583,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda, Node* startNode = nullptr) {
+				forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda, Node* startNode = nullptr) {
 					Node* it = node;
 					do {
 						lambda(it->data.Value);
@@ -593,10 +594,10 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BasePriorityQueue& ForEachValueImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue>& > ) {
+				forceinline const BasePriorityQueue& ForEachValueImpl(LambdaT&& lambda) const {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&> ) {
 							auto node = this->This->heap;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachValueImplWithoutIndex(node, lambda);
 							}
@@ -617,11 +618,11 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BasePriorityQueue& ForEachValueImpl(LambdaT&& lambda) {
+				forceinline BasePriorityQueue& ForEachValueImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TValue&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&>) {
 						auto node = this->This->heap;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachValueImplWithoutIndex(node, lambda);
 						}
@@ -643,7 +644,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline void deleteAll(Node* n, Lambda& lambda) {
+				forceinline void deleteAll(Node* n, Lambda& lambda) {
 					if (n != nullptr) {
 						Node* c = n;
 						do {
@@ -656,18 +657,22 @@ namespace Seed {
 					}
 				}
 
-				__forceinline BasePriorityQueue& RemoveAllImpl() {
+				forceinline BasePriorityQueue& RemoveAllImpl() {
 					this->Dispose();
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BasePriorityQueue& RemoveAllWithImpl(Lambda&& lambda) {
+				forceinline BasePriorityQueue& RemoveAllWithImpl(Lambda&& lambda) {
 					if (This->heap != nullptr)
 						deleteAll(This->heap, lambda);
 					This->heap = nullptr;
 					This->count = 0;
 					return *this;
+				}
+
+				forceinline void UnsafeAdd(Pair&& pair){
+					Insert(MoveRValue(pair));
 				}
 #pragma endregion
 			public:
@@ -693,7 +698,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename TKey, typename TVal>
-		__forceinline void Swap(Containers::BasePriorityQueue<THeap, TKey, TVal>& A, Containers::BasePriorityQueue<THeap, TKey, TVal>& B) {
+		forceinline void Swap(Containers::BasePriorityQueue<THeap, TKey, TVal>& A, Containers::BasePriorityQueue<THeap, TKey, TVal>& B) {
 			Swap(A.This, B.This);
 		}
 	}

@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Exceptions.h"
 
 void Seed::Core::Internals::Exceptions::ThrowNullPointException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT Addr, UInt8 Type)

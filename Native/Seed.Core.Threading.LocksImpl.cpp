@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Threading.DataFlowControler.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
 
@@ -9,7 +12,7 @@
 //HACK: Thinck how remove it. It use for rethrow when Seed exception API not allowed
 void _declspec(noreturn) Seed::Core::Threading::__rethrow()
 {
-	throw;
+	throw; //-V667
 }
 
 Seed::Core::Threading::DataFlowControler::DataFlowControler() :

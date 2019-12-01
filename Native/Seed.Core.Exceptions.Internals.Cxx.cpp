@@ -71,7 +71,7 @@ int StateFromIp(FuncInfo* pFuncInfo, DISPATCHER_CONTEXT* pDC) {
         Ip -= 4;
     }
 
-    IptoStateMapEntry* pIPtoStateMap = GetByOffset<IptoStateMapEntry>(pDC->ImageBase, pFuncInfo->dispIPtoStateMap);
+    auto* pIPtoStateMap = GetByOffset<IptoStateMapEntry>(pDC->ImageBase, pFuncInfo->dispIPtoStateMap);
     for (index = 0; index < pFuncInfo->nIPMapEntries; index++) {
         if (Ip < (UInt64)(pDC->ImageBase + pIPtoStateMap[index].Ip)) {
             break;
@@ -94,7 +94,7 @@ __forceinline int StateFromControlPc(FuncInfo* pFuncInfo, DISPATCHER_CONTEXT* pD
 }
 
 __forceinline void SetState(EHRegistrationNode* pRN, FuncInfo* pFuncInfo, __ehstate_t newState) {
-    *(DWORD*)(pFuncInfo->dispUwindHelp + (size_t)*pRN) = newState;
+    *(DWORD*)(pFuncInfo->dispUwindHelp + (SizeT)*pRN) = newState;
 }
 
 __ehstate_t GetCurrentState(EHRegistrationNode* pRN, DISPATCHER_CONTEXT* pDC, FuncInfo* pFuncInfo) {
@@ -1729,8 +1729,8 @@ void _CopyException(RawExceptionInfo* orig, RawExceptionInfo* copy)
 Seed::Exception::RawException Seed::Core::Exceptions::Exception::StoreCurrentException()
 {
     if (ThreadExceptionInfo->_isCatchBlockProceding) {
-        RawExceptionInfo* current = (RawExceptionInfo*)ThreadExceptionInfo->_curexception;
-        RawExceptionInfo* record = (RawExceptionInfo*)InternalHeapAllocate(sizeof(RawExceptionInfo));
+        RawExceptionInfo* current = static_cast<RawExceptionInfo*>(ThreadExceptionInfo->_curexception);
+        RawExceptionInfo* record = static_cast<RawExceptionInfo*>(InternalHeapAllocate(sizeof(RawExceptionInfo)));
         RtlSecureZeroMemory(record, sizeof(RawExceptionInfo));
         _CopyException(current, record);
         return RawException(record);

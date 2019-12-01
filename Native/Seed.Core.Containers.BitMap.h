@@ -325,6 +325,8 @@ namespace Seed {
 				friend class LINQ::IBitMapT;
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)

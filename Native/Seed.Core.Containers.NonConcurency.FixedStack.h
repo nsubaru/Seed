@@ -4,6 +4,8 @@
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Containers.API.LINQ.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -105,6 +107,8 @@ namespace Seed {
 				friend class LINQ::IFixedStack;
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -300,12 +304,9 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
-					This->stack[Index] = Value;
-				}
-
 				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
+					This->count = Index + 1;
 				}
 
 				__forceinline BaseFixedStack& RemoveAllImpl() {
@@ -348,3 +349,4 @@ namespace Seed {
 		}
 	}
 }
+#pragma warning(pop)

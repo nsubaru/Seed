@@ -30,19 +30,19 @@ extern "C" {
 		volatile __int64* lpAddend
 	);
 	short _InterlockedCompareExchange16(
-		short volatile* Destination,
-		short Exchange,
-		short Comperand
+		short volatile* destination,
+		short exchange,
+		short comperand
 	);
 	long _InterlockedCompareExchange(
-		long volatile* Destination,
-		long Exchange,
-		long Comperand
+		long volatile* destination,
+		long exchange,
+		long comperand
 	);
 	__int64 _InterlockedCompareExchange64(
-		__int64 volatile* Destination,
-		__int64 Exchange,
-		__int64 Comperand
+		__int64 volatile* destination,
+		__int64 exchange,
+		__int64 comperand
 	);
 }
 #pragma endregion
@@ -55,166 +55,166 @@ namespace Seed {
 		public:
 #pragma region Add
 			///<summary>Атомарне додавання</summary>
-			///<param name = "To">volatile зміна до якої додасться значення What</param>
-			///<param name = "What">зміна яка додасться</param>
-			///<returns>Нове значення зміної To</returns>
-			__forceinline static Int32 InterlockedAdd(volatile Int32& To, Int32 What) {
-				return _InterlockedAdd(reinterpret_cast<volatile long*>(&To), What);
+			///<param name = "to">volatile зміна до якої додасться значення what</param>
+			///<param name = "what">зміна яка додасться</param>
+			///<returns>Нове значення змінної to</returns>
+			__forceinline static Int32 InterlockedAdd(volatile Int32& to, Int32 what) {
+				return _InterlockedAdd(reinterpret_cast<volatile long*>(&to), what);
 			}
 
 			///<summary>Атомарне додавання</summary>
-			///<param name = "To">volatile зміна до якої додасться значення What</param>
-			///<param name = "What">зміна яка додасться</param>
-			///<returns>Нове значення зміної To</returns>
-			__forceinline static UInt32 InterlockedAdd(volatile UInt32& To, UInt32 What) {
-				return _InterlockedAdd(reinterpret_cast<volatile long*>(&To), What);
+			///<param name = "to">volatile зміна до якої додасться значення what</param>
+			///<param name = "what">зміна яка додасться</param>
+			///<returns>Нове значення змінної to</returns>
+			__forceinline static UInt32 InterlockedAdd(volatile UInt32& to, UInt32 what) {
+				return _InterlockedAdd(reinterpret_cast<volatile long*>(&to), what);
 			}
 			///<summary>Атомарне додавання</summary>
-			///<param name = "To">volatile зміна до якої додасться значення What</param>
-			///<param name = "What">зміна яка додасться</param>
-			///<returns>Нове значення зміної To</returns>
-			__forceinline static Int64 InterlockedAdd(volatile Int64& To, Int64 What) {
-				return _InterlockedAdd64(reinterpret_cast<volatile __int64*>(&To), What);
+			///<param name = "to">volatile зміна до якої додасться значення what</param>
+			///<param name = "what">зміна яка додасться</param>
+			///<returns>Нове значення змінної to</returns>
+			__forceinline static Int64 InterlockedAdd(volatile Int64& to, Int64 what) {
+				return _InterlockedAdd64(reinterpret_cast<volatile __int64*>(&to), what);
 			}
 
 			///<summary>Атомарне додавання</summary>
-			///<param name = "To">volatile зміна до якої додасться значення What</param>
-			///<param name = "What">зміна яка додасться</param>
-			///<returns>Нове значення зміної To</returns>
-			__forceinline static UInt64 InterlockedAdd(volatile UInt64& To, UInt64 What) {
-				return _InterlockedAdd64(reinterpret_cast<volatile __int64*>(&To), What);
+			///<param name = "to">volatile зміна до якої додасться значення what</param>
+			///<param name = "what">зміна яка додасться</param>
+			///<returns>Нове значення змінної to</returns>
+			__forceinline static UInt64 InterlockedAdd(volatile UInt64& to, UInt64 what) {
+				return _InterlockedAdd64(reinterpret_cast<volatile __int64*>(&to), what);
 			}
 #pragma endregion
 #pragma region Increment
 			///<summary>Атомарне інкрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно інкрементнути</param>
 			///<returns>Нове значення</returns>
-			__forceinline static Int16 Increment(volatile Int16& What) {
-				return _InterlockedIncrement16(reinterpret_cast<volatile short*>(&What));
+			__forceinline static Int16 Increment(volatile Int16& what) {
+				return _InterlockedIncrement16(reinterpret_cast<volatile short*>(&what));
 			}
 			///<summary>Атомарне інкрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно інкрементнути</param>
 			///<returns>Нове значення</returns>
-			__forceinline static UInt16 Increment(volatile UInt16& What) {
-				return _InterlockedIncrement16(reinterpret_cast<volatile short*>(&What));
+			__forceinline static UInt16 Increment(volatile UInt16& what) {
+				return _InterlockedIncrement16(reinterpret_cast<volatile short*>(&what));
 			}
 			///<summary>Атомарне інкрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно інкрементнути</param>
 			///<returns>Нове значення</returns>
-			__forceinline static Int32 Increment(volatile Int32& What) {
-				return _InterlockedIncrement(reinterpret_cast<volatile long*>(&What));
+			__forceinline static Int32 Increment(volatile Int32& what) {
+				return _InterlockedIncrement(reinterpret_cast<volatile long*>(&what));
 			}
 			///<summary>Атомарне інкрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно інкрементнути</param>
 			///<returns>Нове значення</returns>
-			__forceinline static UInt32 Increment(volatile UInt32& What) {
-				return _InterlockedIncrement(reinterpret_cast<volatile long*>(&What));
+			__forceinline static UInt32 Increment(volatile UInt32& what) {
+				return _InterlockedIncrement(reinterpret_cast<volatile long*>(&what));
 			}
 			///<summary>Атомарне інкрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно інкрементнути</param>
 			///<returns>Нове значення</returns>
-			__forceinline static Int64 Increment(volatile Int64& What) {
-				return _InterlockedIncrement64(reinterpret_cast<volatile long long*>(&What));
+			__forceinline static Int64 Increment(volatile Int64& what) {
+				return _InterlockedIncrement64(reinterpret_cast<volatile long long*>(&what));
 			}
 			///<summary>Атомарне інкрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно інкрементнути</param>
 			///<returns>Нове значення</returns>
-			__forceinline static UInt64 Increment(volatile UInt64& What) {
-				return _InterlockedIncrement64(reinterpret_cast<volatile long long*>(&What));
+			__forceinline static UInt64 Increment(volatile UInt64& what) {
+				return _InterlockedIncrement64(reinterpret_cast<volatile long long*>(&what));
 			}
 #pragma endregion
 #pragma region Decrement
 			///<summary>Атомарне декрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно декрементувати</param>
 			///<returns>Нове значення</returns>
-			__forceinline static Int16 Decrement(volatile Int16& What) {
-				return _InterlockedDecrement16(reinterpret_cast<volatile short*>(&What));
+			__forceinline static Int16 Decrement(volatile Int16& what) {
+				return _InterlockedDecrement16(reinterpret_cast<volatile short*>(&what));
 			}
 			///<summary>Атомарне декрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно декрементувати</param>
 			///<returns>Нове значення</returns>
-			__forceinline static UInt16 Decrement(volatile UInt16& What) {
-				return _InterlockedDecrement16(reinterpret_cast<volatile short*>(&What));
+			__forceinline static UInt16 Decrement(volatile UInt16& what) {
+				return _InterlockedDecrement16(reinterpret_cast<volatile short*>(&what));
 			}
 			///<summary>Атомарне декрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно декрементувати</param>
 			///<returns>Нове значення</returns>
-			__forceinline static Int32 Decrement(volatile Int32& What) {
-				return _InterlockedDecrement(reinterpret_cast<volatile long*>(&What));
+			__forceinline static Int32 Decrement(volatile Int32& what) {
+				return _InterlockedDecrement(reinterpret_cast<volatile long*>(&what));
 			}
 			///<summary>Атомарне декрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно декрементувати</param>
 			///<returns>Нове значення</returns>
-			__forceinline static UInt32 Decrement(volatile UInt32& What) {
-				return _InterlockedDecrement(reinterpret_cast<volatile long*>(&What));
+			__forceinline static UInt32 Decrement(volatile UInt32& what) {
+				return _InterlockedDecrement(reinterpret_cast<volatile long*>(&what));
 			}
 			///<summary>Атомарне декрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно декрементувати</param>
 			///<returns>Нове значення</returns>
-			__forceinline static Int64 Decrement(volatile Int64& What) {
-				return _InterlockedDecrement64(reinterpret_cast<volatile long long*>(&What));
+			__forceinline static Int64 Decrement(volatile Int64& what) {
+				return _InterlockedDecrement64(reinterpret_cast<volatile long long*>(&what));
 			}
 			///<summary>Атомарне декрементування змінної</summary>
-			///<param name = "What">Зміна яку потрібно інкрементнути</param>
+			///<param name = "what">Зміна яку потрібно декрементувати</param>
 			///<returns>Нове значення</returns>
-			__forceinline static UInt64 Decrement(volatile UInt64& What) {
-				return _InterlockedDecrement64(reinterpret_cast<volatile long long*>(&What));
+			__forceinline static UInt64 Decrement(volatile UInt64& what) {
+				return _InterlockedDecrement64(reinterpret_cast<volatile long long*>(&what));
 			}
 #pragma endregion
 #pragma region CompareAndSwap
 			///<summary>Атомарне порівняння і обмін
-			///<para> Порівнює Destination з Comperand і обмінює якщо рівне</para></summary>
-			///<param name = "Destination">Силка на змінну в яку запишеться результат вразі успіху</param>
-			///<param name = "Exchange">Нове значення</param>
-			///<param name = "Comperand">Старе значення</param>
+			///<para> Порівнює destination з comperand і обмінює якщо рівне</para></summary>
+			///<param name = "destination">Силка на змінну в яку запишеться результат вразі успіху</param>
+			///<param name = "exchange">Нове значення</param>
+			///<param name = "comperand">Старе значення</param>
 			///<returns>Початкове значення</returns>
-			__forceinline static Int16 CompareAndSwap(volatile Int16& Destination, Int16 Exchange, Int16 Comperand) {
-				return _InterlockedCompareExchange16(reinterpret_cast<volatile short*>(&Destination), Exchange, Comperand);
+			__forceinline static Int16 CompareAndSwap(volatile Int16& destination, Int16 exchange, Int16 comperand) {
+				return _InterlockedCompareExchange16(reinterpret_cast<volatile short*>(&destination), exchange, comperand);
 			}
 			///<summary>Атомарне порівняння і обмін
-			///<para> Порівнює Destination з Comperand і обмінює якщо рівне</para></summary>
-			///<param name = "Destination">Силка на змінну в яку запишеться результат вразі успіху</param>
-			///<param name = "Exchange">Нове значення</param>
-			///<param name = "Comperand">Старе значення</param>
+			///<para> Порівнює destination з comperand і обмінює якщо рівне</para></summary>
+			///<param name = "destination">Силка на змінну в яку запишеться результат вразі успіху</param>
+			///<param name = "exchange">Нове значення</param>
+			///<param name = "comperand">Старе значення</param>
 			///<returns>Початкове значення</returns>
-			__forceinline static UInt16 CompareAndSwap(volatile UInt16& Destination, UInt16 Exchange, UInt16 Comperand) {
-				return _InterlockedCompareExchange16(reinterpret_cast<volatile short*>(&Destination), Exchange, Comperand);
+			__forceinline static UInt16 CompareAndSwap(volatile UInt16& destination, UInt16 exchange, UInt16 comperand) {
+				return _InterlockedCompareExchange16(reinterpret_cast<volatile short*>(&destination), exchange, comperand);
 			}
 			///<summary>Атомарне порівняння і обмін
-			///<para> Порівнює Destination з Comperand і обмінює якщо рівне</para></summary>
-			///<param name = "Destination">Силка на змінну в яку запишеться результат вразі успіху</param>
-			///<param name = "Exchange">Нове значення</param>
-			///<param name = "Comperand">Старе значення</param>
+			///<para> Порівнює destination з comperand і обмінює якщо рівне</para></summary>
+			///<param name = "destination">Силка на змінну в яку запишеться результат вразі успіху</param>
+			///<param name = "exchange">Нове значення</param>
+			///<param name = "comperand">Старе значення</param>
 			///<returns>Початкове значення</returns>
-			__forceinline static Int32 CompareAndSwap(volatile Int32& Destination, Int32 Exchange, Int32 Comperand) {
-				return _InterlockedCompareExchange(reinterpret_cast<volatile long*>(&Destination), Exchange, Comperand);
+			__forceinline static Int32 CompareAndSwap(volatile Int32& destination, Int32 exchange, Int32 comperand) {
+				return _InterlockedCompareExchange(reinterpret_cast<volatile long*>(&destination), exchange, comperand);
 			}
 			///<summary>Атомарне порівняння і обмін
-			///<para> Порівнює Destination з Comperand і обмінює якщо рівне</para></summary>
-			///<param name = "Destination">Силка на змінну в яку запишеться результат вразі успіху</param>
-			///<param name = "Exchange">Нове значення</param>
-			///<param name = "Comperand">Старе значення</param>
+			///<para> Порівнює destination з comperand і обмінює якщо рівне</para></summary>
+			///<param name = "destination">Силка на змінну в яку запишеться результат вразі успіху</param>
+			///<param name = "exchange">Нове значення</param>
+			///<param name = "comperand">Старе значення</param>
 			///<returns>Початкове значення</returns>
-			__forceinline static UInt32 CompareAndSwap(volatile UInt32& Destination, UInt32 Exchange, UInt32 Comperand) {
-				return _InterlockedCompareExchange(reinterpret_cast<volatile long*>(&Destination), Exchange, Comperand);
+			__forceinline static UInt32 CompareAndSwap(volatile UInt32& destination, UInt32 exchange, UInt32 comperand) {
+				return _InterlockedCompareExchange(reinterpret_cast<volatile long*>(&destination), exchange, comperand);
 			}
 			///<summary>Атомарне порівняння і обмін
-			///<para> Порівнює Destination з Comperand і обмінює якщо рівне</para></summary>
-			///<param name = "Destination">Силка на змінну в яку запишеться результат вразі успіху</param>
-			///<param name = "Exchange">Нове значення</param>
-			///<param name = "Comperand">Старе значення</param>
+			///<para> Порівнює destination з comperand і обмінює якщо рівне</para></summary>
+			///<param name = "destination">Силка на змінну в яку запишеться результат вразі успіху</param>
+			///<param name = "exchange">Нове значення</param>
+			///<param name = "comperand">Старе значення</param>
 			///<returns>Початкове значення</returns>
-			__forceinline static Int64 CompareAndSwap(volatile Int64& Destination, Int64 Exchange, Int64 Comperand) {
-				return _InterlockedCompareExchange64(reinterpret_cast<volatile long long*>(&Destination), Exchange, Comperand);
+			__forceinline static Int64 CompareAndSwap(volatile Int64& destination, Int64 exchange, Int64 comperand) {
+				return _InterlockedCompareExchange64(reinterpret_cast<volatile long long*>(&destination), exchange, comperand);
 			}
 			///<summary>Атомарне порівняння і обмін
-			///<para> Порівнює Destination з Comperand і обмінює якщо рівне</para></summary>
-			///<param name = "Destination">Силка на змінну в яку запишеться результат вразі успіху</param>
-			///<param name = "Exchange">Нове значення</param>
-			///<param name = "Comperand">Старе значення</param>
+			///<para> Порівнює destination з comperand і обмінює якщо рівне</para></summary>
+			///<param name = "destination">Силка на змінну в яку запишеться результат вразі успіху</param>
+			///<param name = "exchange">Нове значення</param>
+			///<param name = "comperand">Старе значення</param>
 			///<returns>Початкове значення</returns>
-			__forceinline static UInt64 CompareAndSwap(volatile UInt64& Destination, UInt64 Exchange, UInt64 Comperand) {
-				return _InterlockedCompareExchange64(reinterpret_cast<volatile long long*>(&Destination), Exchange, Comperand);
+			__forceinline static UInt64 CompareAndSwap(volatile UInt64& destination, UInt64 exchange, UInt64 comperand) {
+				return _InterlockedCompareExchange64(reinterpret_cast<volatile long long*>(&destination), exchange, comperand);
 			}
 #pragma endregion
 		};

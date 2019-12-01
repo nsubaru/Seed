@@ -21,18 +21,18 @@ namespace Seed {
             private:
                 template<typename T, typename Tuple, SizeT I = 0>
                 static BaseMemoryStream& FieldsMetaData(const T& Struct, BaseMemoryStream& stream) {
-                    if constexpr (I == Tuple::Count())
+                    if constexpr (I == Tuple::Count)
                         return stream;
                     else
                     {
-                        if constexpr (I + 1 == Tuple::Count()) {
-                            using FieldMetaData = typename Tuple::Item<I>;
+                        if constexpr (I + 1 == Tuple::Count) {
+                            using FieldMetaData = typename Tuple::ItemType<I>;
                             using FieldType = typename FieldMetaData::FieldType;
                             auto ptr = reinterpret_cast<const Byte*>(&Struct) + FieldMetaData::FieldOffset;
                             return SerilizeImpl(reinterpret_cast<const FieldMetaData::FieldType&>(*ptr), stream);
                         }
                         else {
-                            using FieldMetaData = typename Tuple::Item<I>;
+                            using FieldMetaData = typename Tuple::ItemType<I>;
                             using FieldType = typename FieldMetaData::FieldType;
                             auto ptr = reinterpret_cast<const Byte*>(&Struct) + FieldMetaData::FieldOffset;
                             return FieldsMetaData<T, Tuple, I + 1>(Struct, SerilizeImpl(reinterpret_cast<const FieldMetaData::FieldType&>(*ptr), stream));

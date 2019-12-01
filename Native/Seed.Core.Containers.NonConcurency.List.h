@@ -198,7 +198,7 @@ namespace Seed {
 				///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
 				///</para>
 				///</summary>
-				class SeedKernelCall Iterator
+				class SeedKernelCall Iterator : IDisposable
 				{
 					friend class BaseList;
 				private:
@@ -211,6 +211,8 @@ namespace Seed {
 					{
 						if (This != nullptr) ++This->RefCount;
 					}
+				protected:
+                    virtual void Dispose() override {};
 				public:
 					///<summary>Пустий конструктор</summary>
 					__forceinline Iterator() :This(nullptr)
@@ -398,7 +400,7 @@ namespace Seed {
 						}
 						else
 						{
-							__assume(this->This->father != nullptr);
+							__assume(this->This->father != nullptr); //-V547
 							if (this->This->next == nullptr && this->This->prev == nullptr)
 							{
 								this->This->father->root = this->This->father->last = nullptr;
@@ -549,20 +551,7 @@ namespace Seed {
 					template<typename U>
 					friend void Seed::Core::Swap(U& A, U& B);
 
-					///<summary>Деструктор ітератора
-					///<para>Якщо елемент є останьою силкою на об'єкт то відбувається знищення об'єкта
-					///завдяки цьому ітератори можна безпечно передавати не слідкуючи за життямм списку який є
-					///власником об'єкта
-					///</para></summary>
-					__forceinline ~Iterator() noexcept
-					{
-						if (This == nullptr) return;
-						if (--This->RefCount == 0)
-						{
-							delete This;
-						}
-						This = nullptr;
-					}
+                    RefCountClass(Iterator, This);
 				};
 			public:
 				friend Iterator;
@@ -826,7 +815,7 @@ namespace Seed {
 					}
 					else
 					{
-						__assume(node.This->father != nullptr);
+						__assume(node.This->father != nullptr); //-V547
 						if (node.This->next == nullptr && node.This->prev == nullptr)
 						{
 							node.This->father->root = node.This->father->last = nullptr;
@@ -850,7 +839,7 @@ namespace Seed {
 
 						--((node.This)->father->size);
 
-						if (--node.This->RefCount == 0)
+						if (--node.This->RefCount == 1)
 						{
 							auto newThis = node.This->next;
 							delete node.This;
@@ -869,9 +858,6 @@ namespace Seed {
 				friend void Seed::Core::Swap(U& A, U& B);
 			public:
 				RefCountClass(BaseList, This)
-			public:
-				SizeT getCount() { return This->size; }
-				SizeT Property(getCount) Count;
 			public:
 				virtual BaseList Clone() const override final {
 					BaseList result;
@@ -896,6 +882,8 @@ namespace Seed {
 				friend class LINQ::IFixedCollectionBase;
 				template<template<typename THeap, typename T>typename TList, typename THeap, typename T, bool TIsDynamic, bool TIsConcurencySuport>
 				friend class LINQ::IOrderable;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -1225,7 +1213,7 @@ namespace Seed {
 					else {
 						this->This->last->prev->next = this->This->last = new elem(Value, this->This, this->This->last);
 					}
-					this->This->size++;
+					++this->This->size;
 				}
 
 				__forceinline BaseList& RemoveAllImpl() {
@@ -1463,20 +1451,20 @@ namespace Seed {
 
 				template<typename FilterLambda, typename Lambda>
 				__forceinline BaseList& RemoveIf(FilterLambda&& filter, Lambda&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, T&&>::State&&
-						TypeTraits::IsLambdaConvertible<FilteringLambda, Boolean, const T&>::State) {
+					if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
+						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State) {
 						return RemoveIfFilterAndLambdaWithoutIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, T&&>::State&&
-						TypeTraits::IsLambdaConvertible<FilteringLambda, Boolean, const T&, SizeT>::State) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
+						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State) {
 						return RemoveIfFilterWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, T&&, SizeT>::State&&
-						TypeTraits::IsLambdaConvertible<FilteringLambda, Boolean, const T&>::State) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State&&
+						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State) {
 						return RemoveIfLambdaWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertible<Lambda, void, T&&, SizeT>::State&&
-						TypeTraits::IsLambdaConvertible<FilteringLambda, Boolean, const T&, SizeT>::State) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State&&
+						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State) {
 						return RemoveIfFilterAndLambdaWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
 					else

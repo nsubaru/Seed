@@ -22,153 +22,221 @@ typedef struct _GUID {
 #endif
 
 namespace Seed {
-	inline namespace Core {
-		//Клас унікального ідентифікатора UUID сумісного з GUID
-		// який використовується в ядрі Windows
+	inline namespace Core {		
+		/// <summary>
+		/// Клас унікального ідентифікатора UUID сумісного з GUID який використовується в ядрі Windows
+		/// </summary>
 		class SeedKernelCall UUID {
 		private:
-			//GUID для зберігання даних
+			/// <summary>
+			/// значення об'єкту
+			/// </summary>
 			GUID uuid;
 		public:
+			/// <summary>
+			/// Маска UUID для форматування рядка
+			/// </summary>
 			static constexpr Char UUIDStringWildCard[38] = L"{????????-????-????-????????????????}";
 
-			//Вертає нульовий UUID
-			constexpr __forceinline static UUID GetZeroUUID() noexcept { return UUID(); }
+			/// <summary>
+			/// Нульовий UUID
+			/// </summary>
+			/// <returns>Вертає нульовий UUID</returns>
+			constexpr __forceinline static UUID GetZeroUUID() { return UUID(); };
 
-			//Вертає максимальний можливий UUID
-			__forceinline static UUID GetMaxUUID() noexcept {
-				return GUID({ 0xffffffff,0xffff,0xffff,{0xff,0xff,0xff,0xff,0xff} }); //-V112 //-V2523
-			}
+			/// <summary>
+			/// Максимальний можливий UUID
+			/// </summary>
+			/// <returns>Вертає максимальний можливий UUID</returns>
+			constexpr __forceinline static UUID GetMaxUUID() { return UUID(GUID({ 0xffffffff,0xffff,0xffff,{0xff,0xff,0xff,0xff,0xff} })); };//-V112 //-V2523
 
-			//Пустий конструктор, генерує нульовий ідентифікатор
-			constexpr __forceinline UUID() noexcept : uuid({ 0 }) { }
-			//Конструктор з GUID
-			__forceinline UUID(const GUID& uuid) noexcept { this->uuid = uuid; }
+			/// <summary>
+			/// Пустий конструктор, генерує нульовий ідентифікатор
+			/// </summary>
+			/// <returns>Нульовий ідентифікатор</returns>
+			constexpr __forceinline UUID() : uuid({ 0,0,0, {0,0,0,0,0,0,0,0}}) { }
 
-			//Неявне перетворення в GUID потрібно для сумісності з Nt і Rtl функціями ntdll
-			__forceinline operator const GUID& () const noexcept { return this->uuid; }
+			/// <summary>
+			/// Конструктор з GUID
+			/// </summary>
+			/// <param name="uuid">GUID значення</param>
+			/// <returns>Ідентифікатор</returns>
+			constexpr __forceinline UUID(const GUID& uuid) : uuid(uuid) {}
 
-			//Постфіксний декремени
-			__forceinline UUID& operator--() noexcept {
-				if (uuid.Data4[3] == 0)
-					if (uuid.Data4[2] == 0)
-						if (uuid.Data4[1] == 0)
-							if (uuid.Data4[0] == 0)
-								if (uuid.Data3 == 0)
-									if (uuid.Data2 == 0)
-										if (!uuid.Data1 == 0) uuid.Data1 -= 1;
-										else return *this;
-									else uuid.Data2 -= 1;
-								else uuid.Data3 -= 1;
-							else uuid.Data4[0] -= 1;
-						else uuid.Data4[1] -= 1;
-					else uuid.Data4[2] -= 1;
-				else uuid.Data4[3] -= 1;
+			/// <summary>
+			/// Неявне перетворення в GUID потрібно для сумісності з Nt і Rtl функціями ntdll
+			/// </summary>
+			/// <returns>GUID з значенням об'єкта</returns>
+			constexpr __forceinline operator const GUID& () const { return this->uuid; }
+
+			/// <summary>
+			/// Постфіксний декремент
+			/// </summary>
+			/// <returns></returns>
+			constexpr __forceinline UUID& operator--() {
+				if (uuid.Data4[7] == 0)
+					if (uuid.Data4[6] == 0)
+						if (uuid.Data4[5] == 0)
+							if (uuid.Data4[4] == 0)
+								if (uuid.Data4[3] == 0)
+									if (uuid.Data4[2] == 0)
+										if (uuid.Data4[1] == 0)
+											if (uuid.Data4[0] == 0)
+												if (uuid.Data3 == 0)
+													if (uuid.Data2 == 0)
+														if (uuid.Data1 != 0) uuid.Data1 -= 1;
+														else return *this;
+													else uuid.Data2 -= 1;
+												else uuid.Data3 -= 1;
+											else uuid.Data4[0] -= 1;
+										else uuid.Data4[1] -= 1;
+									else uuid.Data4[2] -= 1;
+								else uuid.Data4[3] -= 1;
+							else uuid.Data4[4] -= 1;
+						else uuid.Data4[5] -= 1;
+					else uuid.Data4[6] -= 1;
+				else uuid.Data4[7] -= 1;
 				return *this;
 			}
-			//Постфіксний інкремент
-			__forceinline UUID& operator++() noexcept {
-				if (uuid.Data4[3] == Seed::Math::Max<UInt8>())
-					if (uuid.Data4[2] == Seed::Math::Max<UInt8>())
-						if (uuid.Data4[1] == Seed::Math::Max<UInt8>())
-							if (uuid.Data4[0] == Seed::Math::Max<UInt8>())
-								if (uuid.Data3 == Seed::Math::Max<UInt16>())
-									if (uuid.Data2 == Seed::Math::Max<UInt16>())
-										if (uuid.Data1 != Seed::Math::Max<UInt32>()) uuid.Data1 += 1;
-										else return *this;
-									else uuid.Data2 += 1;
-								else uuid.Data3 += 1;
-							else uuid.Data4[0] += 1;
-						else uuid.Data4[1] += 1;
-					else uuid.Data4[2] += 1;
-				else uuid.Data4[3] += 1;
+			
+			/// <summary>
+			/// Постфіксний інкремент
+			/// </summary>
+			/// <returns>Нове значення</returns>
+			constexpr __forceinline UUID& operator++() {
+				if (uuid.Data4[7] == Seed::Math::Max<UInt8>())
+					if (uuid.Data4[6] == Seed::Math::Max<UInt8>())
+						if (uuid.Data4[5] == Seed::Math::Max<UInt8>())
+							if (uuid.Data4[4] == Seed::Math::Max<UInt8>())
+								if (uuid.Data4[3] == Seed::Math::Max<UInt8>())
+									if (uuid.Data4[2] == Seed::Math::Max<UInt8>())
+										if (uuid.Data4[1] == Seed::Math::Max<UInt8>())
+											if (uuid.Data4[0] == Seed::Math::Max<UInt8>())
+												if (uuid.Data3 == Seed::Math::Max<UInt16>())
+													if (uuid.Data2 == Seed::Math::Max<UInt16>())
+														if (uuid.Data1 != Seed::Math::Max<UInt32>()) uuid.Data1 += 1;
+														else return *this;
+													else uuid.Data2 += 1;
+												else uuid.Data3 += 1;
+											else uuid.Data4[0] += 1;
+										else uuid.Data4[1] += 1;
+									else uuid.Data4[2] += 1;
+								else uuid.Data4[3] += 1;
+							else uuid.Data4[4] += 1;
+						else uuid.Data4[5] += 1;
+					else uuid.Data4[6] += 1;
+				else uuid.Data4[7] += 1;
 				return *this;
 			}
 
-			//Префіксний декремент
-			__forceinline UUID operator--(int) noexcept {
-				GUID uuidCp = this->uuid;
-				if (uuidCp.Data4[3] == 0)
-					if (uuidCp.Data4[2] == 0)
-						if (uuidCp.Data4[1] == 0)
-							if (uuidCp.Data4[0] == 0)
-								if (uuidCp.Data3 == 0)
-									if (uuidCp.Data2 == 0)
-										if (!uuidCp.Data1 == 0) uuidCp.Data1 -= 1;
-										else return uuidCp;
-									else uuidCp.Data2 -= 1;
-								else uuidCp.Data3 -= 1;
-							else uuidCp.Data4[0] -= 1;
-						else uuidCp.Data4[1] -= 1;
-					else uuidCp.Data4[2] -= 1;
-				else uuidCp.Data4[3] -= 1;
+			/// <summary>
+			/// Префіксний декремент
+			/// </summary>
+			/// <returns>Вертає старе значення</returns>
+			constexpr __forceinline UUID operator--(int) {
+				const UUID uuidCp = this->uuid;
+				--*this;
 				return uuidCp;
 			}
-			//Префіксний інкремент
-			__forceinline UUID operator++(int) noexcept {
-				GUID uuidCp = this->uuid;
-				if (uuidCp.Data4[3] == Seed::Math::Max<UInt8>())
-					if (uuidCp.Data4[2] == Seed::Math::Max<UInt8>())
-						if (uuidCp.Data4[1] == Seed::Math::Max<UInt8>())
-							if (uuidCp.Data4[0] == Seed::Math::Max<UInt8>())
-								if (uuidCp.Data3 == Seed::Math::Max<UInt16>())
-									if (uuidCp.Data2 == Seed::Math::Max<UInt16>())
-										if (uuidCp.Data1 != Seed::Math::Max<UInt32>()) uuidCp.Data1 += 1;
-										else return uuidCp;
-									else uuidCp.Data2 += 1;
-								else uuidCp.Data3 += 1;
-							else uuidCp.Data4[0] += 1;
-						else uuidCp.Data4[1] += 1;
-					else uuidCp.Data4[2] += 1;
-				else uuidCp.Data4[3] += 1;
+			
+			/// <summary>
+			/// Префіксний інкремент
+			/// </summary>
+			/// <returns>Вертає старе значення</returns>
+			constexpr __forceinline UUID operator++(int) {
+				const UUID uuidCp = this->uuid;
+				++*this;
 				return uuidCp;
 			}
 
-			//Провірка на рівність
-			__forceinline friend Boolean operator==(const UUID& a, const UUID& b) noexcept {
-				if (a.uuid.Data4[3] == b.uuid.Data4[3])
-					if (a.uuid.Data4[2] == b.uuid.Data4[2])
-						if (a.uuid.Data4[1] == b.uuid.Data4[1])
-							if (a.uuid.Data4[0] == b.uuid.Data4[0])
-								if (a.uuid.Data3 == b.uuid.Data3)
-									if (a.uuid.Data2 == b.uuid.Data2)
-										if (a.uuid.Data1 == b.uuid.Data1)
-											return true;
+			/// <summary>
+			/// Перевірка на рівність
+			/// </summary>
+			/// <param name="a">Праве значення</param>
+			/// <param name="b">Ліве значення</param>
+			/// <returns>True якщо рівні, False якщо ні</returns>
+			constexpr __forceinline friend Boolean operator==(const UUID& a, const UUID& b) {
+				if (a.uuid.Data4[7] == b.uuid.Data4[7])
+					if (a.uuid.Data4[6] == b.uuid.Data4[6])
+						if (a.uuid.Data4[5] == b.uuid.Data4[5])
+							if (a.uuid.Data4[4] == b.uuid.Data4[4])
+								if (a.uuid.Data4[3] == b.uuid.Data4[3])
+									if (a.uuid.Data4[2] == b.uuid.Data4[2])
+										if (a.uuid.Data4[1] == b.uuid.Data4[1])
+											if (a.uuid.Data4[0] == b.uuid.Data4[0])
+												if (a.uuid.Data3 == b.uuid.Data3)
+													if (a.uuid.Data2 == b.uuid.Data2)
+														if (a.uuid.Data1 == b.uuid.Data1) return true;
 				return false;
 			}
 
-			//Провірка на нерівність
-			__forceinline friend Boolean operator!=(const UUID& a, const UUID& b) noexcept {
+			/// <summary>
+			/// Перевірка на нерівність
+			/// </summary>
+			/// <param name="a">Праве значення</param>
+			/// <param name="b">Ліве значення</param>
+			/// <returns>True якщо не рівні, інакше False</returns>
+			constexpr __forceinline friend Boolean operator!=(const UUID& a, const UUID& b) {
 				return !(a == b);
 			}
-			//Провірка a < b
-			__forceinline friend Boolean operator<(const UUID& a, const UUID& b) noexcept {
-				if (a.uuid.Data4[3] < b.uuid.Data4[3])
-					if (a.uuid.Data4[2] < b.uuid.Data4[2])
-						if (a.uuid.Data4[1] < b.uuid.Data4[1])
-							if (a.uuid.Data4[0] < b.uuid.Data4[0])
-								if (a.uuid.Data3 < b.uuid.Data3)
-									if (a.uuid.Data2 < b.uuid.Data2)
-										if (a.uuid.Data1 < b.uuid.Data1)
-											return true;
+
+			/// <summary>
+			/// Перевірка a менше b
+			/// </summary>
+			/// <param name = "a">Праве значення</param>
+			/// <param name = "b">Ліве значення</param>
+			/// <returns>True якщо праве менше ніж ліве, False інакше</returns>
+			constexpr __forceinline friend Boolean operator<(const UUID& a, const UUID& b) {
+				if (a.uuid.Data4[7] < b.uuid.Data4[7])
+					if (a.uuid.Data4[6] < b.uuid.Data4[6])
+						if (a.uuid.Data4[5] < b.uuid.Data4[5])
+							if (a.uuid.Data4[4] < b.uuid.Data4[4])
+								if (a.uuid.Data4[3] < b.uuid.Data4[3])
+									if (a.uuid.Data4[2] < b.uuid.Data4[2])
+										if (a.uuid.Data4[1] < b.uuid.Data4[1])
+											if (a.uuid.Data4[0] < b.uuid.Data4[0])
+												if (a.uuid.Data3 < b.uuid.Data3)
+													if (a.uuid.Data2 < b.uuid.Data2)
+														if (a.uuid.Data1 < b.uuid.Data1) return true;
 				return false;
 			}
-			//Провірка a > b
-			__forceinline friend Boolean operator>(const UUID& a, const UUID& b) noexcept {
-				if (a.uuid.Data4[3] > b.uuid.Data4[3])
-					if (a.uuid.Data4[2] > b.uuid.Data4[2])
-						if (a.uuid.Data4[1] > b.uuid.Data4[1])
-							if (a.uuid.Data4[0] > b.uuid.Data4[0])
-								if (a.uuid.Data3 > b.uuid.Data3)
-									if (a.uuid.Data2 > b.uuid.Data2)
-										if (a.uuid.Data1 > b.uuid.Data1)
-											return true;
+			
+			/// <summary>
+			/// Перевірка a більше b
+			/// </summary>
+			/// <param name="a">Праве значення</param>
+			/// <param name="b">Ліве значення</param>
+			/// <returns>True якщо праве більше ніж ліве, False інакше</returns>
+			constexpr __forceinline friend Boolean operator>(const UUID& a, const UUID& b) {
+				if (a.uuid.Data4[7] > b.uuid.Data4[7])
+					if (a.uuid.Data4[6] > b.uuid.Data4[6])
+						if (a.uuid.Data4[5] > b.uuid.Data4[5])
+							if (a.uuid.Data4[4] > b.uuid.Data4[4])
+								if (a.uuid.Data4[3] > b.uuid.Data4[3])
+									if (a.uuid.Data4[2] > b.uuid.Data4[2])
+										if (a.uuid.Data4[1] > b.uuid.Data4[1])
+											if (a.uuid.Data4[0] > b.uuid.Data4[0])
+												if (a.uuid.Data3 > b.uuid.Data3)
+													if (a.uuid.Data2 > b.uuid.Data2)
+														if (a.uuid.Data1 > b.uuid.Data1) return true;
 				return false;
 			}
-			//Провірка a>=b
-			__forceinline friend Boolean operator>=(const UUID& a, const UUID& b) noexcept { return a == b || a > b; }
-			//Провірка a<=b
-			__forceinline friend Boolean operator<=(const UUID& a, const UUID& b) noexcept { return a == b || a < b; }
+			
+			/// <summary>
+			/// Перевірка a більше рівне b
+			/// </summary>
+			/// <param name="a">Праве значення</param>
+			/// <param name="b">Ліве значення</param>
+			/// <returns>True якщо праве менша або рівне ніж ліве, False інакше</returns>
+			constexpr __forceinline friend Boolean operator>=(const UUID& a, const UUID& b) { return a == b || a > b; }
+			
+			/// <summary>
+			/// Перевірка a меншу рівне b
+			/// </summary>
+			/// <param name="a">Праве значення</param>
+			/// <param name="b">Ліве значення</param>
+			/// <returns>True якщо праве більше або рівне ніж ліве, False інакше</returns>
+			constexpr __forceinline friend Boolean operator<=(const UUID& a, const UUID& b) { return a == b || a < b; }
 		};
 	}
 }

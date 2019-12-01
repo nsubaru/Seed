@@ -6,11 +6,10 @@ namespace Seed {
 		namespace Containers {
 			namespace LINQ {
 				template<template<typename THeap, typename T>typename TList, typename THeap, typename T, bool TIsConcurencySuport>
-				class SeedKernelCall IDynamicQueue :
+				class SeedKernelCall IDynamicQueue :  // NOLINT
 					public ICollection<TList, THeap, T, false, TIsConcurencySuport> {
 				public:
-				public:
-					virtual ~IDynamicQueue() = 0 {}
+					virtual ~IDynamicQueue() = 0 {};
 				};
 			}
 		}

@@ -78,14 +78,10 @@ namespace Seed {
 			///<param name = "orig">Оригинал константного рядка</param>
 			constexpr ConstAString(const ConstAString& orig) : str(orig.str), size(orig.size) {} //-V730
 
-			///<summary>Оператор копіювання</summary>
-			///<param name = "orig">Оригинал константного рядка</param>
-			///<returns>Силку на поточний об'єкт</returns>
 			constexpr ConstAString& operator=(const ConstAString& orig) = default;
 
 			///<summary>Оператор доступу до символів константного ASCII рядка</summary>
-			///<param name = "Index>Індекс символа в рядку</param>
-			///<returns>Константна силка на літеру</returns>
+			///<param name = "Index">Індекс символа в рядку</param>
 			const AChar& operator[](SizeT Index) const {
 				if (Index >= size)
 					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, size);
@@ -123,14 +119,12 @@ namespace Seed {
 			///<param name = "orig">Оригинал константного рядка</param>
 			constexpr ConstString(const ConstString& orig) : str(orig.str), size(orig.size) {} //-V730
 
-			///<summary>Оператор копіювання</summary>
+			//<summary>Оператор копіюваювання</summary>
 			///<param name = "orig">Оригинал константного рядка</param>
-			///<returns>Силку на поточний об'єкт</returns>
 			ConstString& operator=(const ConstString& orig) = default;
 
 			///<summary>Оператор доступу до символів константного рядка</summary>
-			///<param name = "Index>Індекс символа в рядку</param>
-			///<returns>Константна силка на літеру</returns>
+			///<param name = "Index">Індекс символа в рядку</param>
 			const Char& operator[](SizeT Index) const {
 				if (Index >= size)
 					Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, size);

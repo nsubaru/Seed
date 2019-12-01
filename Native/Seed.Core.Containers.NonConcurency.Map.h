@@ -728,30 +728,32 @@ namespace Seed {
 				friend class LINQ::IAssociableCollection;
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
 				friend class LINQ::IMap;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 #pragma region ForEach Pair
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachImplWithIndex(node->left, Index, lambda);
 					lambda(node->data, Index); Index++;
 					if (node->right != nullptr)
-						ForEachImplWithIndex(node->left, Index, lambda);
+						ForEachImplWithIndex(node->right, Index, lambda);
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachImplWithoutIndex(node->left, lambda);
 					lambda(node->data);
 					if (node->right != nullptr)
-						ForEachImplWithoutIndex(node->left, lambda);
+						ForEachImplWithoutIndex(node->right, lambda);
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseMap& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseMap& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
 						auto node = this->This->root;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachImplWithoutIndex(node, lambda);
 						}
@@ -772,11 +774,11 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseMap& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseMap& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TKey, TValue>&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
 						auto node = this->This->root;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachImplWithoutIndex(node, lambda);
 						}
@@ -799,29 +801,29 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Key
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachKeyImplWithIndex(node->left, Index, lambda);
 					lambda(node->data.Key, Index); Index++;
 					if (node->right != nullptr)
-						ForEachKeyImplWithIndex(node->left, Index, lambda);
+						ForEachKeyImplWithIndex(node->right, Index, lambda);
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachKeyImplWithoutIndex(node->left, lambda);
 					lambda(node->data.Key);
 					if (node->right != nullptr)
-						ForEachKeyImplWithoutIndex(node->left, lambda);
+						ForEachKeyImplWithoutIndex(node->right, lambda);
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseMap& ForEachKeyImpl(LambdaT&& lambda) {
+				forceinline BaseMap& ForEachKeyImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
 						return This->lock.ShareLock([&]() -> BaseMap& {
 							auto node = this->This->root;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachKeyImplWithoutIndex(node, lambda);
 							}
@@ -845,10 +847,10 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseMap& ForEachKeyImpl(LambdaT&& lambda) const {
+				forceinline const BaseMap& ForEachKeyImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
 						auto node = this->This->root;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachKeyImplWithoutIndex(node, lambda);
 						}
@@ -870,28 +872,28 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Value
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachValueImplWithIndex(node->left, Index, lambda);
 					lambda(node->data.Value, Index); Index++;
 					if (node->right != nullptr)
-						ForEachValueImplWithIndex(node->left, Index, lambda);
+						ForEachValueImplWithIndex(node->right, Index, lambda);
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachValueImplWithoutIndex(node->left, lambda);
 					lambda(node->data.Value);
 					if (node->right != nullptr)
-						ForEachValueImplWithoutIndex(node->left, lambda);
+						ForEachValueImplWithoutIndex(node->right, lambda);
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseMap& ForEachValueImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue>& > ) {
+				forceinline const BaseMap& ForEachValueImpl(LambdaT&& lambda) const {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&> ) {
 						auto node = this->This->root;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachValueImplWithoutIndex(node, lambda);
 						}
@@ -912,11 +914,11 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseMap& ForEachValueImpl(LambdaT&& lambda) {
+				forceinline BaseMap& ForEachValueImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TValue&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&>) {
 						auto node = this->This->root;
-						if (node == nullptr)
+						if (node != nullptr)
 						{
 							ForEachValueImplWithoutIndex(node, lambda);
 						}
@@ -935,6 +937,10 @@ namespace Seed {
 					else {
 						static_assert(false);
 					}
+				}
+
+				forceinline void UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair){
+					Insert(MoveRValue(pair));
 				}
 #pragma endregion
 			protected:
@@ -964,13 +970,13 @@ namespace Seed {
 					return nullptr;
 				}
 
-				__forceinline BaseMap& RemoveAllImpl() {
+				forceinline BaseMap& RemoveAllImpl() {
 					this->Dispose();
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BaseMap& RemoveAllWithImpl(Lambda&& lambda) {
+				forceinline BaseMap& RemoveAllWithImpl(Lambda&& lambda) {
 					This->root = DestroyTreeWithLambdaPairValues(This->root, lambda);
 					This->count = 0;
 					return *this;
@@ -1015,12 +1021,12 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename TKey, typename TVal>
-		__forceinline void Swap(Containers::BaseMap<THeap, TKey, TVal>& A, Containers::BaseMap<THeap, TKey, TVal>& B) {
+		forceinline void Swap(Containers::BaseMap<THeap, TKey, TVal>& A, Containers::BaseMap<THeap, TKey, TVal>& B) {
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename TKey, typename TVal>
-		__forceinline void Swap(typename Containers::BaseMap<THeap, TKey, TVal>::Iterator& A, typename Containers::BaseMap<THeap, TKey, TVal>::Iterator& B) {
+		forceinline void Swap(typename Containers::BaseMap<THeap, TKey, TVal>::Iterator& A, typename Containers::BaseMap<THeap, TKey, TVal>::Iterator& B) {
 			Swap(A.This, B.This);
 		}
 	}

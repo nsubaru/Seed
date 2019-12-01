@@ -764,31 +764,33 @@ namespace Seed {
 				friend class LINQ::IAssociableCollection;
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
 				friend class LINQ::IMap;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 #pragma region ForEach Pair
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachImplWithIndex(node->left, Index, lambda);
 					lambda(node->data, Index); Index++;
 					if (node->right != nullptr)
-						ForEachImplWithIndex(node->left, Index, lambda);
+						ForEachImplWithIndex(node->right, Index, lambda);
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachImplWithoutIndex(node->left, lambda);
 					lambda(node->data);
 					if (node->right != nullptr)
-						ForEachImplWithoutIndex(node->left, lambda);
+						ForEachImplWithoutIndex(node->right, lambda);
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyMap& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyMap& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachImplWithoutIndex(node, lambda);
 							}
@@ -812,12 +814,12 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseConcurencyMap& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyMap& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TKey, TValue>&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachImplWithoutIndex(node, lambda);
 							}
@@ -843,29 +845,29 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Key
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachKeyImplWithIndex(node->left, Index, lambda);
 					lambda(node->data.Key, Index); Index++;
 					if (node->right != nullptr)
-						ForEachKeyImplWithIndex(node->left, Index, lambda);
+						ForEachKeyImplWithIndex(node->right, Index, lambda);
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachKeyImplWithoutIndex(node->left, lambda);
 					lambda(node->data.Key);
 					if (node->right != nullptr)
-						ForEachKeyImplWithoutIndex(node->left, lambda);
+						ForEachKeyImplWithoutIndex(node->right, lambda);
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseConcurencyMap& ForEachKeyImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyMap& ForEachKeyImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachKeyImplWithoutIndex(node, lambda);
 							}
@@ -889,11 +891,11 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyMap& ForEachKeyImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyMap& ForEachKeyImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachKeyImplWithoutIndex(node, lambda);
 							}
@@ -918,29 +920,29 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Value
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachValueImplWithIndex(node->left, Index, lambda);
 					lambda(node->data.Value, Index); Index++;
 					if (node->right != nullptr)
-						ForEachValueImplWithIndex(node->left, Index, lambda);
+						ForEachValueImplWithIndex(node->right, Index, lambda);
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda) {
+				forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachValueImplWithoutIndex(node->left, lambda);
 					lambda(node->data.Value);
 					if (node->right != nullptr)
-						ForEachValueImplWithoutIndex(node->left, lambda);
+						ForEachValueImplWithoutIndex(node->right, lambda);
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyMap& ForEachValueImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue>& > ) {
+				forceinline const BaseConcurencyMap& ForEachValueImpl(LambdaT&& lambda) const {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&> ) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachValueImplWithoutIndex(node, lambda);
 							}
@@ -964,12 +966,12 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseConcurencyMap& ForEachValueImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyMap& ForEachValueImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TValue&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
-							if (node == nullptr)
+							if (node != nullptr)
 							{
 								ForEachValueImplWithoutIndex(node, lambda);
 							}
@@ -1020,18 +1022,22 @@ namespace Seed {
 					return nullptr;
 				}
 
-				__forceinline BaseConcurencyMap& RemoveAllImpl() {
+				forceinline BaseConcurencyMap& RemoveAllImpl() {
 					this->Dispose();
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BaseConcurencyMap& RemoveAllWithImpl(Lambda&& lambda) {
+				forceinline BaseConcurencyMap& RemoveAllWithImpl(Lambda&& lambda) {
 					return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 						This->root = DestroyTreeWithLambdaPairValues(This->root, lambda);
 						This->count = 0;
 						return *this;
 						});
+				}
+
+				forceinline void UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair){
+					Insert(MoveRValue(pair));
 				}
 			};
 
@@ -1073,13 +1079,13 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename TKey, typename TVal>
-		__forceinline void Swap(Containers::BaseConcurencyMap<THeap, TKey, TVal>& A, Containers::BaseConcurencyMap<THeap, TKey, TVal>& B) {
+		forceinline void Swap(Containers::BaseConcurencyMap<THeap, TKey, TVal>& A, Containers::BaseConcurencyMap<THeap, TKey, TVal>& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename TKey, typename TVal>
-		__forceinline void Swap(typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& A, typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& B) {
+		forceinline void Swap(typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& A, typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}

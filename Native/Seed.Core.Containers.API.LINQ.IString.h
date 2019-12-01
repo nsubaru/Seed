@@ -13,8 +13,8 @@ namespace Seed {
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertible<Lambda, void, TChar&>::State ||
-						TypeTraits::IsLambdaConvertible<Lambda, void, TChar&, SizeT>::State
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&>::State ||
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&, SizeT>::State
 						>,
 						bool
 					> = true>
@@ -26,8 +26,8 @@ namespace Seed {
 						typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertible<Lambda, void, const TChar&>::State ||
-						TypeTraits::IsLambdaConvertible<Lambda, void, const TChar&, SizeT>::State
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&>::State ||
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&, SizeT>::State
 						>,
 						bool
 					> = true>
@@ -38,8 +38,8 @@ namespace Seed {
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertible<Lambda, void, TChar&>::State ||
-						TypeTraits::IsLambdaConvertible<Lambda, void, TChar&, SizeT>::State
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&>::State ||
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&, SizeT>::State
 						>,
 						bool
 					> = true>
@@ -51,8 +51,8 @@ namespace Seed {
 						typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertible<Lambda, void, const TChar&>::State ||
-						TypeTraits::IsLambdaConvertible<Lambda, void, const TChar&, SizeT>::State
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&>::State ||
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&, SizeT>::State
 						>,
 						bool
 					> = true>
@@ -64,12 +64,12 @@ namespace Seed {
 						return static_cast<const ThisCollection&>(*this).AnyImpl();
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const TChar&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const TChar&>::State>, bool> = true>
 					__forceinline bool Any(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const TChar&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const TChar&>::State>, bool> = true>
 					__forceinline bool All(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}

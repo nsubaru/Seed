@@ -10,8 +10,10 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Testing {
-			interface ITest {
-				bool Excecute();
+			class ITest {
+			public:
+				virtual ~ITest() = default;
+				virtual bool Excecute() = 0;
 			};
 			class TestRegister {
 			private:

@@ -26,7 +26,7 @@ namespace Seed
 					template<typename TFloat, bool TIsConst, bool TIsVolatile>
 					struct BaseFloatCTTITypeDataImpl : BaseCTTITypeDataImpl<TFloat, EType::FloatNumeric, true, TIsConst, TIsVolatile>
 					{
-						static constexpr TFloat NaN = Math::NaN;
+						static constexpr TFloat NaN = static_cast<TFloat>(Math::NaN);
 						static constexpr TFloat Infinity = Math::Infinity;
 						static constexpr TFloat Epsilon = Math::Epsilon<TFloat>();
 

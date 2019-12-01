@@ -2,199 +2,294 @@
 #include "Seed.Core.NewCTTI.Base.h"
 #include "Seed.Core.NewCTTI.TypeName.Details.TypeString.h"
 
+#pragma warning(push)
+//Constexpr array can have size 0, it is not standart extension in C++
+#pragma warning(disable: 4200)
+
 namespace Seed {
-	inline namespace Core {
-		namespace NewCTTI {
-			namespace Details {
-				class CompileStringView {
-				private:
-					const AChar* ptr;
-					SizeT size;
-				public:
-					constexpr CompileStringView(const AChar* ptr)
-						:ptr(ptr), size(CStr::Size(ptr))
-					{}
+    inline namespace Core {
+        namespace NewCTTI {
+            namespace Details {
+                class CompileStringView {
+                private:
+                    const AChar* ptr;
+                    SizeT size;
+                public:
+                    constexpr CompileStringView(const AChar* ptr)
+                        :ptr(ptr), size(CStr::Size(ptr))
+                    {}
 
-					template<char ... Chars>
-					constexpr CompileStringView(TypeString<Chars...>)
-						: ptr(TypeString<Chars...>::Data()), size(sizeof...(Chars))
-					{}
+                    template<char ... Chars>
+                    constexpr CompileStringView(TypeString<Chars...>)
+                        : ptr(TypeString<Chars...>::Data()), size(sizeof...(Chars))
+                    {}
 
-					constexpr CompileStringView Offset(SizeT Size) {
-						size -= Size;
-						ptr += Size;
-						return *this;
-					}
+                    constexpr CompileStringView Offset(SizeT Size) {
+                        size -= Size;
+                        ptr += Size;
+                        return *this;
+                    }
 
-					constexpr CompileStringView& Shrink(SizeT Size) {
-						size -= Size;
-						return *this;
-					}
+                    constexpr CompileStringView& Shrink(SizeT Size) {
+                        size -= Size;
+                        return *this;
+                    }
 
-					constexpr CompileStringView(const CompileStringView&) = default;
-					constexpr CompileStringView(CompileStringView&&) = default;
-					constexpr CompileStringView& operator=(const CompileStringView&) = default;
-					constexpr CompileStringView& operator=(CompileStringView&&) = default;
+                    constexpr CompileStringView(const CompileStringView&) = default;
+                    constexpr CompileStringView(CompileStringView&&) = default;
+                    constexpr CompileStringView& operator=(const CompileStringView&) = default;
+                    constexpr CompileStringView& operator=(CompileStringView&&) = default;
 
-					template<SizeT N>
-					constexpr auto AsArray() {
-						ConstexprArray<char, N> ret;
-						for (SizeT i = 0; i < N; i++)
-							ret[i] = ptr[i];
-						return ret;
-					}
+                    template<SizeT N>
+                    constexpr auto AsArray() {
+                        ConstexprArray<char, N> ret;
+                        if constexpr (N == 0)
+                        {
+                            return ret;
+                        }
+                        else
+                        {
+                            for (SizeT i = 0; i < N; i++)
+                                ret[i] = ptr[i];
+                            return ret;
+                        }
+                    }
 
-					constexpr SizeT Find(char ch) {
-						for (SizeT i = 0ui64; i < size; i++)
-							if (ptr[i] == ch)
-								return i;
-						return static_cast<SizeT>(-1);
-					}
+                    constexpr SizeT Find(char ch) {
+                        for (SizeT i = 0ui64; i < size; i++)
+                            if (ptr[i] == ch)
+                                return i;
+                        return static_cast<SizeT>(-1);
+                    }
 
-					constexpr SizeT Find(char ch, SizeT StartPos) {
-						for (SizeT i = StartPos; i < size; i++)
-							if (ptr[i] == ch)
-								return i;
-						return static_cast<SizeT>(-1);
-					}
+                    constexpr SizeT Find(char ch, SizeT StartPos) {
+                        for (SizeT i = StartPos; i < size; i++)
+                            if (ptr[i] == ch)
+                                return i;
+                        return static_cast<SizeT>(-1);
+                    }
 
-					constexpr SizeT Size() { return size; }
+                    constexpr SizeT Size() { return size; }
 
-					template<typename T, SizeT Size>
-					friend class ConstexprArray;
-				};
+                    template<typename T, SizeT Size>
+                    friend class ConstexprArray;
+                };
 
-				template<typename T, SizeT Size>
-				class ConstexprArray {
-				private:
-					T arr[Size];
-				public:
-					template<typename C1, typename ...C>
-					friend constexpr auto Fill(ConstexprArray This, C1 c1, C ... c) {
-						This.arr[sizeof...(C)] = c1;
-						return Fill(This, c...);
-					}
-					template<typename C1>
-					friend constexpr auto Fill(ConstexprArray This, C1 c1) {
-						This.arr[0] = c1;
-						return This;
-					}
-				public:
-					constexpr ConstexprArray() : arr() {}
+                template<typename T, SizeT Size>
+                class ConstexprArray {
+                private:
+                    T arr[Size];
+                public:
+                    template<typename C1, typename ...C>
+                    friend constexpr auto Fill(ConstexprArray This, C1 c1, C ... c) {
+                        This.arr[sizeof...(C)] = c1;
+                        return Fill(This, c...);
+                    }
+                    template<typename C1>
+                    friend constexpr auto Fill(ConstexprArray This, C1 c1) {
+                        This.arr[0] = c1;
+                        return This;
+                    }
+                public:
+                    constexpr ConstexprArray() : arr() {}
 
-					template<typename ... T>
-					constexpr ConstexprArray(T ... t) : arr{ t... } {
-					}
+                    template<typename ... T>
+                    constexpr ConstexprArray(T ... t) : arr{ t... } {
+                    }
 
-					constexpr T& operator[](SizeT Index) {
-						return arr[Index];
-					}
+                    constexpr T& operator[](SizeT Index) {
+                        return arr[Index];
+                    }
 
-					template<SizeT N>
-					constexpr ConstexprArray<T, Size + N> operator+(ConstexprArray<T, N> second) const {
-						ConstexprArray<T, Size + N> ret;
-						for (SizeT i = 0; i < Size; i++)
-							ret[i] = arr[i];
-						for (SizeT i = 0; i < N; i++)
-							ret[Size + i] = second.arr[i];
-						return ret;
-					}
+					constexpr const T& operator[](SizeT Index) const {
+                        return arr[Index];
+                    }
 
-					template<SizeT NewSize>
-					constexpr ConstexprArray<T, NewSize> Resize() const {
-						ConstexprArray<T, NewSize> ret;
-						constexpr SizeT CopySize = Min(Size, NewSize);
-						for (SizeT i = 0; i < CopySize; i++)
-							ret[i] = arr[i];
-						return ret;
-					}
+                    template<SizeT N>
+                    constexpr ConstexprArray<T, Size + N> operator+(ConstexprArray<T, N> second) const {
+                        if constexpr (N == 0)
+                        {
+                            return *this;
+                        }
+                        else
+                        {
+                            ConstexprArray<T, Size + N> ret;
+                            for (SizeT i = 0; i < Size; i++)
+                                ret[i] = arr[i];
+                            for (SizeT i = 0; i < N; i++)
+                                ret[Size + i] = second.arr[i];
+                            return ret;
+                        }
+                    }
 
-					template<SizeT NewSize>
-					constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
-						if constexpr (NewSize >= Size)
-							static_assert(false);
-						ConstexprArray<T, NewSize> ret;
-						constexpr SizeT Delta = Size - NewSize;
-						for (SizeT i = 0; i < NewSize; i++)
-							ret[i] = arr[i + Delta];
-						return ret;
-					}
+                    template<SizeT NewSize>
+                    constexpr ConstexprArray<T, NewSize> Resize() const {
+                        ConstexprArray<T, NewSize> ret;
+                        constexpr SizeT CopySize = Min(Size, NewSize);
+                        for (SizeT i = 0; i < CopySize; i++)
+                            ret[i] = arr[i];
+                        return ret;
+                    }
 
-					constexpr const T* Raw() const { return arr; }
+                    template<SizeT NewSize>
+                    constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
+                        if constexpr (NewSize >= Size)
+                            static_assert(false);
+                        ConstexprArray<T, NewSize> ret;
+                        constexpr SizeT Delta = Size - NewSize;
+                        for (SizeT i = 0; i < NewSize; i++)
+                            ret[i] = arr[i + Delta];
+                        return ret;
+                    }
 
-					static constexpr SizeT Count = Size;
+                    constexpr const T* Raw() const { return arr; }
 
-					constexpr ConstexprArray Reverse() {
-						SizeT j = Size - 1;
-						for (SizeT i = 0; i < Size / 2; i++, j--) {
-							T t = arr[i];
-							arr[i] = arr[j];
-							arr[j] = t;
+                    static constexpr SizeT Count = Size;
+
+                    constexpr ConstexprArray Reverse() {
+						if constexpr (Size < 2)
+							return *this;
+						else
+						{
+							SizeT j = Size - 1;
+							for (SizeT i = 0; i < Size / 2; i++, j--) {
+								T t = arr[i];
+								arr[i] = arr[j];
+								arr[j] = t;
+							}
+							return *this;
 						}
-						return *this;
-					}
+                    }
 
-					template<typename T2, SizeT N>
-					friend class ConstexprArray;
-				};
+                    template<typename T2, SizeT N>
+                    friend class ConstexprArray;
+                };
 
-				template<char ... Chars>
-				constexpr auto TypeStringToArray(TypeString<Chars...>) {
-					return CompileStringView(TypeString<Chars...>()).AsArray<TypeString<Chars...>::Size()>();
-				}
+                template<typename T>
+                class ConstexprArray<T, 0> {
+                public:
+                    constexpr ConstexprArray() {};
+                    constexpr ConstexprArray(const ConstexprArray&) = default;
 
-				template<char ... Chars>
-				constexpr auto TypeStringToArrayWithoutTrailZero(TypeString<Chars...>) {
-					return CompileStringView(TypeString<Chars...>()).AsArray<TypeString<Chars...>::Size() - 1>();
-				}
+                    template<SizeT N>
+                    constexpr ConstexprArray<T, N> operator+(ConstexprArray<T, N> second) const {
+                        return second;
+                    }
 
-				namespace Details {
+                    template<SizeT NewSize>
+                    constexpr ConstexprArray<T, NewSize> Resize() const {
+                        ConstexprArray<T, NewSize> ret;
+                        return ret;
+                    }
+
+                    template<SizeT NewSize>
+                    constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
+                        if constexpr (NewSize >= 0)
+                            static_assert(false);
+                        ConstexprArray<T, NewSize> ret;
+                        return ret;
+                    }
+
+
+                    static constexpr SizeT Count = 0;
+
+                    constexpr ConstexprArray Reverse() {
+                        return *this;
+                    }
+
+                    template<typename T2, SizeT N>
+                    friend class ConstexprArray;
+                };
+
+                template<char ... Chars>
+                constexpr auto TypeStringToArray(TypeString<Chars...>) {
+                    return CompileStringView(TypeString<Chars...>()).AsArray<TypeString<Chars...>::Size()>();
+                }
+
+                template<char ... Chars>
+                constexpr auto TypeStringToArrayWithoutTrailZero(TypeString<Chars...>) {
+                    return CompileStringView(TypeString<Chars...>()).AsArray<TypeString<Chars...>::Size() - 1>();
+                }
+
+                namespace Details {
+                    template <typename U>
+                    static constexpr auto type_name()
+                    {
+                        SizeT prefix = 0;
+                        while (true) {
+                            if (__FUNCSIG__[prefix] == '<')
+                                break;
+                            prefix++;
+                        }
+                        prefix++;
+                        SizeT suffix = CStr::Size(__FUNCSIG__) - 1;
+                        while (true) {
+                            if (__FUNCSIG__[suffix] == '>')
+                                break;
+                            suffix--;
+                        }
+                        suffix = CStr::Size(__FUNCSIG__) - suffix;
+                        return CompileStringView(__FUNCSIG__).Shrink(suffix).Offset(prefix);
+                    }
+
 					template <typename U>
-					static constexpr auto type_name()
+                    static constexpr auto type_name_size()
+                    {
+                        SizeT prefix = 0;
+                        while (true) {
+                            if (__FUNCSIG__[prefix] == '<')
+                                break;
+                            prefix++;
+                        }
+                        prefix++;
+                        SizeT suffix = CStr::Size(__FUNCSIG__) - 1;
+                        while (true) {
+                            if (__FUNCSIG__[suffix] == '>')
+                                break;
+                            suffix--;
+                        }
+                        return suffix - prefix;
+                    } 
+
+                }
+
+                template<typename T>
+                constexpr auto TypeName() {
+                    return (Details::type_name<T>().AsArray<Details::type_name_size<T>()>()).Resize<Details::type_name_size<T>() + 1>();
+                }
+
+                template<SizeT I>
+                constexpr auto ToCharStr() {
+                    constexpr SizeT N = []() {
+						if(I < 9)
+							return 1ui64;
+                        SizeT i = I; SizeT Count = 0;
+                        while (i > 0)
+                        {
+                            Count++; i /= 10;
+                        }
+                        return Count;
+                    }();
+                    ConstexprArray<char, N> ret;
+                    SizeT i = I; SizeT Pos = 0;
+					if constexpr (I == 0)
 					{
-						SizeT prefix = 0;
-						while (true) {
-							if (__FUNCSIG__[prefix] == '<')
-								break;
-							prefix++;
-						}
-						prefix++;
-						SizeT suffix = CStr::Size(__FUNCSIG__) - 1;
-						while (true) {
-							if (__FUNCSIG__[suffix] == '>')
-								break;
-							suffix--;
-						}
-						suffix = CStr::Size(__FUNCSIG__) - suffix;
-						return CompileStringView(__FUNCSIG__).Offset(prefix).Shrink(suffix);
+						ret[0] = '0';
+						return ret.Reverse();
 					}
-				}
-
-				template<typename T>
-				constexpr auto TypeName() {
-					return (Details::type_name<T>().AsArray<Details::type_name<T>().Size()>()).Resize<Details::type_name<T>().Size() + 1>();
-				}
-
-				template<SizeT I>
-				constexpr auto ToCharStr() {
-					constexpr SizeT N = []() {
-						SizeT i = I; SizeT Count = 0;
+					else
+					{
 						while (i > 0)
 						{
-							Count++; i /= 10;
+							ret[Pos] = '0' + i % 10;
+							Pos++; i /= 10;
 						}
-						return Count;
-					}();
-					ConstexprArray<char, N> ret;
-					SizeT i = I; SizeT Pos = 0;
-					while (i > 0)
-					{
-						ret[Pos] = '0' + i % 10;
-						Pos++; i /= 10;
+						return ret.Reverse();
 					}
-					return ret.Reverse();
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 }
+
+#pragma warning(pop)

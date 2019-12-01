@@ -107,7 +107,7 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
-				SizeT GetCount() { return This->count; }
+				SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
 				virtual BaseConcurencyFixedQueue Clone() const override final {
@@ -132,6 +132,8 @@ namespace Seed {
 				friend class LINQ::IFixedStack;
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -340,12 +342,10 @@ namespace Seed {
 						});
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
-					This->queue[Index] = Value;
-				}
-
 				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->queue[Index] = MoveRValue(Value);
+					This->count = Index;
+					This->rear = Index;
 				}
 
 				__forceinline BaseConcurencyFixedQueue& RemoveAllImpl() {

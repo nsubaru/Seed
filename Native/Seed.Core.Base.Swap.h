@@ -4,180 +4,220 @@
 
 namespace Seed {
 	inline namespace Core {
-		///<summary>Обмін значеннями зміних</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Класичний обмін через третю зміну:
-		///<para>Приклад: дано змінні A і B треба обмінняти їхні значення</para>
-		///<para>Процедура наступна: робим тимчасову зміну С</para>
-		///<para><code> C = A; A = B; B = C;</code></para>
-		///</remarks>
+		/// <summary>
+		/// Обмін значеннями змінних
+		/// </summary>
+		/// <typeparam name="T">Тип елементів</typeparam>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Класичний обмін через третю зміну:
+		/// Приклад: дано змінні A і B треба обміняти їхні значення
+		/// Процедура наступна: робим тимчасову зміну С
+		/// C = A; A = B; B = C;
+		/// </remarks>
 		template<typename T>
-		__forceinline void Swap(T& First, T& Second) {
-			T tmp(MoveRValue(First));
-			First = MoveRValue(Second);
-			Second = MoveRValue(tmp);
+		__forceinline void Swap(T& first, T& second) {
+			T tmp(MoveRValue(first));
+			first = MoveRValue(second);
+			second = MoveRValue(tmp);
 		}
-
-		///<summary>Оптимізований обмін значеннями зміних AChar</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних AChar
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(AChar& First, AChar& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(AChar& first, AChar& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних UChar</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних UChar
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(UChar& First, UChar& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(UChar& first, UChar& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних Byte</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних Byte
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(Byte& First, Byte& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(Byte& first, Byte& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних Int16</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних Int16
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(Int16& First, Int16& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(Int16& first, Int16& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних Int32</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних Int32
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(Int32& First, Int32& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(Int32& first, Int32& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних Int64</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних Int64
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(Int64& First, Int64& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(Int64& first, Int64& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних UInt16</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних UInt16
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(UInt16& First, UInt16& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(UInt16& first, UInt16& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних UInt32</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних UInt32
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(UInt32& First, UInt32& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(UInt32& first, UInt32& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін значеннями зміних UInt64</summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR,
-		///<para>задопомогою якого можна обміняти без третьої зміної. </para>
-		///<para>Псевдокод:<code> A = A ^ B; B = B ^ A; A = A ^ B;</code></para>
-		///<para>Приклад числа 5 і 10 бітове представлення 0101 і 1010:</para>
-		///<para><code> 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000;</code> </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних UInt32
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR,
+		/// за допомогою якого можна обміняти без третьої змінної.
+		/// Псевдокод: A = A ^ B; B = B ^ A; A = A ^ B;
+		/// Приклад числа 5 і 10 бітове представлення 0101 і 1010:
+		/// 0000 = 0101 ^ 1010; 0101 = 1010 ^ 0000; 1010 = 0101^0000; 
+		/// </remarks>
 		template<>
-		__forceinline void Swap(UInt64& First, UInt64& Second) { First ^= Second; Second ^= First; First ^= Second; }
+		__forceinline void Swap(UInt64& first, UInt64& second) { first ^= second; second ^= first; first ^= second; }
 
-		///<summary>Оптимізований обмін адресами покажчиків</summary>
-		///<param name='First'>Перший покажчик</param>
-		///<param name='Second'>Другий покажчик</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи
-		///<para>те що на архітектурі AMD64 покачжик всього лиш число UInt64 </para>
-		///<para>Сам обміну відбувається настпним чином: </para>
-		///<para>Перетворюєм покажчик в число SizeT, тоді обмінюєм про числа і все </para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін адресами покажчиків
+		/// </summary>
+		/// <param name="first">Перший покажчик</param>
+		/// <param name="second">Другий покажчик</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи те що на архітектурі AMD64 покажчиком всього лиш число UInt64
+		/// Сам обміну відбувається наступним чином:
+		/// Перетворюємо покажчик в число SizeT, тоді обмінюємо про числа і все 
+		/// </remarks>
 		template<typename T>
-		__forceinline void Swap(T*& First, T*& Second) {
-			Swap((UInt64&)First, (UInt64&)Second); //-V2005 //-V2533
+		__forceinline void Swap(T*& first, T*& second) {
+			Swap(reinterpret_cast<UInt64&>(first), reinterpret_cast<UInt64&>(second)); //-V2005 //-V2533
 		}
-		static_assert(sizeof(void*) == sizeof(SizeT), "Помилка розмір SizeT не є рівним розміру покажчика");
-		static_assert((SizeT)(void*)(0xF0F0F0F0F) == (SizeT)0xF0F0F0F0F, "Помилка неможливо правильно перетворити адресс покажчик в SizeT"); //-V566 //-V2533
+		static_assert(sizeof(void*) == sizeof(SizeT), "SizeT size is not valid. Must be same as size of pointer");
+		static_assert(reinterpret_cast<SizeT>(reinterpret_cast<void*>(0xF0F0F0F0F)) == static_cast<SizeT>(0xF0F0F0F0F), "Error. Can not aquire pointer address to SizeT");  //-V566
 
-		///<summary>Оптимізований обмін значеннями зміних Float </summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR та особливістю <c>union</c>
-		///<para>Спочатку представляєм дійсні числа як цілі а тоді задопомогою XOR робим обмін без третьої зміної</para>
-		///</remarks>
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних Float
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR та особливістю <c>union</c>
+		/// Спочатку представляє дійсні числа як цілі а тоді за допомогою XOR робим обмін без третьої змінної
+		/// </remarks>
 		template<>
-		__forceinline void Swap(Float& First, Float& Second) {
-			static_assert(sizeof(Float) == sizeof(Int32), "Розміри Float і Int32 різні");
-			union
+		__forceinline void Swap(Float& first, Float& second) {
+			static_assert(sizeof(Float) == sizeof(Int32), "Error. Float and Int32 must have same size");
+			union  // NOLINT
 			{
 				Int32* i;
 				Float* f;
-			} F1, F2;
-			F1.f = &First;
-			F2.f = &Second;
-			*F1.i ^= *F2.i;
-			*F2.i ^= *F1.i;
-			*F1.i ^= *F2.i;
+			} f1, f2;
+			f1.f = &first;
+			f2.f = &second;
+			*f1.i ^= *f2.i;
+			*f2.i ^= *f1.i;
+			*f1.i ^= *f2.i;
 		}
-		///<summary>Оптимізований обмін значеннями зміних Double </summary>
-		///<param name='First'>Перше значення</param>
-		///<param name='Second'>Друге значення</param>
-		///<remarks>Оптимізований обмін відбувається використовуючи особливість побітового XOR та особливістю <c>union<c>
-		///<para>Спочатку представляєм дійсні числа як цілі а тоді задопомогою XOR робим обмін без третьої зміної</para>
-		///</remarks>
+
+		/// <summary>
+		/// Оптимізований обмін значеннями змінних Double
+		/// </summary>
+		/// <param name="first">Перше значення</param>
+		/// <param name="second">Друге значення</param>
+		/// <remarks>
+		/// Оптимізований обмін відбувається використовуючи особливість побітового XOR та особливістю <c>union</c>
+		/// Спочатку представляє дійсні числа як цілі а тоді за допомогою XOR робим обмін без третьої змінної
+		/// </remarks>
 		template<>
-		__forceinline void Swap(Double& First, Double& Second) {
-			static_assert(sizeof(Double) == sizeof(Int64), "Розміри Float і Int32 різні");
-			union
+		__forceinline void Swap(Double& first, Double& second) {
+			static_assert(sizeof(Double) == sizeof(Int64), "Error. Double and Int64 must have same size");
+			union  // NOLINT
 			{
 				Int64* i;
 				Double* f;
 			} F1, F2;
-			F1.f = &First;
-			F2.f = &Second;
+			F1.f = &first;
+			F2.f = &second;
 			*F1.i ^= *F2.i;
 			*F2.i ^= *F1.i;
 			*F1.i ^= *F2.i;

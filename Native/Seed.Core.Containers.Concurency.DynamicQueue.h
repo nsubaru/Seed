@@ -11,7 +11,8 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, typename T>
-			class SeedKernelCall BaseConcurencyDynamicQueue :
+			class SeedKernelCall BaseConcurencyDynamicQueue final
+					:
 				public LINQ::IDynamicStack<BaseConcurencyDynamicQueue, THeap, T, true>,
 				public IDisposable,
 				public IClonable<BaseConcurencyDynamicQueue<THeap, T>>
@@ -21,57 +22,72 @@ namespace Seed {
 					SizeT front;
 					SizeT rear;
 					RefCountT count;
-					SizeT bufferSize;
-					RefCountT RefCount;
 					T* queue;
+					SizeT bufferSize;
+					// ReSharper disable CppInconsistentNaming
+					RefCountT RefCount;
+					// ReSharper restore CppInconsistentNaming
+					
 					Threading::DataFlowControler flowControler;
 
-					T& operator[](SizeT Index) {
-						return queue[(front + Index) % bufferSize];
+					T& operator[](SizeT index) {
+						return queue[(front + index) % bufferSize];
 					}
 
-					Data() :
-						front(0),
-						rear(0),
-						count(0),
-						RefCount(1),
-						queue(),
-						flowControler()
-					{}
+					Data()
+						: front(0),
+						  rear(0),
+						  count(0),
+						  queue(),
+						  bufferSize{0},
+						  RefCount(1) {}
+
+					Data(SizeT startCount)
+						: front(0),
+						  rear(0),
+						  count(0),
+						  queue(new T[startCount]),
+						  bufferSize(startCount),
+						  RefCount(1) {}
 				};
 			private:
 				Data* This;
 			protected:
-				virtual void Dispose() final override {}
+				virtual void Dispose() final override
+				{
+					if(This->bufferSize != 0)
+						delete[] This->queue;
+				}
 			public:
 				BaseConcurencyDynamicQueue() : This(new Data()) {}
 
+				BaseConcurencyDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
+
 				BaseConcurencyDynamicQueue(InitilizerList<T>&& list) : BaseConcurencyDynamicQueue() {
 					if (list.size() != 0) {
-						SizeT ActuallyCopyied = list.size();
+						SizeT actuallyCopyied = list.size();
 						This->bufferSize = list.size();
 						This->queue = new T[This->bufferSize];
 						auto it = list.begin();
-						SizeT i = ActuallyCopyied;
-						for (SizeT i = 0; i < ActuallyCopyied; i++) {
-							This->queue[i] = *it; it++;
+						for (SizeT i = 0; i < actuallyCopyied; i++) {
+							This->queue[i] = *it; ++it;
 						}
-						This->rear = This->count = ActuallyCopyied;
+						This->rear = This->count = actuallyCopyied;
 						This->front = 0;
 					}
 				}
 
-				void Enqueue(const T& Value, bool IsResizeIfFull = false) {
+				void Enqueue(const T& value, bool isResizeIfFull = false) {
 					This->flowControler.Produce([&]() {
 						if (++This->count > This->bufferSize) {
-							if (!IsResizeIfFull)
+							if (!isResizeIfFull)
 								This->flowControler.WaitForConcumer();
 							else
 								ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
 						}
 
 						SizeT newRear = (This->rear + 1) % This->bufferSize;
-						This->queue[This->rear] = Value;
+						This->queue[This->rear] = value;
 						This->rear = newRear;
 						});
 				}
@@ -97,7 +113,7 @@ namespace Seed {
 
 						T res = MoveRValue(This->queue[This->front]);
 						This->front = (This->front + 1) % This->bufferSize;
-						This->count--;
+						--This->count;
 
 						return MoveRValue(res);
 						});
@@ -127,7 +143,7 @@ namespace Seed {
 
 				void Shrink() {
 					This->flowControler.ExclusiveLock([&]() {
-						SizeT newSize = This->count;
+						const SizeT newSize = This->count;
 						T* newBuffer = new T[newSize];
 						for (SizeT i = 0; i < This->count; i++)
 						{
@@ -139,13 +155,10 @@ namespace Seed {
 						});
 				}
 
-				///<summary>Оптимізований обмін</summary>
-				///<param name = 'A'>Перший елемент</param>
-				///<param name = 'B'>Другий елемент</param>
-				template<typename U>
-				__forceinline friend void Seed::Core::Swap(U& A, U& B);
+				template<typename TU>
+				__forceinline friend void Seed::Core::Swap(TU& a, TU& b);
 
-				SizeT GetCount() { return This->count; }
+				SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
 				virtual BaseConcurencyDynamicQueue Clone() const override final {
@@ -166,8 +179,8 @@ namespace Seed {
 
 				RefCountClass(BaseConcurencyDynamicQueue, This)
 			private:
-				void ExtendImpl(SizeT AdditionalSize) {
-					SizeT newSize = This->bufferSize + AdditionalSize;
+				void ExtendImpl(SizeT additionalSize) {
+					const SizeT newSize = This->bufferSize + additionalSize;
 					T* newBuffer = new T[newSize];
 					for (SizeT i = 0; i < This->count; i++)
 					{
@@ -178,22 +191,52 @@ namespace Seed {
 					This->queue = newBuffer;
 				}
 			protected:
-				template<template<typename, typename> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
+template <
+					template<typename, typename> typename TCollection,
+					typename TAnyHeap,
+					typename TAny,
+					Boolean TIsDynamic,
+					Boolean TIsConcurencySuport
+				>
 				friend class LINQ::ICollection;
-				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT bufferSize, Boolean TIsConcurencySuport>
+				template<
+					template<typename, SizeT, typename> typename TCollection,
+					typename TAnyHeap,
+					typename TAny,
+					SizeT TBufferSize,
+					Boolean TIsConcurencySuport
+				>
 				friend class LINQ::IFixedCollection;
-				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT bufferSize, Boolean TIsConcurencySuport>
+				template<
+					template<typename, SizeT, typename> typename TCollection,
+					typename TAnyHeap,
+					typename TAny,
+					SizeT TBufferSize,
+					Boolean TIsConcurencySuport
+				>
 				friend class LINQ::IFixedStack;
-				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
+				template<
+					template<typename, typename> typename TCollection,
+					typename TAnyHeap,
+					typename TAny,
+					Boolean TIsDynamic,
+					Boolean TIsConcurencySuport
+				>
 				friend class LINQ::ICollectionBase;
+                template<
+					typename TAnyHeap,
+					typename TAny,
+					typename TEnable
+				>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
 
-				template<typename LambdaT>
-				__forceinline BaseConcurencyDynamicQueue& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+				template<typename TLambdaT>
+				__forceinline BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, T&> ||
+						TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
 
 						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
 							for (SizeT i = 0; i < This->count; i++)
@@ -203,10 +246,41 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, T&, SizeT> ||
+						TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
 
 						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+							SizeT index = 0;
+
+							for (SizeT i = 0; i < This->count; i++, index)
+							{
+								lambda((*This)[i], index);
+							}
+
+							return *this;
+							});
+					}
+					else {
+						// ReSharper disable once CppStaticAssertFailure
+						static_assert(false);
+						__assume(false);
+						return *this;
+					}
+				}
+
+				template<typename TLambdaT>
+				__forceinline const BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) const {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
+							for (SizeT i = 0; i < This->count; i++)
+							{
+								lambda((*This)[i]);
+							}
+							return *this;
+							});
+					}
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&, SizeT>) {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
 							SizeT Index = 0;
 
 							for (SizeT i = 0; i < This->count; i++, Index)
@@ -218,42 +292,17 @@ namespace Seed {
 							});
 					}
 					else {
+						// ReSharper disable once CppStaticAssertFailure
 						static_assert(false);
+						__assume(false);
+						return *this;
 					}
 				}
 
-				template<typename LambdaT>
-				__forceinline const BaseConcurencyDynamicQueue& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
-							for (SizeT i = 0; i < This->count; i++)
-							{
-								lambda((*This)[i]);
-							}
-							return *this;
-							});
-					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
-							SizeT Index = 0;
-
-							for (SizeT i = 0; i < This->count; i++, Index)
-							{
-								lambda((*This)[i], Index);
-							}
-
-							return *this;
-							});
-					}
-					else {
-						static_assert(false);
-					}
-				}
-
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				template<typename TU, typename TLambdaT>
+				__forceinline TU AggregateImpl(TLambdaT&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
-						U result = U();
+						TU result = TU();
 
 						if (This->count == 0) {
 							return MoveRValue(result);
@@ -268,10 +317,10 @@ namespace Seed {
 						});
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				template<typename TU, typename TLambdaT>
+				__forceinline TU AggregateImpl(TLambdaT&& lambda, const TU& value) const {
 					return This->flowControler.SharedLock([&]() {
-						U result = Value;
+						TU result = value;
 						if (This->count == 0) {
 							return MoveRValue(result);
 						}
@@ -285,10 +334,10 @@ namespace Seed {
 						});
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
-					return This->flowControler.SharedLock([&, Value = MoveRValue(Value)]() mutable {
-						U result = MoveRValue(Value);
+				template<typename TU, typename TLambdaT>
+				__forceinline TU AggregateImpl(TLambdaT&& lambda, TU&& value) const {
+					return This->flowControler.SharedLock([&, Value = MoveRValue(value)]() mutable {
+						TU result = MoveRValue(Value);
 
 						if (This->count == 0)
 							return MoveRValue(result);
@@ -304,8 +353,8 @@ namespace Seed {
 
 				bool AnyImpl() const { return This->count > 0; }
 
-				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				__forceinline bool AnyImpl(TLambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -320,8 +369,8 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				__forceinline bool AllImpl(TLambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -336,8 +385,8 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				T& FirstImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				T& FirstImpl(TLambda&& lambda) {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
@@ -348,20 +397,20 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				T& LastImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				T& LastImpl(TLambda&& lambda) {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-						T& ret = This->queue[(This->rear == 0) ? bufferSize - 1 : This->rear - 1];
+						T& ret = This->queue[(This->rear == 0) ? This->bufferSize - 1 : This->rear - 1];
 
 						return ret;
 						});
 				}
 
-				template<typename Lambda>
-				const T& FirstImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				const T& FirstImpl(TLambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
@@ -372,13 +421,13 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				const T& LastImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				const T& LastImpl(TLambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-						T& ret = This->queue[(This->rear == 0) ? bufferSize - 1 : This->rear - 1];
+						T& ret = This->queue[(This->rear == 0) ? This->bufferSize - 1 : This->rear - 1];
 
 						return ret;
 						});
@@ -394,12 +443,12 @@ namespace Seed {
 						});
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
-					This->queue[Index] = Value;
+				__forceinline void UnsafeSet(const T& value, SizeT index) {
+					This->queue[index] = value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
-					This->queue[Index] = MoveRValue(Value);
+				__forceinline void UnsafeSet(T&& value, SizeT index) {
+					This->queue[index] = MoveRValue(value);
 				}
 
 				__forceinline BaseConcurencyDynamicQueue& RemoveAllImpl() {

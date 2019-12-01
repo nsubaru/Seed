@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Testing.Tests.Containers.PriorityQueue.h"
 #include "Seed.Core.Containers.Concurency.PriorityQueue.h"
 #include "Seed.Core.Containers.NonConcurency.PriorityQueue.h"

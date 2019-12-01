@@ -1,28 +1,34 @@
-#pragma once
+п»ї#pragma once
 #include "Seed.Core.Base.Types.h"
 
 namespace Seed {
 	inline namespace Core {
-		///<summary>Виставлення 1 в байті b під індексом bitIndex. Порядок bigEndian</summary>
-		///<param name="b"> Байт в якому треба виставити біт</param>
-		///<param name="bitIndex"> Номер біта від нуля</param>
-		constexpr __forceinline void BitSet(Byte& b, SizeT bitIndex) {
+		/// <summary>
+		/// Р’РёСЃС‚Р°РІР»РµРЅРЅСЏ 1 РІ Р±Р°Р№С‚С– b РїС–Рґ С–РЅРґРµРєСЃРѕРј bitIndex. РџРѕСЂСЏРґРѕРє bigEndian
+		/// </summary>
+		/// <param name="b">Р‘Р°Р№С‚ РІ СЏРєРѕРјСѓ С‚СЂРµР±Р° РІРёСЃС‚Р°РІРёС‚Рё Р±С–С‚</param>
+		/// <param name="bitIndex">РќРѕРјРµСЂ Р±С–С‚Р° РІС–Рґ РЅСѓР»СЏ</param>
+		constexpr __forceinline void BitSet(Byte& b, const SizeT bitIndex) {
 			b |= 1 << bitIndex;
 		}
 
-		///<summary>Виставлення 0 в байті b під індексом bitIndex. Порядок bigEndian</summary>
-		///<param name="b"> Байт в якому треба виставити біт</param>
-		///<param name="bitIndex"> Номер біта від нуля</param>
-		constexpr __forceinline void BitReset(Byte& b, SizeT bitIndex) {
+		/// <summary>
+		/// Р’РёСЃС‚Р°РІР»РµРЅРЅСЏ 0 РІ Р±Р°Р№С‚С– b РїС–Рґ С–РЅРґРµРєСЃРѕРј bitIndex. РџРѕСЂСЏРґРѕРє bigEndian
+		/// </summary>
+		/// <param name="b">Р‘Р°Р№С‚ РІ СЏРєРѕРјСѓ С‚СЂРµР±Р° РІРёСЃС‚Р°РІРёС‚Рё Р±С–С‚</param>
+		/// <param name="bitIndex">РќРѕРјРµСЂ Р±С–С‚Р° РІС–Рґ РЅСѓР»СЏ</param>
+		constexpr __forceinline void BitReset(Byte& b, const SizeT bitIndex) {
 			b &= ~(1 << bitIndex);
 		}
 
-		///<summary>Провірка біта під індексом bitIndex в байті b. Порядок bigEndian</summary>
-		///<param name="b"> Байт в якому треба виставити біт</param>
-		///<param name="bitIndex"> Номер біта від нуля</param>
-		///<returns>True якщо 1, якщо 0 False</returns>
-		constexpr __forceinline Boolean BitCheck(const Byte b, SizeT bitIndex) { //-V669
-			return (b & (1 << bitIndex)) == 1;
+		/// <summary>
+		/// РџРµСЂРµРІС–СЂРєР° Р±С–С‚Р° РїС–Рґ С–РЅРґРµРєСЃРѕРј bitIndex РІ Р±Р°Р№С‚С– b. РџРѕСЂСЏРґРѕРє bigEndian
+		/// </summary>
+		/// <param name="b">Р‘Р°Р№С‚ РІ СЏРєРѕРјСѓ С‚СЂРµР±Р° РІРёСЃС‚Р°РІРёС‚Рё Р±С–С‚</param>
+		/// <param name="bitIndex">РќРѕРјРµСЂ Р±С–С‚Р° РІС–Рґ РЅСѓР»СЏ</param>
+		/// <returns>True СЏРєС‰Рѕ 1, СЏРєС‰Рѕ 0 False</returns>
+		constexpr __forceinline Boolean BitCheck(const Byte b, const SizeT bitIndex) { //-V669
+			return (b & 1 << bitIndex) == 1;
 		}
 	}
 }

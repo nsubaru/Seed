@@ -42,17 +42,17 @@ namespace Seed {
 				};
 
 				//Висота дерева
-				__forceinline UInt8 height(NodeSym* node) {
+				forceinline UInt8 height(NodeSym* node) {
 					return node ? node->height : 0;
 				}
 
 				//Різниця висот лівої і правої підгілки
-				__forceinline Int8 bfactor(NodeSym* node) {
+				forceinline Int8 bfactor(NodeSym* node) {
 					return height(node->right) - height(node->left);
 				}
 
 				//Переобчислення висоти
-				__forceinline void fixheight(NodeSym* node) {
+				forceinline void fixheight(NodeSym* node) {
 					auto h_left = height(node->left);
 					auto h_right = height(node->right);
 					node->height = ((h_left < h_right) ? h_right : h_left) + 1;
@@ -108,12 +108,12 @@ namespace Seed {
 				}
 
 				//Пошук мінімального елемента в дереві
-				__forceinline NodeSym* findmin(NodeSym* p) {
+				forceinline NodeSym* findmin(NodeSym* p) {
 					return p->left ? findmin(p->left) : p;
 				}
 
 				//Видалення мінімального елемента в дереві
-				__forceinline NodeSym* removemin(NodeSym* p) {
+				forceinline NodeSym* removemin(NodeSym* p) {
 					if (p->left == 0)
 						return p->right;
 					p->left = removemin(p->left);
@@ -142,7 +142,7 @@ namespace Seed {
 				}
 
 				//Пошук елемента в дереві
-				__forceinline NodeSym* find(NodeSym* root, Char key) const { //-V688
+				forceinline NodeSym* find(NodeSym* root, Char key) const { //-V688
 					if (!root) return nullptr;
 					while (root->key != key) {
 						if (root->key > key)
@@ -270,7 +270,7 @@ namespace Seed {
 					Threading::SRWLock lock;
 					RefCountT count;
 					RefCountT RefCount;
-					__forceinline RootNode() noexcept :node(nullptr), lock(), count(0), RefCount(1) {};
+					forceinline RootNode() noexcept :node(nullptr), lock(), count(0), RefCount(1) {};
 				};
 			private:
 				//Кореневий елемент
@@ -402,7 +402,7 @@ namespace Seed {
 				}
 
 				//Пошук елемента за ключом
-				__forceinline const TData& Find(const TString& Key) const {
+				forceinline const TData& Find(const TString& Key) const {
 					return This->lock.ShareLock([&]() -> const TData& {
 						if (Key.Size == 0)
 							Throw(NullPointException(ExceptionPosition));
@@ -416,7 +416,7 @@ namespace Seed {
 				}
 
 				//Пошук елемента за ключом
-				__forceinline TData& Find(const TString& Key) {
+				forceinline TData& Find(const TString& Key) {
 					return This->lock.ShareLock([&]() -> TData& {
 						if (Key.Size == 0)
 							Throw(NullPointException(ExceptionPosition));
@@ -429,27 +429,27 @@ namespace Seed {
 						});
 				}
 
-				__forceinline TData& operator[](const TString& key) {
+				forceinline TData& operator[](const TString& key) {
 					return Find(key);
 				}
 
-				__forceinline TData& operator[](TString&& key) {
+				forceinline TData& operator[](TString&& key) {
 					return Find(key);
 				}
 
-				__forceinline const TData& operator[](const TString& key) const {
+				forceinline const TData& operator[](const TString& key) const {
 					return Find(key);
 				}
 
-				__forceinline const TData& operator[](TString&& key) const {
+				forceinline const TData& operator[](TString&& key) const {
 					return Find(key);
 				}
 
 				//Провірка чи дерево пусте
-				__forceinline Boolean IsEmpty() const noexcept { return This->RefCount == 0 ? false : true; }
+				forceinline Boolean IsEmpty() const { return This->RefCount == 0 ? false : true; }
 
 				//Провірки чи є елемент з заданим ключем
-				__forceinline Boolean IsExist(const TString& Key) const {
+				forceinline Boolean IsExist(const TString& Key) const {
 					return This->lock.ShareLock([&]() -> bool {
 						if (This == nullptr) return false;
 						NodeLex* node = find(This->node, Key);
@@ -457,7 +457,7 @@ namespace Seed {
 						});
 				}
 
-				__forceinline Boolean IsExist(TString&& Key) const {
+				forceinline Boolean IsExist(TString&& Key) const {
 					return This->lock.ShareLock([&]() -> bool {
 						if (This == nullptr) return false;
 						NodeLex* node = find(This->node, Key);
@@ -476,7 +476,7 @@ namespace Seed {
 				}
 
 				//Кількість елемент в системі
-				SizeT GetCount() const noexcept {
+				SizeT GetCount() const {
 					return This->count;
 				}
 
@@ -510,9 +510,11 @@ namespace Seed {
 				friend class LINQ::IAssociableCollection;
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
 				friend class LINQ::IDictionary;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 #pragma region For Each
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithoutIndex(
+				forceinline static void ForEachImplWithoutIndex(
 					NodeSym* node,
 					Lambda& lambda)
 				{
@@ -522,7 +524,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithoutIndex(
+				forceinline static void ForEachImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -533,7 +535,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithoutIndex(
+				forceinline static void ForEachImplWithoutIndex(
 					RootNode* This, //-V688
 					Lambda& lambda)
 				{
@@ -543,7 +545,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithIndex(
+				forceinline static void ForEachImplWithIndex(
 					NodeSym* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -554,7 +556,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithIndex(
+				forceinline static void ForEachImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -568,7 +570,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachImplWithIndex(
+				forceinline static void ForEachImplWithIndex(
 					RootNode* This, //-V688
 					Lambda& lambda,
 					SizeT& Index)
@@ -579,7 +581,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyDictionary& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyDictionary& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TString, TData>&>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyDictionary& {
 							ForEachImplWithoutIndex(This, lambda);
@@ -599,7 +601,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseConcurencyDictionary& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyDictionary& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TString, TData>&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TString, TData>&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyDictionary& {
@@ -622,7 +624,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Key
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithoutIndex(
+				forceinline static void ForEachKeyImplWithoutIndex(
 					NodeSym* node,
 					Lambda& lambda)
 				{
@@ -632,7 +634,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithoutIndex(
+				forceinline static void ForEachKeyImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -643,7 +645,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithoutIndex(
+				forceinline static void ForEachKeyImplWithoutIndex(
 					RootNode* This, //-V688
 					Lambda& lambda)
 				{
@@ -653,7 +655,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithIndex(
+				forceinline static void ForEachKeyImplWithIndex(
 					NodeSym* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -664,7 +666,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithIndex(
+				forceinline static void ForEachKeyImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -678,7 +680,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachKeyImplWithIndex(
+				forceinline static void ForEachKeyImplWithIndex(
 					RootNode* This, //-V688
 					Lambda& lambda,
 					SizeT& Index)
@@ -689,7 +691,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyDictionary& ForEachKeyImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyDictionary& ForEachKeyImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TString&>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyDictionary& {
 							ForEachKeyImplWithoutIndex(This, lambda);
@@ -709,7 +711,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseConcurencyDictionary& ForEachKeyImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyDictionary& ForEachKeyImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TString&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyDictionary& {
 							ForEachKeyImplWithoutIndex(This, lambda);
@@ -730,7 +732,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Value
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithoutIndex(
+				forceinline static void ForEachValueImplWithoutIndex(
 					NodeSym* node,
 					Lambda& lambda)
 				{
@@ -740,7 +742,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithoutIndex(
+				forceinline static void ForEachValueImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -751,7 +753,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithoutIndex(
+				forceinline static void ForEachValueImplWithoutIndex(
 					RootNode* This, //-V688
 					Lambda& lambda)
 				{
@@ -761,7 +763,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithIndex(
+				forceinline static void ForEachValueImplWithIndex(
 					NodeSym* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -772,7 +774,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithIndex(
+				forceinline static void ForEachValueImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -786,7 +788,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline static void ForEachValueImplWithIndex(
+				forceinline static void ForEachValueImplWithIndex(
 					RootNode* This, //-V688
 					Lambda& lambda,
 					SizeT& Index)
@@ -797,7 +799,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyDictionary& ForEachValueImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyDictionary& ForEachValueImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TData&>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyDictionary& {
 							ForEachValueImplWithoutIndex(This, lambda);
@@ -817,7 +819,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseConcurencyDictionary& ForEachValueImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyDictionary& ForEachValueImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TData&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TData&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyDictionary& {
@@ -836,6 +838,10 @@ namespace Seed {
 					else {
 						static_assert(false);
 					}
+				}
+
+				forceinline void UnsafeAdd(Pair&& pair){
+					Insert(MoveRValue(pair));
 				}
 #pragma endregion
 			protected:
@@ -880,13 +886,13 @@ namespace Seed {
 					return nullptr;
 				}
 
-				__forceinline BaseConcurencyDictionary& RemoveAllImpl() {
+				forceinline BaseConcurencyDictionary& RemoveAllImpl() {
 					this->Dispose();
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BaseConcurencyDictionary& RemoveAllWithImpl(Lambda&& lambda) {
+				forceinline BaseConcurencyDictionary& RemoveAllWithImpl(Lambda&& lambda) {
 					return This->lock.ShareLock([&]() -> BaseConcurencyDictionary& {
 						This->root = destroy_tree(This->root, lambda);
 						This->count = 0;
@@ -913,7 +919,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename TString, typename T>
-		__forceinline void Swap(Containers::BaseConcurencyDictionary<THeap, TString, T>& A, Containers::BaseConcurencyDictionary<THeap, TString, T>& B) {
+		forceinline void Swap(Containers::BaseConcurencyDictionary<THeap, TString, T>& A, Containers::BaseConcurencyDictionary<THeap, TString, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

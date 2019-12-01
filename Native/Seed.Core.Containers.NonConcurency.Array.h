@@ -23,6 +23,7 @@ namespace Seed {
 					SizeT count;
 					T* array;
 					Data() : RefCount(1), count(0), array(nullptr) {}
+					Data(T*&& array, SizeT count) : RefCount(1), count(count), array(array) {}
 				};
 			private:
 				Data* This;
@@ -73,6 +74,8 @@ namespace Seed {
 				friend class LINQ::IOrderable;
 				template<typename THeap, typename T>
 				friend class BaseVList;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -299,6 +302,7 @@ namespace Seed {
 					delete[] this->This->array;
 					this->This->array = nullptr;
 					this->This->count = 0;
+                    return *this;
 				}
 #pragma warning(pop)
 			public:
@@ -337,6 +341,9 @@ namespace Seed {
 						}
 					}
 				}
+
+				InternalApiCall BaseArray(T*&& Array, SizeT StartCount) : This(new Data(MoveRValue(Array), StartCount))
+				{}
 
 				InternalApiCall operator const T* const() const { return This->array; }
 #pragma warning(pop)
@@ -572,6 +579,7 @@ namespace Seed {
 						}
 						array.This->array[i] = node->arr[i - nodeStartIndex];
 					}
+                    return array;
 				}
 
 				virtual BaseVList Clone() const override final {
@@ -615,6 +623,8 @@ namespace Seed {
 				friend class LINQ::IFixedCollectionBase;
 				template<template<typename THeap, typename T>typename TList, typename THeap, typename T, bool TIsDynamic, bool TIsConcurencySuport>
 				friend class LINQ::IOrderable;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -625,7 +635,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -638,7 +648,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -658,7 +668,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -671,7 +681,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -693,7 +703,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -706,7 +716,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -728,7 +738,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -741,7 +751,7 @@ namespace Seed {
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
 						{
-							if (nodeStartIndex + i = node->size) {
+							if (nodeStartIndex + i == node->size) {
 								nodeStartIndex += node->size;
 								node = node->next;
 							}
@@ -762,7 +772,7 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -778,7 +788,7 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -793,7 +803,7 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -810,7 +820,7 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -826,7 +836,7 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -842,7 +852,7 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -861,7 +871,7 @@ namespace Seed {
 					SizeT index = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -881,7 +891,7 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -900,7 +910,7 @@ namespace Seed {
 					SizeT index = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
@@ -938,13 +948,14 @@ namespace Seed {
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						if (nodeStartIndex + i = node->size) {
+						if (nodeStartIndex + i == node->size) {
 							nodeStartIndex += node->size;
-							tmp = node; node = node->next; delete[] node->arr; delete node;
+							tmp = node; node = node->next; delete[] tmp->arr; delete tmp;
 						}
 						lambda(MoveRValue(node->arr[i - nodeStartIndex]));
 					}
 					This->count = 0; This->last = This->root = nullptr;
+                    return *this;
 				}
 #pragma warning(pop)
 			public:

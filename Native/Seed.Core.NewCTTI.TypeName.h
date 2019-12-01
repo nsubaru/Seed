@@ -112,7 +112,7 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::UInt64> {
 					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt16")());
+						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt64")());
 					}
 				};
 #pragma endregion
@@ -648,6 +648,33 @@ namespace Seed {
 				};
 #pragma endregion
 #pragma endregion
+#pragma region Pair
+				template<typename TKey, typename TValue>
+				struct TTypeName<Seed::Containers::Pair<TKey, TValue>> {
+					constexpr static auto TypeName() {
+						return
+							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Pair<")()) +
+							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
+							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							NewCTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+					}
+				};
+
+				template<typename TKey, typename TValue>
+				struct TTypeName<Seed::Containers::SensitivePair<TKey, TValue>>
+				{
+					constexpr static auto TypeName()
+					{
+						return
+							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitivePair<")()) +
+							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
+							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							NewCTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+					}
+				};
+#pragma endregion
 #pragma region String
 				template<>
 				struct TTypeName<Seed::String>
@@ -674,25 +701,30 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::Tuple<Types...>>
 				{
 				private:
-					template<typename Head, typename ... Tail>
-					constexpr static auto FieldTypeName()
-					{
-						return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>() +
-							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							FieldTypeName<Tail...>();
-					}
+                    template<typename Head, typename ... Tail>
+                    struct TFieldTypeName {
+                        constexpr static auto Name() {
+                            return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>() +
+                                NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
+                                TFieldTypeName<Tail...>::Name();
+                        }
+                    };
 
-					template<typename Head>
-					constexpr static auto FieldTypeName()
-					{
-						return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>();
-					}
+                    template<typename Head>
+                    struct TFieldTypeName<Head> {
+                        constexpr static auto Name() {
+                            return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>();
+                        }
+                    };
+
+					
+					
 				public:
 					constexpr static auto TypeName()
 					{
 						return
 							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Tuple<")()) +
-							FieldTypeName<Types...>() +
+                            TFieldTypeName<Types...>::Name() +
 							NewCTTI::Details::TypeStringToArray(GenNGTypeString(">")());
 					}
 				};

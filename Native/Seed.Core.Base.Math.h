@@ -29,7 +29,7 @@ namespace Seed {
 			constexpr Float Max() { return 3.4E38f; }; //-V2517
 			///<summary>Максимальне значення Double</summary>
 			template<>
-			constexpr Double Max() { return (Seed::Double)1.7E308; }; //-V2533
+			constexpr Double Max() { return static_cast<Seed::Double>(1.7E308); }; //-V2533
 			///<summary>Максимальне значення UInt8</summary>
 			template<>
 			constexpr UInt8 Max() { return 0xFFui8; }; //-V2517
@@ -47,7 +47,10 @@ namespace Seed {
 			template<typename T>
 			constexpr T Min()
 			{
+				// ReSharper disable CppStaticAssertFailure
 				static_assert(false, "Invalid type");
+				// ReSharper restore CppStaticAssertFailure
+				return 0;
 			};
 
 			///<summary>Мінімальне значення Int8</summary>
@@ -64,7 +67,7 @@ namespace Seed {
 			constexpr Int64 Min() { return 0x8000000000000000i64; }; //-V2517
 			///<summary>Мінімальне значення Float </summary>
 			template<>
-			constexpr Float Min() { return (Seed::Float)3.4E-38; }; //-V2533
+			constexpr Float Min() { return static_cast<Seed::Float>(3.4E-38); }; //-V2533
 			///<summary>Мінімальне значення Double</summary>
 			template<>
 			constexpr Double Min() { return 1.7E-308; };
@@ -81,57 +84,69 @@ namespace Seed {
 			template<>
 			constexpr UInt64 Min() { return 0x0000000000000000ui64; }; //-V2517
 
-			///<summary>Максимальна кількість цифр в числовому типі</summary>
-			///<typeparam name = "T">Тип числа</typeparam>
+			/// <summary>
+			/// Максимальна кількість цифр в числовому типі
+			/// </summary>
+			/// <typeparam name="T">Тип числа</typeparam>
 			template<typename T>
 			constexpr UInt8 MaxNumberCount() {
-				//Отримуєм максимальне можливе значення для даного числа
+				//Отримуємо максимальне можливе значення для даного числа
 				T value = Max<T>();
-				//Оголошуєм зміну результату
+				//Оголошуємо зміну результату
 				UInt8 result = 0;
-				//В циклі зменшуєм кількість десяткових розрядів діленням і підраховуєм кількість розрядів поки є розряди
+				//В циклі зменшуємо кількість десяткових розрядів діленням і підраховуємо кількість розрядів поки є розряди
 				do {
 					value /= 10;
 					result++;
 				} while (value > 0);
-				//Вертаєм розряди
+				//Вертаємо розряди
 				return result;
 			}
 
-			///<summary>Машиний епсилон(ноль) типу</summary>
+			///<summary>Машинний епсилон(ноль) типу</summary>
+
+			/// <summary>
+			/// Машинний епсилон(ноль) типу
+			/// </summary>
+			/// <typeparam name="T">Дійсний тип</typeparam>
 			template<typename T>
 			constexpr T Epsilon()
 			{
+				// ReSharper disable once CppStaticAssertFailure
 				static_assert(false, "Invalid type");
+				return 0;
 			};
-			///<summary>Машиний епсилон(ноль) для Float</summary>
+			///<summary>Машинний епсилон(ноль) для Float</summary>
 			template<>
 			constexpr Float Epsilon()
 			{
 				return 1.192092896e-07F;
 			};
-			///<summary>Машиний епсилон(ноль) для Double</summary>
+			///<summary>Машинний епсилон(ноль) для Double</summary>
 			template<>
 			constexpr Double Epsilon()
 			{
 				return 2.2204460492503131e-016;
 			};
 
-			///<summary>Бескінечність</summary>
+			///<value>Безкінечність</value>
 			constexpr Double Infinity = 1e+300 * 1e+300;
 			///<summary>Невизначене значення</summary>
 			constexpr Double NaN = Infinity * 0.0;
-
-			///<summary>Заокруглення до верхнього значення при діленні</summary>
-			///<param name='What'>Вхідне число</param>
-			///<param name='By'>Дільник</param>
-			///<results>Ділене заокреглене до верхньої сторони</results>
-			///<remarks>Така функція потрібна при очислені кількості кластерів які будуть зайнняті файлом чи даними,
-			///<para>наприклад: розмір кластер 512 байт, розмір даних 1000 байт, кластер може бути або зайннятим або ні,</para>
-			///<para>якщо дані не повністю займають кластер все одно вважається що він зайннятий, </para>
-			///<para>відповідно 1000 / 512 буде 1 але ж зрозуміло що другий кластер теж буде зайннятий </para>
-			///<para>тому і треба заокруглити до більшого тобто до 2</para>
-			///</remarks>
+			
+			/// <summary>
+			/// Заокруглення до верхнього значення при діленні
+			/// </summary>
+			/// <param name="What">Вхідне число</param>
+			/// <param name="By">Дільник</param>
+			/// <returns>Ділене заокруглення до верхньої сторони</returns>
+			/// <remarks>
+			/// Така функція потрібна при обчислені кількості кластерів які будуть зайняті файлом чи даними,
+			/// наприклад: розмір кластер 512 байт, розмір даних 1000 байт, кластер може бути або зайнятим або ні,
+			/// якщо дані не повністю займають кластер все одно вважається що він зайнятий,
+			/// відповідно 1000 / 512 буде 1 але ж зрозуміло що другий кластер теж буде зайнятий
+			/// тому і треба заокруглити до більшого тобто до 2
+			/// </remarks>
 			__forceinline constexpr SizeT RoundToUpper(SizeT What, SizeT By) {
 				return (What / By) * By != What
 					?

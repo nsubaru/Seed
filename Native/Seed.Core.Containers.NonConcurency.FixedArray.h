@@ -12,12 +12,14 @@ namespace Seed {
 			class SeedKernelCall BaseFixedArray final :
 				Seed::IDisposable,
 				public LINQ::IFixedArray<BaseFixedArray, THeap, T, TSize, false>,
-				public Memory::Allocator<THeap> {
+				public Memory::Allocator<THeap>,
+				public IClonable<BaseFixedArray<THeap, TSize, T>>
+			{
 			private:
 				struct Data : public Memory::Allocator<THeap> {
 					Seed::RefCountT RefCount;
 					T array[TSize] = {};
-					Data() : RefCount(1), lock() {}
+					Data() : RefCount(1) {}
 				};
 			private:
 				Data* This;
@@ -66,6 +68,8 @@ namespace Seed {
 				friend class LINQ::IFixedArray;
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)

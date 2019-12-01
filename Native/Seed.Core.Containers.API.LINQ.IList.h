@@ -14,10 +14,10 @@ namespace Seed {
 						typename Lambda,
 						typename FilteringLambda,
 						TypeTraits::EnableIfTV<TypeTraits::LogicConst<
-						(TypeTraits::IsLambdaConvertible<Lambda, void, T&&>::State ||
-							TypeTraits::IsLambdaConvertible<Lambda, void, T&&, SizeT>::State) &&
-							(TypeTraits::IsLambdaConvertible<FilteringLambda, Boolean, const T&>::State ||
-								TypeTraits::IsLambdaConvertible<FilteringLambda, Boolean, const T&, SizeT>::State)
+						(TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State ||
+							TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State) &&
+							(TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State ||
+								TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State)
 					>, bool> = true>
 						__forceinline ListType& RemoveIf(FilteringLambda filter, Lambda&& lambda) {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(lambda));

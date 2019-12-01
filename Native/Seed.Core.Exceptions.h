@@ -14,24 +14,20 @@ namespace Seed {
 			public:
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
-				///<exeption cref='Seed::Core::Exceptions::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 				///<returns>Виділену ділянку</returns>
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) final;
 				///<summary>Вирівнняне виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				///<exeption cref='Seed::Core::Exceptions::OutOfMemory'>Якщо неможливо виділити пам'ять</exeption>
 				///<returns>Виділену ділянку</returns>
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				///<exeption cref='Seed::Core::Exceptions::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) final;
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				///<exeption cref='Seed::Core::Exceptions::NullPointException'>Якщо передана не існуюча ділянка пам'яті</exeption>
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) final;
 
 				///<summary>Кількість виділених блоків даних</summary>
@@ -621,7 +617,7 @@ namespace Seed {
 				StringToLong(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT RequiredSize) :
 					Exception(File, FunctName, Line, L"Рядок має завеликий розмір"), requiredSize(RequiredSize) {}
 
-				///<summaru>Вертає запрошений розмір</summary>
+				///<summary>Вертає запрошений розмір</summary>
 				SizeT GetRequiredSize() { return requiredSize; }
 				///<summary>Запрошений розмір</summary>
 				SizeT Property(GetRequiredSize) RequiredSize;
@@ -716,7 +712,7 @@ namespace Seed {
 template<class Type>
 using ThrowableObj = typename Seed::Core::TypeTraits::ConditionT <
 	Seed::Core::TypeTraits::IsFunction<Type>::State,
-	typename Seed::Core::TypeTraits::ResultOf<Type>::Type,
+	typename Seed::Core::TypeTraits::ResultOfT<Type>::Type,
 	typename Type
 >::Result;
 
@@ -731,7 +727,7 @@ struct IsThrowable :
 
 ///<summary>Внутрішня функція генерації помилки</summary>
 ///<param name = 'ex'>Об'єкт помилки</param>
-template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___cxxthrow(E&& ex) { throw ex; }
+template<typename E> InternalApiCall __forceinline void __declspec(noreturn) ___cxxthrow(E&& ex) { throw static_cast<E&>(ex); }
 
 ///<summary>Внутрішня функція пркидування поточної помилки</summary>
 InternalApiCall __forceinline void __declspec(noreturn) __cxxrethrow() { throw; } //-V667

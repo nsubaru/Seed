@@ -112,7 +112,7 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
-				SizeT GetCount() { return This->count; }
+				SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
 				RefCountClass(BaseDynamicStack, This)
@@ -134,6 +134,8 @@ namespace Seed {
 				friend class LINQ::IDynamicStack;
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
+                template<typename THeap, typename T, typename Enable>
+                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -328,12 +330,9 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
-					This->stack[Index] = Value;
-				}
-
 				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
+					This->count = Index + 1;
 				}
 
 				__forceinline BaseDynamicStack& RemoveAllImpl() {

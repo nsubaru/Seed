@@ -1,128 +1,152 @@
-#pragma once
+п»ї#pragma once
 #include "Seed.Core.Base.Types.h"
 
 namespace Seed {
-	inline namespace Core {
-		///<summary>Простір імен функцій для роботи з C-подібними рядковими зміними</summary>
-		namespace CStr {
+    inline namespace Core {
+        ///<summary>РџСЂРѕСЃС‚С–СЂ С–РјРµРЅ С„СѓРЅРєС†С–Р№ РґР»СЏ СЂРѕР±РѕС‚Рё Р· C-РїРѕРґС–Р±РЅРёРјРё СЂСЏРґРєРѕРІРёРјРё Р·РјС–РЅРЅРёРјРё</summary>
+        namespace CStr {
 #pragma inline_recursion(on)
 #pragma inline_depth(256)
-			///<summary>Compile-time функція визначення кількості сиволів в символьному масиві</summary>
-			///<param name="CStr">Рядкова зміна</param>
-			///<returns>Кількість елементів в рядковому масиві</returns>
-			__forceinline constexpr SizeT Size(const CharStr CStr) noexcept {
-				return *CStr == '\0' ? 0 : Size(CStr + 1) + 1;
-			}
-
-#pragma inline_recursion(on)
-#pragma inline_depth(256)
-			///<summary>Compile-time функція визначення кількості сиволів в символьному масиві</summary>
-			///<param name="CStr">Рядкова зміна</param>
-			///<returns>Кількість елементів в рядковому масиві</returns>
-			__forceinline constexpr SizeT Size(const Char* CStr) noexcept {
-				return *CStr == '\0' ? 0 : Size(CStr + 1) + 1;
-			}
+        	/// <summary>
+        	/// Compile-time С„СѓРЅРєС†С–СЏ РІРёР·РЅР°С‡РµРЅРЅСЏ РєС–Р»СЊРєРѕСЃС‚С– СЃРёРјРІРѕР»С–РІ РІ СЃРёРјРІРѕР»СЊРЅРѕРјСѓ РјР°СЃРёРІС–
+        	/// </summary>
+        	/// <param name="cStr">Р СЏРґРєРѕРІР° Р·РјС–РЅР°</param>
+        	/// <returns>РљС–Р»СЊРєС–СЃС‚СЊ РµР»РµРјРµРЅС‚С–РІ РІ СЂСЏРґРєРѕРІРѕРјСѓ РјР°СЃРёРІС–</returns>
+            __forceinline constexpr SizeT Size(const CharStr cStr) noexcept {
+                return *cStr == '\0' ? 0 : Size(cStr + 1) + 1;
+            }
 
 #pragma inline_recursion(on)
 #pragma inline_depth(256)
-			///<summary>Compile-time функція визначення кількості ASCII сиволів в символьному масиві</summary>
-			///<param name="CStr">Рядкова зміна</param>
-			///<returns>Кількість елементів в рядковому масиві</returns>
-			__forceinline constexpr SizeT Size(const AChar* CStr) noexcept {
-				return *CStr == '\0' ? 0 : Size(CStr + 1) + 1;
-			}
+        	/// <summary>
+        	/// Compile-time С„СѓРЅРєС†С–СЏ РІРёР·РЅР°С‡РµРЅРЅСЏ РєС–Р»СЊРєРѕСЃС‚С– СЃРёРјРІРѕР»С–РІ РІ СЃРёРјРІРѕР»СЊРЅРѕРјСѓ РјР°СЃРёРІС–
+        	/// </summary>
+        	/// <param name="cStr">Р СЏРґРєРѕРІР° Р·РјС–РЅР°</param>
+        	/// <returns>РљС–Р»СЊРєС–СЃС‚СЊ РµР»РµРјРµРЅС‚С–РІ РІ СЂСЏРґРєРѕРІРѕРјСѓ РјР°СЃРёРІС–</returns>
+            __forceinline constexpr SizeT Size(const Char* cStr) noexcept {
+                return *cStr == '\0' ? 0 : Size(cStr + 1) + 1;
+            }
 
-			///<summary>Функція копіювання с-подібних рядків
-			///<para>Позначена я не рекомендована</para>
-			///</summary>
-			///<param name="Source">Рядкова зміна з якої копіюється</param>
-			///<param name="Dest">Рядкова зміна в яку копіюється</param>
-			__declspec(deprecated("Без гарантій щодо виходу за межі"))
-				__forceinline void Copy(CharStr Source, CharStr Dest) noexcept {
-				while (*Dest++ = *Source++); //-V2507
-			}
+#pragma inline_recursion(on)
+#pragma inline_depth(256)
+        	/// <summary>
+        	/// Compile-time С„СѓРЅРєС†С–СЏ РІРёР·РЅР°С‡РµРЅРЅСЏ РєС–Р»СЊРєРѕСЃС‚С– ASCII СЃРёРјРІРѕР»С–РІ РІ СЃРёРјРІРѕР»СЊРЅРѕРјСѓ РјР°СЃРёРІС–
+        	/// </summary>
+        	/// <param name="cStr">Р СЏРґРєРѕРІР° Р·РјС–РЅР°</param>
+        	/// <returns>РљС–Р»СЊРєС–СЃС‚СЊ РµР»РµРјРµРЅС‚С–РІ РІ СЂСЏРґРєРѕРІРѕРјСѓ РјР°СЃРёРІС–</returns>
+            __forceinline constexpr SizeT Size(const AChar* cStr) noexcept {
+                return *cStr == '\0' ? 0 : Size(cStr + 1) + 1;
+            }
 
-			///<summary>Функція копіювання с-подібних рядків
-			///<para>Позначена я не рекомендована</para>
-			///</summary>
-			///<param name="Source">Рядкова зміна з якої копіюється</param>
-			///<param name="Dest">Рядкова зміна в яку копіюється</param>
-			__declspec(deprecated("Без гарантій щодо виходу за межі"))
-				__forceinline void Copy(const Char* Source, CharStr Dest) noexcept {
-				while (*Dest++ = *Source++); //-V2507
-			}
+        	/// <summary>
+        	/// Р¤СѓРЅРєС†С–СЏ РєРѕРїС–СЋРІР°РЅРЅСЏ СЃ-РїРѕРґС–Р±РЅРёС… СЂСЏРґРєС–РІ. РќРµ СЂРµРєРѕРјРµРЅРґСѓС”С‚СЊСЃСЏ С‚Р°Рє СЏРє Р±РµР· РїРµСЂРµРІС–СЂРѕРє РЅР° РјРµР¶С– РјР°СЃРёРІС–РІ
+        	/// </summary>
+        	/// <param name="source">Р СЏРґРєРѕРІР° Р·РјС–РЅР° Р· СЏРєРѕС— РєРѕРїС–СЋС”С‚СЊСЃСЏ</param>
+        	/// <param name="dest">Р СЏРґРєРѕРІР° Р·РјС–РЅР° РІ СЏРєСѓ РєРѕРїС–СЋС”С‚СЊСЃСЏ</param>
+            __declspec(deprecated("Р‘РµР· РіР°СЂР°РЅС‚С–Р№ С‰РѕРґРѕ РІРёС…РѕРґСѓ Р·Р° РјРµР¶С–"))
+                __forceinline void Copy(CharStr source, CharStr dest) noexcept {
+                while ((*dest++ = *source++)); //-V2507
+            }
 
-			///<summary>Функція копіювання с-подібних рядків
-			///<para>Позначена я не рекомендована</para>
-			///</summary>
-			///<param name="Source">Рядкова зміна з якої копіюється</param>
-			///<param name="Dest">Рядкова зміна в яку копіюється</param>
-			__declspec(deprecated("Без гарантій щодо виходу за межі"))
-				__forceinline void Copy(const AChar* Source, ACharStr Dest) noexcept {
-				while (*Dest++ = *Source++);
-			}
+        	/// <summary>
+        	/// Р¤СѓРЅРєС†С–СЏ РєРѕРїС–СЋРІР°РЅРЅСЏ СЃ-РїРѕРґС–Р±РЅРёС… СЂСЏРґРєС–РІ. РќРµ СЂРµРєРѕРјРµРЅРґСѓС”С‚СЊСЃСЏ С‚Р°Рє СЏРє Р±РµР· РїРµСЂРµРІС–СЂРѕРє РЅР° РјРµР¶С– РјР°СЃРёРІС–РІ
+        	/// </summary>
+        	/// <param name="source">Р СЏРґРєРѕРІР° Р·РјС–РЅР° Р· СЏРєРѕС— РєРѕРїС–СЋС”С‚СЊСЃСЏ</param>
+        	/// <param name="dest">Р СЏРґРєРѕРІР° Р·РјС–РЅР° РІ СЏРєСѓ РєРѕРїС–СЋС”С‚СЊСЃСЏ</param>
+            __declspec(deprecated("Р‘РµР· РіР°СЂР°РЅС‚С–Р№ С‰РѕРґРѕ РІРёС…РѕРґСѓ Р·Р° РјРµР¶С–"))
+                __forceinline void Copy(const Char* source, CharStr dest) noexcept {
+                while ((*dest++ = *source++)); //-V2507
+            }
 
-			///<summary>Compile-time функція порівняння UTF16-LE с-подібних рядків</summary>
-			///<param name="Str1">Перша рядкова змінна</param>
-			///<param name="Str2">Друга рядкова змінна</param>
-			///<returns>True якщо всі символи ідендисні</returns>
-			__forceinline constexpr Boolean Compare(const CharStr Str1, const CharStr Str2) {
-				SizeT Str1Size = Size(Str1);
-				SizeT Str2Size = Size(Str2);
-				if (Str1Size != Str2Size) return false;
-				for (SizeT i = 0; i < Str1Size; i++)
-					if (Str1[i] != Str2[i]) return false;
-				return true;
-			}
+        	/// <summary>
+        	/// Р¤СѓРЅРєС†С–СЏ РєРѕРїС–СЋРІР°РЅРЅСЏ СЃ-РїРѕРґС–Р±РЅРёС… СЂСЏРґРєС–РІ. РќРµ СЂРµРєРѕРјРµРЅРґСѓС”С‚СЊСЃСЏ С‚Р°Рє СЏРє Р±РµР· РїРµСЂРµРІС–СЂРѕРє РЅР° РјРµР¶С– РјР°СЃРёРІС–РІ
+        	/// </summary>
+        	/// <param name="source">Р СЏРґРєРѕРІР° Р·РјС–РЅР° Р· СЏРєРѕС— РєРѕРїС–СЋС”С‚СЊСЃСЏ</param>
+        	/// <param name="dest">Р СЏРґРєРѕРІР° Р·РјС–РЅР° РІ СЏРєСѓ РєРѕРїС–СЋС”С‚СЊСЃСЏ</param>
+            __declspec(deprecated("Р‘РµР· РіР°СЂР°РЅС‚С–Р№ С‰РѕРґРѕ РІРёС…РѕРґСѓ Р·Р° РјРµР¶С–"))
+                __forceinline void Copy(const AChar* source, ACharStr dest) noexcept {
+                while ((*dest++ = *source++));
+            }
 
-			///<summary>Compile-time функція порівняння UTF-16LE с-подібних рядків</summary>
-			///<param name="Str1">Перша рядкова змінна</param>
-			///<param name="Str2">Друга рядкова змінна</param>
-			///<returns>True якщо всі символи ідендисні</returns>
-			__forceinline constexpr Boolean Compare(const Char* Str1, const Char* Str2) {
-				SizeT Str1Size = Size(Str1);
-				SizeT Str2Size = Size(Str2);
-				if (Str1Size != Str2Size) return false;
-				for (SizeT i = 0; i < Str1Size; i++)
-					if (Str1[i] != Str2[i]) return false;
-				return true;
-			}
+        	/// <summary>
+        	/// Compile-time С„СѓРЅРєС†С–СЏ РїРѕСЂС–РІРЅСЏРЅРЅСЏ UTF16-LE СЃ-РїРѕРґС–Р±РЅРёС… СЂСЏРґРєС–РІ
+        	/// </summary>
+        	/// <param name="str1">РџРµСЂС€Р° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <param name="str2">Р”СЂСѓРіР° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <returns>True СЏРєС‰Рѕ РІСЃС– СЃРёРјРІРѕР»Рё С–РґРµРЅС‚РёС‡РЅС–</returns>
+            __forceinline constexpr Boolean Compare(const CharStr str1, const CharStr str2) {
+                const auto str1Size = Size(str1);
+                const auto str2Size = Size(str2);
+                if (str1Size != str2Size) return false;
+                for (SizeT i = 0; i < str1Size; i++)
+                    if (str1[i] != str2[i]) return false;
+                return true;
+            }
 
-			///<summary>Compile-time функція порівняння ASCII с-подібних рядків</summary>
-			///<param name="Str1">Перша рядкова змінна</param>
-			///<param name="Str2">Друга рядкова змінна</param>
-			///<returns>True якщо всі символи ідендисні</returns>
-			__forceinline constexpr Boolean Compare(const ACharStr Str1, const ACharStr Str2) {
-				SizeT Str1Size = Size(Str1);
-				SizeT Str2Size = Size(Str2);
-				if (Str1Size != Str2Size) return false;
-				for (SizeT i = 0; i < Str1Size; i++)
-					if (Str1[i] != Str2[i]) return false;
-				return true;
-			}
+        	/// <summary>
+        	/// Compile-time С„СѓРЅРєС†С–СЏ РїРѕСЂС–РІРЅСЏРЅРЅСЏ UTF-16LE СЃ-РїРѕРґС–Р±РЅРёС… СЂСЏРґРєС–РІ
+        	/// </summary>
+        	/// <param name="str1">РџРµСЂС€Р° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <param name="str2">Р”СЂСѓРіР° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <returns>True СЏРєС‰Рѕ РІСЃС– СЃРёРјРІРѕР»Рё С–РґРµРЅС‚РёС‡РЅС–</returns>
+            __forceinline constexpr Boolean Compare(const Char* str1, const Char* str2) {
+                const auto str1Size = Size(str1);
+                const auto str2Size = Size(str2);
+                if (str1Size != str2Size) return false;
+                for (SizeT i = 0; i < str1Size; i++)
+                    if (str1[i] != str2[i]) return false;
+                return true;
+            }
 
-			///<summary>Compile-time функція порівняння ASCII с-подібних рядків</summary>
-			///<param name="Str1">Перша рядкова змінна</param>
-			///<param name="Str2">Друга рядкова змінна</param>
-			///<returns>True якщо всі символи ідендисні</returns>
-			__forceinline constexpr Boolean Compare(const AChar* Str1, const AChar* Str2) {
-				SizeT Str1Size = Size((ACharStr)Str1); //-V2533
-				SizeT Str2Size = Size((ACharStr)Str2); //-V2533
-				if (Str1Size != Str2Size) return false;
-				for (SizeT i = 0; i < Str1Size; i++)
-					if (Str1[i] != Str2[i]) return false;
-				return true;
-			}
+        	/// <summary>
+        	/// Compile-time С„СѓРЅРєС†С–СЏ РїРѕСЂС–РІРЅСЏРЅРЅСЏ ASCII СЃ-РїРѕРґС–Р±РЅРёС… СЂСЏРґРєС–РІ
+        	/// </summary>
+        	/// <param name="str1">РџРµСЂС€Р° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <param name="str2">Р”СЂСѓРіР° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <returns>True СЏРєС‰Рѕ РІСЃС– СЃРёРјРІРѕР»Рё С–РґРµРЅС‚РёС‡РЅС–</returns>
+            __forceinline constexpr Boolean Compare(const ACharStr str1, const ACharStr str2) {
+                const auto str1Size = Size(str1);
+                const auto str2Size = Size(str2);
+                if (str1Size != str2Size) return false;
+                for (SizeT i = 0; i < str1Size; i++)
+                    if (str1[i] != str2[i]) return false;
+                return true;
+            }
 
-			__forceinline Char ToUpcase(Char Symbol) {
-				extern Seed::Core::Char UpcaseCharImp(Seed::Core::Char symb);
-				return UpcaseCharImp(Symbol);
-			}
+        	/// <summary>
+        	/// Compile-time С„СѓРЅРєС†С–СЏ РїРѕСЂС–РІРЅСЏРЅРЅСЏ ASCII СЃ-РїРѕРґС–Р±РЅРёС… СЂСЏРґРєС–РІ
+        	/// </summary>
+        	/// <param name="str1">РџРµСЂС€Р° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <param name="str2">Р”СЂСѓРіР° СЂСЏРґРєРѕРІР° Р·РјС–РЅРЅР°</param>
+        	/// <returns>True СЏРєС‰Рѕ РІСЃС– СЃРёРјРІРѕР»Рё С–РґРµРЅС‚РёС‡РЅС–</returns>
+            __forceinline constexpr Boolean Compare(const AChar* str1, const AChar* str2) {
+                const auto str1Size = Size(const_cast<ACharStr>(str1)); //-V2533
+                const auto str2Size = Size(const_cast<ACharStr>(str2)); //-V2533
+                if (str1Size != str2Size) return false;
+                for (SizeT i = 0; i < str1Size; i++)
+                    if (str1[i] != str2[i]) return false;
+                return true;
+            }
 
-			__forceinline Char ToDowncase(Char Symbol) {
-				extern Seed::Core::Char DowncaseCharImp(Seed::Core::Char symb);
-				return DowncaseCharImp(Symbol);
-			}
-		}
-	}
+            /// <summary>
+            /// РџРµСЂРµС‚РІРѕСЂСЋС” СЃРёРјРІРѕР» Сѓ РІРµСЂС…РЅС–Р№ СЂРµРіС–СЃС‚СЂ
+            /// </summary>
+            /// <param name="symbol">РЎРёРјРІРѕР» СЏРєРёР№ РїРѕС‚СЂС–Р±РЅРѕ РїРµСЂРµС‚РІРѕСЂРёС‚Рё</param>
+            /// <returns>РџРµСЂРµС‚РІРѕСЂРµРЅРёР№ СЃРёРјРІРѕР»</returns>
+            __forceinline Char ToUpcase(const Char symbol) {
+                extern Seed::Core::Char UpcaseCharImp(Seed::Core::Char symb);
+                return UpcaseCharImp(symbol);
+            }
+
+            /// <summary>
+            /// РџРµСЂРµС‚РІРѕСЂСЋС” СЃРёРјРІРѕР» Сѓ РЅРёР¶РЅС–Р№ СЂРµРіС–СЃС‚СЂ
+            /// </summary>
+            /// <param name="symbol">РЎРёРјРІРѕР» СЏРєРёР№ РїРѕС‚СЂС–Р±РЅРѕ РїРµСЂРµС‚РІРѕСЂРёС‚Рё</param>
+            /// <returns>РџРµСЂРµС‚РІРѕСЂРµРЅРёР№ СЃРёРјРІРѕР»</returns>
+            __forceinline Char ToDowncase(const Char symbol) {
+                extern Seed::Core::Char DowncaseCharImp(Seed::Core::Char symb);
+                return DowncaseCharImp(symbol);
+            }
+        }
+    }
 }

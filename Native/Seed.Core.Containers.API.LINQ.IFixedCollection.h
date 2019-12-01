@@ -54,15 +54,19 @@ namespace Seed {
 							return newCollection;
 						}
 						else if constexpr (TNewSize < TSize) {
-
+                            Internals::Exceptions::ThrowIndexOutOfRange(__FILE__,
+                                                                        __FUNCSIG__,
+                                                                        __LINE__,
+                                                                        TSize,
+                                                                        TNewSize);
 						}
-					}
+					} //-V591
 				public:
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertible<Lambda, void, T&>::State ||
-						TypeTraits::IsLambdaConvertible<Lambda, void, T&, SizeT>::State
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, T&>::State ||
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, T&, SizeT>::State
 						>,
 						bool
 					> = true>
@@ -74,8 +78,8 @@ namespace Seed {
 						typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertible<Lambda, void, const T&>::State ||
-						TypeTraits::IsLambdaConvertible<Lambda, void, const T&, SizeT>::State
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, const T&>::State ||
+						TypeTraits::IsLambdaConvertibleT<Lambda, void, const T&, SizeT>::State
 						>,
 						bool
 					> = true>
@@ -83,18 +87,18 @@ namespace Seed {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
-					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline T Aggregate(Lambda&& lambda) const {
+					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
+					__forceinline U Aggregate(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda));
 					}
 
-					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline T Aggregate(Lambda&& lambda, const U& StartValue) const {
+					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
+					__forceinline U Aggregate(Lambda&& lambda, const U& StartValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), StartValue);
 					}
 
-					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline T Aggregate(Lambda&& lambda, U&& StartValue) const {
+					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
+					__forceinline U Aggregate(Lambda&& lambda, U&& StartValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(StartValue));
 					}
 
@@ -102,32 +106,32 @@ namespace Seed {
 						return static_cast<const ThisCollection&>(*this).AnyImpl();
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline bool Any(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline bool All(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline T& First(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline T& Last(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline const T& First(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline const T& Last(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
@@ -136,7 +140,7 @@ namespace Seed {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl();
 					}
 
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertible<Lambda, void, T&&>::State>, bool> = true>
+					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State>, bool> = true>
 					__forceinline ThisCollection& RemoveAll(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl(MoveRValue(lambda));
 					}

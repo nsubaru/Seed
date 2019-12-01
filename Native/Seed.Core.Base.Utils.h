@@ -1,4 +1,5 @@
 #pragma once
+
 namespace Seed
 {
 	inline namespace Core
@@ -12,7 +13,7 @@ namespace Seed
 			template<bool value>
 			struct LogicConst
 			{
-				__forceinline constexpr operator bool() { return value; }
+				__forceinline constexpr operator bool() const { return value; }
 				static constexpr bool State = value;
 			};
 
@@ -20,12 +21,12 @@ namespace Seed
 			template<typename value>
 			struct LogicConstT
 			{
-				__forceinline constexpr operator bool() { return value::State; }
+				__forceinline constexpr operator bool() const { return value::State; }
 				static constexpr bool State = value::State;
 			};
-			///<summary>Логічна істина для статичних провірок</summary>
+			///<summary>Логічна істина для статичних перевірок</summary>
 			inline namespace { typedef LogicConst<true> LogicTrue; }
-			///<summary>Логічна хиба для статичних провірок</summary>
+			///<summary>Логічна хиба для статичних перевірок</summary>
 			inline namespace { typedef LogicConst<false> LogicFalse; }
 
 			///<summary>Знімає силку з типу</summary>
@@ -44,62 +45,91 @@ namespace Seed
 			template<typename T>
 			using RemoveRefV = typename RemoveRefT<T>::Type;
 
-			// STRUCT TEMPLATE _Add_reference
-			template<class Type,
+			/// <summary>
+			/// Додає LValue і RValue силку до типу
+			/// </summary>
+			template<class TType,
 				class = void>
 				struct AddReference
 			{	// add reference
-				using Lvalue = Type;
-				using Rvalue = Type;
+				using Lvalue = TType;
+				using Rvalue = TType;
 			};
 
-			template<class Type>
-			struct AddReference<Type, VoidT<Type&>>
+            /// <summary>
+            /// Додає LValue і RValue силку до типу
+            /// </summary>
+			template<class TType>
+			struct AddReference<TType, VoidT<TType&>>
 			{	// add reference
-				using Lvalue = Type&;
-				using Rvalue = Type&&;
+				using Lvalue = TType&;
+				using Rvalue = TType&&;
 			};
 
-			template<class Type>
-			using AddRvalueReferenceT = typename AddReference<Type>::Rvalue;
+            /// <summary>
+            /// Додає RValue силку
+            /// </summary>
+			template<class TType>
+			using AddRvalueReferenceT = typename AddReference<TType>::Rvalue;
 
-			template<class Type>
-			using AddLvalueReferenceT = typename AddReference<Type>::Lvalue;
+            /// <summary>
+            /// Додає LValue силку
+            /// </summary>
+			template<class TType>
+			using AddLvalueReferenceT = typename AddReference<TType>::Lvalue;
 
-			template<class Type>
-			AddRvalueReferenceT<Type> DeclVal() noexcept {};
+            /// <summary>
+            /// Надає визначення типу в процесі інстанціювання шаблону
+            /// </summary>
+			template<class TType>
+			AddRvalueReferenceT<TType> DeclVal() noexcept { return {}; };
 
-			template<typename Type>
+            /// <summary>
+            /// Перевірка чи заданий тип LValue силка
+            /// </summary>
+			template<typename TType>
 			struct IsLValueRef : LogicFalse {};
 
+            /// <summary>
+            /// Перевірка чи заданий тип LValue силка
+            /// </summary>
 			template<typename Type>
 			struct IsLValueRef<Type&> : LogicTrue {};
 		}
-		///<summary>Функція переміщення об'єкта(перенесення rvalue)</summary>
-		///<param name="Obj"> lvalue-силка на об'єкт</param>
-		///<returns>rvalue силку на об'єкт</returns>
+		/// <summary>
+		/// Функція переміщення об'єкта(перенесення rvalue)
+		/// </summary>
+		/// <typeparam name="T">Тип об'єкта(без rvalue)</typeparam>
+		/// <param name="arg">lvalue-силка на rvalue об'єкт</param>
+		/// <returns>rvalue силку на об'єкт</returns>
 		template <typename T>
-		__forceinline constexpr typename TypeTraits::RemoveRefV<T>&& MoveRValue(T&& arg) {
-			return static_cast<typename TypeTraits::RemoveRefV<T>&&>(arg);
+		__forceinline constexpr TypeTraits::RemoveRefV<T>&& MoveRValue(T&& arg) {
+			return static_cast<TypeTraits::RemoveRefV<T>&&>(arg);
 		}
 
-		///<summary>Ідеальна передача</summary>
-		///<param name = 'Arg'>Аргумент</param>
-		///<returns>RV-силку</returns>
-		template<typename Type>
+		/// <summary>
+		/// Ідеальна передача
+		/// </summary>
+		/// <typeparam name="TType">Тип об'єкта без rvalue</typeparam>
+		/// <param name="arg">lvalue-силка на rvalue об'єкт</param>
+		/// <returns>rvalue силку на об'єкт</returns>
+		template<typename TType>
 		[[nodiscard]]
-		__forceinline constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>& Arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
-			return (static_cast<Type&&>(Arg));
+		__forceinline constexpr TType&& ForwardReference(TypeTraits::RemoveRefV<TType>& arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
+			return (static_cast<TType&&>(arg));
 		}
 
-		///<summary>Ідеальна передача</summary>
-		///<param name = 'Arg'>Аргумент</param>
-		///<returns>RV-силку</returns>
-		template<typename Type>
+		/// <summary>
+		/// Ідеальна передача
+		/// </summary>
+		/// <typeparam name="TType">Тип об'єкта без rvalue</typeparam>
+		/// <param name="arg">lvalue-силка на rvalue об'єкт</param>
+		/// <returns>rvalue силку на об'єкт</returns>
+		template<typename TType>
 		[[nodiscard]]
-		__forceinline constexpr Type&& ForwardReference(TypeTraits::RemoveRefV<Type>&& Arg) noexcept {	// forward an rvalue as an rvalue
-			static_assert(!TypeTraits::IsLValueRef<Type>(), "Bad forward call");
-			return (static_cast<Type&&>(Arg));
+		__forceinline constexpr TType&& ForwardReference(TypeTraits::RemoveRefV<TType>&& arg) noexcept {	// forward an rvalue as an rvalue
+			static_assert(!TypeTraits::IsLValueRef<TType>(), "Bad forward call");
+			return (static_cast<TType&&>(arg));
 		}
 	}
 }

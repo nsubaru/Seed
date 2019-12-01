@@ -131,7 +131,7 @@ namespace Seed {
 				virtual const IThreadable& Join() const { thread->Join(); return *this; }
 				virtual const IThreadable& Join(DateTime timeOut) const { thread->Join(timeOut); return *this; }
 
-				virtual ~ThreadableThread()
+				virtual ~ThreadableThread() override
 				{
 					delete thread;
 				}
@@ -370,7 +370,7 @@ Thread& Seed::Core::Threading::Thread::Interupt()
 	case EThreadabledStates::Interupted: break;
 	case EThreadabledStates::Unknown: break;
 	case EThreadabledStates::Starting:
-		This->AbortEvent->Wait();
+		This->AbortEvent->Wait(); //-V796
 	default:
 		switch (This->State)
 		{
@@ -410,7 +410,7 @@ Thread& Seed::Core::Threading::Thread::Suspend()
 	case EThreadabledStates::Interupted: break;
 	case EThreadabledStates::Unknown: break;
 	case EThreadabledStates::Starting:
-		This->AbortEvent->Wait();
+		This->AbortEvent->Wait(); //-V796
 	case EThreadabledStates::Executing:
 	case EThreadabledStates::ExceptionProcessing: {
 		volatile EThreadabledStates oldState = EThreadabledStates::Paused;
