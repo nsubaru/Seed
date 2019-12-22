@@ -19,7 +19,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4996)
         template<class THeap>
-        class SeedKernelCall BaseString final : 
+        class BaseString final : 
             public Memory::Allocator<THeap>, 
             public IComparable<BaseString<THeap>>,
             public Containers::LINQ::IString<BaseString,THeap,UChar,false>

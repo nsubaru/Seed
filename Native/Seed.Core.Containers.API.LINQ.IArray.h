@@ -13,7 +13,7 @@ namespace Seed {
 				/// <typeparam name="T">“ип елемент≥в </typeparam>
 				/// <typeparam name="TIsConcurencySuport">¬казуЇ чи колекц≥€ п≥дтримуЇ багато поточн≥сть </typeparam>
 				template<template<typename THeap, typename T>typename TArray, typename THeap, typename T, bool TIsConcurencySuport>
-				class SeedKernelCall IArray :
+				class IArray :
 					public IOrderable<TArray, THeap, T, false, TIsConcurencySuport> {
 				public:
 					virtual ~IArray() = 0 {}

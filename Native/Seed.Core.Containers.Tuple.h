@@ -1,6 +1,10 @@
 #pragma once
 #include "Seed.Core.Base.h"
 
+#pragma warning(push)
+//Disable dll-interface requiring as Tuple template class, all class code is in header file so we don't need import/export anythink
+#pragma warning(disable: 4251)
+
 namespace Seed
 {
     inline namespace Core
@@ -8,7 +12,7 @@ namespace Seed
         namespace Containers
         {
             template<typename... TDatas>
-            class SeedKernelCall Tuple final {
+            class Tuple final {
             protected:
                 template<UInt64 TN, typename THead, typename... TTypes>
                 struct GetByN {
@@ -23,7 +27,7 @@ namespace Seed
                 };
 
                 template<UInt64 TI, typename TData>
-                struct SeedKernelCall Leaf {
+                struct Leaf {
                     static constexpr UInt64 N = TI;
                     TData data;
 
@@ -59,7 +63,7 @@ namespace Seed
                 };
 
                 template<UInt64 TI, typename TData>
-                struct SeedKernelCall Leaf<TI, const TData&> {
+                struct Leaf<TI, const TData&> {
                     static constexpr UInt64 N = TI;
                     TData data;
 
@@ -95,15 +99,15 @@ namespace Seed
                 };
 
                 template<UInt64 TI>
-                struct SeedKernelCall Leaf<TI, void> {
+                struct Leaf<TI, void> {
                     static constexpr UInt64 N = TI;
                 };
 
                 template<typename TIdx, typename... TTypes>
-                struct SeedKernelCall Leafes;
+                struct Leafes;
 
                 template<SizeT ... TIdxN, typename... TTypes>
-                struct SeedKernelCall Leafes<TypeTraits::Indexator<TIdxN...>, TTypes... > : Leaf<TIdxN, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>>... {
+                struct Leafes<TypeTraits::Indexator<TIdxN...>, TTypes... > : Leaf<TIdxN, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>>... {
                     template<UInt64 TId>
                     using RetType = typename GetByN<TId, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>...>::Type;
 
@@ -193,7 +197,7 @@ namespace Seed
             };
 
             template<>
-            class SeedKernelCall Tuple<> final {
+            class Tuple<> final {
             public:
                 forceinline constexpr Tuple() {}
                 forceinline constexpr Tuple(const Tuple&) = default;
@@ -311,3 +315,5 @@ namespace std
     };
 #pragma endregion 
 }
+
+#pragma warning(pop)

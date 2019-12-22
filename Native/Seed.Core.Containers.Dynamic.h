@@ -13,7 +13,7 @@ namespace Seed
             /// <summary>
             /// Динамічний об'єкт, тип даних відомий при виконанні, містить кортеж змінних
             /// </summary>
-            class SeedKernelCall Dynamic final : protected IDisposable{
+            class Dynamic final : protected IDisposable{
             private:
                 /// <summary>
                 /// Інтерфейс динамічного типу

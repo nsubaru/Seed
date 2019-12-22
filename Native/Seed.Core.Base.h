@@ -124,7 +124,7 @@ namespace Seed {
     	/// <summary>
     	/// Атомарний лічильник. Використовує функції InterlockedXXX
     	/// </summary>
-        class SeedKernelCall RefCountT final {
+        class RefCountT final {
         public:
             using CounterType = SizeT;
         private:

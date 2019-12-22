@@ -12,7 +12,7 @@ namespace Seed {
     inline namespace Core {
         namespace Containers {
             template<typename THeap, SizeT TSize, typename T>
-            class SeedKernelCall BaseConcurencyFixedStack :
+            class BaseConcurencyFixedStack :
                 public LINQ::IFixedStack<BaseConcurencyFixedStack, THeap, T, TSize, true>,
                 public IDisposable,
                 public IClonable<BaseConcurencyFixedStack<THeap, TSize, T>>

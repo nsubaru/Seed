@@ -11,7 +11,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, typename T>
-			class SeedKernelCall BaseConcurencyDynamicStack :
+			class BaseConcurencyDynamicStack :
 				public LINQ::IDynamicStack<BaseConcurencyDynamicStack, THeap, T, true>,
 				public IDisposable,
 				public IClonable<BaseConcurencyDynamicStack<THeap, T>>

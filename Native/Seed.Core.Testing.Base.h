@@ -10,12 +10,12 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Testing {
-			class ITest {
+			class SeedKernelCall ITest {
 			public:
 				virtual ~ITest() = default;
 				virtual bool Excecute() = 0;
 			};
-			class TestRegister {
+			class SeedKernelCall TestRegister {
 			private:
 				struct TestRecord {
 					String name;

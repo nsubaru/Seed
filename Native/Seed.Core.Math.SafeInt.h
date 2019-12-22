@@ -15,7 +15,7 @@ namespace Seed {
 			///<summary>Класс чисел з безпечними операціями</summary>
 			///<param name = "T">Тип який буде базою, може бути лиш unsigned int будь-яклї розрядності</param>
 			template<typename T>
-			class SeedKernelCall SafeInt final {
+			class SafeInt final {
 			private:
 				///Тип числа
 				using Int = TypeTraits::Unsigned<T>;

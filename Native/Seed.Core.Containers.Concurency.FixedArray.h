@@ -11,7 +11,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, SizeT TSize, typename T>
-			class SeedKernelCall BaseConcurencyFixedArray final :
+			class BaseConcurencyFixedArray final :
 				Seed::IDisposable,
 				public LINQ::IFixedArray<BaseConcurencyFixedArray, THeap, T, TSize, true>,
 				public Memory::Allocator<THeap>,

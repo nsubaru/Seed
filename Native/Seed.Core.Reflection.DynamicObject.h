@@ -7,9 +7,9 @@ namespace Seed
 	{
 		namespace Reflection
 		{
-			class SeedKernelCall DynamicObject final : IDisposable{
+			class DynamicObject final : IDisposable{
 			private:
-				class SeedKernelCall IDynamicImpl {
+				class IDynamicImpl {
 				public:
 					virtual String GetTypeName() = 0;
 					virtual String GetCxxTypeName() = 0;
@@ -21,7 +21,7 @@ namespace Seed
 				};
 
 				template<typename ... TTypes>
-				class SeedKernelCall DynamicImpl final : public IDynamicImpl {
+				class DynamicImpl final : public IDynamicImpl {
 				private:
 					using Tuple = Containers::Tuple<TTypes...>;
 				private:

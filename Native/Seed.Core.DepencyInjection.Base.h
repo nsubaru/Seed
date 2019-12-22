@@ -12,7 +12,7 @@ namespace Seed
 		namespace DI
 		{
 			///<summary>Не можливо розвязати залежності типів для побудови класу</summary>
-			class SeedKernelCall DIResolveException : public Exception {
+			class DIResolveException : public Exception {
 			private:
 				/// <summary>
 				/// Тип який DI не зумів знайти

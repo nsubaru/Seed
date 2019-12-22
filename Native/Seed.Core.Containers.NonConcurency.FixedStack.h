@@ -10,7 +10,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, SizeT TSize, typename T>
-			class SeedKernelCall BaseFixedStack :
+			class BaseFixedStack :
 				public LINQ::IFixedStack<BaseFixedStack, THeap, T, TSize, true>,
 				public IDisposable
 			{

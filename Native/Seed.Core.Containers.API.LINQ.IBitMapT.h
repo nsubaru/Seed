@@ -18,7 +18,7 @@ namespace Seed
 				/// <typeparam name="TSize">Кількість бітів</typeparam>
 				/// <typeparam name="TIsConcurencySuport">True якщо підтримує багато потоковість</typeparam>
 				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
-				class SeedKernelCall IBitMapT : public IFixedCollection<TCollection, THeap, T, TSize, TIsConcurencySuport>
+				class IBitMapT : public IFixedCollection<TCollection, THeap, T, TSize, TIsConcurencySuport>
 				{
 					using ThisCollection = TCollection<THeap, TSize, T>;
 				public:

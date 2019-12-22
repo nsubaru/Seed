@@ -6,7 +6,7 @@ namespace Seed {
 		namespace Containers {
 			namespace LINQ {
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
-				class SeedKernelCall IPriorityQueue :
+				class IPriorityQueue :
 					public IAssociableCollection<TCollection, THeap, TKey, TValue, TPair, IsConcurencySuportT>
 				{
 				public:

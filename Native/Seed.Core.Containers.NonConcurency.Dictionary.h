@@ -11,7 +11,7 @@ namespace Seed {
 		namespace Containers {
 			//Шаблон словника слів який виконує швидкісний пошук слова
 			template<typename THeap, typename TString, typename TData>
-			class SeedKernelCall BaseDictionary :
+			class BaseDictionary :
 				public Memory::Allocator<THeap>,
 				public LINQ::IDictionary<BaseDictionary, THeap, TString, TData, BasePair<THeap, TString, TData>, true>,
 				public IDisposable,

@@ -14,7 +14,7 @@ namespace Seed {
             class BaseConcurencyVList;
 
             template<typename THeap, typename T>
-            class SeedKernelCall BaseConcurencyArray final :
+            class BaseConcurencyArray final :
                 Seed::IDisposable,
                 public IClonable<BaseConcurencyArray<THeap, T>>,
                 public Memory::Allocator<THeap>,
@@ -474,7 +474,7 @@ namespace Seed {
             }
 
             template<typename THeap, typename T>
-            class SeedKernelCall BaseConcurencyVList final :
+            class BaseConcurencyVList final :
                 Seed::IDisposable,
                 public IClonable<BaseConcurencyVList<THeap, T>>,
                 public Memory::Allocator<THeap>,

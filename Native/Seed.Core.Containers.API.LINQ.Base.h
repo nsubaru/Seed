@@ -40,7 +40,7 @@ namespace Seed {
 					Boolean TIsConcurencySupportT
 				>
                 // ReSharper disable CppInconsistentNaming
-                struct SeedKernelCall TLinq {
+                struct TLinq {
                     // ReSharper restore CppInconsistentNaming
 
                     /// <summary>
@@ -68,19 +68,19 @@ namespace Seed {
                 /// <summary>
                 /// Базовий клас для LINQ контейнерів
                 /// </summary>
-				class SeedKernelCall ILinqBase { public: virtual ~ILinqBase() = 0 {}; };
+				class ILinqBase { public: virtual ~ILinqBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для загальних колекцій
                 /// </summary>
-				class SeedKernelCall ICollectionGenericBase { public: virtual ~ICollectionGenericBase() = 0 {}; };
+				class ICollectionGenericBase { public: virtual ~ICollectionGenericBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для фіксованих колекцій
                 /// </summary>
-				class SeedKernelCall IFixedCollectionGenericBase { public: virtual ~IFixedCollectionGenericBase() = 0 {}; };
+				class IFixedCollectionGenericBase { public: virtual ~IFixedCollectionGenericBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для асоціативних колекцій
                 /// </summary>
-				class SeedKernelCall IAssociableCollectionGenericBase { public: virtual ~IAssociableCollectionGenericBase() = 0 {}; };
+				class IAssociableCollectionGenericBase { public: virtual ~IAssociableCollectionGenericBase() = 0 {}; };
 #pragma region LINQ for one typearg Collection
 
                 /// <summary>
@@ -98,7 +98,7 @@ namespace Seed {
 			        Boolean TIsDynamic,
 			        Boolean TIsConcurencySuport
 			    >
-				class SeedKernelCall ICollectionBase :
+				class ICollectionBase :
 					public ILinqBase,
 					public ICollectionGenericBase,
 					public TLinq<TCollection<THeap, T>, THeap, T, TIsDynamic, true, TIsConcurencySuport>
@@ -251,7 +251,7 @@ namespace Seed {
                 /// <typeparam name="TIsConcurencySuport">Чи підтримує багатопотоковість</typeparam>
 				template<typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
                 // ReSharper disable once CppInconsistentNaming
-                struct SeedKernelCall TFixedLinq : public TLinq<TCollection, THeap, T, false, false, TIsConcurencySuport> {
+                struct TFixedLinq : public TLinq<TCollection, THeap, T, false, false, TIsConcurencySuport> {
                     /// <summary>
                     /// Кількість елементів
                     /// </summary>
@@ -273,7 +273,7 @@ namespace Seed {
 			        SizeT TSize,
 			        Boolean TIsConcurencySuport
 			    >
-				class SeedKernelCall IFixedCollectionBase :
+				class IFixedCollectionBase :
 					public ILinqBase,
 					public IFixedCollectionGenericBase,
 					public TFixedLinq<TCollection<THeap, TSize, T>, THeap, T, TSize, TIsConcurencySuport>
@@ -422,7 +422,7 @@ namespace Seed {
                 /// <typeparam name="TIsConcurencySuport">Чи підтримує багатопотоковість</typeparam>
 				template<typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, Boolean TIsConcurencySuport>
                 // ReSharper disable once CppInconsistentNaming
-                struct SeedKernelCall TAssociableLinq : public TLinq<TCollection, THeap, TPair, true, true, TIsConcurencySuport> {
+                struct TAssociableLinq : public TLinq<TCollection, THeap, TPair, true, true, TIsConcurencySuport> {
                     // ReSharper restore CppInconsistentNaming
                     
                     /// <summary>
@@ -452,7 +452,7 @@ namespace Seed {
 			        typename TPair,
 			        bool TIsConcurencySuportT
 			    >
-				class SeedKernelCall IAssociableCollectionBase :
+				class IAssociableCollectionBase :
 					public ILinqBase,
 					public IAssociableCollectionGenericBase,
 					public TAssociableLinq<TCollection<THeap, TKey, TValue>, THeap, TKey, TValue, TPair, true>
@@ -472,7 +472,7 @@ namespace Seed {
                 /// <typeparam name="TIsConcurencySuport">Чи підтримує багатопотоковість</typeparam>
 				template<typename TPair, typename THeap, typename TKey, typename TValue, Boolean TIsConcurencySuport>
                 // ReSharper disable CppInconsistentNaming
-                struct SeedKernelCall TPairLinq : public TLinq<TPair, THeap, TPair, false, false, TIsConcurencySuport> {
+                struct TPairLinq : public TLinq<TPair, THeap, TPair, false, false, TIsConcurencySuport> {
                     // ReSharper restore CppInconsistentNaming
 
                     /// <summary>
@@ -495,7 +495,7 @@ namespace Seed {
                 /// <typeparam name="TIsConcurencySuport">Чи підтримує багатопотоковість</typeparam>
 				template<typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
                 // ReSharper disable CppInconsistentNaming
-                struct SeedKernelCall TStringLinq : public TLinq<TString, THeap, TChar, false, true, TIsConcurencySuport> {
+                struct TStringLinq : public TLinq<TString, THeap, TChar, false, true, TIsConcurencySuport> {
                     // ReSharper restore CppInconsistentNaming
 
                     /// <summary>
@@ -511,7 +511,7 @@ namespace Seed {
                 /// <typeparam name="THeap">Тип кучі</typeparam>
                 /// <typeparam name="TChar">Тип символа</typeparam>
 				template<template<typename THeap> typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
-				class SeedKernelCall IStringCollectionBaseLinq : public TStringLinq<TString<THeap>, THeap, TChar, TIsConcurencySuport> {
+				class IStringCollectionBaseLinq : public TStringLinq<TString<THeap>, THeap, TChar, TIsConcurencySuport> {
 				public:
 					virtual ~IStringCollectionBaseLinq() = 0 {};
 				};

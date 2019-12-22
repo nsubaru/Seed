@@ -220,7 +220,7 @@ namespace Seed {
         //Делегат це об'єкт який інкапсулює, функцію з аргументами,
         //тим самим дозволяючи її відкладено виконати,
         //навіть в іншому потоці, apc якогось потоку чи пулі потоків
-        class SeedKernelCall Delegate final : protected IDisposable
+        class Delegate final : protected IDisposable
         {
         private:
             //Внутрішня структура в які дані делегата
@@ -335,7 +335,7 @@ namespace Seed {
         };
         //Створює делегат з функцією F і аргументами Args(може бути і без аргументів)
         template<typename F, typename ... Args>
-        __forceinline SeedKernelCall Delegate CreateAndPackFunctionObj(F f, Args... args)
+        __forceinline Delegate CreateAndPackFunctionObj(F f, Args... args)
         {
             return Delegate(f, args...);
         }

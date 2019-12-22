@@ -6,7 +6,7 @@ namespace Seed {
 		namespace Containers {
 			namespace LINQ {
 				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
-				class SeedKernelCall IFixedQueue : public IFixedCollection<TCollection, THeap, T, TSize, TIsConcurencySuport> {
+				class IFixedQueue : public IFixedCollection<TCollection, THeap, T, TSize, TIsConcurencySuport> {
 				public:
 					virtual ~IFixedQueue() = 0 {}
 				};

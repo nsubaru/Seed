@@ -14,7 +14,7 @@ namespace Seed {
 				/// <typeparam name="TValue">Тип значення</typeparam>
 				/// <typeparam name="TPair">Тип пари ключа - значення</typeparam>
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
-				class SeedKernelCall IAssociableCollection :
+				class IAssociableCollection :
 					public IAssociableCollectionBase<TCollection, THeap, TKey, TValue, TPair, IsConcurencySuportT>
 				{
 				private:

@@ -14,7 +14,7 @@ namespace Seed {
 				/// <typeparam name="TIsDynamic">Чи колекція динамічно змінює розмір</typeparam>
 				/// <typeparam name="TIsConcurencySuport">Чи колекція підтримує багато потоковість</typeparam>
 				template<template<typename, typename> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
-				class SeedKernelCall ICollection :
+				class ICollection :
 					public ICollectionBase< TCollection, THeap, T, TIsDynamic, TIsConcurencySuport>
 				{
 				protected:

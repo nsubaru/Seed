@@ -6,7 +6,7 @@ namespace Seed {
 		namespace Containers {
 			namespace LINQ {
 				template<template<typename THeap, typename T>typename TList, typename THeap, typename T, bool TIsDynamic, bool TIsConcurencySuport>
-				class SeedKernelCall IOrderable :
+				class IOrderable :
 					public ICollection<TList, THeap, T, TIsDynamic, TIsConcurencySuport> {
 				protected:
 					using ThisCollection = TList<THeap, T>;

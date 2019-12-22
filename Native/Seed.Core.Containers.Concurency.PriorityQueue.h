@@ -14,7 +14,7 @@ namespace Seed {
 			///<summary>Пріоритетна черга для обробки даних в порядку приходу з урахуванням пріоритету
 			///<para>Працює через фібоначеву кучу. Ітерація відсутня</para></summary>
 			template <class THeap, typename TPriority, typename TValue>
-			class SeedKernelCall BaseConcurencyPriorityQueue final :
+			class  BaseConcurencyPriorityQueue final :
 			public Memory::Allocator<THeap>,
 				public LINQ::IPriorityQueue<BaseConcurencyPriorityQueue, THeap, TPriority, TValue, BasePair<THeap, TPriority, TValue>, true>,
 				protected IDisposable,

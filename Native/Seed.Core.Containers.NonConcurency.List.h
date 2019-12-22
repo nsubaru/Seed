@@ -9,7 +9,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<class THeap, typename T>
-			class SeedKernelCall BaseList final :
+			class BaseList final :
 				protected IDisposable,
 				public Memory::Allocator<THeap>,
 				public LINQ::IList<BaseList, THeap, T, true>,
@@ -198,7 +198,7 @@ namespace Seed {
 				///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
 				///</para>
 				///</summary>
-				class SeedKernelCall Iterator : IDisposable
+				class Iterator : IDisposable
 				{
 					friend class BaseList;
 				private:

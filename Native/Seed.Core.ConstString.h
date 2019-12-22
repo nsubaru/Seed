@@ -3,8 +3,8 @@
 
 namespace Seed {
 	inline namespace Core {
-		class SeedKernelCall ConstAString;
-		class SeedKernelCall ConstString;
+		class ConstAString;
+		class ConstString;
 
 		namespace Internals {
 			namespace Exceptions {
@@ -61,7 +61,7 @@ namespace Seed {
 		}
 
 		///<summary>Константний ASCII рядок який пам'ятає свій розмір</summary>
-		class SeedKernelCall ConstAString final {
+		class ConstAString final {
 		private:
 			///<summary>Покажчик на текст</summary>
 			const AChar* str;
@@ -102,7 +102,7 @@ namespace Seed {
 		};
 
 		///<summary>Константний рядок який пам'ятає свій розмір</summary>
-		class SeedKernelCall ConstString final {
+		class ConstString final {
 		private:
 			///<summary>Покажчик на текст</summary>
 			const Char* str;

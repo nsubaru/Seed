@@ -8,7 +8,7 @@ namespace Seed {
     inline namespace Core {
         namespace Containers {
             template<typename THeap, typename TKey, typename TValue>
-            class SeedKernelCall BasePair : 
+            class BasePair : 
                 public Memory::Allocator<THeap>, 
                 public LINQ::TPairLinq<BasePair<THeap, TKey, TValue>, THeap, TKey, TValue, false> 
             {

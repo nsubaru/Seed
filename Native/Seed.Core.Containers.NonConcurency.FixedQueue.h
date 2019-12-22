@@ -9,7 +9,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, SizeT TSize, typename T>
-			class SeedKernelCall BaseFixedQueue :
+			class BaseFixedQueue :
 				public LINQ::IFixedQueue<BaseFixedQueue, THeap, T, TSize, true>,
 				public IDisposable,
 				public IClonable<BaseFixedQueue<THeap, TSize, T>>

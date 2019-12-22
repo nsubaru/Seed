@@ -9,7 +9,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, SizeT TSize, typename T>
-			class SeedKernelCall BaseFixedArray final :
+			class BaseFixedArray final :
 				Seed::IDisposable,
 				public LINQ::IFixedArray<BaseFixedArray, THeap, T, TSize, false>,
 				public Memory::Allocator<THeap>,

@@ -8,7 +8,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, typename TKey, typename TValue>
-			class SeedKernelCall BaseConcurencyMap :
+			class BaseConcurencyMap :
 				public LINQ::IAssociableCollection<BaseConcurencyMap, THeap, TKey, TValue, BasePair<THeap, TKey, TValue>, true>,
 				protected IDisposable,
 				public IClonable<BaseConcurencyMap<THeap, TKey, TValue>>
@@ -16,7 +16,7 @@ namespace Seed {
 				struct Tree;
 
 				///<summary>Елемент дерева і елемент в асоціативному масиві</summary>
-				struct SeedKernelCall Node : public Memory::Allocator<THeap>
+				struct Node : public Memory::Allocator<THeap>
 				{
 				private:
 					///<summary>Ключ і значення елемента</summary>
@@ -492,7 +492,7 @@ namespace Seed {
 				}
 			public:
 				///<summary>Ітератор на елемент в асоціативному масиві</summary>
-				class SeedKernelCall Iterator final : protected IDisposable
+				class Iterator final : protected IDisposable
 				{
 				private:
 					friend BaseConcurencyMap;

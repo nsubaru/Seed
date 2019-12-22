@@ -12,7 +12,7 @@ namespace Seed {
 			class BaseVList;
 
 			template<typename THeap, typename T>
-			class SeedKernelCall BaseArray final :
+			class BaseArray final :
 				Seed::IDisposable,
 				public IClonable<BaseArray<THeap, T>>,
 				public Memory::Allocator<THeap>,
@@ -424,7 +424,7 @@ namespace Seed {
 			}
 
 			template<typename THeap, typename T>
-			class SeedKernelCall BaseVList final :
+			class BaseVList final :
 				Seed::IDisposable,
 				public IClonable<BaseVList<THeap, T>>,
 				public Memory::Allocator<THeap>,

@@ -9,7 +9,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			template<typename THeap, typename T>
-			class SeedKernelCall BaseDynamicStack :
+			class BaseDynamicStack :
 				public LINQ::IDynamicStack<BaseDynamicStack, THeap, T, false>,
 				public IDisposable,
 				public IClonable<BaseDynamicStack<THeap, T>>

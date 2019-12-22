@@ -6,7 +6,7 @@ namespace Seed {
 		namespace Containers {
 			namespace LINQ {
 				template<template<typename THeap> typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
-				class SeedKernelCall IString : public IStringCollectionBaseLinq<TString, THeap, TChar, TIsConcurencySuport> {
+				class IString : public IStringCollectionBaseLinq<TString, THeap, TChar, TIsConcurencySuport> {
 				private:
 					using ThisCollection = TString<THeap>;
 				public:
