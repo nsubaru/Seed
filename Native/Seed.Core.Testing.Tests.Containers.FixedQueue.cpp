@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Testing.Tests.Containers.FixedQueue.h"
 #include "Seed.Core.Containers.Concurency.FixedQueue.h"
 #include "Seed.Core.Containers.NonConcurency.FixedQueue.h"

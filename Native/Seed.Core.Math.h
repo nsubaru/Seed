@@ -6,7 +6,8 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Math {
-			//inline constexpr Double Pi = Details::Pi;
+			inline constexpr Double Pi = Internal::Pi();
+			inline constexpr Double E = Internal::E();
 
 			//__forceinline constexpr Double Pow(Double What, Double By) {
 			//	auto constexprLambda = [](Double What, Double Base, Double By) constexpr {
@@ -392,6 +393,14 @@ namespace Seed {
 
 			__forceinline Float ModD(Float X, Float& Y) {
 				return Internal::ModD(X, Y);
+			}
+
+			__forceinline constexpr bool Compare(Float first, Float second){
+				return Abs(first - second) <= Epsilon<Double>();
+			}
+
+			__forceinline constexpr bool Compare(Double first, Double second){
+				return Abs(first - second) <= Epsilon<Double>();
 			}
 		}
 	}

@@ -116,7 +116,7 @@ namespace Seed {
 					if (node->key == key)
 						return node;
 					else
-						if (node->key > key)
+						if (node->key < key)
 							return Find(node->right, key);
 						else
 							return Find(node->left, key);

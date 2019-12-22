@@ -673,8 +673,22 @@ namespace Seed {
 					if (OtherList.This == this->This)
 						return *this;
 
+					if (OtherList.This->size == 0)
+						return *this;
+
 					if (OtherList.This->RefCount == 1) {
+					//Ignore OtherList.This->root == null as if it true than OtherList.This->size == 0
+#pragma warning(push)
+#pragma warning(disable: 28182)
 						return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& {
+							__assume(OtherList.This->root == nullptr);
+							auto item = OtherList.This->root;
+							while (item != nullptr)
+							{
+								item->father = this->This;
+								item = item->next;
+							}
+
 							OtherList.This->root->prev = this->This->last;
 							this->This->last = this->This->last->next = OtherList.This->root;
 							this->This->size = this->This->size + OtherList.This->size;
@@ -682,6 +696,7 @@ namespace Seed {
 							OtherList.This->size = 0;
 							return *this;
 							});
+#pragma warning(pop)
 					}
 					else {
 						return *this += OtherList;

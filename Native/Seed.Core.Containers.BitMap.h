@@ -46,7 +46,7 @@ namespace Seed {
 						{
 							for (SizeT i = 0; i < LastClusterBitsCount; i++)
 							{
-								BitSet(bitMap[FullClustersCount], i);
+								Bits::BitSet<T>(bitMap[FullClustersCount], i);
 							}
 						}
 					}
@@ -62,7 +62,7 @@ namespace Seed {
 							continue;
 						for (SizeT bit = 0; bit < BitCountInFragment; bit++)
 						{
-							if (!BitCheck(bitMap[byte], bit))
+							if (!Bits::BitCheck(bitMap[byte], bit))
 								if (IsFound == false)
 								{
 									RangeSize = 0; IsFound = true;
@@ -81,7 +81,7 @@ namespace Seed {
 					if constexpr (FullClustersCount < Size)
 						for (SizeT bit = 0; bit < BitCountInFragment; bit++)
 						{
-							if (!BitCheck(bitMap[FullClustersCount], bit))
+							if (!Bits::BitCheck(bitMap[FullClustersCount], bit))
 								if (IsFound == false)
 								{
 									RangeSize = 0; IsFound = true;
@@ -115,14 +115,14 @@ namespace Seed {
 					if (StartCluster == EndCluster)
 					{
 						for (SizeT bit = StartBit; bit < EndBit; bit++)
-							BitSet(bitMap[StartCluster], bit);
+							Bits::BitSet(bitMap[StartCluster], bit);
 					}
 					else
 					{
 						if (StartBit != 0)
 						{
 							for (SizeT bit = StartBit; bit < BitCountInFragment; bit++)
-								BitSet(bitMap[StartCluster], bit);
+								Bits::BitSet(bitMap[StartCluster], bit);
 						}
 						else
 						{
@@ -131,7 +131,7 @@ namespace Seed {
 						if (EndBit != BitCountInFragment)
 						{
 							for (SizeT bit = 0; bit < EndBit; bit++)
-								BitSet(bitMap[EndCluster], bit);
+								Bits::BitSet(bitMap[EndCluster], bit);
 						}
 						else
 						{
@@ -160,14 +160,14 @@ namespace Seed {
 					if (StartCluster == EndCluster)
 					{
 						for (SizeT bit = StartBit; bit < EndBit; bit++)
-							BitReset(bitMap[StartCluster], bit);
+							Bits::BitReset(bitMap[StartCluster], bit);
 					}
 					else
 					{
 						if (StartBit != 0)
 						{
 							for (SizeT bit = StartBit; bit < BitCountInFragment; bit++)
-								BitReset(bitMap[StartCluster], bit);
+								Bits::BitReset(bitMap[StartCluster], bit);
 						}
 						else
 						{
@@ -176,7 +176,7 @@ namespace Seed {
 						if (EndBit != BitCountInFragment)
 						{
 							for (SizeT bit = 0; bit < EndBit; bit++)
-								BitReset(bitMap[EndCluster], bit);
+								Bits::BitReset(bitMap[EndCluster], bit);
 						}
 						else
 						{
@@ -194,14 +194,14 @@ namespace Seed {
 				{
 					if (Position > BitCount)
 						Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount));
-					BitSet(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
+					Bits::BitSet(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 				};
 
 				constexpr void ResetBit(SizeT Position)
 				{
 					if (Position > BitCount)
 						Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount));
-					BitReset(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
+					Bits::BitReset(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 				};
 
 				constexpr Boolean IsZero(SizeT Position)
@@ -263,9 +263,9 @@ namespace Seed {
 					for (SizeT i = 0; i < LastClusterBitsCount; i++)
 					{
 						if (Seed::BitCheck(this->bitMap[FullClustersCount], i) || Seed::BitCheck(Second.bitMap[FullClustersCount], i))
-							Seed::BitSet(this->bitMap[FullClustersCount], i);
+							Bits::Seed::BitSet(this->bitMap[FullClustersCount], i);
 						else
-							Seed::BitReset(this->bitMap[FullClustersCount], i);
+							Bits::Seed::BitReset(this->bitMap[FullClustersCount], i);
 					}
 				}
 

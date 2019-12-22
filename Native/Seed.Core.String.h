@@ -2,7 +2,6 @@
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Containers.TypeTraits.h"
 #include "Seed.Core.Containers.API.LINQ.IString.h"
-#include "Seed.Core.CTTI.CompileStringView.h"
 #include "Seed.Core.Math.h"
 #include "Seed.Core.SettingsAPI.h"
 #include "Seed.Core.Memory.h"
@@ -237,21 +236,6 @@ namespace Seed {
                 this->CurrentSize = 1;
                 this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                 this->str[0] = L'\0';
-            }
-
-            /// <summary>
-            /// Конструктор з compile time рядка
-            /// </summary>
-            /// <param name="item">Compile time рядок</param>
-            /// <typeparam name="N">Кільість символів</typeparam>
-            template<SizeT N>
-            BaseString(CTTI::ConstexprArray<char, N>& item) {
-                this->CurrentSize = N;
-                this->ReservedSize = this->CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
-                for (SizeT i = 0; i < N; i++) {
-                    str[i] = item[i];
-                }
             }
 
             /// <summary>

@@ -39,8 +39,6 @@ namespace Seed
 					template<typename T, EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile>
 					struct BaseCTTITypeDataImpl
 					{
-						static_assert(!Core::TypeTraits::IsSameV<T, void>);
-
 						using Type = T;
 						static constexpr EType TypeClass = TTypeClass;
 						static constexpr SizeT Size = sizeof(T);
@@ -57,6 +55,21 @@ namespace Seed
                             TypeClass == EType::FloatNumeric ||
                             TypeClass == EType::Character ||
                             TypeClass == EType::POD);
+					};
+
+					template<EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile>
+					struct BaseCTTITypeDataImpl<void, TTypeClass, TIsSerilizable, TIsConst, TIsVolatile>
+					{
+						using Type = void;
+						static constexpr EType TypeClass = EType::Undefine;
+						static constexpr SizeT Size = 0;
+						static constexpr Boolean IsSerilizable = false;
+						static constexpr Boolean IsConst = TIsConst;
+						static constexpr Boolean IsVolatile = TIsVolatile;
+						static constexpr auto TypeName = NewCTTI::TypeName<void>();
+						static constexpr auto CXXTypeName = NewCTTI::CXXTypeName<void>();
+
+                        static constexpr Boolean IsContaineSubTypes = false;
 					};
 #pragma endregion
 #pragma region Default Implementation

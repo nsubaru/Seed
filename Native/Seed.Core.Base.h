@@ -109,6 +109,11 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 #define forceinline __forceinline
 
 /// <summary>
+/// Гарантія компілятору унікальності адресу змінної
+/// </summary>
+#define restrict __restrict
+
+/// <summary>
 /// Головний простір імен
 /// </summary>
 namespace Seed {

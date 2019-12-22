@@ -278,6 +278,18 @@ namespace Seed
                         TIsVolatile
                         >
                     {};
+
+					//Empty Tuple specialization
+					template<bool TIsConst, bool TIsVolatile>
+                    struct CTTITypeDataImpl<Containers::Tuple<>, TIsConst, TIsVolatile>
+                        : BaseCTTITypeDataImpl<
+                        Containers::Tuple<>,
+                        EType::Tuple,
+                        true,
+                        TIsConst,
+                        TIsVolatile
+                        >
+                    {};
 #pragma endregion
                 }
             }

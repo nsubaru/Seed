@@ -1318,6 +1318,17 @@ namespace Seed {
             /// <typeparam name="T">Покажчик на метод</typeparam>
             template<typename T>
             constexpr bool IsMemberFunctionPointerV = IsMemberFunctionPointerT<T>::State;
+
+			/// <summary>
+			/// Струтура для тегування функцій та методів по тегу з типу
+			/// </summary>
+			template<typename T>
+			struct TypeTag {
+				/// <summary>
+				/// Тип по якому тегують
+				/// </summary>
+				using Type = T;
+			};
         }
     }
 }

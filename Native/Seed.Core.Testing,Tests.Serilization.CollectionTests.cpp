@@ -123,7 +123,7 @@ bool Seed::Testing::Test::Serilization::FixedArray::Excecute()
 
 	for (SizeT i = 0; i < array.Count; i++)
 	{
-		for (SizeT j = 0; j < array[j].Count; j++)
+		for (SizeT j = 0; j < array[i].Count; j++)
 		{
 			if(array[i][j] != deserelizedArray[i][j])
 				return false;

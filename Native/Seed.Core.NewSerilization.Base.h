@@ -20,6 +20,58 @@ namespace Seed
                 struct BaseSerlizationHandler;
 #endif
                 template<typename T>
+                constexpr bool IsNotSerlizable = 
+                    !NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
+
+                template<typename THeap, typename T>
+                struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsNotSerlizable<T>, void>> {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                        static_assert(false, "Cannot serelize this type");
+                        __assume(false);
+                    }
+
+                    forceinline static constexpr SizeT DataSize(const T& data) {
+                        return sizeof(data);
+                    }
+
+                    forceinline static constexpr Boolean IsMemCopy() {
+                        return false;
+                    }
+
+                    forceinline static constexpr auto TypeHint() {
+                        return
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
+                    }
+
+                    forceinline static constexpr auto ConstexprSize() {
+                        return
+                            NewCTTI::Details::ToCharStr<sizeof(T)>();
+                    }
+
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                         static_assert(false, "Cannot deserelize this type");
+                         __assume(false);
+                    }
+
+                    forceinline static constexpr auto TypeMetaData() {
+                        return
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            NewCTTI::TypeName<T>().Resize<NewCTTI::TypeName<T>().Count - 1>() +
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            NewCTTI::Details::ToCharStr<static_cast<SizeT>(NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            NewCTTI::Details::ToCharStr<sizeof(T)>() +
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            ConstexprSize() +
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            TypeHint() +
+							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
+                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                    }
+                };
+
+                template<typename T>
                 constexpr bool IsSerilizablePrimitive = (
                     NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::Numeric ||
                     NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::Character ||

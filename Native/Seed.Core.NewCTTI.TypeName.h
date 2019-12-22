@@ -716,16 +716,20 @@ namespace Seed {
                             return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>();
                         }
                     };
-
-					
 					
 				public:
 					constexpr static auto TypeName()
 					{
-						return
-							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Tuple<")()) +
-                            TFieldTypeName<Types...>::Name() +
-							NewCTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+						if constexpr(sizeof...(Types) ==  0) {
+							return
+								NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Tuple<")()) +
+								NewCTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+						}else{
+							return
+								NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Tuple<")()) +
+								TFieldTypeName<Types...>::Name() +
+								NewCTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+						}
 					}
 				};
 #pragma endregion
