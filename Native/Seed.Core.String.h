@@ -996,7 +996,7 @@ namespace Seed {
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
                 Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                Reverse(str.str, str.CurrentSize - 1);
+                Seed::Core::Reverse(str.str, str.CurrentSize - 1);
                 return str;
             }
 
@@ -1024,7 +1024,7 @@ namespace Seed {
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
                 Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                Reverse(str.str, str.CurrentSize - 1);
+                Seed::Core::Reverse(str.str, str.CurrentSize - 1);
                 return str;
             }
 
@@ -1079,7 +1079,7 @@ namespace Seed {
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
                 Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                Reverse(str.str, str.CurrentSize - 1);
+                Seed::Core::Reverse(str.str, str.CurrentSize - 1);
                 return str;
             }
 #pragma endregion
@@ -1102,7 +1102,7 @@ namespace Seed {
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
                 Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                Reverse(str.str, str.CurrentSize - 1);
+                Seed::Core::Reverse(str.str, str.CurrentSize - 1);
                 return str;
             }
 
@@ -1124,7 +1124,7 @@ namespace Seed {
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
                 Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                Reverse(str.str, str.CurrentSize - 1);
+                Seed::Core::Reverse(str.str, str.CurrentSize - 1);
                 return str;
             }
 
@@ -1146,7 +1146,7 @@ namespace Seed {
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
                 Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                Reverse(str.str, str.CurrentSize - 1);
+                Seed::Core::Reverse(str.str, str.CurrentSize - 1);
                 return str;
             }
 
@@ -1228,7 +1228,7 @@ namespace Seed {
                     size++;
                 }
                 buf[size] = L'\0';
-                Reverse(buf, size);
+                Seed::Core::Reverse(buf, size);
                 BaseString str;
                 str.CurrentSize = size;
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
@@ -1277,7 +1277,7 @@ namespace Seed {
                     size++;
                 }
                 buf[size] = L'\0';
-                Reverse(buf, size);
+                Seed::Core::Reverse(buf, size);
                 BaseString str;
                 str.CurrentSize = size;
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
@@ -1330,7 +1330,7 @@ namespace Seed {
                     size++;
                 }
                 buf[size] = L'\0';
-                Reverse(buf, size);
+                Seed::Core::Reverse(buf, size);
                 BaseString str;
                 str.CurrentSize = size;
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
@@ -1379,7 +1379,7 @@ namespace Seed {
                     size++;
                 }
                 buf[size] = L'\0';
-                Reverse(buf, size);
+                Seed::Core::Reverse(buf, size);
                 BaseString str;
                 str.CurrentSize = size;
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
@@ -1537,7 +1537,7 @@ namespace Seed {
                 str.CurrentSize = array.Count / sizeof(Char);
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString<THeap>::operator new[](str.ReservedSize * sizeof(Char));//new Char[str.CurrentSize + 1];
-                Memory::Copy(array.Raw, str.str, array.Count);
+                Memory::Copy(array.GetRaw(), str.str, array.Count);
                 str.str[str.CurrentSize] = L'\0';
                 return str;
             }
@@ -1613,7 +1613,7 @@ namespace Seed {
             ///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
             ///<returns>Індекс першого входження або -1 якщо не знайдено</retutns>
-            SizeT Find(Char sym, SizeT StartPos = 0, SizeT EndPos = -1) noexcept {
+            SizeT Find(Char sym, SizeT StartPos = 0, SizeT EndPos = -1) const {
                 if (CurrentSize == -1) return -1;
                 if (StartPos == -1) StartPos = 0; else if (StartPos > CurrentSize) return -1;
                 if (EndPos == -1) EndPos = CurrentSize;  else if (EndPos < StartPos) return -1;
@@ -1627,9 +1627,9 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в рядковому літералі з нуль-термінатором</param>
             ///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
-            ///<returns>Індекс першого входження або -1 якщо не знайдено</retutns>
+            ///<returns>Індекс першого входження або -1 якщо не знайдено</returns>
             template<SizeT Size>
-            SizeT Find(const Char(&Text)[Size], SizeT StartPos = 0, SizeT EndPos = -1) noexcept {
+            SizeT Find(const Char(&Text)[Size], SizeT StartPos = 0, SizeT EndPos = -1) const {
                 if (CurrentSize == -1) return -1;
                 if (StartPos == -1) StartPos = 0; else if (StartPos > CurrentSize) return -1;
                 if (EndPos == -1) EndPos = CurrentSize;  else if (EndPos < StartPos) return -1;
@@ -1651,8 +1651,8 @@ namespace Seed {
             ///<param name = "Str">Рядкок який шукатиме</param>
             ///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
-            ///<returns>Індекс першого входження або -1 якщо не знайдено</retutns>
-            SizeT Find(const BaseString& Str, SizeT StartPos = 0, SizeT EndPos = -1) noexcept {
+            ///<returns>Індекс першого входження або -1 якщо не знайдено</returns>
+            SizeT Find(const BaseString& Str, SizeT StartPos = 0, SizeT EndPos = -1) const {
                 if (CurrentSize == -1) return -1;
                 if (StartPos == -1) StartPos = 0; else if (StartPos > CurrentSize) return -1;
                 if (EndPos == -1) EndPos = CurrentSize;  else if (EndPos < StartPos) return -1;
@@ -1696,6 +1696,33 @@ namespace Seed {
                 }
                 if (this->str[EndPos - 1] != Delim)
                     list += BaseString((const CharStr)(this->str + StartPartPos), EndPos - StartPartPos);
+                return list;
+            }
+
+            ///<summary>Розділення рядка по символу Delim з позиції StartPos до EndPos</summary>
+            ///<param name = "Delim">Символ розділювач, він не включається в вихідні фрагменти</param>
+            ///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
+            ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
+            ///<returns>Список підрядків</returns>
+            template<SizeT TCount>
+            Containers::BaseList<THeap, BaseString> Split(const wchar_t(&Delim)[TCount], SizeT StartPos = 0, SizeT EndPos = -1) const {
+                if (this->str == nullptr)
+                    return Containers::BaseList<THeap, BaseString>();
+                if (this->CurrentSize == 0)
+                    return Containers::BaseList<THeap, BaseString>();
+                if(this->CurrentSize <= TCount)
+                    return Containers::BaseList<THeap, BaseString>();
+                if (EndPos == -1) EndPos = this->CurrentSize;
+                Containers::BaseList<THeap, BaseString> list;
+                SizeT CurrentPos = 0;
+                SizeT PreviosPos = 0;
+                do
+                {
+                    CurrentPos = Find(Delim, CurrentPos);
+                    list += BaseString((const CharStr)(this->str + PreviosPos), CurrentPos - PreviosPos);
+                    PreviosPos = CurrentPos;
+                } while (CurrentPos != -1);
+                list += BaseString((const CharStr)(this->str + PreviosPos), this->Size - PreviosPos);
                 return list;
             }
 
@@ -1934,7 +1961,7 @@ namespace Seed {
             //- StartPos більша ніж кількість символів в рядку
             //- StartPos більша ніж EndPos
             BaseString & Replace(
-                Containers::BaseMap<THeap, Char, Char> ReplaceTable,
+                const Containers::BaseMap<THeap, Char, Char> & ReplaceTable,
                 SizeT StartPos = 0,
                 SizeT EndPos = Seed::Math::Max<SizeT>()
             ) {
@@ -1943,12 +1970,10 @@ namespace Seed {
                 if (StartPos > EndPos)
                     Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, StartPos, EndPos);
                 if (EndPos > this->CurrentSize) EndPos = this->CurrentSize;
-                ReplaceTable.ForEach([&](const Containers::BasePair<THeap, Char, Char> pair) {
+                ReplaceTable.ForEach([&](const Containers::BasePair<THeap, Char, Char>& pair) {
                     for (SizeT i = StartPos; i < EndPos; i++) {
-                        for (SizeT j = 0; j < ReplaceTable.Count; j++) {
-                            if (this->str[i] == ReplaceTable[j].Key)
-                                this->str[i] = ReplaceTable[j].Value;
-                        }
+                        if (this->str[i] == pair.Key)
+                            this->str[i] = pair.Value;
                     }
                     });
                 return *this;
