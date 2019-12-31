@@ -218,7 +218,7 @@ namespace Seed {
             InternalApiCall BaseString(const CharStr rawText, SizeT Size) :
                 CurrentSize(Size + 1),
                 ReservedSize(Size + 1 + CurrentSettings().MemoryManager.StringReserveSize),
-                str((CharStr)BaseString::operator new[](Size + 1 + CurrentSettings().MemoryManager.StringReserveSize * sizeof(Char)))
+                str((CharStr)BaseString::operator new[]((Size + 1 + CurrentSettings().MemoryManager.StringReserveSize) * sizeof(Char)))
             {
                 Memory::Copy(rawText, this->str, Size * sizeof(Char));
                 this->str[Size] = L'\0';
@@ -1637,8 +1637,8 @@ namespace Seed {
                 for (SizeT i = StartPos; i < EndPos - Size; i++) {
                     if (str[i] == Text[0]) {
                         Boolean Checked = true;
-                        for (SizeT j = 1; j < Size; j++)
-                            if (str[i + j] != Text[i]) {
+                        for (SizeT j = 1; j < Size - 1; j++)
+                            if (str[i + j] != Text[j]) {
                                 Checked = false; break;
                             }
                         if (Checked) return i;
@@ -1661,7 +1661,7 @@ namespace Seed {
                     if (str[i] == Str.str[0]) {
                         Boolean Checked = true;
                         for (SizeT j = 1; j < Str.CurrentSize; j++)
-                            if (str[i + j] != Str.str[i]) {
+                            if (str[i + j] != Str.str[j]) {
                                 Checked = false; break;
                             }
                         if (Checked) return i;
@@ -1718,9 +1718,11 @@ namespace Seed {
                 SizeT PreviosPos = 0;
                 do
                 {
-                    CurrentPos = Find(Delim, CurrentPos);
+                    CurrentPos = Find(Delim, PreviosPos);
+                    if (CurrentPos == -1)
+                        break;
                     list += BaseString((const CharStr)(this->str + PreviosPos), CurrentPos - PreviosPos);
-                    PreviosPos = CurrentPos;
+                    PreviosPos = CurrentPos + (TCount - 1);
                 } while (CurrentPos != -1);
                 list += BaseString((const CharStr)(this->str + PreviosPos), this->Size - PreviosPos);
                 return list;
@@ -1780,6 +1782,35 @@ namespace Seed {
                 ret[CurrentSize] = L'\0';
                 SizeT i2 = 0;
                 for (SizeT i = 0; i < sizeof(SizeT) * 2; i += 2)
+                {
+                    ret[i2] = HexNumbers[Converter.Code[i / 2].LowPart];
+                    i2++;
+                    ret[i2] = HexNumbers[Converter.Code[i / 2 + 1].HighPart];
+                    i2++;
+                }
+                BaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
+                return str;
+            }
+
+            ///<summary>Шістнадцятиричне представлення UInt64</summary>
+            ///<param name = "Value">Вхідне значення</param>
+            ///<returns>Рядкове представлення бінарних даних</returns>
+            static BaseString<THeap> Int32asHex(Int32 Value) {
+                union ConvertT {
+                    SizeT Variable;
+                    struct {
+                        Byte LowPart : 4;
+                        Byte HighPart : 4;
+                    }
+                    Code[sizeof(Int32)];
+                } Converter;
+                Converter.Variable = Value;
+                constexpr auto CurrentSize = (sizeof(Int32) * 2) + 1;
+                auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+                CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
+                ret[CurrentSize] = L'\0';
+                SizeT i2 = 0;
+                for (SizeT i = 0; i < sizeof(UInt32) * 2; i += 2)
                 {
                     ret[i2] = HexNumbers[Converter.Code[i / 2].LowPart];
                     i2++;
