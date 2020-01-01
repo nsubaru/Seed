@@ -1598,7 +1598,7 @@ void NtStatusExceptionMethodsCallsLogging(ConstAString& FuncName) {
     toCoreLog(L"NtException copy ctor" + String(FuncName));
 }
 
-void ShowExData(void* ptr, ConstString Label) {
+void ShowExData(void* ptr, const ConstString& Label) {
     using SafeString = BaseString<Memory::ExceptionHeap>;
     RawExceptionInfo* record = (RawExceptionInfo*)ptr;
     NtException& ex = (NtException&)record->CxxExceptionInfo.params.pExceptionObject;

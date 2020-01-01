@@ -85,7 +85,7 @@ bool Seed::Core::Testing::Test::Serilization::TupleTypeTupleSerilization::Excecu
 		auto item1 = tuple.GetByIdx<1>();
 		auto deserelizedItem1 = deserelizedTuple.GetByIdx<1>();
 		return 
-			[&](){
+			[&](){ //-V1047
 		auto array = item1.GetByIdx<0>();
 		auto deserelizedArray = deserelizedItem1.GetByIdx<0>();
 		if(array.Count != deserelizedArray.Count)

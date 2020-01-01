@@ -1142,7 +1142,7 @@ namespace Seed {
 						auto l = [](const T& V1, const T& V2) { return V1 > V2; };
 						This->root = mergeSort(This->root, l);
 					}
-					This->last = [&]() {
+					This->last = [&]() { //-V1047
 						elem* node = This->root;
 						while (node->next != nullptr)
 							node = node->next;

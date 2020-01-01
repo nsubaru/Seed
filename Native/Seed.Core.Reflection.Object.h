@@ -739,7 +739,7 @@ namespace Seed
 					}
 
 					bool GetIsArgsSerilizable() const {
-						return this->data->IsRetSerilizable;
+						return this->data->IsArgsSerilizable;
 					}
 
 					bool GetIsConst() const {

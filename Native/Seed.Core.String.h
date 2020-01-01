@@ -126,18 +126,18 @@ namespace Seed {
 
             ///<summary>Конструктор з готової константного ASCII рядка</summary>
             ///<param name = "str">Константний рядок</param>
-            BaseString(const ConstAString& str) {
-                if (str.Size < 2)
+            BaseString(const ConstAString& cstr) {
+                if (cstr.Size < 2)
                 {
                     this->str = nullptr;
                     this->CurrentSize = this->ReservedSize = 0;
                 }
                 else {
-                    CurrentSize = str.Size;
+                    CurrentSize = cstr.Size;
                     ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                     CharStr temp_str = this->str;
-                    ACharStr text = (ACharStr)str.Str;
+                    ACharStr text = (ACharStr)cstr.Str;
                     {
                         while (*temp_str++ = *text++);
                     }
@@ -194,22 +194,21 @@ namespace Seed {
             ///<param name = "Text">Масив букв</param>
             ///<param name = "Size">Кількість символів разом з нуль-термінатором</summary>
             ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-            InternalApiCall BaseString(const AChar* text, SizeT Size) {
-                SizeT size = Size;
-                if (size == 0) {
+            InternalApiCall BaseString(const AChar* text, SizeT textSize) {
+                if (textSize == 0) {
                     this->str = nullptr;
                     this->CurrentSize = this->ReservedSize = 0;
                     return;
                 }
-                CurrentSize = size + 1;
+                CurrentSize = textSize + 1;
                 if (CurrentSize > Math::Max<SizeT>())
                     Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, CurrentSize);
                 ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
-                for (SizeT i = 0; i < size; i++) {
+                for (SizeT i = 0; i < textSize; i++) {
                     this->str[i] = text[i];
                 }
-                this->str[size] = L'\0';
+                this->str[textSize] = L'\0';
             }
 
             ///<summary>Конструктор з масиву символів і його розміру. Копіює вміст і дописую нуль-термінатор</summary>
@@ -1613,13 +1612,26 @@ namespace Seed {
             ///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
             ///<returns>Індекс першого входження або -1 якщо не знайдено</retutns>
-            SizeT Find(Char sym, SizeT StartPos = 0, SizeT EndPos = -1) const {
-                if (CurrentSize == -1) return -1;
-                if (StartPos == -1) StartPos = 0; else if (StartPos > CurrentSize) return -1;
-                if (EndPos == -1) EndPos = CurrentSize;  else if (EndPos < StartPos) return -1;
+            SizeT Find(Char sym, SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
+                if (CurrentSize == Math::Max<SizeT>()) 
+                    return Math::Max<SizeT>();
+
+                if (StartPos == Math::Max<SizeT>()) 
+                    StartPos = 0; 
+                else if (StartPos > CurrentSize) 
+                    return Math::Max<SizeT>();
+
+                if (EndPos == Math::Max<SizeT>()) 
+                    EndPos = CurrentSize;  
+                else if (EndPos < StartPos) 
+                    return Math::Max<SizeT>();
+
+                if (Size > EndPos) 
+                    return Math::Max<SizeT>();
+
                 for (SizeT i = StartPos; i < EndPos; i++)
                     if (str[i] == sym) return i;
-                return -1;
+                return Math::Max<SizeT>();
             }
 
             ///<summary>Пошук символьного масиву з позиції StartPos до позиції EndPos</summary>
@@ -1629,11 +1641,23 @@ namespace Seed {
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
             ///<returns>Індекс першого входження або -1 якщо не знайдено</returns>
             template<SizeT Size>
-            SizeT Find(const Char(&Text)[Size], SizeT StartPos = 0, SizeT EndPos = -1) const {
-                if (CurrentSize == -1) return -1;
-                if (StartPos == -1) StartPos = 0; else if (StartPos > CurrentSize) return -1;
-                if (EndPos == -1) EndPos = CurrentSize;  else if (EndPos < StartPos) return -1;
-                if (Size > EndPos) return -1;
+            SizeT Find(const Char(&Text)[Size], SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
+                if (CurrentSize == Math::Max<SizeT>()) 
+                    return Math::Max<SizeT>();
+
+                if (StartPos == Math::Max<SizeT>()) 
+                    StartPos = 0; 
+                else if (StartPos > CurrentSize) 
+                    return Math::Max<SizeT>();
+
+                if (EndPos == Math::Max<SizeT>()) 
+                    EndPos = CurrentSize;  
+                else if (EndPos < StartPos) 
+                    return Math::Max<SizeT>();
+
+                if (Size > EndPos) 
+                    return Math::Max<SizeT>();
+
                 for (SizeT i = StartPos; i < EndPos - Size; i++) {
                     if (str[i] == Text[0]) {
                         Boolean Checked = true;
@@ -1644,7 +1668,7 @@ namespace Seed {
                         if (Checked) return i;
                     }
                 }
-                return -1;
+                return Math::Max<SizeT>();
             }
 
             ///<summary>Пощук підрядка в даному рядку з позиції StartPos до позиції EndPos</summary>
@@ -1652,11 +1676,23 @@ namespace Seed {
             ///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
             ///<returns>Індекс першого входження або -1 якщо не знайдено</returns>
-            SizeT Find(const BaseString& Str, SizeT StartPos = 0, SizeT EndPos = -1) const {
-                if (CurrentSize == -1) return -1;
-                if (StartPos == -1) StartPos = 0; else if (StartPos > CurrentSize) return -1;
-                if (EndPos == -1) EndPos = CurrentSize;  else if (EndPos < StartPos) return -1;
-                if (EndPos > Str.CurrentSize) return -1;
+            SizeT Find(const BaseString& Str, SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
+                if (CurrentSize == Math::Max<SizeT>()) 
+                    return Math::Max<SizeT>();
+
+                if (StartPos == Math::Max<SizeT>()) 
+                    StartPos = 0; 
+                else if (StartPos > CurrentSize) 
+                    return Math::Max<SizeT>();
+
+                if (EndPos == Math::Max<SizeT>()) 
+                    EndPos = CurrentSize;  
+                else if (EndPos < StartPos) 
+                    return Math::Max<SizeT>();
+
+                if (EndPos > Str.CurrentSize) 
+                    return Math::Max<SizeT>();
+
                 for (SizeT i = StartPos; i < EndPos - Str.CurrentSize; i++) {
                     if (str[i] == Str.str[0]) {
                         Boolean Checked = true;
@@ -1667,7 +1703,7 @@ namespace Seed {
                         if (Checked) return i;
                     }
                 }
-                return -1;
+                return Math::Max<SizeT>();
             }
 
             ///<summary>Розділення рядка по символу Delim з позиції StartPos до EndPos</summary>
@@ -1675,15 +1711,20 @@ namespace Seed {
             ///<param name = "StartPos">Індекс початкової позиції. Не обов'язковий параметр. Якщо не вказано то від початку</param>
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
             ///<returns>Список підрядків</returns>
-            Containers::BaseList<THeap, BaseString> Split(const Char Delim, SizeT StartPos = 0, SizeT EndPos = -1) const {
+            Containers::BaseList<THeap, BaseString> Split(const Char Delim, SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
                 if (this->str == nullptr)
                     return Containers::BaseList<THeap, BaseString>();
+
                 if (this->CurrentSize == 0)
                     return Containers::BaseList<THeap, BaseString>();
-                if (EndPos == -1) EndPos = this->CurrentSize;
+
+                if (EndPos == Math::Max<SizeT>()) 
+                    EndPos = this->CurrentSize;
+
                 Containers::BaseList<THeap, BaseString> list;
                 SizeT StartPartPos = 0;
                 Boolean flag = false;
+
                 for (SizeT i = StartPos; i < EndPos; i++) {
                     if (this->str[i] == Delim && flag == false) {
                         list += BaseString((const CharStr)(this->str + StartPartPos), i - StartPartPos);
@@ -1705,25 +1746,31 @@ namespace Seed {
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
             ///<returns>Список підрядків</returns>
             template<SizeT TCount>
-            Containers::BaseList<THeap, BaseString> Split(const wchar_t(&Delim)[TCount], SizeT StartPos = 0, SizeT EndPos = -1) const {
+            Containers::BaseList<THeap, BaseString> Split(const wchar_t(&Delim)[TCount], SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
                 if (this->str == nullptr)
                     return Containers::BaseList<THeap, BaseString>();
+
                 if (this->CurrentSize == 0)
                     return Containers::BaseList<THeap, BaseString>();
+
                 if(this->CurrentSize <= TCount)
                     return Containers::BaseList<THeap, BaseString>();
-                if (EndPos == -1) EndPos = this->CurrentSize;
+
+                if (EndPos == Math::Max<SizeT>()) 
+                    EndPos = this->CurrentSize;
+
                 Containers::BaseList<THeap, BaseString> list;
                 SizeT CurrentPos = 0;
-                SizeT PreviosPos = 0;
+                SizeT PreviosPos = StartPos;
+
                 do
                 {
                     CurrentPos = Find(Delim, PreviosPos);
-                    if (CurrentPos == -1)
+                    if (CurrentPos == Math::Max<SizeT>())
                         break;
                     list += BaseString((const CharStr)(this->str + PreviosPos), CurrentPos - PreviosPos);
                     PreviosPos = CurrentPos + (TCount - 1);
-                } while (CurrentPos != -1);
+                } while (CurrentPos != Math::Max<SizeT>());
                 list += BaseString((const CharStr)(this->str + PreviosPos), this->Size - PreviosPos);
                 return list;
             }

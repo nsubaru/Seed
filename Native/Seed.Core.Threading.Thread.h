@@ -75,8 +75,8 @@ namespace Seed {
 				operator ID () const { return This->TID; }
 				operator Boolean () const { return This->TID != 0; }
 			public:
-				void SetName(const String& Name) { const_cast<String&>(This->name) = Name; RefreshName(); }
-				void SetName(String&& Name) { const_cast<String&>(This->name) = MoveRValue(Name); RefreshName(); }
+				void SetName(const String& name) { const_cast<String&>(This->name) = name; RefreshName(); }
+				void SetName(String&& name) { const_cast<String&>(This->name) = MoveRValue(name); RefreshName(); }
 				const String& GetName() { return const_cast<String&>(This->name); }
 
 				EThreadabledStates GetThreadState() { return this->This->State; }
