@@ -175,7 +175,12 @@ public:
                 result = new retType(call(f, args));
             }
             //Якщо функція вертає void то просто викликаєм її
-            else call(f, args);
+            else
+            {
+                call(f, args);
+            }
+            //NOTE: Знищення аргументів(якщо цього не робити то модливі циклічні силки в деяких випадках)
+            args.~Tuple<Args...>();
         }
         catch ([[maybe_unused]] Seed::InteruptException&) { //-V2010
             isEnded = true;

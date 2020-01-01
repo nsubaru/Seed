@@ -94,7 +94,7 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 	attrb.Attributes = OBJ_CASE_INSENSITIVE;
 	NTSTATUS status = NtCreateFile(
 		&LogFile.handle,
-		GENERIC_WRITE | SYNCHRONIZE,
+		GENERIC_ALL | SYNCHRONIZE,
 		&attrb,
 		&LogFile.ioBlock,
 		NULL,
@@ -205,6 +205,60 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 		return false;
 	}
 	return true;
+}
+
+#include "Seed.Core.Services.CoreLogger.h"
+
+Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
+	try
+	{
+		RtlEnterCriticalSection(&LogFile.lock);
+		FILE_STANDARD_INFORMATION logFileInfo;
+		NTSTATUS status = NtQueryInformationFile(
+			LogFile.handle, 
+			&LogFile.ioBlock, 
+			&logFileInfo, 
+			sizeof(FILE_STANDARD_INFORMATION), 
+			FileStandardInformation
+		);
+		if (!NT_SUCCESS(status))
+		{
+			Throw(NtException(ExceptionPosition, status));
+		}
+		SizeT bufferSize = logFileInfo.EndOfFile.QuadPart;
+		Char * buffer = new Char[bufferSize];
+		Memory::MemBlkFill(buffer, bufferSize, 0);
+
+		LARGE_INTEGER offset = { 0 };
+		offset.QuadPart = sizeof(char) * 2;
+
+		status = NtReadFile(LogFile.handle, NULL, NULL, NULL, &LogFile.ioBlock, buffer, (ULONG)bufferSize, &offset, NULL);
+		if (!NT_SUCCESS(status))
+		{
+			delete[] buffer;
+			Throw(NtException(ExceptionPosition, status));
+		}
+		SizeT textSize = 0;
+		auto ptr = buffer;
+		while (*ptr != 0)
+		{
+			textSize++;
+			ptr++;
+		}
+		textSize++;
+		auto ret = String(buffer, textSize).Split(L"\r\n");
+		if(ret.LastIt != nullptr)
+			ret.Remove(ret.LastIt);
+		delete[] buffer;
+		RtlLeaveCriticalSection(&LogFile.lock);
+
+		return ret;
+	}
+	catch (...)
+	{
+		RtlLeaveCriticalSection(&LogFile.lock);
+		ReThrow;
+	}
 }
 
 #pragma warning(pop)

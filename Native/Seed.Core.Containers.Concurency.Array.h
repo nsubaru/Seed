@@ -459,6 +459,8 @@ namespace Seed {
             public:
                 SizeT GetCount() const { return This->count; }
                 SizeT Property(GetCount) Count;
+
+                const T* const GetRaw() const { return This->array; }
             public:
                 RefCountClass(BaseConcurencyArray, This);
             };

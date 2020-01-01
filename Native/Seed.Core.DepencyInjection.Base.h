@@ -128,7 +128,10 @@ namespace Seed
 
 					~ServiceRecord() {
 						if (objPtr != nullptr)
+						{
 							rttiRecord.DtorCallerFunction(objPtr);
+							objPtr = nullptr;
+						}
 					}
 				};
 			private:
@@ -158,20 +161,21 @@ namespace Seed
 				TService Resolve() {
 					if (data->serviceTableForNativeLevel.IsExist(&typeid(TService)))
 					{
-						if (data->serviceTableForNativeLevel[&typeid(TService)]->objPtr == nullptr)
+						auto service = data->serviceTableForNativeLevel[&typeid(TService)];
+						if (service->objPtr == nullptr)
 						{
-							data->serviceTableForNativeLevel[&typeid(TService)]->objPtr = 
-								data->serviceTableForNativeLevel[&typeid(TService)]->resolverCtor(*this);
+							service->objPtr = 
+								service->resolverCtor(*this);
 						}
 
-						if (data->serviceTableForNativeLevel[&typeid(TService)]->interfaceCaster != nullptr)
+						if (service->interfaceCaster != nullptr)
 						{
-							return *reinterpret_cast<TService*>(data->serviceTableForNativeLevel[&typeid(TService)]
-								->interfaceCaster(data->serviceTableForNativeLevel[&typeid(TService)]->objPtr));
+							return *reinterpret_cast<TService*>(service
+								->interfaceCaster(service->objPtr));
 						}
 						else
 						{
-							return *reinterpret_cast<TService*>(data->serviceTableForNativeLevel[&typeid(TService)]->objPtr);
+							return *reinterpret_cast<TService*>(service->objPtr);
 						}
 					}
 

@@ -72,12 +72,20 @@ namespace Seed {
 			public:
 				operator volatile IThreadable& () { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
 				operator const volatile IThreadable& () const { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
-				operator SizeT () const { return This->TID; }
+				operator ID () const { return This->TID; }
 				operator Boolean () const { return This->TID != 0; }
 			public:
-				void SetName(const String& Name) { const_cast<String&>(This->name) = Name; RefreshName(); }
-				void SetName(String&& Name) { const_cast<String&>(This->name) = MoveRValue(Name); RefreshName(); }
+				void SetName(const String& name) { const_cast<String&>(This->name) = name; RefreshName(); }
+				void SetName(String&& name) { const_cast<String&>(This->name) = MoveRValue(name); RefreshName(); }
 				const String& GetName() { return const_cast<String&>(This->name); }
+
+				EThreadabledStates GetThreadState() { return this->This->State; }
+
+				ID GetTID() { return this->This->TID; }
+
+				String Property(GetName, SetName) Name;
+				EThreadabledStates Property(GetThreadState) ThreadState;
+				ID Property(GetTID) TID;
 			public:
 				RefCountClass(Thread, This)
 			};
