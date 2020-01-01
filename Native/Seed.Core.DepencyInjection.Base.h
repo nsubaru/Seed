@@ -128,7 +128,10 @@ namespace Seed
 
 					~ServiceRecord() {
 						if (objPtr != nullptr)
+						{
 							rttiRecord.DtorCallerFunction(objPtr);
+							objPtr = nullptr;
+						}
 					}
 				};
 			private:

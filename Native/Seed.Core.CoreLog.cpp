@@ -247,7 +247,7 @@ Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
 		}
 		textSize++;
 		auto ret = String(buffer, textSize).Split(L"\r\n");
-		if(ret.LastIt != nullptr && ret.LastIt->Size == 0)
+		if(ret.LastIt != nullptr)
 			ret.Remove(ret.LastIt);
 		delete[] buffer;
 		RtlLeaveCriticalSection(&LogFile.lock);

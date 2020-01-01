@@ -384,7 +384,7 @@ Thread& Seed::Core::Threading::Thread::Interupt()
 			NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
 			if (!NT_SUCCESS(status)) {
 				NtResumeThread(This->hThread, NULL);
-				Throw(NtException(ExceptionPosition, status));
+				return *this;
 			}
 			DWORD64 ret_point = ctx.Rip;
 			ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
