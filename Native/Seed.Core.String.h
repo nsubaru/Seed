@@ -1736,7 +1736,7 @@ namespace Seed {
                     }
                 }
                 if (this->str[EndPos - 1] != Delim)
-                    list += BaseString((const CharStr)(this->str + StartPartPos), EndPos - StartPartPos);
+                    list += BaseString((const CharStr)(this->str + StartPartPos), (EndPos - StartPartPos) - 1);
                 return list;
             }
 
@@ -1771,7 +1771,7 @@ namespace Seed {
                     list += BaseString((const CharStr)(this->str + PreviosPos), CurrentPos - PreviosPos);
                     PreviosPos = CurrentPos + (TCount - 1);
                 } while (CurrentPos != Math::Max<SizeT>());
-                list += BaseString((const CharStr)(this->str + PreviosPos), this->Size - PreviosPos);
+                list += BaseString((const CharStr)(this->str + PreviosPos), (this->Size - PreviosPos) - 1);
                 return list;
             }
 

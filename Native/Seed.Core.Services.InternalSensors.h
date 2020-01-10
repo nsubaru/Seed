@@ -12,7 +12,11 @@ namespace Seed
 				InternalSensorsService() {}
 
 				String GetExcecutableNtPath() {
-					return CurrentSettings().VirtualSetting.KernelExcecutableLocation;
+#pragma warning(push)
+//Call internal unsafe String ctor
+#pragma warning(disable: 4996)
+					return const_cast<Char*>(static_cast<const Char*>(CurrentSettings().VirtualSetting.KernelExcecutableLocation));
+#pragma warning(pop)
 				}
 			};
 		}

@@ -360,7 +360,6 @@ int TypeMatch(
     // names are identical.
     auto typeCatch = GetByOffset<TypeDescriptor>(ImageBase, pCatch->dispType);
     auto typeCatchable = GetByOffset<TypeDescriptor>(ImageBase, pCatchable->pType);
-    toCoreLog(L"Matching catch closure. TypeCatch: \"" + String(typeCatch->name) + L"\" TypeCatchable: \"" + String(typeCatchable->name) + L"\"");
     if (typeCatch != typeCatchable && !CStr::Compare(typeCatch->name, typeCatchable->name))
         return FALSE;
 

@@ -91,6 +91,46 @@ namespace Seed {
 				///<summary>Кількість ядер в хост ситема ядра</summary>
 				UInt64 CpuCoresCount;
 			};
+
+			/// <summary>
+			/// Статичні налаштування
+			/// </summary>
+			struct SeedKernelCall StaticSettingsData {
+				/// <summary>
+				/// Ім'я простору імен подій ядра Рем
+				/// </summary>
+				static constexpr Char KernelNamespaceName[] = L"\\Kernel";
+				/// <summary>
+				/// Ім'я простору імен подій виконавчої системи ядра Рем
+				/// </summary>
+				static constexpr Char KernelExcecutableNamespaceName[] = L"\\Kernel\\Excecutable";
+				/// <summary>
+				/// Ім'я події завершення системи
+				/// </summary>
+				static constexpr Char ShutdownEventName[] = L"\\Kernel\\Excecutable\\Shutdown";
+				/// <summary>
+				/// Ім'я події перезагрузки системи
+				/// </summary>
+				static constexpr Char ReloadEventName[] = L"\\Kernel\\Excecutable\\Reload";
+
+				/// <summary>
+				/// Тип рядкової змінної імені події завершення системи
+				/// </summary>
+				using TShutdownEventName = TypeTraits::AddReference<decltype(ShutdownEventName)>::Lvalue;
+				/// <summary>
+				/// Тип рядкової змінної імені події перезагрузки системи
+				/// </summary>
+				using TReloadEventName = TypeTraits::AddReference<decltype(ReloadEventName)>::Lvalue;
+
+				/// <summary>
+				/// Тип рядкової змінної імені простору імен подій ядра Рем
+				/// </summary>
+				using TKernelNamespaceName = TypeTraits::AddReference<decltype(KernelNamespaceName)>::Lvalue;
+				/// <summary>
+				/// Тип рядкової змінної імені простору імен подій виконавчої системи ядра Рем
+				/// </summary>
+				using TKernelExcecutableNamespaceName = TypeTraits::AddReference<decltype(KernelExcecutableNamespaceName)>::Lvalue;
+			};
 		public:
 			class SeedKernelCall MemoryManagerT {
 			public:
@@ -493,8 +533,42 @@ namespace Seed {
 				///<summary>Кількість ядер в процесора у робочої системи</summary>
 				UInt64 Property(GetCpuCoresCount) CpuCoresCount;
 			};
+
+			class SeedKernelCall StaticSettingsDataT {
+			public:
+				StaticSettingsDataT() {} //-V730
+
+				constexpr StaticSettingsData::TShutdownEventName GetShutdownEventName() {
+					return StaticSettingsData::ShutdownEventName;
+				}
+
+				constexpr StaticSettingsData::TReloadEventName GetReloadEventName() {
+					return StaticSettingsData::ReloadEventName;
+				}
+
+				constexpr StaticSettingsData::TKernelNamespaceName GetKernelNamespaceName() {
+					return StaticSettingsData::KernelNamespaceName;
+				}
+
+				constexpr StaticSettingsData::TKernelExcecutableNamespaceName GetKernelExcecutableNamespaceName() {
+					return StaticSettingsData::KernelExcecutableNamespaceName;
+				}
+			public:
+				///<summary>Ім'я події завершення роботи ядра</summary>
+				StaticSettingsData::TShutdownEventName Property(GetShutdownEventName) ShutdownEventName;
+				///<summary>Ім'я події перезагрузки ядра</summary>
+				StaticSettingsData::TReloadEventName Property(GetReloadEventName) ReloadEventName;
+
+				///<summary>Ім'я простору імен подій ядра Рем</summary>
+				StaticSettingsData::TKernelNamespaceName Property(GetKernelNamespaceName) KernelNamespaceName;
+				///<summary>Ім'я простору імен подій виконавчої системи ядра Рем</summary>
+				StaticSettingsData::TKernelExcecutableNamespaceName Property(GetKernelExcecutableNamespaceName) KernelExcecutableNamespaceName;
+			};
 		public:
 			CurrentSettings() {};
+
+			StaticSettingsDataT GetStaticSettingsData() { return StaticSettingsDataT(); }
+			void SetStaticSettingsData(StaticSettingsDataT) {}
 
 			VirtualSettingDataT GetVirtualSettingData() { return VirtualSettingDataT(); }
 			void SetVirtualSettingDataT(VirtualSettingDataT) {}
@@ -516,6 +590,10 @@ namespace Seed {
 			VirtualSettingDataT Property(GetVirtualSettingData, SetVirtualSettingDataT) VirtualSetting;
 			///<summary>Налаштування багатопотоковості</summary>
 			ThreadingCfgT Property(GetThreadinfConfig, SetThreadinfConfig) Threading;
+			/// <summary>
+			/// Статичні налаштування ядра
+			/// </summary>
+			StaticSettingsDataT Property(GetStaticSettingsData, SetStaticSettingsData) StaticSettings;
 		public:
 			void SaveCurrentSettings();
 		};

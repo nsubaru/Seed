@@ -140,6 +140,8 @@ namespace Seed
 					Containers::ConcurencyDictionary<SmartPtr<ServiceRecord>> serviceTableForManagedLevel;
 					Containers::ConcurencyMap<const TypeInfo*, Reflection::DataTypeRecord> dataTypeTableForNativeLevel;
 					Containers::ConcurencyDictionary<Reflection::DataTypeRecord> dataTypeTableForManagedLevel;
+					Containers::ConcurencyMap<const TypeInfo*, Reflection::ObjectRTTIRecord> objectTypeTableForNativeLevel;
+					Containers::ConcurencyDictionary<Reflection::ObjectRTTIRecord> objectTypeTableForManagedLevel;
 
 					RefCountT RefCount;
 
@@ -148,7 +150,10 @@ namespace Seed
 						serviceTableForNativeLevel(),
 						serviceTableForManagedLevel(),
 						dataTypeTableForNativeLevel(),
-						dataTypeTableForManagedLevel() {}
+						dataTypeTableForManagedLevel(),
+						objectTypeTableForNativeLevel(),
+						objectTypeTableForManagedLevel()
+					{}
 				};
 			private:
 				Data* data;
@@ -219,8 +224,11 @@ namespace Seed
 						methodRecord.ArgsTypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
 							if (!this->data->dataTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
 							{
-								this->data->dataTypeTableForNativeLevel.Insert(&typeRecord.GetTypeInfo(), typeRecord);
-								this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
+								if (!this->data->objectTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
+								{
+									this->data->dataTypeTableForNativeLevel.Insert(&typeRecord.GetTypeInfo(), typeRecord);
+									this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
+								}
 							}
 						});
 					});
@@ -279,6 +287,18 @@ namespace Seed
 
 					return *this;
 				}
+
+				template<typename T>
+				DepencyInjector& RegisterObjectType(Reflection::ObjectRTTIRecord&& rttiRecord) {
+					if (!this->data->dataTypeTableForNativeLevel.IsExist(&typeid(T)))
+					{
+						this->data->objectTypeTableForNativeLevel.Insert(&typeid(T), rttiRecord);
+						this->data->objectTypeTableForManagedLevel.Insert(rttiRecord.ClassName, rttiRecord);
+					}
+
+					return *this;
+				}
+			public:
 
 				RefCountClass(DepencyInjector, data);
 			};

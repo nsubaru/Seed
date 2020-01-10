@@ -887,5 +887,6 @@ namespace Seed
 }
 
 #define MethodDescription(Class, Method) Seed::Core::Reflection::Details::MethodDescriptor<decltype(&Class::Method), &Class::Method, GenNGTypeString(#Method)>
+#define MethodDescriptionWithArgs(Class, Method, RetType, ...) Seed::Core::Reflection::Details::MethodDescriptor<RetType(Class::*)(__VA_ARGS__), &Class::Method, GenNGTypeString(#Method)>
 #define CtorDescription(Class, ...) Seed::Core::Reflection::Details::ObjectCtorAndDtor<Class, __VA_ARGS__>
 #define ObjectDefinition(Class, CtorDesc, ...) Seed::Core::Reflection::Details::ObjectDescriptor<Class, CtorDesc, __VA_ARGS__>

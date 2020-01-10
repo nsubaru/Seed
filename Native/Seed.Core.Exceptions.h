@@ -453,6 +453,14 @@ namespace Seed {
 				virtual ~NotImplemented() {}
 			};
 
+			/// <summary>
+			/// Аліас для помилки NotImplemented
+			/// </summary>
+			namespace
+			{
+				using NotImplementedException = NotImplemented;
+			}
+
 			///<summary>Доступ до елемента який знаходится за межею розмірів</summary>
 			class SeedKernelCall IndexOutOfRange :public Exception {
 			private:

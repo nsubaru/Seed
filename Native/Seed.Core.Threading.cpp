@@ -954,7 +954,7 @@ SheduledJob& Seed::Core::Threading::SheduledJob::Join(DateTime timeOut)
 
 #pragma endregion
 
-#pragma region
+#pragma region Event
 void Seed::Core::Threading::Event::Dispose()
 {
 	if (data->handle != nullptr)
@@ -1020,19 +1020,63 @@ Seed::Core::Threading::Event::Event(String&& name, Boolean IsManualReset) : data
 	}
 }
 
-void Seed::Core::Threading::Event::Wait()
+void Seed::Core::Threading::Event::Wait() const
 {
 	LARGE_INTEGER delay;
 	delay.QuadPart = Math::Max<Int64>();
 	NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 }
 
-void Seed::Core::Threading::Event::Wait(SizeT TimeOutMs)
+void Seed::Core::Threading::Event::Wait(SizeT TimeOutMs) const
 {
 	LARGE_INTEGER delay;
 	delay.QuadPart = (TimeOutMs > 0) ? -10000LL * TimeOutMs : Math::Max<Int64>();
 	NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 }
+
+void Seed::Core::Threading::WaitForMany(const Containers::Array<Event>& events, Boolean isWaitAll, SizeT TimeOutMs) {
+	if (events.Count > static_cast<SizeT>(Math::Max<UInt32>()))
+		Throw(InvalidArgumentException(ExceptionPosition, L"events.Count", L"events count must be less than ULONG max"));
+
+	HANDLE* hEvents = nullptr;
+
+	LARGE_INTEGER delay;
+	delay.QuadPart = (TimeOutMs > 0 && TimeOutMs != Math::Max<SizeT>()) ? -10000LL * TimeOutMs : Math::Max<Int64>();
+
+	try
+	{
+		if (events.Count == 0)
+			return;
+		if (events.Count == 1)
+		{
+			events.First([] (const Event&)
+			{
+				return true;
+			}).Wait();	
+			return;
+		}
+		hEvents = new HANDLE[events.Count];
+		events.ForEach([&] (const Event& event, SizeT Index)
+		{
+			hEvents[Index] = event.data->handle;
+		});
+
+		NtWaitForMultipleObjects(
+			static_cast<ULONG>(events.Count), 
+			hEvents, 
+			(isWaitAll) ? WaitAll : WaitAny, 
+			TRUE, 
+			&delay
+		);
+
+		delete[] hEvents;
+	}
+	catch (...)
+	{
+		delete[] hEvents;
+	}
+}
+	
 
 #pragma endregion
 
