@@ -7,10 +7,52 @@ namespace Seed {
 	inline namespace Core {
 		namespace NewCTTI {
 			namespace TypeNameSpecializations {
+				static constexpr auto CLASS_TYPE_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("class ")());
+				static constexpr auto CONST_MODIFICATOR_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("const ")());
+				static constexpr auto VOLATILE_MODIFICATOR_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("volatile ")());
+
 				template<typename T>
 				struct TTypeName {
 					constexpr static auto TypeName() {
-						return NewCTTI::Details::TypeName<T>();
+						if constexpr (NewCTTI::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
+							return NewCTTI::Details::TypeName<T>().ResizeLeft<NewCTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
+						else if constexpr (Core::TypeTraits::IsConstV<T>&& Core::TypeTraits::IsVolatileV<T>)
+						{
+							using U = Core::TypeTraits::RemoveCV<T>;
+							if constexpr (NewCTTI::Details::TypeName<U>().IsStartWith(CLASS_TYPE_NAME))
+							{
+								return CONST_MODIFICATOR_NAME + VOLATILE_MODIFICATOR_NAME +
+									NewCTTI::Details::TypeName<T>().ResizeLeft<NewCTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
+							}
+
+							return NewCTTI::Details::TypeName<T>();
+						}
+						else if constexpr (Core::TypeTraits::IsConstV<T>)
+						{
+							using U = Core::TypeTraits::RemoveCV<T>;
+							if constexpr (NewCTTI::Details::TypeName<U>().IsStartWith(CLASS_TYPE_NAME))
+							{
+								return CONST_MODIFICATOR_NAME +
+									NewCTTI::Details::TypeName<T>().ResizeLeft<NewCTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
+							}
+
+							return NewCTTI::Details::TypeName<T>();
+						}
+						else if constexpr (Core::TypeTraits::IsVolatileV<T>)
+						{
+							using U = Core::TypeTraits::RemoveCV<T>;
+							if constexpr (NewCTTI::Details::TypeName<U>().IsStartWith(CLASS_TYPE_NAME))
+							{
+								return VOLATILE_MODIFICATOR_NAME +
+									NewCTTI::Details::TypeName<T>().ResizeLeft<NewCTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
+							}
+
+							return NewCTTI::Details::TypeName<T>();
+						}
+						else
+						{
+							return NewCTTI::Details::TypeName<T>();
+						}
 					}
 				};
 #pragma region Specializations for array and reference

@@ -161,6 +161,20 @@ namespace Seed {
 						}
                     }
 
+                    template<SizeT Size2>
+                    constexpr bool IsStartWith(ConstexprArray<T, Size2> mask) {
+                        if (Size < Size2)
+                            return false;
+
+                        for (SizeT i = 0; i < Size2; i++)
+                        {
+                            if (arr[i] != mask[i])
+                                return false;
+                        }
+
+                        return true;
+                    }
+
                     template<typename T2, SizeT N>
                     friend class ConstexprArray;
                 };
@@ -195,6 +209,11 @@ namespace Seed {
 
                     constexpr ConstexprArray Reverse() {
                         return *this;
+                    }       
+
+                    template<SizeT Size2>
+                    constexpr bool IsStartWith(ConstexprArray<T, Size2> mask) {
+                        return Size == Size2;
                     }
 
                     template<typename T2, SizeT N>

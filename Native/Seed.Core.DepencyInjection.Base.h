@@ -112,6 +112,8 @@ namespace Seed
 
 			using DynamicObject = Reflection::DynamicObject;
 
+			class DepencyInjector;
+
 			class DepencyInjector final : IDisposable {
 			private:
 				using TResolverCtor = void* (*)(DepencyInjector & injector);
@@ -160,31 +162,85 @@ namespace Seed
 			protected:
 				virtual void Dispose() override {};
 			public:
+				class IDI final {
+				private:
+					DepencyInjector& di;
+				private:
+					IDI(DepencyInjector& di) : di(di) {}
+				public:
+					IDI(const IDI& idi) : di(idi.di) {}
+					IDI(IDI&& idi) : di(idi.di) {}
+					IDI& operator=(const IDI& idi) {
+						this->~IDI();
+						this->IDI::IDI(idi);
+						return *this;
+					}
+					IDI& operator=(IDI&& idi) {
+						this->~IDI();
+						this->IDI::IDI(MoveRValue(idi));
+						return *this;
+					}
+					~IDI() {}
+				public:
+					forceinline Containers::List<String> GetAllServicesNames() {
+						return di.GetAllServicesNames();
+					}
+
+					forceinline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) {
+						return di.GetServiceRecordByName(name);
+					}
+
+					forceinline Containers::List<String> GetAllRegisteredObjects() {
+						return di.GetAllRegisteredObjects();
+					}
+
+					forceinline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) {
+						return di.GetObjectRecordByName(name);
+					}
+
+					forceinline Containers::List<String> GetAllRegisteredDataTypes() {
+						return di.GetAllRegisteredDataTypes();
+					}
+
+					forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) {
+						return di.GetDataTypesRecordByName(name);
+					}
+				private:
+					friend class DepencyInjector;
+				};
+			public:
 				DepencyInjector() : data(new Data()) {}
 
 				template<typename TService>
 				TService Resolve() {
-					if (data->serviceTableForNativeLevel.IsExist(&typeid(TService)))
+					if constexpr (TypeTraits::IsSameV<TService, IDI>)
 					{
-						auto service = data->serviceTableForNativeLevel[&typeid(TService)];
-						if (service->objPtr == nullptr)
-						{
-							service->objPtr = 
-								service->resolverCtor(*this);
-						}
-
-						if (service->interfaceCaster != nullptr)
-						{
-							return *reinterpret_cast<TService*>(service
-								->interfaceCaster(service->objPtr));
-						}
-						else
-						{
-							return *reinterpret_cast<TService*>(service->objPtr);
-						}
+						return IDI(*this);
 					}
+					else
+					{
+						if (data->serviceTableForNativeLevel.IsExist(&typeid(TService)))
+						{
+							auto service = data->serviceTableForNativeLevel[&typeid(TService)];
+							if (service->objPtr == nullptr)
+							{
+								service->objPtr =
+									service->resolverCtor(*this);
+							}
 
-					Throw(DIResolveException(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+							if (service->interfaceCaster != nullptr)
+							{
+								return *reinterpret_cast<TService*>(service
+									->interfaceCaster(service->objPtr));
+							}
+							else
+							{
+								return *reinterpret_cast<TService*>(service->objPtr);
+							}
+						}
+
+						Throw(DIResolveException(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+					}
 				};
 
 				template<typename TService, typename ... TCtorArgs>
@@ -298,10 +354,51 @@ namespace Seed
 
 					return *this;
 				}
+
+				forceinline Containers::List<String> GetAllServicesNames() {
+					Containers::List<String> servicesNames;
+					data->serviceTableForManagedLevel.ForEachKey([&] (const String& str) mutable
+					{
+						servicesNames += str;
+					});
+					return servicesNames;
+				}
+
+				forceinline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) {
+					return data->serviceTableForManagedLevel[name]->rttiRecord;
+				}
+
+				forceinline Containers::List<String> GetAllRegisteredObjects() {
+					Containers::List<String> objectNames;
+					data->objectTypeTableForManagedLevel.ForEachKey([&] (const String& str) mutable
+					{
+						objectNames += str;
+					});
+					return objectNames;
+				}
+
+				forceinline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) {
+					return data->objectTypeTableForManagedLevel[name];
+				}
+
+				forceinline Containers::List<String> GetAllRegisteredDataTypes() {
+					Containers::List<String> dataTypeNames;
+					data->dataTypeTableForManagedLevel.ForEachKey([&] (const String& str) mutable
+					{
+						dataTypeNames += str;
+					});
+					return dataTypeNames;
+				}
+
+				forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) {
+					return data->dataTypeTableForManagedLevel[name];
+				}
 			public:
 
 				RefCountClass(DepencyInjector, data);
 			};
+
+			using IDI = DepencyInjector::IDI;
 		}
 	}
 }

@@ -951,31 +951,31 @@ namespace Seed
 							TPropertyDescriptor::PropTypeInformationGetter
 						)) {}
 				public:
-					forceinline String GetName() {
+					forceinline String GetName() const {
 						return data->Name;
 					}
 
-					forceinline String GetPropTypeName() {
+					forceinline String GetPropTypeName() const {
 						return data->PropTypeName;
 					}
 
-					forceinline MethodCaller GetGetter() {
+					forceinline MethodCaller GetGetter() const {
 						return data->Getter;
 					}
 
-					forceinline const Containers::List<CallerData>& GetSetters() {
+					forceinline const Containers::List<CallerData>& GetSetters() const {
 						return data->Setters;
 					}
 
-					forceinline Boolean GetIsRW() {
+					forceinline Boolean GetIsRW() const {
 						return data->IsRW;
 					}
 
-					forceinline const void* const& GetGetterAddr() {
+					forceinline const void* const& GetGetterAddr() const {
 						return data->pGetter;
 					}
 
-					forceinline TypeInformationGetterType GetTypeInformationGetter() {
+					forceinline TypeInformationGetterType GetTypeInformationGetter() const {
 						return data->typeInformationGetter;
 					}
 
