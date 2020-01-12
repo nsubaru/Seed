@@ -221,7 +221,7 @@ namespace Seed
 
 					serviceRecord->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
 					{
-						methodRecord.ArgsTypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
+						methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
 							if (!this->data->dataTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
 							{
 								if (!this->data->objectTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
@@ -276,7 +276,7 @@ namespace Seed
 
 					serviceRecord->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
 					{
-						methodRecord.ArgsTypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
+						methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
 							if (!this->data->dataTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
 							{
 								this->data->dataTypeTableForNativeLevel.Insert(&typeRecord.GetTypeInfo(), typeRecord);

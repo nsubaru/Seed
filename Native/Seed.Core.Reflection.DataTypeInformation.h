@@ -81,7 +81,14 @@ namespace Seed
 
 					static constexpr auto Builder = [] () -> DynamicObject
 					{
-						return DynamicObject(Containers::Tuple<T>(T{}));
+						if constexpr (Core::TypeTraits::IsConstructible<T>)
+						{
+							return DynamicObject(Containers::Tuple<T>(T{}));
+						}
+						else
+						{
+							Throw(NullPointException(ExceptionPosition));
+						}
 					};
 				};
 			public:

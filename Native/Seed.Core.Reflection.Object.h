@@ -126,7 +126,7 @@ namespace Seed
 								{
 									return dynamic.GetValue<TArgs...>().CallWithArgsFromTuple([&] (TArgs&&... args) -> DynamicObject
 									{
-										(pThis->*method)(args...);
+										(pThis->*method)(ForwardReference<TArgs>(args)...);
 										return DynamicObject();
 									});
 								}
@@ -152,9 +152,16 @@ namespace Seed
 						}
 					};
 
-					static constexpr auto ArgsTypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
+					static constexpr auto TypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
 					{
-						return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						if constexpr (TypeTraits::IsSameV<TRet, void>)
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
+						else
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TRet>{}), DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
@@ -162,6 +169,9 @@ namespace Seed
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
 						NewCTTI::TypeTraits::CTTITypeMetaData<TRet>::IsSerilizable;
+
+					using Ret = TRet;
+					using Args = Containers::Tuple<TArgs...>;
 				};
 
 				template<typename TRet, typename TClass, typename ...TArgs>
@@ -261,9 +271,16 @@ namespace Seed
 						}
 					};
 
-					static constexpr auto ArgsTypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
+					static constexpr auto TypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
 					{
-						return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						if constexpr (TypeTraits::IsSameV<TRet, void>)
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
+						else
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TRet>{}), DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
@@ -271,6 +288,9 @@ namespace Seed
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
 						NewCTTI::TypeTraits::CTTITypeMetaData<TRet>::IsSerilizable;
+
+					using Ret = TRet;
+					using Args = Containers::Tuple<TArgs...>;
 				};
 
 				template<typename TRet, typename TClass, typename ...TArgs>
@@ -370,9 +390,16 @@ namespace Seed
 						}
 					};
 
-					static constexpr auto ArgsTypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
+					static constexpr auto TypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
 					{
-						return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						if constexpr (TypeTraits::IsSameV<TRet, void>)
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
+						else
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TRet>{}), DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
@@ -380,6 +407,9 @@ namespace Seed
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
 						NewCTTI::TypeTraits::CTTITypeMetaData<TRet>::IsSerilizable;
+
+					using Ret = TRet;
+					using Args = Containers::Tuple<TArgs...>;
 				};
 
 				template<typename TRet, typename TClass, typename ...TArgs>
@@ -479,9 +509,16 @@ namespace Seed
 						}
 					};
 
-					static constexpr auto ArgsTypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
+					static constexpr auto TypeInformationGetter = [] () -> Containers::List<DataTypeRecord>
 					{
-						return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						if constexpr (TypeTraits::IsSameV<TRet, void>)
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
+						else
+						{
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TRet>{}), DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+						}
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
@@ -489,6 +526,9 @@ namespace Seed
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
 						NewCTTI::TypeTraits::CTTITypeMetaData<TRet>::IsSerilizable;
+
+					using Ret = TRet;
+					using Args = Containers::Tuple<TArgs...>;
 				};
 
 				template<typename T, T pMethodType, typename TName>
@@ -518,11 +558,14 @@ namespace Seed
 
 					static constexpr auto MethodCaller = MethodCallDescriptor<T>::MethodCaller;
 
-					static constexpr auto ArgsTypeInformationGetter = MethodCallDescriptor<T>::ArgsTypeInformationGetter;
+					static constexpr auto TypeInformationGetter = MethodCallDescriptor<T>::TypeInformationGetter;
 
 					static constexpr bool IsArgsSerilizable = MethodCallDescriptor<T>::IsArgsSerilizable;
 
 					static constexpr bool IsRetSerilizable = MethodCallDescriptor<T>::IsRetSerilizable;
+
+					using Ret = typename MethodCallDescriptor<T>::Ret;
+					using Args = typename MethodCallDescriptor<T>::Args;
 				};
 
 				template<typename T, typename ... TArgs>
@@ -571,7 +614,46 @@ namespace Seed
 					}
 				};
 
-				template<typename TObj, typename TObjectCtorAndDtor, typename ... TMethods>
+				template<typename TName, typename TGet, TGet GetT, typename TSetterMethods>
+				struct PropertyDescriptor {
+				private:
+					template<SizeT I = 0>
+					static constexpr bool CheckSetterMethods() {
+						if constexpr (TSetterMethods::Count == I)
+						{
+							return true;
+						}
+						else
+						{
+							return (
+								TypeTraits::IsSameV<typename TSetterMethods::ItemType<I>::Ret, void> &&
+									TSetterMethods::ItemType<0>::Args::Count == 1 &&
+									TypeTraits::IsSameV<
+										typename TypeTraits::RemoveCV<
+											TypeTraits::RemoveRefV<
+												typename TSetterMethods::ItemType<0>::Args::ItemType<0>
+											>
+										>, 
+										typename MethodCallDescriptor<TGet>::Ret
+									>
+								) &&
+								CheckSetterMethods<I + 1>();
+						}
+					}
+				public:
+					static constexpr auto Name = Seed::Core::NewCTTI::Details::TypeStringToArray(TName());
+					static constexpr auto PropTypeName = MethodCallDescriptor<TGet>::RetTypeName;
+					static constexpr auto GetCaller = MethodCallDescriptor<TGet>::MethodCaller;
+					static constexpr auto pGet = GetT;
+					static constexpr auto PropTypeInformationGetter = MethodCallDescriptor<TGet>::TypeInformationGetter;
+					static constexpr bool IsRw = (TSetterMethods::Count != 0);
+					static constexpr bool IsSerelizable = MethodCallDescriptor<TGet>::IsRetSerilizable;
+					using SetterMethods = TSetterMethods;
+
+					static_assert(CheckSetterMethods(), "Invalid setters for property");
+				};
+
+				template<typename TObj, typename TObjectCtorAndDtor, typename TMethodsTuple, typename TPropertiesTuple>
 				struct ObjectDescriptor {
 					static constexpr auto Name = NewCTTI::TypeName<TObj>();
 
@@ -583,7 +665,8 @@ namespace Seed
 					static constexpr auto UnifiedCtor = TObjectCtorAndDtor::UnifiedCtor;
 					static constexpr auto UnifiedDtor = TObjectCtorAndDtor::UnifiedDtor;
 
-					using Methods = Containers::Tuple<TMethods...>;
+					using Methods = TMethodsTuple;
+					using Properties = TPropertiesTuple;
 
 					static constexpr auto CtorArgsTypeName = TObjectCtorAndDtor::CtorArgsTypeName;
 
@@ -594,7 +677,7 @@ namespace Seed
 				private:
 					template<SizeT TId = 0>
 					static constexpr bool IsAllMethodsHaveCorrectClassImpl() {
-						if constexpr (TId == sizeof...(TMethods))
+						if constexpr (TId == TMethodsTuple::Count)
 						{
 							return true;
 						}
@@ -613,14 +696,14 @@ namespace Seed
 				};
 			}
 
-			class ObjectRTTIRecord final : IDisposable, NewSerilization::ISerilizable<ObjectRTTIRecord> {
+			class ObjectRTTIRecord final : IDisposable, public NewSerilization::ISerilizable<ObjectRTTIRecord> {
 			public:
 				using CtorCaller = void* (*)(DynamicObject&&);
 				using DtorCaller = void (*)(void*&);
 				using MethodCaller = DynamicObject(*)(const void* const&, void*, DynamicObject&);
-				using ArgsTypeInformationGetter = Containers::List<DataTypeRecord>(*)();
+				using TypeInformationGetterType = Containers::List<DataTypeRecord>(*)();
 			public:
-				class MethodRTTIRecord : IDisposable, NewSerilization::ISerilizable<MethodRTTIRecord> {
+				class MethodRTTIRecord final : IDisposable, public NewSerilization::ISerilizable<MethodRTTIRecord> {
 				private:
 					struct Data {
 						String MethodName;
@@ -631,7 +714,7 @@ namespace Seed
 						String MethodArgsMetaData;
 						String MethodRetMetaData;
 
-						ArgsTypeInformationGetter argsTypeInformationGetter;
+						TypeInformationGetterType typeInformationGetter;
 						Boolean IsRetSerilizable;
 						Boolean IsArgsSerilizable;
 
@@ -640,7 +723,7 @@ namespace Seed
 
 						RefCountT RefCount;
 
-						Data(
+						forceinline Data(
 							String&& methodName,
 							MethodCaller methodCaller,
 							const void* const& pMethod,
@@ -648,7 +731,7 @@ namespace Seed
 							String&& methodRet,
 							String&& methodArgsMetaData,
 							String&& methodRetMetaData,
-							ArgsTypeInformationGetter argsTypeInformationGetter,
+							TypeInformationGetterType typeInformationGetter,
 							Boolean IsRetSerilizable,
 							Boolean IsArgsSerilizable,
 							Boolean isConstMethod,
@@ -662,7 +745,7 @@ namespace Seed
 							MethodRet(MoveRValue(methodRet)),
 							MethodArgsMetaData(MoveRValue(methodArgsMetaData)),
 							MethodRetMetaData(MoveRValue(methodRetMetaData)),
-							argsTypeInformationGetter(argsTypeInformationGetter),
+							typeInformationGetter(typeInformationGetter),
 							IsRetSerilizable(IsRetSerilizable),
 							IsArgsSerilizable(IsArgsSerilizable),
 							IsConstMethod(isConstMethod),
@@ -672,8 +755,8 @@ namespace Seed
 				private:
 					Data* data;
 				protected:
-					virtual void Dispose() override {}
-					virtual Byte* GetDataPtr() const override {
+					forceinline virtual void Dispose() override {}
+					forceinline virtual Byte* GetDataPtr() const override {
 						return reinterpret_cast<Byte*>(data);
 					}
 				public:
@@ -699,58 +782,58 @@ namespace Seed
 							TMethodDescriptor::RetTypeName,
 							TMethodDescriptor::ArgsMetaData(),
 							TMethodDescriptor::RetMetaData(),
-							TMethodDescriptor::ArgsTypeInformationGetter,
+							TMethodDescriptor::TypeInformationGetter,
 							TMethodDescriptor::IsRetSerilizable,
 							TMethodDescriptor::IsArgsSerilizable,
 							TMethodDescriptor::IsConst,
 							TMethodDescriptor::IsVolatile
 						)) {}
 
-					const String& GetName() const {
+					forceinline const String& GetName() const {
 						return this->data->MethodName;
 					}
 
-					MethodCaller GetMethodCaller() const {
+					forceinline MethodCaller GetMethodCaller() const {
 						return this->data->methodCaller;
 					}
 
-					const String& GetArgsTypeName() const {
+					forceinline const String& GetArgsTypeName() const {
 						return this->data->MethodArgs;
 					}
 
-					const String& GetRetTypeName() const {
+					forceinline const String& GetRetTypeName() const {
 						return this->data->MethodRet;
 					}
 
-					const String& GetArgsMetaData() const {
+					forceinline const String& GetArgsMetaData() const {
 						return this->data->MethodArgsMetaData;
 					}
 
-					const String& GetRetMetaData() const {
+					forceinline const String& GetRetMetaData() const {
 						return this->data->MethodRetMetaData;
 					}
 
-					ArgsTypeInformationGetter GetArgsTypeInformationGetter() const {
-						return this->data->argsTypeInformationGetter;
+					forceinline TypeInformationGetterType GetTypeInformationGetter() const {
+						return this->data->typeInformationGetter;
 					}
 
-					bool GetIsRetSerilizable() const {
+					forceinline bool GetIsRetSerilizable() const {
 						return this->data->IsRetSerilizable;
 					}
 
-					bool GetIsArgsSerilizable() const {
+					forceinline bool GetIsArgsSerilizable() const {
 						return this->data->IsArgsSerilizable;
 					}
 
-					bool GetIsConst() const {
+					forceinline bool GetIsConst() const {
 						return this->data->IsConstMethod;
 					}
 
-					bool GetIsVolatile() const {
+					forceinline bool GetIsVolatile() const {
 						return this->data->IsVolatileMethod;
 					}
 
-					const void* const& GetMethodPointer() const {
+					forceinline const void* const& GetMethodPointer() const {
 						return this->data->pMethod;
 					}
 
@@ -760,7 +843,7 @@ namespace Seed
 					String Property(GetRetTypeName) RetTypeName;
 					String Property(GetArgsMetaData) ArgsMetaData;
 					String Property(GetRetMetaData) RetMetaData;
-					ArgsTypeInformationGetter Property(GetArgsTypeInformationGetter) ArgsTypeInformationGetterFunction;
+					TypeInformationGetterType Property(GetTypeInformationGetter) TypeInformationGetterFunction;
 					bool Property(GetIsRetSerilizable) IsRetSerilizable;
 					bool Property(GetIsArgsSerilizable) IsArgsSerilizable;
 					bool Property(GetIsConst) IsConst;
@@ -768,6 +851,142 @@ namespace Seed
 
 
 					RefCountClass(MethodRTTIRecord, data);
+				};
+
+				class PropertyRTTIRecord final : IDisposable, public NewSerilization::ISerilizable<MethodRTTIRecord> {
+				public:
+					using MethodCaller = DynamicObject(*)(const void* const&, void*, DynamicObject&);
+
+					struct CallerData {
+						MethodCaller Setter;
+						const void* const& pSetter;
+
+						forceinline CallerData(MethodCaller Setter, const void* const& pSetter) : Setter(Setter), pSetter(pSetter) {}
+						forceinline CallerData(const CallerData& callerData) : Setter(callerData.Setter), pSetter(callerData.pSetter) {}
+						forceinline CallerData(CallerData&& callerData) : Setter(callerData.Setter), pSetter(callerData.pSetter) {}
+						forceinline CallerData& operator=(const CallerData& callerData) {
+							this->~CallerData();
+							this->CallerData::CallerData(callerData);
+							return *this;
+						}
+						forceinline CallerData& operator=(CallerData&& callerData) {
+							this->~CallerData();
+							this->CallerData::CallerData(MoveRValue(callerData));
+							return *this;
+						}
+						forceinline ~CallerData() {}
+					};
+				private:
+					struct Data {
+						String Name;
+						String PropTypeName;
+						MethodCaller Getter;
+						Containers::List<CallerData> Setters;
+						Boolean IsRW;
+						const void* const& pGetter;
+						TypeInformationGetterType typeInformationGetter;
+
+						RefCountT RefCount;
+
+						forceinline Data(
+							String Name,
+							String PropTypeName,
+							MethodCaller Getter,
+							Containers::List<CallerData> Setters,
+							Boolean IsRW,
+							const void* const& pGetter,
+							TypeInformationGetterType typeInformationGetter
+						) :
+							Name(Name),
+							PropTypeName(PropTypeName),
+							Getter(Getter),
+							Setters(Setters),
+							IsRW(IsRW),
+							pGetter(pGetter),
+							typeInformationGetter(typeInformationGetter),
+							RefCount(1) {}
+					};
+				private:
+					template<typename TMethods, SizeT I = 0>
+					forceinline static Containers::List<CallerData> GenSettersData(TypeTraits::TypeTag<TMethods> tag) {
+						if constexpr (TMethods::Count == I)
+						{
+							return {};
+						}
+						else
+						{
+							return MoveRValue(
+								Containers::List<CallerData>{
+									CallerData{
+										TMethods::ItemType<I>::MethodCaller, reinterpret_cast<const void* const&>(TMethods::ItemType<I>::pMethod)
+									}
+								} 
+								+= GenSettersData<TMethods, I + 1>(tag)
+							);
+						}
+					}
+				private:
+					Data* data;
+				protected:
+					forceinline virtual void Dispose() override {}
+					forceinline virtual Byte* GetDataPtr() const override {
+						return reinterpret_cast<Byte*>(data);
+					}
+				public:
+					DefStructMetaData(Data,
+						DefStructFieldData(Data, Name),
+						DefStructFieldData(Data, IsRW),
+						DefStructFieldData(Data, PropTypeName)
+					);
+				public:
+					template<typename TPropertyDescriptor>
+					forceinline PropertyRTTIRecord(TypeTraits::TypeTag<TPropertyDescriptor>) :
+						data(new Data(
+							TPropertyDescriptor::Name,
+							TPropertyDescriptor::PropTypeName,
+							TPropertyDescriptor::GetCaller,
+							GenSettersData<TPropertyDescriptor::SetterMethods, 0>(TypeTraits::TypeTag<TPropertyDescriptor::SetterMethods>{}),
+							TPropertyDescriptor::IsRw,
+							reinterpret_cast<const void* const&>(TPropertyDescriptor::pGet),
+							TPropertyDescriptor::PropTypeInformationGetter
+						)) {}
+				public:
+					forceinline String GetName() {
+						return data->Name;
+					}
+
+					forceinline String GetPropTypeName() {
+						return data->PropTypeName;
+					}
+
+					forceinline MethodCaller GetGetter() {
+						return data->Getter;
+					}
+
+					forceinline const Containers::List<CallerData>& GetSetters() {
+						return data->Setters;
+					}
+
+					forceinline Boolean GetIsRW() {
+						return data->IsRW;
+					}
+
+					forceinline const void* const& GetGetterAddr() {
+						return data->pGetter;
+					}
+
+					forceinline TypeInformationGetterType GetTypeInformationGetter() {
+						return data->typeInformationGetter;
+					}
+
+					String Property(GetName) Name;
+					String Property(GetPropTypeName) PropertieTypeName;
+					MethodCaller Property(GetGetter) Getter;
+					Containers::List<CallerData> Property(GetSetters) Setters;
+					Boolean Property(GetIsRW) IsRW;
+					TypeInformationGetterType Property(GetTypeInformationGetter) TypeInformationGetter;
+				public:
+					RefCountClass(PropertyRTTIRecord, data);
 				};
 			private:
 				struct Data {
@@ -778,16 +997,18 @@ namespace Seed
 					DtorCaller dtorCaller;
 					const TypeInfo* RttiTypeInfo;
 					Containers::List<MethodRTTIRecord> Methods;
+					Containers::List<PropertyRTTIRecord> Properties;
 					RefCountT RefCount;
 
-					Data(
+					forceinline Data(
 						String&& className,
 						String&& ctorArgs,
 						String&& ctorMetaDate,
 						CtorCaller ctorCaller,
 						DtorCaller dtorCaller,
 						const TypeInfo* RttiTypeInfo,
-						Containers::List<MethodRTTIRecord>&& methods
+						Containers::List<MethodRTTIRecord>&& methods,
+						Containers::List<PropertyRTTIRecord>&& properties
 					) :
 						ClassName(MoveRValue(className)),
 						CtorArgs(MoveRValue(ctorArgs)),
@@ -796,6 +1017,7 @@ namespace Seed
 						dtorCaller(dtorCaller),
 						RttiTypeInfo(RttiTypeInfo),
 						Methods(MoveRValue(methods)),
+						Properties(MoveRValue(properties)),
 						RefCount(1) {}
 
 				};
@@ -803,7 +1025,7 @@ namespace Seed
 				Data* data;
 			private:
 				template<SizeT TId, typename ... TMethod>
-				static Containers::List<MethodRTTIRecord> GenerateRTTIMethodInfo(TypeTraits::TypeTag<Containers::Tuple<TMethod...>>) {
+				forceinline static Containers::List<MethodRTTIRecord> GenerateRTTIMethodInfo(TypeTraits::TypeTag<Containers::Tuple<TMethod...>>) {
 					if constexpr (TId == sizeof...(TMethod))
 					{
 						return Containers::List<MethodRTTIRecord>();
@@ -819,9 +1041,29 @@ namespace Seed
 						));
 					}
 				}
+
+				template<SizeT TId, typename ... TProperties>
+				forceinline static Containers::List<PropertyRTTIRecord> GenerateRTTIPropertieInfo(TypeTraits::TypeTag<Containers::Tuple<TProperties...>>) {
+					if constexpr (TId == sizeof...(TProperties))
+					{
+						return Containers::List<PropertyRTTIRecord>();
+					}
+					else
+					{
+						return Containers::List<PropertyRTTIRecord>(MoveRValue(
+							(
+								Containers::List<PropertyRTTIRecord>({
+									PropertyRTTIRecord(TypeTraits::TypeTag<typename Containers::Tuple<TProperties...>::ItemType<TId>>{})
+								}) += 
+									MoveRValue(GenerateRTTIPropertieInfo<TId + 1>(TypeTraits::TypeTag<Containers::Tuple<TProperties...>>{})
+								)
+							)
+						));
+					}
+				}
 			protected:
-				virtual void Dispose() override {}
-				virtual Byte* GetDataPtr() const override {
+				forceinline virtual void Dispose() override {}
+				forceinline virtual Byte* GetDataPtr() const override {
 					return reinterpret_cast<Byte*>(data);
 				}
 			public:
@@ -833,7 +1075,7 @@ namespace Seed
 				);
 			public:
 				template<typename TObjectDescriptor>
-				ObjectRTTIRecord(TypeTraits::TypeTag<TObjectDescriptor>) :
+				forceinline ObjectRTTIRecord(TypeTraits::TypeTag<TObjectDescriptor>) :
 					data(new Data(
 						TObjectDescriptor::Name,
 						TObjectDescriptor::CtorArgsTypeName,
@@ -841,34 +1083,39 @@ namespace Seed
 						TObjectDescriptor::UnifiedCtor,
 						TObjectDescriptor::UnifiedDtor,
 						TObjectDescriptor::RttiTypeInfo(),
-						GenerateRTTIMethodInfo<0>(TypeTraits::TypeTag<TObjectDescriptor::Methods>{})
+						GenerateRTTIMethodInfo<0>(TypeTraits::TypeTag<TObjectDescriptor::Methods>{}),
+						GenerateRTTIPropertieInfo<0>(TypeTraits::TypeTag<TObjectDescriptor::Properties>{})
 					)) {};
 
-				const String& GetName() const {
+				forceinline const String& GetName() const {
 					return this->data->ClassName;
 				}
 
-				const String& GetCtorArgs() const {
+				forceinline const String& GetCtorArgs() const {
 					return this->data->CtorArgs;
 				}
 
-				const String& GetArgsMetaData() const {
+				forceinline const String& GetArgsMetaData() const {
 					return this->data->CtorMetaDate;
 				}
 
-				CtorCaller GetCtorCaller() const {
+				forceinline CtorCaller GetCtorCaller() const {
 					return this->data->ctorCaller;
 				}
 
-				DtorCaller GetDtorCaller() const {
+				forceinline DtorCaller GetDtorCaller() const {
 					return this->data->dtorCaller;
 				}
 
-				const Containers::List<MethodRTTIRecord>& GetAllMethods() const {
+				forceinline const Containers::List<MethodRTTIRecord>& GetAllMethods() const {
 					return this->data->Methods;
 				}
 
-				const TypeInfo& GetRTTITypeInfo() const {
+				forceinline const Containers::List<PropertyRTTIRecord>& GetAllProperties() const {
+					return this->data->Properties;
+				}
+
+				forceinline const TypeInfo& GetRTTITypeInfo() const {
 					return *this->data->RttiTypeInfo;
 				}
 
@@ -878,6 +1125,7 @@ namespace Seed
 				CtorCaller Property(GetCtorCaller) CtorCallerFunction;
 				DtorCaller Property(GetDtorCaller) DtorCallerFunction;
 				Containers::List<MethodRTTIRecord> Property(GetAllMethods) Methods;
+				Containers::List<PropertyRTTIRecord> Property(GetAllProperties) Properties;
 
 				RefCountClass(ObjectRTTIRecord, data);
 			};
@@ -885,8 +1133,10 @@ namespace Seed
 		}
 	}
 }
-
+#define ObjectMethodsDefs(...) Seed::Core::Containers::Tuple<__VA_ARGS__>
+#define ObjectPropsDefs(...) Seed::Core::Containers::Tuple<__VA_ARGS__>
 #define MethodDescription(Class, Method) Seed::Core::Reflection::Details::MethodDescriptor<decltype(&Class::Method), &Class::Method, GenNGTypeString(#Method)>
 #define MethodDescriptionWithArgs(Class, Method, RetType, ...) Seed::Core::Reflection::Details::MethodDescriptor<RetType(Class::*)(__VA_ARGS__), &Class::Method, GenNGTypeString(#Method)>
+#define	ObjectProperty(Name, Getter, ...) Seed::Core::Reflection::Details::PropertyDescriptor<GenNGTypeString(#Name), decltype(&Getter), &Getter, Seed::Core::Containers::Tuple<__VA_ARGS__>>
 #define CtorDescription(Class, ...) Seed::Core::Reflection::Details::ObjectCtorAndDtor<Class, __VA_ARGS__>
-#define ObjectDefinition(Class, CtorDesc, ...) Seed::Core::Reflection::Details::ObjectDescriptor<Class, CtorDesc, __VA_ARGS__>
+#define ObjectDefinition(Class, CtorDesc, Methods, Props) Seed::Core::Reflection::Details::ObjectDescriptor<Class, CtorDesc, Methods, Props>

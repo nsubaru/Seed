@@ -2,7 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by Resources.rc
 //
-#define BuildNumber 645
+#define BuildNumber 680
 
 // Next default values for new objects
 // 
