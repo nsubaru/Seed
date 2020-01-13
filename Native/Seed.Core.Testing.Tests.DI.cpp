@@ -12,21 +12,52 @@ using namespace Seed;
 using namespace Seed::Containers;
 
 class ServiceA{
+	int a = 10;
 public:
 	ServiceA() {};
 	void MethodA() {};
 	void MethodB(bool State) {};
 	bool MethodC(bool State1, bool State2) { return State1 || State2; }
+
+	int GetA() {
+		return a;
+	}
+
+	void SetA(int a) {
+		this->a = a;
+	}
+
+	int Property(GetA, SetA) A;
 };
 
 class ServiceB{
 	ServiceA service;
+	String text;
 public:
 	ServiceB(const ServiceA & service) : service(service) {}
 	void MethodA() {};
 	void MethodB(bool State) {};
 	bool MethodC(bool State1, bool State2) { return State1 && State2; }
 	String MethodD(const List<String> & arg) { return arg.Aggregate([](String & result, const String& string) { result += string; }); } 
+
+	String GetText() {
+		return text;
+	}
+
+	void SetText(const String& text) {
+		this->text = text;
+	}
+
+	void SetText(String&& text) {
+		this->text = MoveRValue(text);
+	}
+
+	SizeT GetTextSize() {
+		return this->text.Size;
+	}
+
+	String Property(GetText, SetText) Text;
+	SizeT Property(GetTextSize) TextSize;
 };
 
 class TestObject1 {
@@ -58,19 +89,25 @@ public:
 using TestObject1Definition = ObjectDefinition(
 	TestObject1,
 	CtorDescription(TestObject1),
-	MethodDescription(TestObject1, Method1),
-	MethodDescription(TestObject1, Method2),
-	MethodDescription(TestObject1, Method3),
-	MethodDescription(TestObject1, Method4)
+	ObjectMethodsDefs(
+		MethodDescription(TestObject1, Method1),
+		MethodDescription(TestObject1, Method2),
+		MethodDescription(TestObject1, Method3),
+		MethodDescription(TestObject1, Method4)
+	),
+	ObjectPropsDefs()
 );
 
 using TestObject2Definition = ObjectDefinition(
 	TestObject2,
 	CtorDescription(TestObject2, int, int),
-	MethodDescription(TestObject2, Method1),
-	MethodDescription(TestObject2, Method2),
-	MethodDescription(TestObject2, Method3),
-	MethodDescription(TestObject2, Method4)
+	ObjectMethodsDefs(
+		MethodDescription(TestObject2, Method1),
+		MethodDescription(TestObject2, Method2),
+		MethodDescription(TestObject2, Method3),
+		MethodDescription(TestObject2, Method4)
+	),
+	ObjectPropsDefs()
 );
 
 bool Seed::Core::Testing::Test::DI::RegisterService::Excecute() {
@@ -105,9 +142,16 @@ bool Seed::Core::Testing::Test::DI::ResolveServiceByDI::Excecute() {
 		ObjectDefinition(
 			ServiceA,
 			CtorDescription(ServiceA),
-			MethodDescription(ServiceA, MethodA),
-			MethodDescription(ServiceA, MethodB),
-			MethodDescription(ServiceA, MethodC)
+			ObjectMethodsDefs(
+				MethodDescription(ServiceA, MethodA),
+				MethodDescription(ServiceA, MethodB),
+				MethodDescription(ServiceA, MethodC)
+			),
+			ObjectPropsDefs(
+				ObjectProperty(A, ServiceA::GetA, 
+					MethodDescription(ServiceA, SetA)
+				)
+			)
 		)> {}
 		)
 		);
@@ -117,10 +161,19 @@ bool Seed::Core::Testing::Test::DI::ResolveServiceByDI::Excecute() {
 		ObjectDefinition(
 			ServiceB,
 			CtorDescription(ServiceB,ServiceA),
-			MethodDescription(ServiceB, MethodA),
-			MethodDescription(ServiceB, MethodB),
-			MethodDescription(ServiceB, MethodC),
-			MethodDescription(ServiceB, MethodD)
+			ObjectMethodsDefs(
+				MethodDescription(ServiceB, MethodA),
+				MethodDescription(ServiceB, MethodB),
+				MethodDescription(ServiceB, MethodC),
+				MethodDescription(ServiceB, MethodD)
+			),
+			ObjectPropsDefs(
+				ObjectProperty(TextSize, ServiceB::GetTextSize),
+				ObjectProperty(Text, ServiceB::GetText,
+					MethodDescriptionWithArgs(ServiceB, SetText, void, const String&),
+					MethodDescriptionWithArgs(ServiceB, SetText, void, String&&)
+				)
+			)
 		)> {}
 		)
 		);

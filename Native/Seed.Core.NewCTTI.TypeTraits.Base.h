@@ -79,7 +79,7 @@ namespace Seed
 
                     template<typename T, typename Enable = void>
                     struct CTTITypeDataSpecialization
-						: CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatile<T>>
+						: CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>>
 					{};
 
                     template<typename T>
@@ -88,7 +88,7 @@ namespace Seed
                         T,
                         typename Seed::Core::TypeTraits::EnableIfV<!Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
                         >
-                        : CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatile<T>> {
+                        : CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>> {
 
                     };
 

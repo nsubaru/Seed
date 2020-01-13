@@ -65,7 +65,7 @@ namespace Seed
                         : CTTIStructTypeDataImpl<
                         typename Seed::TypeTraits::RemoveCV<T>, 
                         Seed::TypeTraits::IsConstV<T>, 
-                        Seed::TypeTraits::IsVolatile<T>,
+                        Seed::TypeTraits::IsVolatileV<T>,
                         T::FieldMetaData::IsSerilizable
                         > 
                     {

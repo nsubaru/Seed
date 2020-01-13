@@ -520,7 +520,7 @@ namespace Seed {
             };
 
             template<class T>
-            using Decay = typename DecayStruct<T>::Type;
+            using DecayV = typename DecayStruct<T>::Type;
 
             // STRUCT TEMPLATE AndT
             template <bool _First_value, class _First,
@@ -1276,7 +1276,7 @@ namespace Seed {
             /// Вертає чи тип має модифікатор volatile
             /// </summary>
             template<typename T>
-            constexpr Boolean IsVolatile = IsVolatileT<T>::State;
+            constexpr Boolean IsVolatileV = IsVolatileT<T>::State;
 
             /// <summary>
             /// Вертає логічне And з змінних
