@@ -5,14 +5,32 @@ namespace Seed {
 	inline namespace Core {
 		namespace Containers {
 			namespace LINQ {
+				/// <summary>
+				/// Абстракція фіксованого масиву
+				/// </summary>
+				/// <typeparam name="TCollection">Тип фіксованого масиву</typeparam>
+				/// <typeparam name="THeap">Тип кучі колекції</typeparam>
+				/// <typeparam name="TSize">Кількість елементів в колекції</typeparam>
+				/// <typeparam name="T">Тип елементів колекції</typeparam>
+				/// <typeparam name="TIsConcurencySuport">Флаг підтримки багатопотоковості колекції</typeparam>
 				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
 				class IFixedArray : public IFixedCollection<TCollection, THeap, T, TSize, TIsConcurencySuport> {
 					using ThisCollection = TCollection<THeap, TSize, T>;
 				public:
+					/// <summary>
+					/// Сортування елементів колекції. Використовує оператор >= або <= для сортування
+					/// </summary>
+					/// <param name="IsDescending">Якщо true то сортування спадаючому порядку відбувається</param>
+					/// <returns>Силку на поточну колекцію</returns>
 					ThisCollection& SortBy(bool IsDescending = true) {
 						return static_cast<ThisCollection&>(*this).SortByImpl(IsDescending);
 					}
 
+					/// <summary>
+					/// Генерація колекції з елементами які генерує лямбда
+					/// </summary>
+					/// <param name="generator">Функція генератор формату T(*)() або T(*)(SizeT)</param>
+					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					template<typename Lambda, 
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<

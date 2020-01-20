@@ -64,50 +64,13 @@ namespace Seed {
 					ResetNtEvent(data->handle);
 				}
 
-				/// <summary>
-				/// Очікування на всі події в масиві подій
-				/// </summary>
-				/// <param name="events">Масив подій</param>
-				forceinline friend void WaitForAll(Containers::Array<Event>&& events);
-				/// <summary>
-				/// Очікування на любу з подій в масиві подій
-				/// </summary>
-				/// <param name="events">Масив подій</param>
-				forceinline friend void WaitForAny(Containers::Array<Event>&& events);
-				/// <summary>
-				/// Очікування на всі події в масиві подій з максимальним часом очікування
-				/// </summary>
-				/// <param name="events">Масив подій</param>
-				/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
+				friend void WaitForAll(Containers::Array<Event>&& events);
+				friend void WaitForAny(Containers::Array<Event>&& events);
 				friend void WaitForAll(Containers::Array<Event>&& events, SizeT timeOutMs);
-				/// <summary>
-				/// Очікування на любу з подій в масиві подій з максимальним часом очікування
-				/// </summary>
-				/// <param name="events">Масив подій</param>
-				/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
 				friend void WaitForAny(Containers::Array<Event>&& events, SizeT timeOutMs);
-
-				/// <summary>
-				/// Очікування на всі події в масиві подій
-				/// </summary>
-				/// <param name="events">Масив подій</param>
 				friend void WaitForAll(const Containers::Array<Event>& events);
-				/// <summary>
-				/// Очікування на любу з подій в масиві подій
-				/// </summary>
-				/// <param name="events">Масив подій</param>
 				friend void WaitForAny(const Containers::Array<Event>& events);
-				/// <summary>
-				/// Очікування на всі події в масиві подій з максимальним часом очікування
-				/// </summary>
-				/// <param name="events">Масив подій</param>
-				/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
 				friend void WaitForAll(const Containers::Array<Event>& events, SizeT timeOutMs);
-				/// <summary>
-				/// Очікування на любу з подій в масиві подій з максимальним часом очікування
-				/// </summary>
-				/// <param name="events">Масив подій</param>
-				/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
 				friend void WaitForAny(const Containers::Array<Event>& events, SizeT timeOutMs);
 			private:
 				/// <summary>

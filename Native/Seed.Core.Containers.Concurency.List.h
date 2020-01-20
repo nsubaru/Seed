@@ -1598,7 +1598,7 @@ namespace Seed {
 				}
 
 				template<typename FilterLambda, typename Lambda>
-				__forceinline BaseConcurencyList& RemoveIf(FilterLambda&& filter, Lambda&& lambda) {
+				__forceinline BaseConcurencyList& RemoveIfImpl(FilterLambda&& filter, Lambda&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
 						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State) {
 						return RemoveIfFilterAndLambdaWithoutIndex(MoveRValue(filter), MoveRValue(lambda));

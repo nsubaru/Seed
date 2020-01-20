@@ -13,6 +13,7 @@ namespace Seed {
 				/// <typeparam name="TKey">Тип ключа</typeparam>
 				/// <typeparam name="TValue">Тип значення</typeparam>
 				/// <typeparam name="TPair">Тип пари ключа - значення</typeparam>
+				/// <typeparam name="TIsConcurencySuport">Флаг підтримки багатопотоковості колекції</typeparam>
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
 				class IAssociableCollection :
 					public IAssociableCollectionBase<TCollection, THeap, TKey, TValue, TPair, IsConcurencySuportT>
