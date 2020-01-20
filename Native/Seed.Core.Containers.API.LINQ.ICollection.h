@@ -20,6 +20,11 @@ namespace Seed {
 				protected:
 					using ThisCollection = TCollection<THeap, T>;
 				public:
+					/// <summary>
+					/// Копіює елементи колекції в нову колекцію
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <returns>Нова колекція з копіями елементів</returns>
 					template<template <typename> typename NewCollection,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
@@ -45,6 +50,11 @@ namespace Seed {
 						}
 					}
 
+					/// <summary>
+					/// Копіює елементи колекції в нову колекцію
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <returns>Нова колекція з копіями елементів</returns>
 					template<template <typename> typename NewCollection,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
@@ -70,6 +80,11 @@ namespace Seed {
 						}
 					}
 
+					/// <summary>
+					/// Переміщення елементів в нову колекцію, з старої колекції елементи зникають
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <returns>Нова колекція з елементами</returns>
 					template<template <typename> typename NewCollection,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
@@ -95,6 +110,12 @@ namespace Seed {
 						}
 					}
 				public:
+					/// <summary>
+					/// Обхід усіх елементів в колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&) або void(*)(T&, SizeT)</param>
+					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
@@ -107,6 +128,12 @@ namespace Seed {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Обхід усіх елементів в колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&) або void(*)(const T&, SizeT)</param>
+					/// <returns>Силку на поточну колекцію</returns>
 					template<
 						typename Lambda,
 						TypeTraits::EnableIfTV<
@@ -120,6 +147,13 @@ namespace Seed {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Обхід усіх елементів в колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&) або void(*)(T&, SizeT)</param>
+					/// <param name="сount">Кількість елементів які треба пройти</param>
+					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
@@ -128,10 +162,17 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEach(Lambda&& lambda, SizeT Count) {
-						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
+						ThisCollection& ForEach(Lambda&& lambda, SizeT сount) {
+						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), сount);
 					}
 
+					/// <summary>
+					/// Обхід усіх елементів в колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&) або void(*)(const T&, SizeT)</param>
+					/// <param name="сount">Кількість елементів які треба пройти</param>
+					/// <returns>Силку на поточну колекцію</returns>
 					template<
 						typename Lambda,
 						TypeTraits::EnableIfTV<
@@ -141,73 +182,148 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						__forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT Count) const {
-						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
+						__forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT count) const {
+						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), count);
 					}
 				public:
+					/// <summary>
+					/// Агрегація елементів колекції
+					/// </summary>
+					/// <typeparam name="U">Вихідний тип</typeparam>
+					/// <typeparam name="Lambda">Тип лямбди</typeparam>
+					/// <param name="lambda">Лямбда типу void(*)(U&, const T&)</param>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
 					__forceinline U Aggregate(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Агрегація елементів колекції
+					/// </summary>
+					/// <typeparam name="U">Вихідний тип</typeparam>
+					/// <typeparam name="Lambda">Тип лямбди</typeparam>
+					/// <param name="lambda">Лямбда типу void(*)(U&, const T&)</param>
+					/// <param name="startValue">Стартове значенняя</param>
+					/// <returns>Результат обчислення</returns>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline U Aggregate(Lambda&& lambda, const U& StartValue) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), StartValue);
+					__forceinline U Aggregate(Lambda&& lambda, const U& startValue) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), startValue);
 					}
 
+					/// <summary>
+					/// Агрегація елементів колекції
+					/// </summary>
+					/// <typeparam name="U">Вихідний тип</typeparam>
+					/// <typeparam name="Lambda">Тип лямбди</typeparam>
+					/// <param name="lambda">Лямбда типу void(*)(U&, const T&)</param>
+					/// <param name="startValue">Стартове значенняя</param>
+					/// <returns>Результат обчислення</returns>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline U Aggregate(Lambda&& lambda, U&& StartValue) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(StartValue));
+					__forceinline U Aggregate(Lambda&& lambda, U&& startValue) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(startValue));
 					}
 
+					/// <summary>
+					/// Вертає true якщо в контейнері хоч щось є
+					/// </summary>
+					/// <returns>Вертає true якщо в контейнері хоч щось є</returns>
 					__forceinline bool Any() const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl();
 					}
 
+					/// <summary>
+					/// Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди
+					/// </summary>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline bool Any(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Вертає true якщо всі елементи в контейнері підпадають під умову лямбди
+					/// </summary>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline bool All(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує
+					/// </summary>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline T& First(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує
+					/// </summary>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline T& Last(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує
+					/// </summary>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline const T& First(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує
+					/// </summary>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline const T& Last(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Видаляє всі елементи з колекції
+					/// </summary>
+					/// <returns>Силку на поточний об'єкт колекції</returns>
 					__forceinline ThisCollection& RemoveAll() {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl();
 					}
 
+					/// <summary>
+					/// Видаляє всі елементи з колекції викликаючи для кожного елементу лямбду
+					/// </summary>
+					/// <param name="Lambda">Лямбда формату void(*)(T&&)</param>
+					/// <returns>Силку на поточний об'єкт колекції</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State>, bool> = true>
 					__forceinline ThisCollection& RemoveAll(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Підраховує кількість елементів які підпадають під умову
+					/// </summary>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <returns>Кількість елементів які підпадають під умову</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline SizeT GetCountIf(Lambda && lambda) {
 						return static_cast<ThisCollection&>(*this).GetCountIfImpl(MoveRValue(lambda));
 					}
 
+					/// <summary>
+					/// Генерація колекції з елементами які генерує лямбда
+					/// </summary>
+					/// <param name="generator">Функція генератор формату T(*)() або T(*)(SizeT)</param>
+					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					template<typename Lambda, 
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
@@ -259,9 +375,6 @@ namespace Seed {
 							}
 						}
 					}
-				public:
-
-
 				public:
 					virtual ~ICollection() = 0 {}
 				};
