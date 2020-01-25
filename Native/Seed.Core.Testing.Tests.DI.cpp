@@ -53,7 +53,7 @@ public:
 	}
 
 	SizeT GetTextSize() {
-		return this->text.Size;
+		return this->text.Lenght;
 	}
 
 	String Property(GetText, SetText) Text;
@@ -112,7 +112,7 @@ using TestObject2Definition = ObjectDefinition(
 
 bool Seed::Core::Testing::Test::DI::RegisterService::Excecute() {
 	auto serviceRecord = Reflection::ObjectRTTIRecord(TypeTraits::TypeTag<TestObject1Definition>{});
-	return serviceRecord.ClassName.Size != 0;
+	return serviceRecord.ClassName.Lenght != 0;
 }
 
 bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
@@ -131,7 +131,7 @@ bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
 
 bool Seed::Core::Testing::Test::DI::DataTypeInformation::Excecute() {
 	auto typeData = Reflection::DataTypeRecord(TypeTraits::TypeTag<Containers::Tuple<String, Containers::List<String>>>{});
-	return typeData.TypeName.Size != 0;
+	return typeData.TypeName.Lenght != 0;
 }
 
 bool Seed::Core::Testing::Test::DI::ResolveServiceByDI::Excecute() {

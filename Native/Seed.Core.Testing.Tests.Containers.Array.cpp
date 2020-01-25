@@ -69,8 +69,8 @@ bool Seed::Core::Testing::Test::Containers::ComplexTypeArrayTest::Excecute()
 
 	bool IsForEachWork = [&]() {Int32 tmp = 0; array.ForEach([&](const String& item) {tmp += item.toInt(); }); return tmp; }() == Sum;
 	bool IsAggregateWork = array.Aggregate([](Int32& result, const String& item) { result += item.toInt(); }, 0) == Sum;
-	bool IsAnyWork = !array.Any([&](const String& item) { return item.Size > 2; }) && array.Any([&](const String& item) {return item.Size > 1; });
-	bool IsAllWork = !array.All([&](const String& item) {return item.Size > 2; }) && array.All([&](const String& item) {return !item.IsEmpty; });
+	bool IsAnyWork = !array.Any([&](const String& item) { return item.Lenght > 2; }) && array.Any([&](const String& item) {return item.Lenght > 1; });
+	bool IsAllWork = !array.All([&](const String& item) {return item.Lenght > 2; }) && array.All([&](const String& item) {return !item.IsEmpty; });
 	bool IsFirstWork = array.First([](const String& item) {return !item.IsEmpty; }) == L"1";
 	bool IsLastWork = array.Last([](const String& item) {return !item.IsEmpty; }) == L"10";
 	bool IsResizeWork = [&]() mutable {
@@ -103,8 +103,8 @@ bool Seed::Core::Testing::Test::Containers::ComplexTypeConcurencyArrayTest::Exce
 
 	bool IsForEachWork = [&]() {Int32 tmp = 0; array.ForEach([&](const String& item) {tmp += item.toInt(); }); return tmp; }() == Sum;
 	bool IsAggregateWork = array.Aggregate([](Int32& result, const String& item) { result += item.toInt(); }, 0) == Sum;
-	bool IsAnyWork = !array.Any([&](const String& item) { return item.Size > 2; }) && array.Any([&](const String& item) {return item.Size > 1; });
-	bool IsAllWork = !array.All([&](const String& item) {return item.Size > 2; }) && array.All([&](const String& item) {return !item.IsEmpty; });
+	bool IsAnyWork = !array.Any([&](const String& item) { return item.Lenght > 2; }) && array.Any([&](const String& item) {return item.Lenght > 1; });
+	bool IsAllWork = !array.All([&](const String& item) {return item.Lenght > 2; }) && array.All([&](const String& item) {return !item.IsEmpty; });
 	bool IsFirstWork = array.First([](const String& item) {return !item.IsEmpty; }) == L"1";
 	bool IsLastWork = array.Last([](const String& item) {return !item.IsEmpty; }) == L"10";
 	bool IsResizeWork = [&]() mutable {

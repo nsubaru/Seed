@@ -162,7 +162,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 	{
 		SizeT worldCount = 0;
 		for (SizeT i = 0; i < lines.Count; i++)
-			worldCount += lines[i].Size;
+			worldCount += lines[i].Lenght;
 		ExceptionString data(worldCount);
 		data += lines[0];
 		if (lines.Count > 1)
@@ -178,7 +178,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 			raw[21] = L' ';
 			raw[22] = L'\0';
 			data = ExceptionString(raw) + data + NextLine();
-			SizeT bytesCount = data.Size;
+			SizeT bytesCount = data.Lenght;
 			bytesCount *= sizeof(wchar_t);
 			RtlEnterCriticalSection(&LogFile.lock);
 			NTSTATUS status = NtWriteFile( //-V107

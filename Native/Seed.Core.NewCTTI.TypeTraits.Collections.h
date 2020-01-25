@@ -259,7 +259,7 @@ namespace Seed
 
                     template<typename THeap, typename T, SizeT TSize, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseBitMapT<THeap, TSize, T>, TIsConst, TIsVolatile>
-                        : BaseLINQFixedCollection<THeap, Containers::BaseBitMapT<THeap, TSize, T>, Containers::BaseBitMapT<THeap, TSize, T>::Size, T, false, TIsConst, TIsVolatile, true>
+                        : BaseLINQFixedCollection<THeap, Containers::BaseBitMapT<THeap, TSize, T>, Containers::BaseBitMapT<THeap, TSize, T>::Lenght, T, false, TIsConst, TIsVolatile, true>
                     {
                         static constexpr SizeT FullBytesCount = Containers::BaseBitMapT<THeap, TSize, T>::FullClustersCount;
                         static constexpr SizeT LastByteBitsCount = Containers::BaseBitMapT<THeap, TSize, T>::LastClusterBitsCount;

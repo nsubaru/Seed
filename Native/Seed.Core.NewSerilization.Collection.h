@@ -18,7 +18,7 @@ namespace Seed
 					using CharacterType = typename NewCTTI::TypeTraits::CTTITypeMetaData<TString<TStringHeap>>::Character;
 
 					forceinline static void SerilizeImpl(const TString<TStringHeap>& data, Byte* rawStream, SizeT& offset) {
-						SizeT Count = (data.Size + 1) * sizeof(CharacterType);
+						SizeT Count = (data.Lenght + 1) * sizeof(CharacterType);
 						BaseSerlizationHandler<THeap, SizeT>::SerilizeImpl(Count, rawStream, offset);
 						Memory::Copy(reinterpret_cast<const Byte*>(const_cast<const Char*>(static_cast<const ConstCharStr>(data))),
 									rawStream + offset,
@@ -31,7 +31,7 @@ namespace Seed
 					}
 
 					forceinline static constexpr SizeT DataSize(const TString<TStringHeap>& data) {
-						return ((data.Size + 1) * sizeof(CharacterType)) + sizeof(SizeT);
+						return ((data.Lenght + 1) * sizeof(CharacterType)) + sizeof(SizeT);
 					}
 
 					forceinline static constexpr auto TypeHint() {

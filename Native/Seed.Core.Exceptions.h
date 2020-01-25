@@ -493,6 +493,7 @@ namespace Seed {
 					return ExceptionString(exeptionName)
 						+ ExceptionString(L". При спробі отримати доступ до елемента за індексом ") + BaseString<Memory::ExceptionHeap>::toString(RequiredIndex)
 						+ ExceptionString(L" якщо максимальний дозволений індекс ") + BaseString<Memory::ExceptionHeap>::toString(MaxAllowedIndex)
+						+ ExceptionString(L". ")
 						+ location.toString()
 						+ ExceptionString(L". ");
 				}

@@ -681,7 +681,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 28182)
 						return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& {
-							__assume(OtherList.This->root == nullptr);
+							__assume(OtherList.This->root != nullptr);
 							auto item = OtherList.This->root;
 							while (item != nullptr)
 							{
