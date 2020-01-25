@@ -75,7 +75,7 @@ namespace Seed {
             ///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>
             ///<param name = "Text">Літерал рядка</param>
             template<SizeT Size>
-            __forceinline BaseString(const wchar_t(&Text)[Size]) : BaseString() {
+            __forceinline BaseString(StaticTextRef<Size> Text) : BaseString() {
                 if constexpr (Size < 2)
                 {
                     this->str = nullptr;
@@ -93,7 +93,7 @@ namespace Seed {
             ///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>
             ///<param name = "Text">Літерал рядка</param>
             template<SizeT Size>
-            inline BaseString(const char(&Text)[Size]) : CurrentSize(0), ReservedSize(0), str(nullptr) {
+            inline BaseString(StaticATextRef<Size> Text) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (!(Size < 2))
                 {
                     CurrentSize = Size;
@@ -316,8 +316,8 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline Boolean operator==(const wchar_t(&second)[Size]) const noexcept {
-                if (this->CurrentSize != Size) return false;
+            __forceinline Boolean operator==(StaticTextRef<Size> second) const noexcept {
+                if (this->CurrentSize != Size && !(Size == 1 && this->CurrentSize == 0)) return false;
                 for (SizeT i = 0; i < CurrentSize; i++) {
                     if (this->str[i] != second[i]) return false;
                 }
@@ -331,7 +331,7 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline Boolean operator!=(const wchar_t(&second)[Size]) const noexcept {
+            __forceinline Boolean operator!=(StaticTextRef<Size> second) const noexcept {
                 return !this->operator==<Size>(second);
             }
 
@@ -343,7 +343,7 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator==(const wchar_t(&second)[Size], BaseString first) noexcept {
+            __forceinline friend Boolean operator==(StaticTextRef<Size> second, BaseString first) noexcept {
                 return first.operator==<Size>(second);
             }
 
@@ -355,7 +355,7 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator!=(const wchar_t(&second)[Size], BaseString first) noexcept {
+            __forceinline friend Boolean operator!=(StaticTextRef<Size> second, BaseString first) noexcept {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
@@ -367,7 +367,7 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline Boolean operator==(const char(&second)[Size]) const noexcept {
+            __forceinline Boolean operator==(StaticATextRef<Size> second) const noexcept {
                 if (this->CurrentSize != Size) return false;
                 for (SizeT i = 0; i < CurrentSize; i++) {
                     if (this->str[i] != second[i]) return false;
@@ -382,7 +382,7 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline Boolean operator!=(const char(&second)[Size]) const noexcept {
+            __forceinline Boolean operator!=(StaticATextRef<Size> second) const noexcept {
                 return !this->operator==<Size>(second);
             }
 
@@ -394,7 +394,7 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator==(const char(&second)[Size], BaseString first) noexcept {
+            __forceinline friend Boolean operator==(StaticATextRef<Size> second, BaseString first) noexcept {
                 return first.operator==<Size>(second);
             }
 
@@ -406,7 +406,7 @@ namespace Seed {
             ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator!=(const char(&second)[Size], BaseString first) noexcept {
+            __forceinline friend Boolean operator!=(StaticATextRef<Size> second, BaseString first) noexcept {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
@@ -507,7 +507,7 @@ namespace Seed {
             ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<typename OtherBase>
             __forceinline Boolean operator==(const BaseString<OtherBase>& OtherString) const noexcept {
-                if (this->CurrentSize != OtherString.Size()) return false;
+                if (this->Lenght != OtherString.Lenght) return false;
                 for (SizeT i = 0; i < CurrentSize; i++) {
                     if (this->str[i] != OtherString[i]) return false;
                 }
@@ -598,23 +598,24 @@ namespace Seed {
             ///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             template<SizeT Size>
-            __forceinline BaseString operator+(const Char(&Text)[Size]) const {
+            __forceinline BaseString operator+(StaticTextRef<Size> Text) const {
                 if constexpr (Size < 2)
                     return *this;
-                BaseString ret_data;
-                SizeT NewSize = CurrentSize + Size - 1;
+                BaseString retData;
+                SizeT NewSize = this->Lenght + Size;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
                 if (this->str != nullptr) {
-                    Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
-                    Memory::Copy(Text, ret_data.str + this->CurrentSize - 1, Size * sizeof(Char));
+                    Memory::Copy(this->str, retData.str, this->Lenght * sizeof(Char));
+                    Memory::Copy(Text, retData.str + this->Lenght, Size * sizeof(Char));
                 }
                 else {
-                    Memory::Copy(Text, ret_data.str, Size * sizeof(Char));
+                    Memory::Copy(Text, retData.str, Size * sizeof(Char));
                 }
-                ret_data.CurrentSize = NewSize;
-                ret_data.ReservedSize = NewFullSize;
-                return ret_data;
+                retData.CurrentSize = NewSize;
+                retData.ReservedSize = NewFullSize;
+                retData.str[retData.CurrentSize - 1] = L'\0';
+                return retData;
             }
 
             ///<summary>Оператор додавання рядкового літералу</summary>
@@ -623,12 +624,12 @@ namespace Seed {
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             template<SizeT Size>
-            __forceinline friend BaseString operator+(const Char(&Text)[Size], const BaseString& Right) {
+            __forceinline friend BaseString operator+(StaticTextRef<Size> Text, const BaseString& Right) {
                 if constexpr (Size < 2)
                     return Right;
-                BaseString ret_data(Text);
-                ret_data += Right;
-                return ret_data;
+                BaseString retData(Text);
+                retData += Right;
+                return retData;
             }
 
             ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
@@ -636,23 +637,27 @@ namespace Seed {
             ///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             template<SizeT Size>
-            BaseString operator+(const AChar(&Text)[Size]) const {
+            BaseString operator+(StaticATextRef<Size> Text) const {
                 if constexpr (Size < 2)
                     return *this;
-                BaseString ret_data;
-                SizeT NewSize = CurrentSize + Size - 1;
+
+                BaseString retData;
+                SizeT NewSize = this->Lenght + Size;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
+
                 if (this->str != nullptr)
-                    Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
-                CharStr temp_str = ret_data.str + this->CurrentSize;
+                    Memory::Copy(this->str, retData.str, this->Lenght * sizeof(Char));
+                CharStr tempStr = retData.str + this->CurrentSize;
+
                 ACharStr second = (ACharStr)Text;
                 {
-                    while (*temp_str++ = *second++);
+                    while (*tempStr++ = *second++);
                 }
-                ret_data.CurrentSize = NewSize;
-                ret_data.ReservedSize = NewFullSize;
-                return ret_data;
+
+                retData.CurrentSize = NewSize;
+                retData.ReservedSize = NewFullSize;
+                return retData;
             }
 
             ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
@@ -661,12 +666,12 @@ namespace Seed {
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             template<SizeT Size>
-            __forceinline friend BaseString operator+(const AChar(&Text)[Size], const BaseString& Right) {
+            __forceinline friend BaseString operator+(StaticATextRef<Size> Text, const BaseString& Right) {
                 if constexpr (Size < 2)
                     return Right;
-                BaseString ret_data(Text);
-                ret_data += Right;
-                return ret_data;
+                BaseString retData(Text);
+                retData += Right;
+                return retData;
             }
 #pragma endregion
 #pragma region Const String
@@ -676,20 +681,24 @@ namespace Seed {
             __forceinline BaseString operator+(const ConstString& Text) const {
                 if (Text.Size < 2)
                     return *this;
-                BaseString ret_data;
-                SizeT NewSize = CurrentSize + Text.Size - 1;
+
+                BaseString retData;
+                SizeT NewSize = this->Lenght + Text.Size;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
+
                 if (this->str != nullptr) {
-                    Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
-                    Memory::Copy(Text.Str, ret_data.str + this->CurrentSize - 1, Text.Size * sizeof(Char));
+                    Memory::Copy(this->str, retData.str, this->Lenght * sizeof(Char));
+                    Memory::Copy(Text.Str, retData.str + this->Lenght, Text.Size * sizeof(Char));
                 }
                 else {
-                    Memory::Copy(Text.Str, ret_data.str, Text.Size * sizeof(Char));
+                    Memory::Copy(Text.Str, retData.str, Text.Size * sizeof(Char));
                 }
-                ret_data.CurrentSize = NewSize;
-                ret_data.ReservedSize = NewFullSize;
-                return ret_data;
+
+                retData.CurrentSize = NewSize;
+                retData.ReservedSize = NewFullSize;
+                retData.str[retData.CurrentSize - 1] = L'\0';
+                return retData;
             }
 
             ///<summary>Оператор додавання рядкового літералу</summary>
@@ -699,9 +708,9 @@ namespace Seed {
             __forceinline friend BaseString operator+(const ConstString& Text, const BaseString& Right) {
                 if (Text.Size < 2)
                     return Right;
-                BaseString ret_data(Text);
-                ret_data += Right;
-                return ret_data;
+                BaseString retData(Text);
+                retData += Right;
+                return retData;
             }
 
             ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
@@ -711,19 +720,19 @@ namespace Seed {
                 if (Text.Size < 2)
                     return *this;
                 BaseString ret_data;
-                SizeT NewSize = CurrentSize + Text.Size - 1;
+                SizeT NewSize = this->Lenght + Text.Size;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                ret_data.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
                 if (this->str != nullptr)
-                    Memory::Copy(this->str, ret_data.str, (this->CurrentSize - 1) * sizeof(Char));
-                CharStr temp_str = ret_data.str + this->CurrentSize;
+                    Memory::Copy(this->str, retData.str, (this->Lenght) * sizeof(Char));
+                CharStr tempStr = retData.str + this->CurrentSize;
                 ACharStr second = (ACharStr)Text.Str;
                 {
-                    while (*temp_str++ = *second++);
+                    while (*tempStr++ = *second++);
                 }
-                ret_data.CurrentSize = NewSize;
-                ret_data.ReservedSize = NewFullSize;
-                return ret_data;
+                retData.CurrentSize = NewSize;
+                retData.ReservedSize = NewFullSize;
+                return retData;
             }
 
             ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
@@ -733,9 +742,9 @@ namespace Seed {
             __forceinline friend BaseString operator+(const ConstAString& Text, const BaseString& Right) {
                 if (Text.Size < 2)
                     return Right;
-                BaseString ret_data(Text);
-                ret_data += Right;
-                return ret_data;
+                BaseString retData(Text);
+                retData += Right;
+                return retData;
             }
 #pragma endregion
             ///<summary>Оператор сумування двох рядків</summary>
@@ -754,8 +763,8 @@ namespace Seed {
                 BaseString retData;
                 CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
                 if (this->str != nullptr) {
-                    Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
-                    Memory::Copy(second.str, buf + this->CurrentSize - 1, second.CurrentSize * sizeof(Char));
+                    Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
+                    Memory::Copy(second.str, buf + this->Lenght, second.CurrentSize * sizeof(Char));
                 }
                 else {
                     Memory::Copy(second.str, buf, second.CurrentSize * sizeof(Char));
@@ -764,6 +773,7 @@ namespace Seed {
                 retData.str = buf;
                 retData.CurrentSize = NewSize;
                 retData.ReservedSize = NewFullSize;
+                retData.str[retData.CurrentSize - 1] = L'\0';
                 return retData;
             }
 
@@ -775,8 +785,8 @@ namespace Seed {
                 if (this->CurrentSize == 0)
                     return second;
                 SizeT NewSize = this->CurrentSize;
-                if (second.Size != 0)
-                    NewSize += second.Size - 1;
+                if (second.Lenght != 0)
+                    NewSize += second.Lenght - 1;
                 else
                     return *this;
 
@@ -784,16 +794,17 @@ namespace Seed {
                 BaseString retData;
                 CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
                 if (this->str != nullptr) {
-                    Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
-                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->CurrentSize - 1, (second.Size + 1) * sizeof(Char));
+                    Memory::Copy(this->str, buf, (this->Lenght) * sizeof(Char));
+                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->Lenght, (second.Size) * sizeof(Char));
                 }
                 else {
-                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf, second.Size * sizeof(Char));
+                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf, second.Lenght * sizeof(Char));
                 }
 
                 retData.str = buf;
                 retData.CurrentSize = NewSize;
                 retData.ReservedSize = NewFullSize;
+                retData.str[retData.CurrentSize - 1] = L'\0';
                 return retData;
             }
 
@@ -804,26 +815,28 @@ namespace Seed {
             ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
             ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
             template<SizeT StrSize>
-            BaseString<THeap>& operator+=(const wchar_t(&Text)[StrSize]) {
-                SizeT NewSize = CurrentSize + StrSize - 1;
+            BaseString<THeap>& operator+=(StaticTextRef<StrSize> Text) {
+                SizeT NewSize = this->Lenght + StrSize;
                 if (NewSize > ReservedSize) {
                     SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                     CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
                     if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
-                        Memory::Copy(Text, buf + this->CurrentSize - 1, StrSize * sizeof(Char));
+                        Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
+                        Memory::Copy(Text, buf + this->Lenght, StrSize * sizeof(Char));
                     }
                     else {
                         Memory::Copy(Text, buf, StrSize * sizeof(Char));
                     }
                     BaseString::operator delete[](this->str);
                     this->str = buf;
-                    CurrentSize += StrSize;
+                    CurrentSize = NewSize;
+                    this->str[CurrentSize - 1] = L'\0';
                     ReservedSize = NewFullSize;
                 }
                 else {
-                    Memory::Copy(Text, this->str + (this->CurrentSize - 1), StrSize * sizeof(Char));
+                    Memory::Copy(Text, this->str + this->Lenght, StrSize * sizeof(Char));
                     CurrentSize = NewSize;
+                    this->str[CurrentSize - 1] = L'\0';
                 }
                 return *this;
             }
@@ -835,18 +848,18 @@ namespace Seed {
             ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
             ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
             template<SizeT StrSize>
-            BaseString<THeap>& operator+=(const char(&Text)[StrSize]) {
-                SizeT NewSize = (CurrentSize - 1) + StrSize;
+            BaseString<THeap>& operator+=(StaticATextRef<StrSize> Text) {
+                SizeT NewSize = this->Lenght + StrSize;
                 if (NewSize > ReservedSize) {
                     SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                     CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
                     if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
+                        Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
                     }
-                    CharStr temp_str = this->str + this->CurrentSize;
+                    CharStr tempStr = this->str + this->CurrentSize;
                     ACharStr second = (ACharStr)Text;
                     {
-                        while (*temp_str++ = *second++);
+                        while (*tempStr++ = *second++);
                     }
                     BaseString::operator delete[](this->str);
                     this->str = buf;
@@ -854,10 +867,10 @@ namespace Seed {
                     ReservedSize = NewFullSize;
                 }
                 else {
-                    CharStr temp_str = this->str;
+                    CharStr tempStr = this->str + this->Lenght;
                     ACharStr second = (ACharStr)Text;
                     {
-                        while (*temp_str++ = *second++);
+                        while (*tempStr++ = *second++);
                     }
                     BaseString::operator delete[](this->str);
                     CurrentSize = NewSize;
@@ -871,18 +884,22 @@ namespace Seed {
             ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
             ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
             BaseString& operator+=(const BaseString& second) {
-                SizeT NewSize = this->CurrentSize + second.CurrentSize - 1;
+                if (second.Lenght == 0)
+                    return *this;
+
+                SizeT NewSize = this->Lenght + second.Lenght + 1;
                 if (NewSize < this->ReservedSize) {
-                    Memory::Copy(second.str, this->str + this->CurrentSize - 1, second.CurrentSize * sizeof(Char));
+                    Memory::Copy(second.str, this->str + this->Lenght, second.CurrentSize * sizeof(Char));
                     this->CurrentSize = NewSize;
+                    this->str[this->CurrentSize - 1] = L'\0';
                     return *this;
                 }
                 else {
                     ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                     CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* ReservedSize);
                     if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
-                        Memory::Copy(second.str, buf + this->CurrentSize - 1, second.CurrentSize * sizeof(Char));
+                        Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
+                        Memory::Copy(second.str, buf + this->Lenght, second.CurrentSize * sizeof(Char));
                     }
                     else {
                         Memory::Copy(second.str, buf, second.CurrentSize * sizeof(Char));
@@ -901,25 +918,30 @@ namespace Seed {
             ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
             template<typename OtherBase>
             BaseString& operator+=(const BaseString<OtherBase>& orig) {
-                SizeT NewSize = this->CurrentSize + orig.Size - 1;
+                if (orig.Lenght == 0)
+                    return *this;
+
+                SizeT NewSize = this->Lenght + orig.Lenght + 1;
                 if (NewSize < this->ReservedSize) {
-                    Memory::Copy(orig.operator const Seed::ConstCharStr(), this->str + this->CurrentSize - 1, (orig.Size + 1) * sizeof(Char));
+                    Memory::Copy(orig.operator const Seed::ConstCharStr(), this->str + this->Lenght, orig.Lenght * sizeof(Char));
                     this->CurrentSize = NewSize;
+                    this->str[this->CurrentSize - 1] = L'\0';
                     return *this;
                 }
                 else {
                     ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;;
                     CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* ReservedSize); //-V2005
                     if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, (this->CurrentSize - 1) * sizeof(Char));
-                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf + this->CurrentSize - 1, (orig.Size + 1) * sizeof(Char));
+                        Memory::Copy(this->str, buf, (this->Lenght) * sizeof(Char));
+                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf + this->Lenght, orig.Lenght * sizeof(Char));
                     }
                     else {
-                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf, orig.Size * sizeof(Char));
+                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf, orig.Lenght * sizeof(Char));
                     }
                     BaseString::operator delete[](this->str); //-V2005
                     this->str = buf;
                     this->CurrentSize = NewSize;
+                    this->str[this->CurrentSize - 1] = L'\0';
                 }
                 return *this;
             }
@@ -957,7 +979,7 @@ namespace Seed {
             ///<param name = "ExpectedString">Рядок з якого має починатись поточний рядок</param>
             ///<results><c>True</c> якщо рядок поточний рядок починається ExpectedString</results>
             template<SizeT ExpectedStringSize>
-            __forceinline bool IsStartWith(const wchar_t(&ExpectedString)[ExpectedStringSize]) const {
+            __forceinline bool IsStartWith(StaticTextRef<ExpectedStringSize> ExpectedString) const {
                 if (this->CurrentSize < ExpectedStringSize) return false;
                 for (SizeT i = 0; i < ExpectedStringSize - 1; i++) {
                     if (this->str[i] != ExpectedString[i]) return false;
@@ -1397,14 +1419,14 @@ namespace Seed {
             ///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в рядку є відміний від числа символ</exception>
             template<typename T = Seed::Int32>
             T toInt() const {
-                if (this->CurrentSize == 0 || this->Size == 0)
+                if (this->CurrentSize == 0 || this->Lenght == 0)
                     Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
                 if (this->CurrentSize > Math::MaxNumberCount<T>())
                     throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 
                 if constexpr (TypeTraits::IsSameV<TypeTraits::Unsigned<T>, T>) {
                     Math::SafeInt<T> ret;
-                    for (SizeT i = 0; i < Size; i++) {
+                    for (SizeT i = 0; i < Lenght; i++) {
                         if (str[i] < L'0' || str[i]>L'9')
                             Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                         ret += static_cast<UInt8>(str[i] - L'0');
@@ -1419,7 +1441,7 @@ namespace Seed {
                     if (str[0] == L'-' || str[0] == L'+')
                         i = 1;
                     Math::SafeInt<T> ret = 0;
-                    for (i; i < Size; i++) {
+                    for (i; i < Lenght; i++) {
                         if (str[i] < L'0' || str[i]>L'9')
                             Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                         ret += str[i] - L'0';
@@ -1555,10 +1577,34 @@ namespace Seed {
                 return res;
             }
 
-            ///<summary>Вертає поточну довжина строки</summary>
-            SizeT GetSize() const { return (CurrentSize > 0) ? CurrentSize - 1 : 0; }
-            ///<summary>Поточна довжина строки</summary>
+            ///<summary>Вертає поточну довжина рядку</summary>
+            SizeT GetLenght() const { return (CurrentSize > 0) ? CurrentSize - 1 : 0; }
+            ///<summary>Поточна довжина рядка</summary>
+            SizeT Property(GetLenght) Lenght;
+
+            /// <summary>
+            /// Вертає поточну довжину рядка з нуль-термінатором
+            /// </summary>
+            SizeT GetSize() const {
+                return CurrentSize;
+            }
+
+            /// <summary>
+            /// Поточна довжина рядка з нуль-термінатором
+            /// </summary>
             SizeT Property(GetSize) Size;
+
+            /// <summary>
+            /// Вертає розмір буфера рядка
+            /// </summary>
+            SizeT GetBufferSize() const {
+                return ReservedSize;
+            }
+
+            /// <summary>
+            /// Розмір буфера рядка
+            /// </summary>
+            SizeT Property(GetBufferSize) BufferSize;
 
             ///<summary>Вертає істину якщо рядок пустий</summary>
             Boolean GetIsEmpty() const { return GetSize() == 0; }
@@ -1566,44 +1612,58 @@ namespace Seed {
             Boolean Property(GetIsEmpty) IsEmpty;
 
             ///<summary>Зміна розміру буфера рядкової зміної</summary>
-            ///<param name = "NewReservedSize">Новий розмір буфера без нуль-термінатора,
+            ///<param name = "newSize">Новий розмір буфера без нуль-термінатора,
             ///<para> якщо менший ніж поточний розмір рядкової зміної то решту символів відкине</para></param>
             ///<returns>Силку на поточний рядок</returns>
-            BaseString& Reserve(SizeT NewReservedSize) {
+            BaseString& Resize(SizeT newSize) {
                 if (this->str == nullptr)
                 {
-                    this->str = static_cast<CharStr>(this->operator new[](sizeof(Char)* NewReservedSize));
+                    this->str = static_cast<CharStr>(this->operator new[](sizeof(Char)* newSize));
                     this->str[0] = L'\0';
                     this->CurrentSize = 1;
-                    this->ReservedSize = NewReservedSize;
+                    this->ReservedSize = newSize;
                     return *this;
                 }
-                if (CurrentSize > NewReservedSize)
-                    str[NewReservedSize] = L'\0';
-                NewReservedSize++;
-                CharStr buf = static_cast<CharStr>(this->operator new[](sizeof(Char)* NewReservedSize));
-                if (CurrentSize > NewReservedSize) {
-                    Memory::Copy(str, buf, NewReservedSize * sizeof(Char));
-                    ReservedSize = CurrentSize = NewReservedSize;
+                if (CurrentSize < newSize)
+                    str[newSize] = L'\0';
+                newSize++;
+                CharStr buf = static_cast<CharStr>(this->operator new[](sizeof(Char)* newSize));
+                if (CurrentSize > newSize) {
+                    Memory::Copy(str, buf, newSize * sizeof(Char));
+                    ReservedSize = CurrentSize = newSize;
                 }
                 else {
                     Memory::Copy(str, buf, CurrentSize * sizeof(Char));
-                    ReservedSize = NewReservedSize;
+                    ReservedSize = newSize;
                 }
                 this->operator delete[](str);
                 this->str = buf;
                 return *this;
             }
 
-            ///<summary>Заміна першого входження символа Filler на \0 тим самим зменшуючи розмір строки</summary>
-            ///<param name = "Filler">Символ який заміне на нуль-термінатор</param>
-            ///<returns>Силка на поточний рядок</returns>
-            BaseString& Shrink(Char Filler) {
-                SizeT Pos = Find(Filler);
-                if (Pos == -1)
+            /// <summary>
+            /// Резервування буферу рядка, якщо буфер вже достатній то нічого не відбудеться в іншому випадку відбудеться реалокація рядка
+            /// </summary>
+            /// <param name="newReservedSize">Новий розмір буфера рядка</param>
+            /// <returns>Силка на поточнй об'єкт</returns>
+            BaseString& Reserve(SizeT newReservedSize) {
+                if (newReservedSize < ReservedSize)
                     return *this;
-                CurrentSize = Pos;
-                str[Pos] = L'\0';
+
+                return Resize(newReservedSize);
+            }
+
+            /// <summary>Стиснення рядка до нового розміру</summary>
+            /// <param name = "newSize">Новий фактичний розмір, якшо він більший ніж поточний то генерується помилка ThrowIndexOutOfRange</param>
+            /// <exception cref="Exceptions::ThrowIndexOutOfRange">Новий фактичний розмір більший ніж поточний</exception>
+            /// <returns>Силка на поточний рядок</returns>
+            BaseString& Shrink(SizeT newSize) {
+                if (newSize > CurrentSize)
+                {
+                    Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, newSize, this->CurrentSize);
+                }
+                CurrentSize = newSize;
+                str[newSize] = L'\0';
                 return *this;
             }
 
@@ -1618,15 +1678,12 @@ namespace Seed {
 
                 if (StartPos == Math::Max<SizeT>()) 
                     StartPos = 0; 
-                else if (StartPos > CurrentSize) 
+                else if (StartPos > Lenght) 
                     return Math::Max<SizeT>();
 
                 if (EndPos == Math::Max<SizeT>()) 
                     EndPos = CurrentSize;  
                 else if (EndPos < StartPos) 
-                    return Math::Max<SizeT>();
-
-                if (Size > EndPos) 
                     return Math::Max<SizeT>();
 
                 for (SizeT i = StartPos; i < EndPos; i++)
@@ -1653,9 +1710,6 @@ namespace Seed {
                 if (EndPos == Math::Max<SizeT>()) 
                     EndPos = CurrentSize;  
                 else if (EndPos < StartPos) 
-                    return Math::Max<SizeT>();
-
-                if (Size > EndPos) 
                     return Math::Max<SizeT>();
 
                 for (SizeT i = StartPos; i < EndPos - Size; i++) {
@@ -1688,9 +1742,6 @@ namespace Seed {
                 if (EndPos == Math::Max<SizeT>()) 
                     EndPos = CurrentSize;  
                 else if (EndPos < StartPos) 
-                    return Math::Max<SizeT>();
-
-                if (EndPos > Str.CurrentSize) 
                     return Math::Max<SizeT>();
 
                 for (SizeT i = StartPos; i < EndPos - Str.CurrentSize; i++) {
@@ -1746,7 +1797,7 @@ namespace Seed {
             ///<param name = "EndPos">Індекс кінцевої позиції. Не обов'язковий параметрю. Якщо не вказано то до кінця рядка</param>
             ///<returns>Список підрядків</returns>
             template<SizeT TCount>
-            Containers::BaseList<THeap, BaseString> Split(const wchar_t(&Delim)[TCount], SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
+            Containers::BaseList<THeap, BaseString> Split(StaticTextRef<TCount> Delim, SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
                 if (this->str == nullptr)
                     return Containers::BaseList<THeap, BaseString>();
 
@@ -1771,7 +1822,7 @@ namespace Seed {
                     list += BaseString((const CharStr)(this->str + PreviosPos), CurrentPos - PreviosPos);
                     PreviosPos = CurrentPos + (TCount - 1);
                 } while (CurrentPos != Math::Max<SizeT>());
-                list += BaseString((const CharStr)(this->str + PreviosPos), (this->Size - PreviosPos) - 1);
+                list += BaseString((const CharStr)(this->str + PreviosPos), (this->Lenght - PreviosPos) - 1);
                 return list;
             }
 
@@ -1884,12 +1935,12 @@ namespace Seed {
             ///<exception cref="Seed::Exceptions::NullPointException">Якщо рядок пустий</exception>
             ///<exception cref="Seed::Exceptions::InvalidFormatException">Якщо рядок містить не коректні символи або його розмір не кратний 2</exception>
             static Containers::BaseArray<THeap, Byte> hexToBinary(const BaseString& stringData) {
-                if (stringData.Size == 0)
+                if (stringData.Lenght == 0)
                     Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(&stringData), 0);
-                if (stringData.Size % 2)
+                if (stringData.Lenght % 2)
                     Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
 
-                SizeT Size = stringData.Size / 2;
+                SizeT Size = stringData.Lenght / 2;
                 SizeT i1 = 0, i2 = 0;
                 Containers::BaseArray<THeap, Byte> bytes(Size);
                 //Bite <-> 2 hex digits
@@ -2165,14 +2216,14 @@ namespace Seed {
             template<typename LambdaT>
             __forceinline BaseString& ForEachImpl(LambdaT&& lambda) {
                 if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&>) {
-                    for (SizeT i = 0; i < this->Size; i++)
+                    for (SizeT i = 0; i < this->Lenght; i++)
                     {
                         lambda(this->str[i]);
                     }
                     return *this;
                 }
                 else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&, SizeT>) {
-                    for (SizeT i = 0; i < this->Size; i++)
+                    for (SizeT i = 0; i < this->Lenght; i++)
                     {
                         lambda(this->str[i], i);
                     }
@@ -2187,14 +2238,14 @@ namespace Seed {
             template<typename LambdaT>
             __forceinline const BaseString& ForEachImpl(LambdaT&& lambda) const {
                 if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
-                    for (SizeT i = 0; i < this->Size; i++)
+                    for (SizeT i = 0; i < this->Lenght; i++)
                     {
                         lambda(this->str[i]);
                     }
                     return *this;
                 }
                 else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&, SizeT>) {
-                    for (SizeT i = 0; i < this->Size; i++)
+                    for (SizeT i = 0; i < this->Lenght; i++)
                     {
                         lambda(this->str[i], i);
                     }
@@ -2232,8 +2283,8 @@ namespace Seed {
 
             template<typename LambdaT>
             __forceinline const BaseString& ForEachImpl(LambdaT&& lambda, SizeT count) const {
-                if (count > this->Size)
-                    count = this->Size;
+                if (count > this->Lenght)
+                    count = this->Lenght;
                 if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
                     for (SizeT i = 0; i < count; i++)
                     {
@@ -2254,11 +2305,11 @@ namespace Seed {
                 }
             }
         protected:
-            bool AnyImpl() const { return this->Size > 0; }
+            bool AnyImpl() const { return this->Lenght > 0; }
 
             template<typename Lambda>
             __forceinline bool AnyImpl(Lambda&& lambda) const {
-                for (SizeT i = 0; i < this->Size; i++)
+                for (SizeT i = 0; i < this->Lenght; i++)
                 {
                     if (lambda(this->str[i]))
                         return true;
@@ -2268,7 +2319,7 @@ namespace Seed {
 
             template<typename Lambda>
             __forceinline bool AllImpl(Lambda&& lambda) const {
-                for (SizeT i = 0; i < this->Size; i++)
+                for (SizeT i = 0; i < this->Lenght; i++)
                 {
                     if (!lambda(this->str[i]))
                         return false;
@@ -2277,8 +2328,8 @@ namespace Seed {
             }
 
             BaseString& ReverseImpl() {
-                for (SizeT i = 0; i < this->Size / 2; i++) {
-                    Swap(this->str[i], this->str[(this->Size - 1) - i]);
+                for (SizeT i = 0; i < this->Lenght / 2; i++) {
+                    Swap(this->str[i], this->str[(this->Lenght - 1) - i]);
                 }
                 return *this;
             }

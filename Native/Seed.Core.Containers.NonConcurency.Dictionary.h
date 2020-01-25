@@ -166,7 +166,7 @@ namespace Seed {
 					}
 					rootLex->node_root = insert(rootLex->node_root, data.Key[index - 1]);
 					auto subnode = find(rootLex->node_root, data.Key[index - 1]);
-					if (data.Key.Size != index) {
+					if (data.Key.Lenght != index) {
 						subnode->data = insert(subnode->data, MoveRValue(data), index + 1);
 					}
 					else {
@@ -203,7 +203,7 @@ namespace Seed {
 					size_t index = 1
 				) {
 					if (!This) return nullptr;
-					if (key.Size != index - 1) {
+					if (key.Lenght != index - 1) {
 						auto subnode = find(This->node_root, key[index - 1]);
 						if (!subnode) return This;
 						subnode->data = remove_node(subnode->data, key, removed, index + 1);
@@ -388,7 +388,7 @@ namespace Seed {
 
 				//Пошук елемента за ключом
 				forceinline const TData& Find(const TString& Key) const {
-					if (Key.Size == 0)
+					if (Key.Lenght == 0)
 						Throw(NullPointException(ExceptionPosition));
 					if (This == nullptr)
 						Throw(NullPointException(ExceptionPosition));
@@ -400,7 +400,7 @@ namespace Seed {
 
 				//Пошук елемента за ключом
 				forceinline TData& Find(const TString& Key) {
-					if (Key.Size == 0)
+					if (Key.Lenght == 0)
 						Throw(NullPointException(ExceptionPosition));
 					if (This == nullptr)
 						Throw(NullPointException(ExceptionPosition));

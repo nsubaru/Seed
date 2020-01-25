@@ -19,11 +19,11 @@ bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 		>
 	>();
 
-	return metaData.Size != 0;
+	return metaData.Lenght != 0;
 }
 
 bool Seed::Core::Testing::Test::Serilization::CustomStructMetaDataGen::Excecute() {
 	auto metaData = NewSerilization::MetaDataGen<NewCTTI::TypeTraits::SerilizableClass>();
 
-	return metaData.Size != 0;
+	return metaData.Lenght != 0;
 }

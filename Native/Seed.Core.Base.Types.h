@@ -66,6 +66,24 @@ namespace Seed {
 		///<summary>Покажчик на статичний масив символів в кодуванні UTF-16LE</summary>
 		namespace { using ConstCharStr = const Char* const; using UConstCharStr = UChar*; }
 
+		/// <summary>
+		/// Силка на статичний рядок UTF-16 символів
+		/// </summary>
+		namespace
+		{
+			template<SizeT StrSize>
+			using StaticTextRef = const wchar_t(&)[StrSize];
+		}
+
+		/// <summary>
+		/// Силка на статичний рядок ASCII символів
+		/// </summary>
+		namespace
+		{
+			template<SizeT StrSize>
+			using StaticATextRef = const char(&)[StrSize];
+		}
+
 		///<summary>Логічний тип</summary>
 		namespace { using Boolean = bool; }
 

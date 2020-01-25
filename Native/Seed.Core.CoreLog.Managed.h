@@ -21,7 +21,7 @@ namespace Seed {
 		{
 #pragma warning(push)
 #pragma warning(disable: 4996)
-			return toCoreLog((ConstCharStr)msg, msg.Size);
+			return toCoreLog((ConstCharStr)msg, msg.Lenght);
 #pragma warning(pop)
 		}
 
