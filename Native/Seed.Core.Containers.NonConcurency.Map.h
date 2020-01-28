@@ -104,7 +104,8 @@ namespace Seed {
 				///<param name = "node">Кореневий в якому шукає</param>
 				///<param name = "key">Ключ по якому шукає</param>
 				///<returns>Елемент дерева або <c>nullptr<c></returns>
-				Node* Find(Node* node, const TKey& key) const {
+				template<typename UKey>
+				Node* Find(Node* node, const UKey& key) const {
 					if (node == nullptr)
 						return nullptr;
 					if (node->key == key)
@@ -353,12 +354,13 @@ namespace Seed {
 				///<param name = "node">Батьківський елемент</summary>
 				///<param name = "key">Ключ</param>
 				///<returns>Батьківський елемент</returns>
-				Node* Remove(Node* node, const TKey& key)
+				template<typename UKey>
+				Node* Remove(Node* node, const UKey& key)
 				{
 					if (!node) return nullptr;
-					if (key < node->key)
+					if (node->key > key)
 						node->left = Remove(node->left, key);
-					else if (key > node->key)
+					else if (node->key < key)
 						node->right = Remove(node->right, key);
 					else //  key == Node->key
 					{
@@ -680,7 +682,8 @@ namespace Seed {
 
 				///<summary>Видалення елемента по значенню</summary>
 				///<param name = "key">Ключ по якому відбуватиметься видалення</param>
-				void Delete(const TKey& key)
+				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
+				void Delete(const UKey& key)
 				{
 					--This->count;
 					This->root = Remove(This->root, key);
@@ -690,7 +693,8 @@ namespace Seed {
 				///<param name = "key">Ключ по якому шукатиме значення</param>
 				///<returns>Силка на значення</returns>
 				///<exception cref = "Seed::NullPointException">За заданим ключом немає значення в масиві</exception>
-				TValue& operator[](const TKey& key) {
+				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
+				TValue& operator[](const UKey& key) {
 					Node* node = Find(This->root, key);
 
 					if (node == nullptr)
@@ -701,7 +705,8 @@ namespace Seed {
 				///<param name = "key">Ключ по якому шукатиме значення</param>
 				///<returns>Константна силка на значення</returns>
 				///<exception cref = "Seed::NullPointException">За заданим ключом немає значення в масиві</exception>
-				const TValue& operator[](const TKey& key) const { //-V659
+				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
+				const TValue& operator[](const UKey& key) const { //-V659
 					Node* node = Find(This->root, key);
 
 					if (node == nullptr)
@@ -709,11 +714,13 @@ namespace Seed {
 					return node->value;
 				}
 
-				bool IsExist(const TKey& key) const {
+				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
+				bool IsExist(const UKey& key) const {
 					return Find(This->root, key) != nullptr;
 				}
 
-				bool IsExist(TKey&& key) const {
+				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
+				bool IsExist(UKey&& key) const {
 					return Find(This->root, key) != nullptr;
 				}
 
@@ -945,7 +952,7 @@ namespace Seed {
 #pragma endregion
 			protected:
 				///<summary>Рекурсивне знищеання дерева</summary>
-///<param name = "root">Батьківський елемент</param>
+				///<param name = "root">Батьківський елемент</param>
 				template<typename Lambda>
 				Node* DestroyTreeWithLambdaPairValues(Node* root, Lambda& lambda) //-V688
 				{
@@ -964,7 +971,7 @@ namespace Seed {
 							delete root;
 						else {
 							root->father = root->left = root->right = nullptr;
-							root->tree = nullptr;
+							root->This = nullptr;
 						}
 					}
 					return nullptr;
