@@ -92,6 +92,127 @@ namespace Seed
 			}
 		public:
 			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="other">Рядок</param>
+			/// <returns>true якщо рядок є більшим</returns>
+			bool operator<(const BaseString<Heap>& second) {
+				if (ActualViewLen >= second.Lenght) return false;
+				for (SizeT i = 0; i < ActualViewLen; i++)
+				{
+					if (second[i] >= refStr[offset + i])
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="other">Рядок</param>
+			/// <returns>true якщо рядок менший</returns>
+			bool operator>(const BaseString<Heap>& second) {
+				if (ActualViewLen <= second.Lenght) return false;
+				for (SizeT i = 0; i < second.Lenght; i++)
+				{
+					if (second[i] >= refStr[offset + i])
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="other">Рядок</param>
+			/// <returns>true якщо рядок більший або рівний</returns>
+			bool operator<=(const BaseString<Heap>& second) {
+				if (ActualViewLen > second.Lenght) return false;
+				for (SizeT i = 0; i < ActualViewLen; i++)
+				{
+					if (second[i] > refStr[offset + i])
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="other">Рядок</param>
+			/// <returns>true якщо рядок менший або рівний</returns>
+			bool operator>=(const BaseString<Heap>& second) {
+				if (ActualViewLen < second.Lenght) return false;
+				for (SizeT i = 0; i < second.Lenght; i++)
+				{
+					if (second[i] < refStr[offset + i])
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="first">Відображення рядка</param>
+			/// <param name="second">Рядок</param>
+			/// <returns>true якщо рядок менший</returns>
+			friend bool operator<(const BaseString<Heap>& first, const BaseStringView& second) {
+				if (second.ActualViewLen <= first.Lenght) return false;
+				for (SizeT i = 0; i < first.Lenght; i++)
+				{
+					if (first[i] >= second.refStr[second.offset + i])
+						return false;
+				}
+				return true;
+			}
+			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="first">Відображення рядка</param>
+			/// <param name="second">Рядок</param>
+			/// <returns>true якщо рядок є більшим</returns>
+			friend bool operator>(const BaseString<Heap>& first, const BaseStringView& second) {
+				if (second.ActualViewLen >= first.Lenght) return false;
+				for (SizeT i = 0; i < second.ActualViewLen; i++)
+				{
+					if (first[i] >= second.refStr[second.offset + i])
+						return false;
+				}
+				return true;
+			}
+			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="first">Відображення рядка</param>
+			/// <param name="second">Рядок</param>
+			/// <returns>true якщо рядок менший або рівний</returns>
+			friend bool operator<=(const BaseString<Heap>& first, const BaseStringView& second) {
+				if (second.ActualViewLen < first.Lenght) return false;
+				for (SizeT i = 0; i < first.Lenght; i++)
+				{
+					if (first.other[i] < second.refStr[second.offset + i])
+						return false;
+				}
+				return true;
+			}
+			/// <summary>
+			/// Порівняння з рядком
+			/// </summary>
+			/// <param name="first">Відображення рядка</param>
+			/// <param name="second">Рядок</param>
+			/// <returns>true якщо рядок більший або рівний</returns>
+			friend bool operator>=(const BaseString<Heap>& first, const BaseStringView& second) {
+				if (second.ActualViewLen > first.Lenght) return false;
+				for (SizeT i = 0; i < ActualViewLen; i++)
+				{
+					if (first[i] > second.refStr[second.offset + i])
+						return false;
+				}
+				return true;
+			}
+		public:
+			/// <summary>
 			/// Оператор отримання символу в межах Offset - Offset + ViewLen якщо Індекс рівний Offset + ViewLen то вертаєьться нуль термінатор
 			/// </summary>
 			/// <param name="Index">Індекс символу</param>
