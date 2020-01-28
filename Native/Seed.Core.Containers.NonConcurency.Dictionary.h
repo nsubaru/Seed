@@ -188,7 +188,7 @@ namespace Seed {
 					if (!This) return nullptr;
 					auto subnode = find(This->node_root, data[index]);
 					if (!subnode) return nullptr;
-					if (data.Size - 1 != index) {
+					if (data.Lenght - 1 != index) {
 						return find(subnode->data, data, index + 1);
 					}
 					else {
