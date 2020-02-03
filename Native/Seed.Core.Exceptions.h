@@ -7,6 +7,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
+#pragma warning(disable: 4251)
 namespace Seed {
 	inline namespace Core {
 		namespace Memory {
@@ -153,7 +154,7 @@ namespace Seed {
 					:Exception(File, FunctName, Line, L"Ділення на ноль")
 				{}
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString(exeptionName)
 						+ ExceptionString(L". ")

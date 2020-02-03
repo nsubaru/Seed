@@ -775,6 +775,17 @@ namespace Seed {
 					}
 				};
 #pragma endregion
+#pragma region Void
+				template<>
+				struct TTypeName<void>
+				{
+					constexpr static auto TypeName()
+					{
+						return
+							NewCTTI::Details::TypeStringToArray(GenNGTypeString("void")());
+					}
+				};
+#pragma endregion
 			}
 #pragma region Public API
 			//<summary>Декороване ім'я типу для серелізації</summary>
