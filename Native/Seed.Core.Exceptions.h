@@ -533,8 +533,8 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString(exeptionName)
-						+ ExceptionString(L". Очікуваний тип: ") + ExceptionString((Char*)RequiredType.name())
-						+ ExceptionString(L". Фактичний тип: ") + ExceptionString((Char*)ActuallyType.name())
+						+ ExceptionString(L". Очікуваний тип: ") + ExceptionString((Char*)RequiredType.GetCxxName())
+						+ ExceptionString(L". Фактичний тип: ") + ExceptionString((Char*)ActuallyType.GetCxxName())
 						+ ExceptionString(L". ")
 						+ location.toString()
 						+ ExceptionString(L". ");

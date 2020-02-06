@@ -274,12 +274,21 @@ namespace Seed
 			/// Отримання рядка з відображення
 			/// </summary>
 			/// <returns></returns>
-			BaseString<Heap> ToString() const {
+			template<typename UHeap = Heap> 
+			BaseString<UHeap> ToString() const {
 #pragma warning(push)
 //Use internal string ctor
 #pragma warning(disable: 4996)
-				return BaseString<Heap>(((const CharStr)(ConstCharStr) refStr.operator ConstCharStr()) + offset, ActualViewLen);
+				return BaseString<UHeap>(((const CharStr)(ConstCharStr) refStr.operator ConstCharStr()) + offset, ActualViewLen);
 #pragma warning(pop)
+			}
+
+			/// <summary>
+			/// Отримання рядка з відображення
+			/// </summary>
+			/// <returns></returns>
+			BaseString<Heap> GetText() const {
+				return this->ToString();
 			}
 
 			/// <summary>
@@ -291,9 +300,9 @@ namespace Seed
 			}
 
 			/// <summary>
-			/// Фактичний текст
+			/// Рядок з відображення
 			/// </summary>
-			BaseString<Heap> Property(ToString) Text;
+			BaseString<Heap> Property(GetText) Text;
 			/// <summary>
 			/// Референсний рядок
 			/// </summary>

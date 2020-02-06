@@ -584,7 +584,7 @@ namespace Seed {
 				friend Iterator;
 
 				///<summary>Вертає ітератор на пергий елемент</summary>
-				///<returns>Ітервтор на перший елемент</summary>
+				///<returns>Ітератор на перший елемент</returns>
 				Iterator First()
 				{
 					return this->This->lock.ShareLock([&]() {
@@ -592,7 +592,7 @@ namespace Seed {
 						});
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
-				///<returns>Ітервтор на останій елемент</summary>
+				///<returns>Ітератор на останій елемент</returns>
 				Iterator Last()
 				{
 					return this->This->lock.ShareLock([&]() {
@@ -600,7 +600,7 @@ namespace Seed {
 						});
 				}
 				///<summary>Вертає ітератор на перший елемент</summary>
-				///<returns>Ітервтор на перший елемент</summary>
+				///<returns>Ітератор на перший елемент</returns>
 				Iterator begin()
 				{
 					return this->This->lock.ShareLock([&]() {
@@ -608,7 +608,7 @@ namespace Seed {
 						});
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
-				///<returns>Ітервтор на останій елемент</summary>
+				///<returns>Ітератор на останій елемент</returns>
 				const Iterator end()
 				{
 					return Iterator(nullptr);

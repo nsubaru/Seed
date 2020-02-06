@@ -574,25 +574,25 @@ namespace Seed {
 				friend Iterator;
 
 				///<summary>Вертає ітератор на пергий елемент</summary>
-				///<returns>Ітервтор на перший елемент</summary>
+				///<returns>Ітератор на перший елемент</returns>
 				Iterator FirstIt()
 				{
 					return Iterator(FindMin(This->root));
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
-				///<returns>Ітервтор на останій елемент</summary>
+				///<returns>Ітервтор на останій елемент</v>
 				Iterator LastIt()
 				{
 					return Iterator(FindMax(This->root));
 				}
 				///<summary>Вертає ітератор на перший елемент</summary>
-				///<returns>Ітервтор на перший елемент</summary>
+				///<returns>Ітервтор на перший елемент</returns>
 				Iterator begin()
 				{
 					return FirstIt();
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
-				///<returns>Ітервтор на останій елемент</summary>
+				///<returns>Ітервтор на останій елемент</returns>
 				const Iterator end()
 				{
 					return Iterator(nullptr);

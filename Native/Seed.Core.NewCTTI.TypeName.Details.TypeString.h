@@ -30,7 +30,7 @@ namespace Seed {
 					}
 				};
 
-				template<int N, int M>
+				template<SizeT N, SizeT M>
 				constexpr char GetSymByN(char const(&c)[M]) noexcept
 				{
 					return c[N < M ? N : M - 1];
@@ -72,10 +72,19 @@ namespace Seed {
 	__GetNGTypeStringHelp3(text, 512 + n) \
 	__GetNGTypeStringHelp3(text, 768 + n) \
 
+#ifndef __INTELLISENSE__
 #define GenNGTypeString(text) \
 	Seed::Core::NewCTTI::Details::TypeString<\
 	__GetNGTypeStringHelp4(text, 0)\
 	Seed::Core::NewCTTI::Details::GetSymByN<1024>(text)>
+
+#else
+#define GenNGTypeString(text) \
+	Seed::Core::NewCTTI::Details::TypeString<\
+	__GetNGTypeStringHelp3(text, 0)\
+	Seed::Core::NewCTTI::Details::GetSymByN<Seed::Core::Math::Max<SizeT>()>(text)>
+
+#endif
 			}
 		}
 	}
