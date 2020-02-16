@@ -269,6 +269,8 @@ namespace Seed {
 }
 
 #pragma region Default new and delete operators
+#pragma warning(push)
+#pragma warning(disable: 5043)
 ///<summary>Оператор виділення пам'яті</summary>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
 ///<returns>Вертає ділянку пам'яті</returns>
@@ -359,5 +361,6 @@ inline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size, Seed::Alli
 	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
 	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
 }
+#pragma warning(pop)
 #pragma endregion
 #pragma warning(pop)

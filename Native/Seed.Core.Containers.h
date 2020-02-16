@@ -10,3 +10,5 @@
 #include "Seed.Core.Containers.Dynamic.h"
 #include "Seed.Core.Containers.Delegate.h"
 #include "Seed.Core.Containers.SmartPtr.h"
+//API
+#include "Seed.Core.Containers.API.h"

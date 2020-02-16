@@ -2,6 +2,9 @@
 #include "Seed.Core.Threading.Base.h"
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Exceptions.Internals.Types.h"
+#include "Seed.Core.Exceptions.ABI.Internal.Tls.h"
+
+
 
 #include "Seed.Core.Memory.h"
 
@@ -17,7 +20,9 @@ namespace Seed {
 			struct TLS {
 				IThreadable* Threadable;
 				volatile EThreadabledStates* State;
-				ExceptionInfoT ExceptionInfo;
+				//ExceptionInfoT ExceptionInfo;
+
+				TlsExceptionData ExceptionInfo;
 			};
 
 			static_assert(sizeof(TEB::TlsSlots) >= sizeof(TLS), "Seed TLS to big");
