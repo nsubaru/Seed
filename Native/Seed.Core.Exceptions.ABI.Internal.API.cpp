@@ -1,7 +1,11 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
+#include "Seed.Core.Exceptions.ABI.Public.h"
+
 #include "Seed.Core.Exceptions.ABI.Internal.API.h"
+
+
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -107,7 +111,7 @@ extern "C" int __cdecl __FrameUnwindFilter(
     case EH_EXCEPTION_NUMBER:
         GetThreadExceptionData()->_curexception = pExcept;
         GetThreadExceptionData()->_curcontext = pExPtrs->ContextRecord;
-        //terminate();
+        EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"Невідома помилка про розкуртці стеку");
 
         /*
          See VSW#544593 for more details. __ProcessingThrow is used to implement
@@ -443,6 +447,7 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler(
 
             FrameUnwindToEmptyState(pRN, pDC, pFuncInfo);
         }
+        return ExceptionContinueSearch;
     }
 
     auto tryBlockMap = TryBlockMap4(pFuncInfo, pDC->ImageBase);
@@ -587,7 +592,7 @@ BOOLEAN IsInExceptionSpec(
                     pExcept->params.pThrowInfo->pCatchableTypeArray
                     )->arrayOfCatchableTypes
                 );
-
+        ;
         auto n = reinterpret_cast<CatchableTypeArray*>(
             reinterpret_cast<Seed::SizeT>(pExcept->params.pThrowImageBase) +
             pExcept->params.pThrowInfo->pCatchableTypeArray
@@ -658,7 +663,7 @@ DWORD _FilterSetCurrentException(EXCEPTION_POINTERS* pointers, BOOLEAN fThrowNot
 
             //_pCurrentException = eRecord;
             //_pCurrentExContext = pointers->ContextRecord;
-            //terminate();
+            EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"Вкладені помилки не реалізовані");
         }
     }
 
@@ -1058,7 +1063,7 @@ void FindHandler(
                 }
                 else
                 {
-                    //terminate();
+                    EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"BadException не дозволено на даному кадрі стеку");
                 }
             }
         }
@@ -1080,6 +1085,7 @@ void FindHandler(
         //
         // First, determine range of try blocks to consider:
         // Only try blocks which are at the current catch depth are of interest.
+        __assume(pExcept->params.pThrowInfo != nullptr);
 
         if (tryBlockMap.getNumTryBlocks() > 0)
         {
@@ -1155,7 +1161,7 @@ void FindHandler(
             GetThreadExceptionData()->_curexception = pExcept;
                 GetThreadExceptionData()->_curcontext = pContext;
 
-                //terminate();
+                EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"Обробка помилок заборонена в функціях помічених модифікатором noexcept");
         }
     } // It was a C++ EH exception
     else
@@ -1168,7 +1174,7 @@ void FindHandler(
                 // Translator threw something unintelligible.
 
                 // Two choices here: we could let the new exception take over, or we could abort. We abort.
-                // TODO:abort();
+                EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"Невідома об'єкт помилки");
             }
 
             FindHandlerForForeignException(pExcept, pRN, pContext, pDC, pFuncInfo, curState, CatchDepth, pMarkerRN);
@@ -1304,7 +1310,7 @@ int BuildCatchObjectHelperInternal(
         }
     } __except(EXCEPTION_EXECUTE_HANDLER) {
         // Something went wrong when building the catch object.
-        //TODO: abort();
+        EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"Об'єкт помилки пошкоджений");
     }
 
     return retval;
@@ -1387,7 +1393,7 @@ void BuildCatchObjectInternal(
         }
     } __except(EXCEPTION_EXECUTE_HANDLER) {
         // Something went wrong when building the catch object.
-        //TODO: abort();
+        EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"Конструктор копіювання викликав помилку. Вкладені об'єкти помилко не реалізовані");
     }
 }
 
@@ -1529,7 +1535,7 @@ extern "C" void __cdecl _FindAndUnlinkFrame(
     }
 
     // Should never be reached.
-    //TODO: abort();
+    EmergencyShutdown(__FILE__, __FUNCSIG__, __LINE__, L"Ланцюг об'єктів стеку пошкодженний");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1605,9 +1611,13 @@ void * CxxCallCatchBlock(
         pForeignException = reinterpret_cast<EHExceptionRecord*>(GetThreadExceptionData()->_pForeignException);
         // End Translation Stuff
     }
+    //Store current state of isInCath flag(we can procced catch in another catch)
+    bool isAlredyInCatch = GetThreadExceptionData()->_isInCatch;
 
     __try {
         __try {
+            //Signale that we proceed catch block
+            GetThreadExceptionData()->_isInCatch = true;
             continuationAddress = _CallSettingFrame_LookupContinuationIndex(
                 handlerAddress,
                 pEstablisherFrame,
@@ -1620,6 +1630,8 @@ void * CxxCallCatchBlock(
                 continuationAddress = continuationAddresses[continuationIndex];
             }
            _CallSettingFrame_NotifyContinuationAddr(continuationAddress, pEstablisherFrame);
+           //Restore state
+           GetThreadExceptionData()->_isInCatch = isAlredyInCatch;
         }
         // Filter will be invoked in pass 1 looking for an exception, this lets us set up the correct _CatchStateInParent that should
         // be used when looking for a handler in the parent of a catch funclet inside ExFilterRethrowFH4.
@@ -1627,6 +1639,9 @@ void * CxxCallCatchBlock(
         // In that case, the _CatchStateInParent should not be set until we get into the except.
         __except (ExFilterRethrowFH4(exception_info(), pThisException, HandlerSearchState, &rethrow))
         {
+            //Restore state
+            GetThreadExceptionData()->_isInCatch = isAlredyInCatch;
+
             rethrow = 1;
             GetThreadExceptionData()->_cxxReThrow = false;
             GetThreadExceptionData()->_CatchStateInParent = HandlerSearchState;
@@ -1829,6 +1844,255 @@ extern "C" {
 
     void __cdecl _Init_thread_footer(int* pOnce) noexcept {
         pOnce;
+    }
+}
+
+//Storing exception region
+
+union RawExceptionInfo {
+    EXCEPTION_RECORD NtExceptionInfo;
+    EHExceptionRecord CxxExceptionInfo;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// void _CallCopyCtor();
+//
+// Helper function for calling the copy-ctor on the C++ exception object.  It reads
+// the passed info throw info and determine the type of exception.  If it's a simple type
+// it calls memcpy.  It's a UDT with copy-ctor, it uses the copy-ctor.
+//
+void _CallCopyCtor(_Out_writes_bytes_(size) void* dst, _In_reads_bytes_(size) void* src, size_t size, _In_ const CatchableType* const pType, void* ThrowImageBase)
+{
+    if (pType->properties & CT_IsSimpleType || // this is a simple type
+        pType->copyFunction == NULL    // this is a user defined type without copy ctor
+        )
+    {
+        // just copy with memcpy
+        Seed::Memory::Copy(src, dst, size);
+    }
+    else
+    {
+        try
+        {
+            // it's a user defined type with a copy ctor
+            if (pType->properties & CT_HasVirtualBase)
+            {
+                // this exception got a virtual base
+                _CallMemberFunction2((char*)dst,
+                    reinterpret_cast<void*>(reinterpret_cast<Seed::SizeT>(ThrowImageBase) + pType->copyFunction),
+                    __AdjustPointer(src,
+                        pType->thisDisplacement), 1);
+            }
+            else
+            { //-V565
+                _CallMemberFunction1((char*)dst,
+                    reinterpret_cast<void*>(reinterpret_cast<Seed::SizeT>(ThrowImageBase) + pType->copyFunction),
+                    __AdjustPointer(src,
+                        pType->thisDisplacement));
+            }
+        }
+        catch (...)
+        {
+            // the copy-Ctor() threw.  We need to terminate().
+            
+            EmergencyShutdown(ExceptionPosition, L"copy-Ctor throw exception");
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// void _CopyException();
+//
+// Builds an __ExceptionPtr with the given c++ exception object and its corresponding
+// throwinfo.
+//
+// This function returns the static copy of exception_ptr which points to a
+// std::bad_alloc exception in out-of-memory situation.
+//
+void _CopyException(RawExceptionInfo* orig, RawExceptionInfo* copy, void*(*allocator)(Seed::SizeT))
+{
+    //copying the _EXCEPTION_RECORD (for SEH exceptions)
+    copy->NtExceptionInfo.ExceptionCode = orig->NtExceptionInfo.ExceptionCode;
+    copy->NtExceptionInfo.ExceptionFlags = orig->NtExceptionInfo.ExceptionFlags;
+    copy->NtExceptionInfo.ExceptionRecord = NULL; // We don't chain SEH exceptions
+    copy->NtExceptionInfo.ExceptionAddress = NULL; // Useless field to copy->  It will be overwritten by RaiseException()
+    copy->NtExceptionInfo.NumberParameters = orig->NtExceptionInfo.NumberParameters;
+
+    // copying any addition parameters
+    for (ULONG i = 0; i < copy->NtExceptionInfo.NumberParameters && i < EXCEPTION_MAXIMUM_PARAMETERS; ++i)
+    {
+        copy->NtExceptionInfo.ExceptionInformation[i] = orig->NtExceptionInfo.ExceptionInformation[i];
+    }
+    // NULLing out any un-used parameters
+    for (ULONG i = copy->NtExceptionInfo.NumberParameters; i < EXCEPTION_MAXIMUM_PARAMETERS; ++i)
+    {
+        copy->NtExceptionInfo.ExceptionInformation[i] = 0;
+    }
+
+    if (orig->CxxExceptionInfo.ExceptionCode == EH_EXCEPTION_NUMBER &&
+        orig->CxxExceptionInfo.NumberParameters == EH_EXCEPTION_PARAMETERS && (
+            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER1 ||
+            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER2 ||
+            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER3))
+    {
+        // this is a C++ exception
+        // we need to copy the C++ exception object
+
+        // nulling out the Exception object pointer, because we haven't copied it yet
+        copy->CxxExceptionInfo.params.pExceptionObject = NULL;
+
+        ThrowInfo* pThrow = orig->CxxExceptionInfo.params.pThrowInfo;
+        if (orig->CxxExceptionInfo.params.pExceptionObject == NULL ||
+            pThrow == NULL ||
+            pThrow->pCatchableTypeArray == NULL
+            )
+        {
+            // No ThrowInfo exists.  If this were a C++ exception, something must have corrupted it.
+            //terminate();
+            EmergencyShutdown(ExceptionPosition, L"Throw info empty");
+        }
+
+        // we finally got the type info we want
+        auto ppCatchable =
+            reinterpret_cast<int*>(
+                reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
+                *reinterpret_cast<CatchableTypeArray*>(
+                    reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
+                    orig->CxxExceptionInfo.params.pThrowInfo->pCatchableTypeArray
+                    )->arrayOfCatchableTypes
+                );
+        void* pExceptionBuffer = NULL;
+        auto typeInfo = (CatchableType *)(reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) + *ppCatchable);
+        
+        //TODO: Analyze memory leak
+        pExceptionBuffer = allocator(typeInfo->sizeOrOffset);
+
+        _CallCopyCtor(pExceptionBuffer, orig->CxxExceptionInfo.params.pExceptionObject, typeInfo->sizeOrOffset, typeInfo, orig->CxxExceptionInfo.params.pThrowImageBase);
+
+        copy->CxxExceptionInfo.params.pExceptionObject = pExceptionBuffer;
+    }
+}
+
+void StoreException(void *& ptr, void *(* alocator)(Seed::SizeT))
+{
+    if (GetThreadExceptionData()->_isInCatch) {
+        RawExceptionInfo* current = static_cast<RawExceptionInfo*>(GetThreadExceptionData()->_curexception);
+        RawExceptionInfo* record = static_cast<RawExceptionInfo*>(alocator(sizeof(RawExceptionInfo)));
+        RtlSecureZeroMemory(record, sizeof(RawExceptionInfo));
+        _CopyException(current, record, alocator);
+        ptr = record;
+        return;
+    }
+
+    Seed::Core::Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
+}
+
+void ThrowExceptionFromExceptionStorage(EXCEPTION_RECORD record) {
+    RtlRaiseException(&record);
+}
+
+_Ret_notnull_ _Post_writable_byte_size_(_Size)
+extern "C" void* __cdecl _alloca(_In_ size_t _Size);
+
+void ThrowStoredException(void* exception)
+{
+    if (exception == nullptr)
+        Seed::Core::Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
+    EXCEPTION_RECORD record = { 0 };
+    auto copy = (RawExceptionInfo*)&record;
+    auto orig = (RawExceptionInfo*)exception;
+
+    //copying the _EXCEPTION_RECORD (for SEH exceptions)
+    copy->NtExceptionInfo.ExceptionCode = orig->NtExceptionInfo.ExceptionCode;
+    copy->NtExceptionInfo.ExceptionFlags = orig->NtExceptionInfo.ExceptionFlags;
+    copy->NtExceptionInfo.ExceptionRecord = NULL; // We don't chain SEH exceptions
+    copy->NtExceptionInfo.ExceptionAddress = NULL; // Useless field to copy->  It will be overwritten by RaiseException()
+    copy->NtExceptionInfo.NumberParameters = orig->NtExceptionInfo.NumberParameters;
+
+    // copying any addition parameters
+    for (ULONG i = 0; i < copy->NtExceptionInfo.NumberParameters && i < EXCEPTION_MAXIMUM_PARAMETERS; ++i)
+    {
+        copy->NtExceptionInfo.ExceptionInformation[i] = orig->NtExceptionInfo.ExceptionInformation[i];
+    }
+    // NULLing out any un-used parameters
+    for (ULONG i = copy->NtExceptionInfo.NumberParameters; i < EXCEPTION_MAXIMUM_PARAMETERS; ++i)
+    {
+        copy->NtExceptionInfo.ExceptionInformation[i] = 0;
+    }
+
+    if (orig->CxxExceptionInfo.ExceptionCode == EH_EXCEPTION_NUMBER &&
+        orig->CxxExceptionInfo.NumberParameters == EH_EXCEPTION_PARAMETERS && (
+            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER1 ||
+            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER2 ||
+            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER3))
+    {
+        // this is a C++ exception
+        // we need to copy the C++ exception object
+
+        // nulling out the Exception object pointer, because we haven't copied it yet
+        copy->CxxExceptionInfo.params.pExceptionObject = NULL;
+
+        ThrowInfo* pThrow = orig->CxxExceptionInfo.params.pThrowInfo;
+        if (orig->CxxExceptionInfo.params.pExceptionObject == NULL ||
+            pThrow == NULL ||
+            pThrow->pCatchableTypeArray == NULL
+            )
+        {
+            // No ThrowInfo exists.  If this were a C++ exception, something must have corrupted it.
+            //terminate();
+            EmergencyShutdown(ExceptionPosition, L"Об'єкт помлки пошкоджений або не є С++ помилкою");
+        }
+
+        // we finally got the type info we want
+        //auto typeInfo = GetByOffset<CatchableType>((SizeT)orig->CxxExceptionInfo.params.pThrowImageBase, pThrow->pCatchableTypeArray);
+        // we finally got the type info we want
+        auto ppCatchable =
+            reinterpret_cast<int*>(
+                reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
+                *reinterpret_cast<CatchableTypeArray*>(
+                    reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
+                    orig->CxxExceptionInfo.params.pThrowInfo->pCatchableTypeArray
+                    )->arrayOfCatchableTypes
+                );
+        auto typeInfo = (CatchableType *)(reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) + *ppCatchable);
+
+        void* pExceptionBuffer = NULL;
+
+        __assume(typeInfo->sizeOrOffset < 4Kb);
+#pragma warning(push)
+#pragma warning(disable: 6255)
+        GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca(typeInfo->sizeOrOffset);
+#pragma warning(pop)
+        pExceptionBuffer = GetThreadExceptionData()->_throwObjStorageForStoredException;
+
+        _CallCopyCtor(
+            pExceptionBuffer, 
+            orig->CxxExceptionInfo.params.pExceptionObject, 
+            typeInfo->sizeOrOffset, 
+            typeInfo, 
+            orig->CxxExceptionInfo.params.pThrowImageBase);
+
+        copy->CxxExceptionInfo.params.pExceptionObject = pExceptionBuffer;
+
+        ThrowExceptionFromExceptionStorage(record);
+    }
+    else
+    {
+        ThrowExceptionFromExceptionStorage(record);
+    }
+}
+
+void DestroyStoredException(void*& ptr, void(*dealocator)(void*))
+{
+    if (ptr != nullptr) {
+        RawExceptionInfo* data = (RawExceptionInfo*)ptr;
+        __DestructExceptionObject(&data->CxxExceptionInfo, TRUE);
+        dealocator(data->CxxExceptionInfo.params.pExceptionObject);
+        data->CxxExceptionInfo.params.pExceptionObject = nullptr;
+        dealocator(ptr);
+        ptr = nullptr;
     }
 }
 

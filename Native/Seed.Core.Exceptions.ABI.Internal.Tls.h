@@ -15,8 +15,8 @@ struct TlsExceptionData
     void*              _curexception;    // current exception
     void*              _curcontext;      // current exception context
     int                _ProcessingThrow; // for uncaught_exception
-    void*              _curexcspec;      // for handling exceptions thrown from std::unexpected
     int                _cxxReThrow;      // true if it's a rethrown C++ exception
+    void*              _curexcspec;      // for handling exceptions thrown from std::unexpected
 
     void*              _pExitContext;
     void*              _pUnwindContext;
@@ -27,6 +27,10 @@ struct TlsExceptionData
     int                _CatchStateInParent;   // Used to link together the catch funclet with the parent. During dispatch contains state associated
                                               // with catch in the parent. During unwind represents the current unwind state that is resumed to
                                               // during collided unwind and used to look for handlers of the throwing dtor.
+    
+    void*              _throwObjStorageForStoredException; //Stack allocated stored storage 
+
+    bool               _isInCatch;            //Use for storing exception
 };
 
 TlsExceptionData* GetThreadExceptionData();

@@ -1,5 +1,7 @@
 #include "Seed.Core.Testing.Tests.Exceptions.ABI.h"
 
+#include "Seed.Core.Threading.h"
+
 using namespace Seed;
 
 void Throw1() {
@@ -133,4 +135,31 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Excecute() {
 	auto result4 = Throw5();
 
 	return testResult && result2 && result3 && result4;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::StoringException::Excecute() {
+	try
+	{
+		Threading::Thread(L"Потік тестування передачі помилки", [] ()
+		{
+			try
+			{
+				Throw1();
+			}
+			catch (...)
+			{
+				return Seed::Exceptions::Exception::StoreCurrentException();
+			}
+			Throw(NullPointException(ExceptionPosition));
+		})
+			.Start()
+			.Join()
+			.GetThreadResult<Seed::Exceptions::Exception::RawException>().ThrowThis();
+	}
+	catch (NtException & ex)
+	{
+		(void) (ex);
+		return true;
+	}
+	return false;
 }

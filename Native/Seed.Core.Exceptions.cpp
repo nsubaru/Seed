@@ -276,7 +276,7 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
         str +=
             Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::UInt64asHex(exCode);
         Seed::toCoreLog(str);
-#if !(PreReleaseMode || DebugMode)
+#if (PreReleaseMode || DebugMode)
         __debugbreak();
 #endif
         NtTerminateProcess(NtCurrentProcess(), exCode);
@@ -284,7 +284,12 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
     }
 }
 
-[[noreturn]] InternalApiCall void EmergencyShutdown(const ConstAString& File, const ConstAString& Function, UInt64 Line, const ConstString& Reason) {
+[[noreturn]] InternalApiCall void EmergencyShutdown(
+    Seed::Core::ConstAString File, 
+    Seed::Core::ConstAString Function, 
+    Seed::Core::UInt64 Line, 
+    Seed::Core::ConstString Reason
+) {
     using SafeString = BaseString<Memory::ExceptionHeap>;
     Exception::ExeptionLocation location{ File,Function,Line };
     toCoreLog(SafeString(L"Аварійне завершення ядра. Причина ") + SafeString(Reason) + SafeString(L" Розташування виклику: ") + location.toString());
@@ -399,113 +404,31 @@ void __stdcall __ehvec_dtor(
     }
 }
 
-#pragma warning(pop)
-
+#pragma region Storing exception API
 
 Seed::Exception::RawException Seed::Core::Exceptions::Exception::StoreCurrentException()
 {
-    //if (GetThreadExceptionData()->_isCatchBlockProceding) {
-    //    RawExceptionInfo* current = static_cast<RawExceptionInfo*>(ThreadExceptionInfo->_curexception);
-    //    RawExceptionInfo* record = static_cast<RawExceptionInfo*>(InternalHeapAllocate(sizeof(RawExceptionInfo)));
-    //    RtlSecureZeroMemory(record, sizeof(RawExceptionInfo));
-    //    _CopyException(current, record);
-    //    return RawException(record);
-    //}
-    //___cxxthrow(Exceptions::NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
-    return RawException(nullptr);
+    void* ptr = nullptr;
+    StoreException(ptr, [] (SizeT size) -> void*
+    {
+        return Seed::Core::Memory::ExceptionHeap().Allocate(size);
+    });
+    return RawException(ptr);
 }
 
-void ThrowExceptionFromExceptionStorage(EXCEPTION_RECORD record) {
-    //RtlRaiseException(&record);
-}
-
-void Seed::Core::Exceptions::Exception::ThrowRawException(RawException&& exception)
+void Seed::Core::Exceptions::Exception::ThrowRawException(Seed::Core::Exceptions::Exception::RawException& exception)
 {
-//    if (exception.ptr == nullptr)
-//        ___cxxthrow(Exceptions::NullPointException(ExceptionPosition, 0, NullPointException::Types::Read));
-//    EXCEPTION_RECORD record = { 0 };
-//    EXCEPTION_RECORD* ex = (EXCEPTION_RECORD*)exception.ptr;
-//    auto copy = (RawExceptionInfo*)&record;
-//    auto orig = (RawExceptionInfo*)ex;
-//
-//    //copying the _EXCEPTION_RECORD (for SEH exceptions)
-//    copy->NtExceptionInfo.ExceptionCode = orig->NtExceptionInfo.ExceptionCode;
-//    copy->NtExceptionInfo.ExceptionFlags = orig->NtExceptionInfo.ExceptionFlags;
-//    copy->NtExceptionInfo.ExceptionRecord = NULL; // We don't chain SEH exceptions
-//    copy->NtExceptionInfo.ExceptionAddress = NULL; // Useless field to copy->  It will be overwritten by RaiseException()
-//    copy->NtExceptionInfo.NumberParameters = orig->NtExceptionInfo.NumberParameters;
-//
-//    // copying any addition parameters
-//    for (ULONG i = 0; i < copy->NtExceptionInfo.NumberParameters && i < EXCEPTION_MAXIMUM_PARAMETERS; ++i)
-//    {
-//        copy->NtExceptionInfo.ExceptionInformation[i] = orig->NtExceptionInfo.ExceptionInformation[i];
-//    }
-//    // NULLing out any un-used parameters
-//    for (ULONG i = copy->NtExceptionInfo.NumberParameters; i < EXCEPTION_MAXIMUM_PARAMETERS; ++i)
-//    {
-//        copy->NtExceptionInfo.ExceptionInformation[i] = 0;
-//    }
-//
-//    if (orig->CxxExceptionInfo.ExceptionCode == EH_EXCEPTION_NUMBER &&
-//        orig->CxxExceptionInfo.NumberParameters == EH_EXCEPTION_PARAMETERS && (
-//            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER1 ||
-//            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER2 ||
-//            orig->CxxExceptionInfo.params.magicNumber == EH_MAGIC_NUMBER3))
-//    {
-//        // this is a C++ exception
-//        // we need to copy the C++ exception object
-//
-//        // nulling out the Exception object pointer, because we haven't copied it yet
-//        copy->CxxExceptionInfo.params.pExceptionObject = NULL;
-//
-//        ThrowInfo* pThrow = orig->CxxExceptionInfo.params.pThrowInfo;
-//        if (orig->CxxExceptionInfo.params.pExceptionObject == NULL ||
-//            pThrow == NULL ||
-//            pThrow->pCatchableTypeArray == NULL
-//            )
-//        {
-//            // No ThrowInfo exists.  If this were a C++ exception, something must have corrupted it.
-//            //terminate();
-//            EmergencyShutdown(ExceptionPosition, L"Throw info empty");
-//        }
-//
-//        // we finally got the type info we want
-//        //auto typeInfo = GetByOffset<CatchableType>((SizeT)orig->CxxExceptionInfo.params.pThrowImageBase, pThrow->pCatchableTypeArray);
-//#define THROW_CTLIST_IB(t,ib)			(THROW_CTARRAY_IB(t,ib)->arrayOfCatchableTypes)
-//#define THROW_CTARRAY_IB(t,ib)			((CatchableTypeArray*)((ib) + (t).pCatchableTypeArray))
-//#define _GetThrowImageBase() (SizeT)orig->CxxExceptionInfo.params.pThrowImageBase
-//        const auto typeInfo = (CatchableType*)
-//            (*(int*)THROW_CTLIST_IB(*pThrow, _GetThrowImageBase()) + _GetThrowImageBase()); //-V1004
-//        //		const auto typeInfo2 = ;
-//        //		const auto typeInfo = (CatchableType*)(*(int*)
-//        //			GetByOffset<CatchableTypeArray>(
-//        //			(SizeT)orig->CxxExceptionInfo.params.pThrowImageBase,
-//        //				pThrow->pCatchableTypeArray
-//        //				) + (SizeT)orig->CxxExceptionInfo.params.pThrowImageBase);
-//        void* pExceptionBuffer = NULL;
-//
-//        InternalHeapFree(ThreadExceptionInfo->throwObjStorageForStoredException);
-//
-//        if (sizeof(NtException) != typeInfo->sizeOrOffset)
-//            toCoreLog(L"Попередження: розмір типу не збігається з інформацією з метаданих виконавчого файла");
-//
-//        ThreadExceptionInfo->throwObjStorageForStoredException = InternalHeapAllocate(typeInfo->sizeOrOffset);
-//
-//        pExceptionBuffer = ThreadExceptionInfo->throwObjStorageForStoredException;
-//
-//        _CallCopyCtor(pExceptionBuffer, orig->CxxExceptionInfo.params.pExceptionObject, typeInfo->sizeOrOffset, typeInfo, orig->CxxExceptionInfo.params.pThrowImageBase);
-//
-//        copy->CxxExceptionInfo.params.pExceptionObject = pExceptionBuffer;
-//    }
-//    ThrowExceptionFromExceptionStorage(record);
+    ThrowStoredException(exception.This->ptr);
 }
 
-Seed::Core::Exceptions::Exception::RawException::~RawException()
-{
-    //if (this->ptr != nullptr) {
-    //    RawExceptionInfo* data = (RawExceptionInfo*)this->ptr;
-    //    __DestructExceptionObject(&data->CxxExceptionInfo, TRUE, 0);
-    //    data->CxxExceptionInfo.params.pExceptionObject = InternalHeapFree(data->CxxExceptionInfo.params.pExceptionObject);
-    //    this->ptr = InternalHeapFree(this->ptr);
-    //}
+void Seed::Core::Exceptions::Exception::RawException::Dispose() {
+	DestroyStoredException(this->This->ptr, [] (void* ptr)
+	{
+		Seed::Core::Memory::ExceptionHeap().Free(ptr);
+	});
 }
+#pragma endregion
+
+#pragma warning(pop)
+
+

@@ -2,7 +2,6 @@
 #include "Seed.Core.Threading.Impl.h"
 
 #include "Seed.Core.Exceptions.ABI.SEH.h"
-#include "Seed.Core.Exceptions.ABI.Public.h"
 #include "Seed.Core.Exceptions.ABI.Defines.h"
 #include "Seed.Core.Exceptions.ABI.Types.h"
 #include "Seed.Core.Exceptions.ABI.Internal.Types.h"
