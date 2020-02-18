@@ -1082,12 +1082,11 @@ void Seed::Core::Threading::WaitForMany(const Containers::Array<Event>& events, 
 
 #pragma region Init & Stop
 
-extern InternalApiCall void
-EmergencyShutdown(
-	const Seed::ConstAString& File,
-	const Seed::ConstAString& Function,
-	Seed::UInt64 Line, const
-	Seed::ConstString& Reason
+extern __declspec(noreturn) InternalApiCall void EmergencyShutdown(
+	Seed::Core::ConstAString File,
+	Seed::Core::ConstAString Function,
+	Seed::Core::UInt64 Line,
+	Seed::Core::ConstString Reason
 );
 
 void Seed::Core::Stage1Complete() noexcept
