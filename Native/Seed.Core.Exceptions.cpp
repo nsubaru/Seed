@@ -231,7 +231,6 @@ decltype(typeid(int)) GetBadExceptionTypeId()
 
 void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 {
-	
     switch (exCode) {
 #if !(PreReleaseMode || DebugMode)
     case STATUS_BREAKPOINT:
@@ -274,7 +273,7 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
     default:
         Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
         str +=
-            Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::UInt64asHex(exCode);
+            Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
         Seed::toCoreLog(str);
 #if (PreReleaseMode || DebugMode)
         __debugbreak();
