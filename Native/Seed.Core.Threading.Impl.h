@@ -1,9 +1,10 @@
 #pragma once
 #include "Seed.Core.Threading.Base.h"
 #include "Seed.Core.Exceptions.h"
-#include "Seed.Core.Exceptions.Internals.Types.h"
 
 #include "Seed.Core.Memory.h"
+
+#include "Seed.Core.Exceptions.ABI.Internal.Tls.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
@@ -17,7 +18,9 @@ namespace Seed {
 			struct TLS {
 				IThreadable* Threadable;
 				volatile EThreadabledStates* State;
-				ExceptionInfoT ExceptionInfo;
+				//ExceptionInfoT ExceptionInfo;
+
+				TlsExceptionData ExceptionInfo;
 			};
 
 			static_assert(sizeof(TEB::TlsSlots) >= sizeof(TLS), "Seed TLS to big");
@@ -29,6 +32,7 @@ namespace Seed {
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 				thisTLS->State = State;
 				thisTLS->Threadable = Threadable;
+				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 
 			InternalApiCall __forceinline void DestroyTls() {
@@ -40,6 +44,7 @@ namespace Seed {
 			InternalApiCall __forceinline void InitMinTls() {
 				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
+				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 
 			InternalApiCall __forceinline void StopMinTls() {

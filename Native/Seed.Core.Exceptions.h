@@ -115,32 +115,34 @@ namespace Seed {
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
 				virtual ~Exception() {}
 			public:
-				class SeedKernelCall RawException final {
+				class SeedKernelCall RawException final : IDisposable {
 				private:
-					void* ptr;
+					struct Data : Memory::Allocator<Memory::ExceptionHeap> {
+						void* ptr;
+						RefCountT RefCount;
+
+						Data(void* ptr) : ptr(ptr), RefCount(1) {}
+					};
 				private:
-					RawException(void* ptr) : ptr(ptr) {};
+					Data * This;
+				private:
+					RawException(void* ptr) : This(new Data(ptr)) {};
+				protected:
+					virtual void Dispose() override final;
 				public:
-					RawException() :ptr(nullptr) {};
-					RawException(RawException&) = delete;
-					RawException(RawException&& orig) : ptr(orig.ptr)
-					{
-						orig.ptr = nullptr;
-					}
-					RawException& operator=(RawException&) = delete;
-					RawException& operator=(RawException&& orig) {
-						this->ptr = orig.ptr;
-						orig.ptr = nullptr;
-						return *this;
+					RawException() :This(new Data(nullptr)) {};
+
+					void ThrowThis() {
+						ThrowRawException(*this);
 					}
 
-					~RawException();
+					RefCountClass(RawException, This);
 				public:
 					friend Exception;
 				};
 			public:
 				static RawException StoreCurrentException();
-				static void ThrowRawException(RawException&& exception);
+				static void ThrowRawException(RawException& exception);
 			};
 
 			///<summary>Ділення на ноль</summary>

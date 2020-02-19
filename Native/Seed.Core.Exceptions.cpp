@@ -2,6 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Exceptions.h"
+#include "Seed.Core.CoreLog.h"
+#include "Seed.Core.CoreLog.Managed.h"
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"
 
@@ -213,3 +215,219 @@ inline ID Seed::Core::Exceptions::Exception::GetTargetThreadID()
 {
 	return reinterpret_cast<ID>(NtCurrentThreadId());
 }
+
+#include "Seed.Core.Exceptions.ABI.Public.h"
+
+__declspec(noreturn)
+void ThrowBadException()
+{
+	Throw(Seed::Exceptions::BadException(ExceptionPosition));
+}
+
+decltype(typeid(int)) GetBadExceptionTypeId()
+{
+	return typeid(Seed::Exceptions::BadException);
+}
+
+void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
+{
+    switch (exCode) {
+#if !(PreReleaseMode || DebugMode)
+    case STATUS_BREAKPOINT:
+        Seed::toCoreLog(L"Критична помилка: Відбувається відлагодження");
+        break;
+#endif
+    case STATUS_HEAP_CORRUPTION:
+        Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
+#if (PreReleaseMode || DebugMode)
+        __debugbreak();
+#endif
+        NtTerminateProcess(NtCurrentProcess(), STATUS_HEAP_CORRUPTION);
+        break;
+    case STATUS_ACCESS_VIOLATION:
+    {
+        Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+#if (PreReleaseMode || DebugMode)
+        __debugbreak();
+#endif
+        EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)exData->ExceptionRecord; //-V1027
+        NullPointException::Types type;
+        switch (sehException->ExceptionInformation[0])
+        {
+        case 0:
+            type = NullPointException::Types::Read;
+            break;
+        case 1:
+            type = NullPointException::Types::Write;
+            break;
+        case 8:
+            type = NullPointException::Types::Execute;
+            break;
+        default:
+            type = NullPointException::Types::Read;
+            break;
+        }
+        Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
+    }
+    break;
+    default:
+        Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
+        str +=
+            Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
+        Seed::toCoreLog(str);
+#if (PreReleaseMode || DebugMode)
+        __debugbreak();
+#endif
+        NtTerminateProcess(NtCurrentProcess(), exCode);
+        break;
+    }
+}
+
+[[noreturn]] InternalApiCall void EmergencyShutdown(
+    Seed::Core::ConstAString File, 
+    Seed::Core::ConstAString Function, 
+    Seed::Core::UInt64 Line, 
+    Seed::Core::ConstString Reason
+) {
+    using SafeString = BaseString<Memory::ExceptionHeap>;
+    Exception::ExeptionLocation location{ File,Function,Line };
+    toCoreLog(SafeString(L"Аварійне завершення ядра. Причина ") + SafeString(Reason) + SafeString(L" Розташування виклику: ") + location.toString());
+    NtTerminateProcess(NtCurrentProcess(), STATUS_INTERNAL_ERROR);
+}
+
+#include "Seed.Core.Exceptions.ABI.SEH.h"
+#include "Seed.Core.Exceptions.ABI.Defines.h"
+#include "Seed.Core.Exceptions.ABI.Types.h"
+
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
+int ArrayUnwindFilter(EXCEPTION_POINTERS* pExPtrs)
+{
+    EHExceptionRecord* pExcept = (EHExceptionRecord*)pExPtrs->ExceptionRecord;
+
+    switch (pExcept->ExceptionCode) //-V2520
+    {
+    case EH_EXCEPTION_NUMBER:
+        EmergencyShutdown(ExceptionPosition, L"Dtors can't throw exceptions");
+        //terminate();
+#ifdef ALLOW_UNWIND_ABORT
+    case EH_ABORT_FRAME_UNWIND_PART:
+        return EXCEPTION_EXECUTE_HANDLER;
+#endif
+    default:
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+}
+
+void __stdcall __ArrayUnwind(
+    void* ptr,                // Pointer to array to destruct
+    size_t      size,               // Size of each element (including padding)
+    int         count,              // Number of elements in the array
+    void(__stdcall* pDtor)(void*)    // The destructor to call
+)
+{
+    // 'unwind' rest of array
+
+    __try
+    {
+        while (--count >= 0)
+        {
+            ptr = (char*)ptr - size;
+            (*pDtor)(ptr);
+        }
+    }
+    __except (ArrayUnwindFilter(exception_info()))
+    {
+        ; // Deliberately do nothing
+    }
+}
+
+void __stdcall __ehvec_ctor(
+    void* ptr,                // Pointer to array to destruct
+    size_t      size,               // Size of each element (including padding)
+    size_t      count,              // Number of elements in the array
+    void(__stdcall* pCtor)(void*),   // Constructor to call
+    void(__stdcall* pDtor)(void*)    // Destructor to call should exception be thrown
+)
+{
+    size_t i = 0;      // Count of elements constructed
+    int success = 0;
+
+    __try
+    {
+        // Construct the elements of the array
+        for (; i < count; i++)
+        {
+            (*pCtor)(ptr);
+            ptr = (char*)ptr + size;
+        }
+        success = 1;
+    }
+    __finally
+    {
+        if (!success)
+            __ArrayUnwind(ptr, size, (int)i, pDtor);
+    }
+}
+
+void __stdcall __ehvec_dtor(
+    void* ptr,                // Pointer to array to destruct
+    size_t      size,               // Size of each element (including padding)
+    //  int         count,              // Number of elements in the array
+    size_t      count,              // Number of elements in the array
+    void(__stdcall* pDtor)(void*)    // The destructor to call
+)
+{
+    _Analysis_assume_(count > 0);
+
+    int success = 0;
+
+    // Advance pointer past end of array
+    ptr = (char*)ptr + size * count;
+
+    __try
+    {
+        // Destruct elements
+        while (count-- > 0)
+        {
+            ptr = (char*)ptr - size;
+            (*pDtor)(ptr);
+        }
+        success = 1;
+    }
+    __finally
+    {
+        if (!success)
+            __ArrayUnwind(ptr, size, (int)count, pDtor);
+    }
+}
+
+#pragma region Storing exception API
+
+Seed::Exception::RawException Seed::Core::Exceptions::Exception::StoreCurrentException()
+{
+    void* ptr = nullptr;
+    StoreException(ptr, [] (SizeT size) -> void*
+    {
+        return Seed::Core::Memory::ExceptionHeap().Allocate(size);
+    });
+    return RawException(ptr);
+}
+
+void Seed::Core::Exceptions::Exception::ThrowRawException(Seed::Core::Exceptions::Exception::RawException& exception)
+{
+    ThrowStoredException(exception.This->ptr);
+}
+
+void Seed::Core::Exceptions::Exception::RawException::Dispose() {
+	DestroyStoredException(this->This->ptr, [] (void* ptr)
+	{
+		Seed::Core::Memory::ExceptionHeap().Free(ptr);
+	});
+}
+#pragma endregion
+
+#pragma warning(pop)
+
+
