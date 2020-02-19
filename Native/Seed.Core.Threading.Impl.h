@@ -32,6 +32,7 @@ namespace Seed {
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 				thisTLS->State = State;
 				thisTLS->Threadable = Threadable;
+				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 
 			InternalApiCall __forceinline void DestroyTls() {
@@ -43,6 +44,7 @@ namespace Seed {
 			InternalApiCall __forceinline void InitMinTls() {
 				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
+				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 
 			InternalApiCall __forceinline void StopMinTls() {

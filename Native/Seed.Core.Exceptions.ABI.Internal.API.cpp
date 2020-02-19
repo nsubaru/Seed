@@ -164,8 +164,6 @@ void FrameUnwindToState(
     __ehstate_t targetState             // State to unwind to
     )
 {
-    UNREFERENCED_PARAMETER(pDC); // This parameter is not used in some compilations
-
     ptrdiff_t unwindImageBase = GetThreadExceptionData()->_ImageBase;
     __ehstate_t curState;
 
@@ -190,7 +188,7 @@ void FrameUnwindToState(
     auto unwindMap = UWMap4(pFuncInfo, pDC->ImageBase);
 
     auto start = unwindMap.begin();
-    auto end = unwindMap.end();
+    auto end = unwindMap.begin();
 
     //_VCRT_VERIFY(start >= end);
     unwindMap.getStartStop(curState, targetState, start, end);
@@ -398,7 +396,7 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler(
            will also set EH_MAGIC_NUMBER1 in the 8 element */
         (!(pExcept->ExceptionCode == STATUS_UNWIND_CONSOLIDATE && pExcept->NumberParameters == 15 && ((PULONG_PTR) &pExcept->params.magicNumber)[8] == EH_MAGIC_NUMBER1)) &&
         pExcept->ExceptionCode != STATUS_LONGJUMP &&
-        pFuncInfo->header.EHs == true)
+        pFuncInfo->header.EHs)
     {
          /*
          * This function was compiled /EHs so we don't need to do anything in
@@ -426,9 +424,9 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler(
                 );
 
                 //TODO: _VCRT_VERIFY(target_state >= EH_EMPTY_STATE && target_state < T::GetMaxState(pDC, pFuncInfo));
-                    FrameUnwindToState(pRN, pDC, pFuncInfo, target_state);
-                    //TODO: Log it: EHTRACE_HANDLER_EXIT(ExceptionContinueSearch);
-                    return ExceptionContinueSearch;
+                FrameUnwindToState(pRN, pDC, pFuncInfo, target_state);
+                //TODO: Log it: EHTRACE_HANDLER_EXIT(ExceptionContinueSearch);
+                return ExceptionContinueSearch;
             }
 
             if (IS_TARGET_UNWIND(pExcept->ExceptionFlags) && pExcept->ExceptionCode == STATUS_UNWIND_CONSOLIDATE)
@@ -1008,7 +1006,15 @@ void FindHandler(
     //TODO: _VCRT_VERIFY(curState >= EH_EMPTY_STATE && curState < T::GetMaxState(pDC, pFuncInfo));
 
     // Check if it's a re-throw.  Use the exception we stashed away if it is.
-    if (pExcept->ExceptionCode == EH_EXCEPTION_NUMBER && pExcept->params.pThrowInfo == nullptr)
+    if ((
+        pExcept->ExceptionCode == EH_EXCEPTION_NUMBER &&
+        pExcept->NumberParameters == EH_EXCEPTION_PARAMETERS &&
+        (
+            pExcept->params.magicNumber == EH_MAGIC_NUMBER1 ||
+            pExcept->params.magicNumber == EH_MAGIC_NUMBER2 ||
+            pExcept->params.magicNumber == EH_MAGIC_NUMBER3
+            )
+        ) && pExcept->params.pThrowInfo == nullptr)
     {
         if (GetThreadExceptionData()->_curexception == nullptr)
         {
@@ -1020,7 +1026,7 @@ void FindHandler(
 
         pExcept = reinterpret_cast<EHExceptionRecord*>(GetThreadExceptionData()->_curexception);
         pContext = reinterpret_cast<CONTEXT*>(GetThreadExceptionData()->_curcontext);
-
+        IsRethrow = TRUE;
         GetThreadExceptionData()->_ThrowImageBase = reinterpret_cast<ptrdiff_t>(pExcept->params.pThrowImageBase);
         //TODO: _VCRT_VERIFY(pExcept && (!PER_IS_MSVC_EH(pExcept) || PER_PTHROW(pExcept)));
 
@@ -1085,7 +1091,6 @@ void FindHandler(
         //
         // First, determine range of try blocks to consider:
         // Only try blocks which are at the current catch depth are of interest.
-        __assume(pExcept->params.pThrowInfo != nullptr);
 
         if (tryBlockMap.getNumTryBlocks() > 0)
         {
@@ -1496,18 +1501,17 @@ int ExFilterRethrowFH4(
     return exceptionCode;
 }
 
+union RawExceptionInfo {
+    EXCEPTION_RECORD NtExceptionInfo;
+    EHExceptionRecord CxxExceptionInfo;
+};
 
 __forceinline __declspec(noreturn)
 void __RethrowException(EHExceptionRecord* pThisException)
 {
-    EXCEPTION_RECORD record = { 0 };
-    record.ExceptionCode = pThisException->ExceptionCode; 
-    record.ExceptionFlags = pThisException->ExceptionFlags;
+    RawExceptionInfo* orig = (RawExceptionInfo*) pThisException;
 
-    record.ExceptionInformation[0] = static_cast<ULONG_PTR>(pThisException->params.magicNumber);
-    record.ExceptionInformation[1] = reinterpret_cast<ULONG_PTR>(pThisException->params.pExceptionObject);
-    record.ExceptionInformation[2] = reinterpret_cast<ULONG_PTR>(pThisException->params.pThrowInfo);
-    record.ExceptionInformation[3] = reinterpret_cast<ULONG_PTR>(pThisException->params.pThrowImageBase);
+    EXCEPTION_RECORD record = orig->NtExceptionInfo;
 
     RtlRaiseException(&record);
 }
@@ -1821,7 +1825,7 @@ void CatchIt(
         pExcept,
         pContext,
         pEstablisher,
-        reinterpret_cast<void*>(GetThreadExceptionData()->_ImageBase + pCatch->dispOfHandler),
+        reinterpret_cast<void*>((Seed::SizeT)GetThreadExceptionData()->_ImageBase + pCatch->dispOfHandler),
         pFuncInfo,
         pEntry->tryLow,
         pEntry->catchHigh,
@@ -1848,11 +1852,6 @@ extern "C" {
 }
 
 //Storing exception region
-
-union RawExceptionInfo {
-    EXCEPTION_RECORD NtExceptionInfo;
-    EHExceptionRecord CxxExceptionInfo;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 //

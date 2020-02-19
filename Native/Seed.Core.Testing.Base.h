@@ -47,6 +47,7 @@ namespace Seed {
 
 				static Boolean RunAllTest() {
 					Boolean result = true;
+					toCoreLog(L"Запуск тестів...");
 					tests->ForEach([&](const TestRecord& record) {
 						try {
 							try {
@@ -60,10 +61,12 @@ namespace Seed {
 							}
 							catch (Exception & ex) {
 								toCoreLog(L"При обробці тесту " + record.name + L" виникла помилка ", ex);
+								result = false;
 							}
 						}
 						catch (...) {
 							toCoreLog(L"При обробці тесту " + record.name + L" виникла непередбачувана помилка");
+							result = false;
 						}
 						});
 					return result;
