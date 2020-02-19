@@ -1878,14 +1878,12 @@ namespace Seed {
                 auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                 ret[CurrentSize] = L'\0';
-                SizeT i2 = 0;
-                for (SizeT i = 0; i < sizeof(SizeT) * 2; i += 2)
-                {
-                    ret[i2] = HexNumbers[Converter.Code[i / 2].LowPart];
-                    i2++;
-                    ret[i2] = HexNumbers[Converter.Code[i / 2 + 1].HighPart];
-                    i2++;
+                
+                SizeT len = CurrentSize - 1;
+                for (--len; len >= 0; Value >>= 4, --len) {
+                    ret[len] = HexNumbers[Value & 0xf];
                 }
+
                 BaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
                 return str;
             }
@@ -1907,19 +1905,12 @@ namespace Seed {
                 auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                 ret[CurrentSize] = L'\0';
-                //SizeT i2 = 0;
-                //for (SizeT i = 0; i < sizeof(UInt32) * 2; i += 2)
-                //{
-                //    ret[i2] = HexNumbers[Converter.Code[i / 2].LowPart];
-                //    i2++;
-                //    ret[i2] = HexNumbers[Converter.Code[i / 2 + 1].HighPart];
-                //    i2++;
-                //}
 
                 SizeT len = CurrentSize - 1;
                 for (--len; len >= 0; Value >>= 4, --len) {
                     ret[len] = HexNumbers[Value & 0xf];
                 }
+
                 BaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
                 return str;
             }
