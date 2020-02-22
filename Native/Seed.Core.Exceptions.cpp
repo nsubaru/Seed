@@ -291,7 +291,7 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
     Seed::Core::ConstAString File, 
     Seed::Core::ConstAString Function, 
     Seed::Core::UInt64 Line, 
-    Seed::Core::ConstString Reason
+    Seed::Core::ConstString Reason //-V813
 ) {
     using SafeString = BaseString<Memory::ExceptionHeap>;
     Exception::ExeptionLocation location{ File,Function,Line };
@@ -419,7 +419,7 @@ Seed::Exception::RawException Seed::Core::Exceptions::Exception::StoreCurrentExc
     return RawException(ptr);
 }
 
-void Seed::Core::Exceptions::Exception::ThrowRawException(Seed::Core::Exceptions::Exception::RawException& exception)
+void Seed::Core::Exceptions::Exception::ThrowRawException(Seed::Core::Exceptions::Exception::RawException& exception) //-V669
 {
     ThrowStoredException(exception.This->ptr);
 }

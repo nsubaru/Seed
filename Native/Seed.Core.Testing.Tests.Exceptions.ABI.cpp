@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Testing.Tests.Exceptions.ABI.h"
 
 #include "Seed.Core.Threading.h"
@@ -67,7 +70,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Excecute() {
 	{
 		if (!(ex.Location.File == String(__FILE__) &&
 			ex.Location.FunctName == String(__FUNCSIG__)))
-			if (testResult)
+			if (testResult) //-V547
 				testResult = false;
 	}
 
@@ -107,7 +110,8 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Excecute() {
 		Throw(NtException(ExceptionPosition, 0));
 	}
 	catch (...)
-	{
+	{ //-V565
+		;
 	}
 
 	try
@@ -126,8 +130,8 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Excecute() {
 		}
 	}
 	catch (...)
-	{
-
+	{ //-V565
+		;
 	}
 
 	auto result2 = Throw2();

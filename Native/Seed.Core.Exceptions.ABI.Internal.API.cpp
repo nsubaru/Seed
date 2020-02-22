@@ -128,7 +128,7 @@ extern "C" int __cdecl __FrameUnwindFilter(
          We should revisit std::uncaught_exception() and SEH/managed exception in the
          next version.
          */
-        if (GetThreadExceptionData()->_ProcessingThrow > 0)
+        if (GetThreadExceptionData()->_ProcessingThrow > 0) //-V779
         {
             --GetThreadExceptionData()->_ProcessingThrow;
         }
@@ -394,7 +394,7 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler(
          /* On the 64 bit/ARM platforms, ExceptionCode maybe set to STATUS_UNWIND_CONSOLIDATE
            when called from _UnwindNestedFrames during Logical Unwind. _UnwindNestedFrames
            will also set EH_MAGIC_NUMBER1 in the 8 element */
-        (!(pExcept->ExceptionCode == STATUS_UNWIND_CONSOLIDATE && pExcept->NumberParameters == 15 && ((PULONG_PTR) &pExcept->params.magicNumber)[8] == EH_MAGIC_NUMBER1)) &&
+        (!(pExcept->ExceptionCode == STATUS_UNWIND_CONSOLIDATE && pExcept->NumberParameters == 15 && ((PULONG_PTR) &pExcept->params.magicNumber)[8] == EH_MAGIC_NUMBER1)) && //-V557
         pExcept->ExceptionCode != STATUS_LONGJUMP &&
         pFuncInfo->header.EHs)
     {
@@ -516,7 +516,7 @@ int TypeMatchHelper(
 
     if (pCatch->adjectives & HT_IsBadAllocCompat && pCatchable->properties & CT_IsStdBadAlloc)
     {
-        return true;
+        return true; //-V601
     }
 
     TypeDescriptor* catchableTypeDescriptor =
@@ -724,7 +724,7 @@ TryBlockMap4::IteratorPair GetRangeOfTrysToCheck(
 )
 {
     auto iterStart = tryBlockMap.begin();
-    auto iterEnd = tryBlockMap.begin();
+    auto iterEnd = tryBlockMap.begin(); //-V656
     tryBlockMap.setBuffer(iterStart);
 
     for (auto iter = tryBlockMap.begin(); iter != tryBlockMap.end(); ++iter)
@@ -1475,7 +1475,7 @@ int ExFilterRethrow(
     // In a rethrow, ExceptionCode isn't set to EH_EXCEPTION_NUMBER even for a
     // C++ Exception. Hence we use cxxReThrow in __InternalCxxFrameHandler
     // to check for a C++ Exception
-        GetThreadExceptionData()->_cxxReThrow = true;
+        GetThreadExceptionData()->_cxxReThrow = true; //-V601
         *rethrow = 1;
         return EXCEPTION_EXECUTE_HANDLER;
     }
@@ -1509,7 +1509,7 @@ union RawExceptionInfo {
 __forceinline __declspec(noreturn)
 void __RethrowException(EHExceptionRecord* pThisException)
 {
-    RawExceptionInfo* orig = (RawExceptionInfo*) pThisException;
+    RawExceptionInfo* orig = (RawExceptionInfo*) pThisException; //-V1027
 
     EXCEPTION_RECORD record = orig->NtExceptionInfo;
 
@@ -1647,7 +1647,7 @@ void * CxxCallCatchBlock(
             GetThreadExceptionData()->_isInCatch = isAlredyInCatch;
 
             rethrow = 1;
-            GetThreadExceptionData()->_cxxReThrow = false;
+            GetThreadExceptionData()->_cxxReThrow = false; //-V601
             GetThreadExceptionData()->_CatchStateInParent = HandlerSearchState;
             if (TranslatedCatch) {
                 // Note in case of rethrow, no one else can convert rethrow to
@@ -1806,7 +1806,7 @@ void CatchIt(
     EHRegistrationNode *pEstablisher = pRN;
 
     EHRegistrationNode EstablisherFramePointers;
-    pEstablisher = GetEstablisherFrame(pRN, pDC, pFuncInfo, &EstablisherFramePointers);
+    pEstablisher = GetEstablisherFrame(pRN, pDC, pFuncInfo, &EstablisherFramePointers); //-V519
 
     // Copy the thrown object into a buffer in the handler's stack frame,
     // unless the catch was by elipsis (no conversion) OR the catch was by

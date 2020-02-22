@@ -137,6 +137,11 @@ namespace Seed {
 				/// </summary>
 				static constexpr Char RemotePathName[] = L"Remote";
 
+				/// <summary>
+				/// Ліміт редіректів при обході шляху в об'єктном просторі
+				/// </summary>
+				static constexpr SizeT ToManyRedirectsTreshold = 10;
+
 				using TRootPath = TypeTraits::AddReference<decltype(RootPath)>::Lvalue;
 				using TKernelPathName = TypeTraits::AddReference<decltype(KernelPathName)>::Lvalue;
 				using THostPathName = TypeTraits::AddReference<decltype(HostPathName)>::Lvalue;
@@ -578,7 +583,7 @@ namespace Seed {
 
 			class SeedKernelCall ObjectNamespaceConfigurationT {
 			public:
-				ObjectNamespaceConfigurationT() {} //-V730
+				constexpr ObjectNamespaceConfigurationT() {} //-V730
 
 				constexpr ObjectManagerConfigurations::TRootPath GetRootPath() {
 					return ObjectManagerConfigurations::RootPath;
@@ -594,6 +599,10 @@ namespace Seed {
 
 				constexpr ObjectManagerConfigurations::TRemotePathName GetRemotePathName() {
 					return ObjectManagerConfigurations::RemotePathName;
+				}
+
+				constexpr SizeT GetToManyRedirectsTreshold() {
+					return ObjectManagerConfigurations::ToManyRedirectsTreshold;
 				}
 			public:
 				/// <summary>
@@ -612,15 +621,19 @@ namespace Seed {
 				/// Шлях провайдерів віддалених систем в об'єктному менеджері
 				/// </summary>
 				ObjectManagerConfigurations::TRemotePathName Property(GetRemotePathName) RemotePathName;
+				/// <summary>
+				/// Ліміт редіректів при обході шляху в об'єктном просторі
+				/// </summary>
+				SizeT Property(GetToManyRedirectsTreshold) ToManyRedirectsTreshold;
 			};
 		public:
-			CurrentSettings() {};
+			constexpr CurrentSettings() {};
 
 			StaticSettingsDataT GetStaticSettingsData() { return StaticSettingsDataT(); }
 			void SetStaticSettingsData(StaticSettingsDataT) {}
 
-			ObjectNamespaceConfigurationT GetObjectNamespaceConfiguration() { return ObjectNamespaceConfigurationT(); }
-			void SetObjectNamespaceConfiguration(ObjectNamespaceConfigurationT) {}
+			constexpr ObjectNamespaceConfigurationT GetObjectNamespaceConfiguration() { return ObjectNamespaceConfigurationT(); }
+			constexpr void SetObjectNamespaceConfiguration(ObjectNamespaceConfigurationT) {}
 
 			VirtualSettingDataT GetVirtualSettingData() { return VirtualSettingDataT(); }
 			void SetVirtualSettingDataT(VirtualSettingDataT) {}

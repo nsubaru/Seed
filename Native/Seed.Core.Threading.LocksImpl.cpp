@@ -4,8 +4,6 @@
 #include "Seed.Core.Threading.DataFlowControler.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
 
-#include "Seed.Core.Threading.Internal.h"
-
 #pragma warning(push)
 #pragma warning(disable : 4996)
 
