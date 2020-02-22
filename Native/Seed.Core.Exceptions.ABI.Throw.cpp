@@ -58,21 +58,6 @@ extern "C" __declspec(noreturn) void __stdcall _CxxThrowException(
     // determine an image base, since that was the old way to determine
     // a pure throw, before the TI_IsPure bit was added to the FuncInfo
     // attributes field.
-//    if (pTI && ((pTI->attributes & TI_IsPure)
-//#if _EH_RELATIVE_TYPEINFO
-//                || !throwImageBase
-//#endif // _EH_RELATIVE_TYPEINFO
-//                )) {
-//        magicNumber = EH_PURE_MAGIC_NUMBER1;
-//    }
-
-    // Build the parameters for the EHExceptionRecord:
-    const ULONG_PTR parameters[] = {
-        magicNumber,
-        reinterpret_cast<ULONG_PTR>(pExceptionObject),
-        reinterpret_cast<ULONG_PTR>(pTI),
-        reinterpret_cast<ULONG_PTR>(throwImageBase),
-    };
 
     union RawExceptionInfo {
 		EXCEPTION_RECORD NtExceptionInfo;

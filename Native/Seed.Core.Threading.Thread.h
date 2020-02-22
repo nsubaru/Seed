@@ -4,6 +4,9 @@
 #include "Seed.Core.Threading.Event.h"
 #include "Seed.Core.Containers.Delegate.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
@@ -92,3 +95,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

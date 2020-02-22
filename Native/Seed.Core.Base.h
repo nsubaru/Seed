@@ -51,7 +51,7 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 #pragma warning(push)
 #pragma warning(disable: 4075)
 #pragma init_seg(".INIT$m", RegisterStaticDtors)
-#define INIT
+#define __INIT__
 #pragma warning(pop)
 
 /// <summary>
@@ -90,9 +90,14 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 #define Property(...) EXPAND_VA_ARGS(__Property_GET_MACRO(__VA_ARGS__, __Property2, __Property1)(__VA_ARGS__))
 
 /// <summary>
-/// Інформує що змінна може бути проігнорована
+/// Інформує що результат фнкції\методу може бути проігнорована
 /// </summary>
 #define UnusedData [[maybe_unused]]
+
+/// <summary>
+/// Інформує що результат фнкції\методу не можна ігнорувати
+/// </summary>
+#define NoDiscard [[nodiscard]]
 
 /// <summary>
 /// Відступ відносно початку структури до поля

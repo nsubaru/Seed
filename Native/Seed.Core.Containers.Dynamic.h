@@ -38,7 +38,7 @@ namespace Seed
                     template<typename ... TTypes>
                     Tuple<TTypes...>& GetVariables() {
                         using Pack = Tuple<TTypes...>;
-                        if (typeid(Pack).hash_code() == GetVariablesPackTypeInfo().hash_code())
+                        if (typeid(Pack).GetHashCode() == GetVariablesPackTypeInfo().GetHashCode())
                         {
                             return *reinterpret_cast<Pack*>(GetVariablePackRaw());
                         }

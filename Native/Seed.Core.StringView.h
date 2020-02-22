@@ -97,13 +97,14 @@ namespace Seed
 			/// <param name="other">Рядок</param>
 			/// <returns>true якщо рядок є більшим</returns>
 			bool operator<(const BaseString<Heap>& second) {
-				if (ActualViewLen >= second.Lenght) return false;
-				for (SizeT i = 0; i < ActualViewLen; i++)
+				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (second[i] >= refStr[offset + i])
-						return false;
+					if (refStr[offset + i] != second[i])
+						return  refStr[offset + i] < second[i];
 				}
-				return true;
+				
+				return this->ActualViewLen < second.Lenght;
 			}
 
 			/// <summary>
@@ -112,13 +113,14 @@ namespace Seed
 			/// <param name="other">Рядок</param>
 			/// <returns>true якщо рядок менший</returns>
 			bool operator>(const BaseString<Heap>& second) {
-				if (ActualViewLen <= second.Lenght) return false;
-				for (SizeT i = 0; i < second.Lenght; i++)
+				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (second[i] >= refStr[offset + i])
-						return false;
+					if (refStr[offset + i] != second[i])
+						return refStr[offset + i] > second[i];
 				}
-				return true;
+				
+				return this->ActualViewLen > second.Lenght;
 			}
 
 			/// <summary>
@@ -127,13 +129,14 @@ namespace Seed
 			/// <param name="other">Рядок</param>
 			/// <returns>true якщо рядок більший або рівний</returns>
 			bool operator<=(const BaseString<Heap>& second) {
-				if (ActualViewLen > second.Lenght) return false;
-				for (SizeT i = 0; i < ActualViewLen; i++)
+				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (second[i] > refStr[offset + i])
-						return false;
+					if (refStr[offset + i] != second[i])
+						return refStr[offset + i] <= second[i];
 				}
-				return true;
+				
+				return this->ActualViewLen <= second.Lenght;
 			}
 
 			/// <summary>
@@ -142,13 +145,14 @@ namespace Seed
 			/// <param name="other">Рядок</param>
 			/// <returns>true якщо рядок менший або рівний</returns>
 			bool operator>=(const BaseString<Heap>& second) {
-				if (ActualViewLen < second.Lenght) return false;
-				for (SizeT i = 0; i < second.Lenght; i++)
+				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (second[i] < refStr[offset + i])
-						return false;
+					if (refStr[offset + i] != second[i])
+						return refStr[offset + i] >= second[i];
 				}
-				return true;
+				
+				return this->ActualViewLen >= second.Lenght;
 			}
 
 			/// <summary>
@@ -158,13 +162,15 @@ namespace Seed
 			/// <param name="second">Рядок</param>
 			/// <returns>true якщо рядок менший</returns>
 			friend bool operator<(const BaseString<Heap>& first, const BaseStringView& second) {
-				if (second.ActualViewLen <= first.Lenght) return false;
-				for (SizeT i = 0; i < first.Lenght; i++)
+				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (first[i] >= second.refStr[second.offset + i])
-						return false;
+					if (first[i] != second.refStr[second.offset + i])
+						return first[i] < second.refStr[second.offset + i];
 				}
-				return true;
+				
+				return first.Lenght < second.ActualViewLen;
+
 			}
 			/// <summary>
 			/// Порівняння з рядком
@@ -173,13 +179,14 @@ namespace Seed
 			/// <param name="second">Рядок</param>
 			/// <returns>true якщо рядок є більшим</returns>
 			friend bool operator>(const BaseString<Heap>& first, const BaseStringView& second) {
-				if (second.ActualViewLen >= first.Lenght) return false;
-				for (SizeT i = 0; i < second.ActualViewLen; i++)
+				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (first[i] >= second.refStr[second.offset + i])
-						return false;
+					if (first[i] != second.refStr[second.offset + i])
+						return first[i] > second.refStr[second.offset + i];
 				}
-				return true;
+				
+				return first.Lenght > second.ActualViewLen;
 			}
 			/// <summary>
 			/// Порівняння з рядком
@@ -188,13 +195,14 @@ namespace Seed
 			/// <param name="second">Рядок</param>
 			/// <returns>true якщо рядок менший або рівний</returns>
 			friend bool operator<=(const BaseString<Heap>& first, const BaseStringView& second) {
-				if (second.ActualViewLen < first.Lenght) return false;
-				for (SizeT i = 0; i < first.Lenght; i++)
+				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (first.other[i] < second.refStr[second.offset + i])
-						return false;
+					if (first[i] != second.refStr[second.offset + i])
+						return first[i] <= second.refStr[second.offset + i];
 				}
-				return true;
+				
+				return first.Lenght <= second.ActualViewLen;
 			}
 			/// <summary>
 			/// Порівняння з рядком
@@ -203,13 +211,14 @@ namespace Seed
 			/// <param name="second">Рядок</param>
 			/// <returns>true якщо рядок більший або рівний</returns>
 			friend bool operator>=(const BaseString<Heap>& first, const BaseStringView& second) {
-				if (second.ActualViewLen > first.Lenght) return false;
-				for (SizeT i = 0; i < ActualViewLen; i++)
+				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
+				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (first[i] > second.refStr[second.offset + i])
-						return false;
+					if (first[i] != second.refStr[second.offset + i])
+						return first[i] >= second.refStr[second.offset + i];
 				}
-				return true;
+				
+				return first.Lenght >= second.ActualViewLen;
 			}
 		public:
 			/// <summary>
@@ -274,12 +283,21 @@ namespace Seed
 			/// Отримання рядка з відображення
 			/// </summary>
 			/// <returns></returns>
-			BaseString<Heap> ToString() const {
+			template<typename UHeap = Heap> 
+			BaseString<UHeap> ToString() const {
 #pragma warning(push)
 //Use internal string ctor
 #pragma warning(disable: 4996)
-				return BaseString<Heap>(((const CharStr)(ConstCharStr) refStr.operator ConstCharStr()) + offset, ActualViewLen);
+				return BaseString<UHeap>(((const CharStr) refStr.operator ConstCharStr()) + offset, ActualViewLen);
 #pragma warning(pop)
+			}
+
+			/// <summary>
+			/// Отримання рядка з відображення
+			/// </summary>
+			/// <returns></returns>
+			BaseString<Heap> GetText() const {
+				return this->ToString();
 			}
 
 			/// <summary>
@@ -291,9 +309,9 @@ namespace Seed
 			}
 
 			/// <summary>
-			/// Фактичний текст
+			/// Рядок з відображення
 			/// </summary>
-			BaseString<Heap> Property(ToString) Text;
+			BaseString<Heap> Property(GetText) Text;
 			/// <summary>
 			/// Референсний рядок
 			/// </summary>

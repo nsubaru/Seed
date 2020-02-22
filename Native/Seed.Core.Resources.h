@@ -2,7 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by Seed.Core.Resources.rc
 //
-#define BuildNumber 903
+#define BuildNumber 946
 
 // Next default values for new objects
 // 
@@ -14,3 +14,6 @@
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
+
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)

@@ -232,54 +232,58 @@ decltype(typeid(int)) GetBadExceptionTypeId()
 void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 {
     switch (exCode) {
-#if !(PreReleaseMode || DebugMode)
-    case STATUS_BREAKPOINT:
-        Seed::toCoreLog(L"Критична помилка: Відбувається відлагодження");
-        break;
-#endif
-    case STATUS_HEAP_CORRUPTION:
-        Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
-#if (PreReleaseMode || DebugMode)
-        __debugbreak();
-#endif
-        NtTerminateProcess(NtCurrentProcess(), STATUS_HEAP_CORRUPTION);
-        break;
-    case STATUS_ACCESS_VIOLATION:
-    {
-        Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
-#if (PreReleaseMode || DebugMode)
-        __debugbreak();
-#endif
-        EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)exData->ExceptionRecord; //-V1027
-        NullPointException::Types type;
-        switch (sehException->ExceptionInformation[0])
-        {
-        case 0:
-            type = NullPointException::Types::Read;
-            break;
-        case 1:
-            type = NullPointException::Types::Write;
-            break;
-        case 8:
-            type = NullPointException::Types::Execute;
-            break;
-        default:
-            type = NullPointException::Types::Read;
-            break;
-        }
-        Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
-    }
-    break;
-    default:
-        Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
-        str +=
-            Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
-        Seed::toCoreLog(str);
-#if (PreReleaseMode || DebugMode)
-        __debugbreak();
-#endif
-        NtTerminateProcess(NtCurrentProcess(), exCode);
-        break;
+		case STATUS_INTEGER_OVERFLOW:
+			Throw(Seed::Exceptions::IntegerOverflowException(ExceptionPosition));
+		case STATUS_INTEGER_DIVIDE_BY_ZERO:
+			Throw(Seed::Exceptions::DivideByZero(ExceptionPosition));
+	#if !(PreReleaseMode || DebugMode)
+		case STATUS_BREAKPOINT:
+			Seed::toCoreLog(L"Критична помилка: Відбувається відлагодження");
+			break;
+	#endif
+		case STATUS_HEAP_CORRUPTION:
+			Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
+	#if (PreReleaseMode || DebugMode)
+			__debugbreak();
+	#endif
+			NtTerminateProcess(NtCurrentProcess(), STATUS_HEAP_CORRUPTION);
+			break;
+		case STATUS_ACCESS_VIOLATION:
+		{
+			Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+	#if (PreReleaseMode || DebugMode)
+			__debugbreak();
+	#endif
+			EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)exData->ExceptionRecord; //-V1027
+			NullPointException::Types type;
+			switch (sehException->ExceptionInformation[0])
+			{
+			case 0:
+				type = NullPointException::Types::Read;
+				break;
+			case 1:
+				type = NullPointException::Types::Write;
+				break;
+			case 8:
+				type = NullPointException::Types::Execute;
+				break;
+			default:
+				type = NullPointException::Types::Read;
+				break;
+			}
+			Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
+		}
+		break;
+		default:
+			Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
+			str +=
+				Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
+			Seed::toCoreLog(str);
+	#if (PreReleaseMode || DebugMode)
+			__debugbreak();
+	#endif
+			NtTerminateProcess(NtCurrentProcess(), exCode);
+			break;
     }
 }
 
@@ -287,7 +291,7 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
     Seed::Core::ConstAString File, 
     Seed::Core::ConstAString Function, 
     Seed::Core::UInt64 Line, 
-    Seed::Core::ConstString Reason
+    Seed::Core::ConstString Reason //-V813
 ) {
     using SafeString = BaseString<Memory::ExceptionHeap>;
     Exception::ExeptionLocation location{ File,Function,Line };
@@ -415,7 +419,7 @@ Seed::Exception::RawException Seed::Core::Exceptions::Exception::StoreCurrentExc
     return RawException(ptr);
 }
 
-void Seed::Core::Exceptions::Exception::ThrowRawException(Seed::Core::Exceptions::Exception::RawException& exception)
+void Seed::Core::Exceptions::Exception::ThrowRawException(Seed::Core::Exceptions::Exception::RawException& exception) //-V669
 {
     ThrowStoredException(exception.This->ptr);
 }
@@ -426,6 +430,40 @@ void Seed::Core::Exceptions::Exception::RawException::Dispose() {
 		Seed::Core::Memory::ExceptionHeap().Free(ptr);
 	});
 }
+#pragma endregion
+
+#pragma region VEH handler
+
+//LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
+//	switch (ExceptionInfo->ExceptionRecord->ExceptionCode)
+//	{
+//	case STATUS_INTEGER_OVERFLOW:
+//		Throw(Seed::Exceptions::IntegerOverflowException(ExceptionPosition));
+//	case STATUS_INTEGER_DIVIDE_BY_ZERO:
+//		Throw(Seed::Exceptions::DivideByZero(ExceptionPosition));
+//	default:
+//		break;
+//	}
+//
+//	return EXCEPTION_CONTINUE_SEARCH;
+//}
+
+#pragma endregion
+
+#pragma region Capture stacktrace
+
+extern "C"
+NTSYSAPI USHORT NTAPI RtlCaptureStackBackTrace(
+  ULONG  FramesToSkip,
+  ULONG  FramesToCapture,
+  PVOID  *BackTrace,
+  PULONG BackTraceHash
+);
+
+void Seed::Core::Exceptions::GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace) {
+	stackTrace.Count = RtlCaptureStackBackTrace(1, Exception::StackTraceRecord::MaxStackTraceItemCount, (PVOID*) stackTrace.FunctionAddress, NULL);
+}
+
 #pragma endregion
 
 #pragma warning(pop)

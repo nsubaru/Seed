@@ -18,8 +18,9 @@ namespace Seed {
         }
 #pragma warning(push)
 #pragma warning(disable: 4996)
+#pragma warning(disable: 4251)
         template<class THeap>
-        class BaseString final : 
+        class BaseString final :  //-V553
             public Memory::Allocator<THeap>, 
             public IComparable<BaseString<THeap>>,
             public Containers::LINQ::IString<BaseString,THeap,UChar,false>
@@ -1879,7 +1880,7 @@ namespace Seed {
                 CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                 ret[CurrentSize] = L'\0';
                 
-                SizeT len = CurrentSize - 1;
+                Int32 len = CurrentSize - 1;
                 for (--len; len >= 0; Value >>= 4, --len) {
                     ret[len] = HexNumbers[Value & 0xf];
                 }
@@ -1906,7 +1907,7 @@ namespace Seed {
                 CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                 ret[CurrentSize] = L'\0';
 
-                SizeT len = CurrentSize - 1;
+                Int32 len = CurrentSize - 1;
                 for (--len; len >= 0; Value >>= 4, --len) {
                     ret[len] = HexNumbers[Value & 0xf];
                 }

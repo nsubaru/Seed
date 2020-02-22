@@ -7,6 +7,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
+#pragma warning(disable: 4251)
 namespace Seed {
 	inline namespace Core {
 		namespace Memory {
@@ -49,6 +50,25 @@ namespace Seed {
 			///<summary>Класс базової помилки</summary>
 			class SeedKernelCall Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
 			public:
+				/// <summary>
+				/// Сховище стеку викликів
+				/// </summary>
+				struct SeedKernelCall StackTraceRecord {
+					/// <summary>
+					/// Максимальна кількість адресів функцій які можуть зберігатись в сховищі
+					/// </summary>
+					static inline constexpr SizeT MaxStackTraceItemCount = 8Kb / sizeof(SizeT);
+
+					/// <summary>
+					/// Реальна кількість адресів функцій
+					/// </summary>
+					SizeT Count;
+					/// <summary>
+					/// Адреса функцій
+					/// </summary>
+					SizeT FunctionAddress[MaxStackTraceItemCount];	
+				};
+
 				///<summary>Місце генерації помилки</summary>
 				struct SeedKernelCall ExeptionLocation {
 					///<summary>Ім'я файла</summary>
@@ -72,8 +92,11 @@ namespace Seed {
 				ExeptionLocation location;
 				///<summary>Ім'я помилки</summary>
 				ConstString exeptionName;
+
+				StackTraceRecord stackTrace;
 			private:
 				static ID GetTargetThreadID();
+				friend void GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace);
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -82,7 +105,10 @@ namespace Seed {
 				///<param name = 'Name'>Ім'я помилки</param>
 				///<returns>Екземпляр класу Exeption</returns>
 				__forceinline Exception(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& ExeptionName) noexcept
-					:location({ File, FunctName, Line, GetTargetThreadID() }), exeptionName(ExeptionName) {}
+					:location({ File, FunctName, Line, GetTargetThreadID() }), exeptionName(ExeptionName), stackTrace({ 0 }) 
+				{
+					GetStackBackTrace((Seed::Exceptions::Exception::StackTraceRecord&)this->stackTrace);
+				}
 
 				//__forceinline Exception(const Exception& orig)
 				//	: location(orig.location), exeptionName(orig.exeptionName) {}
@@ -99,10 +125,22 @@ namespace Seed {
 					return location;
 				}
 
+				/// <summary>
+				/// Вертає стек викликів на момент генерації помилки
+				/// </summary>
+				/// <returns></returns>
+				forceinline const StackTraceRecord& GetStackTrace() const {
+					return stackTrace;
+				}
+
 				///<summary>Користувальницька назва помилки</summary>
 				ConstString Property(GetExceptioName) Name;
 				///<summary>Місце генерації помилки</summary>
 				ExeptionLocation Property(GetLocation) Location;
+				/// <summary>
+				/// Стек викликів на момент генерації помилки
+				/// </summary>
+				StackTraceRecord Property(GetStackTrace) StackTrace;
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const = 0 {
@@ -155,7 +193,7 @@ namespace Seed {
 					:Exception(File, FunctName, Line, L"Ділення на ноль")
 				{}
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString(exeptionName)
 						+ ExceptionString(L". ")
@@ -534,8 +572,8 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString(exeptionName)
-						+ ExceptionString(L". Очікуваний тип: ") + ExceptionString((Char*)RequiredType.name())
-						+ ExceptionString(L". Фактичний тип: ") + ExceptionString((Char*)ActuallyType.name())
+						+ ExceptionString(L". Очікуваний тип: ") + ExceptionString((Char*)RequiredType.GetCxxName())
+						+ ExceptionString(L". Фактичний тип: ") + ExceptionString((Char*)ActuallyType.GetCxxName())
 						+ ExceptionString(L". ")
 						+ location.toString()
 						+ ExceptionString(L". ");

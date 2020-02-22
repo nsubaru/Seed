@@ -113,23 +113,39 @@ namespace Seed {
 				/// </summary>
 				static constexpr Char ReloadEventName[] = L"\\Kernel\\Excecutable\\Reload";
 
-				/// <summary>
-				/// Тип рядкової змінної імені події завершення системи
-				/// </summary>
 				using TShutdownEventName = TypeTraits::AddReference<decltype(ShutdownEventName)>::Lvalue;
-				/// <summary>
-				/// Тип рядкової змінної імені події перезагрузки системи
-				/// </summary>
 				using TReloadEventName = TypeTraits::AddReference<decltype(ReloadEventName)>::Lvalue;
+				using TKernelNamespaceName = TypeTraits::AddReference<decltype(KernelNamespaceName)>::Lvalue;
+				using TKernelExcecutableNamespaceName = TypeTraits::AddReference<decltype(KernelExcecutableNamespaceName)>::Lvalue;
+			};
+
+			struct ObjectManagerConfigurations {
+				/// <summary>
+				/// Шлях корення в об'єктному менеджері
+				/// </summary>
+				static constexpr Char RootPath[] = L"\\";
+				/// <summary>
+				/// Шлях провайдерів ядра в об'єктному менеджері
+				/// </summary>
+				static constexpr Char KernelPathName[] = L"Kernel";
+				/// <summary>
+				/// Шлях провайдерів хостової системи в об'єктному менеджері
+				/// </summary>
+				static constexpr Char HostPathName[] = L"Host";
+				/// <summary>
+				/// Шлях провайдерів віддалених систем в об'єктному менеджері
+				/// </summary>
+				static constexpr Char RemotePathName[] = L"Remote";
 
 				/// <summary>
-				/// Тип рядкової змінної імені простору імен подій ядра Рем
+				/// Ліміт редіректів при обході шляху в об'єктном просторі
 				/// </summary>
-				using TKernelNamespaceName = TypeTraits::AddReference<decltype(KernelNamespaceName)>::Lvalue;
-				/// <summary>
-				/// Тип рядкової змінної імені простору імен подій виконавчої системи ядра Рем
-				/// </summary>
-				using TKernelExcecutableNamespaceName = TypeTraits::AddReference<decltype(KernelExcecutableNamespaceName)>::Lvalue;
+				static constexpr SizeT ToManyRedirectsTreshold = 10;
+
+				using TRootPath = TypeTraits::AddReference<decltype(RootPath)>::Lvalue;
+				using TKernelPathName = TypeTraits::AddReference<decltype(KernelPathName)>::Lvalue;
+				using THostPathName = TypeTraits::AddReference<decltype(HostPathName)>::Lvalue;
+				using TRemotePathName = TypeTraits::AddReference<decltype(RemotePathName)>::Lvalue;
 			};
 		public:
 			class SeedKernelCall MemoryManagerT {
@@ -564,11 +580,60 @@ namespace Seed {
 				///<summary>Ім'я простору імен подій виконавчої системи ядра Рем</summary>
 				StaticSettingsData::TKernelExcecutableNamespaceName Property(GetKernelExcecutableNamespaceName) KernelExcecutableNamespaceName;
 			};
+
+			class SeedKernelCall ObjectNamespaceConfigurationT {
+			public:
+				constexpr ObjectNamespaceConfigurationT() {} //-V730
+
+				constexpr ObjectManagerConfigurations::TRootPath GetRootPath() {
+					return ObjectManagerConfigurations::RootPath;
+				}
+
+				constexpr ObjectManagerConfigurations::TKernelPathName GetKernelPathName() {
+					return ObjectManagerConfigurations::KernelPathName;
+				}
+
+				constexpr ObjectManagerConfigurations::THostPathName GetHostPathName() {
+					return ObjectManagerConfigurations::HostPathName;
+				}
+
+				constexpr ObjectManagerConfigurations::TRemotePathName GetRemotePathName() {
+					return ObjectManagerConfigurations::RemotePathName;
+				}
+
+				constexpr SizeT GetToManyRedirectsTreshold() {
+					return ObjectManagerConfigurations::ToManyRedirectsTreshold;
+				}
+			public:
+				/// <summary>
+				/// Шлях корення в об'єктному менеджері
+				/// </summary>
+				ObjectManagerConfigurations::TRootPath Property(GetRootPath) RootPath;
+				/// <summary>
+				/// Шлях провайдерів ядра в об'єктному менеджері
+				/// </summary>
+				ObjectManagerConfigurations::TKernelPathName Property(GetKernelPathName) KernelPathName;
+				/// <summary>
+				/// Шлях провайдерів хостової системи в об'єктному менеджері
+				/// </summary>
+				ObjectManagerConfigurations::THostPathName Property(GetHostPathName) HostPathName;
+				/// <summary>
+				/// Шлях провайдерів віддалених систем в об'єктному менеджері
+				/// </summary>
+				ObjectManagerConfigurations::TRemotePathName Property(GetRemotePathName) RemotePathName;
+				/// <summary>
+				/// Ліміт редіректів при обході шляху в об'єктном просторі
+				/// </summary>
+				SizeT Property(GetToManyRedirectsTreshold) ToManyRedirectsTreshold;
+			};
 		public:
-			CurrentSettings() {};
+			constexpr CurrentSettings() {};
 
 			StaticSettingsDataT GetStaticSettingsData() { return StaticSettingsDataT(); }
 			void SetStaticSettingsData(StaticSettingsDataT) {}
+
+			constexpr ObjectNamespaceConfigurationT GetObjectNamespaceConfiguration() { return ObjectNamespaceConfigurationT(); }
+			constexpr void SetObjectNamespaceConfiguration(ObjectNamespaceConfigurationT) {}
 
 			VirtualSettingDataT GetVirtualSettingData() { return VirtualSettingDataT(); }
 			void SetVirtualSettingDataT(VirtualSettingDataT) {}
@@ -594,6 +659,10 @@ namespace Seed {
 			/// Статичні налаштування ядра
 			/// </summary>
 			StaticSettingsDataT Property(GetStaticSettingsData, SetStaticSettingsData) StaticSettings;
+			/// <summary>
+			/// Налаштування менеджера глобальних об'єктів
+			/// </summary>
+			ObjectNamespaceConfigurationT Property(GetObjectNamespaceConfiguration, SetObjectNamespaceConfiguration) ObjectNamespaceConfiguration;
 		public:
 			void SaveCurrentSettings();
 		};

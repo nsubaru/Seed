@@ -154,7 +154,7 @@ protected:
             Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
         else
         {
-            if (typeid(decltype(call(f, args))).hash_code() != type.hash_code())
+            if (typeid(decltype(call(f, args))).GetHashCode() != type.GetHashCode())
                 Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(retType), type));
             return result;
         }
