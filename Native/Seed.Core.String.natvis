@@ -2,6 +2,7 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::BaseString&lt;*&gt;">
     <DisplayString>{{ Lenght={CurrentSize} Text = {str, su} }}</DisplayString>
+    <StringView>str, su</StringView>
     <Expand>
       <Item Name="Lenght">CurrentSize</Item>
       <Item Name="Capacity">ReservedSize</Item>

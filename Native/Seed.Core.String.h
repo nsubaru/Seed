@@ -1880,7 +1880,7 @@ namespace Seed {
                 CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                 ret[CurrentSize] = L'\0';
                 
-                SizeT len = CurrentSize - 1;
+                Int32 len = CurrentSize - 1;
                 for (--len; len >= 0; Value >>= 4, --len) {
                     ret[len] = HexNumbers[Value & 0xf];
                 }
@@ -1907,7 +1907,7 @@ namespace Seed {
                 CharStr ret = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                 ret[CurrentSize] = L'\0';
 
-                SizeT len = CurrentSize - 1;
+                Int32 len = CurrentSize - 1;
                 for (--len; len >= 0; Value >>= 4, --len) {
                     ret[len] = HexNumbers[Value & 0xf];
                 }
