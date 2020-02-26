@@ -114,7 +114,7 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&) або void(*)(T&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T) або void(*)(T, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<

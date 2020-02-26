@@ -14,8 +14,10 @@ namespace Seed
 				{
 					Logic,
 					Numeric,
+					Enumeration,
 					FloatNumeric,
 					Character,
+					NtTime,
 					Collection,
 					String,
 					FixedCollection,
@@ -82,15 +84,15 @@ namespace Seed
 						: CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>>
 					{};
 
-                    template<typename T>
-                    struct CTTITypeDataSpecialization
-                        <
-                        T,
-                        typename Seed::Core::TypeTraits::EnableIfV<!Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
-                        >
-                        : CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>> {
+                    //template<typename T>
+                    //struct CTTITypeDataSpecialization
+                    //    <
+                    //    T,
+                    //    typename Seed::Core::TypeTraits::EnableIfV<!Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
+                    //    >
+                    //    : CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>> {
 
-                    };
+                    //};
 
 					template<typename T>
 					struct CTTITypeData : CTTITypeDataSpecialization<T>

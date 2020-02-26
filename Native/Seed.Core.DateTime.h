@@ -10,21 +10,40 @@ namespace Seed {
 		class SeedKernelCall Date {
 		public:
 			//Окремі поля
-			UInt16 Year, Month, Week, Day, Hour, Minutes, Second, MiliSecond;
+			UInt16 Year, Month, WeekDay, Day, Hour, Minutes, Second, MiliSecond;
 			//Конструктор
-			constexpr Date() noexcept :Year(1600), Month(0), Week(0), Day(0), Hour(0), Minutes(0), Second(0), MiliSecond(0) {};
+			constexpr Date() noexcept :Year(1600), Month(0), WeekDay(0), Day(0), Hour(0), Minutes(0), Second(0), MiliSecond(0) {};
 			//Конструктор з дати і часу
-			constexpr Date(UInt16 Year, UInt16 Month, UInt16 Week, UInt16 Day,
+			constexpr Date(UInt16 Year, UInt16 Month, UInt16 WeekDay, UInt16 Day,
 				UInt16 Hour, UInt16 Minutes, UInt16 Seconds, UInt16 MiliSeconds)
-				noexcept :Year(Year), Month(Month), Week(Week), Day(Day),
+				noexcept :Year(Year), Month(Month), WeekDay(WeekDay), Day(Day),
 				Hour(Hour), Minutes(Minutes), Second(Seconds), MiliSecond(MiliSeconds) {};
 
-			//TODO: Implement it
 			//Конструктор з об'єкта клас час
 			Date(const DateTime& time);
 			//Конвертація в час
-			operator DateTime() const;
+			operator Seed::Core::DateTime() const;
 			~Date() {};
+		};
+
+		//Клас відносної дати
+		class SeedKernelCall DateSpan {
+		public:
+			//Окремі поля
+			UInt16 Year, Month, WeekDay, Day, Hour, Minutes, Second, MiliSecond;
+			//Конструктор
+			constexpr DateSpan() noexcept :Year(1600), Month(0), WeekDay(0), Day(0), Hour(0), Minutes(0), Second(0), MiliSecond(0) {};
+			//Конструктор з дати і часу
+			constexpr DateSpan(UInt16 Year, UInt16 Month, UInt16 WeekDay, UInt16 Day,
+				UInt16 Hour, UInt16 Minutes, UInt16 Seconds, UInt16 MiliSeconds)
+				noexcept :Year(Year), Month(Month), WeekDay(WeekDay), Day(Day),
+				Hour(Hour), Minutes(Minutes), Second(Seconds), MiliSecond(MiliSeconds) {};
+
+			//Конструктор з об'єкта клас час
+			DateSpan(const DateTime& time);
+			//Конвертація в час
+			operator Seed::Core::DateTime() const;
+			~DateSpan() {};
 		};
 
 		//Клас часу оптимізований під швидку арифметику
@@ -36,20 +55,16 @@ namespace Seed {
 			constexpr DateTime() = default;//-V730
 			//Конструктор з задаванням 100 наносекндних інтервалах
 			constexpr DateTime(UInt64 time) :time_ms(time) {}; //-V730
-			////Копіювальний конструктор
-			//constexpr DateTime(const DateTime& orig) :time_ms(orig.time_ms) {}; //-V730
-			////Оператор копіювання
-			//constexpr DateTime& operator=(const DateTime& orig) { this->time_ms = orig.time_ms; return *this; }
-			//Оператор присвоєння
-			//constexpr DateTime& operator=(const DateTime& from) { this->time_ms = from.time_ms; return *this; }
+			//Копіювальний конструктор
+			constexpr DateTime(const DateTime& orig) :time_ms(orig.time_ms) {}; //-V730
 			//Оператор додавання до
-			constexpr DateTime& operator+=(const DateTime& time) { this->time_ms += time.time_ms; return *this; }
+			constexpr DateTime& operator+=(DateTime time) { this->time_ms += time.time_ms; return *this; }
 			//Оператор віднімання від
-			constexpr DateTime& operator-=(const DateTime& time) { this->time_ms -= time.time_ms; return *this; }
+			constexpr DateTime& operator-=(DateTime time) { this->time_ms -= time.time_ms; return *this; }
 			//Оператор додавання
-			constexpr friend DateTime operator+(const DateTime& time1, const DateTime& time2) { return time1.time_ms + time2.time_ms; }
+			constexpr friend DateTime operator+(DateTime time1, DateTime time2) { return time1.time_ms + time2.time_ms; }
 			//Оператор віднімання
-			constexpr friend DateTime operator-(const DateTime& time1, const DateTime& time2) { return time1.time_ms - time2.time_ms; }
+			constexpr friend DateTime operator-(DateTime time1, DateTime time2) { return time1.time_ms - time2.time_ms; }
 			//Вертає кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 			constexpr UInt64 GetMsFrom1600() const volatile { return time_ms; }
 			constexpr void SetMsFrom1600(UInt64 AbsoluteTime) volatile { this->time_ms = AbsoluteTime; }
@@ -67,8 +82,14 @@ namespace Seed {
 			static DateTime GetCurrentLocalTimeData();
 			//Конвертуючий конструктор
 			friend Date::Date(const DateTime& time);
+			//Конвертуючий конструктор
+			friend DateSpan::DateSpan(const DateTime& time);
 
-			volatile DateTime& operator=(const volatile DateTime& NewValue) volatile { this->time_ms = NewValue.time_ms; return *this; }
+			DateTime& operator=(DateTime newValue) {
+				 this->time_ms = newValue.time_ms; return *this;
+			}
+
+			volatile DateTime& operator=(const volatile DateTime& newValue) volatile { this->time_ms = newValue.time_ms; return *this; }
 
 			static constexpr UInt64 SecondInNtTime = 1000ULL * 10000ULL;
 		};

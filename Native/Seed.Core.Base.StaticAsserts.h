@@ -1733,6 +1733,20 @@ namespace Seed {
 
             template<typename R, typename T, typename U>
             inline constexpr auto IsNothrowComparableRetV = IsNothrowComparableRet<R, T, U>::State;    
+
+            template<typename T>
+            struct IsEnumT : LogicConst<__is_enum(T)> {};
+
+            template<typename T>
+            constexpr bool IsEnumV = __is_enum(T);
+
+            template<typename T>
+            struct EnumUnderlyingTypeT {
+                using Type = __underlying_type(T);
+            };
+
+            template<typename T>
+            using EnumUnderlyingTypeV = __underlying_type(T);
 #pragma endregion
         }
     }

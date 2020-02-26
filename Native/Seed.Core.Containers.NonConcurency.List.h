@@ -1484,6 +1484,20 @@ namespace Seed {
 					else
 						static_assert(false);
 				}
+
+				template<typename Lambda>
+				__forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
+					SizeT selectedCount = 0;
+
+					auto node = this->This->root;
+					while (node != nullptr) {
+						if (lambda(node->value))
+							selectedCount++;
+						node = node->next;
+					}
+
+					return selectedCount;
+				}
 #pragma warning(pop)
 			};
 

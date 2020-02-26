@@ -1,11 +1,5 @@
 #pragma once
-#include "typeinfo"
-#include "Seed.Core.Base.h"
-#include "Seed.Core.String.h"
-#include "Seed.Core.Containers.Concurency.List.h"
-#include "Seed.Core.Exceptions.h"
-#include "Seed.Core.CoreLog.h"
-#include "Seed.Core.CoreLog.Managed.h"
+#include "Seed.Core.Testing.TestSuitesResult.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -15,15 +9,28 @@ namespace Seed {
 				virtual ~ITest() = default;
 				virtual bool Excecute() = 0;
 			};
+
 			class SeedKernelCall TestRegister {
 			private:
 				struct TestRecord {
 					String name;
-					const TypeInfo & testClassName;
+					String testClassName;
+					const TypeInfo & testClassInfo;
 					ITest* testObj;
 
-					TestRecord(const String& name, const TypeInfo& testClassName, ITest*&& testObj) : name(name), testClassName(testClassName), testObj(MoveRValue(testObj)) {}
-					TestRecord(String&& name, const TypeInfo& testClassName, ITest*&& testObj) : name(MoveRValue(name)), testClassName(testClassName), testObj(MoveRValue(testObj)) {}
+					TestRecord(const String& name, String&& testClassName, const TypeInfo& testClassInfo, ITest*&& testObj) : 
+						name(name), 
+						testClassName(MoveRValue(testClassName)), 
+						testClassInfo(testClassInfo),
+						testObj(MoveRValue(testObj)) 
+					{}
+
+					TestRecord(String&& name, String&& testClassName, const TypeInfo& testClassInfo, ITest*&& testObj) : 
+						name(MoveRValue(name)), 
+						testClassName(MoveRValue(testClassName)), 
+						testClassInfo(testClassInfo), 
+						testObj(MoveRValue(testObj)) 
+					{}
 				};
 				static inline Containers::ConcurencyList<TestRecord> * tests;
 
@@ -37,7 +44,8 @@ namespace Seed {
 
 				template<typename T>
 				static void Register(T*&& test, String&& testName) {
-					tests->AddLast(TestRecord(MoveRValue(testName), typeid(T), MoveRValue((ITest*&&)test)));
+					static_assert(TypeTraits::IsBasedOnV<ITest, T>, L"Invalid test type passed");
+					tests->AddLast(TestRecord(MoveRValue(testName), NewCTTI::TypeName<T>(),  typeid(T), MoveRValue((ITest*&&)test)));
 				}
 
 				template<typename T>
@@ -45,32 +53,42 @@ namespace Seed {
 					tests->RemoveIf([](const TestRecord& record) {return record.testClassName == typeof(T); }, [](TestRecord&& record) {delete record.testObj; })
 				}
 
-				static Boolean RunAllTest() {
-					Boolean result = true;
+				static TestPackResult RunAllTest() {
+					Containers::List<TestResult> results;
 					toCoreLog(L"Запуск тестів...");
+					DateTime startTime = DateTime::GetCurrentSystemTimeData();
 					tests->ForEach([&](const TestRecord& record) {
+						DateTime testDurration = DateTime::GetCurrentSystemTimeData();
 						try {
 							try {
 								if (record.testObj->Excecute()) {
 									toCoreLog(L"Тест \"" + record.name + L"\" успішно пройдено");
+									testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+									results += {record.testClassName, TestResult::EStatus::Success, "", testDurration};
 								}
 								else {
 									toCoreLog(L"Тест \"" + record.name + L"\" не пройдено");
-									result = false;
+									testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+									results += {record.testClassName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
 								}
 							}
 							catch (Exception & ex) {
 								toCoreLog(L"При обробці тесту " + record.name + L" виникла помилка ", ex);
-								result = false;
+								testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+								results += {record.testClassName, TestResult::EStatus::Exception, ex.toString(), testDurration};
 							}
 						}
 						catch (...) {
 							toCoreLog(L"При обробці тесту " + record.name + L" виникла непередбачувана помилка");
-							result = false;
+							testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+							results += {record.testClassName, TestResult::EStatus::Exception, L"Uknown", testDurration};
 						}
 						});
-					return result;
+					DateTime endTime = DateTime::GetCurrentSystemTimeData();
+					return TestPackResult(String(L"Тести ядра"), results, startTime, endTime);
 				}
+
+				static void StoreTestResultInNUnitReport(const TestPackResult& results);
 			};
 		}
 	}
