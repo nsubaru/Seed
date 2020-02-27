@@ -129,8 +129,6 @@ using FieldMetaData = typename Seed::Core::NewCTTI::TypeTraits::Details::CustomS
                 public:
                     RefCountClass(SerilizableClass, This);
                 };
-
-				constexpr auto v2 = SerilizableClass::FieldMetaData::Fields::Count;
             }
         }
     }

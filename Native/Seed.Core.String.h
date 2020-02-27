@@ -1235,7 +1235,7 @@ namespace Seed {
                 }
                 buf[size] = L'.';
                 size++;
-                if (IntPart == 0.0F) { //-V550
+                if (Math::Equals(IntPart, 0.0F)) { //-V550
                     buf[size] = L'0';
                     size++;
                 }
@@ -1284,7 +1284,7 @@ namespace Seed {
                 }
                 buf[size] = L'.';
                 size++;
-                if (IntPart == 0.0F) { //-V550
+                if (Math::Equals(IntPart, 0.0F)) { //-V550
                     buf[size] = L'0';
                     size++;
                 }
@@ -1337,7 +1337,7 @@ namespace Seed {
                 }
                 buf[size] = L'.';
                 size++;
-                if (IntPart == 0.0) { //-V550
+                if (Math::Equals(IntPart, 0.0)) { //-V550
                     buf[size] = L'0';
                     size++;
                 }
@@ -1386,7 +1386,7 @@ namespace Seed {
                 }
                 buf[size] = L'.';
                 size++;
-                if (IntPart == 0.0) { //-V550
+                if (Math::Equals(IntPart, 0.0F)) { //-V550
                     buf[size] = L'0';
                     size++;
                 }
@@ -1823,7 +1823,7 @@ namespace Seed {
                     list += BaseString((const CharStr)(this->str + PreviosPos), CurrentPos - PreviosPos);
                     PreviosPos = CurrentPos + (TCount - 1);
                 } while (CurrentPos != Math::Max<SizeT>());
-                list += BaseString((const CharStr)(this->str + PreviosPos), (this->Lenght - PreviosPos) - 1);
+                list += BaseString((const CharStr)(this->str + PreviosPos), this->Lenght - PreviosPos);
                 return list;
             }
 

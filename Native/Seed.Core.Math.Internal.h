@@ -233,25 +233,13 @@ namespace Seed {
 #pragma region Runtime
 				__forceinline Float RuntimeAbs(Float Val)
 				{
-					union
-					{
-						Int32* I;
-						Float* D;
-					} D;
-					D.D = &Val;
-					*D.I &= 1 << 31;
+					*(((int*) &Val)) &= 0x7fffffff;
 					return Val;
 				}
 
 				__forceinline Double RuntimeAbs(Double Val)
 				{
-					union
-					{
-						Int64* I;
-						Double* D;
-					} D;
-					D.D = &Val;
-					*D.I &= 1ULL << 63;
+					*(((int*) &Val) + 1) &= 0x7fffffff;
 					return Val;
 				}
 

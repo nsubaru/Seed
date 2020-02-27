@@ -81,3 +81,63 @@ Seed::Core::DateTime Seed::Core::DateTime::GetCurrentLocalTimeData()
 	RtlSystemTimeToLocalTime(&t1, &t2);
 	return DateTime(t2.QuadPart);
 }
+
+Seed::Core::Date::Date(const Seed::Core::DateTime& time) {
+	LARGE_INTEGER t1 = { 0 };
+	TIME_FIELDS tf = { 0 };
+	t1.QuadPart = time.TimeFromStartEpoch;
+	RtlTimeToTimeFields(&t1, &tf);
+	this->Day = tf.Day;
+	this->Hour = tf.Hour;
+	this->MiliSecond = tf.Milliseconds;
+	this->Minutes = tf.Minute;
+	this->Month = tf.Month;
+	this->Second = tf.Second;
+	this->WeekDay = tf.Weekday;
+	this->Year = tf.Year;
+}
+
+Seed::Core::Date::operator Seed::Core::DateTime() const {
+	LARGE_INTEGER t1;
+	TIME_FIELDS tf;
+	tf.Day = this->Day;
+	tf.Hour = this->Hour;
+	tf.Milliseconds = this->MiliSecond;
+	tf.Minute = this->Minutes;
+	tf.Month = this->Minutes;
+	tf.Second = this->Second;
+	tf.Weekday = this->WeekDay;
+	tf.Year = this->Year;
+	RtlTimeFieldsToTime(&tf, &t1);
+	return DateTime(t1.QuadPart);
+}
+
+Seed::Core::DateSpan::DateSpan(const DateTime& time) {
+	LARGE_INTEGER t1 = { 0 };
+	TIME_FIELDS tf = { 0 };
+	t1.QuadPart = time.TimeFromStartEpoch;
+	RtlTimeToElapsedTimeFields(&t1, &tf);
+	this->Day = tf.Day;
+	this->Hour = tf.Hour;
+	this->MiliSecond = tf.Milliseconds;
+	this->Minutes = tf.Minute;
+	this->Month = tf.Month;
+	this->Second = tf.Second;
+	this->WeekDay = tf.Weekday;
+	this->Year = tf.Year;
+}
+
+Seed::Core::DateSpan::operator Seed::Core::DateTime() const {
+	LARGE_INTEGER t1;
+	TIME_FIELDS tf;
+	tf.Day = this->Day;
+	tf.Hour = this->Hour;
+	tf.Milliseconds = this->MiliSecond;
+	tf.Minute = this->Minutes;
+	tf.Month = this->Minutes;
+	tf.Second = this->Second;
+	tf.Weekday = this->WeekDay;
+	tf.Year = this->Year;
+	RtlTimeFieldsToTime(&tf, &t1);
+	return DateTime(t1.QuadPart);
+}

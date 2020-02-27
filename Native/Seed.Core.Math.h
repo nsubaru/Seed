@@ -395,11 +395,11 @@ namespace Seed {
 				return Internal::ModD(X, Y);
 			}
 
-			__forceinline constexpr bool Compare(Float first, Float second){
+			__forceinline constexpr bool Equals(Float first, Float second){
 				return Abs(first - second) <= Epsilon<Double>();
 			}
 
-			__forceinline constexpr bool Compare(Double first, Double second){
+			__forceinline constexpr bool Equals(Double first, Double second){
 				return Abs(first - second) <= Epsilon<Double>();
 			}
 		}
