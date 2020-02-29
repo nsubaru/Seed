@@ -76,13 +76,13 @@ namespace Seed {
 #define GenNGTypeString(text) \
 	Seed::Core::NewCTTI::Details::TypeString<\
 	__GetNGTypeStringHelp4(text, 0)\
-	Seed::Core::NewCTTI::Details::GetSymByN<1024>(text)>
+	Seed::Core::NewCTTI::Details::GetSymByN<Seed::Core::Math::Max<Seed::Core::SizeT()>(text)>
 
 #else
 #define GenNGTypeString(text) \
 	Seed::Core::NewCTTI::Details::TypeString<\
 	__GetNGTypeStringHelp3(text, 0)\
-	Seed::Core::NewCTTI::Details::GetSymByN<Seed::Core::Math::Max<SizeT>()>(text)>
+	Seed::Core::NewCTTI::Details::GetSymByN<Seed::Core::Math::Max<Seed::Core::SizeT>()>(text)>
 
 #endif
 			}

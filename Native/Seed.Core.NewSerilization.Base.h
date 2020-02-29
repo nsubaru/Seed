@@ -269,6 +269,11 @@ namespace Seed
             forceinline SensitiveString SensitiveMetaDataGen() {
                 return SensitiveString(Details::BaseSerlizationHandler<Memory::SensitiveDataHeap, T>::TypeMetaData() + NewCTTI::Details::TypeStringToArray(GenNGTypeString("")()));
             }
+
+            template<typename T>
+            forceinline constexpr auto CTTIMetaDataGen() {
+                return Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + NewCTTI::Details::TypeStringToArray(GenNGTypeString("")());
+            }
         }
     }
 }
