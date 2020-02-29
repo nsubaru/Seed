@@ -92,20 +92,189 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						NewCollection<T> MoveTo() const {
+						NewCollection<T> MoveTo() {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<T>::IsDynamic == false) {
 							NewCollection<T> Instance = NewCollection<T>(ThisCollectionRef.Count);
-							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) {
-								Instance.UnsafeSet(Item, Index);
+							SizeT Index = 0;
+							ThisCollectionRef.RemoveAll([&](T&& Item) {
+								Instance.UnsafeSet(MoveRValue(Item), Index);
+								Index++;
 								});
 							return Instance;
 						}
 						else {
 							NewCollection<T> Instance = NewCollection<T>();
-							ThisCollectionRef.ForEach([&](const T& Item) {
-								Instance.UnsafeAdd(Item);
+							ThisCollectionRef.RemoveAll([&](T&& Item) {
+								Instance.UnsafeAdd(MoveRValue(Item));
 								});
+							return Instance;
+						}
+					}
+				public:
+					/// <summary>
+					/// Копіює елементи колекції в нову колекцію
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <returns>Нова колекція з копіями елементів</returns>
+					template<template <typename> typename NewCollection,
+						typename Lambda,
+						typename U = typename TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+						TypeTraits::LogicConst<
+						(
+							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&> ||  
+							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>
+						)&&
+						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
+						>,
+						bool
+					> = true>
+						NewCollection<U> CopyTo(Lambda&& lambda) {
+						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+						if constexpr (NewCollection<U>::IsDynamic == false) {
+							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) {
+								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+								{
+									Instance.UnsafeSet(lambda(Item, Index), Index);
+								}
+								else
+								{
+									Instance.UnsafeSet(lambda(Item), Index);
+								}
+								});
+							return Instance;
+						}
+						else {
+							NewCollection<U> Instance = NewCollection<U>();
+							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								{
+									Instance.UnsafeAdd(lambda(Item, Index));
+								});
+							}
+							else
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								{
+									Instance.UnsafeAdd(lambda(Item));
+								});
+							}
+							return Instance;
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи колекції в нову колекцію
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <returns>Нова колекція з копіями елементів</returns>
+					template<template <typename> typename NewCollection,
+						typename Lambda,
+						typename U = typename TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+						TypeTraits::LogicConst<
+						(
+							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&> ||  
+							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>
+						)&&
+						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
+						>,
+						bool
+					> = true>
+						NewCollection<U> CopyTo(Lambda&& lambda) const {
+						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+						if constexpr (NewCollection<U>::IsDynamic == false) {
+							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) {
+								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+								{
+									Instance.UnsafeSet(lambda(Item, Index), Index);
+								}
+								else
+								{
+									Instance.UnsafeSet(lambda(Item), Index);
+								}
+								});
+							return Instance;
+						}
+						else {
+							NewCollection<U> Instance = NewCollection<U>();
+							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								{
+									Instance.UnsafeAdd(lambda(Item, Index));
+								});
+							}
+							else
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								{
+									Instance.UnsafeAdd(lambda(Item));
+								});
+							}
+							return Instance;
+						}
+					}
+
+					/// <summary>
+					/// Переміщення елементів в нову колекцію, з старої колекції елементи зникають
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <returns>Нова колекція з елементами</returns>
+					template<template <typename> typename NewCollection,
+						typename Lambda,
+						typename U = typename TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+						TypeTraits::LogicConst<
+						(
+							TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&> ||  
+							TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>
+						)&&
+						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
+						>,
+						bool
+					> = true>
+						NewCollection<U> MoveTo(Lambda&& lambda) {
+						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+						if constexpr (NewCollection<U>::IsDynamic == false) {
+							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
+							SizeT Index = 0;
+							ThisCollectionRef.RemoveAll([&](T&& Item) {
+								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>)
+								{
+									Instance.UnsafeSet(MoveRValue(lambda(MoveRValue(Item), Index)), Index);
+								}
+								else
+								{
+									Instance.UnsafeSet(MoveRValue(lambda(MoveRValue(Item))), Index);
+								}
+								Index++;
+								});
+							return Instance;
+						}
+						else {
+							NewCollection<U> Instance = NewCollection<U>();
+							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>){ 
+								SizeT Index = 0;
+								ThisCollectionRef.RemoveAll([&] (T&& Item)
+								{
+									Instance.UnsafeAdd(MoveRValue(lambda(MoveRValue(Item), Index)));
+									Index++;
+								});
+							}
+							else
+							{
+								ThisCollectionRef.RemoveAll([&] (T&& Item)
+								{
+									Instance.UnsafeAdd(MoveRValue(lambda(MoveRValue(Item))));
+								});
+							}
 							return Instance;
 						}
 					}

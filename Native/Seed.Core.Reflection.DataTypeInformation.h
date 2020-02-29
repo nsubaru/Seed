@@ -148,14 +148,14 @@ namespace Seed
 			public:
 				template<typename T>
 				DataTypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
-					NewCTTI::TypeName<T>(),
-					NewCTTI::CXXTypeName<T>(),
-					NewSerilization::MetaDataGen<T>(),
-					NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable,
-					DataTypeMetaFunctionsBuilder<T>::SerelizeFrom,
-					DataTypeMetaFunctionsBuilder<T>::DeserelizeToDynamic,
-					DataTypeMetaFunctionsBuilder<T>::Builder,
-					typeid(T)
+					NewCTTI::TypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
+					NewCTTI::CXXTypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
+					NewSerilization::MetaDataGen<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
+					NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::IsSerilizable,
+					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::SerelizeFrom,
+					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::DeserelizeToDynamic,
+					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::Builder,
+					typeid(TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>)
 				))
 				{}
 
@@ -200,6 +200,24 @@ namespace Seed
 				BuilderFunctionType Property(GetBuilderFunction) BuilderFunction;
 
 				RefCountClass(DataTypeRecord, data);
+			public:
+				bool operator==(const DataTypeRecord& other) {
+					return this->data->typeInfo == other.data->typeInfo ||
+						this->data->cxxTypeName == other.data->cxxTypeName;
+				}
+
+				bool operator!=(const DataTypeRecord& other) {
+					return this->data->typeInfo != other.data->typeInfo &&
+						this->data->cxxTypeName != other.data->cxxTypeName;
+				}
+
+				bool operator==(const TypeInfo& other) {
+					return this->data->typeInfo == other;
+				}
+
+				bool operator!=(const TypeInfo& other) {
+					return this->data->typeInfo != other;
+				}
 			};
 		}
 	}
