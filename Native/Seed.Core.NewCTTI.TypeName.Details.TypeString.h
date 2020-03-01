@@ -30,9 +30,11 @@ namespace Seed {
 					}
 				};
 
-				template<SizeT N, SizeT M>
+				template<SizeT N = Seed::Core::Math::Max<Seed::SizeT>(), SizeT M = Seed::Core::Math::Max<Seed::SizeT>()>
 				constexpr char GetSymByN(char const(&c)[M]) noexcept
 				{
+					static_assert(M != Seed::Math::Max<SizeT>(), "Invalid text size passed");
+					__assume(M != Seed::Math::Max<SizeT>());
 					return c[N < M ? N : M - 1];
 				}
 
@@ -76,17 +78,18 @@ namespace Seed {
 #define GenNGTypeString(text) \
 	Seed::Core::NewCTTI::Details::TypeString<\
 	__GetNGTypeStringHelp4(text, 0)\
-	Seed::Core::NewCTTI::Details::GetSymByN<Seed::Core::Math::Max<Seed::Core::SizeT()>(text)>
+	Seed::Core::NewCTTI::Details::GetSymByN(text)>
 
 #else
 #define GenNGTypeString(text) \
 	Seed::Core::NewCTTI::Details::TypeString<\
 	__GetNGTypeStringHelp3(text, 0)\
-	Seed::Core::NewCTTI::Details::GetSymByN<Seed::Core::Math::Max<Seed::Core::SizeT>()>(text)>
+	Seed::Core::NewCTTI::Details::GetSymByN(text)>
 
 #endif
 			}
 		}
 	}
 }
+
 #pragma warning(pop)

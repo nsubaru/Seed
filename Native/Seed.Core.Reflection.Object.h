@@ -614,6 +614,26 @@ namespace Seed
 					}
 				};
 
+				template<typename T>
+				struct ObjectNullCtorAndDtor {
+					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> void*
+					{
+						Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+					};
+
+					static constexpr auto UnifiedDtor = [] (void*& pObject)
+					{
+						delete static_cast<T*>(pObject);
+						pObject = nullptr;
+					};
+
+					static constexpr auto CtorArgsTypeName = Seed::Core::NewCTTI::Details::TypeStringToArray(GenNGTypeString("`invalid`")());
+
+					static String ArgsMetaData() {
+						return Seed::Core::NewCTTI::Details::TypeStringToArray(GenNGTypeString("`Can not construct`")());
+					}
+				};
+
 				template<typename TName, typename TGet, TGet GetT, typename TSetterMethods>
 				struct PropertyDescriptor {
 				private:
@@ -1139,4 +1159,6 @@ namespace Seed
 #define MethodDescriptionWithArgs(Class, Method, RetType, ...) Seed::Core::Reflection::Details::MethodDescriptor<RetType(Class::*)(__VA_ARGS__), &Class::Method, GenNGTypeString(#Method)>
 #define	ObjectProperty(Name, Getter, ...) Seed::Core::Reflection::Details::PropertyDescriptor<GenNGTypeString(#Name), decltype(&Getter), &Getter, Seed::Core::Containers::Tuple<__VA_ARGS__>>
 #define CtorDescription(Class, ...) Seed::Core::Reflection::Details::ObjectCtorAndDtor<Class, __VA_ARGS__>
+#define NullCtorDescription(Class) Seed::Core::Reflection::Details::ObjectNullCtorAndDtor<Class>
 #define ObjectDefinition(Class, CtorDesc, Methods, Props) Seed::Core::Reflection::Details::ObjectDescriptor<Class, CtorDesc, Methods, Props>
+#define GenObjectRTTIRecord(ObjectTypeRecord) Seed::Core::Reflection::ObjectRTTIRecord(Seed::Core::TypeTraits::TypeTag<ObjectTypeRecord>{})
