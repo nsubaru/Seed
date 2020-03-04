@@ -39,6 +39,10 @@ namespace Seed {
 				return This->RefCount;
 			}
 
+			__forceinline decltype(auto) GetTypeInfo() {
+				return typeid(This->ptr);
+			}
+
 			SizeT Property(GetRefCount) RefCount;
 		};
 	}

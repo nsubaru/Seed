@@ -205,6 +205,18 @@ namespace Seed
 					forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) {
 						return di.GetDataTypesRecordByName(name);
 					}
+
+					forceinline void RegisterObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) {
+						di.RegisterObjectType(objectRTTIRecord);
+					}
+
+					forceinline void RegisterObjectRTTIRecord(Reflection::ObjectRTTIRecord&& objectRTTIRecord) {
+						di.RegisterObjectType(MoveRValue(objectRTTIRecord));
+					}
+
+					forceinline void RemoveObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) {
+						di.RemoveObjectType(objectRTTIRecord);
+					}
 				private:
 					friend class DepencyInjector;
 				};
@@ -344,12 +356,32 @@ namespace Seed
 					return *this;
 				}
 
-				template<typename T>
 				DepencyInjector& RegisterObjectType(Reflection::ObjectRTTIRecord&& rttiRecord) {
-					if (!this->data->dataTypeTableForNativeLevel.IsExist(&typeid(T)))
+					
+					if (!this->data->objectTypeTableForNativeLevel.IsExist(&rttiRecord.GetRTTITypeInfo()))
 					{
-						this->data->objectTypeTableForNativeLevel.Insert(&typeid(T), rttiRecord);
+						this->data->objectTypeTableForNativeLevel.Insert(&rttiRecord.GetRTTITypeInfo(), rttiRecord);
+						this->data->objectTypeTableForManagedLevel.Insert(rttiRecord.ClassName, MoveRValue(rttiRecord));
+					}
+
+					return *this;
+				}
+
+				DepencyInjector& RegisterObjectType(const Reflection::ObjectRTTIRecord& rttiRecord) {
+					
+					if (!this->data->objectTypeTableForNativeLevel.IsExist(&rttiRecord.GetRTTITypeInfo()))
+					{
+						this->data->objectTypeTableForNativeLevel.Insert(&rttiRecord.GetRTTITypeInfo(), rttiRecord);
 						this->data->objectTypeTableForManagedLevel.Insert(rttiRecord.ClassName, rttiRecord);
+					}
+
+					return *this;
+				}
+
+				DepencyInjector& RemoveObjectType(const Reflection::ObjectRTTIRecord& rttiRecord) {
+					if (this->data->objectTypeTableForNativeLevel.IsExist(&rttiRecord.GetRTTITypeInfo())) {
+						this->data->objectTypeTableForNativeLevel.Delete(&rttiRecord.GetRTTITypeInfo());
+						this->data->objectTypeTableForManagedLevel.Remove(rttiRecord.ClassName);
 					}
 
 					return *this;

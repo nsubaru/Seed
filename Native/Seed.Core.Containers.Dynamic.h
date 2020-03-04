@@ -38,7 +38,7 @@ namespace Seed
                     template<typename ... TTypes>
                     Tuple<TTypes...>& GetVariables() {
                         using Pack = Tuple<TTypes...>;
-                        if (typeid(Pack).GetHashCode() == GetVariablesPackTypeInfo().GetHashCode())
+                        if (typeid(Pack) == GetVariablesPackTypeInfo())
                         {
                             return *reinterpret_cast<Pack*>(GetVariablePackRaw());
                         }
@@ -74,7 +74,7 @@ namespace Seed
                     /// <returns>RTTI TypeInfo</returns>
                     const TypeInfo& GetVariablesPackTypeInfo() const override
                     {
-                        return typeid(decltype(data));
+                        return typeid(Tuple<TTypes...>);
                     }
 
                     /// <summary>
@@ -90,7 +90,13 @@ namespace Seed
                     /// Конструктор з пакету змінних
                     /// </summary>
                     /// <param name="types">Пакет змінних</param>
-                    DynamicImpl(TTypes... types) : data(types...) {}
+                    DynamicImpl(TTypes&&... types) : data(ForwardReference<TTypes>(types)...) {}
+
+                    /// <summary>
+                    /// Конструктор з пакету змінних
+                    /// </summary>
+                    /// <param name="types">Пакет змінних</param>
+                    DynamicImpl(Tuple<TTypes...>&& types) : data(ForwardReference<Tuple<TTypes...>>(types)) {}
 
                     /// <summary>
                     /// Деструктор
@@ -133,7 +139,14 @@ namespace Seed
                 /// </summary>
                 /// <typeparam name="TTypes">Пакет типів</typeparam>
                 template<typename ... TTypes>
-                Dynamic(TTypes ... types) : This(new Data(new DynamicImpl<TTypes...>(types...))) {}
+                Dynamic(TTypes&& ... types) : This(new Data(new DynamicImpl<TTypes...>(ForwardReference<TTypes>(types)...))) {}
+
+                /// <summary>
+                /// Конструктор з пакета змінних
+                /// </summary>
+                /// <typeparam name="TTypes">Пакет типів</typeparam>
+                template<typename ... TTypes>
+                Dynamic(Tuple<TTypes...>&& types) : This(new Data(new DynamicImpl<TTypes...>(ForwardReference<Tuple<TTypes...>>(types)))) {}
 
                 /// <summary>
                 /// Вертає силку на пакет змінних які містить об'єкт,

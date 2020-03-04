@@ -115,7 +115,7 @@ namespace Seed
 		/// <returns>rvalue силку на об'єкт</returns>
 		template<typename TType>
 		[[nodiscard]]
-		__forceinline constexpr TType&& ForwardReference(TypeTraits::RemoveRefV<TType>& arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
+		__forceinline constexpr TType&& ForwardReference(typename TypeTraits::RemoveRefV<TType>& arg) noexcept {	// forward an lvalue as either an lvalue or an rvalue
 			return (static_cast<TType&&>(arg));
 		}
 
@@ -127,7 +127,7 @@ namespace Seed
 		/// <returns>rvalue силку на об'єкт</returns>
 		template<typename TType>
 		[[nodiscard]]
-		__forceinline constexpr TType&& ForwardReference(TypeTraits::RemoveRefV<TType>&& arg) noexcept {	// forward an rvalue as an rvalue
+		__forceinline constexpr TType&& ForwardReference(typename TypeTraits::RemoveRefV<TType>&& arg) noexcept {	// forward an rvalue as an rvalue
 			static_assert(!TypeTraits::IsLValueRef<TType>(), "Bad forward call");
 			return (static_cast<TType&&>(arg));
 		}

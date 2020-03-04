@@ -33,9 +33,12 @@ namespace Seed {
 				template<SizeT N = Seed::Core::Math::Max<Seed::SizeT>(), SizeT M = Seed::Core::Math::Max<Seed::SizeT>()>
 				constexpr char GetSymByN(char const(&c)[M]) noexcept
 				{
+#pragma warning(push)
+#pragma warning(disable: 6385)
 					static_assert(M != Seed::Math::Max<SizeT>(), "Invalid text size passed");
 					__assume(M != Seed::Math::Max<SizeT>());
 					return c[N < M ? N : M - 1];
+#pragma warning(push)
 				}
 
 #define __GenNGTypeStringHelp(text, n)\
