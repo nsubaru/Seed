@@ -189,26 +189,35 @@ namespace Seed
                     }
 
 					forceinline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset) {
-						SizeT Count;
-						BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset);
-					   
-						if constexpr (!TCollectionClass::IsDynamic){
-							data = TCollectionClass(Count);
-							for (SizeT i = 0; i < Count; i++)
+						if constexpr (NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
+						{
+							SizeT Count;
+							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset);
+
+							if constexpr (!TCollectionClass::IsDynamic)
 							{
-								T tmp = T();
-								BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset);
-								data.UnsafeSet(MoveRValue(tmp), i); 
+								data = TCollectionClass(Count);
+								for (SizeT i = 0; i < Count; i++)
+								{
+									T tmp = T();
+									BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset);
+									data.UnsafeSet(MoveRValue(tmp), i);
+								}
+							}
+							else
+							{
+								data = TCollectionClass();
+								for (SizeT i = 0; i < Count; i++)
+								{
+									T tmp = T();
+									BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset);
+									data.UnsafeAdd(MoveRValue(tmp));
+								}
 							}
 						}
-						else {
-							data = TCollectionClass();
-							for (SizeT i = 0; i < Count; i++)
-							{
-								T tmp = T();
-								BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset);
-								data.UnsafeAdd(MoveRValue(tmp)); 
-							}
+						else
+						{
+							Throw(NullPointException(ExceptionPosition));
 						}
 					}
 				};
@@ -277,15 +286,22 @@ namespace Seed
                     }
 
 					forceinline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset) {
-						SizeT Count;
-						BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset);
-					   
-						data = TCollectionClass();
-						for (SizeT i = 0; i < Count; i++)
+						if constexpr (NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 						{
-							T tmp = T();
-							BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset);
-							data.UnsafeSet(MoveRValue(tmp), i); 
+							SizeT Count;
+							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset);
+
+							data = TCollectionClass();
+							for (SizeT i = 0; i < Count; i++)
+							{
+								T tmp = T();
+								BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset);
+								data.UnsafeSet(MoveRValue(tmp), i);
+							}
+						}
+						else
+						{
+							Throw(NullPointException(ExceptionPosition));
 						}
 					}
 				};

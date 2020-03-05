@@ -1422,7 +1422,7 @@ namespace Seed {
 						{
 							if (filter(it->value)) {
 
-								lambda(it->value);
+								lambda(MoveRValue(it->value));
 
 								if (it->next == nullptr && it->prev == nullptr)
 								{
@@ -1466,19 +1466,19 @@ namespace Seed {
 				template<typename FilterLambda, typename Lambda>
 				__forceinline BaseList& RemoveIfImpl(FilterLambda&& filter, Lambda&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State) {
+						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&>::State) {
 						return RemoveIfFilterAndLambdaWithoutIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State) {
+						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&, SizeT>::State) {
 						return RemoveIfFilterWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State) {
+						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&>::State) {
 						return RemoveIfLambdaWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State) {
+						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&, SizeT>::State) {
 						return RemoveIfFilterAndLambdaWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
 					else

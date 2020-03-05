@@ -46,7 +46,6 @@ namespace Seed {
 					/// <param name="lambda">Лямбда яка знищує елементи з сигнатурою void(*)(T&&)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<
-						typename Lambda,
 						typename FilteringLambda,
 						TypeTraits::EnableIfTV<TypeTraits::LogicConst<
 							(TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State ||
