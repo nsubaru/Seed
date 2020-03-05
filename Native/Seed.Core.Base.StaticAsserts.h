@@ -1748,6 +1748,9 @@ namespace Seed {
             template<typename T>
             using EnumUnderlyingTypeV = __underlying_type(T);
 #pragma endregion
+
+            template<typename T>
+            using RemoveCVRefV = typename RemoveCV<typename RemoveRefV<T>>;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Seed
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsNotSerlizable<T>, void>> {
                     forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
-                        static_assert(false, "Cannot serelize this type");
+                        Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
                         __assume(false);
                     }
 
@@ -49,8 +49,7 @@ namespace Seed
                     }
 
                     forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
-                         static_assert(false, "Cannot deserelize this type");
-                         __assume(false);
+                         Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
                     }
 
                     forceinline static constexpr auto TypeMetaData() {

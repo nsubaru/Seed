@@ -58,17 +58,18 @@ namespace Seed
 				template<typename TRet, typename TClass, typename ...TArgs>
 				struct MethodCallDescriptor<TRet(TClass::*)(TArgs...)> {
 					using MethodType = TRet(TClass::*)(TArgs...);
+					using ArgsType = typename Containers::Tuple<typename TypeTraits::RemoveCVRefV<TArgs>...>;
 
 					using Class = TClass;
 
 					static constexpr Boolean IsConst = false;
 					static constexpr Boolean IsVolatile = false;
 
-					static constexpr auto ArgsTypeName = NewCTTI::TypeName<Containers::Tuple<TArgs...>>();
-					static constexpr auto RetTypeName = NewCTTI::TypeName<Containers::Tuple<TRet>>();
+					static constexpr auto ArgsTypeName = NewCTTI::TypeName<ArgsType>();
+					static constexpr auto RetTypeName = NewCTTI::TypeName<ArgsType>();
 
 					static String ArgsMetaData() {
-						return NewSerilization::MetaDataGen<Containers::Tuple<TArgs...>>();
+						return NewSerilization::MetaDataGen<ArgsType>();
 					}
 
 					static String RetMetaData() {
@@ -122,9 +123,9 @@ namespace Seed
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
 
-								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<TArgs...>))
+								if (dynamic.GetImplementationTypeInfo() == typeid(ArgsType))
 								{
-									return dynamic.GetValue<TArgs...>().CallWithArgsFromTuple([&] (TArgs&&... args) -> DynamicObject
+									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>().CallWithArgsFromTuple([&] (TArgs&&... args) -> DynamicObject
 									{
 										(pThis->*method)(ForwardReference<TArgs>(args)...);
 										return DynamicObject();
@@ -137,11 +138,12 @@ namespace Seed
 							}
 							else
 							{
-								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<TArgs...>))
+								if (dynamic.GetImplementationTypeInfo() == typeid(ArgsType))
 								{
-									return dynamic.GetValue<TArgs...>().CallWithArgsFromTuple([&] (TArgs&&... args)
+									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>()
+										.CallWithArgsFromTuple([&] (TypeTraits::RemoveCVRefV<TArgs>&&... args)
 									{
-										return DynamicObject(Containers::Tuple<TRet>((pThis->*method)(args...)));
+										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>((pThis->*method)(args...)));
 									});
 								}
 								else
@@ -156,22 +158,25 @@ namespace Seed
 					{
 						if constexpr (TypeTraits::IsSameV<TRet, void>)
 						{
-							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TArgs>>{})...};
 						}
 						else
 						{
-							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TRet>{}), DataTypeRecord(TypeTraits::TypeTag<TArgs>{})...};
+							return Containers::List<DataTypeRecord>{
+								DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TRet>>{}), 
+								DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TArgs>>{})...
+							};
 						}
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
-						(NewCTTI::TypeTraits::CTTITypeMetaData<TArgs>::IsSerilizable && ...);
+						(NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
-						NewCTTI::TypeTraits::CTTITypeMetaData<TRet>::IsSerilizable;
+						NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
 
-					using Ret = TRet;
-					using Args = Containers::Tuple<TArgs...>;
+					using Ret = TypeTraits::RemoveCVRefV<TRet>;
+					using Args = ArgsType;
 				};
 
 				template<typename TRet, typename TClass, typename ...TArgs>
