@@ -285,6 +285,7 @@ bool Seed::Core::Threading::MainThread(Delegate&& delegate)
 	MainThread->This->State = EThreadabledStates::Starting;
 	MainThread->This->hThread = threadHandle;
 	MainThread->This->AbortEvent = new Event();
+	MainThread->This->TID =  reinterpret_cast<SizeT>(NtCurrentThreadId());
 	MainThread->RefreshName();
 	EntryPoint(MainThread->This->delegate, MainThread);
 	AllActiveThreadable->ForEach([](SmartPtr<IThreadable>& thread) {
