@@ -26,6 +26,14 @@ namespace Seed
                     class StringContactanation final : public ITest {
                         virtual bool Excecute() override;
                     };
+
+                    class StringDoubleFloatConvert final : public ITest {
+                        virtual bool Excecute() override;
+                    };
+
+                    class StringIntConvert final : public ITest {
+                        virtual bool Excecute() override;
+                    };
 				}
 			}
 		}

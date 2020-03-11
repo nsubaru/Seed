@@ -1,4 +1,5 @@
 #pragma once
+#include "typeinfo"
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Containers.TypeTraits.h"
 #include "Seed.Core.Containers.API.LINQ.IString.h"
@@ -22,7 +23,6 @@ namespace Seed {
         template<class THeap>
         class BaseString final :  //-V553
             public Memory::Allocator<THeap>, 
-            public IComparable<BaseString<THeap>>,
             public Containers::LINQ::IString<BaseString,THeap,UChar,false>
             {
         private:
@@ -247,7 +247,6 @@ namespace Seed {
             BaseString(const NewCTTI::Details::ConstexprArray<char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (N == 0)
                 {
-	                // ReSharper disable once CppStaticAssertFailure
 	                static_assert(false, "ConstexprArray must have '\\0' in end");
                 }
                 else
@@ -289,23 +288,14 @@ namespace Seed {
             ///<summary>Оператор рівності</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline Boolean operator==(const BaseString& second) const noexcept {
-                if (this->CurrentSize != second.CurrentSize) return false;
-                if (this->str == second.str) return true;
-                for (SizeT i = 0; i < CurrentSize; i++) {
-                    if (this->str[i] != second.str[i]) return false;
-                }
-                return true;
+            __forceinline Boolean operator==(const BaseString& second) const {
+                return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline Boolean operator!=(const BaseString& second) const noexcept {
+            __forceinline Boolean operator!=(const BaseString& second) const {
                 return !this->operator==(second);
             }
 #pragma endregion
@@ -314,23 +304,15 @@ namespace Seed {
             ///<param name = "second">Правий аргумент оператора</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
             __forceinline Boolean operator==(StaticTextRef<Size> second) const noexcept {
-                if (this->CurrentSize != Size && !(Size == 1 && this->CurrentSize == 0)) return false;
-                for (SizeT i = 0; i < CurrentSize; i++) {
-                    if (this->str[i] != second[i]) return false;
-                }
-                return true;
+                return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності з рядковим літералом</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
             __forceinline Boolean operator!=(StaticTextRef<Size> second) const noexcept {
                 return !this->operator==<Size>(second);
@@ -341,10 +323,8 @@ namespace Seed {
             ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator==(StaticTextRef<Size> second, BaseString first) noexcept {
+            __forceinline friend Boolean operator==(StaticTextRef<Size> second, const BaseString& first) {
                 return first.operator==<Size>(second);
             }
 
@@ -353,10 +333,8 @@ namespace Seed {
             ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator!=(StaticTextRef<Size> second, BaseString first) noexcept {
+            __forceinline friend Boolean operator!=(StaticTextRef<Size> second, const BaseString& first) {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
@@ -365,25 +343,17 @@ namespace Seed {
             ///<param name = "second">Правий аргумент оператора</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline Boolean operator==(StaticATextRef<Size> second) const noexcept {
-                if (this->CurrentSize != Size) return false;
-                for (SizeT i = 0; i < CurrentSize; i++) {
-                    if (this->str[i] != second[i]) return false;
-                }
-                return true;
+            __forceinline Boolean operator==(StaticATextRef<Size> second) const {
+                return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності з рядковим літералом ASCII символів</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline Boolean operator!=(StaticATextRef<Size> second) const noexcept {
+            __forceinline Boolean operator!=(StaticATextRef<Size> second) const {
                 return !this->operator==<Size>(second);
             }
 
@@ -392,10 +362,8 @@ namespace Seed {
             ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator==(StaticATextRef<Size> second, BaseString first) noexcept {
+            __forceinline friend Boolean operator==(StaticATextRef<Size> second, const BaseString& first) {
                 return first.operator==<Size>(second);
             }
 
@@ -404,10 +372,8 @@ namespace Seed {
             ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline friend Boolean operator!=(StaticATextRef<Size> second, BaseString first) noexcept {
+            __forceinline friend Boolean operator!=(StaticATextRef<Size> second, const BaseString& first) {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
@@ -415,22 +381,14 @@ namespace Seed {
             ///<summary>Оператор рівності з константним рядком</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline Boolean operator==(const ConstString& second) const noexcept {
-                if (this->CurrentSize != second.Size) return false;
-                for (SizeT i = 0; i < CurrentSize; i++) {
-                    if (this->str[i] != second[i]) return false;
-                }
-                return true;
+            __forceinline Boolean operator==(const ConstString& second) const {
+                return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності з константним рядком</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline Boolean operator!=(const ConstString& second) const noexcept {
+            __forceinline Boolean operator!=(const ConstString& second) const {
                 return !this->operator==(second);
             }
 
@@ -438,9 +396,7 @@ namespace Seed {
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константий рядок</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline friend Boolean operator==(const ConstString& second, BaseString first) noexcept {
+            __forceinline friend Boolean operator==(const ConstString& second, const BaseString& first) {
                 return first.operator==(second);
             }
 
@@ -448,9 +404,7 @@ namespace Seed {
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константий рядок</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline friend Boolean operator!=(const ConstString& second, BaseString first) noexcept {
+            __forceinline friend Boolean operator!=(const ConstString& second, const BaseString& first) {
                 return first.operator!=(second);
             }
 #pragma endregion
@@ -458,45 +412,31 @@ namespace Seed {
             ///<summary>Оператор рівності з константним рядком ASCII символів</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<SizeT Size>
-            __forceinline Boolean operator==(const ConstAString& second) const noexcept {
-                if (this->CurrentSize != second.Size) return false;
-                for (SizeT i = 0; i < CurrentSize; i++) {
-                    if (this->str[i] != second[i]) return false;
-                }
-                return true;
+            __forceinline Boolean operator==(const ConstAString& second) const {
+                return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності з константним рядком ASCII символів</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline Boolean operator!=(const ConstAString& second) const noexcept {
+            __forceinline Boolean operator!=(const ConstAString& second) const {
                 return !this->operator==(second);
             }
 
             ///<summary>Оператор рівності з константним рядком ASCII символів</summary>
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константний рядок</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline friend Boolean operator==(const ConstAString& second, BaseString first) noexcept {
+            __forceinline friend Boolean operator==(const ConstAString& second, const BaseString& first) {
                 return first.operator==(second);
             }
 
             ///<summary>Оператор нерівності з константним рядком ASCII символів</summary>
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константний рядок</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
-            __forceinline friend Boolean operator!=(const ConstAString& second, BaseString first) noexcept {
+            __forceinline friend Boolean operator!=(const ConstAString& second, const BaseString& first) {
                 return first.operator!=(second);
             }
 #pragma endregion
@@ -504,15 +444,14 @@ namespace Seed {
             ///<summary>Оператор рівності з рядком алокованим в іншій кучі</summary>
             ///<param name = "OtherString">Константне посилання на рядкову зміну</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            ///<remarks>Порівнює поточні розміра якщо рівні то порівнює вміст,
-            ///якщо хоч одна умова не виконується то рядки різні</remarks>
             template<typename OtherBase>
-            __forceinline Boolean operator==(const BaseString<OtherBase>& OtherString) const noexcept {
-                if (this->Lenght != OtherString.Lenght) return false;
-                for (SizeT i = 0; i < CurrentSize; i++) {
-                    if (this->str[i] != OtherString[i]) return false;
-                }
-                return true;
+            __forceinline Boolean operator==(const BaseString<OtherBase>& OtherString) const {
+                return (*this <=> OtherString) == 0;
+            }
+
+            template<typename OtherBase>
+            __forceinline Boolean operator!=(const BaseString<OtherBase>& OtherString) const {
+                return (*this <=> OtherString) != 0;
             }
 #pragma endregion
 #pragma endregion
@@ -523,7 +462,7 @@ namespace Seed {
             ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
             ///Текст просто копіюється по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
             BaseString& operator=(const BaseString& orig) {
-                if (*this == orig) return *this;
+                if (this->str == orig.str) return *this;
                 if (this->ReservedSize >= orig.CurrentSize) {
                     Memory::Copy(orig.str, this->str, orig.CurrentSize * sizeof(Char));
                     this->CurrentSize = orig.CurrentSize;
@@ -554,43 +493,118 @@ namespace Seed {
             }
 #pragma endregion
 #pragma region Comparing
-            ///<summary>Порівнює рядки</summary>
-            __forceinline bool operator>(const BaseString& right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) > 0;
-            }
-            ///<summary>Порівнює рядки</summary>
-            __forceinline bool operator<(const BaseString& right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) < 0;
-            }
-            ///<summary>Порівнює рядки</summary>
-            __forceinline bool operator>=(const BaseString& right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) >= 0;
-            }
-            ///<summary>Порівнює рядки</summary>
-            __forceinline bool operator<=(const BaseString& right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                return CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize) <= 0;
-            }
 
-            ///<summary>Порівнює два екземпляри типу T та вертає значення відносно поточного об'єкта</summary>
-            virtual inline Equality Compare(const BaseString& right) const override final {
+            /// <summary>
+            /// Універсальний оператор порівняння
+            /// </summary>
+            /// <param name="str1">Другий рядок</param>
+            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            template<typename TOtherHeap>
+            StrongOrdering operator<=>(const BaseString<TOtherHeap>& right) const {
                 extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                auto res = CompareString(this->str, right.str, this->CurrentSize, right.CurrentSize);
+                auto res = CompareString(this->str, right.str, this->Lenght, right.Lenght);
                 if (res == 0)
-                    return Equality::Equal;
+                    return StrongOrdering::equal;
+                else if (res > 0)
+                    return StrongOrdering::greater;
                 else
-                    if (res > 0)
-                        return Equality::Bigger;
-                    else
-                        return Equality::Smaller;
+                    return StrongOrdering::less;
             }
 
-            //Equality operator<=>(const BaseString& str1) {
-            //
-            //}
+            /// <summary>
+            /// Універсальний оператор порівняння
+            /// </summary>
+            /// <param name="str1">Другий рядок</param>
+            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            template<> 
+            StrongOrdering operator<=>(const BaseString<THeap>& right) const {
+                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+                auto res = CompareString(this->str, right.str, this->Lenght, right.Lenght);
+                if (res == 0)
+                    return StrongOrdering::equal;
+                else if (res > 0)
+                    return StrongOrdering::greater;
+                else
+                    return StrongOrdering::less;
+            }
+
+            /// <summary>
+            /// Універсальний оператор порівняння
+            /// </summary>
+            /// <param name="str1">Другий рядок</param>
+            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            template<SizeT TextLenght>
+            StrongOrdering operator<=>(StaticTextRef<TextLenght> right) const {
+                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+                auto res = CompareString(this->str, (Char*)right, this->Lenght, TextLenght - 1);
+                if (res == 0)
+                    return StrongOrdering::equal;
+                else if (res > 0)
+                    return StrongOrdering::greater;
+                else
+                    return StrongOrdering::less;
+            }
+
+            /// <summary>
+            /// Універсальний оператор порівняння
+            /// </summary>
+            /// <param name="str1">Другий рядок</param>
+            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            StrongOrdering operator<=>(const ConstString& right) const {
+                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
+                auto res = CompareString(this->str, (Char*)right.Str, this->Lenght, right.GetSize() - 1);
+                if (res == 0)
+                    return StrongOrdering::equal;
+                else if (res > 0)
+                    return StrongOrdering::greater;
+                else
+                    return StrongOrdering::less;
+            }
+
+            /// <summary>
+            /// Універсальний оператор порівняння
+            /// </summary>
+            /// <param name="str1">Другий рядок</param>
+            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            StrongOrdering operator<=>(const ConstAString& right) const {
+                auto countedSize = Min(this->Size, right.Size);
+
+                for (SizeT i = 0; i < countedSize; i++)
+                {
+                    if (this->str[i] != right[i])
+                    {
+                        if (this->str[i] > right[i])
+                            return StrongOrdering::greater;
+                        else
+                            return StrongOrdering::less;
+                    }
+                }
+
+                return (this->Size <=> right.Size);
+            }
+
+            /// <summary>
+            /// Універсальний оператор порівняння
+            /// </summary>
+            /// <param name="str1">Другий рядок</param>
+            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            template<SizeT TextLenght>
+            StrongOrdering operator<=>(StaticATextRef<TextLenght> right) const {
+                auto countedSize = Min(this->Size, TextLenght);
+
+                for (SizeT i = 0; i < countedSize; i++)
+                {
+                    if (this->str[i] != right[i])
+                    {
+                        if (this->str[i] > right[i])
+                            return StrongOrdering::greater;
+                        else
+                            return StrongOrdering::less;
+                    }
+                }
+
+                return this->Size <=> TextLenght;
+            }
 #pragma endregion
 #pragma region Add operators
 #pragma region Literals
@@ -720,7 +734,7 @@ namespace Seed {
             BaseString operator+(const ConstAString& Text) const {
                 if (Text.Size < 2)
                     return *this;
-                BaseString ret_data;
+                BaseString retData;
                 SizeT NewSize = this->Lenght + Text.Size;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                 retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
@@ -873,7 +887,6 @@ namespace Seed {
                     {
                         while (*tempStr++ = *second++);
                     }
-                    BaseString::operator delete[](this->str);
                     CurrentSize = NewSize;
                 }
                 return *this;
@@ -1212,76 +1225,30 @@ namespace Seed {
 #pragma endregion
 #pragma region Converting string to types
 #pragma region Converting float typed to string
-            ///<summary>Конвертація дійсного числа з одинарною точністю до рядка</summary>
-            ///<param name = "val">Число яке конвертуватиме</param>
-            ///<returns>Рядкове представлення числа</returns>
-            static BaseString toString(Float val) {
-                using namespace Math;
-                if (val == 0.0F) return L"0"; //-V550
-                if (val != val) return L"NaN";
-                if (val == Seed::Math::Infinity) return L"Infinity"; //-V550
-                if (val == -Seed::Math::Infinity) return L"-Infinity"; //-V550
-                Boolean sign = Math::Sign(val);
-                if (sign) Math::Abs(val);
-                Float IntPart;
-                Float DoublePart = Math::ModD(val, IntPart);
-                DoublePart *= 10e5;
-                Char buf[25];
-                SizeT size = 0;
-                while (DoublePart >= 1) {
-                    buf[size] = L'0' + (Int32)(DoublePart) % 10; //-V2005 //-V2003
-                    size++;
-                    DoublePart /= 10;
-                }
-                buf[size] = L'.';
-                size++;
-                if (Math::Equals(IntPart, 0.0F)) { //-V550
-                    buf[size] = L'0';
-                    size++;
-                }
-                else
-                    while (IntPart >= 1) {
-                        buf[size] = L'0' + (Int32)(IntPart) % 10; //-V2005 //-V2003
-                        size++;
-                        IntPart /= 10;
-                    }
-                if (sign) {
-                    buf[size] = '-';
-                    size++;
-                }
-                buf[size] = L'\0';
-                Seed::Core::Reverse(buf, size);
-                BaseString str;
-                str.CurrentSize = size;
-                str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
-                Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                return str;
-            }
-
             ///<summary>Конвертація дійсного числа з одинарною точністю до рядка з певною кількістю знаків після коми</summary>
             ///<param name = "val">Число яке конвертуватиме</param>
             ///<param name = "precision">Кількість знаків після коми</param>
             ///<returns>Рядкове представлення числа</returns>
-            static BaseString toString(Float val, UInt8 precision) {
+            static BaseString toString(Float val, UInt8 precision = 3) {
                 using namespace Math;
-                if (val == 0.0F) return L"0"; //-V550
+                if (val == 0.0) return L"0"; //-V550
                 if (val != val) return L"NaN";
                 if (val == Infinity) return L"Infinity"; //-V550
                 if (val == -Infinity) return L"-Infinity"; //-V550
                 if (precision > 10) precision = 10;
                 Boolean sign = Math::Sign(val);
-                if (sign) val *= -1.0F;
+                if (sign) val *= -1.0;
                 Float IntPart;
                 Float DoublePart = Math::ModD(val, IntPart);
                 DoublePart *= Math::Pow(10, precision);
-                Char buf[25];
+                Char buf[50];
                 SizeT size = 0;
                 while (DoublePart >= 1) {
                     buf[size] = L'0' + (Int32)(DoublePart) % 10; //-V2005 //-V2003
                     size++;
                     DoublePart /= 10;
                 }
+                if(size != precision) for (size; size < precision; size++) buf[size] = L'0';
                 buf[size] = L'.';
                 size++;
                 if (Math::Equals(IntPart, 0.0F)) { //-V550
@@ -1300,64 +1267,12 @@ namespace Seed {
                 }
                 buf[size] = L'\0';
                 Seed::Core::Reverse(buf, size);
-                BaseString str;
-                str.CurrentSize = size;
-                str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
-                Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
-                return str;
-            }
-
-            ///<summary>Конвертація дійсного числа з подвійною точністю до рядка</summary>
-            ///<param name = "val">Число яке конвертуватиме</param>
-            ///<returns>Рядкове представлення числа</returns>
-            static BaseString toString(Double val) {
-                using namespace Math;
-                if (val == 0.0) return L"0"; //-V550
-                if (val != val) return L"NaN";
-                if (val == Seed::Math::Infinity) return L"Infinity"; //-V550
-                if (val == -Seed::Math::Infinity) return L"-Infinity"; //-V550
-                Boolean sign = Math::Sign(val);
-                if (sign) val *= -1.0;
-                Double IntPart;
-                Double DoublePart = Math::ModD(val, IntPart);
-                DoublePart *= 10e5;
-                Char buf[40];
-                SizeT size = 0;
-                if (DoublePart == 0.0) { //-V550
-                    buf[0] = L'0';
-                    size++;
-                }
-                else {
-                    while (DoublePart >= 1) {
-                        buf[size] = L'0' + (Int32)(DoublePart) % 10; //-V2005 //-V2003
-                        size++;
-                        DoublePart /= 10;
-                    }
-                }
-                buf[size] = L'.';
                 size++;
-                if (Math::Equals(IntPart, 0.0)) { //-V550
-                    buf[size] = L'0';
-                    size++;
-                }
-                else
-                    while (IntPart >= 1) {
-                        buf[size] = L'0' + (Int32)(IntPart) % 10; //-V2005 //-V2003
-                        size++;
-                        IntPart /= 10;
-                    }
-                if (sign) {
-                    buf[size] = '-';
-                    size++;
-                }
-                buf[size] = L'\0';
-                Seed::Core::Reverse(buf, size);
                 BaseString str;
                 str.CurrentSize = size;
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
-                Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
+                Memory::Copy(buf, str.str, (str.CurrentSize) * sizeof(Char));
                 return str;
             }
 
@@ -1365,7 +1280,7 @@ namespace Seed {
             ///<param name = "val">Число яке конвертуватиме</param>
             ///<param name = "precision">Кількість знаків після коми</param>
             ///<returns>Рядкове представлення числа</returns>
-            static BaseString toString(Double val, UInt8 precision) {
+            static BaseString toString(Double val, UInt8 precision = 5) {
                 using namespace Math;
                 if (val == 0.0) return L"0"; //-V550
                 if (val != val) return L"NaN";
@@ -1384,9 +1299,10 @@ namespace Seed {
                     size++;
                     DoublePart /= 10;
                 }
+                if(size != precision) for (size; size < precision; size++) buf[size] = L'0';
                 buf[size] = L'.';
                 size++;
-                if (Math::Equals(IntPart, 0.0F)) { //-V550
+                if (Math::Equals(IntPart, 0.0)) { //-V550
                     buf[size] = L'0';
                     size++;
                 }
@@ -1402,11 +1318,12 @@ namespace Seed {
                 }
                 buf[size] = L'\0';
                 Seed::Core::Reverse(buf, size);
+                size++;
                 BaseString str;
                 str.CurrentSize = size;
                 str.ReservedSize = str.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                 str.str = (CharStr)BaseString::operator new[](sizeof(Char)* str.ReservedSize); //-V2005
-                Memory::Copy(buf, str.str, str.CurrentSize * sizeof(Char));
+                Memory::Copy(buf, str.str, (str.CurrentSize) * sizeof(Char));
                 return str;
             }
 #pragma endregion
@@ -1428,7 +1345,7 @@ namespace Seed {
                 if constexpr (TypeTraits::IsSameV<TypeTraits::Unsigned<T>, T>) {
                     Math::SafeInt<T> ret;
                     for (SizeT i = 0; i < Lenght; i++) {
-                        if (str[i] < L'0' || str[i]>L'9')
+                        if (!(L'0' <= str[i] && str[i] <= L'9'))
                             Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                         ret += static_cast<UInt8>(str[i] - L'0');
                         if (i < CurrentSize - 2)
@@ -1443,7 +1360,7 @@ namespace Seed {
                         i = 1;
                     Math::SafeInt<T> ret = 0;
                     for (i; i < Lenght; i++) {
-                        if (str[i] < L'0' || str[i]>L'9')
+                        if (!(L'0' <= str[i] && str[i] <= L'9'))
                             Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                         ret += str[i] - L'0';
                         if (i < CurrentSize - 2)
@@ -1461,33 +1378,33 @@ namespace Seed {
             ///<exception cref="Seed::Exceptions::IntegerOverflowException">якщо кількість цифр є більшою ніж можу вмістити число Float</exception>
             ///<exception cref="Seed::Exceptions::InvalidFormatException">якщо в строці є відміні від цифр і одної крапки символи</exception>
             Float toFloat() {
-                if (this->CurrentSize == 0)
+                 if (this->CurrentSize == 0)
                     Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
-                if (this->CurrentSize > 9)
+                if (this->CurrentSize > 18)
                     Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
                 Boolean sign(this->str[0] == '-');
                 size_t i = 0;
                 if (str[0] == L'-' || str[0] == L'+')
                     i = 1;
                 Float int_part = 0.0, double_part = 0.0;
-                for (i; i < CurrentSize && this->str[i] != L'.'; i++) {
-                    if (str[i] < L'0' || str[i]>L'9')
+                for (i; i < Lenght && this->str[i] != L'.'; i++) {
+                    if (!(L'0' <= str[i] && str[i] <= L'9'))
                         Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                     int_part += this->str[i] - L'0';
                     int_part *= 10;
                 }
                 int_part /= 10;
                 if (i != CurrentSize) {
-                    i++;
-                    for (size_t j = CurrentSize - 1; j >= i; j--) {
-                        if (str[i] < L'0' || str[i]>L'9')
+                    for (SizeT j = Lenght - 1; j > i; j--)
+                    {
+                        if (!(L'0' <= str[j] && str[j] <= L'9'))
                             Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                         double_part += this->str[j] - L'0';
                         double_part /= 10;
                     }
                     int_part += double_part;
                 }
-                return int_part * ((sign) ? -1.0f : 1.0f);
+                return int_part * ((sign) ? -1.0 : 1.0);
             }
 
             ///<summary>Перетворення тексту в дійсне число Double. На початку може стояти символ '+' або '-'</summary>
@@ -1505,17 +1422,17 @@ namespace Seed {
                 if (str[0] == L'-' || str[0] == L'+')
                     i = 1;
                 Double int_part = 0.0, double_part = 0.0;
-                for (i; i < CurrentSize && this->str[i] != L'.'; i++) {
-                    if (str[i] < L'0' || str[i]>L'9')
+                for (i; i < Lenght && this->str[i] != L'.'; i++) {
+                    if (!(L'0' <= str[i] && str[i] <= L'9'))
                         Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                     int_part += this->str[i] - L'0';
                     int_part *= 10;
                 }
                 int_part /= 10;
                 if (i != CurrentSize) {
-                    i++;
-                    for (size_t j = CurrentSize - 1; j >= i; j--) {
-                        if (str[i] < L'0' || str[i]>L'9')
+                    for (SizeT j = Lenght - 1; j > i; j--)
+                    {
+                        if (!(L'0' <= str[j] && str[j] <= L'9'))
                             Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                         double_part += this->str[j] - L'0';
                         double_part /= 10;
@@ -1549,6 +1466,15 @@ namespace Seed {
                 extern void ConvertDateTimeToStringImpl(const Seed::Core::DateTime & time, Seed::CharStr buffer);
                 ConvertDateTimeToStringImpl(time, buffer);
                 return buffer;
+            }
+
+            /// <summary>
+            /// Перетворює в рядок опис CxxRtti опис типу
+            /// </summary>
+            /// <param name="typeInfo">CxxRtti опис типу</param>
+            /// <returns>Кодована назва типу</returns>
+            static BaseString<THeap> toString(const TypeInfo& typeInfo) {
+                return BaseString<THeap>(const_cast<AChar*>(typeInfo.GetCxxName()));
             }
 
             ///<summary>Приведення бінарного тексту до рядкової зміної</summary>
@@ -2227,7 +2153,6 @@ namespace Seed {
                     return *this;
                 }
                 else {
-	                // ReSharper disable once CppStaticAssertFailure
 	                static_assert(false);
                 }
             }
@@ -2249,7 +2174,6 @@ namespace Seed {
                     return *this;
                 }
                 else {
-	                // ReSharper disable once CppStaticAssertFailure
 	                static_assert(false);
                 }
             }
@@ -2273,7 +2197,6 @@ namespace Seed {
                     return *this;
                 }
                 else {
-	                // ReSharper disable once CppStaticAssertFailure
 	                static_assert(false);
                 }
             }
@@ -2297,7 +2220,6 @@ namespace Seed {
                     return *this;
                 }
                 else {
-	                // ReSharper disable once CppStaticAssertFailure
 	                static_assert(false);
                 }
             }
@@ -2348,10 +2270,10 @@ namespace Seed {
                 this->~BaseString();
             	return *this;
             }
-        };
 
-        //template<typename THeap>
-        //__forceinline void Swap(BaseString<THeap>& a, BaseString<THeap>& b) 
+            template<typename TOtherHeap>
+            friend class BaseString;
+        };
 
         ///<summary>Тип кінця рядка</summary>
         namespace { typedef const Char(&EndLineT)[3]; }
@@ -2364,7 +2286,6 @@ namespace Seed {
         namespace { using String = BaseString<Memory::Heap>; }
         ///<summary>Рядок для збереження конфіденційної інформації</summary>
         namespace { using SensitiveString = BaseString<Memory::SensitiveDataHeap>; }
-#pragma warning(pop)
 
         namespace TypeTraits {
             namespace Collection {
@@ -2374,3 +2295,13 @@ namespace Seed {
         }
     }
 }
+
+#pragma warning(disable: 4455)
+
+__forceinline Seed::Core::String operator "" S(const wchar_t* const text, const Seed::SizeT size)
+{ //-V2537
+	using namespace Seed;
+	return String((Char*)text); //-V2533
+}
+    
+#pragma warning(pop)

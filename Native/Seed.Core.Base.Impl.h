@@ -83,7 +83,7 @@ OptimizeExport(
 InternalApiCall
 OptimizeExport(
 	Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize), {
-		return RtlCompareUnicodeStrings(left, leftSize, right, rightSize, TRUE);
+		return RtlCompareUnicodeStrings(left, leftSize, right, rightSize, FALSE);
 	}
 );
 

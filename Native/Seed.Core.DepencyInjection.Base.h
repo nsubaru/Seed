@@ -160,7 +160,17 @@ namespace Seed
 			private:
 				Data* data;
 			protected:
-				virtual void Dispose() override {};
+				virtual void Dispose() override {
+					//Видалення сервісів
+					data->serviceTableForManagedLevel.RemoveAll();
+					data->serviceTableForNativeLevel.RemoveAll();
+					//Видалення записів про типи даних
+					data->dataTypeTableForManagedLevel.RemoveAll();
+					data->dataTypeTableForNativeLevel.RemoveAll();
+					//Видалення записів про типи об'єктів
+					data->objectTypeTableForManagedLevel.RemoveAll();
+					data->objectTypeTableForNativeLevel.RemoveAll();
+				};
 			public:
 				class IDI final {
 				private:

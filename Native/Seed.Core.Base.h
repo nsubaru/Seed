@@ -5,20 +5,13 @@
 
 #include "Seed.Core.Base.Types.h"
 #include "Seed.Core.Base.Interlocked.h"
-// ReSharper disable CppUnusedIncludeDirective
 #include "Seed.Core.Base.Math.h"
-// ReSharper restore CppUnusedIncludeDirective
-// ReSharper disable once CppUnusedIncludeDirective
+#include "Seed.Core.Base.Comparing.h"
 #include "Seed.Core.Base.BitOperations.h"
-// ReSharper disable once CppUnusedIncludeDirective
 #include "Seed.Core.Base.CStr.h"
 #include "Seed.Core.Base.Swap.h"
-// ReSharper disable CppUnusedIncludeDirective
 #include "Seed.Core.Base.StaticAsserts.h"
-// ReSharper restore CppUnusedIncludeDirective
-// ReSharper disable CppUnusedIncludeDirective
 #include "Seed.Core.Base.UUID.h"
-// ReSharper restore CppUnusedIncludeDirective
 #include "Seed.Core.Base.Utils.h"
 
 #pragma warning(disable: 26439)
@@ -237,23 +230,6 @@ namespace Seed {
         	/// Метод для звільнення ресурсів, викликається деструктором автоматично в класів з підрахунком силок
         	/// </summary>
             virtual void Dispose() = 0;
-        };
-
-    	/// <summary>
-    	/// Можливі варіанти порівняння
-    	/// </summary>
-        enum class Equality : Int8 {
-            Smaller = -1, Equal = 0, Bigger = 1, NonComparable = -127
-        };
-
-    	/// <summary>
-    	/// Інтерфейс порівняння
-    	/// </summary>
-        template<typename T>
-        class IComparable
-        {
-            ///<summary>Порівнює два екземпляри типу T та вертає значення відносно поточного об'єкта</summary>
-            virtual Equality Compare(const T& val) const = 0;
         };
 
     	/// <summary>
