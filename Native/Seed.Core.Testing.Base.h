@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Testing.TestSuitesResult.h"
+#include "Seed.Core.Testing.Asserts.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -59,24 +60,31 @@ namespace Seed {
 					DateTime startTime = DateTime::GetCurrentSystemTimeData();
 					tests->ForEach([&](const TestRecord& record) {
 						DateTime testDurration = DateTime::GetCurrentSystemTimeData();
-						try {
-							try {
-								if (record.testObj->Excecute()) {
-									toCoreLog(L"Тест \"" + record.name + L"\" успішно пройдено");
-									testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-									results += {record.testClassName, TestResult::EStatus::Success, "", testDurration};
-								}
-								else {
-									toCoreLog(L"Тест \"" + record.name + L"\" не пройдено");
-									testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-									results += {record.testClassName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
-								}
-							}
-							catch (Exception & ex) {
-								toCoreLog(L"При обробці тесту " + record.name + L" виникла помилка ", ex);
+						try
+						{
+							if (record.testObj->Excecute())
+							{
+								toCoreLog(L"Тест \"" + record.name + L"\" успішно пройдено");
 								testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-								results += {record.testClassName, TestResult::EStatus::Exception, ex.toString(), testDurration};
+								results += {record.testClassName, TestResult::EStatus::Success, "", testDurration};
 							}
+							else
+							{
+								toCoreLog(L"Тест \"" + record.name + L"\" не пройдено");
+								testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+								results += {record.testClassName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
+							}
+						}
+						catch (Asserts::AssertException & ex)
+						{
+							toCoreLog(L"Спрацював ассерт в тесті \"" + record.name + L"\": " + ex.AssertMessage);
+							testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+							results += {record.testClassName, TestResult::EStatus::Failure, ex.toString(), testDurration};
+						}
+						catch (Exception & ex) {
+							toCoreLog(L"При обробці тесту " + record.name + L" виникла помилка ", ex);
+							testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+							results += {record.testClassName, TestResult::EStatus::Exception, ex.toString(), testDurration};
 						}
 						catch (...) {
 							toCoreLog(L"При обробці тесту " + record.name + L" виникла непередбачувана помилка");

@@ -1,6 +1,7 @@
 #pragma once
 #include "Seed.Core.Base.Types.h"
 #include "Seed.Core.Base.Math.h"
+#include "Seed.Core.Base.Comparing.h"
 
 #ifndef __GUID_DEFINED
 #define __GUID_DEFINED
@@ -150,93 +151,10 @@ namespace Seed {
 			}
 
 			/// <summary>
-			/// Перевірка на рівність
+			/// Універсальне порівняння
 			/// </summary>
-			/// <param name="a">Праве значення</param>
-			/// <param name="b">Ліве значення</param>
-			/// <returns>True якщо рівні, False якщо ні</returns>
-			constexpr __forceinline friend Boolean operator==(const UUID& a, const UUID& b) {
-				if (a.uuid.Data4[7] == b.uuid.Data4[7])
-					if (a.uuid.Data4[6] == b.uuid.Data4[6])
-						if (a.uuid.Data4[5] == b.uuid.Data4[5])
-							if (a.uuid.Data4[4] == b.uuid.Data4[4])
-								if (a.uuid.Data4[3] == b.uuid.Data4[3])
-									if (a.uuid.Data4[2] == b.uuid.Data4[2])
-										if (a.uuid.Data4[1] == b.uuid.Data4[1])
-											if (a.uuid.Data4[0] == b.uuid.Data4[0])
-												if (a.uuid.Data3 == b.uuid.Data3)
-													if (a.uuid.Data2 == b.uuid.Data2)
-														if (a.uuid.Data1 == b.uuid.Data1) return true;
-				return false;
-			}
-
-			/// <summary>
-			/// Перевірка на нерівність
-			/// </summary>
-			/// <param name="a">Праве значення</param>
-			/// <param name="b">Ліве значення</param>
-			/// <returns>True якщо не рівні, інакше False</returns>
-			constexpr __forceinline friend Boolean operator!=(const UUID& a, const UUID& b) {
-				return !(a == b);
-			}
-
-			/// <summary>
-			/// Перевірка a менше b
-			/// </summary>
-			/// <param name = "a">Праве значення</param>
-			/// <param name = "b">Ліве значення</param>
-			/// <returns>True якщо праве менше ніж ліве, False інакше</returns>
-			constexpr __forceinline friend Boolean operator<(const UUID& a, const UUID& b) {
-				if (a.uuid.Data4[7] < b.uuid.Data4[7])
-					if (a.uuid.Data4[6] < b.uuid.Data4[6])
-						if (a.uuid.Data4[5] < b.uuid.Data4[5])
-							if (a.uuid.Data4[4] < b.uuid.Data4[4])
-								if (a.uuid.Data4[3] < b.uuid.Data4[3])
-									if (a.uuid.Data4[2] < b.uuid.Data4[2])
-										if (a.uuid.Data4[1] < b.uuid.Data4[1])
-											if (a.uuid.Data4[0] < b.uuid.Data4[0])
-												if (a.uuid.Data3 < b.uuid.Data3)
-													if (a.uuid.Data2 < b.uuid.Data2)
-														if (a.uuid.Data1 < b.uuid.Data1) return true;
-				return false;
-			}
-			
-			/// <summary>
-			/// Перевірка a більше b
-			/// </summary>
-			/// <param name="a">Праве значення</param>
-			/// <param name="b">Ліве значення</param>
-			/// <returns>True якщо праве більше ніж ліве, False інакше</returns>
-			constexpr __forceinline friend Boolean operator>(const UUID& a, const UUID& b) {
-				if (a.uuid.Data4[7] > b.uuid.Data4[7])
-					if (a.uuid.Data4[6] > b.uuid.Data4[6])
-						if (a.uuid.Data4[5] > b.uuid.Data4[5])
-							if (a.uuid.Data4[4] > b.uuid.Data4[4])
-								if (a.uuid.Data4[3] > b.uuid.Data4[3])
-									if (a.uuid.Data4[2] > b.uuid.Data4[2])
-										if (a.uuid.Data4[1] > b.uuid.Data4[1])
-											if (a.uuid.Data4[0] > b.uuid.Data4[0])
-												if (a.uuid.Data3 > b.uuid.Data3)
-													if (a.uuid.Data2 > b.uuid.Data2)
-														if (a.uuid.Data1 > b.uuid.Data1) return true;
-				return false;
-			}
-			
-			/// <summary>
-			/// Перевірка a більше рівне b
-			/// </summary>
-			/// <param name="a">Праве значення</param>
-			/// <param name="b">Ліве значення</param>
-			/// <returns>True якщо праве менша або рівне ніж ліве, False інакше</returns>
-			constexpr __forceinline friend Boolean operator>=(const UUID& a, const UUID& b) { return a == b || a > b; }
-			
-			/// <summary>
-			/// Перевірка a меншу рівне b
-			/// </summary>
-			/// <param name="a">Праве значення</param>
-			/// <param name="b">Ліве значення</param>
-			/// <returns>True якщо праве більше або рівне ніж ліве, False інакше</returns>
-			constexpr __forceinline friend Boolean operator<=(const UUID& a, const UUID& b) { return a == b || a < b; }
+			/// <returns>Відносність об'єктів</returns>
+			StrongOrdering operator<=>(const UUID&) const = default;
 		};
 	}
 }

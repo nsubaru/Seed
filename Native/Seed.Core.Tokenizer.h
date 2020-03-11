@@ -13,17 +13,17 @@ namespace Seed {
 		public:
 			class Token;
 
-			class StringView {
+			class TokenView {
 				const Token& This;
 			public:
-				StringView(const Token& This) : This(This) {}
-				StringView(const StringView&) = delete;
-				StringView(StringView&& from) : This(from.This) {}
+				TokenView(const Token& This) : This(This) {}
+				TokenView(const TokenView&) = delete;
+				TokenView(TokenView&& from) : This(from.This) {}
 
-				StringView& operator=(const StringView&) = delete;
-				StringView& operator=(StringView&& from) {
-					this->~StringView();
-					this->StringView::StringView(MoveRValue(from));
+				TokenView& operator=(const TokenView&) = delete;
+				TokenView& operator=(TokenView&& from) {
+					this->~TokenView();
+					this->TokenView::TokenView(MoveRValue(from));
 				}
 
 				const Char& operator[](SizeT Index) const {
@@ -50,7 +50,7 @@ namespace Seed {
 
 			public:
 				friend class Tokenizer;
-				friend class StringView;
+				friend class TokenView;
 				friend struct Tokenizer::Data;
 			private:
 				Token(Tokenizer* Text, SizeT OffSet, SizeT Size, SizeT DelimIndex)
@@ -77,9 +77,9 @@ namespace Seed {
 						this->Size != other.Size;
 				}
 
-				StringView operator*() {
+				TokenView operator*() {
 					if (Text != nullptr)
-						return StringView(*this);
+						return TokenView(*this);
 					else
 						Throw(Exceptions::NullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, NullPointException::Types::Read));
 				}
@@ -128,7 +128,7 @@ namespace Seed {
 			};
 
 			friend class Token;
-			friend class StringView;
+			friend class TokenView;
 		private:
 			struct Data {
 				union {

@@ -56,13 +56,7 @@ namespace Seed
 			/// <param name="other">Рядок</param>
 			/// <returns>true якщо рівні</returns>
 			bool operator==(const BaseString<Heap>& other) const {
-				if (ActualViewLen != other.Lenght) return false;
-				for (SizeT i = 0; i < other.Lenght; i++)
-				{
-					if (other[i] != refStr[offset + i])
-						return false;
-				}
-				return true;
+				return (*this <=> other) == 0;
 			}
 			/// <summary>
 			/// Порівняння з рядком
@@ -94,131 +88,71 @@ namespace Seed
 			/// <summary>
 			/// Порівняння з рядком
 			/// </summary>
-			/// <param name="other">Рядок</param>
-			/// <returns>true якщо рядок є більшим</returns>
-			bool operator<(const BaseString<Heap>& second) {
-				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
-				for (SizeT i = 0; i < comparableLen; i++)
-				{
-					if (refStr[offset + i] != second[i])
-						return  refStr[offset + i] < second[i];
-				}
-				
-				return this->ActualViewLen < second.Lenght;
-			}
-
-			/// <summary>
-			/// Порівняння з рядком
-			/// </summary>
-			/// <param name="other">Рядок</param>
-			/// <returns>true якщо рядок менший</returns>
-			bool operator>(const BaseString<Heap>& second) {
-				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
-				for (SizeT i = 0; i < comparableLen; i++)
-				{
-					if (refStr[offset + i] != second[i])
-						return refStr[offset + i] > second[i];
-				}
-				
-				return this->ActualViewLen > second.Lenght;
-			}
-
-			/// <summary>
-			/// Порівняння з рядком
-			/// </summary>
-			/// <param name="other">Рядок</param>
-			/// <returns>true якщо рядок більший або рівний</returns>
-			bool operator<=(const BaseString<Heap>& second) {
-				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
-				for (SizeT i = 0; i < comparableLen; i++)
-				{
-					if (refStr[offset + i] != second[i])
-						return refStr[offset + i] <= second[i];
-				}
-				
-				return this->ActualViewLen <= second.Lenght;
-			}
-
-			/// <summary>
-			/// Порівняння з рядком
-			/// </summary>
-			/// <param name="other">Рядок</param>
-			/// <returns>true якщо рядок менший або рівний</returns>
-			bool operator>=(const BaseString<Heap>& second) {
-				auto comparableLen = Min(this->ActualViewLen, second.Lenght);
-				for (SizeT i = 0; i < comparableLen; i++)
-				{
-					if (refStr[offset + i] != second[i])
-						return refStr[offset + i] >= second[i];
-				}
-				
-				return this->ActualViewLen >= second.Lenght;
-			}
-
-			/// <summary>
-			/// Порівняння з рядком
-			/// </summary>
 			/// <param name="first">Відображення рядка</param>
 			/// <param name="second">Рядок</param>
-			/// <returns>true якщо рядок менший</returns>
-			friend bool operator<(const BaseString<Heap>& first, const BaseStringView& second) {
-				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
-				for (SizeT i = 0; i < comparableLen; i++)
-				{
-					if (first[i] != second.refStr[second.offset + i])
-						return first[i] < second.refStr[second.offset + i];
-				}
-				
-				return first.Lenght < second.ActualViewLen;
-
+			/// <returns>true якщо рівні</returns>
+			template<typename TOtherHeap>
+			friend bool operator==(const BaseString<Heap>& first, const BaseStringView<TOtherHeap>& second) {
+				return (second <=> first) == 0;
 			}
 			/// <summary>
 			/// Порівняння з рядком
 			/// </summary>
 			/// <param name="first">Відображення рядка</param>
-			/// <param name="second">Рядок</param>
-			/// <returns>true якщо рядок є більшим</returns>
-			friend bool operator>(const BaseString<Heap>& first, const BaseStringView& second) {
-				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
-				for (SizeT i = 0; i < comparableLen; i++)
-				{
-					if (first[i] != second.refStr[second.offset + i])
-						return first[i] > second.refStr[second.offset + i];
-				}
-				
-				return first.Lenght > second.ActualViewLen;
+			/// <param name="second"><Рядок/param>
+			/// <returns>true якщо не рівні</returns>
+			template<typename TOtherHeap>
+			friend bool operator!=(const BaseString<Heap>& first, const BaseStringView<TOtherHeap>& second) {
+				return (second != first) == 0;
 			}
+
 			/// <summary>
-			/// Порівняння з рядком
+			/// Універсальне порівняння
 			/// </summary>
-			/// <param name="first">Відображення рядка</param>
-			/// <param name="second">Рядок</param>
-			/// <returns>true якщо рядок менший або рівний</returns>
-			friend bool operator<=(const BaseString<Heap>& first, const BaseStringView& second) {
+			/// <param name="first">Перший елемент</param>
+			/// <param name="second">Другий елемент</param>
+			/// <returns>Результат порівняння</returns>
+			friend StrongOrdering operator<=>(const BaseString<Heap>& first, const BaseStringView& second) {
 				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
 				for (SizeT i = 0; i < comparableLen; i++)
 				{
 					if (first[i] != second.refStr[second.offset + i])
-						return first[i] <= second.refStr[second.offset + i];
+						return first[i] <=> second.refStr[second.offset + i];
 				}
-				
-				return first.Lenght <= second.ActualViewLen;
+				return first.Lenght <=> second.ActualViewLen;
 			}
+
 			/// <summary>
-			/// Порівняння з рядком
+			/// Універсальне порівняння
 			/// </summary>
-			/// <param name="first">Відображення рядка</param>
-			/// <param name="second">Рядок</param>
-			/// <returns>true якщо рядок більший або рівний</returns>
-			friend bool operator>=(const BaseString<Heap>& first, const BaseStringView& second) {
-				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
+			/// <param name="first">Перший елемент</param>
+			/// <param name="second">Другий елемент</param>
+			/// <returns>Результат порівняння</returns>
+			friend StrongOrdering operator<=>(const BaseStringView& first, const BaseString<Heap>& second) {
+				auto comparableLen = Min(first.ActualViewLen, second.Lenght);
 				for (SizeT i = 0; i < comparableLen; i++)
 				{
-					if (first[i] != second.refStr[second.offset + i])
-						return first[i] >= second.refStr[second.offset + i];
+					if (first.refStr[first.offset + i] != second[i])
+						return first.refStr[first.offset + i] <=> second[i];
 				}
-				
-				return first.Lenght >= second.ActualViewLen;
+				return first.ActualViewLen <=> second.Lenght;
+			}
+
+			/// <summary>
+			/// Універсальне порівняння
+			/// </summary>
+			/// <param name="first">Перший елемент</param>
+			/// <param name="second">Другий елемент</param>
+			/// <returns>Результат порівняння</returns>
+			template<typename TOtherHeap>
+			friend StrongOrdering operator<=>(const BaseStringView& first, const BaseStringView<TOtherHeap>& second) {
+				auto comparableLen = Min(first.ActualViewLen, second.ActualViewLen);
+				for (SizeT i = 0; i < comparableLen; i++)
+				{
+					if (first.refStr[first.offset + i] != second.refStr[second.offset + i])
+						return first.refStr[first.offset + i] <=> second.refStr[second.offset + i];
+				}
+				return first.ActualViewLen <=> second.ActualViewLen;
 			}
 		public:
 			/// <summary>
@@ -328,6 +262,9 @@ namespace Seed
 			/// Фактичний розмір відображення
 			/// </summary>
 			SizeT Property(GetActualViewLen) ActualViewLen;
+		public:
+			template<typename TOtherHeap>
+			friend class BaseStringView;
 		};
 
 		///<summary>Простий референс на рядок</summary>
