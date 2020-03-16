@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::Containers::BaseDynamicCircularBuffer&lt;*, *&gt;">
+    <DisplayString>{{ Lenght={This->ActualSize.count} RefCount={This->RefCount.count} }}</DisplayString>
+    <Expand>
+      <Item Name="[Reference count]">This->RefCount.count</Item>
+      <Item Name="[Lenght]">This->ActualSize.count</Item>
+      <ArrayItems>
+        <Size>This->ActualSize.count</Size>
+        <ValuePointer>This->buffer</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

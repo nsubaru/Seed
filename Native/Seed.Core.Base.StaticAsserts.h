@@ -1755,4 +1755,4 @@ namespace Seed {
     }
 }
 
-#define IS_CONSTEXPR(...)  !noexcept(Seed::Core::TypeTraits::Details::IsConstexprHelper(__VA_ARGS__))  // NOLINT(cppcoreguidelines-macro-usage)
+#define IS_CONSTEXPR(...)  !noexcept(Seed::Core::TypeTraits::Details::IsConstexprHelper(__VA_ARGS__)) 

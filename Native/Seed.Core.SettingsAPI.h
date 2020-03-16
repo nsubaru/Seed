@@ -48,8 +48,10 @@ namespace Seed {
 					SizeT DefaultPriorityQueueMaxSize;
 					///<summary>Розмір резервування для стеку у кількості елементів</summary>
 					SizeT DynamicStackReserveSize;
-					///<summary>Розмір резурвування для черги у кількіоті елементів</summary>
+					///<summary>Розмір резервування для черги у кількіоті елементів</summary>
 					SizeT DynamicQueueReserveSize;
+					/// <summary>Стартовий розмір динамічного циклічного буферу </summary>
+					SizeT DynamicCircularBufferStartSize;
 				};
 
 				///<summary>Налаштування багатопотоковості</summary>
@@ -445,6 +447,15 @@ namespace Seed {
 					extern SettingsData CurrentSettingsData;
 					CurrentSettingsData.MainMemoryManager.DynamicQueueReserveSize = NewSize;
 				}
+
+				SizeT GetDynamicCircularBufferStartSize() {
+					extern SettingsData CurrentSettingsData;
+					return CurrentSettingsData.MainMemoryManager.DynamicCircularBufferStartSize;
+				}
+				void SetDynamicCircularBufferStartSize(SizeT NewSize) {
+					extern SettingsData CurrentSettingsData;
+					CurrentSettingsData.MainMemoryManager.DynamicCircularBufferStartSize = NewSize;
+				}
 			public:
 				///<summary>Налаштування стандартної кучі пам'яті</summary>
 				DefaultHeapT Property(GetDefaultHeap, SetDefaultHeap) DefaultHeap;
@@ -461,6 +472,8 @@ namespace Seed {
 				SizeT Property(GetStackReserveSize, SetStackReserveSize) StackReserveSize;
 				///<summary>Розмір резервування для черги у кількості елементів</summary>
 				SizeT Property(GetQueueReserveSize, SetQueueReserveSize) QueueReserveSize;
+				/// <summary>Стартовий розмір динамічного циклічного буферу </summary>
+				SizeT Property(GetDynamicCircularBufferStartSize, SetDynamicCircularBufferStartSize) DynamicCircularBufferStartSize;
 			};
 
 			class SeedKernelCall ThreadingCfgT {

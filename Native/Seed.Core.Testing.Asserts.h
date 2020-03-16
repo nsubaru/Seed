@@ -44,7 +44,7 @@ namespace Seed
 			};
 		public:
 			template<typename Lambda>
-			static void AssertEqual(Lambda&& lambda) {
+			static void AssertTrue(Lambda&& lambda) {
 				if (!lambda())
 					Throw(AssertEqualException(ExceptionPosition));
 			}
