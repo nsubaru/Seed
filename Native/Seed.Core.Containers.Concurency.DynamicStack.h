@@ -381,6 +381,11 @@ namespace Seed {
 						});
 				}
 
+				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+					This->stack[Index] = Value;
+					This->count = Index + 1;
+				}
+
 				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;

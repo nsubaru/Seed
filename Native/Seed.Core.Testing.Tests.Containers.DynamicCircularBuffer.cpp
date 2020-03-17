@@ -1,3 +1,6 @@
+#include "Seed.Core.Containers.NonConcurency.DynamicCircularBuffer.h"
+#include "Seed.Core.Containers.Concurency.DynamicCircularBuffer.h"
+
 #include "Seed.Core.Testing.Tests.Containers.DynamicCircularBuffer.h"
 
 bool Seed::Core::Testing::Test::Containers::DynamicCircularBuffer::Excecute() {

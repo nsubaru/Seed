@@ -461,17 +461,28 @@ namespace Seed
 						return res;
 					});
 				}
+			protected:
+				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+					This->buffer[Index] = Value;
+				}
+
+				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+					This->buffer[Index] = MoveRValue(Value);
+				}
 			public:
 				RefCountClass(BaseConcurencyDynamicCircularBuffer, This);
 			protected:
 				template<template<typename THeap, typename T>typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
 				friend class LINQ::IDynamicCircularBuffer;
-				template<template<typename THeap, typename T>typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
+				template<typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
 				friend class LINQ::ICircularBuffer;
 				template<template<typename, typename> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollection;
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
+			public:
+				template<typename U>
+				friend void Seed::Core::Swap(U& A, U& B);
 			};
 
 			namespace {
@@ -483,6 +494,11 @@ namespace Seed
 				template<typename T>
 				using ConcurencySensitiveDynamicCircularBuffer = BaseConcurencyDynamicCircularBuffer<Seed::Core::Memory::SensitiveDataHeap, T>;
 			}
+		}
+
+		template<typename THeap, typename T>
+		__forceinline void Swap(Containers::BaseConcurencyDynamicCircularBuffer<THeap, T>& A, Containers::BaseConcurencyDynamicCircularBuffer<THeap, T>& B) {
+			Swap(A.This, B.This);
 		}
 	}
 }

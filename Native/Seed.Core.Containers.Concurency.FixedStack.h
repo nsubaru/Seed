@@ -353,6 +353,11 @@ namespace Seed {
 					This->count = Index + 1;
                 }
 
+                __forceinline void UnsafeSet(const T& Value, SizeT Index) {
+					This->stack[Index] = MoveRValue(Value);
+					This->count = Index + 1;
+                }
+
                 __forceinline BaseConcurencyFixedStack& RemoveAllImpl() {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& {
                         for (SizeT i = 0; i < This->count; i++) {

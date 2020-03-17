@@ -305,6 +305,12 @@ namespace Seed {
 					This->rear = Index + 1;
 				}
 
+				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+					This->queue[Index] = Value;
+					This->count = Index + 1;
+					This->rear = Index + 1;
+				}
+
 				__forceinline BaseFixedQueue& RemoveAllImpl() {
 					if (This->count == 0)
 						return *this;

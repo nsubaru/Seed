@@ -24,9 +24,7 @@ namespace Seed {
 					RefCountT count;
 					T* queue;
 					SizeT bufferSize;
-					// ReSharper disable CppInconsistentNaming
 					RefCountT RefCount;
-					// ReSharper restore CppInconsistentNaming
 					
 					Threading::DataFlowControler flowControler;
 
@@ -191,7 +189,7 @@ namespace Seed {
 					This->queue = newBuffer;
 				}
 			protected:
-template <
+				template <
 					template<typename, typename> typename TCollection,
 					typename TAnyHeap,
 					typename TAny,

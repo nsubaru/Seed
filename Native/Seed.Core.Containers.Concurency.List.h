@@ -1345,6 +1345,16 @@ namespace Seed {
 					this->This->size++;
 				}
 
+				__forceinline void UnsafeAdd(T&& Value) {
+					if (this->This->root == nullptr) {
+						this->This->root = this->This->last = new elem(MoveRValue(Value), this->This);
+					}
+					else {
+						this->This->last->prev->next = this->This->last = new elem(MoveRValue(Value), this->This, this->This->last);
+					}
+					this->This->size++;
+				}
+
 				__forceinline BaseConcurencyList& RemoveAllImpl() {
 					this->Dispose();
 					return *this;

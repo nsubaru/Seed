@@ -400,12 +400,20 @@ namespace Seed
 					
 					return res;
 				}
+			protected:
+				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+					This->buffer[Index] = Value;
+				}
+
+				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+					This->buffer[Index] = MoveRValue(Value);
+				}
 			public:
 				RefCountClass(BaseDynamicCircularBuffer, This);
 			protected:
 				template<template<typename THeap, typename T>typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
 				friend class LINQ::IDynamicCircularBuffer;
-				template<template<typename THeap, typename T>typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
+				template<typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
 				friend class LINQ::ICircularBuffer;
 				template<template<typename, typename> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollection;

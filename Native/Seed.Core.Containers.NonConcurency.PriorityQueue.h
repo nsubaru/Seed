@@ -674,6 +674,10 @@ namespace Seed {
 				forceinline void UnsafeAdd(Pair&& pair){
 					Insert(MoveRValue(pair));
 				}
+
+				forceinline void UnsafeAdd(const Pair& pair){
+					Insert(pair);
+				}
 #pragma endregion
 			public:
 				RefCountClass(BasePriorityQueue, This)

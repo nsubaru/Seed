@@ -1,7 +1,5 @@
 #pragma once
 #include "Seed.Core.Testing.Base.h"
-#include "Seed.Core.Containers.NonConcurency.DynamicCircularBuffer.h"
-#include "Seed.Core.Containers.Concurency.DynamicCircularBuffer.h"
 
 namespace Seed {
 	inline namespace Core {

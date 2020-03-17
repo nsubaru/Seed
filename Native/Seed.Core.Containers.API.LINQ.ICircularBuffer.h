@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.Containers.API.LINQ.ICollection.h"
+#include "Seed.Core.Containers.API.LINQ.Base.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -12,11 +12,10 @@ namespace Seed {
 				/// <typeparam name="THeap">Тип кучі колекції</typeparam>
 				/// <typeparam name="T">Тип елементів</typeparam>
 				/// <typeparam name="TIsConcurencySuport">Флаг підтримки багатопотоковості колекції</typeparam>
-				template<template<typename THeap, typename T>typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
-				class ICircularBuffer : 
-					public ICollection<TCircularBuffer, THeap, T, false, TIsConcurencySuport> {
+				template<typename TCircularBuffer, typename THeap, typename T, bool TIsConcurencySuport>
+				class ICircularBuffer {
 				private:
-					using ThisCollection = typename TCircularBuffer<THeap, T>;
+					using ThisCollection = TCircularBuffer;
 				public:
 					void Add(const T& item) {
 						return static_cast<ThisCollection&>(*this).AddImpl(item);

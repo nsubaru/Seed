@@ -326,6 +326,10 @@ namespace Seed {
                     This->array[Index] = Value;
                 }
 
+                __forceinline void UnsafeSet(T&& Value, SizeT Index) {
+                    This->array[Index] = MoveRValue(Value);
+                }
+
                 __forceinline BaseConcurencyArray& RemoveAllImpl() {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyArray& {
                         delete[] this->This->array;
@@ -1030,6 +1034,10 @@ namespace Seed {
 
                 __forceinline void UnsafeSet(const T& Value, SizeT Index) {
                     This->root->arr[Index] = Value;
+                }
+
+                __forceinline void UnsafeSet(T&& Value, SizeT Index) {
+                    This->root->arr[Index] = MoveRValue(Value);
                 }
 
                 __forceinline BaseConcurencyVList& RemoveAllImpl() {

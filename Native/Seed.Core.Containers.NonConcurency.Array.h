@@ -287,6 +287,10 @@ namespace Seed {
 					This->array[Index] = Value;
 				}
 
+				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+					This->array[Index] = MoveRValue(Value);
+				}
+
 				__forceinline BaseArray& RemoveAllImpl() {
 					delete[] this->This->array;
 					this->This->array = nullptr;
@@ -928,6 +932,10 @@ namespace Seed {
 
 				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->root->arr[Index] = Value;
+				}
+
+				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+					This->root->arr[Index] = MoveRValue(Value);
 				}
 
 				__forceinline BaseVList& RemoveAllImpl() {

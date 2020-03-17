@@ -309,6 +309,11 @@ namespace Seed {
 					This->count = Index + 1;
 				}
 
+				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+					This->stack[Index] = Value;
+					This->count = Index + 1;
+				}
+
 				__forceinline BaseFixedStack& RemoveAllImpl() {
 					for (SizeT i = 0; i < This->count; i++) {
 						This->stack[i].~T();

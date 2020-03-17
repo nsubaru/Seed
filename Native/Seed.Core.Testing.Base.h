@@ -39,18 +39,18 @@ namespace Seed {
 				friend void StopTestRegister();
 			public:
 				template<typename T>
-				static void Register(T*&& test, const String& testName) {
+				forceinline static void Register(T*&& test, const String& testName) {
 					tests->AddLast(TestRecord(testName, typeid(T), MoveRValue((ITest*&&)test)));
 				}
 
 				template<typename T>
-				static void Register(T*&& test, String&& testName) {
+				forceinline static void Register(T*&& test, String&& testName) {
 					static_assert(TypeTraits::IsBasedOnV<ITest, T>, L"Invalid test type passed");
 					tests->AddLast(TestRecord(MoveRValue(testName), NewCTTI::TypeName<T>(),  typeid(T), MoveRValue((ITest*&&)test)));
 				}
 
 				template<typename T>
-				static void UnRegister() {
+				forceinline static void UnRegister() {
 					tests->RemoveIf([](const TestRecord& record) {return record.testClassName == typeof(T); }, [](TestRecord&& record) {delete record.testObj; })
 				}
 

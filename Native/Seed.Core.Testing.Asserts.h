@@ -49,6 +49,18 @@ namespace Seed
 					Throw(AssertEqualException(ExceptionPosition));
 			}
 
+			template<typename T>
+			static void AssertEqual(T&& a, T&& b) {
+				if (a != b)
+					Throw(AssertEqualException(ExceptionPosition));
+			}
+
+			template<typename T>
+			static void AssertNotEqual(T&& a, T&& b) {
+				if (a == b)
+					Throw(AssertEqualException(ExceptionPosition));
+			}
+
 			template<typename Lambda>
 			static void AssertNotEqual(Lambda&& lambda) {
 				if (lambda())

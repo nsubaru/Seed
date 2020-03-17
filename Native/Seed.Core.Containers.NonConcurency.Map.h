@@ -949,6 +949,10 @@ namespace Seed {
 				forceinline void UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair){
 					Insert(MoveRValue(pair));
 				}
+
+				forceinline void UnsafeAdd(const BasePair<THeap, TKey, TValue>& pair){
+					Insert(pair);
+				}
 #pragma endregion
 			protected:
 				///<summary>Рекурсивне знищеання дерева</summary>
