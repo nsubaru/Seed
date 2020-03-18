@@ -57,6 +57,14 @@ namespace Seed {
 					SizeT GetSize() const {
 						return static_cast<const ThisCollection&>(*this).GetSizeImpl(); 
 					}
+					Boolean GetIsFull() const {
+						return GetActualSize() == GetSize();
+					}
+				public:
+					SizeT Property(GetActualSize) ActualSize;
+					Boolean Property(GetIsEmpty) IsEmpty;
+					Boolean Property(GetIsFull) IsFull;
+					SizeT Property(GetSize) BufferSize;
 				public:
 					virtual ~ICircularBuffer() = 0 {};
 				};

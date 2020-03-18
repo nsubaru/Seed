@@ -208,7 +208,7 @@ namespace Seed {
 				///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
 				///</para>
 				///</summary>
-				class Iterator : IDisposable
+				class Iterator : protected IDisposable
 				{
 					friend class BaseConcurencyList;
 				private:
