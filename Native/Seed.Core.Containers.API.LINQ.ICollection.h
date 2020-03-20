@@ -283,7 +283,7 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T) або void(*)(T, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&amp;) або void(*)(T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
@@ -301,7 +301,7 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&) або void(*)(const T&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&amp;) або void(*)(const T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<
 						typename Lambda,
@@ -320,7 +320,7 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&) або void(*)(T&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&amp;) або void(*)(T&amp;, SizeT)</param>
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda,
@@ -339,7 +339,7 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&) або void(*)(const T&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&amp;) або void(*)(const T&amp;, SizeT)</param>
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<
@@ -360,7 +360,7 @@ namespace Seed {
 					/// </summary>
 					/// <typeparam name="U">Вихідний тип</typeparam>
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
-					/// <param name="lambda">Лямбда типу void(*)(U&, const T&)</param>
+					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
 					__forceinline U Aggregate(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda));
@@ -371,7 +371,7 @@ namespace Seed {
 					/// </summary>
 					/// <typeparam name="U">Вихідний тип</typeparam>
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
-					/// <param name="lambda">Лямбда типу void(*)(U&, const T&)</param>
+					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
@@ -384,7 +384,7 @@ namespace Seed {
 					/// </summary>
 					/// <typeparam name="U">Вихідний тип</typeparam>
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
-					/// <param name="lambda">Лямбда типу void(*)(U&, const T&)</param>
+					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
@@ -403,7 +403,7 @@ namespace Seed {
 					/// <summary>
 					/// Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline bool Any(Lambda&& lambda) {
@@ -413,7 +413,7 @@ namespace Seed {
 					/// <summary>
 					/// Вертає true якщо всі елементи в контейнері підпадають під умову лямбди
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline bool All(Lambda&& lambda) {
@@ -423,7 +423,7 @@ namespace Seed {
 					/// <summary>
 					/// Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline T& First(Lambda&& lambda) {
@@ -433,7 +433,7 @@ namespace Seed {
 					/// <summary>
 					/// Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline T& Last(Lambda&& lambda) {
@@ -443,7 +443,7 @@ namespace Seed {
 					/// <summary>
 					/// Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline const T& First(Lambda&& lambda) const {
@@ -453,7 +453,7 @@ namespace Seed {
 					/// <summary>
 					/// Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline const T& Last(Lambda&& lambda) const {
@@ -471,7 +471,7 @@ namespace Seed {
 					/// <summary>
 					/// Видаляє всі елементи з колекції викликаючи для кожного елементу лямбду
 					/// </summary>
-					/// <param name="Lambda">Лямбда формату void(*)(T&&)</param>
+					/// <param name="Lambda">Лямбда формату void(*)(T&amp;&amp;)</param>
 					/// <returns>Силку на поточний об'єкт колекції</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State>, bool> = true>
 					__forceinline ThisCollection& RemoveAll(Lambda&& lambda) {
@@ -481,7 +481,7 @@ namespace Seed {
 					/// <summary>
 					/// Підраховує кількість елементів які підпадають під умову
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Кількість елементів які підпадають під умову</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
 					__forceinline SizeT GetCountIf(Lambda && lambda) {

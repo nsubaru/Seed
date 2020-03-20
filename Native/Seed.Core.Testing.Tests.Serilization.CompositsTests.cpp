@@ -19,7 +19,8 @@ bool Seed::Core::Testing::Test::Serilization::SimpleTypeTupleSerilization::Excec
 }
 
 bool Seed::Core::Testing::Test::Serilization::ComplexTypeTupleSerilization::Excecute() {
-	auto tuple = Seed::Core::Containers::Tuple<String, Containers::Array<Int32>, Containers::List<Int32>, Boolean>{L"test",{1,2,3,4},{1,2,3,4},true};
+	auto tuple = Seed::Core::Containers::Tuple<String, Containers::Array<Int32>, Containers::List<Int32>, Boolean>
+				{L"test",{1,2,3,4},{1,2,3,4},true};
 
 	auto stream = NewSerilization::Serilize(tuple);
 	decltype(tuple) deserelizedTuple;

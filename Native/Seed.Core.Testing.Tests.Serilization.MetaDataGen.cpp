@@ -19,6 +19,21 @@ bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 		>
 	>();
 
+	constexpr auto MetaDataConstExpr = NewSerilization::CTTIMetaDataGen<
+		Containers::Tuple<
+			Containers::Dictionary<
+				Containers::List<
+					Containers::FixedArray<10, Int32>
+				>
+			>, 
+			Containers::PriorityQueue<
+				Int32, 
+				String
+			>, 
+			Boolean
+		>
+	>();
+
 	return metaData.Lenght != 0;
 }
 

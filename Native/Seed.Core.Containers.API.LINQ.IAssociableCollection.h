@@ -159,6 +159,910 @@ namespace Seed {
 					}
 				public:
 					/// <summary>
+					/// Копіює елементи до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename THeap, typename U> class NewCollection,
+						typename Lambda,
+						typename FilterLambda, 
+						typename UHeap, 
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TPair&> &&
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TPair&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<UHeap, U> CopyToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
+						{
+							FilterLambda filterCopy = filterLambda;
+							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this)
+								.GetCountIf(MoveRValue(filterCopy)));
+
+							SizeT Index = 0;
+							this->ForEach([&] (const TPair& pair)
+							{
+								if (filterLambda(pair))
+								{
+									result.UnsafeSet(lambda(pair), Index);
+									Index++;
+								}
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<UHeap, U> result;
+							this->ForEach([&] (const TPair& pair)
+							{
+								if (filterLambda(pair))
+								{
+									result.UnsafeAdd(lambda(pair));
+								}
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename Lambda,
+						typename FilterLambda,  
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TPair&> &&
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TPair&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<U> CopyToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						if constexpr (NewCollection<U>::IsDynamic == false)
+						{
+							FilterLambda filterCopy = filterLambda;
+							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this)
+								.GetCountIf(MoveRValue(filterCopy)));
+
+							SizeT Index = 0;
+							this->ForEach([&] (const TPair& pair)
+							{
+								if (filterLambda(pair))
+								{
+									result.UnsafeSet(lambda(pair), Index);
+									Index++;
+								}
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<U> result;
+							this->ForEach([&] (const TPair& pair)
+							{
+								if (filterLambda(pair))
+								{
+									result.UnsafeAdd(lambda(pair));
+								}
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename UHeap, typename U> class NewCollection,
+						typename Lambda,
+						typename UHeap,
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TPair&> &&
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, TPair&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<UHeap, U> CopyToCollection(Lambda&& lambda) const {
+						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
+						{
+							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this).GetCount());
+							this->ForEach([&] (const TPair& pair, SizeT Index)
+							{
+								result.UnsafeSet(lambda(pair), Index);
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<UHeap, U> result;
+							this->ForEach([&] (const TPair& pair)
+							{
+								result.UnsafeAdd(lambda(pair));
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename Lambda,
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TPair&> &&
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, TPair&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<U> CopyToCollection(Lambda&& lambda) const {
+						if constexpr (NewCollection<U>::IsDynamic == false)
+						{
+							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this).GetCount());
+							this->ForEach([&] (const TPair& pair, SizeT Index)
+							{
+								result.UnsafeSet(lambda(pair), Index);
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<U> result;
+							this->ForEach([&] (const TPair& pair)
+							{
+								result.UnsafeAdd(lambda(pair));
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename UHeap, typename U> class NewCollection,
+						typename UHeap, 
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TPair>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<UHeap, TPair> CopyToCollection() const {
+						return this->CopyToCollection<NewCollection, UHeap>([] (const TPair& pair) -> TPair
+						{
+							return pair;
+						});
+					}
+
+					/// <summary>
+					/// Копіює елементи до колекції
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<TPair>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<TPair> CopyToCollection() const {
+						return this->CopyToCollection<NewCollection>([] (const TPair& pair) -> TPair
+						{
+							return pair;
+						});
+					}
+
+					///// <summary>
+					///// Копіює елементи до колекції
+					///// </summary>
+					///// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					///// <returns>Колекція з копією всіх елементів</returns>
+					//template<
+					//	template<typename UHeap, typename U> class NewCollection,
+					//	typename UHeap, 
+					//	TypeTraits::EnableIfTV<
+					//		TypeTraits::LogicConst<
+					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TPair>>
+					//			>,
+					//		bool> 
+					//	= true
+					//>
+					//NewCollection<UHeap, TPair> CopyToCollection() const {
+					//	return this->CopyToCollection<NewCollection, UHeap>([] (const TPair& pair) -> TPair
+					//	{
+					//		return pair;
+					//	});
+					//}
+
+					///// <summary>
+					///// Копіює елементи до колекції
+					///// </summary>
+					///// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					///// <returns>Колекція з копією всіх елементів</returns>
+					//template<
+					//	template<typename UHeap, typename U> class NewCollection,
+					//	typename FilterLambda,
+					//	typename UHeap,
+					//	TypeTraits::EnableIfTV<
+					//		TypeTraits::LogicConst<
+					//			TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TPair&> &&
+					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TPair>>
+					//			>,
+					//		bool> 
+					//	= true
+					//>
+					//NewCollection<UHeap, TPair> CopyIfToCollection(FilterLambda && filter) const {
+					//	return this->CopyToCollection<NewCollection, UHeap>(MoveRValue(filter), [] (const TPair& pair) -> TPair
+					//	{
+					//		return pair;
+					//	});
+					//}
+
+					/// <summary>
+					/// Копіює елементи до колекції
+					/// </summary>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename FilterLambda,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TPair&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<TPair>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<TPair> CopyIfToCollection(FilterLambda && filter) const {
+						return this->CopyToCollection<NewCollection>(MoveRValue(filter), [] (const TPair& pair) -> TPair
+						{
+							return pair;
+						});
+					}
+				public:
+					/// <summary>
+					/// Копіює ключі до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename UHeap, typename U> class NewCollection,
+						typename Lambda,
+						typename FilterLambda, 
+						typename UHeap, 
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TKey&> &&
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TKey&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<UHeap, U> CopyKeyToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
+						{
+							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this)
+								.GetCountIf([&] (const TPair& pair)
+							{
+								return filterLambda(pair.Key);
+							}));
+
+							SizeT Index = 0;
+							this->ForEachKey([&] (const TKey& key)
+							{
+								if (filterLambda(key))
+								{
+									result.UnsafeSet(lambda(key), Index);
+								}
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<UHeap, U> result;
+							this->ForEachKey([&] (const TKey& key)
+							{
+								if (filterLambda(key))
+								{
+									result.UnsafeAdd(lambda(key));
+								}
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює ключі до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename Lambda,
+						typename FilterLambda,  
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TKey&> &&
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TKey&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<U> CopyKeyToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						if constexpr (NewCollection<U>::IsDynamic == false)
+						{
+							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this)
+								.GetCountIf([&] (const TPair& pair)
+							{
+								return filterLambda(pair.Key);
+							}));
+
+							this->ForEachKey([&] (const TKey& key, SizeT Index)
+							{
+								if (filterLambda(key))
+								{
+									result.UnsafeSet(lambda(key), Index);
+								}
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<U> result;
+							this->ForEachKey([&] (const TKey& key)
+							{
+								if (filterLambda(key))
+								{
+									result.UnsafeAdd(lambda(key));
+								}
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює ключі до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename UHeap, typename U> class NewCollection,
+						typename Lambda,
+						typename UHeap, 
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TKey&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<UHeap, U> CopyKeyToCollection(Lambda&& lambda) const {
+						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
+						{
+							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this).GetCount());
+							this->ForEachKey([&] (const TKey& pair, SizeT Index)
+							{
+								result.UnsafeSet(lambda(pair), Index);
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<UHeap, U> result;
+							this->ForEachKey([&] (const TKey& pair)
+							{
+								result.UnsafeAdd(lambda(pair));
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює ключі до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename Lambda,
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TKey&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<U> CopyKeyToCollection(Lambda&& lambda) const {
+						if constexpr (NewCollection<U>::IsDynamic == false)
+						{
+							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this).GetCount());
+							this->ForEachKey([&] (const TKey& pair, SizeT Index)
+							{
+								result.UnsafeSet(lambda(pair), Index);
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<U> result;
+							this->ForEachKey([&] (const TKey& pair)
+							{
+								result.UnsafeAdd(lambda(pair));
+							});
+							return result;
+						}
+					}
+
+					///// <summary>
+					///// Копіює ключі до колекції
+					///// </summary>
+					///// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					///// <returns>Колекція з копією всіх елементів</returns>
+					//template<
+					//	template<typename UHeap, typename U> class NewCollection,
+					//	typename UHeap, 
+					//	TypeTraits::EnableIfTV<
+					//		TypeTraits::LogicConst<
+					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TKey>>
+					//			>,
+					//		bool> 
+					//	= true
+					//>
+					//NewCollection<UHeap, TKey> CopyKeyToCollection() const {
+					//	return this->CopyKeyToCollection<NewCollection, UHeap>([] (const TKey& pair) -> TKey
+					//	{
+					//		return pair;
+					//	});
+					//}
+
+					/// <summary>
+					/// Копіює ключі до колекції
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<TKey>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<TKey> CopyKeyToCollection() const {
+						return this->CopyKeyToCollection<NewCollection>([] (const TKey& pair) -> TKey
+						{
+							return pair;
+						});
+					}
+
+					///// <summary>
+					///// Копіює ключі до колекції
+					///// </summary>
+					///// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					///// <returns>Колекція з копією всіх елементів</returns>
+					//template<
+					//	template<typename UHeap, typename U> class NewCollection,
+					//	typename FilterLambda,
+					//	typename UHeap, 
+					//	TypeTraits::EnableIfTV<
+					//		TypeTraits::LogicConst<
+					//			TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TKey&> &&
+					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TKey>>
+					//			>,
+					//		bool> 
+					//	= true
+					//>
+					//NewCollection<UHeap, TKey> CopyKeyIfToCollection(FilterLambda&& filter) const {
+					//	return this->CopyKeyToCollection<NewCollection, UHeap>(MoveRValue(filter), [] (const TKey& pair) -> TKey
+					//	{
+					//		return pair;
+					//	});
+					//}
+
+					/// <summary>
+					/// Копіює ключі до колекції
+					/// </summary>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename FilterLambda,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TKey&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<TKey>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<TKey> CopyKeyIfToCollection(FilterLambda&& filter) const {
+						return this->CopyKeyToCollection<NewCollection>(MoveRValue(filter), [] (const TKey& pair) -> TKey
+						{
+							return pair;
+						});
+					}
+				public:
+					/// <summary>
+					/// Копіює значення до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename UHeap, typename U> class NewCollection,
+						typename Lambda,
+						typename FilterLambda, 
+						typename UHeap, 
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TValue&> &&
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TValue&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<UHeap, U> CopyValueToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
+						{
+							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this)
+								.GetCountIf([&] (const TPair& pair)
+							{
+								return filterLambda(pair.Value);
+							}));
+
+							SizeT Index = 0;
+							this->ForEachValue([&] (const TValue& value)
+							{
+								if (filterLambda(value))
+								{
+									result.UnsafeSet(lambda(value), Index);
+									Index++;
+								}
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<UHeap, U> result;
+							this->ForEachValue([&] (const TValue& value)
+							{
+								if (filterLambda(value))
+								{
+									result.UnsafeAdd(lambda(value));
+								}
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює значення до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename Lambda,
+						typename FilterLambda,  
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TValue&> &&
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TValue&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<U> CopyValueToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						if constexpr (NewCollection<U>::IsDynamic == false)
+						{
+							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this)
+								.GetCountIf([&] (const TPair& pair)
+							{
+								return filterLambda(pair.Value);
+							}));
+
+							SizeT Index = 0;
+							this->ForEachValue([&] (const TValue& value)
+							{
+								if (filterLambda(value))
+								{
+									result.UnsafeSet(lambda(value), Index);
+									Index++;
+								}
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<U> result;
+							this->ForEachValue([&] (const TValue& value)
+							{
+								if (filterLambda(value))
+								{
+									result.UnsafeAdd(lambda(value));
+								}
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює значення до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename THeap, typename U> class NewCollection,
+						typename Lambda,
+						typename UHeap, 
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TValue&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<UHeap, U> CopyValueToCollection(Lambda&& lambda) const {
+						if constexpr (NewCollection<THeap, U>::IsDynamic == false)
+						{
+							NewCollection<THeap, U> result = NewCollection<THeap, U>(static_cast<ThisCollection&>(*this).GetCount());
+							this->ForEachValue([&] (const TValue& pair, SizeT Index)
+							{
+								result.UnsafeSet(lambda(pair), Index);
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<THeap, U> result;
+							this->ForEachValue([&] (const TValue& pair)
+							{
+								result.UnsafeAdd(lambda(pair));
+							});
+							return result;
+						}
+					}
+
+					/// <summary>
+					/// Копіює значення до колекції
+					/// </summary>
+					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename Lambda,
+						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TValue&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<U>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<U> CopyValueToCollection(Lambda&& lambda) const {
+						if constexpr (NewCollection<U>::IsDynamic == false)
+						{
+							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this).GetCount());
+							this->ForEach([&] (const TValue& pair, SizeT Index)
+							{
+								result.UnsafeSet(lambda(pair), Index);
+							});
+							return result;
+						}
+						else
+						{
+							NewCollection<U> result;
+							this->ForEach([&] (const TValue& pair)
+							{
+								result.UnsafeAdd(lambda(pair));
+							});
+							return result;
+						}
+					}
+
+					///// <summary>
+					///// Копіює значення до колекції
+					///// </summary>
+					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					///// <returns>Колекція з копією всіх елементів</returns>
+					//template<
+					//	template<typename THeap, typename U> class NewCollection,
+					//	typename UHeap, 
+					//	TypeTraits::EnableIfTV<
+					//		TypeTraits::LogicConst<
+					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TValue>>
+					//			>,
+					//		bool> 
+					//	= true
+					//>
+					//NewCollection<UHeap, TValue> CopyValueToCollection() const {
+					//	return this->CopyValueToCollection<NewCollection, UHeap>([] (const TValue& pair) -> TValue
+					//	{
+					//		return pair;
+					//	});
+					//}
+
+					/// <summary>
+					/// Копіює значення до колекції
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<TPair>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<TValue> CopyValueToCollection() const {
+						return this->CopyValueToCollection<NewCollection>([] (const TValue& pair) -> TValue
+						{
+							return pair;
+						});
+					}
+
+					///// <summary>
+					///// Копіює значення до колекції
+					///// </summary>
+					///// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
+					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
+					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					///// <returns>Колекція з копією всіх елементів</returns>
+					//template<
+					//	template<typename THeap, typename U> class NewCollection,
+					//	typename UHeap, 
+					//	typename FilterLambda,
+					//	TypeTraits::EnableIfTV<
+					//		TypeTraits::LogicConst<
+					//			TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TValue&> &&
+					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TValue>>
+					//			>,
+					//		bool> 
+					//	= true
+					//>
+					//NewCollection<UHeap, TValue> CopyValueIfToCollection(FilterLambda&& filter) const {
+					//	return this->CopyValueToCollection<NewCollection, UHeap>(MoveRValue(filter), [] (const TValue& pair) -> TValue
+					//	{
+					//		return pair;
+					//	});
+					//}
+
+					/// <summary>
+					/// Копіює значення до колекції
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="U">Тип елементів в новій колекції</typeparam>
+					/// <returns>Колекція з копією всіх елементів</returns>
+					template<
+						template<typename U> class NewCollection,
+						typename FilterLambda,
+						TypeTraits::EnableIfTV<
+							TypeTraits::LogicConst<
+								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TValue&> &&
+								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<TPair>>
+								>,
+							bool> 
+						= true
+					>
+					NewCollection<TValue> CopyValueIfToCollection(FilterLambda&& filter) const {
+						return this->CopyValueToCollection<NewCollection>(MoveRValue(filter), [] (const TValue& pair) -> TValue
+						{
+							return pair;
+						});
+					}
+				public:
+					/// <summary>
 					/// Деструктор чисто віртуальний бо це лиш розширення асоціативних колекцій
 					/// </summary>
 					virtual ~IAssociableCollection() = 0 {};

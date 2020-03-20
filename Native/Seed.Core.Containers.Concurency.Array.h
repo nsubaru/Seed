@@ -699,6 +699,8 @@ namespace Seed {
                 friend class LINQ::IOrderable;
                 template<typename THeap, typename T, typename Enable>
                 friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
+                friend class LINQ::IAssociableCollection;
             protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)

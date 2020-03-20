@@ -550,8 +550,41 @@ namespace Seed {
 #pragma endregion
 					template<typename U>
 					friend void Seed::Core::Swap(U& A, U& B);
+#pragma region Ctor, Dtor, copy operators
 
-                    RefCountClass(Iterator, This);
+					Iterator(const Iterator& iterator) : This(iterator.This) {
+						if (This != nullptr)
+							This->RefCount++;
+					}
+
+					Iterator(Iterator&& iterator) : This(iterator.This) {
+						iterator.This = nullptr;
+					}
+
+					Iterator& operator=(const Iterator& iterator) {
+						this->~Iterator();
+						this->Iterator::Iterator(iterator);
+						return *this;
+					}
+
+					Iterator& operator=(Iterator&& iterator) {
+						this->~Iterator();
+						this->Iterator::Iterator(MoveRValue(iterator));
+						return *this;
+					}
+
+					~Iterator() {
+						if (This != nullptr)
+						{
+							if (--This->RefCount == 0)
+							{
+								this->Dispose(); 
+								delete This;
+							}
+							This = nullptr;
+						}
+					}
+#pragma endregion
 				};
 			public:
 				friend Iterator;
@@ -898,6 +931,8 @@ namespace Seed {
 				friend class LINQ::IOrderable;
                 template<typename THeap, typename T, typename Enable>
                 friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
+                friend class LINQ::IAssociableCollection;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -1267,54 +1302,54 @@ namespace Seed {
 
 				template<typename FilterLambda, typename Lambda>
 				__forceinline BaseList& RemoveIfFilterAndLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
-						if (This == nullptr)
-							return *this;
-						elem* it = This->root;
-						elem* tmp;
-						SizeT Index = 0;
-						while (it != nullptr)
-						{
-							if (filter(it->value, Index)) {
-
-								lambda(it->value, Index);
-
-								if (it->next == nullptr && it->prev == nullptr)
-								{
-									This->root = nullptr;
-									This->last = nullptr;
-									tmp = nullptr;
-								}
-								else if (it->next == nullptr)
-								{
-									tmp = nullptr;
-									if (it->prev != nullptr)
-										it->prev->next = nullptr;
-									This->last = it->prev;
-								}
-								else if (it->prev == nullptr)
-								{
-									tmp = it->next;
-									it->next->prev = nullptr;
-									This->root = it->next;
-								}
-								else
-								{
-									tmp = it->next;
-									tmp->prev = it->prev;
-									it->prev->next = tmp;
-								}
-								--it->RefCount;
-								if (it->RefCount == 0)
-								{
-									delete it;
-								}
-								--This->size;
-								it = tmp;
-
-							}
-							else  it = it->next;
-						}
+					if (This == nullptr)
 						return *this;
+					elem* it = This->root;
+					elem* tmp;
+					SizeT Index = 0;
+					while (it != nullptr)
+					{
+						if (filter(it->value, Index)) {
+
+							lambda(it->value, Index);
+
+							if (it->next == nullptr && it->prev == nullptr)
+							{
+								This->root = nullptr;
+								This->last = nullptr;
+								tmp = nullptr;
+							}
+							else if (it->next == nullptr)
+							{
+								tmp = nullptr;
+								if (it->prev != nullptr)
+									it->prev->next = nullptr;
+								This->last = it->prev;
+							}
+							else if (it->prev == nullptr)
+							{
+								tmp = it->next;
+								it->next->prev = nullptr;
+								This->root = it->next;
+							}
+							else
+							{
+								tmp = it->next;
+								tmp->prev = it->prev;
+								it->prev->next = tmp;
+							}
+							--it->RefCount;
+							if (it->RefCount == 0)
+							{
+								delete it;
+							}
+							--This->size;
+							it = tmp;
+
+						}
+						else  it = it->next;
+					}
+					return *this;
 				}
 
 				template<typename FilterLambda, typename Lambda>
@@ -1371,106 +1406,106 @@ namespace Seed {
 
 				template<typename FilterLambda, typename Lambda>
 				__forceinline BaseList& RemoveIfLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
-						if (This == nullptr)
-							return *this;
-						elem* it = This->root;
-						elem* tmp;
-						SizeT Index = 0;
-						while (it != nullptr)
-						{
-							if (filter(it->value)) {
-
-								lambda(it->value, Index);
-
-								if (it->next == nullptr && it->prev == nullptr)
-								{
-									This->root = nullptr;
-									This->last = nullptr;
-									tmp = nullptr;
-								}
-								else if (it->next == nullptr)
-								{
-									tmp = nullptr;
-									if (it->prev != nullptr)
-										it->prev->next = nullptr;
-									This->last = it->prev;
-								}
-								else if (it->prev == nullptr)
-								{
-									tmp = it->next;
-									it->next->prev = nullptr;
-									This->root = it->next;
-								}
-								else
-								{
-									tmp = it->next;
-									tmp->prev = it->prev;
-									it->prev->next = tmp;
-								}
-								--it->RefCount;
-								if (it->RefCount == 0)
-								{
-									delete it;
-								}
-								--This->size;
-								it = tmp;
-
-							}
-							else  it = it->next;
-						}
+					if (This == nullptr)
 						return *this;
+					elem* it = This->root;
+					elem* tmp;
+					SizeT Index = 0;
+					while (it != nullptr)
+					{
+						if (filter(it->value)) {
+
+							lambda(it->value, Index);
+
+							if (it->next == nullptr && it->prev == nullptr)
+							{
+								This->root = nullptr;
+								This->last = nullptr;
+								tmp = nullptr;
+							}
+							else if (it->next == nullptr)
+							{
+								tmp = nullptr;
+								if (it->prev != nullptr)
+									it->prev->next = nullptr;
+								This->last = it->prev;
+							}
+							else if (it->prev == nullptr)
+							{
+								tmp = it->next;
+								it->next->prev = nullptr;
+								This->root = it->next;
+							}
+							else
+							{
+								tmp = it->next;
+								tmp->prev = it->prev;
+								it->prev->next = tmp;
+							}
+							--it->RefCount;
+							if (it->RefCount == 0)
+							{
+								delete it;
+							}
+							--This->size;
+							it = tmp;
+
+						}
+						else  it = it->next;
+					}
+					return *this;
 				}
 
 				template<typename FilterLambda, typename Lambda>
 				__forceinline BaseList& RemoveIfFilterAndLambdaWithoutIndex(FilterLambda&& filter, Lambda&& lambda) {
-						if (This == nullptr)
-							return *this;
-						elem* it = This->root;
-						elem* tmp;
-						SizeT Index = 0;
-						while (it != nullptr)
-						{
-							if (filter(it->value)) {
-
-								lambda(MoveRValue(it->value));
-
-								if (it->next == nullptr && it->prev == nullptr)
-								{
-									This->root = nullptr;
-									This->last = nullptr;
-									tmp = nullptr;
-								}
-								else if (it->next == nullptr)
-								{
-									tmp = nullptr;
-									if (it->prev != nullptr)
-										it->prev->next = nullptr;
-									This->last = it->prev;
-								}
-								else if (it->prev == nullptr)
-								{
-									tmp = it->next;
-									it->next->prev = nullptr;
-									This->root = it->next;
-								}
-								else
-								{
-									tmp = it->next;
-									tmp->prev = it->prev;
-									it->prev->next = tmp;
-								}
-								--it->RefCount;
-								if (it->RefCount == 0)
-								{
-									delete it;
-								}
-								--This->size;
-								it = tmp;
-
-							}
-							else  it = it->next;
-						}
+					if (This == nullptr)
 						return *this;
+					elem* it = This->root;
+					elem* tmp;
+					SizeT Index = 0;
+					while (it != nullptr)
+					{
+						if (filter(it->value)) {
+
+							lambda(MoveRValue(it->value));
+
+							if (it->next == nullptr && it->prev == nullptr)
+							{
+								This->root = nullptr;
+								This->last = nullptr;
+								tmp = nullptr;
+							}
+							else if (it->next == nullptr)
+							{
+								tmp = nullptr;
+								if (it->prev != nullptr)
+									it->prev->next = nullptr;
+								This->last = it->prev;
+							}
+							else if (it->prev == nullptr)
+							{
+								tmp = it->next;
+								it->next->prev = nullptr;
+								This->root = it->next;
+							}
+							else
+							{
+								tmp = it->next;
+								tmp->prev = it->prev;
+								it->prev->next = tmp;
+							}
+							--it->RefCount;
+							if (it->RefCount == 0)
+							{
+								delete it;
+							}
+							--This->size;
+							it = tmp;
+
+						}
+						else  it = it->next;
+					}
+					return *this;
 				}
 
 				template<typename FilterLambda, typename Lambda>

@@ -508,8 +508,6 @@ namespace Seed {
 					///<summary>Конструктор</summary>
 					Iterator() : item(nullptr) {};
 
-					RefCountClass(Iterator, item);
-
 					///<summary>Переходить до наступного елемента</summary>
 					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
 					///<returns>Силку на цей ітератор</returns>
@@ -579,6 +577,42 @@ namespace Seed {
 
 					template<typename U>
 					friend void Seed::Core::Swap(U& A, U& B);
+
+#pragma region Ctor, Dtor, copy operators
+
+					Iterator(const Iterator& iterator) : item(iterator.item) {
+						if (item != nullptr)
+							item->RefCount++;
+					}
+
+					Iterator(Iterator&& iterator) : item(iterator.item) {
+						iterator.item = nullptr;
+					}
+
+					Iterator& operator=(const Iterator& iterator) {
+						this->~Iterator();
+						this->Iterator::Iterator(iterator);
+						return *this;
+					}
+
+					Iterator& operator=(Iterator&& iterator) {
+						this->~Iterator();
+						this->Iterator::Iterator(MoveRValue(iterator));
+						return *this;
+					}
+
+					~Iterator() {
+						if (item != nullptr)
+						{
+							if (--item->RefCount == 0)
+							{
+								this->Dispose(); 
+								delete item;
+							}
+							item = nullptr;
+						}
+					}
+#pragma endregion
 				};
 
 				friend Iterator;

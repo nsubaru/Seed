@@ -114,11 +114,26 @@ namespace Seed {
 				/// Ім'я події перезагрузки системи
 				/// </summary>
 				static constexpr Char ReloadEventName[] = L"\\Kernel\\Excecutable\\Reload";
+				/// <summary>
+				/// Ім'я події малої кількості вільної ОЗУ в системі
+				/// </summary>
+				static constexpr Char HostRamLowEventName[] = L"\\Host\\RamLow";
+				/// <summary>
+				/// Ім'я події малої кількості вільної пам'яті в системі
+				/// </summary>
+				static constexpr Char HostCommitLowEventName[] = L"\\Host\\CommitLow";
+				/// <summary>
+				/// Ім'я події нехватки вільної пам'яті в системі
+				/// </summary>
+				static constexpr Char HostCommitFullEventName[] = L"\\Host\\CommitFull";
 
 				using TShutdownEventName = TypeTraits::AddReference<decltype(ShutdownEventName)>::Lvalue;
 				using TReloadEventName = TypeTraits::AddReference<decltype(ReloadEventName)>::Lvalue;
 				using TKernelNamespaceName = TypeTraits::AddReference<decltype(KernelNamespaceName)>::Lvalue;
 				using TKernelExcecutableNamespaceName = TypeTraits::AddReference<decltype(KernelExcecutableNamespaceName)>::Lvalue;
+				using THostRamLowEventName = TypeTraits::AddReference<decltype(HostRamLowEventName)>::Lvalue;
+				using THostCommitLowEventName = TypeTraits::AddReference<decltype(HostCommitLowEventName)>::Lvalue;
+				using THostCommitFullEventName = TypeTraits::AddReference<decltype(HostCommitFullEventName)>::Lvalue;
 			};
 
 			struct ObjectManagerConfigurations {
@@ -582,6 +597,18 @@ namespace Seed {
 				constexpr StaticSettingsData::TKernelExcecutableNamespaceName GetKernelExcecutableNamespaceName() {
 					return StaticSettingsData::KernelExcecutableNamespaceName;
 				}
+
+				constexpr StaticSettingsData::THostRamLowEventName GetHostRamLowEventName() {
+					return StaticSettingsData::HostRamLowEventName;
+				}
+
+				constexpr StaticSettingsData::THostCommitLowEventName GetHostCommitLowEventName() {
+					return StaticSettingsData::HostCommitLowEventName;
+				}
+
+				constexpr StaticSettingsData::THostCommitFullEventName GetHostCommitFullEventName() {
+					return StaticSettingsData::HostCommitFullEventName;
+				}
 			public:
 				///<summary>Ім'я події завершення роботи ядра</summary>
 				StaticSettingsData::TShutdownEventName Property(GetShutdownEventName) ShutdownEventName;
@@ -592,6 +619,19 @@ namespace Seed {
 				StaticSettingsData::TKernelNamespaceName Property(GetKernelNamespaceName) KernelNamespaceName;
 				///<summary>Ім'я простору імен подій виконавчої системи ядра Рем</summary>
 				StaticSettingsData::TKernelExcecutableNamespaceName Property(GetKernelExcecutableNamespaceName) KernelExcecutableNamespaceName;
+
+				/// <summary>
+				/// Ім'я події малої кількості вільної ОЗУ в системі
+				/// </summary>
+				StaticSettingsData::THostRamLowEventName Property(GetHostRamLowEventName) HostRamLowEventName;
+				/// <summary>
+				/// Ім'я події малої кількості вільної пам'яті в системі
+				/// </summary>
+				StaticSettingsData::THostCommitLowEventName Property(GetHostCommitLowEventName) HostCommitLowEventName;
+				/// <summary>
+				/// Ім'я події нехватки вільної пам'яті в системі
+				/// </summary>
+				StaticSettingsData::THostCommitFullEventName Property(GetHostCommitFullEventName) HostCommitFullEventName;
 			};
 
 			class SeedKernelCall ObjectNamespaceConfigurationT {
