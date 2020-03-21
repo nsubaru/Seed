@@ -1,3 +1,3 @@
 #pragma once
-#include "Seed.Core.NewCTTI.h"
-#include "Seed.Core.NewSerilization.h"
+#include "Seed.Core.CTTI.h"
+#include "Seed.Core.Serilization.h"

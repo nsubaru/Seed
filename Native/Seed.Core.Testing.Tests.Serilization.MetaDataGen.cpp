@@ -4,7 +4,7 @@
 #include "Seed.Core.Testing.Tests.Serilization.MetaDataGen.h"
 
 bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
-	auto metaData = NewSerilization::MetaDataGen<
+	auto metaData = Core::Serilization::MetaDataGen<
 		Containers::Tuple<
 			Containers::Dictionary<
 				Containers::List<
@@ -19,7 +19,7 @@ bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 		>
 	>();
 
-	constexpr auto MetaDataConstExpr = NewSerilization::CTTIMetaDataGen<
+	constexpr auto MetaDataConstExpr = Core::Serilization::CTTIMetaDataGen<
 		Containers::Tuple<
 			Containers::Dictionary<
 				Containers::List<
@@ -38,7 +38,7 @@ bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 }
 
 bool Seed::Core::Testing::Test::Serilization::CustomStructMetaDataGen::Excecute() {
-	auto metaData = NewSerilization::MetaDataGen<NewCTTI::TypeTraits::SerilizableClass>();
+	auto metaData = Core::Serilization::MetaDataGen<CTTI::TypeTraits::SerilizableClass>();
 
 	return metaData.Lenght != 0;
 }

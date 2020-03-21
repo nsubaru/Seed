@@ -157,7 +157,7 @@ namespace Seed {
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
                 template<typename THeap, typename T, typename Enable>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
                 friend class LINQ::IAssociableCollection;
 			protected:

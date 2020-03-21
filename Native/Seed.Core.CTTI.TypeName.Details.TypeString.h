@@ -7,7 +7,7 @@
 
 namespace Seed {
 	inline namespace Core {
-		namespace NewCTTI {
+		namespace CTTI {
 			namespace Details {
 				template<char... C>
 				struct TypeString final {
@@ -42,22 +42,22 @@ namespace Seed {
 				}
 
 #define __GenNGTypeStringHelp(text, n)\
-	Seed::Core::NewCTTI::Details::GetSymByN<0 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<1 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<2 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<3 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<4 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<5 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<6 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<7 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<8 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<9 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<10 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<11 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<12 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<13 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<14 + n>(text), \
-	Seed::Core::NewCTTI::Details::GetSymByN<15 + n>(text)
+	Seed::Core::CTTI::Details::GetSymByN<0 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<1 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<2 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<3 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<4 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<5 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<6 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<7 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<8 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<9 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<10 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<11 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<12 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<13 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<14 + n>(text), \
+	Seed::Core::CTTI::Details::GetSymByN<15 + n>(text)
 
 #define __GetNGTypeStringHelp2(text, n) \
 	__GenNGTypeStringHelp(text, 0 + n), \
@@ -79,15 +79,15 @@ namespace Seed {
 
 #ifndef __INTELLISENSE__
 #define GenNGTypeString(text) \
-	Seed::Core::NewCTTI::Details::TypeString<\
+	Seed::Core::CTTI::Details::TypeString<\
 	__GetNGTypeStringHelp4(text, 0)\
-	Seed::Core::NewCTTI::Details::GetSymByN(text)>
+	Seed::Core::CTTI::Details::GetSymByN(text)>
 
 #else
 #define GenNGTypeString(text) \
-	Seed::Core::NewCTTI::Details::TypeString<\
+	Seed::Core::CTTI::Details::TypeString<\
 	__GetNGTypeStringHelp3(text, 0)\
-	Seed::Core::NewCTTI::Details::GetSymByN(text)>
+	Seed::Core::CTTI::Details::GetSymByN(text)>
 
 #endif
 			}

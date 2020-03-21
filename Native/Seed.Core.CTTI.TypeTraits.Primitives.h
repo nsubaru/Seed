@@ -1,12 +1,12 @@
 #pragma once
-#include "Seed.Core.NewCTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.Base.h"
 #include "Seed.Core.Math.h"
 
 namespace Seed
 {
 	inline namespace Core
 	{
-		namespace NewCTTI
+		namespace CTTI
 		{
 			namespace TypeTraits
 			{
@@ -68,7 +68,7 @@ namespace Seed
 #pragma region Character
 					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<UChar, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<UChar, EType::Character, true, TIsConst, TIsVolatile>
 					{
-						static constexpr auto CodePage = NewCTTI::Details::TypeStringToArray(GenNGTypeString("UTF-16LE")());
+						static constexpr auto CodePage = CTTI::Details::TypeStringToArray(GenNGTypeString("UTF-16LE")());
 
 						static constexpr UChar Max = static_cast<UChar>(Math::Max<UInt16>());
 						static constexpr UChar Min = static_cast<UChar>(Math::Max<UInt16>());

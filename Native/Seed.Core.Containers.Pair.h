@@ -63,7 +63,7 @@ namespace Seed {
                 TValue value;
             private:
                 template<typename TOtherHeap, typename T, typename TEnable>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
             };
 
             namespace {

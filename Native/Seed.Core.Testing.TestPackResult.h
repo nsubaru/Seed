@@ -7,7 +7,7 @@ namespace Seed
 	{
 		namespace Testing
 		{
-			class SeedKernelCall TestPackResult : IDisposable, public NewSerilization::ISerilizable<TestPackResult> {
+			class SeedKernelCall TestPackResult : IDisposable, public Serilization::ISerilizable<TestPackResult> {
 			private:
 				struct Data {
 					String Name;

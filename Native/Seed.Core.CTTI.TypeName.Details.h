@@ -1,6 +1,6 @@
 #pragma once
-#include "Seed.Core.NewCTTI.Base.h"
-#include "Seed.Core.NewCTTI.TypeName.Details.TypeString.h"
+#include "Seed.Core.CTTI.Base.h"
+#include "Seed.Core.CTTI.TypeName.Details.TypeString.h"
 
 #pragma warning(push)
 //Constexpr array can have size 0, it is not standart extension in C++
@@ -8,7 +8,7 @@
 
 namespace Seed {
     inline namespace Core {
-        namespace NewCTTI {
+        namespace CTTI {
             namespace Details {
                 class CompileStringView {
                 private:

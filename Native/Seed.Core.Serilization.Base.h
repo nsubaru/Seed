@@ -1,6 +1,6 @@
 #pragma once
 #include "Seed.Core.Containers.h"
-#include "Seed.Core.NewCTTI.h"
+#include "Seed.Core.CTTI.h"
 
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
@@ -10,7 +10,7 @@ namespace Seed
 {
     inline namespace Core
     {
-        namespace NewSerilization
+        namespace Serilization
         {
             namespace Details
             {
@@ -21,7 +21,7 @@ namespace Seed
 #endif
                 template<typename T>
                 constexpr bool IsNotSerlizable = 
-                    !NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
+                    !CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsNotSerlizable<T>, void>> {
@@ -40,12 +40,12 @@ namespace Seed
 
                     forceinline static constexpr auto TypeHint() {
                         return
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
                     }
 
                     forceinline static constexpr auto ConstexprSize() {
                         return
-                            NewCTTI::Details::ToCharStr<sizeof(T)>();
+                            CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
                     forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
@@ -54,32 +54,32 @@ namespace Seed
 
                     forceinline static constexpr auto TypeMetaData() {
                         return
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
-                            NewCTTI::TypeName<T>().Resize<NewCTTI::TypeName<T>().Count - 1>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::ToCharStr<static_cast<SizeT>(NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::ToCharStr<sizeof(T)>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<sizeof(T)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             ConstexprSize() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             TypeHint() +
-							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
                     }
                 };
 
                 template<typename T>
                 constexpr bool IsSerilizablePrimitive = (
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::Numeric ||
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::Character ||
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::FloatNumeric ||
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::Logic ||
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::POD
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Numeric ||
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Character ||
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::FloatNumeric ||
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Logic ||
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::POD
                     )
                     &&
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T,typename TypeTraits::EnableIfV<IsSerilizablePrimitive<T>, void>> {
@@ -97,12 +97,12 @@ namespace Seed
 
                     forceinline static constexpr auto TypeHint() {
                         return
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
                     }
 
                     forceinline static constexpr auto ConstexprSize() {
                         return
-                            NewCTTI::Details::ToCharStr<sizeof(T)>();
+                            CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
                     forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
@@ -111,30 +111,30 @@ namespace Seed
 
                     forceinline static constexpr auto TypeMetaData() {
                         return
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
-                            NewCTTI::TypeName<T>().Resize<NewCTTI::TypeName<T>().Count - 1>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::ToCharStr<static_cast<SizeT>(NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::ToCharStr<sizeof(T)>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<sizeof(T)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             ConstexprSize() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             TypeHint() +
-							NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
                     }
                 };
 
                 template<typename T>
                 constexpr bool IsCFixedArraySerlizable = 
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == NewCTTI::TypeTraits::EType::FixedArray &&
-                    NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::FixedArray &&
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsCFixedArraySerlizable<T>, void>> {
-                    using ItemType = typename NewCTTI::TypeTraits::CTTITypeMetaData<T>::ItemType::Type;
+                    using ItemType = typename CTTI::TypeTraits::CTTITypeMetaData<T>::ItemType::Type;
 
                     forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
                         if constexpr (IsMemCopy())
@@ -145,7 +145,7 @@ namespace Seed
                         }
                         else
                         {
-                            for (SizeT i = 0; i < NewCTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
+                            for (SizeT i = 0; i < CTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
                             {
                                 BaseSerlizationHandler<THeap, ItemType>::SerilizeImpl(data[i], rawStream, offset);
                             }
@@ -156,12 +156,12 @@ namespace Seed
                     forceinline static constexpr SizeT DataSize(const T& data) {
                         if constexpr (IsMemCopy())
                         {
-                            return sizeof(ItemType) * NewCTTI::TypeTraits::CTTITypeMetaData<T>::Count;
+                            return sizeof(ItemType) * CTTI::TypeTraits::CTTITypeMetaData<T>::Count;
                         }
                         else
                         {
                             SizeT Size = 1;
-                            for (SizeT i = 0; i < NewCTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
+                            for (SizeT i = 0; i < CTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
                             {
                                 Size *= BaseSerlizationHandler<THeap, ItemType>::DataSize(data[i]);
                             }
@@ -175,12 +175,12 @@ namespace Seed
 
                     forceinline static constexpr auto TypeHint() {
                         return
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
                     }
 
                     forceinline static constexpr auto ConstexprSize() {
                         return
-                            NewCTTI::Details::ToCharStr<NewCTTI::TypeTraits::CTTITypeMetaData<T>::Count>();
+                            CTTI::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<T>::Count>();
                     }
 
                     forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
@@ -192,7 +192,7 @@ namespace Seed
                         else
                         {
                             SizeT Size = 1;
-                            for (SizeT i = 0; i < NewCTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
+                            for (SizeT i = 0; i < CTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
                             {
                                 Size *= BaseSerlizationHandler<THeap, ItemType>::DeserelizeImpl(data[i], rawStream, offset);
                             }
@@ -201,19 +201,19 @@ namespace Seed
 
                     forceinline static constexpr auto TypeMetaData() {
                         return
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
-                            NewCTTI::TypeName<T>().Resize<NewCTTI::TypeName<T>().Count - 1>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::ToCharStr<static_cast<SizeT>(NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            NewCTTI::Details::ToCharStr<sizeof(T)>() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<sizeof(T)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             ConstexprSize() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             TypeHint() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             BaseSerlizationHandler<THeap, ItemType>::TypeMetaData() +
-                            NewCTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
                     }
                 };
             }
@@ -256,22 +256,22 @@ namespace Seed
 
             template<typename THeap, typename T>
             forceinline BaseString<THeap> BaseMetaDataGen() {
-                return BaseString<THeap>(Details::BaseSerlizationHandler<THeap, T>::TypeMetaData() + NewCTTI::Details::TypeStringToArray(GenNGTypeString("")()));
+                return BaseString<THeap>(Details::BaseSerlizationHandler<THeap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
             }
 
             template<typename T>
             forceinline String MetaDataGen() {
-                return String(Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + NewCTTI::Details::TypeStringToArray(GenNGTypeString("")()));
+                return String(Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
             }
 
             template<typename T>
             forceinline SensitiveString SensitiveMetaDataGen() {
-                return SensitiveString(Details::BaseSerlizationHandler<Memory::SensitiveDataHeap, T>::TypeMetaData() + NewCTTI::Details::TypeStringToArray(GenNGTypeString("")()));
+                return SensitiveString(Details::BaseSerlizationHandler<Memory::SensitiveDataHeap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
             }
 
             template<typename T>
             forceinline constexpr auto CTTIMetaDataGen() {
-                return Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + NewCTTI::Details::TypeStringToArray(GenNGTypeString("")());
+                return Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")());
             }
         }
     }

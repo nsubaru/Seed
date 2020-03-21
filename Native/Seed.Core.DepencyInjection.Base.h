@@ -261,7 +261,7 @@ namespace Seed
 							}
 						}
 
-						Throw(DIResolveException(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+						Throw(DIResolveException(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
 					}
 				};
 
@@ -286,7 +286,7 @@ namespace Seed
 					};
 
 					if (rttiRecord.GetRTTITypeInfo() != typeid(TService))
-						Throw(DIRegisterService(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+						Throw(DIRegisterService(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
 
 					auto serviceRecord = SmartPtr<ServiceRecord>{ new ServiceRecord(
 						InjectorCtor,
@@ -341,7 +341,7 @@ namespace Seed
 					}
 
 					if (rttiRecord.GetRTTITypeInfo() != typeid(TService))
-						Throw(DIRegisterService(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+						Throw(DIRegisterService(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
 
 					auto serviceRecord = SmartPtr<ServiceRecord>{ new ServiceRecord(
 						InjectorCtor,
@@ -350,7 +350,7 @@ namespace Seed
 					) };
 
 					this->data->serviceTableForNativeLevel.Insert(&typeid(TServiceInterface), serviceRecord);
-					this->data->serviceTableForManagedLevel.Insert(NewCTTI::TypeName<TServiceInterface>(), serviceRecord);
+					this->data->serviceTableForManagedLevel.Insert(CTTI::TypeName<TServiceInterface>(), serviceRecord);
 
 					serviceRecord->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
 					{

@@ -319,7 +319,7 @@ Thread& Seed::Core::Threading::Thread::Start()
 {
 	if (this->This->This != nullptr)
 		Throw(ThreadableAlredyStarted(ExceptionPosition));
-	toCoreLog(String(L"Запуск потоку з ім'ям \"") + this->GetName() + L"\" з потоку з ID " + String::toString(GetTID()));
+	toCoreLog(String(L"Запуск потоку з ім'ям \"") + this->GetName() + L"\" з потоку з ID " + String::toString(Threading::GetTID()));
 	this->This->AbortEvent = new Event();
 	CLIENT_ID id;
 	size_t stack_max = 10485760, stack_alloc = 524288;

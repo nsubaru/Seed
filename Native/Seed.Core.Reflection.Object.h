@@ -42,13 +42,13 @@ namespace Seed
 				struct IsCTTIStringT : TypeTraits::LogicFalse {};
 
 				template<char ... TChars>
-				struct IsCTTIStringT<NewCTTI::Details::TypeString<TChars...>> : TypeTraits::LogicTrue {};
+				struct IsCTTIStringT<CTTI::Details::TypeString<TChars...>> : TypeTraits::LogicTrue {};
 
 				template<typename T>
 				constexpr bool IsCTTIStringV = IsCTTIStringT<T>::State;
 
 				template<char ... TChars>
-				using CTTIString = NewCTTI::Details::TypeString<TChars...>;
+				using CTTIString = CTTI::Details::TypeString<TChars...>;
 
 				template<typename>
 				struct MethodCallDescriptor {
@@ -65,11 +65,11 @@ namespace Seed
 					static constexpr Boolean IsConst = false;
 					static constexpr Boolean IsVolatile = false;
 
-					static constexpr auto ArgsTypeName = NewCTTI::TypeName<ArgsType>();
-					static constexpr auto RetTypeName = NewCTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
+					static constexpr auto ArgsTypeName = CTTI::TypeName<ArgsType>();
+					static constexpr auto RetTypeName = CTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
 
 					static String ArgsMetaData() {
-						return NewSerilization::MetaDataGen<ArgsType>();
+						return Serilization::MetaDataGen<ArgsType>();
 					}
 
 					static String RetMetaData() {
@@ -79,7 +79,7 @@ namespace Seed
 						}
 						else
 						{
-							return NewSerilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
 						}
 					}
 
@@ -170,10 +170,10 @@ namespace Seed
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
-						(NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
+						(CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
-						NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
+						CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
 
 					using Ret = TypeTraits::RemoveCVRefV<TRet>;
 					using Args = ArgsType;
@@ -189,11 +189,11 @@ namespace Seed
 					static constexpr Boolean IsConst = true;
 					static constexpr Boolean IsVolatile = false;
 
-					static constexpr auto ArgsTypeName = NewCTTI::TypeName<ArgsType>();
-					static constexpr auto RetTypeName = NewCTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
+					static constexpr auto ArgsTypeName = CTTI::TypeName<ArgsType>();
+					static constexpr auto RetTypeName = CTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
 
 					static String ArgsMetaData() {
-						return NewSerilization::MetaDataGen<ArgsType>();
+						return Serilization::MetaDataGen<ArgsType>();
 					}
 
 					static String RetMetaData() {
@@ -203,7 +203,7 @@ namespace Seed
 						}
 						else
 						{
-							return NewSerilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
 						}
 					}
 
@@ -294,10 +294,10 @@ namespace Seed
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
-						(NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
+						(CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
-						NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
+						CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
 
 					using Ret = TypeTraits::RemoveCVRefV<TRet>;
 					using Args = ArgsType;
@@ -313,11 +313,11 @@ namespace Seed
 					static constexpr Boolean IsConst = false;
 					static constexpr Boolean IsVolatile = true;
 
-					static constexpr auto ArgsTypeName = NewCTTI::TypeName<ArgsType>();
-					static constexpr auto RetTypeName = NewCTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
+					static constexpr auto ArgsTypeName = CTTI::TypeName<ArgsType>();
+					static constexpr auto RetTypeName = CTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
 
 					static String ArgsMetaData() {
-						return NewSerilization::MetaDataGen<ArgsType>();
+						return Serilization::MetaDataGen<ArgsType>();
 					}
 
 					static String RetMetaData() {
@@ -327,7 +327,7 @@ namespace Seed
 						}
 						else
 						{
-							return NewSerilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
 						}
 					}
 
@@ -418,10 +418,10 @@ namespace Seed
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
-						(NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
+						(CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
-						NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
+						CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
 
 					using Ret = TypeTraits::RemoveCVRefV<TRet>;
 					using Args = ArgsType;
@@ -437,11 +437,11 @@ namespace Seed
 					static constexpr Boolean IsConst = true;
 					static constexpr Boolean IsVolatile = true;
 
-					static constexpr auto ArgsTypeName = NewCTTI::TypeName<ArgsType>();
-					static constexpr auto RetTypeName = NewCTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
+					static constexpr auto ArgsTypeName = CTTI::TypeName<ArgsType>();
+					static constexpr auto RetTypeName = CTTI::TypeName<TypeTraits::RemoveCVRefV<TRet>>();
 
 					static String ArgsMetaData() {
-						return NewSerilization::MetaDataGen<ArgsType>();
+						return Serilization::MetaDataGen<ArgsType>();
 					}
 
 					static String RetMetaData() {
@@ -451,7 +451,7 @@ namespace Seed
 						}
 						else
 						{
-							return NewSerilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
 						}
 					}
 
@@ -542,10 +542,10 @@ namespace Seed
 					};
 
 					static constexpr bool IsArgsSerilizable = IsFunctionWithoutArgs<TArgs...> ||
-						(NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
+						(CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TArgs>>::IsSerilizable && ...);
 
 					static constexpr bool IsRetSerilizable = TypeTraits::IsSameV<TRet, void> ||
-						NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
+						CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<TRet>>::IsSerilizable;
 
 					using Ret = TypeTraits::RemoveCVRefV<TRet>;
 					using Args = ArgsType;
@@ -555,7 +555,7 @@ namespace Seed
 				struct MethodDescriptor {
 					static_assert(IsCTTIStringV<TName>, "TName must be CTTIString");
 
-					static constexpr auto Name = Seed::Core::NewCTTI::Details::TypeStringToArray(TName());
+					static constexpr auto Name = Seed::Core::CTTI::Details::TypeStringToArray(TName());
 					using MethodCallType = typename MethodCallDescriptor<T>::MethodType;
 
 					using MethodClass = typename MethodCallDescriptor<T>::Class;
@@ -627,10 +627,10 @@ namespace Seed
 						pObject = nullptr;
 					};
 
-					static constexpr auto CtorArgsTypeName = NewCTTI::TypeName<Containers::Tuple<TArgs...>>();
+					static constexpr auto CtorArgsTypeName = CTTI::TypeName<Containers::Tuple<TArgs...>>();
 
 					static String ArgsMetaData() {
-						return NewSerilization::MetaDataGen<Containers::Tuple<TArgs...>>();
+						return Serilization::MetaDataGen<Containers::Tuple<TArgs...>>();
 					}
 				};
 
@@ -647,10 +647,10 @@ namespace Seed
 						pObject = nullptr;
 					};
 
-					static constexpr auto CtorArgsTypeName = Seed::Core::NewCTTI::Details::TypeStringToArray(GenNGTypeString("`invalid`")());
+					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::TypeStringToArray(GenNGTypeString("`invalid`")());
 
 					static String ArgsMetaData() {
-						return Seed::Core::NewCTTI::Details::TypeStringToArray(GenNGTypeString("`Can not construct`")());
+						return Seed::Core::CTTI::Details::TypeStringToArray(GenNGTypeString("`Can not construct`")());
 					}
 				};
 
@@ -681,7 +681,7 @@ namespace Seed
 						}
 					}
 				public:
-					static constexpr auto Name = Seed::Core::NewCTTI::Details::TypeStringToArray(TName());
+					static constexpr auto Name = Seed::Core::CTTI::Details::TypeStringToArray(TName());
 					static constexpr auto PropTypeName = MethodCallDescriptor<TGet>::RetTypeName;
 					static constexpr auto GetCaller = MethodCallDescriptor<TGet>::MethodCaller;
 					static constexpr auto pGet = GetT;
@@ -695,7 +695,7 @@ namespace Seed
 
 				template<typename TObj, typename TObjectCtorAndDtor, typename TMethodsTuple, typename TPropertiesTuple>
 				struct ObjectDescriptor {
-					static constexpr auto Name = NewCTTI::TypeName<TObj>();
+					static constexpr auto Name = CTTI::TypeName<TObj>();
 
 					static constexpr auto RttiTypeInfo = [] () 
 					{
@@ -736,14 +736,14 @@ namespace Seed
 				};
 			}
 
-			class ObjectRTTIRecord final : IDisposable, public NewSerilization::ISerilizable<ObjectRTTIRecord> {
+			class ObjectRTTIRecord final : IDisposable, public Serilization::ISerilizable<ObjectRTTIRecord> {
 			public:
 				using CtorCaller = void* (*)(DynamicObject&&);
 				using DtorCaller = void (*)(void*&);
 				using MethodCaller = DynamicObject(*)(const void* const&, void*, DynamicObject&);
 				using TypeInformationGetterType = Containers::List<DataTypeRecord>(*)();
 			public:
-				class MethodRTTIRecord final : IDisposable, public NewSerilization::ISerilizable<MethodRTTIRecord> {
+				class MethodRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
 				private:
 					struct Data {
 						String MethodName;
@@ -893,7 +893,7 @@ namespace Seed
 					RefCountClass(MethodRTTIRecord, data);
 				};
 
-				class PropertyRTTIRecord final : IDisposable, public NewSerilization::ISerilizable<MethodRTTIRecord> {
+				class PropertyRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
 				public:
 					using MethodCaller = DynamicObject(*)(const void* const&, void*, DynamicObject&);
 

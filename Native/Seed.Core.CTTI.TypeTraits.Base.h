@@ -1,11 +1,11 @@
 #pragma once
-#include "Seed.Core.NewCTTI.TypeName.h"
+#include "Seed.Core.CTTI.TypeName.h"
 
 namespace Seed
 {
 	inline namespace Core
 	{
-		namespace NewCTTI
+		namespace CTTI
 		{
 			namespace TypeTraits
 			{
@@ -47,8 +47,8 @@ namespace Seed
 						static constexpr Boolean IsSerilizable = TIsSerilizable;
 						static constexpr Boolean IsConst = TIsConst;
 						static constexpr Boolean IsVolatile = TIsVolatile;
-						static constexpr auto TypeName = NewCTTI::TypeName<T>();
-						static constexpr auto CXXTypeName = NewCTTI::CXXTypeName<T>();
+						static constexpr auto TypeName = CTTI::TypeName<T>();
+						static constexpr auto CXXTypeName = CTTI::CXXTypeName<T>();
 
                         static constexpr Boolean IsContaineSubTypes =
                             !(
@@ -68,8 +68,8 @@ namespace Seed
 						static constexpr Boolean IsSerilizable = false;
 						static constexpr Boolean IsConst = TIsConst;
 						static constexpr Boolean IsVolatile = TIsVolatile;
-						static constexpr auto TypeName = NewCTTI::TypeName<void>();
-						static constexpr auto CXXTypeName = NewCTTI::CXXTypeName<void>();
+						static constexpr auto TypeName = CTTI::TypeName<void>();
+						static constexpr auto CXXTypeName = CTTI::CXXTypeName<void>();
 
                         static constexpr Boolean IsContaineSubTypes = false;
 					};

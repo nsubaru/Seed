@@ -10,7 +10,7 @@
 #include "Seed.Core.Containers.NonConcurency.Array.h"
 #include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.Containers.NonConcurency.Map.h"
-#include "Seed.Core.NewCTTI.TypeName.Details.h"
+#include "Seed.Core.CTTI.TypeName.Details.h"
 
 namespace Seed {
     inline namespace Core {
@@ -244,7 +244,7 @@ namespace Seed {
             /// <param name="item">Compile time рядок</param>
             /// <typeparam name="N">Кільість символів</typeparam>
             template<SizeT N>
-            BaseString(const NewCTTI::Details::ConstexprArray<char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
+            BaseString(const CTTI::Details::ConstexprArray<char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (N == 0)
                 {
 	                static_assert(false, "ConstexprArray must have '\\0' in end");
