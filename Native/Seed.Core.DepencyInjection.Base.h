@@ -140,6 +140,7 @@ namespace Seed
 				struct Data {
 					Containers::ConcurencyMap<const TypeInfo*, SmartPtr<ServiceRecord>> serviceTableForNativeLevel;
 					Containers::ConcurencyDictionary<SmartPtr<ServiceRecord>> serviceTableForManagedLevel;
+					Containers::ConcurencyList<SmartPtr<ServiceRecord>> serviceStore;
 					Containers::ConcurencyMap<const TypeInfo*, Reflection::DataTypeRecord> dataTypeTableForNativeLevel;
 					Containers::ConcurencyDictionary<Reflection::DataTypeRecord> dataTypeTableForManagedLevel;
 					Containers::ConcurencyMap<const TypeInfo*, Reflection::ObjectRTTIRecord> objectTypeTableForNativeLevel;
@@ -161,9 +162,11 @@ namespace Seed
 				Data* data;
 			protected:
 				virtual void Dispose() override {
-					//Видалення сервісів
+					//Видалення сервісів з реєстрів
 					data->serviceTableForManagedLevel.RemoveAll();
 					data->serviceTableForNativeLevel.RemoveAll();
+					//Видалення сервісів
+					data->serviceStore.RemoveAll();
 					//Видалення записів про типи даних
 					data->dataTypeTableForManagedLevel.RemoveAll();
 					data->dataTypeTableForNativeLevel.RemoveAll();
@@ -293,6 +296,8 @@ namespace Seed
 						nullptr,
 						MoveRValue(rttiRecord)
 					) };
+
+					this->data->serviceStore += serviceRecord;
 
 					this->data->serviceTableForNativeLevel.Insert(&typeid(TService), serviceRecord);
 					this->data->serviceTableForManagedLevel.Insert(serviceRecord->rttiRecord.ClassName, serviceRecord);

@@ -19,10 +19,10 @@ namespace Seed {
 					/// <summary>
 					/// Видалення елементів які підпадають під умову FilteringLambda
 					/// </summary>
-					/// <typeparam name="FilteringLambda">Тип лямбди з сигнатурою bool(*)(const T&) або bool(*)(const T&, SizeT)</typeparam>
-					/// <typeparam name="Lambda">Тип лямбди яка знищує елементи з сигнатурою void(*)(T&&)</typeparam>
-					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&) або bool(*)(const T&, SizeT)</param>
-					/// <param name="lambda">Лямбда яка знищує елементи з сигнатурою void(*)(T&&)</param>
+					/// <typeparam name="FilteringLambda">Тип лямбди з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</typeparam>
+					/// <typeparam name="Lambda">Тип лямбди яка знищує елементи з сигнатурою void(*)(T&amp;&amp;)</typeparam>
+					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</param>
+					/// <param name="lambda">Лямбда яка знищує елементи з сигнатурою void(*)(T&amp;&amp;)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<
 						typename Lambda,
@@ -40,10 +40,8 @@ namespace Seed {
 					/// <summary>
 					/// Видалення елементів які підпадають під умову FilteringLambda
 					/// </summary>
-					/// <typeparam name="FilteringLambda">Тип лямбди з сигнатурою bool(*)(const T&) або bool(*)(const T&, SizeT)</typeparam>
-					/// <typeparam name="Lambda">Тип лямбди яка знищує елементи з сигнатурою void(*)(T&&)</typeparam>
-					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&) або bool(*)(const T&, SizeT)</param>
-					/// <param name="lambda">Лямбда яка знищує елементи з сигнатурою void(*)(T&&)</param>
+					/// <typeparam name="FilteringLambda">Тип лямбди з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</typeparam>
+					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&) або bool(*)(const T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<
 						typename FilteringLambda,
