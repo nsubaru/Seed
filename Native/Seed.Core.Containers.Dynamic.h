@@ -13,12 +13,12 @@ namespace Seed
             /// <summary>
             /// Динамічний об'єкт, тип даних відомий при виконанні, містить кортеж змінних
             /// </summary>
-            class Dynamic final : protected IDisposable{
+            class Dynamic final : protected IDisposable, public IClonable<Dynamic> {
             private:
                 /// <summary>
                 /// Інтерфейс динамічного типу
                 /// </summary>
-                class IDynamicImpl {
+                class IDynamicImpl : public IClonable<IDynamicImpl*> {
                 protected:
                     /// <summary>
                     /// RTTI інформація про тип кортежу
@@ -72,8 +72,7 @@ namespace Seed
                     /// Інформацію типу який містить об'єкт
                     /// </summary>
                     /// <returns>RTTI TypeInfo</returns>
-                    const TypeInfo& GetVariablesPackTypeInfo() const override
-                    {
+                    const TypeInfo& GetVariablesPackTypeInfo() const override {
                         return typeid(Tuple<TTypes...>);
                     }
 
@@ -81,10 +80,16 @@ namespace Seed
                     /// Покажчик на пакет змінних
                     /// </summary>
                     /// <returns></returns>
-                    void* GetVariablePackRaw() override
-                    {
+                    void* GetVariablePackRaw() override {
                         return reinterpret_cast<void*>(&data);
                     }
+
+                    /// <summary>
+                    /// Копіювальний конструктор
+                    /// </summary>
+                    /// <param name="other"></param>
+                    DynamicImpl(const DynamicImpl& other) : data(other.data) {}
+
                 public:
                     /// <summary>
                     /// Конструктор з пакету змінних
@@ -97,6 +102,14 @@ namespace Seed
                     /// </summary>
                     /// <param name="types">Пакет змінних</param>
                     DynamicImpl(Tuple<TTypes...>&& types) : data(ForwardReference<Tuple<TTypes...>>(types)) {}
+
+                    /// <summary>
+                    /// Клонування імплементації dynamic
+                    /// </summary>
+                    /// <returns>Інтерфейс імплементації</returns>
+                    virtual IDynamicImpl* Clone() const {
+                        return new DynamicImpl(*this);
+                    }
 
                     /// <summary>
                     /// Деструктор
@@ -126,13 +139,18 @@ namespace Seed
                 /// Покажчик на дані об'єкта
                 /// </summary>
                 Data* This;
-            private:
+            protected:
                 /// <summary>
                 /// Звільнення ресурсів
                 /// </summary>
                 virtual void Dispose() override final {
                     delete This->pack;
                 }
+            private:
+                /// <summary>
+                /// Конструктор з імплементації
+                /// </summary>
+                Dynamic(IDynamicImpl* pack) : This(new Data(pack)) {}
             public:
                 /// <summary>
                 /// Конструктор з пакета змінних
@@ -162,8 +180,7 @@ namespace Seed
                 /// Вертає тип кортежу пакета які на даний момент містить об'єкт
                 /// </summary>
                 /// <returns></returns>
-                const TypeInfo& GetVariableType() const
-                {
+                const TypeInfo& GetVariableType() const {
                     return This->pack->GetType();
                 }
 
@@ -171,6 +188,33 @@ namespace Seed
                 /// Тип кортежу пакета які на даний момент містить об'єкт
                 /// </summary>
                 TypeInfo Property(GetVariableType) Type;
+
+                /// <summary>
+                /// Конструктор копіювання
+                /// </summary>
+                /// <param name="other">Оригинал</param>
+                Dynamic(Dynamic& other) : This(other.This) {
+                    other.This->RefCount++;
+                }
+
+                /// <summary>
+                /// Оператор копіювання
+                /// </summary>
+                /// <param name="other">Оригинал</param>
+                /// <returns>Силку на поточний елемент</returns>
+                Dynamic& operator=(Dynamic& other) {
+                    this->~Dynamic();
+                    this->Dynamic::Dynamic(other);
+                    return *this;
+                }
+
+                /// <summary>
+                /// Створює повну копію об'єкта
+                /// </summary>
+                /// <returns></returns>
+                virtual Dynamic Clone() const {
+                    return Dynamic(This->pack->Clone());
+                }
 
                 RefCountClass(Dynamic, This);
             };

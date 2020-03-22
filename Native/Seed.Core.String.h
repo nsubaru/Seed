@@ -2106,6 +2106,28 @@ namespace Seed {
                 return *this;
             }
 
+            /// <summary>
+            /// Ефективно комбінує рядки в один
+            /// </summary>
+            /// <param name="strings">Масив рядків</param>
+            /// <returns>Рядоку який є сумою масиву вхідних рядків</returns>
+            __forceinline static BaseString Combine(Containers::Array<BaseString>&& strings) {
+                return strings.Aggregate(
+                    [&] (BaseString& res, const BaseString& item)
+                    {
+                        res += item;
+                    }, 
+                    BaseString(
+                        strings.Aggregate<SizeT>(
+                            [&] (SizeT& sz, const BaseString& str)
+                            {
+                                sz += str.Lenght;
+                            }
+                        )
+                    )
+                );
+            }
+
             ///<summary>Конвертор для строк з різним алокатором</summary>
             ///<param name = "NewBase">Новий алокатор</summary>
             ///<returns>Копія рядка алокована алокатором NewBase</returns>

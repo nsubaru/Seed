@@ -363,7 +363,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
 					__forceinline U Aggregate(Lambda&& lambda) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda));
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), U());
 					}
 
 					/// <summary>
