@@ -32,23 +32,23 @@ namespace Seed
 				public:
 					DynamicImpl() : 
 						tuple(), 
-						typeName(NewCTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
-						cxxTypeName(NewCTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
-						serelizableMetaData(NewSerilization::MetaDataGen<Tuple>())
+						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
+						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
+						serelizableMetaData(Serilization::MetaDataGen<Tuple>())
 					{}
 
 					DynamicImpl(const Tuple & tuple) : 
 						tuple(tuple),
-						typeName(NewCTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
-						cxxTypeName(NewCTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
-						serelizableMetaData(NewSerilization::MetaDataGen<Tuple>())
+						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
+						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
+						serelizableMetaData(Serilization::MetaDataGen<Tuple>())
 					{}
 
 					DynamicImpl(Tuple && tuple) : 
 						tuple(MoveRValue(tuple)),
-						typeName(NewCTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
-						cxxTypeName(NewCTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
-						serelizableMetaData(NewSerilization::MetaDataGen<Tuple>())
+						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
+						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
+						serelizableMetaData(Serilization::MetaDataGen<Tuple>())
 					{}
 
 					Tuple& GetValue() { return tuple; }

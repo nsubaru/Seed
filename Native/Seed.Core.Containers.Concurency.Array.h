@@ -78,7 +78,7 @@ namespace Seed {
                 template<typename THeap, typename T>
                 friend class BaseConcurencyVList;
                 template<typename THeap, typename T, typename Enable>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
             protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -324,6 +324,10 @@ namespace Seed {
 
                 __forceinline void UnsafeSet(const T& Value, SizeT Index) {
                     This->array[Index] = Value;
+                }
+
+                __forceinline void UnsafeSet(T&& Value, SizeT Index) {
+                    This->array[Index] = MoveRValue(Value);
                 }
 
                 __forceinline BaseConcurencyArray& RemoveAllImpl() {
@@ -694,7 +698,9 @@ namespace Seed {
                 template<template<typename THeap, typename T>typename TList, typename THeap, typename T, bool TIsDynamic, bool TIsConcurencySuport>
                 friend class LINQ::IOrderable;
                 template<typename THeap, typename T, typename Enable>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
+                template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
+                friend class LINQ::IAssociableCollection;
             protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -1030,6 +1036,10 @@ namespace Seed {
 
                 __forceinline void UnsafeSet(const T& Value, SizeT Index) {
                     This->root->arr[Index] = Value;
+                }
+
+                __forceinline void UnsafeSet(T&& Value, SizeT Index) {
+                    This->root->arr[Index] = MoveRValue(Value);
                 }
 
                 __forceinline BaseConcurencyVList& RemoveAllImpl() {

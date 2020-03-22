@@ -6,7 +6,7 @@
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.CoreLog.h"
 #include "Seed.Core.CoreLog.Managed.h"
-#include "Seed.Core.NewSerilization.h"
+#include "Seed.Core.Serilization.h"
 
 namespace Seed
 {
@@ -14,7 +14,7 @@ namespace Seed
 	{
 		namespace Testing
 		{
-			class SeedKernelCall TestResult : IDisposable, public NewSerilization::ISerilizable<TestResult> {
+			class SeedKernelCall TestResult : IDisposable, public Serilization::ISerilizable<TestResult> {
 			public:
 				enum class EStatus : UInt8 {
 					Success, Failure, Exception

@@ -140,6 +140,7 @@ namespace Seed
 				struct Data {
 					Containers::ConcurencyMap<const TypeInfo*, SmartPtr<ServiceRecord>> serviceTableForNativeLevel;
 					Containers::ConcurencyDictionary<SmartPtr<ServiceRecord>> serviceTableForManagedLevel;
+					Containers::ConcurencyList<SmartPtr<ServiceRecord>> serviceStore;
 					Containers::ConcurencyMap<const TypeInfo*, Reflection::DataTypeRecord> dataTypeTableForNativeLevel;
 					Containers::ConcurencyDictionary<Reflection::DataTypeRecord> dataTypeTableForManagedLevel;
 					Containers::ConcurencyMap<const TypeInfo*, Reflection::ObjectRTTIRecord> objectTypeTableForNativeLevel;
@@ -161,9 +162,11 @@ namespace Seed
 				Data* data;
 			protected:
 				virtual void Dispose() override {
-					//Видалення сервісів
+					//Видалення сервісів з реєстрів
 					data->serviceTableForManagedLevel.RemoveAll();
 					data->serviceTableForNativeLevel.RemoveAll();
+					//Видалення сервісів
+					data->serviceStore.RemoveAll();
 					//Видалення записів про типи даних
 					data->dataTypeTableForManagedLevel.RemoveAll();
 					data->dataTypeTableForNativeLevel.RemoveAll();
@@ -261,7 +264,7 @@ namespace Seed
 							}
 						}
 
-						Throw(DIResolveException(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+						Throw(DIResolveException(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
 					}
 				};
 
@@ -286,7 +289,7 @@ namespace Seed
 					};
 
 					if (rttiRecord.GetRTTITypeInfo() != typeid(TService))
-						Throw(DIRegisterService(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+						Throw(DIRegisterService(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
 
 					auto serviceRecord = SmartPtr<ServiceRecord>{ new ServiceRecord(
 						InjectorCtor,
@@ -294,20 +297,21 @@ namespace Seed
 						MoveRValue(rttiRecord)
 					) };
 
+					this->data->serviceStore += serviceRecord;
+
 					this->data->serviceTableForNativeLevel.Insert(&typeid(TService), serviceRecord);
 					this->data->serviceTableForManagedLevel.Insert(serviceRecord->rttiRecord.ClassName, serviceRecord);
 
 					serviceRecord->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
 					{
 						methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
-							if (!this->data->dataTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
-							{
-								if (!this->data->objectTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
-								{
-									this->data->dataTypeTableForNativeLevel.Insert(&typeRecord.GetTypeInfo(), typeRecord);
-									this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
-								}
-							}
+							if (this->data->dataTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
+								return;
+							if (this->data->objectTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
+								return;
+
+							this->data->dataTypeTableForNativeLevel.Insert(&typeRecord.GetTypeInfo(), typeRecord);
+							this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
 						});
 					});
 
@@ -341,7 +345,7 @@ namespace Seed
 					}
 
 					if (rttiRecord.GetRTTITypeInfo() != typeid(TService))
-						Throw(DIRegisterService(ExceptionPosition, NewCTTI::TypeName<TService>(), typeid(TService)));
+						Throw(DIRegisterService(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
 
 					auto serviceRecord = SmartPtr<ServiceRecord>{ new ServiceRecord(
 						InjectorCtor,
@@ -350,16 +354,18 @@ namespace Seed
 					) };
 
 					this->data->serviceTableForNativeLevel.Insert(&typeid(TServiceInterface), serviceRecord);
-					this->data->serviceTableForManagedLevel.Insert(NewCTTI::TypeName<TServiceInterface>(), serviceRecord);
+					this->data->serviceTableForManagedLevel.Insert(CTTI::TypeName<TServiceInterface>(), serviceRecord);
 
 					serviceRecord->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
 					{
 						methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
-							if (!this->data->dataTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
-							{
-								this->data->dataTypeTableForNativeLevel.Insert(&typeRecord.GetTypeInfo(), typeRecord);
-								this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
-							}
+							if (this->data->dataTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
+								return;
+							if (this->data->objectTypeTableForNativeLevel.IsExist(&typeRecord.GetTypeInfo()))
+								return;
+
+							this->data->dataTypeTableForNativeLevel.Insert(&typeRecord.GetTypeInfo(), typeRecord);
+							this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
 						});
 					});
 

@@ -208,7 +208,7 @@ namespace Seed {
 				///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
 				///</para>
 				///</summary>
-				class Iterator : IDisposable
+				class Iterator : protected IDisposable
 				{
 					friend class BaseConcurencyList;
 				private:
@@ -597,7 +597,41 @@ namespace Seed {
 					template<typename U>
 					friend void Seed::Core::Swap(U& A, U& B);
 
-					RefCountClass(Iterator, This);
+#pragma region Ctor, Dtor, copy operators
+
+					Iterator(const Iterator& iterator) : This(iterator.This) {
+						if (This != nullptr)
+							This->RefCount++;
+					}
+
+					Iterator(Iterator&& iterator) : This(iterator.This) {
+						iterator.This = nullptr;
+					}
+
+					Iterator& operator=(const Iterator& iterator) {
+						this->~Iterator();
+						this->Iterator::Iterator(iterator);
+						return *this;
+					}
+
+					Iterator& operator=(Iterator&& iterator) {
+						this->~Iterator();
+						this->Iterator::Iterator(MoveRValue(iterator));
+						return *this;
+					}
+
+					~Iterator() {
+						if (This != nullptr)
+						{
+							if (--This->RefCount == 0)
+							{
+								this->Dispose(); 
+								delete This;
+							}
+							This = nullptr;
+						}
+					}
+#pragma endregion
 				};
 			public:
 				friend Iterator;
@@ -977,7 +1011,9 @@ namespace Seed {
 				template<template<typename THeap, typename T>typename TList, typename THeap, typename T, bool TIsDynamic, bool TIsConcurencySuport>
 				friend class LINQ::IOrderable;
 				template<typename THeap, typename T, typename Enable>
-				friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+				friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
+				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
+                friend class LINQ::IAssociableCollection;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -1341,6 +1377,16 @@ namespace Seed {
 					}
 					else {
 						this->This->last->prev->next = this->This->last = new elem(Value, this->This, this->This->last);
+					}
+					this->This->size++;
+				}
+
+				__forceinline void UnsafeAdd(T&& Value) {
+					if (this->This->root == nullptr) {
+						this->This->root = this->This->last = new elem(MoveRValue(Value), this->This);
+					}
+					else {
+						this->This->last->prev->next = this->This->last = new elem(MoveRValue(Value), this->This, this->This->last);
 					}
 					this->This->size++;
 				}

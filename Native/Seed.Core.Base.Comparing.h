@@ -83,7 +83,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		friend constexpr Boolean operator==(const weak_equality left, LiteralZero) {
+		friend constexpr Boolean operator==(const weak_equality left, LiteralZero) { //-V801
 			return left.value == 0;
 		}
 		/// <summary>
@@ -91,7 +91,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		friend constexpr Boolean operator!=(const weak_equality left, LiteralZero) {
+		friend constexpr Boolean operator!=(const weak_equality left, LiteralZero) { //-V801
 			return left.value != 0;
 		}
 		/// <summary>
@@ -99,7 +99,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		friend constexpr Boolean operator==(LiteralZero, const weak_equality left) {
+		friend constexpr Boolean operator==(LiteralZero, const weak_equality left) { //-V801
 			return 0 == left.value;
 		}
 		/// <summary>
@@ -107,7 +107,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		friend constexpr Boolean operator!=(LiteralZero, const weak_equality left) {
+		friend constexpr Boolean operator!=(LiteralZero, const weak_equality left) { //-V801
 			return 0 != left.value;
 		}
 	public:
@@ -116,7 +116,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		friend constexpr weak_equality operator<=>(const weak_equality left, LiteralZero) {
+		friend constexpr weak_equality operator<=>(const weak_equality left, LiteralZero) { //-V801
 			return left;
 		}
 		/// <summary>
@@ -124,7 +124,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		friend constexpr weak_equality operator<=>(LiteralZero, const weak_equality left) {
+		friend constexpr weak_equality operator<=>(LiteralZero, const weak_equality left) { //-V801
 			return left;
 		}
 	public:
@@ -156,7 +156,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		friend constexpr Boolean operator==(const strong_equality left, LiteralZero) {
+		friend constexpr Boolean operator==(const strong_equality left, LiteralZero) { //-V801
 			return left.value == 0;
 		}
 		/// <summary>
@@ -164,7 +164,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		friend constexpr Boolean operator!=(const strong_equality left, LiteralZero) {
+		friend constexpr Boolean operator!=(const strong_equality left, LiteralZero) { //-V801
 			return left.value != 0;
 		}
 		/// <summary>
@@ -172,7 +172,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		friend constexpr Boolean operator==(LiteralZero, const strong_equality left) {
+		friend constexpr Boolean operator==(LiteralZero, const strong_equality left) { //-V801
 			return 0 == left.value;
 		}
 		/// <summary>
@@ -180,7 +180,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		friend constexpr Boolean operator!=(LiteralZero, const strong_equality left) {
+		friend constexpr Boolean operator!=(LiteralZero, const strong_equality left) { //-V801
 			return 0 != left.value;
 		}
 	public:
@@ -189,7 +189,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		friend constexpr strong_equality operator<=>(const strong_equality left, LiteralZero) {
+		friend constexpr strong_equality operator<=>(const strong_equality left, LiteralZero) { //-V801
 			return left;
 		}
 		/// <summary>
@@ -197,7 +197,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		friend constexpr strong_equality operator<=>(LiteralZero, const strong_equality left) {
+		friend constexpr strong_equality operator<=>(LiteralZero, const strong_equality left) { //-V801
 			return left;
 		}
 	public:
@@ -265,7 +265,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator==(const partial_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator==(const partial_ordering left, LiteralZero) { //-V801
 			return left.isOrdered && left.value == 0;
 		}
 		/// <summary>
@@ -273,7 +273,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator!=(const partial_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator!=(const partial_ordering left, LiteralZero) { //-V801
 			return !left.isOrdered || left.value != 0;
 		}
 		/// <summary>
@@ -281,7 +281,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator<(const partial_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator<(const partial_ordering left, LiteralZero) { //-V801
 			return left.isOrdered && left.value < 0;
 		}
 		/// <summary>
@@ -289,7 +289,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator>(const partial_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator>(const partial_ordering left, LiteralZero) { //-V801
 			return left.isOrdered && left.value > 0;
 		}
 		/// <summary>
@@ -297,7 +297,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator<=(const partial_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator<=(const partial_ordering left, LiteralZero) { //-V801
 			return left.isOrdered && left.value <= 0;
 		}
 		/// <summary>
@@ -305,7 +305,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator>=(const partial_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator>=(const partial_ordering left, LiteralZero) { //-V801
 			return left.isOrdered && left.value >= 0;
 		}
 #pragma endregion
@@ -315,7 +315,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator==(LiteralZero, const partial_ordering right) {
+		__forceinline constexpr friend Boolean operator==(LiteralZero, const partial_ordering right) { //-V801
 			return right.isOrdered && 0 == right.value;
 		}
 		/// <summary>
@@ -323,7 +323,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator!=(LiteralZero, const partial_ordering right) {
+		__forceinline constexpr friend Boolean operator!=(LiteralZero, const partial_ordering right) { //-V801
 			return !right.isOrdered || 0 != right.value;
 		}
 		/// <summary>
@@ -331,7 +331,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator<(LiteralZero, const partial_ordering right) {
+		__forceinline constexpr friend Boolean operator<(LiteralZero, const partial_ordering right) { //-V801
 			return right.isOrdered && 0 < right.value;
 		}
 		/// <summary>
@@ -339,7 +339,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator>(LiteralZero, const partial_ordering right) {
+		__forceinline constexpr friend Boolean operator>(LiteralZero, const partial_ordering right) { //-V801
 			return right.isOrdered && 0 > right.value;
 		}
 		/// <summary>
@@ -347,7 +347,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator<=(LiteralZero, const partial_ordering right) {
+		__forceinline constexpr friend Boolean operator<=(LiteralZero, const partial_ordering right) { //-V801
 			return right.isOrdered && 0 <= right.value;
 		}
 		/// <summary>
@@ -355,7 +355,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator>=(LiteralZero, const partial_ordering right) {
+		__forceinline constexpr friend Boolean operator>=(LiteralZero, const partial_ordering right) { //-V801
 			return right.isOrdered && 0 >= right.value;
 		}
 #pragma endregion
@@ -365,7 +365,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		__forceinline constexpr friend partial_ordering operator<=>(const partial_ordering left, LiteralZero) {
+		__forceinline constexpr friend partial_ordering operator<=>(const partial_ordering left, LiteralZero) { //-V801
 			return left;
 		}
 		/// <summary>
@@ -373,7 +373,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		__forceinline constexpr friend partial_ordering operator<=>(LiteralZero, const partial_ordering left) {
+		__forceinline constexpr friend partial_ordering operator<=>(LiteralZero, const partial_ordering left) { //-V801
 			return partial_ordering{ static_cast<ComparingResult>(-left.value),  left.isOrdered };
 		}
 #pragma endregion
@@ -444,7 +444,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator==(const weak_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator==(const weak_ordering left, LiteralZero) { //-V801
 			return left.value == 0;
 		}
 		/// <summary>
@@ -452,7 +452,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator!=(const weak_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator!=(const weak_ordering left, LiteralZero) { //-V801
 			return left.value != 0;
 		}
 		/// <summary>
@@ -460,7 +460,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator<(const weak_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator<(const weak_ordering left, LiteralZero) { //-V801
 			return left.value < 0;
 		}
 		/// <summary>
@@ -468,7 +468,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator>(const weak_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator>(const weak_ordering left, LiteralZero) { //-V801
 			return left.value > 0;
 		}
 		/// <summary>
@@ -476,7 +476,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator<=(const weak_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator<=(const weak_ordering left, LiteralZero) { //-V801
 			return left.value <= 0;
 		}
 		/// <summary>
@@ -484,7 +484,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator>=(const weak_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator>=(const weak_ordering left, LiteralZero) { //-V801
 			return left.value >= 0;
 		}
 #pragma endregion
@@ -494,7 +494,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator==(LiteralZero, const weak_ordering right) {
+		__forceinline constexpr friend Boolean operator==(LiteralZero, const weak_ordering right) { //-V801
 			return 0 == right.value;
 		}
 		/// <summary>
@@ -502,7 +502,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator!=(LiteralZero, const weak_ordering right) {
+		__forceinline constexpr friend Boolean operator!=(LiteralZero, const weak_ordering right) { //-V801
 			return 0 != right.value;
 		}
 		/// <summary>
@@ -510,7 +510,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator<(LiteralZero, const weak_ordering right) {
+		__forceinline constexpr friend Boolean operator<(LiteralZero, const weak_ordering right) { //-V801
 			return 0 < right.value;
 		}
 		/// <summary>
@@ -518,7 +518,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator>(LiteralZero, const weak_ordering right) {
+		__forceinline constexpr friend Boolean operator>(LiteralZero, const weak_ordering right) { //-V801
 			return 0 > right.value;
 		}
 		/// <summary>
@@ -526,7 +526,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator<=(LiteralZero, const weak_ordering right) {
+		__forceinline constexpr friend Boolean operator<=(LiteralZero, const weak_ordering right) { //-V801
 			return 0 <= right.value;
 		}
 		/// <summary>
@@ -534,7 +534,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator>=(LiteralZero, const weak_ordering right) {
+		__forceinline constexpr friend Boolean operator>=(LiteralZero, const weak_ordering right) { //-V801
 			return 0 >= right.value;
 		}
 #pragma endregion
@@ -544,7 +544,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		__forceinline constexpr friend weak_ordering operator<=>(const weak_ordering left, LiteralZero) {
+		__forceinline constexpr friend weak_ordering operator<=>(const weak_ordering left, LiteralZero) { //-V801
 			return left;
 		}
 		/// <summary>
@@ -552,7 +552,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		__forceinline constexpr friend weak_ordering operator<=>(LiteralZero, const weak_ordering left) {
+		__forceinline constexpr friend weak_ordering operator<=>(LiteralZero, const weak_ordering left) { //-V801
 			return weak_ordering{ static_cast<ComparingResult>(-left.value) };
 		}
 #pragma endregion
@@ -639,7 +639,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator==(const strong_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator==(const strong_ordering left, LiteralZero) { //-V801
 			return left.value == 0;
 		}
 		/// <summary>
@@ -647,7 +647,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator!=(const strong_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator!=(const strong_ordering left, LiteralZero) { //-V801
 			return left.value != 0;
 		}
 		/// <summary>
@@ -655,7 +655,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator<(const strong_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator<(const strong_ordering left, LiteralZero) { //-V801
 			return left.value < 0;
 		}
 		/// <summary>
@@ -663,7 +663,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator>(const strong_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator>(const strong_ordering left, LiteralZero) { //-V801
 			return left.value > 0;
 		}
 		/// <summary>
@@ -671,7 +671,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator<=(const strong_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator<=(const strong_ordering left, LiteralZero) { //-V801
 			return left.value <= 0;
 		}
 		/// <summary>
@@ -679,7 +679,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator>=(const strong_ordering left, LiteralZero) {
+		__forceinline constexpr friend Boolean operator>=(const strong_ordering left, LiteralZero) { //-V801
 			return left.value >= 0;
 		}
 #pragma endregion
@@ -689,7 +689,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator==(LiteralZero, const strong_ordering right) {
+		__forceinline constexpr friend Boolean operator==(LiteralZero, const strong_ordering right) { //-V801
 			return 0 == right.value;
 		}
 		/// <summary>
@@ -697,7 +697,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння не Equal або Equality</returns>
-		__forceinline constexpr friend Boolean operator!=(LiteralZero, const strong_ordering right) {
+		__forceinline constexpr friend Boolean operator!=(LiteralZero, const strong_ordering right) { //-V801
 			return 0 != right.value;
 		}
 		/// <summary>
@@ -705,7 +705,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator<(LiteralZero, const strong_ordering right) {
+		__forceinline constexpr friend Boolean operator<(LiteralZero, const strong_ordering right) { //-V801
 			return 0 < right.value;
 		}
 		/// <summary>
@@ -713,7 +713,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater</returns>
-		__forceinline constexpr friend Boolean operator>(LiteralZero, const strong_ordering right) {
+		__forceinline constexpr friend Boolean operator>(LiteralZero, const strong_ordering right) { //-V801
 			return 0 > right.value;
 		}
 		/// <summary>
@@ -721,7 +721,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator<=(LiteralZero, const strong_ordering right) {
+		__forceinline constexpr friend Boolean operator<=(LiteralZero, const strong_ordering right) { //-V801
 			return 0 <= right.value;
 		}
 		/// <summary>
@@ -729,7 +729,7 @@ namespace std
 		/// </summary>
 		/// <param name="right">Значення впорядкованості</param>
 		/// <returns>true якщо результат порівняння Greater або Equal</returns>
-		__forceinline constexpr friend Boolean operator>=(LiteralZero, const strong_ordering right) {
+		__forceinline constexpr friend Boolean operator>=(LiteralZero, const strong_ordering right) { //-V801
 			return 0 >= right.value;
 		}
 #pragma endregion
@@ -739,7 +739,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		__forceinline constexpr friend strong_ordering operator<=>(const strong_ordering left, LiteralZero) {
+		__forceinline constexpr friend strong_ordering operator<=>(const strong_ordering left, LiteralZero) { //-V801
 			return left;
 		}
 		/// <summary>
@@ -747,7 +747,7 @@ namespace std
 		/// </summary>
 		/// <param name="left">Результат порівняння</param>
 		/// <returns>Результат порівняння</returns>
-		__forceinline constexpr friend strong_ordering operator<=>(LiteralZero, const strong_ordering left) {
+		__forceinline constexpr friend strong_ordering operator<=>(LiteralZero, const strong_ordering left) { //-V801
 			return strong_ordering{ static_cast<ComparingResult>(-left.value) };
 		}
 #pragma endregion

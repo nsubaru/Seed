@@ -4,7 +4,7 @@
 
 namespace Seed {
 	inline namespace Core {
-        namespace NewSerilization
+        namespace Serilization
         {
             namespace Details
             {

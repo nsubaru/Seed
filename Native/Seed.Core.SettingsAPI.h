@@ -48,8 +48,10 @@ namespace Seed {
 					SizeT DefaultPriorityQueueMaxSize;
 					///<summary>Розмір резервування для стеку у кількості елементів</summary>
 					SizeT DynamicStackReserveSize;
-					///<summary>Розмір резурвування для черги у кількіоті елементів</summary>
+					///<summary>Розмір резервування для черги у кількіоті елементів</summary>
 					SizeT DynamicQueueReserveSize;
+					/// <summary>Стартовий розмір динамічного циклічного буферу </summary>
+					SizeT DynamicCircularBufferStartSize;
 				};
 
 				///<summary>Налаштування багатопотоковості</summary>
@@ -113,10 +115,16 @@ namespace Seed {
 				/// </summary>
 				static constexpr Char ReloadEventName[] = L"\\Kernel\\Excecutable\\Reload";
 
+				/// <summary>
+				/// Ім'я події малої кількості вільної пам'яті в системі
+				/// </summary>
+				static constexpr Char HostCommitLowEventName[] = L"\\Host\\CommitLow";
+
 				using TShutdownEventName = TypeTraits::AddReference<decltype(ShutdownEventName)>::Lvalue;
 				using TReloadEventName = TypeTraits::AddReference<decltype(ReloadEventName)>::Lvalue;
 				using TKernelNamespaceName = TypeTraits::AddReference<decltype(KernelNamespaceName)>::Lvalue;
 				using TKernelExcecutableNamespaceName = TypeTraits::AddReference<decltype(KernelExcecutableNamespaceName)>::Lvalue;
+				using THostCommitLowEventName = TypeTraits::AddReference<decltype(HostCommitLowEventName)>::Lvalue;
 			};
 
 			struct ObjectManagerConfigurations {
@@ -445,6 +453,15 @@ namespace Seed {
 					extern SettingsData CurrentSettingsData;
 					CurrentSettingsData.MainMemoryManager.DynamicQueueReserveSize = NewSize;
 				}
+
+				SizeT GetDynamicCircularBufferStartSize() {
+					extern SettingsData CurrentSettingsData;
+					return CurrentSettingsData.MainMemoryManager.DynamicCircularBufferStartSize;
+				}
+				void SetDynamicCircularBufferStartSize(SizeT NewSize) {
+					extern SettingsData CurrentSettingsData;
+					CurrentSettingsData.MainMemoryManager.DynamicCircularBufferStartSize = NewSize;
+				}
 			public:
 				///<summary>Налаштування стандартної кучі пам'яті</summary>
 				DefaultHeapT Property(GetDefaultHeap, SetDefaultHeap) DefaultHeap;
@@ -461,6 +478,8 @@ namespace Seed {
 				SizeT Property(GetStackReserveSize, SetStackReserveSize) StackReserveSize;
 				///<summary>Розмір резервування для черги у кількості елементів</summary>
 				SizeT Property(GetQueueReserveSize, SetQueueReserveSize) QueueReserveSize;
+				/// <summary>Стартовий розмір динамічного циклічного буферу </summary>
+				SizeT Property(GetDynamicCircularBufferStartSize, SetDynamicCircularBufferStartSize) DynamicCircularBufferStartSize;
 			};
 
 			class SeedKernelCall ThreadingCfgT {
@@ -569,6 +588,10 @@ namespace Seed {
 				constexpr StaticSettingsData::TKernelExcecutableNamespaceName GetKernelExcecutableNamespaceName() {
 					return StaticSettingsData::KernelExcecutableNamespaceName;
 				}
+
+				constexpr StaticSettingsData::THostCommitLowEventName GetHostCommitLowEventName() {
+					return StaticSettingsData::HostCommitLowEventName;
+				}
 			public:
 				///<summary>Ім'я події завершення роботи ядра</summary>
 				StaticSettingsData::TShutdownEventName Property(GetShutdownEventName) ShutdownEventName;
@@ -579,6 +602,11 @@ namespace Seed {
 				StaticSettingsData::TKernelNamespaceName Property(GetKernelNamespaceName) KernelNamespaceName;
 				///<summary>Ім'я простору імен подій виконавчої системи ядра Рем</summary>
 				StaticSettingsData::TKernelExcecutableNamespaceName Property(GetKernelExcecutableNamespaceName) KernelExcecutableNamespaceName;
+
+				/// <summary>
+				/// Ім'я події малої кількості вільної пам'яті в системі
+				/// </summary>
+				StaticSettingsData::THostCommitLowEventName Property(GetHostCommitLowEventName) HostCommitLowEventName;
 			};
 
 			class SeedKernelCall ObjectNamespaceConfigurationT {

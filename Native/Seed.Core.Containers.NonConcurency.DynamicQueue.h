@@ -208,7 +208,9 @@ namespace Seed {
 					typename TAny,
 					typename TEnable
 				>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
+				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
+                friend class LINQ::IAssociableCollection;
 #pragma warning(push)
 #pragma warning(disable: 4172)
 

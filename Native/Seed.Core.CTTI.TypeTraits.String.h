@@ -1,13 +1,13 @@
 #pragma once
-#include "Seed.Core.NewCTTI.TypeTraits.Base.h"
-#include "Seed.Core.NewCTTI.TypeTraits.Primitives.h"
-#include "Seed.Core.NewCTTI.TypeTraits.HeapMetaData.h"
+#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.Primitives.h"
+#include "Seed.Core.CTTI.TypeTraits.HeapMetaData.h"
 
 namespace Seed
 {
 	inline namespace Core
 	{
-		namespace NewCTTI
+		namespace CTTI
 		{
 			namespace TypeTraits
 			{

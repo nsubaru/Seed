@@ -6,10 +6,10 @@
 bool Seed::Core::Testing::Test::Serilization::SimpleTypeTupleSerilization::Excecute() {
 	auto tuple = Seed::Core::Containers::Tuple<Int32, Int64, Char, Boolean>{1,1,'1',true};
 
-	auto stream = NewSerilization::Serilize(tuple);
+	auto stream = Core::Serilization::Serilize(tuple);
 	decltype(tuple) deserelizedTuple;
 
-	NewSerilization::Deserilize(stream, deserelizedTuple);
+	Core::Serilization::Deserilize(stream, deserelizedTuple);
 
 	return 
 		tuple.GetByIdx<0>() == deserelizedTuple.GetByIdx<0>() &&
@@ -19,12 +19,13 @@ bool Seed::Core::Testing::Test::Serilization::SimpleTypeTupleSerilization::Excec
 }
 
 bool Seed::Core::Testing::Test::Serilization::ComplexTypeTupleSerilization::Excecute() {
-	auto tuple = Seed::Core::Containers::Tuple<String, Containers::Array<Int32>, Containers::List<Int32>, Boolean>{L"test",{1,2,3,4},{1,2,3,4},true};
+	auto tuple = Seed::Core::Containers::Tuple<String, Containers::Array<Int32>, Containers::List<Int32>, Boolean>
+				{L"test",{1,2,3,4},{1,2,3,4},true};
 
-	auto stream = NewSerilization::Serilize(tuple);
+	auto stream = Core::Serilization::Serilize(tuple);
 	decltype(tuple) deserelizedTuple;
 
-	NewSerilization::Deserilize(stream, deserelizedTuple);
+	Core::Serilization::Deserilize(stream, deserelizedTuple);
 
 	return 
 		tuple.GetByIdx<0>() == deserelizedTuple.GetByIdx<0>() &&
@@ -66,10 +67,10 @@ bool Seed::Core::Testing::Test::Serilization::TupleTypeTupleSerilization::Excecu
 	true
 	};
 
-	auto stream = NewSerilization::Serilize(tuple);
+	auto stream = Core::Serilization::Serilize(tuple);
 	decltype(tuple) deserelizedTuple;
 
-	NewSerilization::Deserilize(stream, deserelizedTuple);
+	Core::Serilization::Deserilize(stream, deserelizedTuple);
 
 	return 
 		[&](){
@@ -103,14 +104,14 @@ bool Seed::Core::Testing::Test::Serilization::TupleTypeTupleSerilization::Excecu
 }
 
 bool Seed::Core::Testing::Test::Serilization::CustomStructSerilization::Excecute() {
-	auto data = NewCTTI::TypeTraits::SerilizableClass();
+	auto data = CTTI::TypeTraits::SerilizableClass();
 	data.Name() = L"Test";
 	data.Storage() = {{L"one", L"1"}, {L"two", L"2"}, {L"three", L"3"}};
 
-	auto stream = NewSerilization::Serilize(data);
+	auto stream = Core::Serilization::Serilize(data);
 	decltype(data) deserelizedData;
 
-	NewSerilization::Deserilize(stream, deserelizedData);
+	Core::Serilization::Deserilize(stream, deserelizedData);
 
 	return data.Name() == deserelizedData.Name() &&
 		[&](){

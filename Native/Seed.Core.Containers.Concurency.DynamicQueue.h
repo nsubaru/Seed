@@ -24,9 +24,7 @@ namespace Seed {
 					RefCountT count;
 					T* queue;
 					SizeT bufferSize;
-					// ReSharper disable CppInconsistentNaming
 					RefCountT RefCount;
-					// ReSharper restore CppInconsistentNaming
 					
 					Threading::DataFlowControler flowControler;
 
@@ -191,7 +189,7 @@ namespace Seed {
 					This->queue = newBuffer;
 				}
 			protected:
-template <
+				template <
 					template<typename, typename> typename TCollection,
 					typename TAnyHeap,
 					typename TAny,
@@ -228,7 +226,9 @@ template <
 					typename TAny,
 					typename TEnable
 				>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
+				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
+                friend class LINQ::IAssociableCollection;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)

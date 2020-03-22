@@ -295,7 +295,7 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 ) {
     using SafeString = BaseString<Memory::ExceptionHeap>;
     Exception::ExeptionLocation location{ File,Function,Line };
-    toCoreLog(SafeString(L"Аварійне завершення ядра. Причина ") + SafeString(Reason) + SafeString(L" Розташування виклику: ") + location.toString());
+    toCoreLog(SafeString(L"Аварійне завершення ядра. Причина ") + SafeString(Reason) + SafeString(L". Розташування виклику: ") + location.toString());
     NtTerminateProcess(NtCurrentProcess(), STATUS_INTERNAL_ERROR);
 }
 

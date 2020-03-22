@@ -282,6 +282,39 @@ namespace Seed {
 				virtual ~InvalidHandleUsage() {}
 			};
 
+			/// <summary>
+			/// Не знайдено 
+			/// </summary>
+			class SeedKernelCall NotFoundException : public Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				NotFoundException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					:Exception(File, FunctName, Line, L"Не знайдено")
+				{}
+
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				///<param name = "Msg">Повідомлення</param>
+				NotFoundException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& Msg)
+					:Exception(File, FunctName, Line, Msg)
+				{}
+
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ location.toString()
+						+ ExceptionString(L". ");
+				}
+
+				virtual ~NotFoundException() {}
+			};
+
 			///<summary>Неможливо перетворити тип</summary>
 			class SeedKernelCall BadCast : public Exception {
 			public:
@@ -326,24 +359,46 @@ namespace Seed {
 				virtual ~BadPureCall() {}
 			};
 
+			///<summary>Вже існує</summary>
+			class SeedKernelCall AllredyExistException : public Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				AllredyExistException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+					:Exception(File, FunctName, Line, L"Вже існує")
+				{}
+
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				AllredyExistException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& Msg)
+					:Exception(File, FunctName, Line, Msg)
+				{}
+
+				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				virtual ExceptionString toString() const override {
+					return ExceptionString(exeptionName)
+						+ ExceptionString(L". ")
+						+ location.toString()
+						+ ExceptionString(L". ");
+				}
+
+				virtual ~AllredyExistException() {}
+			};
+
 			///<summary>Ключ вжк існує</summary>
-			class SeedKernelCall KeyAllredyExistException : Exception {
+			class SeedKernelCall KeyAllredyExistException : public AllredyExistException {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				KeyAllredyExistException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-					:Exception(File, FunctName, Line, L"Ключ вже існує")
+					:AllredyExistException(File, FunctName, Line, L"Ключ вже існує")
 				{}
-
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
-				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
-				}
 
 				virtual ~KeyAllredyExistException() {}
 			};

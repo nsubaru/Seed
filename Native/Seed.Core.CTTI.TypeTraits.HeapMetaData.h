@@ -1,11 +1,11 @@
 #pragma once
-#include "Seed.Core.NewCTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.Base.h"
 
 namespace Seed
 {
 	inline namespace Core
 	{
-		namespace NewCTTI
+		namespace CTTI
 		{
 			namespace TypeTraits
 			{

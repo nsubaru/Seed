@@ -511,7 +511,7 @@ namespace Seed {
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
 				friend class LINQ::IDictionary;
                 template<typename THeap, typename T, typename Enable>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 #pragma region For Each
 				template<typename Lambda>
 				forceinline static void ForEachImplWithoutIndex(
@@ -842,6 +842,10 @@ namespace Seed {
 
 				forceinline void UnsafeAdd(Pair&& pair){
 					Insert(MoveRValue(pair));
+				}
+
+				forceinline void UnsafeAdd(const Pair& pair){
+					Insert(pair);
 				}
 #pragma endregion
 			protected:

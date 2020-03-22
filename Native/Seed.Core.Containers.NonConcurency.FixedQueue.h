@@ -120,7 +120,7 @@ namespace Seed {
 				template<template<typename THeap, typename T> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
 				friend class LINQ::ICollectionBase;
                 template<typename THeap, typename T, typename Enable>
-                friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+                friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -301,6 +301,12 @@ namespace Seed {
 
 				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->queue[Index] = MoveRValue(Value);
+					This->count = Index + 1;
+					This->rear = Index + 1;
+				}
+
+				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+					This->queue[Index] = Value;
 					This->count = Index + 1;
 					This->rear = Index + 1;
 				}

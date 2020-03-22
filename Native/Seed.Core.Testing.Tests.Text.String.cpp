@@ -199,17 +199,17 @@ bool Seed::Core::Testing::Test::Text::StringDoubleFloatConvert::Excecute() {
 	double Pattern4 = 1.018;
 	double Pattern5 = 0.016;
 
-	Asserts::AssertEqual([&] () { return String::toString(Pattern1, 1) == L"1.0"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern2, 2) == L"2.12"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern3, 2) == L"0.14"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern4, 3) == L"1.018"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern5, 3) == L"0.016"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern1, 1) == L"1.0"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern2, 2) == L"2.12"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern3, 2) == L"0.14"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern4, 3) == L"1.018"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern5, 3) == L"0.016"; });
 
-	Asserts::AssertEqual([&] () { return Math::Equals(L"1.0"S.toDouble(),	Pattern1); });
-	Asserts::AssertEqual([&] () { return Math::Equals(L"2.12"S.toDouble(),	Pattern2); });
-	Asserts::AssertEqual([&] () { return Math::Equals(L"0.14"S.toDouble(),	Pattern3); });
-	Asserts::AssertEqual([&] () { return Math::Equals(L"1.018"S.toDouble(), Pattern4); });
-	Asserts::AssertEqual([&] () { return Math::Equals(L"0.016"S.toDouble(), Pattern5); });
+	Asserts::AssertTrue([&] () { return Math::Equals(L"1.0"S.toDouble(),	Pattern1); });
+	Asserts::AssertTrue([&] () { return Math::Equals(L"2.12"S.toDouble(),	Pattern2); });
+	Asserts::AssertTrue([&] () { return Math::Equals(L"0.14"S.toDouble(),	Pattern3); });
+	Asserts::AssertTrue([&] () { return Math::Equals(L"1.018"S.toDouble(), Pattern4); });
+	Asserts::AssertTrue([&] () { return Math::Equals(L"0.016"S.toDouble(), Pattern5); });
 
 	return true;
 }
@@ -221,17 +221,17 @@ bool Seed::Core::Testing::Test::Text::StringIntConvert::Excecute() {
 	int Pattern4 = 105;
 	int Pattern5 = 1050;
 
-	Asserts::AssertEqual([&] () { return String::toString(Pattern1) == L"1"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern2) == L"25"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern3) == L"0"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern4) == L"105"; });
-	Asserts::AssertEqual([&] () { return String::toString(Pattern5) == L"1050"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern1) == L"1"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern2) == L"25"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern3) == L"0"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern4) == L"105"; });
+	Asserts::AssertTrue([&] () { return String::toString(Pattern5) == L"1050"; });
 
-	Asserts::AssertEqual([&] () { return L"1"S.toInt()	== Pattern1; });
-	Asserts::AssertEqual([&] () { return L"25"S.toInt()	== Pattern2; });
-	Asserts::AssertEqual([&] () { return L"0"S.toInt()	== Pattern3; });
-	Asserts::AssertEqual([&] () { return L"105"S.toInt()	== Pattern4; });
-	Asserts::AssertEqual([&] () { return L"1050"S.toInt()	== Pattern5; });
+	Asserts::AssertTrue([&] () { return L"1"S.toInt()	== Pattern1; });
+	Asserts::AssertTrue([&] () { return L"25"S.toInt()	== Pattern2; });
+	Asserts::AssertTrue([&] () { return L"0"S.toInt()	== Pattern3; });
+	Asserts::AssertTrue([&] () { return L"105"S.toInt()	== Pattern4; });
+	Asserts::AssertTrue([&] () { return L"1050"S.toInt()	== Pattern5; });
 
 	return true;
 }

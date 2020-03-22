@@ -1,6 +1,6 @@
 #pragma once
-#include "Seed.Core.NewCTTI.h"
-#include "Seed.Core.NewSerilization.h"
+#include "Seed.Core.CTTI.h"
+#include "Seed.Core.Serilization.h"
 
 namespace Seed
 {
@@ -8,12 +8,12 @@ namespace Seed
 	{
 		namespace RTTI
 		{
-			class SeedKernelCall RTTITypeRecord : IDisposable, NewSerilization::ISerilizable<RTTITypeRecord>
+			class SeedKernelCall RTTITypeRecord : IDisposable, Serilization::ISerilizable<RTTITypeRecord>
 			{
 				struct Data {
 					String TypeName;
 					String CxxTypeName;
-					NewCTTI::TypeTraits::EType TypeClass;
+					CTTI::TypeTraits::EType TypeClass;
 					Boolean IsSerilizeable;
 					const TypeInfo* rttiTypeInfo;
 					RefCountT RefCount;
@@ -21,7 +21,7 @@ namespace Seed
 					Data(
 						String && TypeName, 
 						String && CxxTypeName, 
-						NewCTTI::TypeTraits::EType TypeClass, 
+						CTTI::TypeTraits::EType TypeClass, 
 						Boolean IsSerilizeable, 
 						const TypeInfo* rttiTypeInfo
 					) : TypeName(MoveRValue(TypeName)), 
@@ -49,17 +49,17 @@ namespace Seed
 
 				template<typename T>
 				RTTITypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
-					NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeName,
-					NewCTTI::TypeTraits::CTTITypeMetaData<T>::CXXTypeName,
-					NewCTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
-					NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable,
+					CTTI::TypeTraits::CTTITypeMetaData<T>::TypeName,
+					CTTI::TypeTraits::CTTITypeMetaData<T>::CXXTypeName,
+					CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+					CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable,
 					&typeid(T)
 				))
 				{}
 
 				const String& GetTypeName() { return data->TypeName; }
 				const String& GetCxxTypeName() { return data->CxxTypeName; }
-				NewCTTI::TypeTraits::EType GetCxxTypeClass() { return data->TypeClass; }
+				CTTI::TypeTraits::EType GetCxxTypeClass() { return data->TypeClass; }
 				Boolean GetIsSerilizeable() { return data->IsSerilizeable; }
 				const auto& TypeId() {return *data->rttiTypeInfo; }
 			public:
@@ -88,7 +88,7 @@ namespace Seed
 				}
 			};
 
-			class SeedKernelCall RTTIFunction : IDisposable, NewSerilization::ISerilizable<RTTITypeRecord> {
+			class SeedKernelCall RTTIFunction : IDisposable, Serilization::ISerilizable<RTTITypeRecord> {
 				struct Data{
 					RTTITypeRecord FunctionRecord;
 					RTTITypeRecord FunctionRetRecord;
@@ -137,7 +137,7 @@ namespace Seed
 				const auto& FunctionTypeId() { return data->FunctionRecord.TypeId(); }
 			};
 
-			class SeedKernelCall RTTIMethod : IDisposable, NewSerilization::ISerilizable<RTTITypeRecord> {
+			class SeedKernelCall RTTIMethod : IDisposable, Serilization::ISerilizable<RTTITypeRecord> {
 				struct Data{
 					RTTITypeRecord MethodRecord;
 					RTTITypeRecord MethodClassRecord;

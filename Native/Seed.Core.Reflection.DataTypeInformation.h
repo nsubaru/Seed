@@ -42,13 +42,13 @@ namespace Seed
 				virtual ~NonSerelizableType() {}
 			};
 
-			class DataTypeRecord : IDisposable, NewSerilization::ISerilizable<DataTypeRecord> {
+			class DataTypeRecord : IDisposable, Serilization::ISerilizable<DataTypeRecord> {
 			private:
 				template<typename T>
 				struct DataTypeMetaFunctionsBuilder {
 					static constexpr auto SerelizeFrom = [] (const DynamicObject& data) -> Containers::Array<Byte>
 					{
-						if constexpr (NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 						{
 							if (data.GetImplementationTypeInfo() != typeid(T))
 							{
@@ -56,26 +56,26 @@ namespace Seed
 							}
 							else
 							{
-								return NewSerilization::Serilize(data.GetValue<T>());
+								return Serilization::Serilize(data.GetValue<T>());
 							}
 						}
 						else
 						{
-							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(NewCTTI::TypeName<T>()), typeid(T)));
+							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>()), typeid(T)));
 						}
 					};
 
 					static constexpr auto DeserelizeToDynamic = [] (const Containers::Array<Byte>& rawData) -> DynamicObject
 					{
-						if constexpr (NewCTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 						{
 							T object;
-							NewSerilization::Deserilize(rawData, object);
+							Serilization::Deserilize(rawData, object);
 							return DynamicObject(Containers::Tuple<T>(object));
 						}
 						else
 						{
-							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(NewCTTI::TypeName<T>()), typeid(T)));
+							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>()), typeid(T)));
 						}
 					};
 
@@ -148,10 +148,10 @@ namespace Seed
 			public:
 				template<typename T>
 				DataTypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
-					NewCTTI::TypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
-					NewCTTI::CXXTypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
-					NewSerilization::MetaDataGen<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
-					NewCTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::IsSerilizable,
+					CTTI::TypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
+					CTTI::CXXTypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
+					Serilization::MetaDataGen<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
+					CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::IsSerilizable,
 					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::SerelizeFrom,
 					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::DeserelizeToDynamic,
 					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::Builder,

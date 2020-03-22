@@ -1,12 +1,12 @@
 #pragma once
-#include "Seed.Core.NewCTTI.TypeTraits.Base.h"
-#include "Seed.Core.NewCTTI.TypeTraits.Collections.h"
+#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.Collections.h"
 
 namespace Seed
 {
     inline namespace Core
     {
-        namespace NewCTTI
+        namespace CTTI
         {
             namespace TypeTraits
             {
@@ -19,7 +19,7 @@ namespace Seed
                 {
                     template<typename T, typename TypeStringT, SizeT Offset>
                     struct FieldTypeData : CTTITypeData<T> {
-                        static constexpr auto FieldName = NewCTTI::Details::TypeStringToArray(TypeStringT());
+                        static constexpr auto FieldName = CTTI::Details::TypeStringToArray(TypeStringT());
                         static constexpr SizeT FieldSize = sizeof(T);
                         static constexpr SizeT FieldOffset = Offset;
                         using Type = T;
@@ -85,16 +85,16 @@ namespace Seed
                     friend struct Details::CTTIStructTypeDataImpl;
 
 					template<typename THeap, typename T, typename Enable>
-					friend struct Seed::Core::NewSerilization::Details::BaseSerlizationHandler;
+					friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
                 public:
 					virtual ~ISerilizable() = 0 {};
                 };
 
 #define DefStructFieldData(Struct, Name) \
-    Seed::Core::NewCTTI::TypeTraits::Details::FieldTypeData<decltype(Struct::Name), GenNGTypeString(#Name) , StructOffsetOfMember(Struct, Name)>
+    Seed::Core::CTTI::TypeTraits::Details::FieldTypeData<decltype(Struct::Name), GenNGTypeString(#Name) , StructOffsetOfMember(Struct, Name)>
 
 #define DefStructMetaData(Struct, ...) \
-using FieldMetaData = typename Seed::Core::NewCTTI::TypeTraits::Details::CustomStruct<Struct, __VA_ARGS__>
+using FieldMetaData = typename Seed::Core::CTTI::TypeTraits::Details::CustomStruct<Struct, __VA_ARGS__>
 
                 class SerilizableClass : Seed::IDisposable, public ISerilizable<SerilizableClass> {
                 private:

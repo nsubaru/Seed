@@ -5,9 +5,9 @@
 
 bool Seed::Core::Testing::Test::Serilization::StringSerilization::Excecute() {
     String Value = __FUNCSIG__;
-    const auto stream = NewSerilization::Serilize(Value);
+    const auto stream = Core::Serilization::Serilize(Value);
     decltype(Value) deserelizedValue;
-    NewSerilization::Deserilize(stream, deserelizedValue);
+     Core::Serilization::Deserilize(stream, deserelizedValue);
     return Value == deserelizedValue;
 }
 
@@ -18,9 +18,9 @@ bool Seed::Core::Testing::Test::Serilization::ArraySerilization::Excecute() {
 			}, 100);
 		}, 100);
 
-	const auto stream = NewSerilization::Serilize(array);
+	const auto stream = Core::Serilization::Serilize(array);
 	decltype(array) deserelizedArray;
-	NewSerilization::Deserilize(stream, deserelizedArray);
+	Core::Serilization::Deserilize(stream, deserelizedArray);
 	for (SizeT i = 0; i < 100; i++)
 	{
 		for (SizeT j = 0; j < 100; j++)
@@ -40,9 +40,9 @@ bool Seed::Core::Testing::Test::Serilization::ListSerilization::Excecute() {
 			}, 100);
 		}, 100);
 
-		const auto stream = NewSerilization::Serilize(list);
+		const auto stream =  Core::Serilization::Serilize(list);
 	decltype(list) deserelizedList;
-	NewSerilization::Deserilize(stream, deserelizedList);
+	 Core::Serilization::Deserilize(stream, deserelizedList);
 
 	if(list.Count != deserelizedList.Count)
 		return false;
@@ -79,7 +79,7 @@ bool Seed::Testing::Test::Serilization::DynamicQueue::Excecute()
 		}, 100);
 	}, 100);
 
-	auto stream = NewSerilization::Serilize(queue);
+	auto stream = Core::Serilization::Serilize(queue);
 	decltype(queue) deserelizedQueue;
 
 	if(queue.Count != deserelizedQueue.Count)
@@ -113,10 +113,10 @@ bool Seed::Testing::Test::Serilization::FixedArray::Excecute()
 				});
 		});
 
-	const auto stream = NewSerilization::Serilize(array);
+	const auto stream = Core::Serilization::Serilize(array);
 
 	decltype(array) deserelizedArray;
-	NewSerilization::Deserilize(stream, deserelizedArray);
+	Core::Serilization::Deserilize(stream, deserelizedArray);
 
 	if(array.Count != deserelizedArray.Count)
 		return false;
@@ -142,10 +142,10 @@ bool Seed::Testing::Test::Serilization::FixedQueue::Excecute()
 		{1,2,3,4,5}
 	};
 
-	const auto stream = NewSerilization::Serilize(queue);
+	const auto stream = Core::Serilization::Serilize(queue);
 
 	decltype(queue) deserelizedQueue;
-	NewSerilization::Deserilize(stream, deserelizedQueue);
+	Core::Serilization::Deserilize(stream, deserelizedQueue);
 
 	if(queue.Count != deserelizedQueue.Count)
 		return false;
@@ -182,10 +182,10 @@ bool Seed::Testing::Test::Serilization::Dictionary::Excecute()
 		{L"дев'ять", 9},
 	};
 
-	const auto stream = NewSerilization::Serilize(dictionary);
+	const auto stream = Core::Serilization::Serilize(dictionary);
 	decltype(dictionary) deserelizedDictionary;
 
-	NewSerilization::Deserilize(stream,deserelizedDictionary);
+	Core::Serilization::Deserilize(stream,deserelizedDictionary);
 
 	if(dictionary.Count != deserelizedDictionary.Count)
 		return false;
@@ -224,10 +224,10 @@ bool Seed::Testing::Test::Serilization::Map::Excecute()
 		{L"дев'ять", 9},
 	};
 
-	const auto stream = NewSerilization::Serilize(map);
+	const auto stream = Core::Serilization::Serilize(map);
 	decltype(map) deserelizedMap;
 
-	NewSerilization::Deserilize(stream,deserelizedMap);
+	Core::Serilization::Deserilize(stream,deserelizedMap);
 
 	if(map.Count != deserelizedMap.Count)
 		return false;
@@ -262,10 +262,10 @@ bool Seed::Testing::Test::Serilization::PriorityQueue::Excecute()
 		{2, "десять"}
 	};
 
-	const auto stream = NewSerilization::Serilize(priortyQueue);
+	const auto stream = Core::Serilization::Serilize(priortyQueue);
 	decltype(priortyQueue) deserelizedPriortyQueue;
 
-	NewSerilization::Deserilize(stream,deserelizedPriortyQueue);
+	Core::Serilization::Deserilize(stream,deserelizedPriortyQueue);
 
 	if(priortyQueue.Count != deserelizedPriortyQueue.Count)
 		return false;
