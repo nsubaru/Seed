@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010"> 
+  <Type Name="Seed::Core::Containers::BaseConcurencyMap&lt;*, *, *&gt;">
+    <DisplayString>{{ Lenght={This->count.count} RefCount={This->RefCount.count} }}</DisplayString>
+    <Expand>
+      <Item Name="[Reference count]">This->RefCount.count</Item>
+      <Item Name="[Lenght]">This->count.count</Item>
+      <TreeItems>
+        <Size>This->count.count</Size>
+        <HeadPointer>This->root</HeadPointer>
+        <LeftPointer>left</LeftPointer>
+        <RightPointer>right</RightPointer>
+        <ValueNode>data</ValueNode>
+      </TreeItems> 
+    </Expand>
+  </Type>
+</AutoVisualizer>
