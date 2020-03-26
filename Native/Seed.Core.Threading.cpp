@@ -33,11 +33,11 @@ using namespace Seed::Threading;
 
 static Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>* AllActiveThreadable;
 
-__forceinline IThreadable* GetThisThreadable() {
+forceinline IThreadable* GetThisThreadable() {
 	return Seed::Core::Threading::GetTLS()->Threadable;
 }
 
-__forceinline volatile EThreadabledStates* GetThisThreadableState() {
+forceinline volatile EThreadabledStates* GetThisThreadableState() {
 	return Seed::Core::Threading::GetTLS()->State;
 }
 

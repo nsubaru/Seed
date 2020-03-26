@@ -76,7 +76,7 @@ namespace Seed {
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'TID'>Id не існуючого потоку</param>
-				__forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID) //-V730
+				forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID) //-V730
 					noexcept : Exception(File, FunctName, Line, L"Не можна працювати з незареєстрованим в рантаймі потоком"), tid(TID)
 				{};
 
@@ -104,7 +104,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				forceinline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Не валідний об'єкт потоку")
 				{};
 
@@ -126,7 +126,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				forceinline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Запуск запущеного об'єкта")
 				{};
 
@@ -149,7 +149,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				forceinline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Взаємне блокування")
 				{};
 

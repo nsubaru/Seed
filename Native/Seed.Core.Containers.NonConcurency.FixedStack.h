@@ -114,7 +114,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename LambdaT>
-				__forceinline BaseFixedStack& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseFixedStack& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
 						if (This->count == 0)
 							return *this;
@@ -141,7 +141,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseFixedStack& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseFixedStack& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						if (This->count == 0)
 							return *this;
@@ -168,7 +168,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				forceinline U AggregateImpl(LambdaT&& lambda) const {
 					if (This->count == 0)
 						return U();
 					U result = U();
@@ -181,7 +181,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					U result = Value;
 					if (This->count == 0)
 						return result;
@@ -194,7 +194,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, T&& Value) const {
+				forceinline T AggregateImpl(LambdaT&& lambda, T&& Value) const {
 					if (This->count == 0)
 						return Value;
 					SizeT i = This->count;
@@ -208,7 +208,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -221,7 +221,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -304,17 +304,17 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = Value;
 					This->count = Index + 1;
 				}
 
-				__forceinline BaseFixedStack& RemoveAllImpl() {
+				forceinline BaseFixedStack& RemoveAllImpl() {
 					for (SizeT i = 0; i < This->count; i++) {
 						This->stack[i].~T();
 					}
@@ -322,7 +322,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseFixedStack& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseFixedStack& RemoveAllImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->stack[i]));
 					}
@@ -349,7 +349,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		__forceinline void Swap(Containers::BaseFixedStack<THeap, TSize, T>& A, Containers::BaseFixedStack<THeap, TSize, T>& B) {
+		forceinline void Swap(Containers::BaseFixedStack<THeap, TSize, T>& A, Containers::BaseFixedStack<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

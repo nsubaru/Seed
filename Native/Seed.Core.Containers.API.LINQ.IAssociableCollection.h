@@ -57,7 +57,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						__forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
+						forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 				public:

@@ -33,7 +33,7 @@ namespace Seed {
 							(TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State ||
 								TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State)
 					>, bool> = true>
-						__forceinline ListType& RemoveIf(FilteringLambda filter, Lambda&& lambda) {
+						forceinline ListType& RemoveIf(FilteringLambda filter, Lambda&& lambda) {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(filter), MoveRValue(lambda));
 					}
 
@@ -49,7 +49,7 @@ namespace Seed {
 							(TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State ||
 								TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State)
 					>, bool> = true>
-						__forceinline ListType& RemoveIf(FilteringLambda filter) {
+						forceinline ListType& RemoveIf(FilteringLambda filter) {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(filter), [] (T&&){});
 					}
 				public:

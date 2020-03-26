@@ -83,7 +83,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
                 template<typename LambdaT>
-                __forceinline BaseConcurencyArray& ForEachImpl(LambdaT&& lambda) {
+                forceinline BaseConcurencyArray& ForEachImpl(LambdaT&& lambda) {
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
                         return This->lock.ShareLock([&]() -> BaseConcurencyArray& {
                             for (SizeT i = 0; i < This->count; i++)
@@ -108,7 +108,7 @@ namespace Seed {
                 }
 
                 template<typename LambdaT>
-                __forceinline const BaseConcurencyArray& ForEachImpl(LambdaT&& lambda) const {
+                forceinline const BaseConcurencyArray& ForEachImpl(LambdaT&& lambda) const {
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
                         return this->This->lock.ShareLock([&]() -> const BaseConcurencyArray& {
                             for (SizeT i = 0; i < This->count; i++)
@@ -133,7 +133,7 @@ namespace Seed {
                 }
 
                 template<typename LambdaT>
-                __forceinline BaseConcurencyArray& ForEachImpl(LambdaT&& lambda, SizeT count) {
+                forceinline BaseConcurencyArray& ForEachImpl(LambdaT&& lambda, SizeT count) {
                     if (count > this->Count)
                         count = this->Count;
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
@@ -160,7 +160,7 @@ namespace Seed {
                 }
 
                 template<typename LambdaT>
-                __forceinline const BaseConcurencyArray& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+                forceinline const BaseConcurencyArray& ForEachImpl(LambdaT&& lambda, SizeT count) const {
                     if (count > this->Count)
                         count = this->Count;
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
@@ -187,7 +187,7 @@ namespace Seed {
                 }
             protected:
                 template<typename U, typename LambdaT>
-                __forceinline U AggregateImpl(LambdaT&& lambda) const {
+                forceinline U AggregateImpl(LambdaT&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         U val = U();
                         for (SizeT i = 0; i < This->count; i++)
@@ -199,7 +199,7 @@ namespace Seed {
                 }
 
                 template<typename U, typename LambdaT>
-                __forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+                forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         U result = Value;
                         for (SizeT i = 0; i < This->count; i++)
@@ -211,7 +211,7 @@ namespace Seed {
                 }
 
                 template<typename U, typename LambdaT>
-                __forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+                forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         for (SizeT i = 0; i < This->count; i++)
                         {
@@ -224,7 +224,7 @@ namespace Seed {
                 bool AnyImpl() const { return This->count > 0; }
 
                 template<typename Lambda>
-                __forceinline bool AnyImpl(Lambda&& lambda) const {
+                forceinline bool AnyImpl(Lambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         for (SizeT i = 0; i < This->count; i++)
                         {
@@ -236,7 +236,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                __forceinline bool AllImpl(Lambda&& lambda) const {
+                forceinline bool AllImpl(Lambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         for (SizeT i = 0; i < This->count; i++)
                         {
@@ -322,15 +322,15 @@ namespace Seed {
                         });
                 }
 
-                __forceinline void UnsafeSet(const T& Value, SizeT Index) {
+                forceinline void UnsafeSet(const T& Value, SizeT Index) {
                     This->array[Index] = Value;
                 }
 
-                __forceinline void UnsafeSet(T&& Value, SizeT Index) {
+                forceinline void UnsafeSet(T&& Value, SizeT Index) {
                     This->array[Index] = MoveRValue(Value);
                 }
 
-                __forceinline BaseConcurencyArray& RemoveAllImpl() {
+                forceinline BaseConcurencyArray& RemoveAllImpl() {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyArray& {
                         delete[] this->This->array;
                         this->This->count = 0;
@@ -339,7 +339,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                __forceinline BaseConcurencyArray& RemoveAllImpl(Lambda&& lambda) {
+                forceinline BaseConcurencyArray& RemoveAllImpl(Lambda&& lambda) {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyArray& {
                         for (SizeT i = 0; i < This->count; i++) {
                             lambda(MoveRValue(This->array[i]));
@@ -350,7 +350,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                __forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
+                forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
                     return This->lock.ShareLock([&]() {
                         SizeT selectedCount = 0;
                         for (SizeT i = 0; i < This->count; i++)
@@ -418,7 +418,7 @@ namespace Seed {
 #pragma warning(disable: 4996)
                 ///<summary>Зміна розміру</summary>
                 ///<param name = 'NewSize'>Новий розмір масиву</param>
-                __forceinline BaseConcurencyArray& Resize(SizeT NewSize) {
+                forceinline BaseConcurencyArray& Resize(SizeT NewSize) {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyArray& {
                         if (This->array == nullptr || This->count == 0)
                         {
@@ -705,7 +705,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
                 template<typename LambdaT>
-                __forceinline BaseConcurencyVList& ForEachImpl(LambdaT&& lambda) {
+                forceinline BaseConcurencyVList& ForEachImpl(LambdaT&& lambda) {
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
                         return This->lock.ShareLock([&]() -> BaseConcurencyVList& {
                             Node* node = This->root;
@@ -742,7 +742,7 @@ namespace Seed {
                 }
 
                 template<typename LambdaT>
-                __forceinline const BaseConcurencyVList& ForEachImpl(LambdaT&& lambda) const {
+                forceinline const BaseConcurencyVList& ForEachImpl(LambdaT&& lambda) const {
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
                         return this->This->lock.ShareLock([&]() -> const BaseConcurencyVList& {
                             Node* node = This->root;
@@ -779,7 +779,7 @@ namespace Seed {
                 }
 
                 template<typename LambdaT>
-                __forceinline BaseConcurencyVList& ForEachImpl(LambdaT&& lambda, SizeT count) {
+                forceinline BaseConcurencyVList& ForEachImpl(LambdaT&& lambda, SizeT count) {
                     if (count > this->Count)
                         count = this->Count;
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
@@ -818,7 +818,7 @@ namespace Seed {
                 }
 
                 template<typename LambdaT>
-                __forceinline const BaseConcurencyVList& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+                forceinline const BaseConcurencyVList& ForEachImpl(LambdaT&& lambda, SizeT count) const {
                     if (count > this->Count)
                         count = this->Count;
                     if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
@@ -858,7 +858,7 @@ namespace Seed {
 
             protected:
                 template<typename U, typename LambdaT>
-                __forceinline U AggregateImpl(LambdaT&& lambda) const {
+                forceinline U AggregateImpl(LambdaT&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         U val = U();
                         Node* node = This->root;
@@ -876,7 +876,7 @@ namespace Seed {
                 }
 
                 template<typename U, typename LambdaT>
-                __forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+                forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         U result = Value;
                         Node* node = This->root;
@@ -894,7 +894,7 @@ namespace Seed {
                 }
 
                 template<typename U, typename LambdaT>
-                __forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+                forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         Node* node = This->root;
                         SizeT nodeStartIndex = 0;
@@ -913,7 +913,7 @@ namespace Seed {
                 bool AnyImpl() const { return This->count > 0; }
 
                 template<typename Lambda>
-                __forceinline bool AnyImpl(Lambda&& lambda) const {
+                forceinline bool AnyImpl(Lambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         Node* node = This->root;
                         SizeT nodeStartIndex = 0;
@@ -931,7 +931,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                __forceinline bool AllImpl(Lambda&& lambda) const {
+                forceinline bool AllImpl(Lambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         Node* node = This->root;
                         SizeT nodeStartIndex = 0;
@@ -1034,15 +1034,15 @@ namespace Seed {
                         });
                 }
 
-                __forceinline void UnsafeSet(const T& Value, SizeT Index) {
+                forceinline void UnsafeSet(const T& Value, SizeT Index) {
                     This->root->arr[Index] = Value;
                 }
 
-                __forceinline void UnsafeSet(T&& Value, SizeT Index) {
+                forceinline void UnsafeSet(T&& Value, SizeT Index) {
                     This->root->arr[Index] = MoveRValue(Value);
                 }
 
-                __forceinline BaseConcurencyVList& RemoveAllImpl() {
+                forceinline BaseConcurencyVList& RemoveAllImpl() {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyVList& {
                         Node* node = This->root;
                         Node* tmp;
@@ -1058,7 +1058,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                __forceinline BaseConcurencyVList& RemoveAllImpl(Lambda&& lambda) {
+                forceinline BaseConcurencyVList& RemoveAllImpl(Lambda&& lambda) {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyVList& {
                         Node* node = This->root;
                         Node* tmp;
@@ -1076,7 +1076,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                __forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
+                forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
                     return This->lock.ShareLock([&]() {
                         SizeT selectedCount = 0;
                         for (SizeT i = 0; i < This->count; i++)
@@ -1118,13 +1118,13 @@ namespace Seed {
         }
 
         template<typename THeap, typename T>
-        __forceinline void Swap(Containers::BaseConcurencyArray<THeap, T>& A, Containers::BaseConcurencyArray<THeap, T>) {
+        forceinline void Swap(Containers::BaseConcurencyArray<THeap, T>& A, Containers::BaseConcurencyArray<THeap, T>) {
             //TODO: Interlocked Exchange
             Swap(A.This, B.This);
         }
 
         template<typename THeap, typename T>
-        __forceinline void Swap(Containers::BaseConcurencyVList<THeap, T>& A, Containers::BaseConcurencyVList<THeap, T>) {
+        forceinline void Swap(Containers::BaseConcurencyVList<THeap, T>& A, Containers::BaseConcurencyVList<THeap, T>) {
             //TODO: Interlocked Exchange
             Swap(A.This, B.This);
         }

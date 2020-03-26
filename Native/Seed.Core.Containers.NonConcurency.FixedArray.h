@@ -75,7 +75,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename LambdaT>
-				__forceinline BaseFixedArray& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseFixedArray& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
 						for (SizeT i = 0; i < TSize; i++)
 						{
@@ -96,7 +96,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseFixedArray& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseFixedArray& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						for (SizeT i = 0; i < TSize; i++)
 						{
@@ -117,7 +117,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				forceinline U AggregateImpl(LambdaT&& lambda) const {
 					U val = U();
 					for (SizeT i = 0; i < TSize; i++)
 					{
@@ -127,7 +127,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline T AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					U result = Value;
 					for (SizeT i = 0; i < TSize; i++)
 					{
@@ -137,7 +137,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					for (SizeT i = 0; i < TSize; i++)
 					{
 						lambda(Value, This->array[i]);
@@ -148,7 +148,7 @@ namespace Seed {
 				bool AnyImpl() const { return TSize > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					for (SizeT i = 0; i < TSize; i++)
 					{
 						if (lambda(This->array[i]))
@@ -158,7 +158,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					for (SizeT i = 0; i < TSize; i++)
 					{
 						if (!lambda(This->array[i]))
@@ -230,15 +230,15 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->array[Index] = Value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->array[Index] = MoveRValue(Value);
 				}
 
-				__forceinline BaseFixedArray& RemoveAllImpl() {
+				forceinline BaseFixedArray& RemoveAllImpl() {
 					for (SizeT i = 0; i < TSize; i++) {
 						This->array[i].~T();
 					}
@@ -246,7 +246,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseFixedArray& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseFixedArray& RemoveAllImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < TSize; i++) {
 						lambda(MoveRValue(This->array[i]));
 					}
@@ -320,7 +320,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		__forceinline void Swap(Containers::BaseFixedArray<THeap, TSize, T>& A, Containers::BaseFixedArray<THeap, TSize, T>& B) {
+		forceinline void Swap(Containers::BaseFixedArray<THeap, TSize, T>& A, Containers::BaseFixedArray<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

@@ -164,7 +164,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 				template<typename LambdaT>
-				__forceinline BaseConcurencyDynamicStack& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyDynamicStack& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyDynamicStack& {
 							if (This->count == 0)
@@ -195,7 +195,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyDynamicStack& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyDynamicStack& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						return this->This->lock.ShareLock([&]() -> const BaseConcurencyDynamicStack& {
 							if (This->count == 0)
@@ -226,7 +226,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				forceinline U AggregateImpl(LambdaT&& lambda) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 
 						if (This->count == 0)
@@ -242,7 +242,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						U result = Value;
 						if (This->count == 0)
@@ -257,7 +257,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						if (This->count == 0)
 							return Value;
@@ -273,7 +273,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -288,7 +288,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -383,17 +383,17 @@ namespace Seed {
 						});
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = Value;
 					This->count = Index + 1;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 				}
 
-				__forceinline BaseConcurencyDynamicStack& RemoveAllImpl() {
+				forceinline BaseConcurencyDynamicStack& RemoveAllImpl() {
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& {
 						for (SizeT i = 0; i < This->count; i++) {
 							This->stack[i].~T();
@@ -403,7 +403,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseConcurencyDynamicStack& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseConcurencyDynamicStack& RemoveAllImpl(Lambda&& lambda) {
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& {
 						for (SizeT i = 0; i < This->count; i++) {
 							lambda(MoveRValue(This->stack[i]));
@@ -413,7 +413,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
+				forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
 					return This->lock.ShareLock([&]() {
 						SizeT selectedCount = 0;
 
@@ -448,7 +448,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseConcurencyDynamicStack<THeap, T>& A, Containers::BaseConcurencyDynamicStack<THeap, T>& B) {
+		forceinline void Swap(Containers::BaseConcurencyDynamicStack<THeap, T>& A, Containers::BaseConcurencyDynamicStack<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

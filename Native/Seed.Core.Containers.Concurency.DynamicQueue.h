@@ -154,7 +154,7 @@ namespace Seed {
 				}
 
 				template<typename TU>
-				__forceinline friend void Seed::Core::Swap(TU& a, TU& b);
+				forceinline friend void Seed::Core::Swap(TU& a, TU& b);
 
 				SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
@@ -234,7 +234,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename TLambdaT>
-				__forceinline BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) {
+				forceinline BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, T&> ||
 						TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
 
@@ -269,7 +269,7 @@ namespace Seed {
 				}
 
 				template<typename TLambdaT>
-				__forceinline const BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) const {
+				forceinline const BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
 						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
 							for (SizeT i = 0; i < This->count; i++)
@@ -300,7 +300,7 @@ namespace Seed {
 				}
 
 				template<typename TU, typename TLambdaT>
-				__forceinline TU AggregateImpl(TLambdaT&& lambda) const {
+				forceinline TU AggregateImpl(TLambdaT&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						TU result = TU();
 
@@ -318,7 +318,7 @@ namespace Seed {
 				}
 
 				template<typename TU, typename TLambdaT>
-				__forceinline TU AggregateImpl(TLambdaT&& lambda, const TU& value) const {
+				forceinline TU AggregateImpl(TLambdaT&& lambda, const TU& value) const {
 					return This->flowControler.SharedLock([&]() {
 						TU result = value;
 						if (This->count == 0) {
@@ -335,7 +335,7 @@ namespace Seed {
 				}
 
 				template<typename TU, typename TLambdaT>
-				__forceinline TU AggregateImpl(TLambdaT&& lambda, TU&& value) const {
+				forceinline TU AggregateImpl(TLambdaT&& lambda, TU&& value) const {
 					return This->flowControler.SharedLock([&, Value = MoveRValue(value)]() mutable {
 						TU result = MoveRValue(Value);
 
@@ -354,7 +354,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename TLambda>
-				__forceinline bool AnyImpl(TLambda&& lambda) const {
+				forceinline bool AnyImpl(TLambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -370,7 +370,7 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				__forceinline bool AllImpl(TLambda&& lambda) const {
+				forceinline bool AllImpl(TLambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -443,15 +443,15 @@ namespace Seed {
 						});
 				}
 
-				__forceinline void UnsafeSet(const T& value, SizeT index) {
+				forceinline void UnsafeSet(const T& value, SizeT index) {
 					This->queue[index] = value;
 				}
 
-				__forceinline void UnsafeSet(T&& value, SizeT index) {
+				forceinline void UnsafeSet(T&& value, SizeT index) {
 					This->queue[index] = MoveRValue(value);
 				}
 
-				__forceinline BaseConcurencyDynamicQueue& RemoveAllImpl() {
+				forceinline BaseConcurencyDynamicQueue& RemoveAllImpl() {
 					return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
 						if (This->count == 0)
 							return *this;
@@ -464,7 +464,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseConcurencyDynamicQueue& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseConcurencyDynamicQueue& RemoveAllImpl(Lambda&& lambda) {
 					return This->flowControler.SharedLock([&, lambda = MoveRValue(lambda)]()->BaseConcurencyDynamicQueue& {
 						if (This->count == 0)
 							return *this;
@@ -477,7 +477,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
+				forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
 					return This->lock.SharedLock([&]() {
 						SizeT selectedCount = 0;
 
@@ -511,7 +511,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseConcurencyDynamicQueue<THeap, T>& A, Containers::BaseConcurencyDynamicQueue<THeap, T>& B) {
+		forceinline void Swap(Containers::BaseConcurencyDynamicQueue<THeap, T>& A, Containers::BaseConcurencyDynamicQueue<THeap, T>& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}

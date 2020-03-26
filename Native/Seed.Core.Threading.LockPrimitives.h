@@ -22,7 +22,7 @@ namespace Seed {
 			private:
 				friend _declspec(noreturn) void __rethrow();
 			public:
-				__forceinline SRWLock()
+				forceinline SRWLock()
 				{
 					extern void InitSRWLock(void*);
 					InitSRWLock(&lock);
@@ -31,7 +31,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				__forceinline decltype(auto) ExclusiveLock(T& Funct)
+				forceinline decltype(auto) ExclusiveLock(T& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
@@ -63,7 +63,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				__forceinline decltype(auto) ShareLock(T& Funct)
+				forceinline decltype(auto) ShareLock(T& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{

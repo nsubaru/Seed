@@ -76,7 +76,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename LambdaT>
-				__forceinline BaseConcurencyFixedArray& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyFixedArray& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyFixedArray& {
 							for (SizeT i = 0; i < TSize; i++)
@@ -101,7 +101,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyFixedArray& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyFixedArray& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedArray& {
 							for (SizeT i = 0; i < TSize; i++)
@@ -126,7 +126,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				forceinline U AggregateImpl(LambdaT&& lambda) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						U val = U();
 						for (SizeT i = 0; i < TSize; i++)
@@ -138,7 +138,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						U result = Value;
 						for (SizeT i = 0; i < TSize; i++)
@@ -150,7 +150,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						for (SizeT i = 0; i < TSize; i++)
 						{
@@ -163,7 +163,7 @@ namespace Seed {
 				bool AnyImpl() const { return TSize > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						for (SizeT i = 0; i < TSize; i++)
 						{
@@ -175,7 +175,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						for (SizeT i = 0; i < TSize; i++)
 						{
@@ -261,15 +261,15 @@ namespace Seed {
 						});
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->array[Index] = Value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->array[Index] = MoveRValue(Value);
 				}
 
-				__forceinline BaseConcurencyFixedArray& RemoveAllImpl() {
+				forceinline BaseConcurencyFixedArray& RemoveAllImpl() {
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& {
 						for (SizeT i = 0; i < TSize; i++) {
 							This->array[i].~T();
@@ -279,7 +279,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseConcurencyFixedArray& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseConcurencyFixedArray& RemoveAllImpl(Lambda&& lambda) {
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& {
 						for (SizeT i = 0; i < TSize; i++) {
 							lambda(MoveRValue(This->array[i]));
@@ -359,7 +359,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		__forceinline void Swap(Containers::BaseConcurencyFixedArray<THeap, TSize, T>& A, Containers::BaseConcurencyFixedArray<THeap, TSize, T>& B) {
+		forceinline void Swap(Containers::BaseConcurencyFixedArray<THeap, TSize, T>& A, Containers::BaseConcurencyFixedArray<THeap, TSize, T>& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}

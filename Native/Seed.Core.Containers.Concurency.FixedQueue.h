@@ -138,7 +138,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 				template<typename LambdaT>
-				__forceinline BaseConcurencyFixedQueue& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseConcurencyFixedQueue& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 
@@ -170,7 +170,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseConcurencyFixedQueue& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseConcurencyFixedQueue& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						return This->flowControler.SharedLock([&]() -> const BaseConcurencyFixedQueue& {
 							for (SizeT i = 0; i < This->count; i++)
@@ -198,7 +198,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				forceinline U AggregateImpl(LambdaT&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						U result = U();
 
@@ -216,7 +216,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					return This->flowControler.SharedLock([&]() {
 						U result = Value;
 						if (This->count == 0) {
@@ -234,7 +234,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					return This->flowControler.SharedLock([&, Value = MoveRValue(Value)]() mutable {
 						U result = MoveRValue(Value);
 
@@ -253,7 +253,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -269,7 +269,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->count == 0)
 							return false;
@@ -342,19 +342,19 @@ namespace Seed {
 						});
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->queue[Index] = Value;
 					This->count = Index;
 					This->rear = Index;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->queue[Index] = MoveRValue(Value);
 					This->count = Index;
 					This->rear = Index;
 				}
 
-				__forceinline BaseConcurencyFixedQueue& RemoveAllImpl() {
+				forceinline BaseConcurencyFixedQueue& RemoveAllImpl() {
 					return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& {
 						if (This->count == 0)
 							return *this;
@@ -367,7 +367,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseConcurencyFixedQueue& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseConcurencyFixedQueue& RemoveAllImpl(Lambda&& lambda) {
 					return This->flowControler.SharedLock([&, lambda = MoveRValue(lambda)]()->BaseConcurencyFixedQueue& {
 						if (This->count == 0)
 							return *this;
@@ -399,7 +399,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		__forceinline void Swap(Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& A, Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& B) {
+		forceinline void Swap(Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& A, Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& B) {
 			//TODO: Interlooked exchange
 			Swap(A.This, B.This);
 		}

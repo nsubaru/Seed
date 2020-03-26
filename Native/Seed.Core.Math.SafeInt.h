@@ -32,7 +32,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr __forceinline SafeInt operator+(SafeInt second) {
+				constexpr forceinline SafeInt operator+(SafeInt second) {
 					if (static_cast<Int>(this->value + second.value) >= this->value)
 						return static_cast<Int>(this->value + second.value);
 					else
@@ -43,7 +43,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr __forceinline SafeInt operator-(SafeInt second) {
+				constexpr forceinline SafeInt operator-(SafeInt second) {
 					if (this->value >= second.value)
 						return static_cast<Int>(this->value - second.value);
 					else
@@ -57,7 +57,7 @@ namespace Seed {
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
 #pragma intrinsic(_umul128)
-				constexpr __forceinline SafeInt operator*(SafeInt second) {
+				constexpr forceinline SafeInt operator*(SafeInt second) {
 					if constexpr (TypeTraits::IsSameV<Int, UInt8>) {
 						UInt16 res = this->value * second.value;
 						if (res > Math::Max<Int>())
@@ -100,7 +100,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr __forceinline SafeInt operator/(SafeInt second) {
+				constexpr forceinline SafeInt operator/(SafeInt second) {
 					if (second.value == 0)
 						throw DivideByZero(__FILE__, __FUNCSIG__, __LINE__);
 					else
@@ -111,7 +111,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr __forceinline SafeInt operator+=(SafeInt second) {
+				constexpr forceinline SafeInt operator+=(SafeInt second) {
 					if (static_cast<Int>(this->value + second.value) >= this->value)
 						return this->value = static_cast<Int>(this->value + second.value);
 					else
@@ -122,7 +122,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr __forceinline SafeInt operator-=(SafeInt second) {
+				constexpr forceinline SafeInt operator-=(SafeInt second) {
 					if (this->value >= second.value)
 						return this->value = static_cast<Int>(this->value - second.value);
 					else
@@ -137,7 +137,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr __forceinline SafeInt operator*=(SafeInt second) {
+				constexpr forceinline SafeInt operator*=(SafeInt second) {
 					if constexpr (TypeTraits::IsSameV<Int, UInt8>) {
 						UInt16 res = this->value * second.value;
 						if (res > Math::Max<Int>())
@@ -175,27 +175,27 @@ namespace Seed {
 				}
 #pragma warning(pop)
 
-				constexpr __forceinline bool operator<(SafeInt second) {
+				constexpr forceinline bool operator<(SafeInt second) {
 					return this->value < second.value;
 				}
 
-				constexpr __forceinline bool operator>(SafeInt second) {
+				constexpr forceinline bool operator>(SafeInt second) {
 					return this->value > second.value;
 				}
-				constexpr __forceinline bool operator<=(SafeInt second) {
+				constexpr forceinline bool operator<=(SafeInt second) {
 					return this->value <= second.value;
 				}
-				constexpr __forceinline bool operator>=(SafeInt second) {
+				constexpr forceinline bool operator>=(SafeInt second) {
 					return this->value >= second.value;
 				}
-				constexpr __forceinline bool operator==(SafeInt second) {
+				constexpr forceinline bool operator==(SafeInt second) {
 					return this->value == second.value;
 				}
-				constexpr __forceinline bool operator!=(SafeInt second) {
+				constexpr forceinline bool operator!=(SafeInt second) {
 					return this->value != second.value;
 				}
 
-				constexpr __forceinline Int GetValue() { return value; }
+				constexpr forceinline Int GetValue() { return value; }
 				Int Property(GetValue) Value;
 			};
 

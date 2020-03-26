@@ -125,7 +125,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 				template<typename LambdaT>
-				__forceinline BaseFixedQueue& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseFixedQueue& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
@@ -151,7 +151,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseFixedQueue& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseFixedQueue& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
@@ -175,7 +175,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				forceinline U AggregateImpl(LambdaT&& lambda) const {
 					U result = U();
 
 					if (This->count == 0) {
@@ -191,7 +191,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					U result = Value;
 					if (This->count == 0) {
 						ReleaseLockSharedSRWLock(&This->Lock);
@@ -207,7 +207,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					U result = MoveRValue(Value);
 
 					if (This->count == 0)
@@ -224,7 +224,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 
@@ -238,7 +238,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 
@@ -299,19 +299,19 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->queue[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 					This->rear = Index + 1;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->queue[Index] = Value;
 					This->count = Index + 1;
 					This->rear = Index + 1;
 				}
 
-				__forceinline BaseFixedQueue& RemoveAllImpl() {
+				forceinline BaseFixedQueue& RemoveAllImpl() {
 					if (This->count == 0)
 						return *this;
 					for (SizeT i = 0; i < This->count; i++)
@@ -322,7 +322,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseFixedQueue& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseFixedQueue& RemoveAllImpl(Lambda&& lambda) {
 					if (This->count == 0)
 						return *this;
 					for (SizeT i = 0; i < This->count; i++)
@@ -352,7 +352,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		__forceinline void Swap(Containers::BaseFixedQueue<THeap, TSize, T>& A, Containers::BaseFixedQueue<THeap, TSize, T>& B) {
+		forceinline void Swap(Containers::BaseFixedQueue<THeap, TSize, T>& A, Containers::BaseFixedQueue<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

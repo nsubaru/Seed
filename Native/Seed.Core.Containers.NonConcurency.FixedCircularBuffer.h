@@ -199,7 +199,7 @@ namespace Seed
 				}
 			protected:
 				template<typename U, typename Lambda>
-				__forceinline U AggregateImpl(Lambda&& lambda) const {
+				forceinline U AggregateImpl(Lambda&& lambda) const {
 					U value;
 
 					for (SizeT i = 0; i < This->ActualSize; i++)
@@ -211,7 +211,7 @@ namespace Seed
 				}
 
 				template<typename U, typename Lambda>
-				__forceinline U AggregateImpl(Lambda&& lambda, const U& startValue) const {
+				forceinline U AggregateImpl(Lambda&& lambda, const U& startValue) const {
 					U value = startValue;
 
 					for (SizeT i = 0; i < This->ActualSize; i++)
@@ -223,7 +223,7 @@ namespace Seed
 				}
 
 				template<typename U, typename Lambda>
-				__forceinline U AggregateImpl(Lambda&& lambda, U&& value) const {
+				forceinline U AggregateImpl(Lambda&& lambda, U&& value) const {
 					for (SizeT i = 0; i < This->ActualSize; i++)
 					{
 						lambda(value, This->buffer[i]);
@@ -232,12 +232,12 @@ namespace Seed
 					return value;
 				}
 			protected:
-				__forceinline bool AnyImpl() const {
+				forceinline bool AnyImpl() const {
 					return TSize != 0;
 				}
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					for (SizeT i = 0; i < This->ActualSize; i++)
 					{
 						if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
@@ -259,7 +259,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					for (SizeT i = 0; i < This->ActualSize; i++)
 					{
 						if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
@@ -281,7 +281,7 @@ namespace Seed
 				}
 			protected:
 				template<typename Lambda>
-				__forceinline T& FirstImpl(Lambda&& lambda) {
+				forceinline T& FirstImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < This->ActualSize; i++)
 					{
 						if(lambda(This->buffer[i]))
@@ -292,7 +292,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline T& LastImpl(Lambda&& lambda) {
+				forceinline T& LastImpl(Lambda&& lambda) {
 					T* item = nullptr;
 
 					for (SizeT i = 0; i < This->ActualSize; i++)
@@ -312,7 +312,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline const T& FirstImpl(Lambda&& lambda) const {
+				forceinline const T& FirstImpl(Lambda&& lambda) const {
 					for (SizeT i = 0; i < This->ActualSize; i++)
 					{
 						if(lambda(This->buffer[i]))
@@ -323,7 +323,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline const T& LastImpl(Lambda&& lambda) const {
+				forceinline const T& LastImpl(Lambda&& lambda) const {
 					T* item = nullptr;
 
 					for (SizeT i = 0; i < This->ActualSize; i++)
@@ -342,13 +342,13 @@ namespace Seed
 					}
 				}
 			protected:
-				__forceinline BaseFixedCircularBuffer& RemoveAllImpl() {
+				forceinline BaseFixedCircularBuffer& RemoveAllImpl() {
 					Dispose();
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BaseFixedCircularBuffer& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseFixedCircularBuffer& RemoveAllImpl(Lambda&& lambda) {
 					try
 					{
 						for (SizeT i = 0; i < This->ActualSize; i++)
@@ -367,7 +367,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline SizeT GetCountIfImpl(Lambda && lambda) {
+				forceinline SizeT GetCountIfImpl(Lambda && lambda) {
 					if (This->ActualSize != TSize)
 					{
 						count = This->ActualSize;
@@ -394,11 +394,11 @@ namespace Seed
                     }
 				}
 			protected:
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->buffer[Index] = Value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->buffer[Index] = MoveRValue(Value);
 				}
 			public:
@@ -429,7 +429,7 @@ namespace Seed
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		__forceinline void Swap(Containers::BaseFixedCircularBuffer<THeap, TSize, T>& A, Containers::BaseFixedCircularBuffer<THeap, TSize, T>& B) {
+		forceinline void Swap(Containers::BaseFixedCircularBuffer<THeap, TSize, T>& A, Containers::BaseFixedCircularBuffer<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

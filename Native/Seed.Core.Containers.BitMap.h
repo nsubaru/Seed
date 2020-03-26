@@ -26,7 +26,7 @@ namespace Seed {
 				static constexpr SizeT LastClusterBitsCount = BitCount - (FullClustersCount * BitCountInFragment);
 				
 			public:
-				__forceinline constexpr SizeT GetCount()
+				forceinline constexpr SizeT GetCount()
 				{
 					return BitCount;
 				}
@@ -34,7 +34,7 @@ namespace Seed {
 			private:
 				T bitMap[Size] = { 0 };
 			public:
-				__forceinline constexpr BaseBitMapT(Boolean IsSetAll = false)
+				forceinline constexpr BaseBitMapT(Boolean IsSetAll = false)
 				{
 					if (IsSetAll)
 					{
@@ -211,7 +211,7 @@ namespace Seed {
 					return !BitCheck(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 				};
 
-				__forceinline constexpr void ResetAll()
+				forceinline constexpr void ResetAll()
 				{
 					Memory::MemBlkFill(bitMap, Size, 0);
 				};
@@ -332,7 +332,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename LambdaT>
-				__forceinline BaseBitMapT& ForEachImpl(LambdaT&& lambda)
+				forceinline BaseBitMapT& ForEachImpl(LambdaT&& lambda)
 				{
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>)
 					{
@@ -357,7 +357,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseBitMapT& ForEachImpl(LambdaT&& lambda) const
+				forceinline const BaseBitMapT& ForEachImpl(LambdaT&& lambda) const
 				{
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>)
 					{
@@ -382,7 +382,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const
+				forceinline U AggregateImpl(LambdaT&& lambda) const
 				{
 					U val = U();
 					for (SizeT i = 0; i < Size; i++)
@@ -393,7 +393,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda, const U& Value) const
+				forceinline T AggregateImpl(LambdaT&& lambda, const U& Value) const
 				{
 					U result = Value;
 					for (SizeT i = 0; i < Size; i++)
@@ -404,7 +404,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{
@@ -419,7 +419,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const
+				forceinline bool AnyImpl(Lambda&& lambda) const
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{
@@ -430,7 +430,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const
+				forceinline bool AllImpl(Lambda&& lambda) const
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{
@@ -488,7 +488,7 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				__forceinline BaseBitMapT& ReverseImpl()
+				forceinline BaseBitMapT& ReverseImpl()
 				{
 					for (SizeT i = 0; i < Size / 2; i++)
 					{
@@ -497,24 +497,24 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index)
+				forceinline void UnsafeSet(const T& Value, SizeT Index)
 				{
 					bitMap[Index] = Value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index)
+				forceinline void UnsafeSet(T&& Value, SizeT Index)
 				{
 					bitMap[Index] = MoveRValue(Value);
 				}
 
-				__forceinline BaseBitMapT& RemoveAllImpl()
+				forceinline BaseBitMapT& RemoveAllImpl()
 				{
 					this->ResetAll();
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BaseBitMapT& RemoveAllImpl(Lambda&& lambda)
+				forceinline BaseBitMapT& RemoveAllImpl(Lambda&& lambda)
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{

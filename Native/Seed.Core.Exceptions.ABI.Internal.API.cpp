@@ -1506,7 +1506,7 @@ union RawExceptionInfo {
     EHExceptionRecord CxxExceptionInfo;
 };
 
-__forceinline __declspec(noreturn)
+forceinline __declspec(noreturn)
 void __RethrowException(EHExceptionRecord* pThisException)
 {
     RawExceptionInfo* orig = (RawExceptionInfo*) pThisException; //-V1027

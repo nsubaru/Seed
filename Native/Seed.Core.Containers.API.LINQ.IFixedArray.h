@@ -38,7 +38,7 @@ namespace Seed {
 							TypeTraits::IsLambdaConvertibleT<Lambda, T, SizeT>::State
 						>
 						, bool> = true>
-					static __forceinline ThisCollection Generate(Lambda generator) {
+					static forceinline ThisCollection Generate(Lambda generator) {
 						if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, T>::State)
 						{
 							if constexpr (!ThisCollection::IsDynamic)

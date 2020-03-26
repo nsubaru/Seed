@@ -236,7 +236,7 @@ namespace Seed
 				}
 			protected:
 				template<typename U, typename Lambda>
-				__forceinline U AggregateImpl(Lambda&& lambda) const {
+				forceinline U AggregateImpl(Lambda&& lambda) const {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> U
 					{
 						U value;
@@ -251,7 +251,7 @@ namespace Seed
 				}
 
 				template<typename U, typename Lambda>
-				__forceinline U AggregateImpl(Lambda&& lambda, const U& startValue) const {
+				forceinline U AggregateImpl(Lambda&& lambda, const U& startValue) const {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> U
 					{
 						U value = startValue;
@@ -266,7 +266,7 @@ namespace Seed
 				}
 
 				template<typename U, typename Lambda>
-				__forceinline U AggregateImpl(Lambda&& lambda, U&& value) const {
+				forceinline U AggregateImpl(Lambda&& lambda, U&& value) const {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda), value = MoveRValue(value)]() mutable -> U
 					{
 						for (SizeT i = 0; i < This->ActualSize; i++)
@@ -278,12 +278,12 @@ namespace Seed
 					});
 				}
 			protected:
-				__forceinline bool AnyImpl() const {
+				forceinline bool AnyImpl() const {
 					return This->Size != 0;
 				}
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> bool
 					{
 						for (SizeT i = 0; i < This->ActualSize; i++)
@@ -309,7 +309,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> bool
 					{
 						for (SizeT i = 0; i < This->ActualSize; i++)
@@ -335,7 +335,7 @@ namespace Seed
 				}
 			protected:
 				template<typename Lambda>
-				__forceinline T& FirstImpl(Lambda&& lambda) {
+				forceinline T& FirstImpl(Lambda&& lambda) {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> T&
 					{
 						for (SizeT i = 0; i < This->ActualSize; i++)
@@ -349,7 +349,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline T& LastImpl(Lambda&& lambda) {
+				forceinline T& LastImpl(Lambda&& lambda) {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> T&
 					{
 						T* item = nullptr;
@@ -372,7 +372,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline const T& FirstImpl(Lambda&& lambda) const {
+				forceinline const T& FirstImpl(Lambda&& lambda) const {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> const T&
 					{
 						for (SizeT i = 0; i < This->ActualSize; i++)
@@ -386,7 +386,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline const T& LastImpl(Lambda&& lambda) const {
+				forceinline const T& LastImpl(Lambda&& lambda) const {
 					return This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> const T&
 					{
 						T* item = nullptr;
@@ -408,7 +408,7 @@ namespace Seed
 					});
 				}
 			protected:
-				__forceinline BaseConcurencyDynamicCircularBuffer& RemoveAllImpl() {
+				forceinline BaseConcurencyDynamicCircularBuffer& RemoveAllImpl() {
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicCircularBuffer&
 					{
 						Dispose();
@@ -417,7 +417,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline BaseConcurencyDynamicCircularBuffer& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseConcurencyDynamicCircularBuffer& RemoveAllImpl(Lambda&& lambda) {
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicCircularBuffer&
 					{
 						try
@@ -439,7 +439,7 @@ namespace Seed
 				}
 
 				template<typename Lambda>
-				__forceinline SizeT GetCountIfImpl(Lambda && lambda) {
+				forceinline SizeT GetCountIfImpl(Lambda && lambda) {
 					This->lock.ShareLock([&, lambda = MoveRValue(lambda)]() -> SizeT {
 						if (This->ActualSize != This->Size)
 						{
@@ -462,11 +462,11 @@ namespace Seed
 					});
 				}
 			protected:
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->buffer[Index] = Value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->buffer[Index] = MoveRValue(Value);
 				}
 			public:
@@ -499,7 +499,7 @@ namespace Seed
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseConcurencyDynamicCircularBuffer<THeap, T>& A, Containers::BaseConcurencyDynamicCircularBuffer<THeap, T>& B) {
+		forceinline void Swap(Containers::BaseConcurencyDynamicCircularBuffer<THeap, T>& A, Containers::BaseConcurencyDynamicCircularBuffer<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

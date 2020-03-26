@@ -25,9 +25,9 @@ namespace Seed {
 
 			static_assert(sizeof(TEB::TlsSlots) >= sizeof(TLS), "Seed TLS to big");
 
-			InternalApiCall __forceinline TLS* GetTLS() { return reinterpret_cast<TLS*>(NtCurrentTeb()->TlsSlots); }
+			InternalApiCall forceinline TLS* GetTLS() { return reinterpret_cast<TLS*>(NtCurrentTeb()->TlsSlots); }
 
-			InternalApiCall __forceinline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates* State) {
+			InternalApiCall forceinline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates* State) {
 				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 				thisTLS->State = State;
@@ -35,19 +35,19 @@ namespace Seed {
 				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 
-			InternalApiCall __forceinline void DestroyTls() {
+			InternalApiCall forceinline void DestroyTls() {
 				TLS* thisTLS = GetTLS();
 				delete thisTLS->Threadable;
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 			}
 
-			InternalApiCall __forceinline void InitMinTls() {
+			InternalApiCall forceinline void InitMinTls() {
 				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 
-			InternalApiCall __forceinline void StopMinTls() {
+			InternalApiCall forceinline void StopMinTls() {
 				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 			}

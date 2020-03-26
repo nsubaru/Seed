@@ -24,7 +24,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="IsDescending">Якщо true то сортування спадаючому порядку відбувається</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					__forceinline ThisCollection& SortBy(bool IsDescending = true) {
+					forceinline ThisCollection& SortBy(bool IsDescending = true) {
 						return static_cast<ThisCollection&>(*this).SortByImpl(IsDescending);
 					}
 
@@ -32,7 +32,7 @@ namespace Seed {
 					/// Реверсує порядок елементів в колекції
 					/// </summary>
 					/// <returns>Силку на поточну колекцію</returns>
-					__forceinline ThisCollection& Reverse() {
+					forceinline ThisCollection& Reverse() {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
 				public:

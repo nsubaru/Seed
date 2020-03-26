@@ -142,7 +142,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 				template<typename LambdaT>
-				__forceinline BaseDynamicStack& ForEachImpl(LambdaT&& lambda) {
+				forceinline BaseDynamicStack& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
 						if (This->count == 0)
 							return *this;
@@ -169,7 +169,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseDynamicStack& ForEachImpl(LambdaT&& lambda) const {
+				forceinline const BaseDynamicStack& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						if (This->count == 0)
 							return *this;
@@ -196,7 +196,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
+				forceinline T AggregateImpl(LambdaT&& lambda) const {
 					if (This->count == 0)
 						return U();
 					U result = U();
@@ -209,7 +209,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					U result = Value;
 					if (This->count == 0)
 						return result;
@@ -222,7 +222,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					if (This->count == 0)
 						return Value;
 					SizeT i = This->count;
@@ -236,7 +236,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -249,7 +249,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				forceinline bool AllImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -332,17 +332,17 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = Value;
 					This->count = Index + 1;
 				}
 
-				__forceinline BaseDynamicStack& RemoveAllImpl() {
+				forceinline BaseDynamicStack& RemoveAllImpl() {
 					for (SizeT i = 0; i < This->count; i++) {
 						This->stack[i].~T();
 					}
@@ -350,7 +350,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseDynamicStack& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseDynamicStack& RemoveAllImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->stack[i]));
 					}
@@ -378,7 +378,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseDynamicStack<THeap, T>& A, Containers::BaseDynamicStack<THeap, T>& B) {
+		forceinline void Swap(Containers::BaseDynamicStack<THeap, T>& A, Containers::BaseDynamicStack<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}
