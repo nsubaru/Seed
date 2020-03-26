@@ -28,7 +28,8 @@ namespace Seed {
 					RefCountT count;
 					NodeSym* node_root;
 					BasePair<THeap, TString, TData>* data;
-					NodeLex(SizeT count = 0) :node_root(nullptr), count(count), data(nullptr) {};
+
+					forceinline NodeLex(SizeT count = 0) :node_root(nullptr), count(count), data(nullptr) {};
 				};
 
 				//Структура букви в складі AVL-дерева
@@ -38,7 +39,8 @@ namespace Seed {
 					NodeLex* data;
 					NodeSym* left;
 					NodeSym* right;
-					NodeSym(Char key) :key(key), height(1), left(nullptr), right(nullptr), data(nullptr) {}
+
+					forceinline NodeSym(Char key) :key(key), height(1), left(nullptr), right(nullptr), data(nullptr) {}
 				};
 
 				//Висота дерева
@@ -59,7 +61,7 @@ namespace Seed {
 				}
 
 				//Правий поворо піддерева
-				NodeSym* rotateright(NodeSym* p) {
+				forceinline NodeSym* rotateright(NodeSym* p) {
 					NodeSym* q = p->left;
 					p->left = q->right;
 					q->right = p;
@@ -69,7 +71,7 @@ namespace Seed {
 				}
 
 				//Лівий поворот піддерева
-				NodeSym* rotateleft(NodeSym* q) {
+				forceinline NodeSym* rotateleft(NodeSym* q) {
 					NodeSym* p = q->right;
 					q->right = p->left;
 					p->left = q;
@@ -97,7 +99,7 @@ namespace Seed {
 				}
 
 				//Вставка елемента в дерево
-				NodeSym* insert(NodeSym* p, wchar_t key) {
+				forceinline NodeSym* insert(NodeSym* p, wchar_t key) {
 					if (!p) return new NodeSym(key);
 					if (key == p->key) return p;
 					if (key < p->key)
@@ -269,6 +271,7 @@ namespace Seed {
 					NodeLex* node;
 					RefCountT count;
 					RefCountT RefCount;
+
 					forceinline RootNode() noexcept :node(nullptr), count(0), RefCount(1) {};
 				};
 			private:
@@ -302,41 +305,41 @@ namespace Seed {
 					return copy;
 				}
 
-				void toMap(
+				void ToMap(
 					NodeSym* node,
 					BaseMap<THeap, TString, TData>& list)
 				{
-					if (node->left != nullptr) toMap(node->left, list);
-					if (node->data != nullptr) toMap(node->data, list);
-					if (node->right != nullptr) toMap(node->right, list);
+					if (node->left != nullptr) ToMap(node->left, list);
+					if (node->data != nullptr) ToMap(node->data, list);
+					if (node->right != nullptr) ToMap(node->right, list);
 				}
 
-				void toMap(
+				void ToMap(
 					NodeLex* node,
 					BaseMap<THeap, TString, TData>& list)
 				{
 					if (node->data != nullptr)
 						list.Insert(*node->data);
 					if (node->node_root != nullptr)
-						toMap(node->node_root, list);
+						ToMap(node->node_root, list);
 				}
 
-				void toMap(
+				void ToMap(
 					RootNode* This, //-V688
 					BaseMap<THeap, TString, TData>& list)
 				{
 					if (This != nullptr)
 						if (This->node != nullptr)
-							toMap(This->node, list);
+							ToMap(This->node, list);
 				}
 			protected:
-				virtual void Dispose() final {
+				forceinline virtual void Dispose() final {
 					This->node = destroy_node(This->node);
 					This->count = 0;
 				}
 			public:
 				//Конструктор
-				BaseDictionary() :This(new RootNode()) {};
+				forceinline BaseDictionary() :This(new RootNode()) {};
 				///<summary>Конструктор</summary>
 				BaseDictionary(InitilizerList<BasePair<THeap, TString, TData>>&& pairs) : This(new RootNode())
 				{
@@ -346,41 +349,41 @@ namespace Seed {
 				}
 
 				//Вставка елемента в систему по назві і значенню
-				BaseDictionary& Insert(const TString& key, const TData& value) {
+				forceinline BaseDictionary& Insert(const TString& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ key, value };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseDictionary& Insert(TString&& key, const TData& value) {
+				forceinline BaseDictionary& Insert(TString&& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), value };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseDictionary& Insert(const TString& key, TData&& value) {
+				forceinline BaseDictionary& Insert(const TString& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ key, MoveRValue(value) };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseDictionary& Insert(TString&& key, TData&& value) {
+				forceinline BaseDictionary& Insert(TString&& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), MoveRValue(value) };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseDictionary& Insert(Pair&& data) {
+				forceinline BaseDictionary& Insert(Pair&& data) {
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseDictionary& Insert(const Pair& data) {
+				forceinline BaseDictionary& Insert(const Pair& data) {
 					This->node = insert(This->node, MoveRValue(Pair(data)));
 					++This->count;
 					return *this;
@@ -451,20 +454,20 @@ namespace Seed {
 				}
 
 				//Кількість елемент в системі
-				SizeT GetCount() const {
+				forceinline SizeT GetCount() const {
 					return This->count;
 				}
 
 				SizeT Property(GetCount) Count;
 
 				//Повертає ассоціативний масив з лексикона
-				BaseMap<THeap, TString, TData> toMap() {
+				forceinline BaseMap<THeap, TString, TData> ToMap() {
 					BaseMap<THeap, TString, TData> ret_val;
-					toMap(This, ret_val);
+					ToMap(This, ret_val);
 					return ret_val;
 				}
 
-				virtual BaseDictionary Clone() const override {
+				forceinline virtual BaseDictionary Clone() const override {
 					BaseDictionary result;
 					result.This->node = create_lex_copy(This->node);
 					result.This->count = This->count;
@@ -495,7 +498,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithoutIndex(
+				static void ForEachImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -527,7 +530,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithIndex(
+				static void ForEachImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -597,7 +600,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithoutIndex(
+				static void ForEachKeyImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -629,7 +632,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithIndex(
+				static void ForEachKeyImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -697,7 +700,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithoutIndex(
+				static void ForEachValueImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -729,7 +732,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithIndex(
+				static void ForEachValueImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -814,12 +817,13 @@ namespace Seed {
 				}
 
 				forceinline BaseDictionary& RemoveAllImpl() {
-					this->Dispose();
+					This->node = destroy_node(This->node);
+					This->count = 0;
 					return *this;
 				}
 
 				template<typename Lambda>
-				forceinline BaseDictionary& RemoveAllWithImpl(Lambda&& lambda) {
+				BaseDictionary& RemoveAllWithImpl(Lambda&& lambda) {
 					return This->lock.ShareLock([&]() -> BaseDictionary& {
 						This->root = destroy_tree(This->root, lambda);
 						This->count = 0;

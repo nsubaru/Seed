@@ -28,7 +28,8 @@ namespace Seed {
 					RefCountT count;
 					NodeSym* node_root;
 					BasePair<THeap, TString, TData>* data;
-					NodeLex(SizeT count = 0) :node_root(nullptr), count(count), data(nullptr) {};
+
+					forceinline NodeLex(SizeT count = 0) :node_root(nullptr), count(count), data(nullptr) {};
 				};
 
 				//Структура букви в складі AVL-дерева
@@ -38,7 +39,8 @@ namespace Seed {
 					NodeLex* data;
 					NodeSym* left;
 					NodeSym* right;
-					NodeSym(Char key) :key(key), height(1), left(nullptr), right(nullptr), data(nullptr) {}
+
+					forceinline NodeSym(Char key) :key(key), height(1), left(nullptr), right(nullptr), data(nullptr) {}
 				};
 
 				//Висота дерева
@@ -59,7 +61,7 @@ namespace Seed {
 				}
 
 				//Правий поворо піддерева
-				NodeSym* rotateright(NodeSym* p) {
+				forceinline NodeSym* rotateright(NodeSym* p) {
 					NodeSym* q = p->left;
 					p->left = q->right;
 					q->right = p;
@@ -69,7 +71,7 @@ namespace Seed {
 				}
 
 				//Лівий поворот піддерева
-				NodeSym* rotateleft(NodeSym* q) {
+				forceinline NodeSym* rotateleft(NodeSym* q) {
 					NodeSym* p = q->right;
 					q->right = p->left;
 					p->left = q;
@@ -97,7 +99,7 @@ namespace Seed {
 				}
 
 				//Вставка елемента в дерево
-				NodeSym* insert(NodeSym* p, wchar_t key) {
+				forceinline NodeSym* insert(NodeSym* p, wchar_t key) {
 					if (!p) return new NodeSym(key);
 					if (key == p->key) return p;
 					if (key < p->key)
@@ -180,7 +182,7 @@ namespace Seed {
 				}
 
 				//Пошук елемента в системі дерев
-				NodeLex* find(
+				forceinline NodeLex* find(
 					NodeLex* This, //-V688
 					const TString& data,
 					size_t index = 0
@@ -270,6 +272,7 @@ namespace Seed {
 					Threading::SRWLock lock;
 					RefCountT count;
 					RefCountT RefCount;
+
 					forceinline RootNode() noexcept :node(nullptr), lock(), count(0), RefCount(1) {};
 				};
 			private:
@@ -303,35 +306,35 @@ namespace Seed {
 					return copy;
 				}
 
-				void toMap(
+				forceinline void ToMap(
 					NodeSym* node,
 					BaseConcurencyMap<THeap, TString, TData>& list)
 				{
-					if (node->left != nullptr) toMap(node->left, list);
-					if (node->data != nullptr) toMap(node->data, list);
-					if (node->right != nullptr) toMap(node->right, list);
+					if (node->left != nullptr) ToMap(node->left, list);
+					if (node->data != nullptr) ToMap(node->data, list);
+					if (node->right != nullptr) ToMap(node->right, list);
 				}
 
-				void toMap(
+				void ToMap(
 					NodeLex* node,
 					BaseConcurencyMap<THeap, TString, TData>& list)
 				{
 					if (node->data != nullptr)
 						list.Insert(*node->data);
 					if (node->node_root != nullptr)
-						toMap(node->node_root, list);
+						ToMap(node->node_root, list);
 				}
 
-				void toMap(
+				forceinline void ToMap(
 					RootNode* This, //-V688
 					BaseConcurencyMap<THeap, TString, TData>& list)
 				{
 					if (This != nullptr)
 						if (This->node != nullptr)
-							toMap(This->node, list);
+							ToMap(This->node, list);
 				}
 			protected:
-				virtual void Dispose() final {
+				forceinline virtual void Dispose() final {
 					This->lock.ExclusiveLock([&]() {
 						This->node = destroy_node(This->node);
 						This->count = 0;
@@ -339,7 +342,7 @@ namespace Seed {
 				}
 			public:
 				//Конструктор
-				BaseConcurencyDictionary() :This(new RootNode()) {};
+				forceinline BaseConcurencyDictionary() :This(new RootNode()) {};
 				///<summary>Конструктор</summary>
 				BaseConcurencyDictionary(InitilizerList<BasePair<THeap, TString, TData>>&& pairs) : This(new RootNode())
 				{
@@ -349,7 +352,7 @@ namespace Seed {
 				}
 
 				//Вставка елемента в систему по назві і значенню
-				BaseConcurencyDictionary& Insert(const TString& key, const TData& value) {
+				forceinline BaseConcurencyDictionary& Insert(const TString& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ key, value };
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDictionary& {
 						This->node = insert(This->node, MoveRValue(data));
@@ -358,7 +361,7 @@ namespace Seed {
 						});
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseConcurencyDictionary& Insert(TString&& key, const TData& value) {
+				forceinline BaseConcurencyDictionary& Insert(TString&& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), value };
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDictionary& {
 						This->node = insert(This->node, MoveRValue(data));
@@ -367,7 +370,7 @@ namespace Seed {
 						});
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseConcurencyDictionary& Insert(const TString& key, TData&& value) {
+				forceinline BaseConcurencyDictionary& Insert(const TString& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ key, MoveRValue(value) };
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDictionary& {
 						This->node = insert(This->node, MoveRValue(data));
@@ -376,7 +379,7 @@ namespace Seed {
 						});
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseConcurencyDictionary& Insert(TString&& key, TData&& value) {
+				forceinline BaseConcurencyDictionary& Insert(TString&& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), MoveRValue(value) };
 					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDictionary& {
 						This->node = insert(This->node, MoveRValue(data));
@@ -385,7 +388,7 @@ namespace Seed {
 						});
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseConcurencyDictionary& Insert(Pair&& data) {
+				forceinline BaseConcurencyDictionary& Insert(Pair&& data) {
 					return This->lock.ExclusiveLock([&, data = MoveRValue(data)]() mutable->BaseConcurencyDictionary& {
 						This->node = insert(This->node, MoveRValue(data));
 						++This->count;
@@ -393,7 +396,7 @@ namespace Seed {
 					});
 				}
 				//Вставка елемента в систему по назві і значенню
-				BaseConcurencyDictionary& Insert(const Pair& data) {
+				forceinline BaseConcurencyDictionary& Insert(const Pair& data) {
 					return This->lock.ExclusiveLock([&]() mutable -> BaseConcurencyDictionary& {
 						This->node = insert(This->node, MoveRValue(Pair(data)));
 						++This->count;
@@ -476,17 +479,17 @@ namespace Seed {
 				}
 
 				//Кількість елемент в системі
-				SizeT GetCount() const {
+				forceinline SizeT GetCount() const {
 					return This->count;
 				}
 
 				SizeT Property(GetCount) Count;
 
 				//Повертає ассоціативний масив з лексикона
-				BaseConcurencyMap<THeap, TString, TData> toMap() {
+				BaseConcurencyMap<THeap, TString, TData> ToMap() {
 					return This->lock.ShareLock([&]() -> BaseConcurencyMap<THeap, TString, TData> {
 						BaseConcurencyMap<THeap, TString, TData> ret_val;
-						toMap(This, ret_val);
+						ToMap(This, ret_val);
 						return ret_val;
 						});
 				}
@@ -524,7 +527,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithoutIndex(
+				static void ForEachImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -556,7 +559,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithIndex(
+				static void ForEachImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -634,7 +637,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithoutIndex(
+				static void ForEachKeyImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -666,7 +669,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithIndex(
+				static void ForEachKeyImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -742,7 +745,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithoutIndex(
+				static void ForEachValueImplWithoutIndex(
 					NodeLex* node,
 					Lambda& lambda)
 				{
@@ -774,7 +777,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithIndex(
+				static void ForEachValueImplWithIndex(
 					NodeLex* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -891,8 +894,11 @@ namespace Seed {
 				}
 
 				forceinline BaseConcurencyDictionary& RemoveAllImpl() {
-					this->Dispose();
-					return *this;
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDictionary& {
+						This->node = destroy_node(This->node);
+						This->count = 0;
+						return *this;
+						});
 				}
 
 				template<typename Lambda>

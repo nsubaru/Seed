@@ -408,7 +408,7 @@ namespace Seed {
             public:
                 forceinline T& operator[](SizeT Index) {
                     return This->lock.ShareLock([&]() -> T& {
-                        if (This->count < Index)
+                        if (Index < This->count)
                         {
                             return This->array[Index];
                         }
@@ -420,7 +420,7 @@ namespace Seed {
                 }
                 forceinline const T& operator[](SizeT Index) const {
                     return This->lock.ShareLock([&]() -> const T& {
-                        if (This->count < Index)
+                        if (Index < This->count)
                         {
                             return This->array[Index];
                         }

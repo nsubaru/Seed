@@ -357,7 +357,7 @@ namespace Seed {
 #pragma warning(pop)
 			public:
 				forceinline T& operator[](SizeT Index) {
-					if (This->count < Index)
+					if (Index < This->count)
                     {
                         return This->array[Index];
                     }
@@ -368,7 +368,7 @@ namespace Seed {
 				}
 
 				forceinline const T& operator[](SizeT Index) const {
-					if (This->count < Index)
+					if (Index < This->count)
                     {
                         return This->array[Index];
                     }
