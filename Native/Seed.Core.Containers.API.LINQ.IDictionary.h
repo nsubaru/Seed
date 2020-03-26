@@ -19,7 +19,7 @@ namespace Seed {
 					public IAssociableCollection<TCollection, THeap, TKey, TValue, TPair, TIsConcurencySuport>
 				{
 				public:
-					virtual ~IDictionary() = 0 {}
+					forceinline virtual ~IDictionary() = 0 {}
 				};
 			}
 		}

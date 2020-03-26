@@ -17,47 +17,47 @@ namespace Seed {
 				private:
 					using ThisCollection = TCircularBuffer;
 				public:
-					void Add(const T& item) {
+					forceinline void Add(const T& item) {
 						return static_cast<ThisCollection&>(*this).AddImpl(item);
 					}
-					void Add(T&& item) {
+					forceinline void Add(T&& item) {
 						return static_cast<ThisCollection&>(*this).AddImpl(MoveRValue(item));
 					}
 				public:
-					ThisCollection& operator+=(const T& item) {
+					forceinline ThisCollection& operator+=(const T& item) {
 						Add(item);
 						return static_cast<ThisCollection&>(*this);
 					}
 
-					ThisCollection& operator+=(T&& item) {
+					forceinline ThisCollection& operator+=(T&& item) {
 						Add(MoveRValue(item));
 						return static_cast<ThisCollection&>(*this);
 					}
 				public:
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					T& GetBy(Lambda&& lambda) {
+					forceinline T& GetBy(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).GetByImpl(MoveRValue(lambda));
 					}
 
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					const T& GetBy(Lambda&& lambda) const {
+					forceinline const T& GetBy(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).GetByImpl(MoveRValue(lambda));
 					}
 				public:
-					void Flush() {
+					forceinline void Flush() {
 						return static_cast<ThisCollection&>(*this).FlushImpl();
 					}
 				public:
-					SizeT GetActualSize() const {
+					forceinline SizeT GetActualSize() const {
 						return static_cast<const ThisCollection&>(*this).GetActualSizeImpl();
 					}
-					Boolean GetIsEmpty() const {
+					forceinline Boolean GetIsEmpty() const {
 						return static_cast<const ThisCollection&>(*this).GetIsEmptyImpl();
 					}
-					SizeT GetSize() const {
+					forceinline SizeT GetSize() const {
 						return static_cast<const ThisCollection&>(*this).GetSizeImpl(); 
 					}
-					Boolean GetIsFull() const {
+					forceinline Boolean GetIsFull() const {
 						return GetActualSize() == GetSize();
 					}
 				public:
@@ -66,7 +66,7 @@ namespace Seed {
 					Boolean Property(GetIsFull) IsFull;
 					SizeT Property(GetSize) BufferSize;
 				public:
-					virtual ~ICircularBuffer() = 0 {};
+					forceinline virtual ~ICircularBuffer() = 0 {};
 				};
 			}
 		}

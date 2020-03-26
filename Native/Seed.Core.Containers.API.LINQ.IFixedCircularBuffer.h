@@ -21,8 +21,7 @@ namespace Seed {
 				private:
 					using ThisCollection = typename TCircularBuffer<THeap, TSize, T>;
 				public:
-				public:
-					virtual ~IFixedCircularBuffer() = 0 {}
+					forceinline virtual ~IFixedCircularBuffer() = 0 {}
 				};
 			}
 		}

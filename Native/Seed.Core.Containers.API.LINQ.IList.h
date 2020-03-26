@@ -53,7 +53,7 @@ namespace Seed {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(filter), [] (T&&){});
 					}
 				public:
-					virtual ~IList() = 0 {}
+					forceinline virtual ~IList() = 0 {}
 				};
 			}
 		}

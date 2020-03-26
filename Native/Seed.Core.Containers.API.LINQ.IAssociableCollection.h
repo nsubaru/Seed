@@ -38,7 +38,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEach(Lambda&& lambda) {
+						forceinline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -75,7 +75,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEachKey(Lambda&& lambda) {
+						forceinline ThisCollection& ForEachKey(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
 
@@ -93,7 +93,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						const ThisCollection& ForEachKey(Lambda&& lambda) const {
+						forceinline const ThisCollection& ForEachKey(Lambda&& lambda) const {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
 				public:
@@ -111,7 +111,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEachValue(Lambda&& lambda) {
+						forceinline ThisCollection& ForEachValue(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
 
@@ -129,7 +129,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						const ThisCollection& ForEachValue(Lambda&& lambda) const {
+						forceinline const ThisCollection& ForEachValue(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
 				public:
@@ -137,7 +137,7 @@ namespace Seed {
 					/// Видаляє всі елементи з колекції
 					/// </summary>
 					/// <returns>Силку на колекцію</returns>
-					ThisCollection& RemoveAll() {
+					forceinline ThisCollection& RemoveAll() {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl();
 					}
 
@@ -154,7 +154,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& RemoveAllWith(Lambda && lambda) {
+						forceinline ThisCollection& RemoveAllWith(Lambda && lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllWithImpl(MoveRValue(lambda));
 					}
 				public:
@@ -370,7 +370,7 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					NewCollection<UHeap, TPair> CopyToCollection() const {
+					forceinline NewCollection<UHeap, TPair> CopyToCollection() const {
 						return this->CopyToCollection<NewCollection, UHeap>([] (const TPair& pair) -> TPair
 						{
 							return pair;
@@ -392,63 +392,12 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					NewCollection<TPair> CopyToCollection() const {
+					forceinline NewCollection<TPair> CopyToCollection() const {
 						return this->CopyToCollection<NewCollection>([] (const TPair& pair) -> TPair
 						{
 							return pair;
 						});
 					}
-
-					///// <summary>
-					///// Копіює елементи до колекції
-					///// </summary>
-					///// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
-					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
-					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
-					///// <returns>Колекція з копією всіх елементів</returns>
-					//template<
-					//	template<typename UHeap, typename U> class NewCollection,
-					//	typename UHeap, 
-					//	TypeTraits::EnableIfTV<
-					//		TypeTraits::LogicConst<
-					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TPair>>
-					//			>,
-					//		bool> 
-					//	= true
-					//>
-					//NewCollection<UHeap, TPair> CopyToCollection() const {
-					//	return this->CopyToCollection<NewCollection, UHeap>([] (const TPair& pair) -> TPair
-					//	{
-					//		return pair;
-					//	});
-					//}
-
-					///// <summary>
-					///// Копіює елементи до колекції
-					///// </summary>
-					///// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
-					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
-					///// <returns>Колекція з копією всіх елементів</returns>
-					//template<
-					//	template<typename UHeap, typename U> class NewCollection,
-					//	typename FilterLambda,
-					//	typename UHeap,
-					//	TypeTraits::EnableIfTV<
-					//		TypeTraits::LogicConst<
-					//			TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TPair&> &&
-					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TPair>>
-					//			>,
-					//		bool> 
-					//	= true
-					//>
-					//NewCollection<UHeap, TPair> CopyIfToCollection(FilterLambda && filter) const {
-					//	return this->CopyToCollection<NewCollection, UHeap>(MoveRValue(filter), [] (const TPair& pair) -> TPair
-					//	{
-					//		return pair;
-					//	});
-					//}
 
 					/// <summary>
 					/// Копіює елементи до колекції
@@ -468,7 +417,7 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					NewCollection<TPair> CopyIfToCollection(FilterLambda && filter) const {
+					forceinline NewCollection<TPair> CopyIfToCollection(FilterLambda && filter) const {
 						return this->CopyToCollection<NewCollection>(MoveRValue(filter), [] (const TPair& pair) -> TPair
 						{
 							return pair;
@@ -669,31 +618,6 @@ namespace Seed {
 						}
 					}
 
-					///// <summary>
-					///// Копіює ключі до колекції
-					///// </summary>
-					///// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
-					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
-					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
-					///// <returns>Колекція з копією всіх елементів</returns>
-					//template<
-					//	template<typename UHeap, typename U> class NewCollection,
-					//	typename UHeap, 
-					//	TypeTraits::EnableIfTV<
-					//		TypeTraits::LogicConst<
-					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TKey>>
-					//			>,
-					//		bool> 
-					//	= true
-					//>
-					//NewCollection<UHeap, TKey> CopyKeyToCollection() const {
-					//	return this->CopyKeyToCollection<NewCollection, UHeap>([] (const TKey& pair) -> TKey
-					//	{
-					//		return pair;
-					//	});
-					//}
-
 					/// <summary>
 					/// Копіює ключі до колекції
 					/// </summary>
@@ -709,39 +633,12 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					NewCollection<TKey> CopyKeyToCollection() const {
+					forceinline NewCollection<TKey> CopyKeyToCollection() const {
 						return this->CopyKeyToCollection<NewCollection>([] (const TKey& pair) -> TKey
 						{
 							return pair;
 						});
 					}
-
-					///// <summary>
-					///// Копіює ключі до колекції
-					///// </summary>
-					///// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
-					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
-					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
-					///// <returns>Колекція з копією всіх елементів</returns>
-					//template<
-					//	template<typename UHeap, typename U> class NewCollection,
-					//	typename FilterLambda,
-					//	typename UHeap, 
-					//	TypeTraits::EnableIfTV<
-					//		TypeTraits::LogicConst<
-					//			TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TKey&> &&
-					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TKey>>
-					//			>,
-					//		bool> 
-					//	= true
-					//>
-					//NewCollection<UHeap, TKey> CopyKeyIfToCollection(FilterLambda&& filter) const {
-					//	return this->CopyKeyToCollection<NewCollection, UHeap>(MoveRValue(filter), [] (const TKey& pair) -> TKey
-					//	{
-					//		return pair;
-					//	});
-					//}
 
 					/// <summary>
 					/// Копіює ключі до колекції
@@ -761,7 +658,7 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					NewCollection<TKey> CopyKeyIfToCollection(FilterLambda&& filter) const {
+					forceinline NewCollection<TKey> CopyKeyIfToCollection(FilterLambda&& filter) const {
 						return this->CopyKeyToCollection<NewCollection>(MoveRValue(filter), [] (const TKey& pair) -> TKey
 						{
 							return pair;
@@ -965,30 +862,6 @@ namespace Seed {
 						}
 					}
 
-					///// <summary>
-					///// Копіює значення до колекції
-					///// </summary>
-					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
-					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
-					///// <returns>Колекція з копією всіх елементів</returns>
-					//template<
-					//	template<typename THeap, typename U> class NewCollection,
-					//	typename UHeap, 
-					//	TypeTraits::EnableIfTV<
-					//		TypeTraits::LogicConst<
-					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TValue>>
-					//			>,
-					//		bool> 
-					//	= true
-					//>
-					//NewCollection<UHeap, TValue> CopyValueToCollection() const {
-					//	return this->CopyValueToCollection<NewCollection, UHeap>([] (const TValue& pair) -> TValue
-					//	{
-					//		return pair;
-					//	});
-					//}
-
 					/// <summary>
 					/// Копіює значення до колекції
 					/// </summary>
@@ -1011,33 +884,6 @@ namespace Seed {
 						});
 					}
 
-					///// <summary>
-					///// Копіює значення до колекції
-					///// </summary>
-					///// <typeparam name="FilterLambda">Тип лямбди фільтрування елементів</typeparam>
-					///// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					///// <typeparam name="UHeap">Тип кучі нової колекції</typeparam>
-					///// <typeparam name="U">Тип елементів в новій колекції</typeparam>
-					///// <returns>Колекція з копією всіх елементів</returns>
-					//template<
-					//	template<typename THeap, typename U> class NewCollection,
-					//	typename UHeap, 
-					//	typename FilterLambda,
-					//	TypeTraits::EnableIfTV<
-					//		TypeTraits::LogicConst<
-					//			TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TValue&> &&
-					//			TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, TValue>>
-					//			>,
-					//		bool> 
-					//	= true
-					//>
-					//NewCollection<UHeap, TValue> CopyValueIfToCollection(FilterLambda&& filter) const {
-					//	return this->CopyValueToCollection<NewCollection, UHeap>(MoveRValue(filter), [] (const TValue& pair) -> TValue
-					//	{
-					//		return pair;
-					//	});
-					//}
-
 					/// <summary>
 					/// Копіює значення до колекції
 					/// </summary>
@@ -1055,7 +901,7 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					NewCollection<TValue> CopyValueIfToCollection(FilterLambda&& filter) const {
+					forceinline NewCollection<TValue> CopyValueIfToCollection(FilterLambda&& filter) const {
 						return this->CopyValueToCollection<NewCollection>(MoveRValue(filter), [] (const TValue& pair) -> TValue
 						{
 							return pair;
@@ -1065,7 +911,7 @@ namespace Seed {
 					/// <summary>
 					/// Деструктор чисто віртуальний бо це лиш розширення асоціативних колекцій
 					/// </summary>
-					virtual ~IAssociableCollection() = 0 {};
+					forceinline virtual ~IAssociableCollection() = 0 {};
 				};
 			}
 		}

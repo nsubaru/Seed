@@ -20,11 +20,11 @@ namespace Seed {
 				private:
 					using ThisCollection = typename TCircularBuffer<THeap, T>;
 				public:
-					void Resize(SizeT newSize) {
+					forceinline void Resize(SizeT newSize) {
 						static_cast<ThisCollection&>(*this).ResizeImpl(newSize);
 					}
 				public:
-					virtual ~IDynamicCircularBuffer() = 0 {}
+					forceinline virtual ~IDynamicCircularBuffer() = 0 {}
 				};
 			}
 		}

@@ -36,7 +36,7 @@ namespace Seed {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
 				public:
-					virtual ~IOrderable() = 0 {}
+					forceinline virtual ~IOrderable() = 0 {}
 				};
 			}
 		}

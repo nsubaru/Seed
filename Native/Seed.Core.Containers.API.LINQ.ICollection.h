@@ -293,7 +293,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEach(Lambda&& lambda) {
+						forceinline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -500,7 +500,7 @@ namespace Seed {
 							TypeTraits::IsLambdaConvertibleT<Lambda, T, SizeT>::State
 						>
 						, bool> = true>
-					static forceinline ThisCollection Generate(Lambda generator, SizeT count) {
+					forceinline static ThisCollection Generate(Lambda generator, SizeT count) {
 						if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, T>::State)
 						{
 							if constexpr (!ThisCollection::IsDynamic)
@@ -545,7 +545,7 @@ namespace Seed {
 						}
 					}
 				public:
-					virtual ~ICollection() = 0 {}
+					forceinline virtual ~ICollection() = 0 {}
 				};
 			}
 		}

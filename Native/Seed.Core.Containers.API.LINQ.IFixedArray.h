@@ -22,7 +22,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="IsDescending">Якщо true то сортування спадаючому порядку відбувається</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					ThisCollection& SortBy(bool IsDescending = true) {
+					forceinline ThisCollection& SortBy(bool IsDescending = true) {
 						return static_cast<ThisCollection&>(*this).SortByImpl(IsDescending);
 					}
 
@@ -83,7 +83,7 @@ namespace Seed {
 						}
 					}
 				public:
-					virtual ~IFixedArray() = 0 {}
+					forceinline virtual ~IFixedArray() = 0 {}
 				};
 			}
 		}

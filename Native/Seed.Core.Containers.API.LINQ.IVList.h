@@ -16,7 +16,7 @@ namespace Seed {
 				class IVList :
 					public ICollection<TList, THeap, T, false, TIsConcurencySuport> {
 				public:
-					virtual ~IVList() = 0 {}
+					forceinline virtual ~IVList() = 0 {}
 				};
 			}
 		}

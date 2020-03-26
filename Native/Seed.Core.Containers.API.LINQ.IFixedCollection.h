@@ -21,7 +21,7 @@ namespace Seed {
 					using ThisCollection = TCollection<THeap, TSize, T>;
 				public:
 					template<template<SizeT, typename> typename NewCollection>
-					NewCollection<TSize, T> CopyToFixed() {
+					forceinline NewCollection<TSize, T> CopyToFixed() {
 						NewCollection<TSize, T> newCollection;
 						ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
 						thisCollection.ForEach([&](const T& Value, SizeT Index) {
@@ -31,7 +31,7 @@ namespace Seed {
 					}
 
 					template<template<SizeT, typename> typename NewCollection>
-					NewCollection<TSize, T> CopyToFixed() const {
+					forceinline NewCollection<TSize, T> CopyToFixed() const {
 						NewCollection<TSize, T> newCollection;
 						const ThisCollection& thisCollection = static_cast<const ThisCollection&>(*this);
 						thisCollection.ForEach([&](const T& Value, SizeT Index) {
@@ -41,7 +41,7 @@ namespace Seed {
 					}
 
 					template<template<SizeT, typename> typename NewCollection>
-					NewCollection<TSize, T> MoveToFixed() {
+					forceinline NewCollection<TSize, T> MoveToFixed() {
 						NewCollection<TSize, T> newCollection;
 						ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
 						SizeT Index = 0;
@@ -53,7 +53,7 @@ namespace Seed {
 					}
 
 					template<template<SizeT, typename> typename NewCollection, SizeT TNewSize>
-					NewCollection<TNewSize, T> CopyToFixed() {
+					forceinline NewCollection<TNewSize, T> CopyToFixed() {
 						if constexpr (TNewSize == TSize) {
 							NewCollection<TNewSize, T> newCollection;
 							ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
@@ -69,7 +69,7 @@ namespace Seed {
                                                                         TSize,
                                                                         TNewSize);
 						}
-					} //-V591
+					}
 				public:
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
@@ -79,7 +79,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEach(Lambda&& lambda) {
+						forceinline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -227,7 +227,7 @@ namespace Seed {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
 				public:
-					virtual ~IFixedCollection() = 0 {}
+					forceinline virtual ~IFixedCollection() = 0 {}
 				};
 			}
 		}

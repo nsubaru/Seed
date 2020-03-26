@@ -31,7 +31,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEach(Lambda&& lambda) {
+						forceinline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -68,7 +68,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEach(Lambda&& lambda, SizeT Count) {
+						forceinline ThisCollection& ForEach(Lambda&& lambda, SizeT Count) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
 					}
 
@@ -127,7 +127,7 @@ namespace Seed {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
 				public:
-					virtual ~IString() = 0 {}
+					forceinline virtual ~IString() = 0 {}
 				};
 			}
 		}

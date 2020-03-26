@@ -16,7 +16,7 @@ namespace Seed {
 				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
 				class IFixedStack : public IFixedCollection<TCollection, THeap, T, TSize, TIsConcurencySuport> {
 				public:
-					virtual ~IFixedStack() = 0 {}
+					forceinline virtual ~IFixedStack() = 0 {}
 				};
 			}
 		}

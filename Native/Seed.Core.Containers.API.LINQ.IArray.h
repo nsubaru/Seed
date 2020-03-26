@@ -16,7 +16,7 @@ namespace Seed {
 				class IArray :
 					public IOrderable<TArray, THeap, T, false, TIsConcurencySuport> {
 				public:
-					virtual ~IArray() = 0 {}
+					forceinline virtual ~IArray() = 0 {}
 				};
 			}
 		}
