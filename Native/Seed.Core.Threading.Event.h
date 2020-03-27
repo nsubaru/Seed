@@ -1,5 +1,10 @@
 #pragma once
 #include "Seed.Core.Threading.Base.h"
+#include "Seed.Core.Threading.Internal.h"
+
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
 
 namespace Seed {
 	inline namespace Core {
@@ -50,18 +55,15 @@ namespace Seed {
 
 				///<summary>Подати імпульс на подію</summary>
 				void Signale() {
-					extern void PulseNtEvent(void* handle);
-					PulseNtEvent(data->handle);
+					Internals::PulseNtEvent(data->handle);
 				}
 				///<summary>Виставити true на подію</summary>
 				void Set() {
-					extern void SetNtEvent(void* handle);
-					SetNtEvent(data->handle);
+					Internals::SetNtEvent(data->handle);
 				}
 				///<summary>Виставити false на подію</summary>
 				void Reset() {
-					extern void ResetNtEvent(void* handle);
-					ResetNtEvent(data->handle);
+					Internals::ResetNtEvent(data->handle);
 				}
 
 				friend void WaitForAll(Containers::Array<SynchronizeEvent>&& events);
@@ -146,3 +148,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)
