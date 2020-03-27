@@ -81,10 +81,12 @@ namespace Seed {
 					ID ThreadID;
 					///<summary>Текстове представлення</summary>
 					ExceptionString toString() const {
-						return ExceptionString(L"Згенеровано у рядку ") + BaseString<Memory::ExceptionHeap>::toString(Line)
-							+ ExceptionString(L" у функції ") + ExceptionString(FunctName)
-							+ ExceptionString(L" у файлі ") + ExceptionString(File)
-							+ ExceptionString(L" в потоці з ID ") + BaseString<Memory::ExceptionHeap>::toString(ThreadID);
+						return ExceptionString::Combine({
+							ExceptionString(L"Згенеровано у рядку ") , ExceptionString::toString(Line), 
+							ExceptionString(L" у функції ") , ExceptionString(FunctName), 
+							ExceptionString(L" у файлі ") , ExceptionString(File), 
+							ExceptionString(L" в потоці з ID ") , ExceptionString::toString(ThreadID)
+						});
 					}
 				};
 			protected:
@@ -109,9 +111,6 @@ namespace Seed {
 				{
 					GetStackBackTrace((Seed::Exceptions::Exception::StackTraceRecord&)this->stackTrace);
 				}
-
-				//forceinline Exception(const Exception& orig)
-				//	: location(orig.location), exeptionName(orig.exeptionName) {}
 
 				///<summary>Вертає користувальницьку назву помилки</summary>
 				forceinline const ConstString& GetExceptioName() const
@@ -144,9 +143,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const = 0 {
-					return ExceptionString(L"Невідома помилка з повідомлення ") + ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString();
+					return ExceptionString::Combine({
+						ExceptionString(L"Невідома помилка з повідомлення "), ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString()
+						});
 				}
 
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
@@ -183,7 +183,7 @@ namespace Seed {
 			};
 
 			///<summary>Ділення на ноль</summary>
-			class SeedKernelCall DivideByZero : public Exception {
+			class SeedKernelCall DivideByZero final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -195,10 +195,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~DivideByZero() {};
@@ -211,7 +211,7 @@ namespace Seed {
 			///<para> - Execute - спроба виконати команду за неіснуючим адресом</para>
 			///<para>Тому помилка містить інформацію про тип доступу та адресс який пробували використати</para>
 			///</summary>
-			class SeedKernelCall NullPointException : public Exception {
+			class SeedKernelCall NullPointException final : public Exception {
 			public:
 				///<summary> Можливі варіанти помилки</summary>
 				enum class Types : UInt8 { Read, Write, Execute };
@@ -248,20 +248,22 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L" за адресом ") + BaseString<Memory::ExceptionHeap>::toString(GetMemoryAddress())
-						+ ExceptionString(L" при спробі ") +
-						((GetAccessType() == Types::Read) ? ExceptionString(L"читання. ") :
-						(GetAccessType() == Types::Write) ? ExceptionString(L"запису. ") : ExceptionString(L"виконання. "))
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName),
+						ExceptionString(L" за адресом "), ExceptionString::toString(GetMemoryAddress()),
+						ExceptionString(L" при спробі "),
+						((GetAccessType() == Types::Read) ?		ExceptionString(L"читання. ") :
+						(GetAccessType() == Types::Write) ?		ExceptionString(L"запису. ")
+														  :		ExceptionString(L"виконання. ")),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~NullPointException() {}
 			};
 
 			///<summary>Використання невалідного дескриптора</summary>
-			class SeedKernelCall InvalidHandleUsage : public Exception {
+			class SeedKernelCall InvalidHandleUsage final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -273,10 +275,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~InvalidHandleUsage() {}
@@ -306,17 +308,17 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~NotFoundException() {}
 			};
 
 			///<summary>Неможливо перетворити тип</summary>
-			class SeedKernelCall BadCast : public Exception {
+			class SeedKernelCall BadCast final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -328,17 +330,17 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~BadCast() {}
 			};
 
 			///<summary>Неможливо викликати віртуальну функцію</summary>
-			class SeedKernelCall BadPureCall : public Exception {
+			class SeedKernelCall BadPureCall final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -350,10 +352,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~BadPureCall() {}
@@ -380,10 +382,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~AllredyExistException() {}
@@ -404,7 +406,7 @@ namespace Seed {
 			};
 
 			///<summary>Некоректний тип помилки</summary>
-			class SeedKernelCall BadException : public Exception {
+			class SeedKernelCall BadException final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -416,17 +418,17 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~BadException() {}
 			};
 
 			///<summary>Недостатньо оперативної пам'яті для операції</summary>
-			class SeedKernelCall OutOfMemory :public Exception {
+			class SeedKernelCall OutOfMemory final : public Exception {
 			private:
 				///<summary>Ім'я кучі</summary>
 				ConstString HeapName;
@@ -469,21 +471,23 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L" в ") + ExceptionString(HeapName) + ExceptionString(L" кучі ")
-						+ ExceptionString(L" при виділені ") + BaseString<Memory::ExceptionHeap>::toString(TryAllocate)
-						+ ExceptionString(L" байт, на момент виникнення помилки було виділено ")
-						+ BaseString<Memory::ExceptionHeap>::toString(AllocatedBefore) + ExceptionString(L" байт в ")
-						+ BaseString<Memory::ExceptionHeap>::toString(MemBlkscountBefore)
-						+ ExceptionString((MemBlkscountBefore == 1) ? ExceptionString(L" блоку пам'яті. ") : (L"блоках пам'яті. "))
-						+ location.toString();
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName),
+						ExceptionString(L" в "), ExceptionString(HeapName), ExceptionString(L" кучі "),
+						ExceptionString(L" при виділені "), ExceptionString::toString(TryAllocate),
+						ExceptionString(L" байт, на момент виникнення помилки було виділено "),
+						ExceptionString::toString(AllocatedBefore), ExceptionString(L" байт в "),
+						ExceptionString::toString(MemBlkscountBefore),
+						ExceptionString((MemBlkscountBefore == 1) ? ExceptionString(L" блоку пам'яті. ") : (L"блоках пам'яті. ")),
+						location.toString()
+					});
 				}
 
 				virtual ~OutOfMemory() {}
 			};
 
 			///<summary>Внутрішня помилка ядра</summary>
-			class SeedKernelCall InternalError : public Exception {
+			class SeedKernelCall InternalError final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -495,10 +499,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~InternalError() {}
@@ -517,47 +521,39 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~InvalidFormatException() {}
 			};
 
 			///<summary>Невірний формат</summary>
-			class SeedKernelCall NotImplemented : public Exception {
+			class SeedKernelCall NotImplementedException final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				NotImplemented(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				NotImplementedException(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Функція\\метод не реалізовані")
 				{}
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
-				virtual ~NotImplemented() {}
+				virtual ~NotImplementedException() {}
 			};
 
-			/// <summary>
-			/// Аліас для помилки NotImplemented
-			/// </summary>
-			namespace
-			{
-				using NotImplementedException = NotImplemented;
-			}
-
 			///<summary>Доступ до елемента який знаходится за межею розмірів</summary>
-			class SeedKernelCall IndexOutOfRange :public Exception {
+			class SeedKernelCall IndexOutOfRange : public Exception {
 			private:
 				SizeT Index;
 				SizeT MaxIndex;
@@ -585,19 +581,21 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". При спробі отримати доступ до елемента за індексом ") + BaseString<Memory::ExceptionHeap>::toString(RequiredIndex)
-						+ ExceptionString(L" якщо максимальний дозволений індекс ") + BaseString<Memory::ExceptionHeap>::toString(MaxAllowedIndex)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName),
+						ExceptionString(L". При спробі отримати доступ до елемента за індексом "), ExceptionString::toString(RequiredIndex),
+						ExceptionString(L" якщо максимальний дозволений індекс "), ExceptionString::toString(MaxAllowedIndex),
+						ExceptionString(L". "),
+						location.toString(),
+						ExceptionString(L". ")
+					});
 				}
 
 				virtual ~IndexOutOfRange() {}
 			};
 
 			///<summary>Некоректний тип</summary>
-			class SeedKernelCall InvalidTypeException : public Exception {
+			class SeedKernelCall InvalidTypeException final : public Exception {
 			private:
 				const TypeInfo& requiredType;
 				const TypeInfo& actuallyType;
@@ -626,19 +624,20 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". Очікуваний тип: ") + ExceptionString((Char*)RequiredType.GetCxxName())
-						+ ExceptionString(L". Фактичний тип: ") + ExceptionString((Char*)ActuallyType.GetCxxName())
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName),
+						ExceptionString(L". Очікуваний тип: "), ExceptionString((Char*) RequiredType.GetCxxName()),
+						ExceptionString(L". Фактичний тип: "), ExceptionString((Char*) ActuallyType.GetCxxName()),
+						ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~InvalidTypeException() {}
 			};
 
 			///<summary>Невірний аргумент</summary>
-			class SeedKernelCall InvalidArgumentException : public Exception {
+			class SeedKernelCall InvalidArgumentException final : public Exception {
 			private:
 				///<summary>Ім'я аргумента</summary>
 				ConstString ArgNameValue;
@@ -667,12 +666,14 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName) +
-						ExceptionString(L". Невірний ") + ArgNameValue +
-						ExceptionString(L" аргумент. Додатковий опис: ") +
-						ExceptionString(DescriptionValue) + ExceptionString(L". ") +
-						location.toString() +
-						ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName),
+						ExceptionString(L". Невірний "), ArgNameValue,
+						ExceptionString(L" аргумент. Додатковий опис: "),
+						ExceptionString(DescriptionValue), ExceptionString(L". "),
+						location.toString(),
+						ExceptionString(L". ")
+					});
 				}
 
 				virtual ~InvalidArgumentException() {}
@@ -698,17 +699,17 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~InteruptException() {}
 			};
 
 			///<summary>Рядок має завеликий розмір</summary>
-			class SeedKernelCall StringToLong :public Exception {
+			class SeedKernelCall StringToLong final : public Exception {
 			private:
 				///<summary>Запрошений розмір</summary>
 				SizeT requiredSize;
@@ -728,9 +729,11 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". Запрошений розмір ") + BaseString<Memory::ExceptionHeap>::toString(requiredSize)
-						+ location.toString();
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName),
+						ExceptionString(L". Запрошений розмір "), ExceptionString::toString(requiredSize),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 			};
 
@@ -746,15 +749,15 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 			};
 
 			///<summary>Ітератор на кінець не є визначеним</summary>
-			class SeedKernelCall EndNodeNotDeferencable : public Exception
+			class SeedKernelCall EndNodeNotDeferencable final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -767,10 +770,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 			};
 
@@ -788,24 +791,18 @@ namespace Seed {
 					noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 				{}
 
-				//NtException(const NtException& orig): statusCode(orig.statusCode), Exception(orig) {
-				//	extern void NtStatusExceptionMethodsCallsLogging(ConstAString & methodName);
-				//	NtStatusExceptionMethodsCallsLogging(ConstAString(__FUNCSIG__));
-				//}
-
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". Системний виклик вернув код ")
-						+ BaseString<Memory::ExceptionHeap>::UInt64asHex(statusCode) + ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName),
+						ExceptionString(L". Системний виклик вернув код "),
+						BaseString<Memory::ExceptionHeap>::UInt64asHex(statusCode), ExceptionString(L". "),
+						location.toString(),
+						ExceptionString(L". ")
+					});
 				}
 
-				virtual ~NtException() {
-					//extern void NtStatusExceptionMethodsCallsLogging(ConstAString & methodName);
-					//NtStatusExceptionMethodsCallsLogging(ConstAString(__FUNCSIG__));
-				}
+				virtual ~NtException() {}
 			};
 		}
 	}

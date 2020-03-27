@@ -118,7 +118,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::Thread; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -153,7 +153,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::JobTask; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -188,7 +188,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::SheduledTask; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }

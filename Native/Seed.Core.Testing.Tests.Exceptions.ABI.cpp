@@ -78,7 +78,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Excecute() {
 	{
 		Throw(NtException(ExceptionPosition, 0));
 	}
-	catch (NotImplemented & ex)
+	catch (NotImplementedException & ex)
 	{
 		if (!(ex.Location.File == String(__FILE__) &&
 			ex.Location.FunctName == String(__FUNCSIG__)))

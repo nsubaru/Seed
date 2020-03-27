@@ -65,7 +65,7 @@ namespace Seed {
 			};
 
 			///<summary>Неіснуючий потік або він не є керований через Core</summary>
-			class SeedKernelCall InvalidThread :public Exception
+			class SeedKernelCall InvalidThread final : public Exception
 			{
 			private:
 				///<summary>ID не існуючого потоку</summary>
@@ -88,16 +88,18 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(this->exeptionName)
-						+ ExceptionString(L". Не знайдено потоку з ID ") + ExceptionString(tid) + ExceptionString(L". ")
-						+ this->Location.toString() + ExceptionString(L".");
+					return ExceptionString::Combine({
+						ExceptionString(this->exeptionName),
+						ExceptionString(L". Не знайдено потоку з ID "), ExceptionString(tid), ExceptionString(L". "),
+						Location.toString(), ExceptionString(L".")
+					});
 				}
 
 				virtual ~InvalidThread() override final {};
 			};
 
 			///<summary>Не валідний об'єкт потоку</summary>
-			class SeedKernelCall InvalidThreadObj :public Exception
+			class SeedKernelCall InvalidThreadObj final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -110,16 +112,16 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
 				}
 
 				virtual ~InvalidThreadObj() override final {}
 			};
 			///<summary>Запуск запущеного об'єкта</summary>
-			class SeedKernelCall ThreadableAlredyStarted :public Exception
+			class SeedKernelCall ThreadableAlredyStarted final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -132,17 +134,17 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
 				}
 
 				virtual ~ThreadableAlredyStarted() override final {}
 			};
 
 			///<summary>Взаємне блокування</summary>
-			class SeedKernelCall DedlockExpected :public Exception
+			class SeedKernelCall DedlockExpected final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -155,10 +157,10 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
 				}
 
 				virtual ~DedlockExpected() override final {}

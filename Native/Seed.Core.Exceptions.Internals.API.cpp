@@ -40,7 +40,7 @@ void Seed::Core::Internals::Exceptions::ThrowEndNodeNotDeferencable(const Seed::
 
 void Seed::Core::Internals::Exceptions::ThrowNotImplemented(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)
 {
-	Throw(NotImplemented(File, Function, Line));
+	Throw(NotImplementedException(File, Function, Line));
 }
 
 void Seed::Core::Internals::Exceptions::ThrowKeyAlredyExist(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)

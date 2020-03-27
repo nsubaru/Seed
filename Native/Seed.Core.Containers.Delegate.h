@@ -11,7 +11,7 @@ namespace Seed {
     inline namespace Core {
         inline namespace Exeptions {
             ///<summary>Спроба отримати результат не виконаної ще функції</summary>
-            class SeedKernelCall CantGetResultNotInvokedFunction :public Exception
+            class SeedKernelCall CantGetResultNotInvokedFunction final : public Exception
             {
             public:
                 ///<summary>Генерація помилки спроби отримати результат не виконаної ще функції</summary>
@@ -24,15 +24,15 @@ namespace Seed {
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
-                    return ExceptionString(exeptionName)
-                        + ExceptionString(L". ")
-                        + Location.toString()
-                        + ExceptionString(L".");
+                    return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
                 }
             };
 
             ///<summary>Спроба повторно запусти вже виконаний делегат або який виконується зараз</summary>
-            class SeedKernelCall TryReStartDelegate :public Exception
+            class SeedKernelCall TryReStartDelegate final : public Exception
             {
             public:
                 ///<summary>Генерація помилки спроби повторно запусти вже виконаний делегат або який виконується зараз</summary>
@@ -45,15 +45,15 @@ namespace Seed {
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
-                    return ExceptionString(exeptionName)
-                        + ExceptionString(L". ")
-                        + Location.toString()
-                        + ExceptionString(L".");
+                    return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
                 }
             };
 
             ///<summary>Делегат в процесі виконання</summary>
-            class SeedKernelCall AlredyExecute :public Exception
+            class SeedKernelCall AlredyExecute final : public Exception
             {
             public:
                 ///<summary>Конструктор помилки</summary>
@@ -66,10 +66,10 @@ namespace Seed {
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
-                    return ExceptionString(exeptionName)
-                        + ExceptionString(L". ")
-                        + Location.toString()
-                        + ExceptionString(L".");
+                   return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                   });
                 }
             };
         }
