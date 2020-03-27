@@ -23,15 +23,15 @@ namespace Seed {
 					BasePair<THeap, TKey, TValue> data;
 
 					///<summary>Гетер ключа</summary>
-					const TKey& GetKey() const { return data.Key; }
+					forceinline const TKey& GetKey() const { return data.Key; }
 					///<summary>Гетер значення</summary>
-					TValue& GetValue() { return data.Value; }
+					forceinline TValue& GetValue() { return data.Value; }
 					///<summary>Гетер значення</summary>
-					const TValue& GetValue() const { return data.Value; }
+					forceinline const TValue& GetValue() const { return data.Value; }
 					///<summary>Сеттер значення</summary>
-					void SetValue(const TValue& newValue) { data.Value = newValue; }
+					forceinline void SetValue(const TValue& newValue) { data.Value = newValue; }
 					///<summary>Оптимізований сеттер значення</summary>
-					void SetValue(TValue&& newValue) { data.Value = MoveRValue(newValue); }
+					forceinline void SetValue(TValue&& newValue) { data.Value = MoveRValue(newValue); }
 
 					///<summary>Ключ</summary>
 					TKey Property(GetKey) key;
@@ -54,27 +54,27 @@ namespace Seed {
 					RefCountT RefCount;
 
 					///<summary>Конструктор копіювання ключа і значення</summary>
-					Node(const TKey& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					forceinline Node(const TKey& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор переміщення значення і копіювання значення</summary>
-					Node(TKey&& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>((MoveRValue(key)), value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					forceinline Node(TKey&& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>((MoveRValue(key)), value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{}
 
 					///<summary>Конструктор копіювання значення і переміщення значення</summary>
-					Node(const TKey& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					forceinline Node(const TKey& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор переміщення і значення і ключа</summary>
-					Node(TKey&& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(MoveRValue(key), MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					forceinline Node(TKey&& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(MoveRValue(key), MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор копіювання пари ключ і значення</summary>
-					Node(const BasePair<THeap, TKey, TValue>& data, Node* father, Tree* This) : data(data), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					forceinline Node(const BasePair<THeap, TKey, TValue>& data, Node* father, Tree* This) : data(data), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор переміщення пари ключ і значення</summary>
-					Node(BasePair<THeap, TKey, TValue>&& data, Node* father, Tree* This) : data(MoveRValue(data)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					forceinline Node(BasePair<THeap, TKey, TValue>&& data, Node* father, Tree* This) : data(MoveRValue(data)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					friend BaseConcurencyMap;
@@ -94,13 +94,13 @@ namespace Seed {
 
 					RefCountT RefCount;
 
-					Tree() : root(nullptr), count(0), lock(), RefCount(1) {}
+					forceinline Tree() : root(nullptr), count(0), lock(), RefCount(1) {}
 				};
 			private:
 				///<summary>Дані об'єкта</summary>
 				Tree* This;
 			protected:
-				virtual void Dispose() final override {
+				forceinline virtual void Dispose() final override {
 					This->lock.ExclusiveLock([&]() {
 						DestroyTree(This->root);
 						});
@@ -111,7 +111,7 @@ namespace Seed {
 				///<param name = "key">Ключ по якому шукає</param>
 				///<returns>Елемент дерева або <c>nullptr<c></returns>
 				template<typename UKey>
-				Node* Find(Node* node, const UKey& key) const {
+				forceinline static Node* Find(Node* node, const UKey& key) {
 					if (node == nullptr)
 						return nullptr;
 					if (node->key == key)
@@ -126,21 +126,21 @@ namespace Seed {
 				///<summary>Обчислення висоти дерева</summary>
 				///<param name = "node">Елемент для якого відбувається обчилення</summary>
 				///<returns>Значення висоти</summary>
-				UInt16 Height(Node* node)
+				forceinline static UInt16 Height(Node* node)
 				{
 					return node ? node->height : 0;
 				}
 				///<summary>Обчислює різницю висот правого і лівого під елемента</summary>
 				///<param name = "node">Батьківський елемент</param>
 				///<returns>Відємне значення вказує що у правого вища висота, додатнє - у лівого, 0 рівні по висоті</returns>
-				Int16 BFactor(Node* node)
+				forceinline static Int16 BFactor(Node* node)
 				{
 					return  Height(node->right) - Height(node->left);
 				}
 
 				///<summary>Переобчислює висоту даного елемента</summary>
 				///<param name = "node">Елемент для якого оновлюється значення висоти</param>
-				void FixHeight(Node* node)
+				forceinline static void FixHeight(Node* node)
 				{
 					UInt16 HLeft = Height(node->left);
 					UInt16 HRight = Height(node->right);
@@ -150,7 +150,7 @@ namespace Seed {
 				///<summary>Правий малий поворот дерева</summary>
 				///<param name = "node">Елемент відносно якого відбувається поворот</param>
 				///<returns>Новий батьківський елемент</summary>
-				Node* RotateRight(Node* node)
+				forceinline static Node* RotateRight(Node* node)
 				{
 					Node* left = node->left;
 					Node* node_father = node->father;
@@ -173,7 +173,7 @@ namespace Seed {
 				///<summary>Лвий малий поворот дерева</summary>
 				///<param name = "node">Елемент відносно якого відбувається поворот</param>
 				///<returns>Новий батьківський елемент</summary>
-				Node* RotateLeft(Node* node)
+				static forceinline Node* RotateLeft(Node* node)
 				{
 					Node* right = node->right;
 					Node* node_father = node->father;
@@ -199,7 +199,7 @@ namespace Seed {
 				///</summary>
 				///<param name = "node">Елемент відносно якого відбувається балансування</param>
 				///<returns>Новий батьківський елемент</summary>
-				Node* Balance(Node* node)
+				static Node* Balance(Node* node)
 				{
 					FixHeight(node);
 					if (BFactor(node) == 2)
@@ -223,7 +223,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				Node* Insert(Node* node, const TKey& key, const TValue& value, Node* father)
+				forceinline Node* Insert(Node* node, const TKey& key, const TValue& value, Node* father)
 				{
 					if (!node) return new Node(key, value, father, this->This);
 					if (key < node->key)
@@ -242,7 +242,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				Node* Insert(Node* node, TKey&& key, const TValue& value, Node* father)
+				forceinline Node* Insert(Node* node, TKey&& key, const TValue& value, Node* father)
 				{
 					if (!node) return new Node(MoveRValue(key), value, father, this->This);
 					if (key < node->key)
@@ -261,7 +261,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				Node* Insert(Node* node, const TKey& key, TValue&& value, Node* father)
+				forceinline Node* Insert(Node* node, const TKey& key, TValue&& value, Node* father)
 				{
 					if (!node) return new Node(key, MoveRValue(value), father, this->This);
 					if (key < node->key)
@@ -280,7 +280,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				Node* Insert(Node* node, TKey&& key, TValue&& value, Node* father)
+				forceinline Node* Insert(Node* node, TKey&& key, TValue&& value, Node* father)
 				{
 					if (!node) return new Node(MoveRValue(key), MoveRValue(value), father, this->This);
 					if (key < node->key)
@@ -298,7 +298,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				Node* Insert(Node* node, const BasePair<THeap, TKey, TValue>& pair, Node* father)
+				forceinline Node* Insert(Node* node, const BasePair<THeap, TKey, TValue>& pair, Node* father)
 				{
 					if (!node) return new Node(pair, father, this->This);
 					if (pair.Key < node->key)
@@ -316,7 +316,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				Node* Insert(Node* node, BasePair<THeap, TKey, TValue>&& pair, Node* father)
+				forceinline Node* Insert(Node* node, BasePair<THeap, TKey, TValue>&& pair, Node* father)
 				{
 					if (!node) return new Node(MoveRValue(pair), father, this->This);
 					if (pair.Key < node->key)
@@ -332,7 +332,7 @@ namespace Seed {
 				///<summary>Рекурсивний пошук мінімального елемента в дереві</summary>
 				///<param name = "node">Кореневий елемент</summary>
 				///<returns>Мінімальний елемент</returns>
-				static Node* FindMin(Node* node)
+				forceinline static Node* FindMin(Node* node)
 				{
 					return node->left ? FindMin(node->left) : node;
 				}
@@ -340,7 +340,7 @@ namespace Seed {
 				///<summary>Рекурсивний пошук максимального елемента в дереві</summary>
 				///<param name = "node">Кореневий елемент</summary>
 				///<returns>Максимальний елемент</returns>
-				static Node* FindMax(Node* node)
+				forceinline static Node* FindMax(Node* node)
 				{
 					return node->right ? FindMax(node->right) : node;
 				}
@@ -348,7 +348,7 @@ namespace Seed {
 				///<summary>Рекурсивне видалення мінімального елемента</summary>
 				///<param name = "node">Батьківський елемент</param>
 				///<returns>Батьківський елемент</returns>
-				Node* RemoveMin(Node* node)
+				forceinline static Node* RemoveMin(Node* node)
 				{
 					if (node->left == nullptr)
 						return node->right;
@@ -361,7 +361,7 @@ namespace Seed {
 				///<param name = "key">Ключ</param>
 				///<returns>Батьківський елемент</returns>
 				template<typename UKey>
-				Node* Remove(Node* node, const UKey& key)
+				forceinline static Node* Remove(Node* node, const UKey& key)
 				{
 					if (!node) return nullptr;
 					if (node->key > key)
@@ -384,7 +384,7 @@ namespace Seed {
 
 				///<summary>Рекурсивне знищеання дерева</summary>
 				///<param name = "root">Батьківський елемент</param>
-				Node* DestroyTree(Node* root) //-V688
+				forceinline static Node* DestroyTree(Node* root) //-V688
 				{
 					if (root != nullptr)
 					{
@@ -411,7 +411,7 @@ namespace Seed {
 				///<param name = "parrent">Батьківський елемент в новому дереві</param>
 				///<param name = "owner">Поінтеер на нове дерево</param>
 				///<returns>Поінтер на новий елемент з під елементами</returns>
-				Node* copyTree(Node* node, Node * parrent, Tree * owner) const {
+				forceinline static Node* copyTree(Node* node, Node * parrent, Tree * owner) {
 					Node* newNode = new Node(node->key, node->value, parrent, owner);
 					newNode->height = node->height;
 					if (node->left != nullptr)
@@ -494,24 +494,22 @@ namespace Seed {
 				}
 			public:
 				///<summary>Ітератор на елемент в асоціативному масиві</summary>
-				class Iterator final : protected IDisposable
+				class Iterator final
 				{
 				private:
 					friend BaseConcurencyMap;
 					///<summary>Покажчик на елемент</summary>
 					Node* item;
 					///<summary>Конструктор з елемента</summary>
-					Iterator(Node* item) : item(item) { if (item != nullptr) ++item->RefCount; };
-				protected:
-					virtual void Dispose() {}
+					forceinline Iterator(Node* item) : item(item) { if (item != nullptr) ++item->RefCount; };
 				public:
 					///<summary>Конструктор</summary>
-					Iterator() : item(nullptr) {};
+					forceinline Iterator() : item(nullptr) {};
 
 					///<summary>Переходить до наступного елемента</summary>
 					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
 					///<returns>Силку на цей ітератор</returns>
-					Iterator& operator++()
+					forceinline Iterator& operator++()
 					{
 						this->item = Next(item);
 						return *this;
@@ -520,7 +518,7 @@ namespace Seed {
 					///<summary>Переходить до попереднього елемента</summary>
 					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
 					///<returns>Силка на цей ітератор</returns>
-					Iterator& operator--()
+					forceinline Iterator& operator--()
 					{
 						this->item = Prev(item);
 						return *this;
@@ -529,7 +527,7 @@ namespace Seed {
 					///<summary>Порівняння ітераторів</summary>
 					///<param name = "other">Лівий операнд</param>
 					///<returns><c>true</c>Якщо не рівні</returns>
-					bool operator!=(const Iterator& other)
+					forceinline bool operator!=(const Iterator& other)
 					{
 						if (this->item == nullptr && other.item == nullptr)
 							return false;
@@ -542,35 +540,35 @@ namespace Seed {
 					///<summary>Порівняння з нуль-ітератором</summary>
 					///<param name = "other"><c>nullptr</c></param>
 					///<returns><c>true</c>Якщо це нуль-ітератор</returns>
-					bool operator!=(const NullptrT&)
+					forceinline bool operator!=(const NullptrT&)
 					{
 						return this->item != nullptr;
 					}
 
 					///<summary>Операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					auto* operator->()
+					forceinline auto* operator->()
 					{
 						return &this->item->data;
 					};
 
 					///<summary>Операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					auto& operator*()
+					forceinline auto& operator*()
 					{
 						return this->item->data;
 					}
 
 					///<summary>Константна операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					const auto* operator->() const
+					forceinline const auto* operator->() const
 					{
 						return &this->item->data;
 					};
 
 					///<summary>Константна операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					const auto& operator*() const
+					forceinline const auto& operator*() const
 					{
 						return this->item->data;
 					}
@@ -580,33 +578,32 @@ namespace Seed {
 
 #pragma region Ctor, Dtor, copy operators
 
-					Iterator(const Iterator& iterator) : item(iterator.item) {
+					forceinline Iterator(const Iterator& iterator) : item(iterator.item) {
 						if (item != nullptr)
 							item->RefCount++;
 					}
 
-					Iterator(Iterator&& iterator) : item(iterator.item) {
+					forceinline Iterator(Iterator&& iterator) : item(iterator.item) {
 						iterator.item = nullptr;
 					}
 
-					Iterator& operator=(const Iterator& iterator) {
+					forceinline Iterator& operator=(const Iterator& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(iterator);
 						return *this;
 					}
 
-					Iterator& operator=(Iterator&& iterator) {
+					forceinline Iterator& operator=(Iterator&& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(MoveRValue(iterator));
 						return *this;
 					}
 
-					~Iterator() {
+					forceinline ~Iterator() {
 						if (item != nullptr)
 						{
 							if (--item->RefCount == 0)
 							{
-								this->Dispose(); 
 								delete item;
 							}
 							item = nullptr;
@@ -619,7 +616,7 @@ namespace Seed {
 
 				///<summary>Вертає ітератор на пергий елемент</summary>
 				///<returns>Ітератор на перший елемент</returns>
-				Iterator First()
+				forceinline Iterator First()
 				{
 					return this->This->lock.ShareLock([&]() {
 						return Iterator(FindMin(This->root));
@@ -627,7 +624,7 @@ namespace Seed {
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
 				///<returns>Ітератор на останій елемент</returns>
-				Iterator Last()
+				forceinline Iterator Last()
 				{
 					return this->This->lock.ShareLock([&]() {
 						return Iterator(FindMax(This->root));
@@ -635,7 +632,7 @@ namespace Seed {
 				}
 				///<summary>Вертає ітератор на перший елемент</summary>
 				///<returns>Ітератор на перший елемент</returns>
-				Iterator begin()
+				forceinline Iterator begin()
 				{
 					return this->This->lock.ShareLock([&]() {
 						return First();
@@ -643,14 +640,14 @@ namespace Seed {
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
 				///<returns>Ітератор на останій елемент</returns>
-				const Iterator end()
+				forceinline const Iterator end()
 				{
 					return Iterator(nullptr);
 				}
 
 			public:
 				///<summary>Конструктор</summary>
-				BaseConcurencyMap() :This(new Tree)
+				forceinline BaseConcurencyMap() :This(new Tree)
 				{}
 
 				///<summary>Конструктор</summary>
@@ -668,14 +665,14 @@ namespace Seed {
 				RefCountClass(BaseConcurencyMap, This);
 
 				///<summary>Вертає кількість елементів в асоціативному масиві</summary>
-				SizeT getCount() const { return This->count; }
+				forceinline SizeT GetCount() const { return This->count; }
 				///<value>Кількість елементів в асоціативному масиві</value>
-				SizeT Property(getCount) Count;
+				SizeT Property(GetCount) Count;
 
 				///<summary>Вставка нового елемента</summary>
 				///<param name = "pair">Пара ключ і значення</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				void Insert(const BasePair<THeap, TKey, TValue>& pair)
+				forceinline void Insert(const BasePair<THeap, TKey, TValue>& pair)
 				{
 					This->lock.ExclusiveLock([&]() {
 						This->root = Insert(This->root, pair, nullptr);
@@ -686,7 +683,7 @@ namespace Seed {
 				///<summary>Вставка нового елемента</summary>
 				///<param name = "pair">Пара ключ і значення</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				void Insert(BasePair<THeap, TKey, TValue>&& pair)
+				forceinline void Insert(BasePair<THeap, TKey, TValue>&& pair)
 				{
 					This->lock.ExclusiveLock([&]() {
 						This->root = Insert(This->root, pair, nullptr);
@@ -698,7 +695,7 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				void Insert(const TKey& key, const TValue& value)
+				forceinline void Insert(const TKey& key, const TValue& value)
 				{
 					This->lock.ExclusiveLock([&]() {
 						This->root = Insert(This->root, key, value, nullptr);
@@ -710,7 +707,7 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				void Insert(TKey&& key, const TValue& value)
+				forceinline void Insert(TKey&& key, const TValue& value)
 				{
 					This->lock.ExclusiveLock([&, key = MoveRValue(key)]() mutable {
 						This->root = Insert(This->root, MoveRValue(key), value, nullptr);
@@ -722,7 +719,7 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				void Insert(const TKey& key, TValue&& value)
+				forceinline void Insert(const TKey& key, TValue&& value)
 				{
 					This->lock.ExclusiveLock([&, value = MoveRValue(value)]() mutable {
 						This->root = Insert(This->root, key, MoveRValue(value), nullptr);
@@ -734,7 +731,7 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				void Insert(TKey&& key, TValue&& value)
+				forceinline void Insert(TKey&& key, TValue&& value)
 				{
 					This->lock.ExclusiveLock([&, key = MoveRValue(key), value = MoveRValue(value)]() mutable {
 						This->root = Insert(This->root, MoveRValue(key), MoveRValue(value), nullptr);
@@ -745,7 +742,7 @@ namespace Seed {
 				///<summary>Видалення елемента по значенню</summary>
 				///<param name = "key">Ключ по якому відбуватиметься видалення</param>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				void Delete(const UKey& key)
+				forceinline void Delete(const UKey& key)
 				{
 					This->lock.ExclusiveLock([&]() {
 						--This->count;
@@ -758,7 +755,7 @@ namespace Seed {
 				///<returns>Силка на значення</returns>
 				///<exception cref = "Seed::NullPointException">За заданим ключом немає значення в масиві</exception>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				TValue& operator[](const UKey& key) {
+				forceinline TValue& operator[](const UKey& key) {
 					Node* node = This->lock.ShareLock([&]() {
 						return Find(This->root, key); });
 
@@ -771,7 +768,7 @@ namespace Seed {
 				///<returns>Константна силка на значення</returns>
 				///<exception cref = "Seed::NullPointException">За заданим ключом немає значення в масиві</exception>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				const TValue& operator[](const UKey& key) const { //-V659
+				forceinline const TValue& operator[](const UKey& key) const { //-V659
 					Node* node = This->lock.ShareLock([&]() {
 						return Find(This->root, key); });
 
@@ -781,13 +778,13 @@ namespace Seed {
 				}
 
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				bool IsExist(const UKey& key) const {
+				forceinline bool IsExist(const UKey& key) const {
 					return This->lock.ShareLock([&]() {
 						return Find(This->root, key); }) != nullptr;
 				}
 
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				bool IsExist(UKey&& key) const {
+				forceinline bool IsExist(UKey&& key) const {
 					return This->lock.ShareLock([&]() {
 						return Find(This->root, key); }) != nullptr;
 				}
@@ -1064,8 +1061,11 @@ namespace Seed {
 				}
 
 				forceinline BaseConcurencyMap& RemoveAllImpl() {
-					this->Dispose();
-					return *this;
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyMap& {
+						This->root = DestroyTree(This->root);
+						This->count = 0;
+						return *this;
+					});
 				}
 
 				template<typename Lambda>
