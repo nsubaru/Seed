@@ -201,11 +201,11 @@ namespace Seed {
 						});
 				}
 
-				forceinline bool getIsEmpty() const {
+				forceinline bool GetIsEmpty() const {
 					return this->This->heap == nullptr || this->This->Count == 0;
 				}
 
-				forceinline SizeT getCount() const {
+				forceinline SizeT GetCount() const {
 					return this->This->Count;
 				}
 
@@ -253,10 +253,10 @@ namespace Seed {
 						});
 				}
 
-				Boolean Property(getIsEmpty) IsEmpty;
-				SizeT Property(getCount) Count;
+				Boolean Property(GetIsEmpty) IsEmpty;
+				SizeT Property(GetCount) Count;
 			private:
-				forceinline Node* merge(Node* a, Node* b) {
+				forceinline static Node* merge(Node* a, Node* b) {
 					if (a == nullptr) return b;
 					if (b == nullptr) return a;
 					if (a->data.Key > b->data.Key) {
@@ -283,14 +283,14 @@ namespace Seed {
 					}
 				}
 
-				forceinline void addChild(Node* parent, Node* child) {
+				forceinline static void addChild(Node* parent, Node* child) {
 					child->prev = child->next = child;
 					child->parent = parent;
 					parent->degree++;
 					parent->child = merge(parent->child, child);
 				}
 
-				forceinline void _unMarkAndUnParentAll(Node* n) {
+				forceinline static void _unMarkAndUnParentAll(Node* n) {
 					if (n == nullptr)return;
 					Node* c = n;
 					do {
@@ -300,7 +300,7 @@ namespace Seed {
 					} while (c != n);
 				}
 
-				forceinline Node* removeMinimum(Node* n) {
+				static Node* removeMinimum(Node* n) {
 					_unMarkAndUnParentAll(n->child);
 					if (n->next == n) {
 						n = n->child;
@@ -356,7 +356,7 @@ namespace Seed {
 					return min;
 				}
 
-				forceinline Node* cut(Node* heap, Node* n) {
+				forceinline static Node* cut(Node* heap, Node* n) {
 					if (n->next == n) {
 						n->parent->child = nullptr;
 					}
@@ -370,7 +370,7 @@ namespace Seed {
 					return merge(heap, n);
 				}
 
-				forceinline Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
+				static Node* decreaseKey(Node* heap, Node* n, const TPriority& priority) {
 					if (n->data.Key < priority)return heap;
 					n->data = Pair(priority, MoveRValue(n->data.Value));
 					if (n->data.Key < n->parent->data.Key) {
@@ -389,7 +389,7 @@ namespace Seed {
 					return heap;
 				}
 
-				forceinline Node* find(Node* heap, const TPriority& priority) {
+				forceinline static Node* find(Node* heap, const TPriority& priority) {
 					Node* n = heap;
 					if (n == nullptr) return nullptr;
 					do {
@@ -401,7 +401,7 @@ namespace Seed {
 					return nullptr;
 				}
 
-				forceinline Node* copyTree(Node* orig, Node* parrent) const {
+				static Node* copyTree(Node* orig, Node* parrent) {
 					Node* newNode = nullptr;
 					Node* newNodeFirst = nullptr;
 					try {
@@ -449,7 +449,7 @@ namespace Seed {
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 #pragma region ForEach Pair
 				template<typename Lambda>
-				forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					Node* it = node;
 					do {
 						lambda(it->data, Index); Index++;
@@ -460,7 +460,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
+				static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
 					Node* it = node;
 					do {
 						lambda(it->data);
@@ -530,7 +530,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Key
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					Node* it = node;
 					do {
 						lambda(it->data.Key, Index); Index++:
@@ -541,7 +541,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
+				static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
 					Node* it = node;
 					do {
 						lambda(it->data.Key);
@@ -609,7 +609,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Value
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda, Node* startNode = nullptr) {
+				static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda, Node* startNode = nullptr) {
 					Node* it = node;
 					do {
 						lambda(it->data.Value, Index); Index++:
@@ -620,7 +620,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda, Node* startNode = nullptr) {
+				static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda, Node* startNode = nullptr) {
 					Node* it = node;
 					do {
 						lambda(it->data.Value);
@@ -703,13 +703,21 @@ namespace Seed {
 				}
 
 				forceinline BaseConcurencyPriorityQueue& RemoveAllImpl() {
-					this->Dispose();
-					return *this;
+					return This->flowControler.ExclusiveLock([&] () -> BaseConcurencyPriorityQueue&
+					{
+						if (This->heap != nullptr)
+						{
+							deleteAll(This->heap);
+						}
+						This->heap = nullptr;
+						This->Count = 0;
+						return *this;
+					});
 				}
 
 				template<typename Lambda>
 				forceinline BaseConcurencyPriorityQueue& RemoveAllWithImpl(Lambda&& lambda) {
-					return This->lock.ShareLock([&]() -> BaseConcurencyPriorityQueue& {
+					return This->flowControler.ExclusiveLock([&]() -> BaseConcurencyPriorityQueue& {
 						if (This->heap != nullptr)
 							deleteAll(This->heap, lambda);
 						This->heap = nullptr;
