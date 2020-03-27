@@ -21,7 +21,7 @@ namespace Seed {
 					SizeT front;
 					SizeT rear;
 					RefCountT count;
-					T* queue;
+					T* restrict queue;
 					SizeT bufferSize;
 					RefCountT RefCount;
 					
@@ -458,10 +458,6 @@ namespace Seed {
 					return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
 						if (This->count == 0)
 							return *this;
-						for (SizeT i = 0; i < This->count; i++)
-						{
-							(*This)[i].~T();
-						}
 						delete[] This->queue;
 						This->front = This->rear = This->count = This->bufferSize = 0;
 						This->queue = nullptr;
