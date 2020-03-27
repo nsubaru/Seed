@@ -25,11 +25,11 @@ namespace Seed {
 					RefCountT RefCount;
 					
 
-					T& operator[](SizeT Index) {
+					forceinline T& operator[](SizeT Index) {
 						return queue[(front + Index) % bufferSize];
 					}
 
-					Data()
+					forceinline Data()
 						: front(0),
 						  rear(0),
 						  count(0),
@@ -37,7 +37,7 @@ namespace Seed {
 						  bufferSize(0),
 						  RefCount(1) {}
 
-					Data(SizeT startCount)
+					forceinline Data(SizeT startCount)
 						: front(0),
 						  rear(0),
 						  count(0),
@@ -48,15 +48,19 @@ namespace Seed {
 			private:
 				Data* This;
 			protected:
-				virtual void Dispose() final override
+				forceinline virtual void Dispose() final override
 				{
-					if(This->bufferSize != 0)
+					if (This->bufferSize != 0)
+					{
 						delete[] This->queue;
+						This->front = This->rear = This->count = This->bufferSize = 0;
+						This->queue = nullptr;
+					}
 				}
 			public:
-				BaseDynamicQueue() : This(new Data()) {}
+				forceinline BaseDynamicQueue() : This(new Data()) {}
 
-				BaseDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
+				forceinline BaseDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
 
 				BaseDynamicQueue(InitilizerList<T>&& list) : BaseDynamicQueue() {
 					if (list.size() != 0) {
@@ -72,7 +76,7 @@ namespace Seed {
 					}
 				}
 
-				void Enqueue(const T& value, bool isResizeIfFull = false) {
+				forceinline void Enqueue(const T& value, bool isResizeIfFull = false) {
 					if (++This->count > This->bufferSize) {
 						if (isResizeIfFull)
 							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
@@ -85,7 +89,7 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
-				void Enqueue(T&& value, bool isResizeIfFull = false) {
+				forceinline void Enqueue(T&& value, bool isResizeIfFull = false) {
 					if (++This->count > This->bufferSize) {
 						if (isResizeIfFull)
 							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
@@ -98,7 +102,7 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
-				T Dequeue() {
+				forceinline T Dequeue() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
 
@@ -109,19 +113,19 @@ namespace Seed {
 					return MoveRValue(res);
 				}
 
-				const T& Top() {
+				forceinline const T& Top() {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
-				const T& Top() const {
+				forceinline const T& Top() const {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
-				void Extend(SizeT additionalSize) {
+				forceinline void Extend(SizeT additionalSize) {
 					ExtendImpl(additionalSize);
 				}
 
@@ -140,7 +144,7 @@ namespace Seed {
 				template<typename TU>
 				friend void Seed::Core::Swap(TU& a, TU& b);
 
-				SizeT GetCount() const { return This->count; }
+				forceinline SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
 				virtual BaseDynamicQueue Clone() const override final {
@@ -215,7 +219,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename TLambdaT>
-				forceinline BaseDynamicQueue& ForEachImpl(TLambdaT&& lambda) {
+				BaseDynamicQueue& ForEachImpl(TLambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, T&> ||
 						TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
@@ -244,7 +248,7 @@ namespace Seed {
 				}
 
 				template<typename TLambdaT>
-				forceinline const BaseDynamicQueue& ForEachImpl(TLambdaT&& lambda) const {
+				const BaseDynamicQueue& ForEachImpl(TLambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
@@ -263,17 +267,15 @@ namespace Seed {
 						return *this;
 					}
 					else {
-						// ReSharper disable CppStaticAssertFailure
 						static_assert(false);
-						// ReSharper restore CppStaticAssertFailure
 						__assume(false);
 						return *this;
 					}
 				}
 
-				template<typename TU, typename TLambdaT>
-				forceinline TU AggregateImpl(TLambdaT&& lambda) const {
-					TU result = TU();
+				template<typename T, typename Lambda>
+				T AggregateImpl(Lambda&& lambda) const {
+					T result = T();
 
 					if (This->count == 0) {
 						return MoveRValue(result);
@@ -287,9 +289,9 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename TU, typename TLambdaT>
-				forceinline TU AggregateImpl(TLambdaT&& lambda, const TU& value) const {
-					TU result = value;
+				template<typename T, typename Lambda>
+				T AggregateImpl(Lambda&& lambda, const T& value) const {
+					T result = value;
 					if (This->count == 0) {
 						return MoveRValue(result);
 					}
@@ -302,9 +304,9 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename TU, typename TLambdaT>
-				forceinline TU AggregateImpl(TLambdaT&& lambda, TU&& value) const {
-					TU result = MoveRValue(value);
+				template<typename T, typename Lambda>
+				T AggregateImpl(Lambda&& lambda, T&& value) const {
+					T result = MoveRValue(value);
 
 					if (This->count == 0)
 						return MoveRValue(result);
@@ -317,10 +319,10 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				bool AnyImpl() const { return This->count > 0; }
+				forceinline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename TLambda>
-				forceinline bool AnyImpl(TLambda&& lambda) const {
+				bool AnyImpl(TLambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 
@@ -334,7 +336,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline bool AllImpl(Lambda&& lambda) const {
+				bool AllImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 
@@ -348,7 +350,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				T& FirstImpl(Lambda&& lambda) {
+				forceinline T& FirstImpl(Lambda&& lambda) {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -358,7 +360,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				T& LastImpl(Lambda&& lambda) {
+				forceinline T& LastImpl(Lambda&& lambda) {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -368,7 +370,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				const T& FirstImpl(Lambda&& lambda) const {
+				forceinline const T& FirstImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -378,7 +380,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				const T& LastImpl(Lambda&& lambda) const {
+				forceinline const T& LastImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -410,6 +412,9 @@ namespace Seed {
 					{
 						(*This)[i].~T();
 					}
+					delete[] This->queue;
+					This->front = This->rear = This->count = This->bufferSize = 0;
+					This->queue = nullptr;
 					return *this;
 				}
 
@@ -421,6 +426,9 @@ namespace Seed {
 					{
 						lambda(MoveRValue((*This)[i]));
 					}
+					delete[] This->queue;
+					This->front = This->rear = This->count = This->bufferSize = 0;
+					This->queue = nullptr;
 					return *this;
 				}
 			};
