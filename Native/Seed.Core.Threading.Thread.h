@@ -21,7 +21,7 @@ namespace Seed {
 					volatile ID TID;
 					volatile EThreadabledStates State;
 					Handle hThread;
-					Event* AbortEvent;
+					SynchronizeEvent* AbortEvent;
 					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;
 
 					Data(const String& Name, Delegate&& delegate) :
