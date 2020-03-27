@@ -24,14 +24,14 @@ namespace Seed {
                     Threading::SRWLock lock;
                     T stack[TSize];
 
-                    Data() : count(0), RefCount(1), lock(), stack() {}
+                    forceinline Data() : count(0), RefCount(1), lock(), stack() {}
                 };
             private:
                 Data* This;
             protected:
-                virtual void Dispose() final override {}
+                forceinline virtual void Dispose() final override {}
             public:
-                BaseConcurencyFixedStack() : This(new Data()) {}
+                forceinline BaseConcurencyFixedStack() : This(new Data()) {}
 
                 BaseConcurencyFixedStack(InitilizerList<T>&& list) : This(new Data()) {
                     if (list.size() != 0) {
@@ -45,7 +45,7 @@ namespace Seed {
                     }
                 }
 
-                void Push(const T& item) {
+                forceinline void Push(const T& item) {
                     This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == TSize)
                             Throw(NullPointException(ExceptionPosition));
@@ -54,7 +54,7 @@ namespace Seed {
                         });
                 }
 
-                void Push(T&& item) {
+                forceinline void Push(T&& item) {
                     This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == TSize)
                             Throw(NullPointException(ExceptionPosition));
@@ -63,7 +63,7 @@ namespace Seed {
                         });
                 }
 
-                T Pop() {
+                forceinline T Pop() {
                     return MoveRValue(This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == 0)
                             Throw(NullPointException(ExceptionPosition));
@@ -72,7 +72,7 @@ namespace Seed {
                         }));
                 }
 
-                const T& Top() {
+                forceinline const T& Top() {
                     return This->lock.ExclusiveLock([&]() mutable -> const T& {
                         if (This->count == 0)
                             Throw(NullPointException(ExceptionPosition));
@@ -81,7 +81,7 @@ namespace Seed {
                         });
                 }
 
-                const T& Top() const {
+                forceinline const T& Top() const {
                     return This->lock.ExclusiveLock([&]() mutable -> const T& {
                         if (This->count == 0)
                             Throw(NullPointException(ExceptionPosition));
@@ -93,7 +93,7 @@ namespace Seed {
                 template<typename U>
                 friend void Seed::Core::Swap(U& A, U& B);
 
-                SizeT GetCount() { return This->count; }
+               forceinline  SizeT GetCount() { return This->count; }
                 SizeT Property(GetCount) Count;
 
                 virtual BaseConcurencyFixedStack Clone() const override final {
@@ -128,10 +128,9 @@ namespace Seed {
             protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
-
-                template<typename LambdaT>
-                forceinline BaseConcurencyFixedStack& ForEachImpl(LambdaT&& lambda) {
-                    if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
+                template<typename Lambda>
+                BaseConcurencyFixedStack& ForEachImpl(Lambda&& lambda) {
+                    if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
                         return This->lock.ShareLock([&]() -> BaseConcurencyFixedStack& {
                             if (This->count == 0)
                                 return *this;
@@ -142,7 +141,7 @@ namespace Seed {
                             return *this;
                             });
                     }
-                    else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT>) {
+                    else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT>) {
                         return This->lock.ShareLock([&]() -> BaseConcurencyFixedStack& {
                             if (This->count == 0)
                                 return *this;
@@ -159,9 +158,9 @@ namespace Seed {
                     }
                 }
 
-                template<typename LambdaT>
-                forceinline const BaseConcurencyFixedStack& ForEachImpl(LambdaT&& lambda) const {
-                    if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+                template<typename Lambda>
+                const BaseConcurencyFixedStack& ForEachImpl(Lambda&& lambda) const {
+                    if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
                         return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedStack& {
                             if (This->count == 0)
                                 return *this;
@@ -173,7 +172,7 @@ namespace Seed {
                             return *this;
                             });
                     }
-                    else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
+                    else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
                         return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedStack& {
                             if (This->count == 0)
                                 return *this;
@@ -190,8 +189,8 @@ namespace Seed {
                     }
                 }
 
-                template<typename U, typename LambdaT>
-                forceinline U AggregateImpl(LambdaT&& lambda) const {
+                template<typename U, typename Lambda>
+                U AggregateImpl(Lambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
 
                         if (This->count == 0)
@@ -206,8 +205,8 @@ namespace Seed {
                         }));
                 }
 
-                template<typename U, typename LambdaT>
-                forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+                template<typename U, typename Lambda>
+                U AggregateImpl(Lambda&& lambda, const U& Value) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         U result = Value;
                         if (This->count == 0)
@@ -221,8 +220,8 @@ namespace Seed {
                         }));
                 }
 
-                template<typename U, typename LambdaT>
-                forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+                template<typename U, typename Lambda>
+                U AggregateImpl(Lambda&& lambda, U&& Value) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         if (This->count == 0)
                             return Value;
@@ -235,10 +234,10 @@ namespace Seed {
                         }));
                 }
 
-                bool AnyImpl() const { return This->count > 0; }
+                forceinline bool AnyImpl() const { return This->count > 0; }
 
                 template<typename Lambda>
-                forceinline bool AnyImpl(Lambda&& lambda) const {
+                bool AnyImpl(Lambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         if (This->count == 0)
                             return false;
@@ -253,7 +252,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                forceinline bool AllImpl(Lambda&& lambda) const {
+                bool AllImpl(Lambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         if (This->count == 0)
                             return false;
@@ -358,7 +357,7 @@ namespace Seed {
 					This->count = Index + 1;
                 }
 
-                forceinline BaseConcurencyFixedStack& RemoveAllImpl() {
+                BaseConcurencyFixedStack& RemoveAllImpl() {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& {
                         for (SizeT i = 0; i < This->count; i++) {
                             This->stack[i].~T();
@@ -368,7 +367,7 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
-                forceinline BaseConcurencyFixedStack& RemoveAllImpl(Lambda&& lambda) {
+                BaseConcurencyFixedStack& RemoveAllImpl(Lambda&& lambda) {
                     return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& {
                         for (SizeT i = 0; i < This->count; i++) {
                             lambda(MoveRValue(This->stack[i]));
