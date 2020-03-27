@@ -93,5 +93,11 @@ namespace Seed {
 
 			static constexpr UInt64 SecondInNtTime = 1000ULL * 10000ULL;
 		};
+
+		namespace Internals
+		{
+			InternalApiCall SeedKernelCall void ConvertDateTimeToStringImpl(const Seed::Core::DateTime& time, Seed::CharStr buffer);
+			InternalApiCall SeedKernelCall void ConvertDateToStringImpl(Seed::Core::Date date, Seed::Core::CharStr buffer);
+		}
 	}
 }

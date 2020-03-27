@@ -501,8 +501,7 @@ namespace Seed {
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<typename TOtherHeap>
             StrongOrdering operator<=>(const BaseString<TOtherHeap>& right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                auto res = CompareString(this->str, right.str, this->Lenght, right.Lenght);
+                auto res = Internals::CompareString(this->str, right.str, this->Lenght, right.Lenght);
                 if (res == 0)
                     return StrongOrdering::equal;
                 else if (res > 0)
@@ -518,8 +517,7 @@ namespace Seed {
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<> 
             StrongOrdering operator<=>(const BaseString<THeap>& right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                auto res = CompareString(this->str, right.str, this->Lenght, right.Lenght);
+                auto res = Internals::CompareString(this->str, right.str, this->Lenght, right.Lenght);
                 if (res == 0)
                     return StrongOrdering::equal;
                 else if (res > 0)
@@ -535,8 +533,7 @@ namespace Seed {
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<SizeT TextLenght>
             StrongOrdering operator<=>(StaticTextRef<TextLenght> right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                auto res = CompareString(this->str, (Char*)right, this->Lenght, TextLenght - 1);
+                auto res = Internals::CompareString(this->str, (Char*)right, this->Lenght, TextLenght - 1);
                 if (res == 0)
                     return StrongOrdering::equal;
                 else if (res > 0)
@@ -551,8 +548,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             StrongOrdering operator<=>(const ConstString& right) const {
-                extern Seed::Int32 CompareString(Seed::CharStr left, Seed::CharStr right, Seed::SizeT leftSize, Seed::SizeT rightSize);
-                auto res = CompareString(this->str, (Char*)right.Str, this->Lenght, right.GetSize() - 1);
+                auto res = Internals::CompareString(this->str, (Char*)right.Str, this->Lenght, right.GetSize() - 1);
                 if (res == 0)
                     return StrongOrdering::equal;
                 else if (res > 0)
@@ -1447,24 +1443,21 @@ namespace Seed {
             static BaseString<THeap> toString(const UUID& id) {
                 auto ReservedSize = sizeof(UUID::UUIDStringWildCard) + CurrentSettings().MemoryManager.StringReserveSize;
                 CharStr buffer = reinterpret_cast<CharStr>(BaseString<THeap>::operator new[](sizeof(UUID::UUIDStringWildCard)));
-                extern void ConvertUUIDtoCharStr(const Seed::Core::UUID & id, Seed::CharStr buffer);
-                ConvertUUIDtoCharStr(id, buffer);
+                Internals::ConvertUUIDtoCharStr(id, buffer);
                 return BaseString<THeap>(MoveRValue(buffer), sizeof(UUID::UUIDStringWildCard), ReservedSize);
             }
 
             ///<summary>Перетворення дати і часу в строкове представлення</summary>
             static BaseString<THeap> toString(Seed::Core::Date date) {
                 Char buffer[22];
-                extern void ConvertDateToStringImpl(Seed::Core::Date date, Seed::Core::CharStr buffer);
-                ConvertDateToStringImpl(date, buffer);
+                Internals::ConvertDateToStringImpl(date, buffer);
                 return buffer;
             }
 
             ///<summary>Перетворення часу і дати в строкове представлення</summary>
             static BaseString<THeap> toString(Seed::Core::DateTime time) {
                 Char buffer[22];
-                extern void ConvertDateTimeToStringImpl(const Seed::Core::DateTime & time, Seed::CharStr buffer);
-                ConvertDateTimeToStringImpl(time, buffer);
+                Internals::ConvertDateTimeToStringImpl(time, buffer);
                 return buffer;
             }
 
@@ -1497,8 +1490,7 @@ namespace Seed {
                 if (this->str == nullptr || this->CurrentSize == 0)
                     Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
                 UUID res;
-                extern bool ConvertCharStrToUUID(Seed::Core::CharStr str, Seed::Core::UUID & uuid);
-                if (!ConvertCharStrToUUID(this->str, res)) {
+                if (!Internals::ConvertCharStrToUUID(this->str, res)) {
                     Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
                 }
                 return res;
