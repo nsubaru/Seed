@@ -9,7 +9,7 @@
 
 #include "Seed.Core.SettingsAPI.h"
 
-#include "Seed.Core.Threading.Impl.h"
+#include "Seed.Core.Threading.TLS.GlobalTLSBlock.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
@@ -69,14 +69,11 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 
 	ExceptionsHeap.AllocatedMemBlksCount = ExceptionsHeap.AllocatedMemory = 0;
 
-	Threading::InitMinTls();
-
 	return true;
 }
 
 void Seed::Core::Stop::Exceptions() noexcept
 {
-	Threading::StopMinTls();
 	RtlDestroyHeap(ExceptionsHeap.HeapHandle);
 }
 

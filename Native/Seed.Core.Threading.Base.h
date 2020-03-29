@@ -42,11 +42,11 @@ namespace Seed {
 				virtual ~IThreadable() = 0 {}
 			};
 
-			SizeT GetThreadableCount(Boolean WithPseudoThreadable = false);
-			Containers::ConcurencyList<SmartPtr<IThreadable>> GetAllThreadable();
+			SeedKernelCall SizeT GetThreadableCount(Boolean WithPseudoThreadable = false);
+			SeedKernelCall Containers::ConcurencyList<SmartPtr<IThreadable>> GetAllThreadable();
 
-			IThreadable& GetThis();
-			ID GetTID();
+			SeedKernelCall IThreadable& GetThis();
+			SeedKernelCall ID GetTID();
 
 			void Sleep(DateTime time, Boolean IsRelative);
 			inline void Sleep(UInt64 ms) { Sleep(DateTime((DateTime::SecondInNtTime / 1000) * ms), true); }
@@ -65,7 +65,7 @@ namespace Seed {
 			};
 
 			///<summary>Неіснуючий потік або він не є керований через Core</summary>
-			class SeedKernelCall InvalidThread final : public Exception
+			class InvalidThread final : public Exception
 			{
 			private:
 				///<summary>ID не існуючого потоку</summary>
@@ -95,11 +95,11 @@ namespace Seed {
 					});
 				}
 
-				virtual ~InvalidThread() override final {};
+				forceinline virtual ~InvalidThread() override final {};
 			};
 
 			///<summary>Не валідний об'єкт потоку</summary>
-			class SeedKernelCall InvalidThreadObj final : public Exception
+			class InvalidThreadObj final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -118,10 +118,10 @@ namespace Seed {
                     });
 				}
 
-				virtual ~InvalidThreadObj() override final {}
+				forceinline virtual ~InvalidThreadObj() override final {}
 			};
 			///<summary>Запуск запущеного об'єкта</summary>
-			class SeedKernelCall ThreadableAlredyStarted final : public Exception
+			class ThreadableAlredyStarted final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -140,11 +140,11 @@ namespace Seed {
                     });
 				}
 
-				virtual ~ThreadableAlredyStarted() override final {}
+				forceinline virtual ~ThreadableAlredyStarted() override final {}
 			};
 
 			///<summary>Взаємне блокування</summary>
-			class SeedKernelCall DedlockExpected final : public Exception
+			class DedlockExpected final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -163,7 +163,7 @@ namespace Seed {
                     });
 				}
 
-				virtual ~DedlockExpected() override final {}
+				forceinline virtual ~DedlockExpected() override final {}
 			};
 		}
 	}

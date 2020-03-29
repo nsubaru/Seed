@@ -9,7 +9,7 @@ namespace Seed {
 			class JobPool;
 			class ThreadPool;
 
-			class SeedKernelCall ThreadPool final: IDisposable{
+			class ThreadPool final: IDisposable{
 			private:
 				//Дані диспетчера
 				struct dispatcher {
@@ -32,7 +32,7 @@ namespace Seed {
 
 					String Name;
 
-					dispatcher(const String& Name) :
+					forceinline dispatcher(const String& Name) :
 						Name(Name),
 						pool(nullptr),
 						env(nullptr),
@@ -44,7 +44,7 @@ namespace Seed {
 						IsTerminating(false)
 					{}
 
-					dispatcher(String&& Name) :
+					forceinline dispatcher(String&& Name) :
 						Name(MoveRValue(Name)),
 						pool(nullptr),
 						env(nullptr),
@@ -60,30 +60,30 @@ namespace Seed {
 				//Дані даного екземаляра
 				dispatcher* This;
 			protected:
-				virtual void Dispose() override final;
+				SeedKernelCall virtual void Dispose() override final;
 			private:
-				void InitThreadPool();
-				ThreadPool(dispatcher* This) : This(This) { ++This->RefCount; }
+				SeedKernelCall void InitThreadPool();
+				forceinline ThreadPool(dispatcher* This) : This(This) { ++This->RefCount; }
 			private:
-				friend SRWLock GetPoolLock(JobPool* thread);
-				friend Boolean IsPoolTerminating(JobPool* thread);
+				SeedKernelCall friend SRWLock GetPoolLock(JobPool* thread);
+				SeedKernelCall friend Boolean IsPoolTerminating(JobPool* thread);
 			public:
-				ThreadPool() : This(new dispatcher("Unnamed Thread Pool")) { InitThreadPool(); }
-				ThreadPool(const String& Name) : This(new dispatcher(Name)) { InitThreadPool(); }
-				ThreadPool(String&& Name) : This(new dispatcher(MoveRValue(Name))) { InitThreadPool(); }
+				forceinline ThreadPool() : This(new dispatcher("Unnamed Thread Pool")) { InitThreadPool(); }
+				forceinline ThreadPool(const String& Name) : This(new dispatcher(Name)) { InitThreadPool(); }
+				forceinline ThreadPool(String&& Name) : This(new dispatcher(MoveRValue(Name))) { InitThreadPool(); }
 			public:
-				JobPool Dispatch(const String& Name, Delegate&& delegate);
-				JobPool Dispatch(String&& Name, Delegate&& delegate);
-				JobPool Dispatch(Delegate&& delegate);
+				SeedKernelCall JobPool Dispatch(const String& Name, Delegate&& delegate);
+				SeedKernelCall JobPool Dispatch(String&& Name, Delegate&& delegate);
+				SeedKernelCall JobPool Dispatch(Delegate&& delegate);
 			public:
-				SizeT GetTasksCount() { return This->JobsCounts; }
+				SeedKernelCall SizeT GetTasksCount() { return This->JobsCounts; }
 			public:
 				friend class JobPool;
 			public:
 				RefCountClass(ThreadPool, This)
 			};
 
-			class SeedKernelCall JobPool final :IDisposable{
+			class JobPool final :IDisposable{
 			private:
 				struct Data {
 					volatile EThreadabledStates State;
@@ -108,7 +108,7 @@ namespace Seed {
 
 					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;
 					//Конструктор
-					Data(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) :
+					forceinline Data(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) :
 						State(EThreadabledStates::NotStarted),
 						delegate(MoveRValue(delegate)),
 						Parrent(Parrent.This),
@@ -122,7 +122,7 @@ namespace Seed {
 						TID(0)
 					{}
 					//Конструктор
-					Data(Delegate&& delegate, String&& Name, const ThreadPool& Parrent) :
+					forceinline Data(Delegate&& delegate, String&& Name, const ThreadPool& Parrent) :
 						State(EThreadabledStates::NotStarted),
 						delegate(MoveRValue(delegate)),
 						Parrent(Parrent.This),
@@ -139,52 +139,54 @@ namespace Seed {
 			private:
 				Data* This;
 			private:
-				friend void RegisterThread(JobPool* thread);
-				friend void UnRegisterThread(JobPool* thread);
-				friend Delegate& GetJobEntryPoint(JobPool* thread);
-				friend void SetEventOnJobEnd(JobPool* thread, void* callbackObj);
-				friend SRWLock GetPoolLock(JobPool* thread);
-				friend Boolean IsPoolTerminating(JobPool* thread);
-				friend class ThreadableJobPool;
+				SeedKernelCall friend void RegisterThread(JobPool* thread);
+				SeedKernelCall friend void UnRegisterThread(JobPool* thread);
+				SeedKernelCall friend Delegate& GetJobEntryPoint(JobPool* thread);
+				SeedKernelCall friend void SetEventOnJobEnd(JobPool* thread, void* callbackObj);
+				SeedKernelCall friend SRWLock GetPoolLock(JobPool* thread);
+				SeedKernelCall friend Boolean IsPoolTerminating(JobPool* thread);
+				SeedKernelCall friend class ThreadableJobPool;
 			private:
-				JobPool(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) : This(new Data(MoveRValue(delegate), Name, Parrent)) {}
-				JobPool(Delegate&& delegate, String&& Name, const ThreadPool& Parrent) : This(new Data(MoveRValue(delegate), MoveRValue(Name), Parrent)) {}
+				forceinline JobPool(Delegate&& delegate, const String& Name, const ThreadPool& Parrent) : This(new Data(MoveRValue(delegate), Name, Parrent)) {}
+				forceinline JobPool(Delegate&& delegate, String&& Name, const ThreadPool& Parrent) : This(new Data(MoveRValue(delegate), MoveRValue(Name), Parrent)) {}
 			private:
-				JobPool& Dispatch();
+				SeedKernelCall JobPool& Dispatch();
 			protected:
-				virtual void Dispose() override final { This->Parrent = nullptr; }
+				forceinline virtual void Dispose() override final { This->Parrent = nullptr; }
 			public:
-				ThreadPool GetThreadPool() { return ThreadPool(This->Parrent); }
-				EThreadabledStates GetCurrentState() { return This->State; }
-				JobPool& Interupt();
-				JobPool& Join();
-				JobPool& Suspend();
-				JobPool& Join(DateTime timeOut);
-				Boolean IsValid() { return This != nullptr; }
+				forceinline ThreadPool GetThreadPool() { return ThreadPool(This->Parrent); }
+				forceinline EThreadabledStates GetCurrentState() { return This->State; }
+				SeedKernelCall JobPool& Interupt();
+				SeedKernelCall JobPool& Join();
+				SeedKernelCall JobPool& Suspend();
+				SeedKernelCall JobPool& Join(DateTime timeOut);
+				forceinline Boolean IsValid() { return This != nullptr; }
 			public:
-				const String& GetName() { return This->Name; }
-				void SetName(const String& NewName) { This->Name = NewName; }
-				void SetName(String&& NewName) { This->Name = MoveRValue(NewName); }
+				forceinline const String& GetName() { return This->Name; }
+				forceinline void SetName(const String& NewName) { This->Name = NewName; }
+				forceinline void SetName(String&& NewName) { This->Name = MoveRValue(NewName); }
+			public:
+				String Property(GetName, SetName) Name;
 			public:
 				RefCountClass(JobPool, This)
 			public:
 				friend class ThreadPool;
 			};
 
-			inline JobPool ThreadPool::Dispatch(const String& Name, Delegate&& delegate)
+			forceinline JobPool ThreadPool::Dispatch(const String& Name, Delegate&& delegate)
 			{
 				auto obj = JobPool(MoveRValue(delegate), Name, *this);
 				obj.Dispatch();
 				return obj;
 			}
 
-			inline JobPool ThreadPool::Dispatch(String&& Name, Delegate&& delegate) {
+			forceinline JobPool ThreadPool::Dispatch(String&& Name, Delegate&& delegate) {
 				auto obj = JobPool(MoveRValue(delegate), MoveRValue(Name), *this);
 				obj.Dispatch();
 				return obj;
 			}
 
-			inline JobPool ThreadPool::Dispatch(Delegate&& delegate) {
+			forceinline JobPool ThreadPool::Dispatch(Delegate&& delegate) {
 				auto obj = JobPool(MoveRValue(delegate), L"Unnamed job", *this);
 				obj.Dispatch();
 				return obj;

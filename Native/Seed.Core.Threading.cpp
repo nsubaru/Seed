@@ -17,7 +17,7 @@
 
 #include "Seed.Core.Manage.h"
 
-#include "Seed.Core.Threading.Impl.h"
+#include "Seed.Core.Threading.TLS.GlobalTLSBlock.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
@@ -1093,9 +1093,7 @@ extern __declspec(noreturn) InternalApiCall void EmergencyShutdown(
 void Seed::Core::Stage1Complete() noexcept
 {
 	try {
-		Threading::StopMinTls();
 		Threading::MainThread([]() {Stage2(); });
-		Threading::InitMinTls();
 	}
 	catch (...) {
 		EmergencyShutdown(ExceptionPosition, L"Не можливо ініціалізувати підсистему підтримки багатопотоковості");

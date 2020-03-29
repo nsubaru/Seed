@@ -1840,17 +1840,6 @@ inline TlsExceptionData * GetThreadExceptionData()
     return &Seed::Core::Threading::GetTLS()->ExceptionInfo;
 }
 
-extern "C" {
-    BOOL _Init_thread_epoch;
-    void __cdecl _Init_thread_header(int* pOnce) noexcept {
-        pOnce;
-    }
-
-    void __cdecl _Init_thread_footer(int* pOnce) noexcept {
-        pOnce;
-    }
-}
-
 //Storing exception region
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,7 +27,7 @@ struct {
 	HANDLE handle;
 	IO_STATUS_BLOCK ioBlock;
 	RTL_CRITICAL_SECTION lock;
-} LogFile;
+} LogFile = { 0 };
 
 void FormatCurrentTime(Seed::Char* buffer) {
 	using namespace Seed;
@@ -261,4 +261,20 @@ Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
 	}
 }
 
-#pragma warning(pop)
+//#pragma comment(linker, "/include:_tls_used")
+//#pragma section("INIT$XLB", read)
+//
+//void NTAPI TLSCallback(PVOID DllHandle, DWORD Reason, PVOID Reserved)
+//{
+//	UNREFERENCED_PARAMETER(Reserved);
+//
+//	if (LogFile.handle != nullptr)
+//	{
+//		Seed::toCoreLog(L"TLS callback called");
+//	}
+//}
+//
+//extern "C" __declspec(allocate("INIT$XLB")) PIMAGE_TLS_CALLBACK g_pAddressOfTLSCallback = TLSCallback;
+//#pragma comment(linker, "/include:g_pAddressOfTLSCallback")
+//
+//#pragma warning(pop)

@@ -15,17 +15,14 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			struct TLS {
-				IThreadable* Threadable;
+
+			inline __declspec(thread) struct TLS {
+				IThreadable* Threadable = 0;
 				volatile EThreadabledStates* State;
-				//ExceptionInfoT ExceptionInfo;
-
 				TlsExceptionData ExceptionInfo;
-			};
+			} TLSData = { 0 };
 
-			static_assert(sizeof(TEB::TlsSlots) >= sizeof(TLS), "Seed TLS to big");
-
-			InternalApiCall forceinline TLS* GetTLS() { return reinterpret_cast<TLS*>(NtCurrentTeb()->TlsSlots); }
+			InternalApiCall forceinline TLS* GetTLS() { return &TLSData; }
 
 			InternalApiCall forceinline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates* State) {
 				TLS* thisTLS = GetTLS();
@@ -38,17 +35,6 @@ namespace Seed {
 			InternalApiCall forceinline void DestroyTls() {
 				TLS* thisTLS = GetTLS();
 				delete thisTLS->Threadable;
-				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
-			}
-
-			InternalApiCall forceinline void InitMinTls() {
-				TLS* thisTLS = GetTLS();
-				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
-				thisTLS->ExceptionInfo = TlsExceptionData();
-			}
-
-			InternalApiCall forceinline void StopMinTls() {
-				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 			}
 		}

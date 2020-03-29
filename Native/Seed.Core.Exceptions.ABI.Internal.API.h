@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.Threading.Impl.h"
+#include "Seed.Core.Threading.TLS.GlobalTLSBlock.h"
 
 #include "Seed.Core.Exceptions.ABI.SEH.h"
 #include "Seed.Core.Exceptions.ABI.Defines.h"

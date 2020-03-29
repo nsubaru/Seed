@@ -27,6 +27,7 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 #pragma warning(push)
 #pragma warning(disable: 4075)
 #pragma init_seg(".INIT$m", RegisterStaticDtors)
+#pragma comment(linker, "/merge:INIT=.rdata")
 #define __INIT__
 #pragma warning(pop)
 

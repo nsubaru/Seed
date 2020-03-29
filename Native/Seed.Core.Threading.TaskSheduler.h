@@ -18,7 +18,7 @@ namespace Seed {
 			/// <summary>
 			/// Планувальник задач на базі пулу потоків(виконує задачі в задану дату і час)
 			/// </summary>
-			class SeedKernelCall TaskSheduler final : protected IDisposable {
+			class TaskSheduler final : protected IDisposable {
 				struct Data {
 					///<summary>Керуюча структура пула потоків</summary>
 					ImplSpecificT pool;
@@ -45,7 +45,7 @@ namespace Seed {
 					/// Конструктор з іменем планувальника задач
 					/// </summary>
 					/// <param name="Name">Ім'я планувальника задач</param>
-					Data(const String& Name) :
+					forceinline Data(const String& Name) :
 						Name(Name),
 						pool(nullptr),
 						env(nullptr),
@@ -60,7 +60,7 @@ namespace Seed {
 					/// Конструктор з іменем планувальника задач
 					/// </summary>
 					/// <param name="Name">Ім'я планувальника задач</param>
-					Data(String&& Name) :
+					forceinline Data(String&& Name) :
 						Name(MoveRValue(Name)),
 						pool(nullptr),
 						env(nullptr),
@@ -77,12 +77,12 @@ namespace Seed {
 				/// <summary>
 				/// Ініціалізація панувальник задач на базі пулу потоків
 				/// </summary>
-				void InitTaskSheduler();
+				SeedKernelCall void InitTaskSheduler();
 				/// <summary>
 				/// Конструктор планувальник задач на базі пулу потоків
 				/// </summary>
 				/// <param name="This">Дані даного планувальника задач</param>
-				TaskSheduler(Data* This) :This(This) { ++This->RefCount; }
+				forceinline TaskSheduler(Data* This) :This(This) { ++This->RefCount; }
 			private:
 				/// <summary>
 				/// Вертає блокировку пулу до якого відноситься задача
@@ -100,34 +100,34 @@ namespace Seed {
 				/// <summary>
 				/// Знищення пулу
 				/// </summary>
-				virtual void Dispose() override final;
+				forceinline virtual void Dispose() override final;
 			public:
 				/// <summary>
 				/// Створення безіменного планувальник задач на базі пулу потоків
 				/// </summary>
-				TaskSheduler() : This(new Data("Unnamed Task Sheduler")) { InitTaskSheduler(); }
+				forceinline TaskSheduler() : This(new Data("Unnamed Task Sheduler")) { InitTaskSheduler(); }
 				/// <summary>
 				/// Створення іменого планувальник задач на базі пулу потоків
 				/// </summary>
 				/// <param name="Name">Ім'я пулу</param>
-				TaskSheduler(const String& Name) : This(new Data(Name)) { InitTaskSheduler(); }
+				forceinline TaskSheduler(const String& Name) : This(new Data(Name)) { InitTaskSheduler(); }
 				/// <summary>
 				/// Створення іменого планувальник задач на базі пулу потоків
 				/// </summary>
 				/// <param name="Name">Ім'я пулу</param>
-				TaskSheduler(String&& Name) : This(new Data(MoveRValue(Name))) { InitTaskSheduler(); }
+				forceinline TaskSheduler(String&& Name) : This(new Data(MoveRValue(Name))) { InitTaskSheduler(); }
 				/// <summary>
 				/// Передача задачі в планувальник задач на базі пулу потоків
 				/// </summary>
 				/// <param name="task">Завдання яке передається</param>
 				/// <returns>Об'єкт задачі в пулі потоків</returns>
-				[[nodiscard]] SheduledJobBuilder NewTask(ITask*&& task);
+				SeedKernelCall [[nodiscard]] SheduledJobBuilder NewTask(ITask*&& task);
 
 				/// <summary>
 				/// Кількість зареєстрованих задач(включно з тими шо в черзі але без тих які вже виконались)
 				/// </summary>
 				/// <returns>Кількість задач</returns>
-				SizeT GetTaskCount() { return this->This->TaskCount; }
+				forceinline SizeT GetTaskCount() { return this->This->TaskCount; }
 				/// <summary>
 				/// Кількість зареєстрованих задач(включно з тими шо в черзі але без тих які вже виконались)
 				/// </summary>
@@ -231,7 +231,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="Task">Поінтер на задачу</param>
 					/// <param name="sheduler">Поінтер на дані планувальника</param>
-					Data(ITask* Task, TaskSheduler::Data* sheduler) :
+					forceinline Data(ITask* Task, TaskSheduler::Data* sheduler) :
 						Task(Task),
 						PeriodLenght(0),
 						TimerProximity(0),
@@ -257,7 +257,7 @@ namespace Seed {
 				/// Конструктор задачі
 				/// </summary>
 				/// <param name="This">Поінтер на дані задачі</param>
-				SheduledJob(Data* This) : This(This) { ++This->RefCount; }
+				forceinline SheduledJob(Data* This) : This(This) { ++This->RefCount; }
 			private:
 				friend void RegisterThread(SheduledJob* thread);
 				friend void UnRegisterThread(SheduledJob* thread);
@@ -274,49 +274,49 @@ namespace Seed {
 				/// Вертає пул задачі в якому зареєстрована дана задача
 				/// </summary>
 				/// <returns>Об'єкт планувальника задач</returns>
-				TaskSheduler& GetThreadPool() { return TaskSheduler(This->sheduler); }
+				forceinline TaskSheduler& GetThreadPool() { return TaskSheduler(This->sheduler); }
 				/// <summary>
 				/// Стан задачі
 				/// </summary>
 				/// <returns>Стан задачі</returns>
-				EThreadabledStates GetCurrentState() { return This->State; }
+				forceinline EThreadabledStates GetCurrentState() { return This->State; }
 				/// <summary>
 				/// Переривання виконання задачі
 				/// </summary>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJob& Interupt();
+				SeedKernelCall SheduledJob& Interupt();
 				/// <summary>
 				/// Очікування на завершення задачі
 				/// </summary>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJob& Join();
+				SeedKernelCall SheduledJob& Join();
 				/// <summary>
 				/// Призупинити виконання задачі
 				/// </summary>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJob& Suspend();
+				SeedKernelCall SheduledJob& Suspend();
 				/// <summary>
 				/// Очікування на завершення задачі
 				/// </summary>
 				/// <param name="timeOut">Таймаут очікування</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJob& Join(DateTime timeOut);
+				SeedKernelCall SheduledJob& Join(DateTime timeOut);
 			public:
 				/// <summary>
 				/// Ім'я задачі
 				/// </summary>
 				/// <returns></returns>
-				const String& GetName() { return This->Name; }
+				forceinline const String& GetName() { return This->Name; }
 				/// <summary>
 				/// Встановлення імені задачі
 				/// </summary>
 				/// <param name="NewName">Нове ім'я задачі</param>
-				void SetName(const String& newName) { This->Name = newName; }
+				forceinline void SetName(const String& newName) { This->Name = newName; }
 				/// <summary>
 				/// Встановлення імені задачі
 				/// </summary>
 				/// <param name="NewName">Нове ім'я задачі</param>
-				void SetName(String&& newName) { This->Name = MoveRValue(newName); }
+				forceinline void SetName(String&& newName) { This->Name = MoveRValue(newName); }
 				/// <summary>
 				/// Ім'я задачі
 				/// </summary>
@@ -331,7 +331,7 @@ namespace Seed {
 			/// <summary>
 			/// Проміжний клас для побудови задачі
 			/// </summary>
-			class SeedKernelCall SheduledJobBuilder final {
+			class SheduledJobBuilder final {
 			private:
 				/// <summary>
 				/// Дані задачі
@@ -347,25 +347,26 @@ namespace Seed {
 				/// </summary>
 				/// <param name="sheduler">Планувальник потоків</param>
 				/// <param name="task">Задача</param>
-				SheduledJobBuilder(TaskSheduler& sheduler, ITask*&& task) : This(new SheduledJob::Data(MoveRValue(task), sheduler.This)), IsExcecutionTimeRelative(false) {}
+				forceinline SheduledJobBuilder(TaskSheduler& sheduler, ITask*&& task) : This(new SheduledJob::Data(MoveRValue(task), sheduler.This)), IsExcecutionTimeRelative(false) {}
 			public:
-				SheduledJobBuilder(const SheduledJobBuilder&) = delete;
+				forceinline SheduledJobBuilder(const SheduledJobBuilder&) = delete;
 				/// <summary>
 				/// Конструктор переміщення
 				/// </summary>
 				/// <param name="orig">Оригинал об'єкту</param>
-				SheduledJobBuilder(SheduledJobBuilder&& orig) : This(orig.This), IsExcecutionTimeRelative(orig.IsExcecutionTimeRelative) { orig.This = nullptr; }
+				forceinline SheduledJobBuilder(SheduledJobBuilder&& orig) : This(orig.This), IsExcecutionTimeRelative(orig.IsExcecutionTimeRelative) { orig.This = nullptr; }
+				
 				SheduledJobBuilder& operator=(const SheduledJobBuilder&) = delete;
 				/// <summary>
 				/// Оператор переміщення
 				/// </summary>
 				/// <param name="orig">Оригинал об'єкту</param>
 				/// <returns>Силка на об'єкт</returns>
-				SheduledJobBuilder& operator=(SheduledJobBuilder&& orig) { Swap(this->This, orig.This); return *this; }
+				forceinline SheduledJobBuilder& operator=(SheduledJobBuilder&& orig) { Swap(this->This, orig.This); return *this; }
 				/// <summary>
 				/// Деструктор
 				/// </summary>
-				~SheduledJobBuilder()
+				forceinline ~SheduledJobBuilder()
 				{
 					if (This != nullptr) {
 						if (--This->RefCount == 0) {
@@ -383,20 +384,20 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Name">Нове ім'я задачі</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJobBuilder& SetName(const String& Name) { This->Name = Name; return *this; }
+				forceinline SheduledJobBuilder& SetName(const String& Name) { This->Name = Name; return *this; }
 				/// <summary>
 				/// Встановлення імені задачі
 				/// </summary>
 				/// <param name="Name">Нове ім'я задачі</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJobBuilder& SetName(String&& Name) { This->Name = MoveRValue(Name); return *this; }
+				forceinline SheduledJobBuilder& SetName(String&& Name) { This->Name = MoveRValue(Name); return *this; }
 				/// <summary>
 				/// Встановлення часу виконання
 				/// </summary>
 				/// <param name="time">Час виконання</param>
 				/// <param name="isExcecutionTimeRelative">Флаг відносності часу, якщо true то час відносний відносно моменту запуску</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJobBuilder& SetExecutionTime(DateTime time, Boolean isExcecutionTimeRelative = false) {
+				forceinline SheduledJobBuilder& SetExecutionTime(DateTime time, Boolean isExcecutionTimeRelative = false) {
 					This->StartTime = time; 
 					this->IsExcecutionTimeRelative = isExcecutionTimeRelative; 
 					return *this;
@@ -406,7 +407,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="time">Тривалість циклу</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJobBuilder& SetLoopDuration(DateTime time) {
+				forceinline SheduledJobBuilder& SetLoopDuration(DateTime time) {
 					This->PeriodLenght = (Int32) time.TimeFromStartEpoch;
 					return *this;
 				}
@@ -415,7 +416,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="count">Кількість циклів виконання задачі</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJobBuilder& SetLoopsCount(Int32 count) {
+				forceinline SheduledJobBuilder& SetLoopsCount(Int32 count) {
 					This->PeriodsCount = count; 
 					This->RemainingPeriodsCount = count; 
 					return *this;
@@ -425,16 +426,16 @@ namespace Seed {
 				/// </summary>
 				/// <param name="proximity">Точність таймера для задачі</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SheduledJobBuilder& SetTimerProximity(DateTime proximity) { This->TimerProximity = (Int32)proximity.TimeFromStartEpoch; return *this; }
+				forceinline SheduledJobBuilder& SetTimerProximity(DateTime proximity) { This->TimerProximity = (Int32)proximity.TimeFromStartEpoch; return *this; }
 				/// <summary>
 				/// Запуск задачі
 				/// </summary>
 				/// <returns></returns>
-				[[maybe_unused]] SheduledJob Shedule();
+				SeedKernelCall [[maybe_unused]] SheduledJob Shedule();
 				/// <summary>
 				/// Скасування задачі
 				/// </summary>
-				void Cancel() { this->~SheduledJobBuilder(); }
+				forceinline void Cancel() { this->~SheduledJobBuilder(); }
 
 			public:
 				friend class TaskSheduler;

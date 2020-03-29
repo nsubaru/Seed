@@ -89,7 +89,7 @@ namespace Seed {
 				}
 
 				template<typename T>
-				Boolean TryInShareLock(T& Funct) {
+				forceinline Boolean TryInShareLock(T& Funct) {
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
 						if (!Internals::TryAcquireLockSharedSRWLock(&lock))

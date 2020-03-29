@@ -11,7 +11,7 @@ namespace Seed {
 		namespace Threading {
 			///<summary>Подія NT
 			///<para>Об'єкт синхронізації потоків</para></summary>
-			class SeedKernelCall SynchronizeEvent final : protected IDisposable
+			class SynchronizeEvent final : protected IDisposable
 			{
 				///<summary>Дані події</summary>
 				struct event_data
@@ -26,43 +26,43 @@ namespace Seed {
 					String Name;
 
 					///<summary>Конструктор з отриманням дескриптора</summary>
-					event_data(Boolean IsManualReset, const String& name)
+					forceinline event_data(Boolean IsManualReset, const String& name)
 						:IsManualReset(IsManualReset), handle(nullptr), RefCount(1), Name(name)
 					{};
 					///<summary>Конструктор з оптимізована отриманням дескриптора</summary>
-					event_data(Boolean IsManualReset, String&& name)
+					forceinline event_data(Boolean IsManualReset, String&& name)
 						:IsManualReset(IsManualReset), handle(nullptr), RefCount(1), Name(MoveRValue(name))
 					{};
 				};
 				///<summary>Дані об'єкту події</summary>
 				event_data* data;
 				///<summary>Знищення останнього елемента</summary>
-				virtual void Dispose() override final;
+				SeedKernelCall virtual void Dispose() override final;
 			public:
 				///<summary>Конструктор</summary>
-				SynchronizeEvent(Boolean IsManualReset = false);
+				SeedKernelCall SynchronizeEvent(Boolean IsManualReset = false);
 				///<summary>Конструктор з іменем об'єкта</summary>
-				SynchronizeEvent(const String& name, Boolean IsManualReset = false);
+				SeedKernelCall SynchronizeEvent(const String& name, Boolean IsManualReset = false);
 				///<summary>Конструктор з оптимізованою передачею імені об'єкта</summary>
-				SynchronizeEvent(String&& name, Boolean IsManualReset = false);
+				SeedKernelCall SynchronizeEvent(String&& name, Boolean IsManualReset = false);
 
 				RefCountClass(SynchronizeEvent, data)
 
 				///<summary>Очікування на подію</summary>
-				void Wait() const;
+				SeedKernelCall void Wait() const;
 				///<summary>Очікування з таймаутом</summary>
-				void Wait(SizeT TimeOutMs) const;
+				SeedKernelCall void Wait(SizeT TimeOutMs) const;
 
 				///<summary>Подати імпульс на подію</summary>
-				void Signale() {
+				forceinline void Signale() {
 					Internals::PulseNtEvent(data->handle);
 				}
 				///<summary>Виставити true на подію</summary>
-				void Set() {
+				forceinline void Set() {
 					Internals::SetNtEvent(data->handle);
 				}
 				///<summary>Виставити false на подію</summary>
-				void Reset() {
+				forceinline void Reset() {
 					Internals::ResetNtEvent(data->handle);
 				}
 
