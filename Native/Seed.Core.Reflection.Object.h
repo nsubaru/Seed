@@ -21,10 +21,10 @@ namespace Seed
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+						ExceptionString(exeptionName), ExceptionString(L". "),
+						location.toString(), ExceptionString(L". ")
+					});
 				}
 
 				virtual ~InvlaidDynamicFunctionArgs() {}

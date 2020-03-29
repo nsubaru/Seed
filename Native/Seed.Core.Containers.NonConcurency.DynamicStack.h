@@ -21,14 +21,17 @@ namespace Seed {
 					SizeT bufferSize;
 					T* stack;
 
-					Data(SizeT bufferSize) : count(0), RefCount(1), stack(new T[bufferSize]), bufferSize(bufferSize) {}
+					forceinline Data(SizeT bufferSize) : count(0), RefCount(1), stack(new T[bufferSize]), bufferSize(bufferSize) {}
 				};
 			private:
 				Data* This;
 			protected:
-				virtual void Dispose() final override {}
+				virtual void Dispose() final override {
+					delete[] This->stack;
+					This->count = This->bufferSize = 0;
+				}
 			public:
-				BaseDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
+				forceinline BaseDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
 
 				BaseDynamicStack(InitilizerList<T>&& list) {
 					if (list.size() != 0) {
@@ -45,7 +48,7 @@ namespace Seed {
 					}
 				}
 
-				void Push(const T& item) {
+				forceinline void Push(const T& item) {
 					if (This->count == This->bufferSize) {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 					}
@@ -53,7 +56,7 @@ namespace Seed {
 					This->count++;
 				}
 
-				void Push(T&& item) {
+				forceinline void Push(T&& item) {
 					if (This->count == This->bufferSize) {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 					}
@@ -61,28 +64,28 @@ namespace Seed {
 					This->count++;
 				}
 
-				T Pop() {
+				forceinline T Pop() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
 					This->count--;
 					return MoveRValue(This->stack[This->count]);
 				}
 
-				const T& Top() const {
+				forceinline const T& Top() const {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
 					This->count--;
 					return This->stack[This->count];
 				}
 
-				const T& Top() {
+				forceinline const T& Top() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
 					This->count--;
 					return This->stack[This->count];
 				}
 
-				void ExtendBuffer(SizeT AdditionalSize) {
+				forceinline void ExtendBuffer(SizeT AdditionalSize) {
 					ExtendBufferImpl(AdditionalSize);
 				}
 
@@ -112,7 +115,7 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
-				SizeT GetCount() const { return This->count; }
+				forceinline SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
 				RefCountClass(BaseDynamicStack, This)
@@ -141,9 +144,9 @@ namespace Seed {
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
-				template<typename LambdaT>
-				__forceinline BaseDynamicStack& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
+				template<typename Lambda>
+				BaseDynamicStack& ForEachImpl(Lambda&& lambda) {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
 						if (This->count == 0)
 							return *this;
 						SizeT i = This->count;
@@ -153,7 +156,7 @@ namespace Seed {
 						} while (i != 0);
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT>) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT>) {
 						if (This->count == 0)
 							return *this;
 						SizeT i = This->count;
@@ -168,9 +171,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				__forceinline const BaseDynamicStack& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+				template<typename Lambda>
+				const BaseDynamicStack& ForEachImpl(Lambda&& lambda) const {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
 						if (This->count == 0)
 							return *this;
 						SizeT i = This->count;
@@ -180,7 +183,7 @@ namespace Seed {
 						} while (i != 0);
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
 						if (This->count == 0)
 							return *this;
 						SizeT i = This->count;
@@ -195,8 +198,8 @@ namespace Seed {
 					}
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline T AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename Lambda>
+				T AggregateImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return U();
 					U result = U();
@@ -208,8 +211,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda, const U& Value) const {
 					U result = Value;
 					if (This->count == 0)
 						return result;
@@ -221,8 +224,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda, U&& Value) const {
 					if (This->count == 0)
 						return Value;
 					SizeT i = This->count;
@@ -233,10 +236,10 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				bool AnyImpl() const { return This->count > 0; }
+				forceinline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				bool AnyImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -249,7 +252,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				bool AllImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -325,35 +328,36 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				BaseDynamicStack& ReverseImpl() {
+				forceinline BaseDynamicStack& ReverseImpl() {
 					for (SizeT i = 0; i < This->count / 2; i++) {
 						Swap(This->stack[i], This->stack[(This->count - 1) - i]);
 					}
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = Value;
 					This->count = Index + 1;
 				}
 
-				__forceinline BaseDynamicStack& RemoveAllImpl() {
-					for (SizeT i = 0; i < This->count; i++) {
-						This->stack[i].~T();
-					}
+				forceinline BaseDynamicStack& RemoveAllImpl() {
+					delete[] This->stack;
+					This->count = This->bufferSize = 0;
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BaseDynamicStack& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseDynamicStack& RemoveAllImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->stack[i]));
 					}
+					delete[] This->stack;
+					This->count = This->bufferSize = 0;
 					return *this;
 				}
 			};
@@ -378,7 +382,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseDynamicStack<THeap, T>& A, Containers::BaseDynamicStack<THeap, T>& B) {
+		forceinline void Swap(Containers::BaseDynamicStack<THeap, T>& A, Containers::BaseDynamicStack<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

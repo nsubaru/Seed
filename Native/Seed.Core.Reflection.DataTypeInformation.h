@@ -9,38 +9,7 @@ namespace Seed
 	{
 		namespace Reflection
 		{
-			///<summary>Не можливо серелізувати або десерелізувати даний тип</summary>
-			class SeedKernelCall NonSerelizableType : public Exception {
-			private:
-				/// <summary>
-				/// Тип який DI не зумів знайти
-				/// </summary>
-				const TypeInfo& type;
-				/// <summary>
-				/// Ім'я типу який не знайдено
-				/// </summary>
-				ExceptionString typeName;
-			public:
-				///<summary>Конструктор помилки</summary>
-				///<param name = 'File'>Файл в якому згенерована помилка</param>
-				///<param name = 'FunctName'>Ім'я функції</param>
-				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				///<param Name = 'Type'>Тип який DI не зумів знайти</param>
-				NonSerelizableType(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ExceptionString&& typeName, const TypeInfo& type)
-					:Exception(File, FunctName, Line, L"Неможливо викликати динамічну функцію з даним набором аргументів"), type(type), typeName(MoveRValue(typeName)) {}
-
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
-				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". Ім'я типу: ")
-						+ typeName
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
-				}
-
-				virtual ~NonSerelizableType() {}
-			};
+			using NonSerelizableType = Serilization::NonSerelizableType;
 
 			class DataTypeRecord : IDisposable, Serilization::ISerilizable<DataTypeRecord> {
 			private:

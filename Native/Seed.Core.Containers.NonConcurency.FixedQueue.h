@@ -22,11 +22,11 @@ namespace Seed {
 					RefCountT RefCount;
 					T queue[TSize];
 
-					T& operator[](SizeT Index) {
+					forceinline T& operator[](SizeT Index) {
 						return queue[(front + Index) % TSize];
 					}
 
-					Data() :
+					forceinline Data() :
 						front(0),
 						rear(0),
 						count(0),
@@ -37,9 +37,9 @@ namespace Seed {
 			private:
 				Data* This;
 			protected:
-				virtual void Dispose() final override {}
+				forceinline virtual void Dispose() final override {}
 			public:
-				BaseFixedQueue() : This(new Data()) {}
+				forceinline BaseFixedQueue() : This(new Data()) {}
 
 				BaseFixedQueue(InitilizerList<T>&& list) : BaseFixedQueue() {
 					if (list.size() != 0) {
@@ -54,7 +54,7 @@ namespace Seed {
 					}
 				}
 
-				void Enqueue(const T& Value) {
+				forceinline void Enqueue(const T& Value) {
 					if (++This->count > TSize)
 						Throw(NullPointException(ExceptionPosition));
 					SizeT newRear = (This->rear + 1) % TSize;
@@ -62,7 +62,7 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
-				void Enqueue(T&& Value) {
+				forceinline void Enqueue(T&& Value) {
 					if (++This->count > TSize)
 						Throw(NullPointException(ExceptionPosition));
 					SizeT newRear = (This->rear + 1) % TSize;
@@ -70,7 +70,7 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
-				T Dequeue() {
+				forceinline T Dequeue() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
 					T res = MoveRValue(This->queue[This->front]);
@@ -79,13 +79,13 @@ namespace Seed {
 					return res;
 				}
 
-				const T& Top() {
+				forceinline const T& Top() {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
-				const T& Top() const {
+				forceinline const T& Top() const {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
 					return This->queue[This->front];
@@ -94,7 +94,7 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
-				SizeT GetCount() const { return This->count; }
+				forceinline SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
 				virtual BaseFixedQueue Clone() const override final {
@@ -124,18 +124,18 @@ namespace Seed {
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
-				template<typename LambdaT>
-				__forceinline BaseFixedQueue& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+				template<typename Lambda>
+				BaseFixedQueue& ForEachImpl(Lambda&& lambda) {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&> ||
+						TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
 							lambda((*This)[i]);
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT> ||
+						TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
 						SizeT Index = 0;
 
 						for (SizeT i = 0; i < This->count; i++, Index)
@@ -150,16 +150,16 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				__forceinline const BaseFixedQueue& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+				template<typename Lambda>
+				const BaseFixedQueue& ForEachImpl(Lambda&& lambda) const {
+					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
 							lambda((*This)[i]);
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
 						SizeT Index = 0;
 
 						for (SizeT i = 0; i < This->count; i++, Index)
@@ -174,8 +174,8 @@ namespace Seed {
 					}
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda) const {
 					U result = U();
 
 					if (This->count == 0) {
@@ -190,8 +190,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda, const U& Value) const {
 					U result = Value;
 					if (This->count == 0) {
 						ReleaseLockSharedSRWLock(&This->Lock);
@@ -206,8 +206,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda, U&& Value) const {
 					U result = MoveRValue(Value);
 
 					if (This->count == 0)
@@ -224,7 +224,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				forceinline bool AnyImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 
@@ -238,7 +238,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				bool AllImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 
@@ -256,9 +256,15 @@ namespace Seed {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-					T& ret = This->queue[This->front];
+					for (SizeT i = 0; i < This->count; i++)
+					{
+						if (!lambda((*This)[i]))
+						{
+							return (*This)[i];
+						}
+					}
 
-					return ret;
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
 				template<typename Lambda>
@@ -266,9 +272,24 @@ namespace Seed {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-					T& ret = This->queue[(This->rear == 0) ? bufferSize - 1 : This->rear - 1];
+					T* item = nullptr;
 
-					return ret;
+					for (SizeT i = 0; i < This->count; i++)
+					{
+						if (!lambda((*This)[i]))
+						{
+							item = &(*This)[i];
+						}
+					}
+
+					if (item != nullptr)
+					{
+						return *item;
+					}
+					else
+					{
+						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
+					}
 				}
 
 				template<typename Lambda>
@@ -276,9 +297,15 @@ namespace Seed {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-					T& ret = This->queue[This->front];
+					for (SizeT i = 0; i < This->count; i++)
+					{
+						if (!lambda((*This)[i]))
+						{
+							return (*This)[i];
+						}
+					}
 
-					return ret;
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
 				template<typename Lambda>
@@ -286,12 +313,30 @@ namespace Seed {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-					T& ret = This->queue[(This->rear == 0) ? bufferSize - 1 : This->rear - 1];
+					if (This->count == 0)
+						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-					return ret;
+					T* item = nullptr;
+
+					for (SizeT i = 0; i < This->count; i++)
+					{
+						if (!lambda((*This)[i]))
+						{
+							item = &(*This)[i];
+						}
+					}
+
+					if (item != nullptr)
+					{
+						return *item;
+					}
+					else
+					{
+						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
+					}
 				}
 
-				BaseFixedQueue& ReverseImpl() {
+				forceinline BaseFixedQueue& ReverseImpl() {
 					for (SizeT i = 0; i < This->count / 2; i++)
 					{
 						Seed::Swap((*This)[i], (*This)[(This->count - 1) - i]);
@@ -299,19 +344,19 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->queue[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 					This->rear = Index + 1;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->queue[Index] = Value;
 					This->count = Index + 1;
 					This->rear = Index + 1;
 				}
 
-				__forceinline BaseFixedQueue& RemoveAllImpl() {
+				forceinline BaseFixedQueue& RemoveAllImpl() {
 					if (This->count == 0)
 						return *this;
 					for (SizeT i = 0; i < This->count; i++)
@@ -322,7 +367,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseFixedQueue& RemoveAllImpl(Lambda&& lambda) {
+				forceinline BaseFixedQueue& RemoveAllImpl(Lambda&& lambda) {
 					if (This->count == 0)
 						return *this;
 					for (SizeT i = 0; i < This->count; i++)
@@ -352,7 +397,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		__forceinline void Swap(Containers::BaseFixedQueue<THeap, TSize, T>& A, Containers::BaseFixedQueue<THeap, TSize, T>& B) {
+		forceinline void Swap(Containers::BaseFixedQueue<THeap, TSize, T>& A, Containers::BaseFixedQueue<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

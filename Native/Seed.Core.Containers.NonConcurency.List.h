@@ -37,21 +37,21 @@ namespace Seed {
 					T value;
 
 					///<summary>Пустий конструктор</summary>
-					elem() :
+					forceinline elem() :
 						father(nullptr), next(nullptr), prev(nullptr),
 						RefCount(1), value()
 					{};
 					///<summary>Конструктор з присвоєнням значення</summary>
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
-					elem(const T& obj, list_data* This) :
+					forceinline elem(const T& obj, list_data* This) :
 						father(This), next(nullptr), prev(nullptr),
 						RefCount(1), value(obj)
 					{};
 					///<summary>Конструктор з переміщенням значення</summary>
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
-					elem(T&& obj, list_data* This) :
+					forceinline elem(T&& obj, list_data* This) :
 						father(This), next(nullptr), prev(nullptr),
 						RefCount(1), value(MoveRValue(obj))
 					{};
@@ -59,7 +59,7 @@ namespace Seed {
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
-					elem(const T& obj, list_data* This, elem* prev) : //-V730
+					forceinline elem(const T& obj, list_data* This, elem* prev) : //-V730
 						father(This), prev(prev), next(nullptr),
 						RefCount(1), value(obj)
 					{};
@@ -67,7 +67,7 @@ namespace Seed {
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
-					elem(T&& obj, list_data* This, elem* prev) : //-V730
+					forceinline elem(T&& obj, list_data* This, elem* prev) : //-V730
 						father(This), prev(prev), next(nullptr),
 						RefCount(1), value(MoveRValue(obj))
 					{};
@@ -76,7 +76,7 @@ namespace Seed {
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
 					///<param name = "next">Покажчик на наступний елемент</param>
-					elem(const T& obj, list_data* This, elem* prev, elem* next) :
+					forceinline elem(const T& obj, list_data* This, elem* prev, elem* next) :
 						father(This), prev(prev), next(next),
 						RefCount(1), value(obj)
 					{};
@@ -85,7 +85,7 @@ namespace Seed {
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
 					///<param name = "next">Покажчик на наступний елемент</param>
-					elem(T&& obj, list_data* This, elem* prev, elem* next) :
+					forceinline elem(T&& obj, list_data* This, elem* prev, elem* next) :
 						father(This), prev(prev), next(next),
 						RefCount(1), value(MoveRValue(obj))
 					{};
@@ -103,7 +103,7 @@ namespace Seed {
 					RefCountT RefCount;
 
 					///<summary>Конструктор, заповнює початкові дані</summary>
-					list_data() :
+					forceinline list_data() :
 						root(nullptr),
 						last(nullptr),
 						size(0),
@@ -198,7 +198,7 @@ namespace Seed {
 				///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
 				///</para>
 				///</summary>
-				class Iterator : protected IDisposable
+				class Iterator final
 				{
 					friend class BaseList;
 				private:
@@ -207,20 +207,18 @@ namespace Seed {
 				private:
 					///<summary>Конструктор з елемента списку</summary>
 					///<param name = "This">Покажчик на елемент</param>
-					__forceinline Iterator(elem* This) :This(This)
+					forceinline Iterator(elem* This) :This(This)
 					{
 						if (This != nullptr) ++This->RefCount;
 					}
-				protected:
-                    virtual void Dispose() override {};
 				public:
 					///<summary>Пустий конструктор</summary>
-					__forceinline Iterator() :This(nullptr)
+					forceinline Iterator() :This(nullptr)
 					{};
 #pragma region Operators
 #pragma region Iterator Ariphmetic
 					///<summary>Константний постфіксний інкремент</summary>
-					const Iterator operator++(int) const
+					forceinline const Iterator operator++(int) const
 					{
 						Iterator node(*this);
 						if (This == nullptr)
@@ -240,7 +238,7 @@ namespace Seed {
 						}
 					}
 					///<summary>Константний постфіксний декремент</summary>
-					const Iterator operator--(int) const
+					forceinline const Iterator operator--(int) const
 					{
 						Iterator node(*this);
 						if (This == nullptr)
@@ -260,7 +258,7 @@ namespace Seed {
 						}
 					}
 					///<summary>Префіксний інкремент</summary>
-					Iterator& operator++()
+					forceinline Iterator& operator++()
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -280,7 +278,7 @@ namespace Seed {
 						return *this;
 					}
 					///<summary>Префіксний декремент</summary>
-					Iterator& operator--()
+					forceinline Iterator& operator--()
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -302,24 +300,24 @@ namespace Seed {
 #pragma region Comparing
 					///<summary>Оператор рівності двох ітераторів</summary>
 					///<param name = "seconde">Правий ітератор</param>
-					__forceinline bool operator==(const Iterator& second) const
+					forceinline bool operator==(const Iterator& second) const
 					{
 						return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(second.This);
 					}
 					///<summary>Оператор не рівності двох ітераторів</summary>
 					///<param name = "seconde">Правий ітератор</param>
-					__forceinline bool operator!=(const Iterator& second) const
+					forceinline bool operator!=(const Iterator& second) const
 					{
 						return reinterpret_cast<SizeT>(This) != reinterpret_cast<SizeT>(second.This);
 					}
 
 					///<summary>Оператор рівності з nullptr</summary>
-					__forceinline bool operator==(const Seed::NullptrT) const
+					forceinline bool operator==(const Seed::NullptrT) const
 					{
 						return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(nullptr);
 					}
 					///<summary>Оператор не рівності з nullptr</summary>
-					__forceinline bool operator!=(const Seed::NullptrT) const
+					forceinline bool operator!=(const Seed::NullptrT) const
 					{
 						return This != nullptr;
 					}
@@ -328,7 +326,7 @@ namespace Seed {
 #pragma region Data access operators
 					///<summary>Оператор розіменування ітератора</summary>
 					///<returns>Значення елемента</returns>
-					__forceinline T& operator*()
+					forceinline T& operator*()
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -336,7 +334,7 @@ namespace Seed {
 					}
 					///<summary>Константний оператор розіменування ітератора</summary>
 					///<returns>Константне значення елемента</returns>
-					__forceinline const T& operator*() const
+					forceinline const T& operator*() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -344,7 +342,7 @@ namespace Seed {
 					}
 					///<summary>Оператор доступу до полів/методів структури/класу</summary>
 					///<returns>Покажчик на елемент</returns>
-					__forceinline T* operator->()
+					forceinline T* operator->()
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -352,7 +350,7 @@ namespace Seed {
 					}
 					///<summary>Константний оператор доступу до полів/методів структури/класу</summary>
 					///<returns>Константний покажчик на елемент</returns>
-					__forceinline const T* operator->() const
+					forceinline const T* operator->() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -362,7 +360,7 @@ namespace Seed {
 #pragma endregion
 #pragma region Iterator move
 					///<summary>Вертає наступний елемент</summary>
-					__forceinline const Iterator Next() const
+					forceinline const Iterator Next() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -374,7 +372,7 @@ namespace Seed {
 					}
 
 					///<summary>Попередній елемент</summary>
-					__forceinline const Iterator Prev() const
+					forceinline const Iterator Prev() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -447,19 +445,19 @@ namespace Seed {
 #pragma region Adding element to list by iterator
 					///<summary>Вставка елемента після заданого</summary>
 					///<param name = "Value">Значення нового елемента</summary>
-					__forceinline Iterator Insert(const T& Value)
+					forceinline Iterator Insert(const T& Value)
 					{
 						return AddAfter(Value);
 					}
 					///<summary>Оптимізована вставка елемента після заданого</summary>
 					///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
-					__forceinline Iterator Insert(T&& Value)
+					forceinline Iterator Insert(T&& Value)
 					{
 						return AddAfter(MoveRValue(Value));
 					}
 					///<summary>Вставка елемента після поточного</summary>
 					///<param name = "Value">Значення нового елемента</summary>
-					__forceinline Iterator AddAfter(const T& Value)
+					forceinline Iterator AddAfter(const T& Value)
 					{
 
 						if (This == nullptr)
@@ -482,7 +480,7 @@ namespace Seed {
 					}
 					///<summary>Оптимізована вставка елемента після поточного</summary>
 					///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
-					__forceinline Iterator AddAfter(T&& Value)
+					forceinline Iterator AddAfter(T&& Value)
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
@@ -504,7 +502,7 @@ namespace Seed {
 					}
 					///<summary>Вставка елемента перед поточним</summary>
 					///<param name = "Value">Значення нового елемента</summary>
-					__forceinline Iterator AddBefore(const T& Value)
+					forceinline Iterator AddBefore(const T& Value)
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
@@ -526,7 +524,7 @@ namespace Seed {
 					}
 					///<summary>Оптимізована вставка елемента перед поточним</summary>
 					///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
-					__forceinline Iterator AddBefore(T&& Value)
+					forceinline Iterator AddBefore(T&& Value)
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
@@ -551,34 +549,32 @@ namespace Seed {
 					template<typename U>
 					friend void Seed::Core::Swap(U& A, U& B);
 #pragma region Ctor, Dtor, copy operators
-
-					Iterator(const Iterator& iterator) : This(iterator.This) {
+					forceinline Iterator(const Iterator& iterator) : This(iterator.This) {
 						if (This != nullptr)
 							This->RefCount++;
 					}
 
-					Iterator(Iterator&& iterator) : This(iterator.This) {
+					forceinline Iterator(Iterator&& iterator) : This(iterator.This) {
 						iterator.This = nullptr;
 					}
 
-					Iterator& operator=(const Iterator& iterator) {
+					forceinline Iterator& operator=(const Iterator& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(iterator);
 						return *this;
 					}
 
-					Iterator& operator=(Iterator&& iterator) {
+					forceinline Iterator& operator=(Iterator&& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(MoveRValue(iterator));
 						return *this;
 					}
 
-					~Iterator() {
+					forceinline ~Iterator() {
 						if (This != nullptr)
 						{
 							if (--This->RefCount == 0)
 							{
-								this->Dispose(); 
 								delete This;
 							}
 							This = nullptr;
@@ -590,7 +586,7 @@ namespace Seed {
 				friend Iterator;
 
 				///<summary>Пустий конструктор</summary>
-				__forceinline BaseList() :This(new list_data)
+				forceinline BaseList() :This(new list_data)
 				{};
 
 				///<summary>Конструктор через list-initializer</summary>
@@ -618,13 +614,13 @@ namespace Seed {
 
 				///<summary>Оператор додавання значення в кінець списку</summary>
 				///<param name = "Value">Значення нового елемента</param>
-				__forceinline BaseList& operator+=(const T& Value)
+				forceinline BaseList& operator+=(const T& Value)
 				{
 					this->AddLast(Value); return *this;
 				}
 				///<summary>Оптимізований оператор додавання значення в кінець списку</summary>
 				///<param name = "Value">rvalue силка на значення нового елемента</param>
-				__forceinline BaseList& operator+=(T&& Value)
+				forceinline BaseList& operator+=(T&& Value)
 				{
 					this->AddLast(MoveRValue(Value)); return *this;
 				}
@@ -632,7 +628,7 @@ namespace Seed {
 				///<summary>Додавання елементів списку OtherList в кінець цього списку</summary>
 				///<param name = "OtherList">Другий список</param>
 				///<returns>Силку на поточний список</returns>
-				__forceinline BaseList& operator+=(const BaseList& OtherList) {
+				forceinline BaseList& operator+=(const BaseList& OtherList) {
 					if (OtherList.This == this->This)
 						return *this;
 
@@ -652,7 +648,7 @@ namespace Seed {
 				///<summary>Оптимізована додавання елементів до даного списку</summary>
 				///<param name = "OtherList">Другий список</param>
 				///<returns>Силку на поточний список</returns>
-				__forceinline BaseList& operator+=(BaseList&& OtherList) {
+				forceinline BaseList& operator+=(BaseList&& OtherList) {
 					if (OtherList.This == this->This)
 						return *this;
 
@@ -684,7 +680,7 @@ namespace Seed {
 					return *this;
 				}
 
-				Boolean operator==(const BaseList& second) {
+				forceinline Boolean operator==(const BaseList& second) {
 					if (this->Count == second.Count) {
 						auto it1 = this->This->root;
 						auto it2 = second.This->root;
@@ -702,13 +698,13 @@ namespace Seed {
 #pragma endregion
 #pragma region Item count methods
 				///<summary>Вертає true якщо список пустий</summary>
-				__forceinline Boolean IsEmpty() const
+				forceinline Boolean IsEmpty() const
 				{
 					return (this->This == nullptr || this->This->size == 0);
 				}
 
 				///<summary>Вертає кількість елементів в списку</summary>
-				virtual inline SizeT GetCount() const
+				forceinline virtual SizeT GetCount() const
 				{
 					return IsEmpty() ? 0ull : (SizeT)This->size; //-V2517
 				}
@@ -718,34 +714,32 @@ namespace Seed {
 #pragma endregion
 #pragma region Iterators
 #pragma region Gettter
-				////TODO: Maybe implement as property
-
 				///<summary>Одержання ітератора на перший елемент</summary>
-				__forceinline Iterator GetRoot()
+				forceinline Iterator GetRoot()
 				{
 					if (This == nullptr) return GetEnd();
 						return Iterator(This->root);
 				}
 				///<summary>Одержання ітератора на останій елемент</summary>
-				__forceinline Iterator GetLast()
+				forceinline Iterator GetLast()
 				{
 					if (This == nullptr) return GetEnd();
 						return Iterator(This->last);
 				}
 				///<summary>Константне одержання ітератора на перший елемент</summary>
-				__forceinline const Iterator GetRoot() const
+				forceinline const Iterator GetRoot() const
 				{
 					if (This == nullptr) return GetEnd();
 						return Iterator(This->root);
 				}
 				///<summary>Константне одержання ітератора на останій елемент</summary>
-				__forceinline const Iterator GetLast() const
+				forceinline const Iterator GetLast() const
 				{
 					if (This == nullptr) return GetEnd();
 						return Iterator(This->last);
 				}
 				///<summary>Одержання нуль ітератора на кінець списку</summary>
-				__forceinline static Iterator GetEnd()
+				forceinline static Iterator GetEnd()
 				{
 					return Iterator(nullptr);
 				}
@@ -760,7 +754,7 @@ namespace Seed {
 #pragma region Add new value by iterator
 				///<summary>Додавання нового елемента в кінець списку</summary>
 				///<param name = "Value">Значення нового елемента</param>
-				Iterator AddLast(const T& Value)
+				forceinline Iterator AddLast(const T& Value)
 				{
 					if (This == nullptr)
 					{
@@ -782,7 +776,7 @@ namespace Seed {
 
 				///<summary>Оптимізоване додавання елемента до списку</summary>
 				///<param name = "Value">rvalue силка на значення нового елемента</param>
-				Iterator AddLast(T&& Value)
+				forceinline Iterator AddLast(T&& Value)
 				{
 					if (This == nullptr)
 					{
@@ -804,28 +798,28 @@ namespace Seed {
 				///<summary>Додавання нового елемента після заданого ітератором</summary>
 				///<param name = "Item">Ітератор на елмент</param>
 				///<param name = "Value">Значення нового елемента</param>
-				Iterator AddAfter(Iterator Item, const T& Value)
+				forceinline Iterator AddAfter(Iterator Item, const T& Value)
 				{
 					return Item.AddAfter(Value);
 				}
 				///<summary>Оптимізоване додавання елемента після заданого ітератором</summary>
 				///<param name = "Item">Ітератор на елмент</param>
 				///<param name = "Value">rvalue силка на значення нового елемента</param>
-				Iterator AddAfter(Iterator Item, T&& Value)
+				forceinline Iterator AddAfter(Iterator Item, T&& Value)
 				{
 					return Item.AddAfter(MoveRValue(Value));
 				}
 				///<summary>Додавання нового елемента перед елементом заданим ітератором</summary>
 				///<param name = "Item">Ітератор на елмент</param>
 				///<param name = "Value">Значення нового елемента</param>
-				Iterator AddBefore(Iterator Item, const T& Value)
+				forceinline Iterator AddBefore(Iterator Item, const T& Value)
 				{
 					return Item.AddBefore(Value);
 				}
 				///<summary>Додавання нового елемента перед елементом заданим ітератором</summary>
 				///<param name = "Item">Ітератор на елмент</param>
 				///<param name = "Value">rvalue силка на значення нового елемента</param>
-				Iterator AddBefore(Iterator Item, T&& Value)
+				forceinline Iterator AddBefore(Iterator Item, T&& Value)
 				{
 					return Item.AddBefore(MoveRValue(Value));
 				}
@@ -833,24 +827,24 @@ namespace Seed {
 			public:
 #pragma region For each support methods
 				///<summary>Вертає константний ітератор на початок для циклу з перебором</summary>
-				__forceinline const Iterator begin() const
+				forceinline const Iterator begin() const
 				{
 					return GetRoot();
 				}
 				///<summary>Вертає константний ітератор на кінець для циклу з перебором</summary>
-				__forceinline const Iterator end() const
+				forceinline const Iterator end() const
 				{
 					return nullptr;
 				}
 				///<summary>Вертає ітератор на початок для циклу з перебором</summary>
-				__forceinline Iterator begin()
+				forceinline Iterator begin()
 				{
 					return GetRoot();
 				}
 #pragma endregion
 			public:
 				///<summary>Видалення елемента по ітератору. Ітератор обнулює</summary>
-				__forceinline void Remove(Iterator& node)
+				void Remove(Iterator& node)
 				{
 					if (node.This == nullptr)
 						Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -937,7 +931,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 				template<typename LambdaT>
-				__forceinline BaseList& ForEachImpl(LambdaT&& lambda) {
+				BaseList& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&> || 
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 							auto node = this->This->root;
@@ -964,7 +958,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseList& ForEachImpl(LambdaT&& lambda) const {
+				const BaseList& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						auto node = this->This->root;
 						while (node != nullptr) {
@@ -989,7 +983,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseList& ForEachImpl(LambdaT&& lambda, SizeT count) {
+				BaseList& ForEachImpl(LambdaT&& lambda, SizeT count) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&> || 
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 							if (count > this->This->size)
@@ -1046,7 +1040,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseList& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+				const BaseList& ForEachImpl(LambdaT&& lambda, SizeT count) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						if (count > this->This->size)
 						{
@@ -1101,9 +1095,8 @@ namespace Seed {
 				}
 
 			protected:
-
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				forceinline U AggregateImpl(LambdaT&& lambda) const {
 					U value;
 					auto node = this->This->root;
 					SizeT index = 0;
@@ -1116,7 +1109,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					auto node = this->This->root;
 					U result = Value;
 					SizeT index = 0;
@@ -1129,7 +1122,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					auto node = this->This->root;
 					SizeT index = 0;
 					while (node != nullptr) {
@@ -1140,10 +1133,10 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				__forceinline bool AnyImpl() const { return this->This->size > 0; }
+				forceinline bool AnyImpl() const { return this->This->size > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda lambda) const {
+				forceinline bool AnyImpl(Lambda lambda) const {
 					auto node = this->This->root;
 					SizeT index = 0;
 					while (node != nullptr) {
@@ -1156,7 +1149,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda lambda) const {
+				forceinline bool AllImpl(Lambda lambda) const {
 					auto node = this->This->root;
 					SizeT index = 0;
 					while (node != nullptr) {
@@ -1168,7 +1161,7 @@ namespace Seed {
 					return true;
 				}
 
-				__forceinline BaseList& SortByImpl(bool IsDescending = true) {
+				forceinline BaseList& SortByImpl(bool IsDescending = true) {
 					if (IsDescending) {
 						auto l = [](const T& V1, const T& V2) { return V1 < V2; };
 						This->root = mergeSort(This->root, l);
@@ -1187,7 +1180,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline T& FirstImpl(Lambda&& lambda) {
+				forceinline T& FirstImpl(Lambda&& lambda) {
 					elem* node = This->root;
 					while (node != nullptr)
 						if (lambda(node->value))
@@ -1199,7 +1192,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline T& LastImpl(Lambda&& lambda) {
+				forceinline T& LastImpl(Lambda&& lambda) {
 					elem* node = This->root;
 					elem* selected = nullptr;
 					while (node != nullptr) {
@@ -1214,7 +1207,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline const T& FirstImpl(Lambda&& lambda) const {
+				forceinline const T& FirstImpl(Lambda&& lambda) const {
 					elem* node = This->root;
 					while (node != nullptr)
 						if (lambda(node->value))
@@ -1226,7 +1219,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline const T& LastImpl(Lambda&& lambda) const {
+				forceinline const T& LastImpl(Lambda&& lambda) const {
 					elem* node = This->root;
 					elem* selected = nullptr;
 					while (node != nullptr) {
@@ -1241,7 +1234,7 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				__forceinline BaseList& ReverseImpl() {
+				forceinline BaseList& ReverseImpl() {
 					elem* temp = nullptr;
 					elem* current = This->root;
 
@@ -1255,7 +1248,7 @@ namespace Seed {
 					return *this;
 				}
 
-				__forceinline void UnsafeAdd(const T& Value) {
+				forceinline void UnsafeAdd(const T& Value) {
 					if (this->This->root == nullptr) {
 						this->This->root = this->This->last = new elem(Value, this->This);
 					}
@@ -1265,7 +1258,7 @@ namespace Seed {
 					++this->This->size;
 				}
 
-				__forceinline void UnsafeAdd(T&& Value) {
+				forceinline void UnsafeAdd(T&& Value) {
 					if (this->This->root == nullptr) {
 						this->This->root = this->This->last = new elem(MoveRValue(Value), this->This);
 					}
@@ -1275,33 +1268,50 @@ namespace Seed {
 					++this->This->size;
 				}
 
-				__forceinline BaseList& RemoveAllImpl() {
-					this->Dispose();
+				forceinline BaseList& RemoveAllImpl() {
+					elem* node;
+					while (this->This->root != nullptr)
+					{
+						node = this->This->root;
+						this->This->root = This->root->next;
+						if (--node->RefCount == 0)
+						{
+							delete node;
+							continue;
+						}
+						node->next = nullptr;
+						node->father = nullptr;
+						node->prev = nullptr;
+					}
+					this->This->root = this->This->last = nullptr;
+					this->This->size = 0;
 					return *this;
 				}
 
 				template<typename Lambda>
-				__forceinline BaseList& RemoveAllImpl(Lambda&& lambda) {
-						elem* node;
-						while (this->This->root != nullptr)
+				forceinline BaseList& RemoveAllImpl(Lambda&& lambda) {
+					elem* node;
+					while (this->This->root != nullptr)
+					{
+						node = this->This->root;
+						this->This->root = This->root->next;
+						lambda(MoveRValue(node->value));
+						if (--node->RefCount == 0)
 						{
-							node = this->This->root;
-							this->This->root = This->root->next;
-							lambda(MoveRValue(node->value));
-							if (--node->RefCount == 0)
-							{
-								delete node;
-								continue;
-							}
-							node->next = nullptr;
-							node->father = nullptr;
-							node->prev = nullptr;
+							delete node;
+							continue;
 						}
-						return *this;
+						node->next = nullptr;
+						node->father = nullptr;
+						node->prev = nullptr;
+					}
+					this->This->root = this->This->last = nullptr;
+					this->This->size = 0;
+					return *this;
 				}
 
 				template<typename FilterLambda, typename Lambda>
-				__forceinline BaseList& RemoveIfFilterAndLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
+				BaseList& RemoveIfFilterAndLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
 					if (This == nullptr)
 						return *this;
 					elem* it = This->root;
@@ -1353,7 +1363,7 @@ namespace Seed {
 				}
 
 				template<typename FilterLambda, typename Lambda>
-				__forceinline BaseList& RemoveIfFilterWithIndex(FilterLambda&& filter, Lambda&& lambda) {
+				BaseList& RemoveIfFilterWithIndex(FilterLambda&& filter, Lambda&& lambda) {
 						if (This == nullptr)
 							return *this;
 						elem* it = This->root;
@@ -1405,7 +1415,7 @@ namespace Seed {
 				}
 
 				template<typename FilterLambda, typename Lambda>
-				__forceinline BaseList& RemoveIfLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
+				BaseList& RemoveIfLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
 					if (This == nullptr)
 						return *this;
 					elem* it = This->root;
@@ -1457,7 +1467,7 @@ namespace Seed {
 				}
 
 				template<typename FilterLambda, typename Lambda>
-				__forceinline BaseList& RemoveIfFilterAndLambdaWithoutIndex(FilterLambda&& filter, Lambda&& lambda) {
+				BaseList& RemoveIfFilterAndLambdaWithoutIndex(FilterLambda&& filter, Lambda&& lambda) {
 					if (This == nullptr)
 						return *this;
 					elem* it = This->root;
@@ -1509,7 +1519,7 @@ namespace Seed {
 				}
 
 				template<typename FilterLambda, typename Lambda>
-				__forceinline BaseList& RemoveIfImpl(FilterLambda&& filter, Lambda&& lambda) {
+				forceinline BaseList& RemoveIfImpl(FilterLambda&& filter, Lambda&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
 						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&>::State) {
 						return RemoveIfFilterAndLambdaWithoutIndex(MoveRValue(filter), MoveRValue(lambda));
@@ -1531,7 +1541,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
+				forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
 					SizeT selectedCount = 0;
 
 					auto node = this->This->root;
@@ -1585,12 +1595,12 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseList<THeap, T>& A, Containers::BaseList<THeap, T>& B) {
+		forceinline void Swap(Containers::BaseList<THeap, T>& A, Containers::BaseList<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(typename Containers::BaseList<THeap, T>::Iterator& A, typename Containers::BaseList<THeap, T>::Iterator& B) {
+		forceinline void Swap(typename Containers::BaseList<THeap, T>::Iterator& A, typename Containers::BaseList<THeap, T>::Iterator& B) {
 			Swap(A.This, B.This);
 		}
 	}

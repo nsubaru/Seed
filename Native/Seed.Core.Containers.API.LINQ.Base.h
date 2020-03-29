@@ -72,15 +72,15 @@ namespace Seed {
                 /// <summary>
                 /// Базовий клас для загальних колекцій
                 /// </summary>
-				class ICollectionGenericBase { public: virtual ~ICollectionGenericBase() = 0 {}; };
+				class ICollectionGenericBase { public: forceinline virtual ~ICollectionGenericBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для фіксованих колекцій
                 /// </summary>
-				class IFixedCollectionGenericBase { public: virtual ~IFixedCollectionGenericBase() = 0 {}; };
+				class IFixedCollectionGenericBase { public: forceinline virtual ~IFixedCollectionGenericBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для асоціативних колекцій
                 /// </summary>
-				class IAssociableCollectionGenericBase { public: virtual ~IAssociableCollectionGenericBase() = 0 {}; };
+				class IAssociableCollectionGenericBase { public: forceinline virtual ~IAssociableCollectionGenericBase() = 0 {}; };
 #pragma region LINQ for one typearg Collection
 
                 /// <summary>
@@ -407,7 +407,7 @@ namespace Seed {
 						}
 					}
 				public:
-					virtual ~IFixedCollectionBase() = 0 {}
+					forceinline virtual ~IFixedCollectionBase() = 0 {}
 				};
 #pragma endregion
 #pragma region LINQ for associable Collection
@@ -458,7 +458,7 @@ namespace Seed {
 					public TAssociableLinq<TCollection<THeap, TKey, TValue>, THeap, TKey, TValue, TPair, true>
 				{
 				public:
-					virtual ~IAssociableCollectionBase() = 0 {}
+					forceinline virtual ~IAssociableCollectionBase() = 0 {}
 				};
 #pragma endregion
 #pragma region LINQ for Pair
@@ -513,7 +513,7 @@ namespace Seed {
 				template<template<typename THeap> typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
 				class IStringCollectionBaseLinq : public TStringLinq<TString<THeap>, THeap, TChar, TIsConcurencySuport> {
 				public:
-					virtual ~IStringCollectionBaseLinq() = 0 {};
+					forceinline virtual ~IStringCollectionBaseLinq() = 0 {};
 				};
 #pragma endregion
 			}

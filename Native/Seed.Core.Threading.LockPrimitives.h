@@ -1,5 +1,10 @@
 #pragma once
 #include "Seed.Core.Base.h"
+#include "Seed.Core.Threading.Internal.h"
+
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
 
 namespace Seed {
 	inline namespace Core {
@@ -13,49 +18,40 @@ namespace Seed {
 				};
 
 				ImplT lock;
-			private:
-				friend void AcquireLockExclusiveSRWLock(void* PSRWLock);
-				friend void ReleaseLockExclusiveSRWLock(void* PSRWLock);
-				friend void AcquireLockSharedSRWLock(void* PSRWLock);
-				friend void ReleaseLockSharedSRWLock(void* PSRWLock);
-				friend bool TryAcquireLockSharedSRWLock(void* PSRWLock);
-			private:
-				friend _declspec(noreturn) void __rethrow();
 			public:
-				__forceinline SRWLock()
+				forceinline SRWLock()
 				{
-					extern void InitSRWLock(void*);
-					InitSRWLock(&lock);
+					Internals::InitSRWLock(&lock);
 				}
 				///<summary>Виконує <see cref="Funct"/> з еклюзивним блокуванням</summary>
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				__forceinline decltype(auto) ExclusiveLock(T& Funct)
+				forceinline decltype(auto) ExclusiveLock(T& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
-						AcquireLockExclusiveSRWLock(&lock);
+						Internals::AcquireLockExclusiveSRWLock(&lock);
 						try {
 							Funct();
 						}
 						catch (...) {
-							ReleaseLockExclusiveSRWLock(&lock);
-							__rethrow();
+							Internals::ReleaseLockExclusiveSRWLock(&lock);
+							Internals::__CxxRethrowImpl();
 						}
-						ReleaseLockExclusiveSRWLock(&lock);
+						Internals::ReleaseLockExclusiveSRWLock(&lock);
 					}
 					else
 					{
-						AcquireLockExclusiveSRWLock(&lock);
+						Internals::AcquireLockExclusiveSRWLock(&lock);
 						try {
 							decltype(Funct()) ret(Funct());
-							ReleaseLockExclusiveSRWLock(&lock);
+							Internals::ReleaseLockExclusiveSRWLock(&lock);
 							return ret;
 						}
 						catch (...) {
-							ReleaseLockExclusiveSRWLock(&lock);
-							__rethrow();
+							Internals::ReleaseLockExclusiveSRWLock(&lock);
+							Internals::__CxxRethrowImpl();
 						}
 					}
 				}
@@ -63,49 +59,49 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T>
-				__forceinline decltype(auto) ShareLock(T& Funct)
+				forceinline decltype(auto) ShareLock(T& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
-						AcquireLockSharedSRWLock(&lock);
+						Internals::AcquireLockSharedSRWLock(&lock);
 						try {
 							Funct();
 						}
 						catch (...) {
-							ReleaseLockSharedSRWLock(&lock);
-							__rethrow();
+							Internals::ReleaseLockSharedSRWLock(&lock);
+							Internals::__CxxRethrowImpl();
 						}
-						ReleaseLockSharedSRWLock(&lock);
+						Internals::ReleaseLockSharedSRWLock(&lock);
 					}
 					else
 					{
-						AcquireLockSharedSRWLock(&lock);
+						Internals::AcquireLockSharedSRWLock(&lock);
 						try {
 							decltype(Funct()) ret(Funct());
-							ReleaseLockSharedSRWLock(&lock);
+							Internals::ReleaseLockSharedSRWLock(&lock);
 							return ret;
 						}
 						catch (...) {
-							ReleaseLockSharedSRWLock(&lock);
-							__rethrow();
+							Internals::ReleaseLockSharedSRWLock(&lock);
+							Internals::__CxxRethrowImpl();
 						}
 					}
 				}
 
 				template<typename T>
-				Boolean TryInShareLock(T& Funct) {
+				forceinline Boolean TryInShareLock(T& Funct) {
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
-						if (!TryAcquireLockSharedSRWLock(&lock))
+						if (!Internals::TryAcquireLockSharedSRWLock(&lock))
 							return false;
 						try {
 							Funct();
 						}
 						catch (...) {
-							ReleaseLockSharedSRWLock(&lock);
-							__rethrow();
+							Internals::ReleaseLockSharedSRWLock(&lock);
+							Internals::__CxxRethrowImpl();
 						}
-						ReleaseLockSharedSRWLock(&lock);
+						Internals::ReleaseLockSharedSRWLock(&lock);
 						return true;
 					}
 					else
@@ -117,3 +113,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

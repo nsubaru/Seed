@@ -21,15 +21,17 @@ namespace Seed {
 				struct Data : public Memory::Allocator<THeap> {
 					Seed::RefCountT RefCount;
 					SizeT count;
-					T* array;
-					Data() : RefCount(1), count(0), array(nullptr) {}
-					Data(T*&& array, SizeT count) : RefCount(1), count(count), array(array) {}
+					T* restrict array;
+
+					forceinline Data() : RefCount(1), count(0), array(nullptr) {}
+					forceinline Data(T*&& array, SizeT count) : RefCount(1), count(count), array(array) {}
 				};
 			private:
 				Data* This;
 			protected:
-				virtual void Dispose() override {
+				forceinline virtual void Dispose() override {
 					delete[] This->array;
+					This->array = nullptr;
 				}
 			private:
 				template<typename Lambda>
@@ -83,7 +85,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename LambdaT>
-				__forceinline BaseArray& ForEachImpl(LambdaT&& lambda) {
+				BaseArray& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
@@ -104,7 +106,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseArray& ForEachImpl(LambdaT&& lambda) const {
+				const BaseArray& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
@@ -125,7 +127,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseArray& ForEachImpl(LambdaT&& lambda, SizeT count) {
+				BaseArray& ForEachImpl(LambdaT&& lambda, SizeT count) {
 					if (count > this->Count)
 						count = this->Count;
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
@@ -148,7 +150,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseArray& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+				const BaseArray& ForEachImpl(LambdaT&& lambda, SizeT count) const {
 					if (count > this->Count)
 						count = this->Count;
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
@@ -171,8 +173,8 @@ namespace Seed {
 				}
 			protected:
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda) const {
 					U val = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
@@ -181,8 +183,8 @@ namespace Seed {
 					return val;
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda, const U& Value) const {
 					U result = Value;
 					for (SizeT i = 0; i < This->count; i++)
 					{
@@ -191,8 +193,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				template<typename U, typename Lambda>
+				U AggregateImpl(Lambda&& lambda, U&& Value) const {
 					for (SizeT i = 0; i < This->count; i++)
 					{
 						lambda(Value, This->array[i]);
@@ -200,10 +202,10 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				bool AnyImpl() const { return This->count > 0; }
+				forceinline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				bool AnyImpl(Lambda&& lambda) const {
 					for (SizeT i = 0; i < This->count; i++)
 					{
 						if (lambda(This->array[i]))
@@ -213,7 +215,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				bool AllImpl(Lambda&& lambda) const {
 					for (SizeT i = 0; i < This->count; i++)
 					{
 						if (!lambda(This->array[i]))
@@ -222,7 +224,7 @@ namespace Seed {
 					return true;
 				}
 
-				BaseArray& SortByImpl(bool IsDescending = true) {
+				forceinline BaseArray& SortByImpl(bool IsDescending = true) {
 					if (IsDescending) {
 						auto l = [](const T& V1, const T& V2) { return V1 < V2; };
 						QuickSort(This->array, 0, This->count - 1, l);
@@ -278,22 +280,22 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				BaseArray& ReverseImpl() {
+				forceinline BaseArray& ReverseImpl() {
 					for (SizeT i = 0; i < This->count / 2; i++) {
 						Swap(This->array[i], This->array[(This->count - 1) - i]);
 					}
 					return *this;
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->array[Index] = Value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->array[Index] = MoveRValue(Value);
 				}
 
-				__forceinline BaseArray& RemoveAllImpl() {
+				forceinline BaseArray& RemoveAllImpl() {
 					delete[] this->This->array;
 					this->This->array = nullptr;
 					this->This->count = 0;
@@ -301,8 +303,8 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseArray& RemoveAllImpl(Lambda&& lambda) {
-					for (SizeT i = 0; i < This->Count; i++) {
+				forceinline BaseArray& RemoveAllImpl(Lambda&& lambda) {
+					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->array[i]));
 					}
 					delete[] this->This->array;
@@ -314,7 +316,7 @@ namespace Seed {
 			public:
 #pragma warning(push)
 #pragma warning(disable: 6386)
-				BaseArray() : This(new Data()) {}
+				forceinline BaseArray() : This(new Data()) {}
 				BaseArray(InitilizerList<T>&& list) : This(new Data()) {
 					if (list.size() != 0) {
 						This->count = list.size();
@@ -326,7 +328,7 @@ namespace Seed {
 						}
 					}
 				}
-				BaseArray(SizeT StartCount) : This(new Data()) {
+				forceinline BaseArray(SizeT StartCount) : This(new Data()) {
 					if (StartCount != 0) {
 						This->array = new T[StartCount];
 						This->count = StartCount;
@@ -351,20 +353,35 @@ namespace Seed {
 				InternalApiCall BaseArray(T*&& Array, SizeT StartCount) : This(new Data(MoveRValue(Array), StartCount))
 				{}
 
-				InternalApiCall operator const T* const() const { return This->array; }
+				forceinline InternalApiCall operator const T* const() const { return This->array; }
 #pragma warning(pop)
 			public:
-				T& operator[](SizeT Index) {
-					return This->array[Index];
+				forceinline T& operator[](SizeT Index) {
+					if (Index < This->count)
+                    {
+                        return This->array[Index];
+                    }
+                    else
+                    {
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, This->count);
+                    }
 				}
-				const T& operator[](SizeT Index) const {
-					return This->array[Index];
+
+				forceinline const T& operator[](SizeT Index) const {
+					if (Index < This->count)
+                    {
+                        return This->array[Index];
+                    }
+                    else
+                    {
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, This->count);
+                    }
 				}
 #pragma warning(push)
 #pragma warning(disable: 4996)
 				///<summary>Зміна розміру</summary>
 				///<param name = 'NewSize'>Новий розмір масиву</param>
-				__forceinline BaseArray& Resize(SizeT NewSize) {
+				forceinline BaseArray& Resize(SizeT NewSize) {
 					if (this->This->array == nullptr || this->This->count == 0)
 					{
 						this->This->array = new T[NewSize];
@@ -405,10 +422,10 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 			public:
-				SizeT GetCount() const { return This->count; }
+				forceinline SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
-				const T* const GetRaw() const { return This->array; }
+				forceinline const T* const GetRaw() const { return This->array; }
 			public:
 				RefCountClass(BaseArray, This);
 			};
@@ -439,7 +456,7 @@ namespace Seed {
 				public LINQ::IArray<BaseVList, THeap, T, false> {
 			private:
 				struct Node {
-					T* arr;
+					T* restrict arr;
 					SizeT size;
 					Node* next;
 
@@ -483,7 +500,7 @@ namespace Seed {
 			private:
 				Data* This;
 			public:
-				BaseVList() : This(new Data()) {}
+				forceinline BaseVList() : This(new Data()) {}
 				BaseVList(InitilizerList<T>&& list) : This(new Data(list.size())) {
 					auto it = list.begin();
 					for (SizeT i = 0; i < list.size(); i++)
@@ -491,10 +508,10 @@ namespace Seed {
 						This->root->arr[i] = *it; ++it;
 					}
 				}
-				BaseVList(const BaseArray<THeap, T>& array) : This(nullptr) {
+				forceinline BaseVList(const BaseArray<THeap, T>& array) : This(nullptr) {
 					this->This = new Data(array.This->count, static_cast<T*&>(array.This->array));
 				}
-				BaseVList(BaseArray<THeap, T>&& array) : This(nullptr) {
+				forceinline BaseVList(BaseArray<THeap, T>&& array) : This(nullptr) {
 					if (--array.This->RefCount == 0) {
 						This = new Data(array.This->count, MoveRValue(array.This->array));
 					}
@@ -606,7 +623,7 @@ namespace Seed {
 					return result;
 				}
 			public:
-				SizeT GetCount() const { return This->count; }
+				forceinline SizeT GetCount() const { return This->count; }
 				SizeT Property(GetCount) Count;
 
 				template<typename U>
@@ -637,7 +654,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 				template<typename LambdaT>
-				__forceinline BaseVList& ForEachImpl(LambdaT&& lambda) {
+				BaseVList& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
@@ -670,7 +687,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseVList& ForEachImpl(LambdaT&& lambda) const {
+				const BaseVList& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
@@ -703,7 +720,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline BaseVList& ForEachImpl(LambdaT&& lambda, SizeT count) {
+				BaseVList& ForEachImpl(LambdaT&& lambda, SizeT count) {
 					if (count > this->Count)
 						count = this->Count;
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
@@ -738,7 +755,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				__forceinline const BaseVList& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+				const BaseVList& ForEachImpl(LambdaT&& lambda, SizeT count) const {
 					if (count > this->Count)
 						count = this->Count;
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
@@ -774,7 +791,7 @@ namespace Seed {
 
 			protected:
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda) const {
+				U AggregateImpl(LambdaT&& lambda) const {
 					U val = U();
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
@@ -790,7 +807,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				U AggregateImpl(LambdaT&& lambda, const U& Value) const {
 					T result = Value;
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
@@ -806,7 +823,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				__forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				U AggregateImpl(LambdaT&& lambda, U&& Value) const {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -820,10 +837,10 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				bool AnyImpl() const { return This->count > 0; }
+				forceinline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				__forceinline bool AnyImpl(Lambda&& lambda) const {
+				bool AnyImpl(Lambda&& lambda) const {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -839,7 +856,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline bool AllImpl(Lambda&& lambda) const {
+				bool AllImpl(Lambda&& lambda) const {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -932,15 +949,15 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				__forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				forceinline void UnsafeSet(const T& Value, SizeT Index) {
 					This->root->arr[Index] = Value;
 				}
 
-				__forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				forceinline void UnsafeSet(T&& Value, SizeT Index) {
 					This->root->arr[Index] = MoveRValue(Value);
 				}
 
-				__forceinline BaseVList& RemoveAllImpl() {
+				forceinline BaseVList& RemoveAllImpl() {
 					Node* node = This->root;
 					Node* tmp;
 					SizeT nodeStartIndex = 0;
@@ -954,7 +971,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				__forceinline BaseVList& RemoveAllImpl(Lambda&& lambda) {
+				BaseVList& RemoveAllImpl(Lambda&& lambda) {
 					Node* node = This->root;
 					Node* tmp;
 					SizeT nodeStartIndex = 0;
@@ -996,12 +1013,12 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseArray<THeap, T>& A, Containers::BaseArray<THeap, T>) {
+		forceinline void Swap(Containers::BaseArray<THeap, T>& A, Containers::BaseArray<THeap, T>) {
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename T>
-		__forceinline void Swap(Containers::BaseVList<THeap, T>& A, Containers::BaseVList<THeap, T>) {
+		forceinline void Swap(Containers::BaseVList<THeap, T>& A, Containers::BaseVList<THeap, T>) {
 			Swap(A.This, B.This);
 		}
 	}

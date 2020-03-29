@@ -1506,7 +1506,7 @@ union RawExceptionInfo {
     EHExceptionRecord CxxExceptionInfo;
 };
 
-__forceinline __declspec(noreturn)
+forceinline __declspec(noreturn)
 void __RethrowException(EHExceptionRecord* pThisException)
 {
     RawExceptionInfo* orig = (RawExceptionInfo*) pThisException; //-V1027
@@ -1838,17 +1838,6 @@ void CatchIt(
 inline TlsExceptionData * GetThreadExceptionData()
 {
     return &Seed::Core::Threading::GetTLS()->ExceptionInfo;
-}
-
-extern "C" {
-    BOOL _Init_thread_epoch;
-    void __cdecl _Init_thread_header(int* pOnce) noexcept {
-        pOnce;
-    }
-
-    void __cdecl _Init_thread_footer(int* pOnce) noexcept {
-        pOnce;
-    }
 }
 
 //Storing exception region

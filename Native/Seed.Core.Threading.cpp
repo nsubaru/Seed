@@ -17,7 +17,7 @@
 
 #include "Seed.Core.Manage.h"
 
-#include "Seed.Core.Threading.Impl.h"
+#include "Seed.Core.Threading.TLS.GlobalTLSBlock.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
@@ -33,11 +33,11 @@ using namespace Seed::Threading;
 
 static Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>* AllActiveThreadable;
 
-__forceinline IThreadable* GetThisThreadable() {
+forceinline IThreadable* GetThisThreadable() {
 	return Seed::Core::Threading::GetTLS()->Threadable;
 }
 
-__forceinline volatile EThreadabledStates* GetThisThreadableState() {
+forceinline volatile EThreadabledStates* GetThisThreadableState() {
 	return Seed::Core::Threading::GetTLS()->State;
 }
 
@@ -118,7 +118,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::Thread; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -153,7 +153,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::JobTask; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -188,7 +188,7 @@ namespace Seed {
 				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::SheduledTask; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
-				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplemented(ExceptionPosition)); }
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
 
 				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
 				virtual Boolean IsHaveParrentThreadable() const { return false; }
@@ -284,7 +284,7 @@ bool Seed::Core::Threading::MainThread(Delegate&& delegate)
 	Thread* MainThread = new Thread("Main thread", MoveRValue(delegate));
 	MainThread->This->State = EThreadabledStates::Starting;
 	MainThread->This->hThread = threadHandle;
-	MainThread->This->AbortEvent = new Event();
+	MainThread->This->AbortEvent = new SynchronizeEvent();
 	MainThread->This->TID =  reinterpret_cast<SizeT>(NtCurrentThreadId());
 	MainThread->RefreshName();
 	EntryPoint(MainThread->This->delegate, MainThread);
@@ -320,7 +320,7 @@ Thread& Seed::Core::Threading::Thread::Start()
 	if (this->This->This != nullptr)
 		Throw(ThreadableAlredyStarted(ExceptionPosition));
 	toCoreLog(String(L"Запуск потоку з ім'ям \"") + this->GetName() + L"\" з потоку з ID " + String::toString(Threading::GetTID()));
-	this->This->AbortEvent = new Event();
+	this->This->AbortEvent = new SynchronizeEvent();
 	CLIENT_ID id;
 	size_t stack_max = 10485760, stack_alloc = 524288;
 	RtlCreateUserThread(
@@ -955,13 +955,13 @@ SheduledJob& Seed::Core::Threading::SheduledJob::Join(DateTime timeOut)
 
 #pragma endregion
 
-#pragma region Event
-void Seed::Core::Threading::Event::Dispose()
+#pragma region SynchronizeEvent
+void Seed::Core::Threading::SynchronizeEvent::Dispose()
 {
 	if (data->handle != nullptr)
 		NtClose(data->handle);
 }
-Seed::Core::Threading::Event::Event(Boolean IsManualReset) : data(new event_data(IsManualReset, String()))
+Seed::Core::Threading::SynchronizeEvent::SynchronizeEvent(Boolean IsManualReset) : data(new event_data(IsManualReset, String()))
 {
 	NTSTATUS status = NtCreateEvent(
 		&data->handle,
@@ -977,7 +977,7 @@ Seed::Core::Threading::Event::Event(Boolean IsManualReset) : data(new event_data
 		Throw(NtException(ExceptionPosition, status));
 	}
 }
-Seed::Core::Threading::Event::Event(const String& name, Boolean IsManualReset) : data(new event_data(IsManualReset, name))
+Seed::Core::Threading::SynchronizeEvent::SynchronizeEvent(const String& name, Boolean IsManualReset) : data(new event_data(IsManualReset, name))
 {
 	OBJECT_ATTRIBUTES attrbs;
 	UNICODE_STRING label;
@@ -999,7 +999,7 @@ Seed::Core::Threading::Event::Event(const String& name, Boolean IsManualReset) :
 	}
 }
 
-Seed::Core::Threading::Event::Event(String&& name, Boolean IsManualReset) : data(new event_data(IsManualReset, MoveRValue(name)))
+Seed::Core::Threading::SynchronizeEvent::SynchronizeEvent(String&& name, Boolean IsManualReset) : data(new event_data(IsManualReset, MoveRValue(name)))
 {
 	OBJECT_ATTRIBUTES attrbs;
 	UNICODE_STRING label;
@@ -1021,21 +1021,21 @@ Seed::Core::Threading::Event::Event(String&& name, Boolean IsManualReset) : data
 	}
 }
 
-void Seed::Core::Threading::Event::Wait() const
+void Seed::Core::Threading::SynchronizeEvent::Wait() const
 {
 	LARGE_INTEGER delay;
 	delay.QuadPart = Math::Max<Int64>();
 	NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 }
 
-void Seed::Core::Threading::Event::Wait(SizeT TimeOutMs) const
+void Seed::Core::Threading::SynchronizeEvent::Wait(SizeT TimeOutMs) const
 {
 	LARGE_INTEGER delay;
 	delay.QuadPart = (TimeOutMs > 0) ? -10000LL * TimeOutMs : Math::Max<Int64>();
 	NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 }
 
-void Seed::Core::Threading::WaitForMany(const Containers::Array<Event>& events, Boolean isWaitAll, SizeT TimeOutMs) {
+void Seed::Core::Threading::WaitForMany(const Containers::Array<SynchronizeEvent>& events, Boolean isWaitAll, SizeT TimeOutMs) {
 	if (events.Count > static_cast<SizeT>(Math::Max<UInt32>()))
 		Throw(InvalidArgumentException(ExceptionPosition, L"events.Count", L"events count must be less than ULONG max"));
 
@@ -1050,14 +1050,14 @@ void Seed::Core::Threading::WaitForMany(const Containers::Array<Event>& events, 
 			return;
 		if (events.Count == 1)
 		{
-			events.First([] (const Event&)
+			events.First([] (const SynchronizeEvent&)
 			{
 				return true;
 			}).Wait();	
 			return;
 		}
 		hEvents = new HANDLE[events.Count];
-		events.ForEach([&] (const Event& event, SizeT Index)
+		events.ForEach([&] (const SynchronizeEvent& event, SizeT Index)
 		{
 			hEvents[Index] = event.data->handle;
 		});
@@ -1093,9 +1093,7 @@ extern __declspec(noreturn) InternalApiCall void EmergencyShutdown(
 void Seed::Core::Stage1Complete() noexcept
 {
 	try {
-		Threading::StopMinTls();
 		Threading::MainThread([]() {Stage2(); });
-		Threading::InitMinTls();
 	}
 	catch (...) {
 		EmergencyShutdown(ExceptionPosition, L"Не можливо ініціалізувати підсистему підтримки багатопотоковості");

@@ -12,7 +12,7 @@
     </Expand>
   </Type>
   <Type Name="Seed::Core::ConsAString">
-    <DisplayString>{{Text = {str,na}, Lenght = {size}}}</DisplayString>
+    <DisplayString>{{Text = {str,s}, Lenght = {size}}}</DisplayString>
     <StringView>str,na</StringView>
     <Expand>
       <Item Name="[Lenght]">size</Item>

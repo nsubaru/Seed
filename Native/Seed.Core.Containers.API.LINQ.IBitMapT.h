@@ -22,7 +22,7 @@ namespace Seed
 				{
 					using ThisCollection = TCollection<THeap, TSize, T>;
 				public:
-					virtual ~IBitMapT() = 0
+					forceinline virtual ~IBitMapT() = 0
 					{}
 				};
 			}

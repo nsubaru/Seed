@@ -18,28 +18,28 @@ namespace Seed {
 			SmartPtr(T*&& ptr) : This(new Data(MoveRValue(ptr))) {}
 			RefCountClass(SmartPtr, This);
 
-			__forceinline T& operator*()
+			forceinline T& operator*()
 			{
 				return *This->ptr;
 			}
-			__forceinline const T& operator*() const
+			forceinline const T& operator*() const
 			{
 				return *This->ptr;
 			}
-			__forceinline T* operator->()
+			forceinline T* operator->()
 			{
 				return This->ptr;
 			}
-			__forceinline const T* operator->() const
+			forceinline const T* operator->() const
 			{
 				return This->ptr;
 			}
 
-			__forceinline SizeT GetRefCount() {
+			forceinline SizeT GetRefCount() {
 				return This->RefCount;
 			}
 
-			__forceinline decltype(auto) GetTypeInfo() {
+			forceinline decltype(auto) GetTypeInfo() {
 				return typeid(This->ptr);
 			}
 

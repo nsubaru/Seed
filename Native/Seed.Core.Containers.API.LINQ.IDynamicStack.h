@@ -16,8 +16,7 @@ namespace Seed {
 				class IDynamicStack :
 					public ICollection<TDynamicStack, THeap, T, false, TIsConcurencySuport> {
 				public:
-				public:
-					virtual ~IDynamicStack() = 0 {}
+					forceinline virtual ~IDynamicStack() = 0 {}
 				};
 			}
 		}

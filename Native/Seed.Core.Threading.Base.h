@@ -42,11 +42,11 @@ namespace Seed {
 				virtual ~IThreadable() = 0 {}
 			};
 
-			SizeT GetThreadableCount(Boolean WithPseudoThreadable = false);
-			Containers::ConcurencyList<SmartPtr<IThreadable>> GetAllThreadable();
+			SeedKernelCall SizeT GetThreadableCount(Boolean WithPseudoThreadable = false);
+			SeedKernelCall Containers::ConcurencyList<SmartPtr<IThreadable>> GetAllThreadable();
 
-			IThreadable& GetThis();
-			ID GetTID();
+			SeedKernelCall IThreadable& GetThis();
+			SeedKernelCall ID GetTID();
 
 			void Sleep(DateTime time, Boolean IsRelative);
 			inline void Sleep(UInt64 ms) { Sleep(DateTime((DateTime::SecondInNtTime / 1000) * ms), true); }
@@ -65,7 +65,7 @@ namespace Seed {
 			};
 
 			///<summary>Неіснуючий потік або він не є керований через Core</summary>
-			class SeedKernelCall InvalidThread :public Exception
+			class InvalidThread final : public Exception
 			{
 			private:
 				///<summary>ID не існуючого потоку</summary>
@@ -76,7 +76,7 @@ namespace Seed {
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'TID'>Id не існуючого потоку</param>
-				__forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID) //-V730
+				forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID) //-V730
 					noexcept : Exception(File, FunctName, Line, L"Не можна працювати з незареєстрованим в рантаймі потоком"), tid(TID)
 				{};
 
@@ -88,80 +88,82 @@ namespace Seed {
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(this->exeptionName)
-						+ ExceptionString(L". Не знайдено потоку з ID ") + ExceptionString(tid) + ExceptionString(L". ")
-						+ this->Location.toString() + ExceptionString(L".");
+					return ExceptionString::Combine({
+						ExceptionString(this->exeptionName),
+						ExceptionString(L". Не знайдено потоку з ID "), ExceptionString(tid), ExceptionString(L". "),
+						Location.toString(), ExceptionString(L".")
+					});
 				}
 
-				virtual ~InvalidThread() override final {};
+				forceinline virtual ~InvalidThread() override final {};
 			};
 
 			///<summary>Не валідний об'єкт потоку</summary>
-			class SeedKernelCall InvalidThreadObj :public Exception
+			class InvalidThreadObj final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				forceinline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Не валідний об'єкт потоку")
 				{};
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
 				}
 
-				virtual ~InvalidThreadObj() override final {}
+				forceinline virtual ~InvalidThreadObj() override final {}
 			};
 			///<summary>Запуск запущеного об'єкта</summary>
-			class SeedKernelCall ThreadableAlredyStarted :public Exception
+			class ThreadableAlredyStarted final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				forceinline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Запуск запущеного об'єкта")
 				{};
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
 				}
 
-				virtual ~ThreadableAlredyStarted() override final {}
+				forceinline virtual ~ThreadableAlredyStarted() override final {}
 			};
 
 			///<summary>Взаємне блокування</summary>
-			class SeedKernelCall DedlockExpected :public Exception
+			class DedlockExpected final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				__forceinline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				forceinline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Взаємне блокування")
 				{};
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
-						+ ExceptionString(L". ")
-						+ location.toString()
-						+ ExceptionString(L". ");
+					return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
 				}
 
-				virtual ~DedlockExpected() override final {}
+				forceinline virtual ~DedlockExpected() override final {}
 			};
 		}
 	}

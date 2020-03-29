@@ -11,65 +11,65 @@ namespace Seed {
     inline namespace Core {
         inline namespace Exeptions {
             ///<summary>Спроба отримати результат не виконаної ще функції</summary>
-            class SeedKernelCall CantGetResultNotInvokedFunction :public Exception
+            class SeedKernelCall CantGetResultNotInvokedFunction final : public Exception
             {
             public:
                 ///<summary>Генерація помилки спроби отримати результат не виконаної ще функції</summary>
                 ///<param name = 'File'>Файл в якому згенерована помилка</param>
                 ///<param name = 'FunctName'>Ім'я функції</param>
                 ///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-                __forceinline CantGetResultNotInvokedFunction(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+                forceinline CantGetResultNotInvokedFunction(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
                     noexcept : Exception(File, FunctName, Line, L"Не можливо отримати результат не виконаної функції")
                 {}
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
-                    return ExceptionString(exeptionName)
-                        + ExceptionString(L". ")
-                        + Location.toString()
-                        + ExceptionString(L".");
+                    return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
                 }
             };
 
             ///<summary>Спроба повторно запусти вже виконаний делегат або який виконується зараз</summary>
-            class SeedKernelCall TryReStartDelegate :public Exception
+            class SeedKernelCall TryReStartDelegate final : public Exception
             {
             public:
                 ///<summary>Генерація помилки спроби повторно запусти вже виконаний делегат або який виконується зараз</summary>
                 ///<param name = 'File'>Файл в якому згенерована помилка</param>
                 ///<param name = 'FunctName'>Ім'я функції</param>
                 ///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-                __forceinline TryReStartDelegate(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+                forceinline TryReStartDelegate(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
                     noexcept : Exception(File, FunctName, Line, L"Неможливо повторно запустити делегат на виконання")
                 {}
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
-                    return ExceptionString(exeptionName)
-                        + ExceptionString(L". ")
-                        + Location.toString()
-                        + ExceptionString(L".");
+                    return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                    });
                 }
             };
 
             ///<summary>Делегат в процесі виконання</summary>
-            class SeedKernelCall AlredyExecute :public Exception
+            class SeedKernelCall AlredyExecute final : public Exception
             {
             public:
                 ///<summary>Конструктор помилки</summary>
                 ///<param name = 'File'>Файл в якому згенерована помилка</param>
                 ///<param name = 'FunctName'>Ім'я функції</param>
                 ///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-                __forceinline AlredyExecute(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+                forceinline AlredyExecute(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
                     noexcept : Exception(File, FunctName, Line, L"Неможливо отримати результат делегат в процесі його виконання")
                 {}
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
-                    return ExceptionString(exeptionName)
-                        + ExceptionString(L". ")
-                        + Location.toString()
-                        + ExceptionString(L".");
+                   return ExceptionString::Combine({
+                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        Location.toString(), ExceptionString(L".")
+                   });
                 }
             };
         }
@@ -100,7 +100,7 @@ namespace Seed {
             //- NullPointExeption якщо результату немає, або функція завершилась через генерування помилки
             //- InvalidType якщо типи результату не коректний
             template<typename T>
-            __forceinline T GetResult()
+            forceinline T GetResult()
             {
                 return MoveRValue(*(T*)__get_result(typeid(T)));
             }
@@ -146,7 +146,7 @@ protected:
     //Генерить наступні ексепшини
     //- NullPointExeption якщо результату немає, або функція завершилась через генерацію ексепшина
     //- InvalidType якщо типи результату не коректний
-    __forceinline virtual void* __get_result(const Seed::TypeInfo& type) override final
+    forceinline virtual void* __get_result(const Seed::TypeInfo& type) override final
     {
         if constexpr (Seed::Core::TypeTraits::IsSameT<retType, void>::State)
             Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(void), type));
@@ -162,7 +162,7 @@ protected:
 public:
     //Виконанує функцію, записує що функція запустилась і завершилась,
     //і якщо результат функції на void то і результат запам'ятовує
-    __forceinline void Init() override final
+    forceinline void Init() override final
     {
         isStarted = true;
         try
@@ -195,21 +195,21 @@ public:
         isEnded = true;
     }
     //Конструктор, ініціалізує тупл з аргументами, обнулює покажчик на результат, і запам'ятовує функцію
-    __forceinline TemplateFunctionT(F f, Args&&... args) : f(f), result(nullptr), args(Seed::ForwardReference<Args>(args)...)
+    forceinline TemplateFunctionT(F f, Args&&... args) : f(f), result(nullptr), args(Seed::ForwardReference<Args>(args)...)
     {}
     //Вертає true якщо функція запущена була
-    __forceinline virtual bool IsStarted() const noexcept override final
+    forceinline virtual bool IsStarted() const noexcept override final
     {
         return isStarted;
     }
     //Вертає true якщо функція завершилась
-    __forceinline virtual bool IsEnded() const noexcept override final
+    forceinline virtual bool IsEnded() const noexcept override final
     {
         return isEnded;
     }
 
     //Деструктор, видаляє результат якщо він є
-    __forceinline virtual ~TemplateFunctionT() override final
+    forceinline virtual ~TemplateFunctionT() override final
     {
         if constexpr (!Seed::Core::TypeTraits::IsSameT<decltype(call(f, args)), void>::State)
             if (result != nullptr)
@@ -233,7 +233,7 @@ namespace Seed {
             {
                 FunctionObj* function;
                 RefCountT RefCount;
-                __forceinline delegate(FunctionObj* function) : function(function), RefCount(1)
+                forceinline delegate(FunctionObj* function) : function(function), RefCount(1)
                 {}
             };
             //Покажчик на дані даного делегата
@@ -250,11 +250,11 @@ namespace Seed {
             forceinline Delegate(TF f, TArgs... args) : data(new delegate(new TemplateFunctionT<TF, TArgs...>(f, ForwardReference<TArgs>(args)...)))
             {};
 
-            __forceinline Delegate(const Delegate & Orig) :data(Orig.data) { ++data->RefCount; };
-            __forceinline Delegate(Delegate && From) : data(From.data) { From.data = nullptr; };
-            __forceinline Delegate & operator=(const Delegate & Orig){this->~Delegate(); this->Delegate::Delegate(Orig); return *this; };
-            __forceinline Delegate & operator=(Delegate && From){if(this == &From) return *this; this->~Delegate(); this->Delegate::Delegate(Seed::MoveRValue(From)); return *this; };
-            __forceinline virtual ~Delegate(){if (data != nullptr)
+            forceinline Delegate(const Delegate & Orig) :data(Orig.data) { ++data->RefCount; };
+            forceinline Delegate(Delegate && From) : data(From.data) { From.data = nullptr; };
+            forceinline Delegate & operator=(const Delegate & Orig){this->~Delegate(); this->Delegate::Delegate(Orig); return *this; };
+            forceinline Delegate & operator=(Delegate && From){if(this == &From) return *this; this->~Delegate(); this->Delegate::Delegate(Seed::MoveRValue(From)); return *this; };
+            forceinline virtual ~Delegate(){if (data != nullptr)
             {
                 if (--data->RefCount == 0)
                 {
@@ -300,7 +300,7 @@ namespace Seed {
             //- AlredyExecute якщо функція в процесі виконання
             //- InvalidType якщо тип T не збігаєтья з типом результату функції
             template<typename T>
-            __forceinline T GetResult()
+            forceinline T GetResult()
             {
                 if (this->data == nullptr)
                     Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this->data), NullPointException::Types::Read));
@@ -317,7 +317,7 @@ namespace Seed {
             //- AlredyExecute якщо функція в процесі виконання
             //- InvalidType якщо тип T не збігаєтья з типом результату функції
             template<typename T>
-            __forceinline T GetResult() volatile
+            forceinline T GetResult() volatile
             {
                 if (this->data == nullptr)
                     Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this->data), NullPointException::Types::Read));
@@ -328,19 +328,19 @@ namespace Seed {
                 return this->data->function->GetResult<T>();
             }
 
-            __forceinline volatile Delegate& operator()() volatile {
+            forceinline volatile Delegate& operator()() volatile {
                 this->Init();
                 return *this;
             }
 
-            __forceinline Delegate& operator()() {
+            forceinline Delegate& operator()() {
                 this->Init();
                 return *this;
             }
         };
         //Створює делегат з функцією F і аргументами Args(може бути і без аргументів)
         template<typename F, typename ... Args>
-        __forceinline Delegate CreateAndPackFunctionObj(F f, Args... args)
+        forceinline Delegate CreateAndPackFunctionObj(F f, Args... args)
         {
             return Delegate(f, args...);
         }

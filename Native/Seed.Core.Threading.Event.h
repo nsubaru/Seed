@@ -1,12 +1,17 @@
 #pragma once
 #include "Seed.Core.Threading.Base.h"
+#include "Seed.Core.Threading.Internal.h"
+
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
 
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			///<summary>Подія NT
 			///<para>Об'єкт синхронізації потоків</para></summary>
-			class SeedKernelCall Event final : protected IDisposable
+			class SynchronizeEvent final : protected IDisposable
 			{
 				///<summary>Дані події</summary>
 				struct event_data
@@ -21,57 +26,54 @@ namespace Seed {
 					String Name;
 
 					///<summary>Конструктор з отриманням дескриптора</summary>
-					event_data(Boolean IsManualReset, const String& name)
+					forceinline event_data(Boolean IsManualReset, const String& name)
 						:IsManualReset(IsManualReset), handle(nullptr), RefCount(1), Name(name)
 					{};
 					///<summary>Конструктор з оптимізована отриманням дескриптора</summary>
-					event_data(Boolean IsManualReset, String&& name)
+					forceinline event_data(Boolean IsManualReset, String&& name)
 						:IsManualReset(IsManualReset), handle(nullptr), RefCount(1), Name(MoveRValue(name))
 					{};
 				};
 				///<summary>Дані об'єкту події</summary>
 				event_data* data;
 				///<summary>Знищення останнього елемента</summary>
-				virtual void Dispose() override final;
+				SeedKernelCall virtual void Dispose() override final;
 			public:
 				///<summary>Конструктор</summary>
-				Event(Boolean IsManualReset = false);
+				SeedKernelCall SynchronizeEvent(Boolean IsManualReset = false);
 				///<summary>Конструктор з іменем об'єкта</summary>
-				Event(const String& name, Boolean IsManualReset = false);
+				SeedKernelCall SynchronizeEvent(const String& name, Boolean IsManualReset = false);
 				///<summary>Конструктор з оптимізованою передачею імені об'єкта</summary>
-				Event(String&& name, Boolean IsManualReset = false);
+				SeedKernelCall SynchronizeEvent(String&& name, Boolean IsManualReset = false);
 
-				RefCountClass(Event, data)
+				RefCountClass(SynchronizeEvent, data)
 
 				///<summary>Очікування на подію</summary>
-				void Wait() const;
+				SeedKernelCall void Wait() const;
 				///<summary>Очікування з таймаутом</summary>
-				void Wait(SizeT TimeOutMs) const;
+				SeedKernelCall void Wait(SizeT TimeOutMs) const;
 
 				///<summary>Подати імпульс на подію</summary>
-				void Signale() {
-					extern void PulseNtEvent(void* handle);
-					PulseNtEvent(data->handle);
+				forceinline void Signale() {
+					Internals::PulseNtEvent(data->handle);
 				}
 				///<summary>Виставити true на подію</summary>
-				void Set() {
-					extern void SetNtEvent(void* handle);
-					SetNtEvent(data->handle);
+				forceinline void Set() {
+					Internals::SetNtEvent(data->handle);
 				}
 				///<summary>Виставити false на подію</summary>
-				void Reset() {
-					extern void ResetNtEvent(void* handle);
-					ResetNtEvent(data->handle);
+				forceinline void Reset() {
+					Internals::ResetNtEvent(data->handle);
 				}
 
-				friend void WaitForAll(Containers::Array<Event>&& events);
-				friend void WaitForAny(Containers::Array<Event>&& events);
-				friend void WaitForAll(Containers::Array<Event>&& events, SizeT timeOutMs);
-				friend void WaitForAny(Containers::Array<Event>&& events, SizeT timeOutMs);
-				friend void WaitForAll(const Containers::Array<Event>& events);
-				friend void WaitForAny(const Containers::Array<Event>& events);
-				friend void WaitForAll(const Containers::Array<Event>& events, SizeT timeOutMs);
-				friend void WaitForAny(const Containers::Array<Event>& events, SizeT timeOutMs);
+				friend void WaitForAll(Containers::Array<SynchronizeEvent>&& events);
+				friend void WaitForAny(Containers::Array<SynchronizeEvent>&& events);
+				friend void WaitForAll(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs);
+				friend void WaitForAny(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs);
+				friend void WaitForAll(const Containers::Array<SynchronizeEvent>& events);
+				friend void WaitForAny(const Containers::Array<SynchronizeEvent>& events);
+				friend void WaitForAll(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs);
+				friend void WaitForAny(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs);
 			private:
 				/// <summary>
 				/// Реалізація очікування на декілька подій
@@ -79,21 +81,21 @@ namespace Seed {
 				/// <param name="events">Масив подій</param>
 				/// <param name="isWaitAll">Чи очікувати на всі, якщо false то очікування відбувається на будь-яку з</param>
 				/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-				friend void WaitForMany(const Containers::Array<Event>& events, Boolean isWaitAll, SizeT timeOutMs = Math::Max<SizeT>());
+				friend void WaitForMany(const Containers::Array<SynchronizeEvent>& events, Boolean isWaitAll, SizeT timeOutMs = Math::Max<SizeT>());
 			};
 
 			/// <summary>
 			/// Очікування на всі події в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			forceinline void WaitForAll(Containers::Array<Event>&& events) {
+			forceinline void WaitForAll(Containers::Array<SynchronizeEvent>&& events) {
 				WaitForMany(events, true);
 			}
 			/// <summary>
 			/// Очікування на любу з подій в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			forceinline void WaitForAny(Containers::Array<Event>&& events) {
+			forceinline void WaitForAny(Containers::Array<SynchronizeEvent>&& events) {
 				WaitForMany(events, false);
 			}
 			/// <summary>
@@ -101,7 +103,7 @@ namespace Seed {
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			forceinline void WaitForAll(Containers::Array<Event>&& events, SizeT timeOutMs) {
+			forceinline void WaitForAll(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs) {
 				WaitForMany(events, true, timeOutMs);
 			}
 			/// <summary>
@@ -109,7 +111,7 @@ namespace Seed {
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			forceinline void WaitForAny(Containers::Array<Event>&& events, SizeT timeOutMs) {
+			forceinline void WaitForAny(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs) {
 				WaitForMany(events, false, timeOutMs);
 			}
 
@@ -117,14 +119,14 @@ namespace Seed {
 			/// Очікування на всі події в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			forceinline void WaitForAll(const Containers::Array<Event>& events) {
+			forceinline void WaitForAll(const Containers::Array<SynchronizeEvent>& events) {
 				WaitForMany(events, true);
 			}
 			/// <summary>
 			/// Очікування на любу з подій в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			forceinline void WaitForAny(const Containers::Array<Event>& events) {
+			forceinline void WaitForAny(const Containers::Array<SynchronizeEvent>& events) {
 				WaitForMany(events, false);
 			}
 			/// <summary>
@@ -132,7 +134,7 @@ namespace Seed {
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			forceinline void WaitForAll(const Containers::Array<Event>& events, SizeT timeOutMs) {
+			forceinline void WaitForAll(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs) {
 				WaitForMany(events, true, timeOutMs);
 			}
 			/// <summary>
@@ -140,9 +142,11 @@ namespace Seed {
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			forceinline void WaitForAny(const Containers::Array<Event>& events, SizeT timeOutMs) {
+			forceinline void WaitForAny(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs) {
 				WaitForMany(events, false, timeOutMs);
 			}
 		}
 	}
 }
+
+#pragma warning(pop)

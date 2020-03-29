@@ -19,7 +19,7 @@ namespace Seed {
 					public IAssociableCollection<TCollection, THeap, TKey, TValue, TPair, IsConcurencySuportT>
 				{
 				public:
-					virtual ~IMap() = 0 {}
+					forceinline virtual ~IMap() = 0 {}
 				};
 			}
 		}

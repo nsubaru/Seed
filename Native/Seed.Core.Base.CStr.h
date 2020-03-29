@@ -1,5 +1,10 @@
 ﻿#pragma once
 #include "Seed.Core.Base.Types.h"
+#include "Seed.Core.Base.Internals.h"
+
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
 
 namespace Seed {
     inline namespace Core {
@@ -134,8 +139,7 @@ namespace Seed {
             /// <param name="symbol">Символ який потрібно перетворити</param>
             /// <returns>Перетворений символ</returns>
             __forceinline Char ToUpcase(const Char symbol) {
-                extern Seed::Core::Char UpcaseCharImp(Seed::Core::Char symb);
-                return UpcaseCharImp(symbol);
+                return Internals::UpcaseCharImp(symbol);
             }
 
             /// <summary>
@@ -144,9 +148,10 @@ namespace Seed {
             /// <param name="symbol">Символ який потрібно перетворити</param>
             /// <returns>Перетворений символ</returns>
             __forceinline Char ToDowncase(const Char symbol) {
-                extern Seed::Core::Char DowncaseCharImp(Seed::Core::Char symb);
-                return DowncaseCharImp(symbol);
+               return Internals::DowncaseCharImp(symbol);
             }
         }
     }
 }
+
+#pragma warning(pop)

@@ -10,7 +10,7 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			class SeedKernelCall Thread final : IDisposable{
+			class Thread final : IDisposable{
 			private:
 				friend class ThreadableThread;
 			private:
@@ -21,10 +21,10 @@ namespace Seed {
 					volatile ID TID;
 					volatile EThreadabledStates State;
 					Handle hThread;
-					Event* AbortEvent;
+					SynchronizeEvent* AbortEvent;
 					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;
 
-					Data(const String& Name, Delegate&& delegate) :
+					forceinline Data(const String& Name, Delegate&& delegate) :
 						name(Name),
 						delegate(MoveRValue(delegate)),
 						State(EThreadabledStates::NotStarted),
@@ -35,7 +35,7 @@ namespace Seed {
 						RefCount(1)
 					{}
 
-					Data(String&& Name, Delegate&& delegate) :
+					forceinline Data(String&& Name, Delegate&& delegate) :
 						name(Name),
 						delegate(MoveRValue(delegate)),
 						State(EThreadabledStates::NotStarted),
@@ -54,37 +54,37 @@ namespace Seed {
 				friend extern volatile Delegate& ThreadEntryPoint(Thread* thread);
 				friend extern bool MainThread(Delegate&& delegate);
 			private:
-				void RefreshName();
+				SeedKernelCall void RefreshName();
 			protected:
 				virtual void Dispose() override final;
 			public:
-				Thread(Delegate&& delegate) : This(new Data(L"Unnamed Thread", MoveRValue(delegate))) {}
-				Thread(String&& Name, Delegate&& delegate) : This(new Data(MoveRValue(Name), MoveRValue(delegate))) {}
-				Thread(const String& Name, Delegate&& delegate) : This(new Data(Name, MoveRValue(delegate))) {}
+				forceinline Thread(Delegate&& delegate) : This(new Data(L"Unnamed Thread", MoveRValue(delegate))) {}
+				forceinline Thread(String&& Name, Delegate&& delegate) : This(new Data(MoveRValue(Name), MoveRValue(delegate))) {}
+				forceinline Thread(const String& Name, Delegate&& delegate) : This(new Data(Name, MoveRValue(delegate))) {}
 			public:
-				Thread& Start();
-				Thread& Join();
-				Thread& Join(DateTime timeOut);
-				Thread& Interupt();
-				Thread& Suspend();
+				SeedKernelCall Thread& Start();
+				SeedKernelCall Thread& Join();
+				SeedKernelCall Thread& Join(DateTime timeOut);
+				SeedKernelCall Thread& Interupt();
+				SeedKernelCall Thread& Suspend();
 			public:
 				template<typename T>
-				T GetThreadResult() {
+				forceinline T GetThreadResult() {
 					return This->delegate.GetResult<T>();
 				}
 			public:
-				operator volatile IThreadable& () { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
-				operator const volatile IThreadable& () const { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
-				operator ID () const { return This->TID; }
-				operator Boolean () const { return This->TID != 0; }
+				forceinline operator volatile IThreadable& () { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
+				forceinline operator const volatile IThreadable& () const { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
+				forceinline operator ID () const { return This->TID; }
+				forceinline operator Boolean () const { return This->TID != 0; }
 			public:
-				void SetName(const String& name) { const_cast<String&>(This->name) = name; RefreshName(); }
-				void SetName(String&& name) { const_cast<String&>(This->name) = MoveRValue(name); RefreshName(); }
-				const String& GetName() { return const_cast<String&>(This->name); }
+				forceinline void SetName(const String& name) { const_cast<String&>(This->name) = name; RefreshName(); }
+				forceinline void SetName(String&& name) { const_cast<String&>(This->name) = MoveRValue(name); RefreshName(); }
+				forceinline const String& GetName() { return const_cast<String&>(This->name); }
 
-				EThreadabledStates GetThreadState() { return this->This->State; }
+				forceinline EThreadabledStates GetThreadState() { return this->This->State; }
 
-				ID GetTID() { return this->This->TID; }
+				forceinline ID GetTID() { return this->This->TID; }
 
 				String Property(GetName, SetName) Name;
 				EThreadabledStates Property(GetThreadState) ThreadState;

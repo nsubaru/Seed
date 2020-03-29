@@ -21,7 +21,7 @@ namespace Seed {
 					using ThisCollection = TCollection<THeap, TSize, T>;
 				public:
 					template<template<SizeT, typename> typename NewCollection>
-					NewCollection<TSize, T> CopyToFixed() {
+					forceinline NewCollection<TSize, T> CopyToFixed() {
 						NewCollection<TSize, T> newCollection;
 						ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
 						thisCollection.ForEach([&](const T& Value, SizeT Index) {
@@ -31,7 +31,7 @@ namespace Seed {
 					}
 
 					template<template<SizeT, typename> typename NewCollection>
-					NewCollection<TSize, T> CopyToFixed() const {
+					forceinline NewCollection<TSize, T> CopyToFixed() const {
 						NewCollection<TSize, T> newCollection;
 						const ThisCollection& thisCollection = static_cast<const ThisCollection&>(*this);
 						thisCollection.ForEach([&](const T& Value, SizeT Index) {
@@ -41,7 +41,7 @@ namespace Seed {
 					}
 
 					template<template<SizeT, typename> typename NewCollection>
-					NewCollection<TSize, T> MoveToFixed() {
+					forceinline NewCollection<TSize, T> MoveToFixed() {
 						NewCollection<TSize, T> newCollection;
 						ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
 						SizeT Index = 0;
@@ -53,7 +53,7 @@ namespace Seed {
 					}
 
 					template<template<SizeT, typename> typename NewCollection, SizeT TNewSize>
-					NewCollection<TNewSize, T> CopyToFixed() {
+					forceinline NewCollection<TNewSize, T> CopyToFixed() {
 						if constexpr (TNewSize == TSize) {
 							NewCollection<TNewSize, T> newCollection;
 							ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
@@ -69,7 +69,7 @@ namespace Seed {
                                                                         TSize,
                                                                         TNewSize);
 						}
-					} //-V591
+					}
 				public:
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<
@@ -79,7 +79,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						ThisCollection& ForEach(Lambda&& lambda) {
+						forceinline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -92,7 +92,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						__forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
+						forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -103,7 +103,7 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда типу void(*)(U&, const T&)</param>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline U Aggregate(Lambda&& lambda) const {
+					forceinline U Aggregate(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), U());
 					}
 
@@ -116,7 +116,7 @@ namespace Seed {
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline U Aggregate(Lambda&& lambda, const U& StartValue) const {
+					forceinline U Aggregate(Lambda&& lambda, const U& StartValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), StartValue);
 					}
 
@@ -129,7 +129,7 @@ namespace Seed {
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
 					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
-					__forceinline U Aggregate(Lambda&& lambda, U&& StartValue) const {
+					forceinline U Aggregate(Lambda&& lambda, U&& StartValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(StartValue));
 					}
 
@@ -137,7 +137,7 @@ namespace Seed {
 					/// Вертає true якщо в контейнері хоч щось є
 					/// </summary>
 					/// <returns>Вертає true якщо в контейнері хоч щось є</returns>
-					__forceinline bool Any() const {
+					forceinline bool Any() const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl();
 					}
 
@@ -147,7 +147,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					__forceinline bool Any(Lambda&& lambda) {
+					forceinline bool Any(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
@@ -157,7 +157,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					__forceinline bool All(Lambda&& lambda) {
+					forceinline bool All(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 
@@ -167,7 +167,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					__forceinline T& First(Lambda&& lambda) {
+					forceinline T& First(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
@@ -177,7 +177,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					__forceinline T& Last(Lambda&& lambda) {
+					forceinline T& Last(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
@@ -187,7 +187,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					__forceinline const T& First(Lambda&& lambda) const {
+					forceinline const T& First(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
@@ -197,7 +197,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					__forceinline const T& Last(Lambda&& lambda) const {
+					forceinline const T& Last(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
@@ -205,7 +205,7 @@ namespace Seed {
 					/// Видаляє всі елементи з колекції
 					/// </summary>
 					/// <returns>Силку на поточний об'єкт колекції</returns>
-					__forceinline ThisCollection& RemoveAll() {
+					forceinline ThisCollection& RemoveAll() {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl();
 					}
 
@@ -215,7 +215,7 @@ namespace Seed {
 					/// <param name="Lambda">Лямбда формату void(*)(T&&)</param>
 					/// <returns>Силку на поточний об'єкт колекції</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State>, bool> = true>
-					__forceinline ThisCollection& RemoveAll(Lambda&& lambda) {
+					forceinline ThisCollection& RemoveAll(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl(MoveRValue(lambda));
 					}
 
@@ -223,11 +223,11 @@ namespace Seed {
 					/// Реверсує порядок елементів в колекції
 					/// </summary>
 					/// <returns>Силку на поточну колекцію</returns>
-					__forceinline ThisCollection& Reverse() {
+					forceinline ThisCollection& Reverse() {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
 				public:
-					virtual ~IFixedCollection() = 0 {}
+					forceinline virtual ~IFixedCollection() = 0 {}
 				};
 			}
 		}

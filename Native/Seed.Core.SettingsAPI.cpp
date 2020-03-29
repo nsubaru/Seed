@@ -22,12 +22,51 @@ using namespace Seed::Settings;
 CurrentSettings::SettingsData CurrentSettingsData;
 CurrentSettings::VirtualSettingData CurrentVirtualSettingsData;
 
+CurrentSettings::SettingsData oldCurrentSettingsData;
+
+
 namespace Seed {
 	inline namespace Core {
 		Boolean isFirstStartup = false;
 
+		using TChangeSettingCallback = 
+			void(*)(const CurrentSettings::SettingsData& oldSetting, CurrentSettings::SettingsData& newSetting);
+
 		namespace Settings {
 			Handle SettingsFile;
+		}
+
+		TChangeSettingCallback& GetChangeSettingCallback() {
+			static TChangeSettingCallback callback = nullptr;
+			return callback;
+		}
+
+		const CurrentSettings::SettingsData& CurrentSettings::GetCurrentSettingDataRaw() {
+			return CurrentSettingsData;
+		}
+
+		CurrentSettings::SettingsData& CurrentSettings::SetCurrentSettingDataRaw() {
+			oldCurrentSettingsData = CurrentSettingsData;
+			return CurrentSettingsData;
+		}
+
+		void CurrentSettings::InformAboutSettingsChange() {
+			try
+			{
+				auto callback = GetChangeSettingCallback();
+				if (callback != nullptr)
+				{
+					callback(oldCurrentSettingsData, CurrentSettingsData);
+				}
+			}
+			catch (...)
+			{
+				toCoreLog(L"Перехоплено невідому помилку при обробці зміни налаштувань ядра");
+			}
+		}
+
+		const CurrentSettings::VirtualSettingData& CurrentSettings::GetVirtualSettingDataRaw() {
+			return CurrentVirtualSettingsData;
 		}
 
 		void CurrentSettings::SaveCurrentSettings()
@@ -69,6 +108,8 @@ Boolean Seed::Core::IsFirstStartup() noexcept
 {
 	return isFirstStartup;
 }
+
+#include "Seed.Core.Threading.TLS.GlobalTLSBlock.h"
 
 Boolean Seed::Core::Init::SettingsAPI() noexcept
 {
