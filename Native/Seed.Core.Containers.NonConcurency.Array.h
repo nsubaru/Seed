@@ -304,7 +304,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				forceinline BaseArray& RemoveAllImpl(Lambda&& lambda) {
-					for (SizeT i = 0; i < This->Count; i++) {
+					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->array[i]));
 					}
 					delete[] this->This->array;
