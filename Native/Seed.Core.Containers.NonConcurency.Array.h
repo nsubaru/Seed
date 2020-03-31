@@ -591,7 +591,7 @@ namespace Seed {
 					}
 				}
 			public:
-				BaseArray<THeap, T> toArray() {
+				BaseArray<THeap, T> ToArray() {
 					BaseArray<THeap, T> array(this->This->count);
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;

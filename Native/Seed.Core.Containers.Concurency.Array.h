@@ -649,7 +649,7 @@ namespace Seed {
                     });
                 }
             public:
-                BaseConcurencyArray<THeap, T> toArray() {
+                BaseConcurencyArray<THeap, T> ToArray() {
                     This->lock.ShareLock([&]() mutable {
                         BaseConcurencyArray<THeap, T> array(this->This->count);
                         Node* node = This->root;

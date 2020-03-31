@@ -406,7 +406,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					forceinline bool Any(Lambda&& lambda) {
+					forceinline bool Any(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
@@ -416,7 +416,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
-					forceinline bool All(Lambda&& lambda) {
+					forceinline bool All(Lambda&& lambda) const  {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 

@@ -16,10 +16,6 @@ namespace Seed
 			class NonSerelizableType : public Exception {
 			private:
 				/// <summary>
-				/// Тип який DI не зумів знайти
-				/// </summary>
-				const TypeInfo& type;
-				/// <summary>
 				/// Ім'я типу який не знайдено
 				/// </summary>
 				ExceptionString typeName;
@@ -29,8 +25,8 @@ namespace Seed
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param Name = 'Type'>Тип який DI не зумів знайти</param>
-				NonSerelizableType(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ExceptionString&& typeName, const TypeInfo& type)
-					:Exception(File, FunctName, Line, L"Неможливо викликати динамічну функцію з даним набором аргументів"), type(type), typeName(MoveRValue(typeName)) {}
+				NonSerelizableType(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ExceptionString&& typeName)
+					:Exception(File, FunctName, Line, L"Неможливо серелізувати даний тип"), typeName(MoveRValue(typeName)) {}
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {

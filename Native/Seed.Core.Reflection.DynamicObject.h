@@ -11,9 +11,9 @@ namespace Seed
 			private:
 				class IDynamicImpl {
 				public:
-					virtual String GetTypeName() = 0;
-					virtual String GetCxxTypeName() = 0;
-					virtual String GetSerilizationMetadata() = 0;
+					virtual String GetTypeName() const = 0;
+					virtual String GetCxxTypeName() const = 0;
+					virtual String GetSerilizationMetadata() const = 0;
 
 					virtual const TypeInfo& GetImplementationTypeInfo() const = 0;
 				public:
@@ -54,9 +54,9 @@ namespace Seed
 					Tuple& GetValue() { return tuple; }
 					const Tuple& GetValue() const { return tuple; }
 				public:
-					virtual String GetTypeName() { return typeName; }
-					virtual String GetCxxTypeName() { return cxxTypeName; }
-					virtual String GetSerilizationMetadata() { return serelizableMetaData; }
+					virtual String GetTypeName() const { return typeName; }
+					virtual String GetCxxTypeName() const { return cxxTypeName; }
+					virtual String GetSerilizationMetadata() const { return serelizableMetaData; }
 
 					virtual const TypeInfo& GetImplementationTypeInfo() const { return typeid(Tuple); }
 				public:
@@ -82,9 +82,9 @@ namespace Seed
 				template<typename ... TTypes>
 				DynamicObject(Containers::Tuple<TTypes...>&& tuple) : data(new Data(MoveRValue(new DynamicImpl(MoveRValue(tuple))))) {}
 
-				String GetTypeName() { return data->impl->GetTypeName(); }
-				String GetCxxTypeName() { return data->impl->GetCxxTypeName(); }
-				String GetSerilizationMetadata() { return data->impl->GetSerilizationMetadata(); }
+				String GetTypeName() const { return data->impl->GetTypeName(); }
+				String GetCxxTypeName() const { return data->impl->GetCxxTypeName(); }
+				String GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }
 
 				const TypeInfo& GetImplementationTypeInfo() const { return data->impl->GetImplementationTypeInfo(); }
 

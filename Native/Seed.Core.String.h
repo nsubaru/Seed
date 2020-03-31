@@ -70,7 +70,7 @@ namespace Seed {
             static constexpr const auto HexNumbers = L"0123456789abcdef";
         public:
             ///<summary>Пустий конструктор</summary>
-            forceinline BaseString() noexcept : str(nullptr), CurrentSize(0), ReservedSize(0) {};
+            constexpr forceinline BaseString() noexcept : str(nullptr), CurrentSize(0), ReservedSize(0) {};
 
             ///<summary>Конструктор з готової літерала рядка</summary>
             ///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>

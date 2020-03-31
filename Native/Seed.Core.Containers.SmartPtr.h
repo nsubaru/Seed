@@ -35,11 +35,11 @@ namespace Seed {
 				return This->ptr;
 			}
 
-			forceinline SizeT GetRefCount() {
+			forceinline SizeT GetRefCount() const {
 				return This->RefCount;
 			}
 
-			forceinline decltype(auto) GetTypeInfo() {
+			forceinline decltype(auto) GetTypeInfo() const {
 				return typeid(This->ptr);
 			}
 
