@@ -8,7 +8,7 @@ namespace Seed
 	{
 		namespace Services
 		{
-			class SerelizationService final : public IDisposable {
+			class SerilizationService final : public IDisposable {
 			private:
 				struct Data {
 					DI::IDI idi;
@@ -21,7 +21,7 @@ namespace Seed
 			protected:
 				virtual void Dispose() override {}
 			public:
-				SerelizationService(const DI::IDI& idi) : This(new Data(idi)) {}
+				SerilizationService(const DI::IDI& idi) : This(new Data(idi)) {}
 			public:
 				template<typename T>
 				Containers::Blob Serelize(const T& data) {
@@ -45,6 +45,9 @@ namespace Seed
 				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data);
 
 				String GetTypeMetaDataDynObj(const Reflection::DynamicObject& data);
+
+			public:
+				RefCountClass(SerilizationService, This);
 			};
 		}
 	}

@@ -9,6 +9,8 @@ namespace Seed {
 	inline namespace Core {
 		namespace CTTI {
 			namespace Details {
+				static constexpr SizeT TypeStringSize = 1024;
+
 				template<char... C>
 				struct TypeString final {
 				private:

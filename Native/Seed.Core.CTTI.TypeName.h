@@ -799,6 +799,8 @@ namespace Seed {
 			constexpr auto CXXTypeName() {
 				return CTTI::Details::TypeName<T>();
 			}
+
+			static constexpr SizeT TypeStringSize = Details::TypeStringSize;
 #pragma endregion
 		}
 	}

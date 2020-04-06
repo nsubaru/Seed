@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Exceptions::Exception::ExeptionLocation">
-    <DisplayString>{{{FunctName.str, s}:{Line} at {File.str, s} in thread {ThreadID}}}</DisplayString>
+    <DisplayString>{{{FunctName.str, na}:{Line} at {File.str, na} in thread {ThreadID}}}</DisplayString>
     <Expand>
-      <Item Name="File">File.str, s</Item>
-      <Item Name="Function">FunctName.str, s</Item>
+      <Item Name="File">File.str, na</Item>
+      <Item Name="Function">FunctName.str, na</Item>
       <Item Name="Line">Line</Item>
       <Item Name="Thread ID">ThreadID</Item>
     </Expand>
   </Type>
   <Type Name="Seed::Core::Exceptions::Exception" Inheritable="true">
-    <DisplayString>{{Exception: {exeptionName.str, su}}}</DisplayString>
+    <DisplayString>{{Exception: {exeptionName.str, na}}}</DisplayString>
     <Expand>
-      <Item Name="Name">{exeptionName.str, su}</Item>
+      <Item Name="Name">{exeptionName.str, na}</Item>
       <ExpandedItem>location</ExpandedItem>
       <Item Name="StackTrace">stackTrace</Item>
     </Expand>

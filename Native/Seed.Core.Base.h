@@ -171,7 +171,7 @@ namespace Seed {
 /// Define додає конструктор та оператор копіювання і переміщення та деструктор
 /// </remarks>
 #define RefCountClass(ClassName, This) \
-__forceinline ClassName(const ClassName & Orig) :This(Orig.This) { ++This->RefCount; }; \
+__forceinline ClassName(const ClassName & Orig) :This(Orig.This) { if(This != nullptr) ++This->RefCount; }; \
 __forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullptr; }; \
 __forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
 __forceinline ClassName & operator=(ClassName && From){if(this == &From) return *this; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \

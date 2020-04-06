@@ -148,17 +148,38 @@ namespace Seed {
 				SizeT Property(GetCount) Count;
 
 				virtual BaseDynamicQueue Clone() const override final {
-					BaseDynamicQueue result;
-					result.This->queue = new T[This->bufferSize];
-					result.This->front = This->front;
-					result.This->rear = This->rear;
-					result.This->count = This->count;
-					result.This->bufferSize = This->bufferSize;
-					for (SizeT i = 0; i < This->count; i++)
+					if constexpr (TypeTraits::IsConstructible<T>)
 					{
-						(*result.This)[i] = (*This)[i];
+						BaseDynamicQueue result;
+						result.This->queue = new T[This->bufferSize];
+						result.This->front = This->front;
+						result.This->rear = This->rear;
+						result.This->count = This->count;
+						result.This->bufferSize = This->bufferSize;
+						for (SizeT i = 0; i < This->count; i++)
+						{
+							(*result.This)[i] = (*This)[i];
+						}
+						return result;
+						}
+					else if constexpr (TypeTraits::IsBasedOnV<IClonable<T>, T>)
+					{
+						BaseDynamicQueue result;
+						result.This->queue = new T[This->bufferSize];
+						result.This->front = This->front;
+						result.This->rear = This->rear;
+						result.This->count = This->count;
+						result.This->bufferSize = This->bufferSize;
+						for (SizeT i = 0; i < This->count; i++)
+						{
+							(*result.This)[i] = (*This)[i].Clone();
+						}
+						return result;
 					}
-					return result;
+					else
+					{
+						Throw(NotImplementedException(ExceptionPosition));
+					}
 				}
 
 				RefCountClass(BaseDynamicQueue, This)

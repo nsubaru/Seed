@@ -77,7 +77,7 @@ Containers::Blob SerilizeObjectType(
 		.ToArray();
 }
 
-Containers::Blob Seed::Core::Services::SerelizationService::SerelizeDynObj(const Reflection::DynamicObject& data) {
+Containers::Blob Seed::Core::Services::SerilizationService::SerelizeDynObj(const Reflection::DynamicObject& data) {
 	//Try search type in object records storage by type name
 	if (This->idi.IsExistObjectRecordByName(data.GetTypeName()))
 	{
@@ -113,10 +113,10 @@ Containers::Blob Seed::Core::Services::SerelizationService::SerelizeDynObj(const
 	}
 }
 
-Reflection::DynamicObject Seed::Core::Services::SerelizationService::DeserelizeDynObj(const Containers::Blob& data) {
+Reflection::DynamicObject Seed::Core::Services::SerilizationService::DeserelizeDynObj(const Containers::Blob& data) {
 	Throw(NotImplementedException(ExceptionPosition));
 }
 
-String Seed::Core::Services::SerelizationService::GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) {
+String Seed::Core::Services::SerilizationService::GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) {
 	Throw(NotImplementedException(ExceptionPosition));
 }

@@ -163,19 +163,44 @@ namespace Seed {
 				SizeT Property(GetCount) Count;
 
 				virtual BaseConcurencyDynamicQueue Clone() const override final {
-					return This->flowControler.SharedLock([&]() {
-						BaseConcurencyDynamicQueue result;
-						result.This->queue = new T[This->bufferSize];
-						result.This->front = This->front;
-						result.This->rear = This->rear;
-						result.This->count = This->count;
-						result.This->bufferSize = This->bufferSize;
-						for (SizeT i = 0; i < This->count; i++)
+					if constexpr (TypeTraits::IsConstructible<T>)
+					{
+						return This->flowControler.SharedLock([&] ()
 						{
-							(*result.This)[i] = (*This)[i];
-						}
-						return result;
+							BaseConcurencyDynamicQueue result;
+							result.This->queue = new T[This->bufferSize];
+							result.This->front = This->front;
+							result.This->rear = This->rear;
+							result.This->count = This->count;
+							result.This->bufferSize = This->bufferSize;
+							for (SizeT i = 0; i < This->count; i++)
+							{
+								(*result.This)[i] = (*This)[i];
+							}
+							return result;
 						});
+					}
+					else if constexpr (TypeTraits::IsBasedOnV<IClonable<T>, T>)
+					{
+						return This->flowControler.SharedLock([&] ()
+						{
+							BaseConcurencyDynamicQueue result;
+							result.This->queue = new T[This->bufferSize];
+							result.This->front = This->front;
+							result.This->rear = This->rear;
+							result.This->count = This->count;
+							result.This->bufferSize = This->bufferSize;
+							for (SizeT i = 0; i < This->count; i++)
+							{
+								(*result.This)[i] = (*This)[i].Clone();
+							}
+							return result;
+						});
+					}
+					else
+					{
+						Throw(NotImplementedException(ExceptionPosition));
+					}
 				}
 
 				RefCountClass(BaseConcurencyDynamicQueue, This)

@@ -24,8 +24,20 @@ namespace Seed {
 					/// </summary>
 					/// <param name="IsDescending">Якщо true то сортування спадаючому порядку відбувається</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					forceinline ThisCollection& SortBy(bool IsDescending = true) {
+					forceinline ThisCollection& Sort(bool IsDescending = true) {
 						return static_cast<ThisCollection&>(*this).SortByImpl(IsDescending);
+					}
+
+					/// <summary>
+					/// Сортування елементів колекції. Використовує лямбду яка вказує як порівнювати елементи
+					/// </summary>
+					/// <param name="lambda">Лямбда вигляду bool(const T&amp;, const T&amp;)</param>
+					/// <returns>Силку на поточну колекцію</returns>
+					template<typename Lambda, TypeTraits::EnableIfTV<
+						TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&, const T&>::State>
+						, bool> = true>
+					forceinline ThisCollection& SortBy(Lambda&& lambda) {
+						return static_cast<ThisCollection&>(*this).SortByLambdaImpl(lambda);
 					}
 
 					/// <summary>

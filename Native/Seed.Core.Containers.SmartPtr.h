@@ -15,6 +15,7 @@ namespace Seed {
 		protected:
 			virtual void Dispose() override final { delete This->ptr; }
 		public:
+			SmartPtr() : This(nullptr) {}
 			SmartPtr(T*&& ptr) : This(new Data(MoveRValue(ptr))) {}
 			RefCountClass(SmartPtr, This);
 

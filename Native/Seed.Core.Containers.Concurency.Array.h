@@ -264,6 +264,18 @@ namespace Seed {
                 }
 
                 template<typename Lambda>
+				forceinline BaseConcurencyArray& SortByLambdaImpl(Lambda&& lambda) {
+                    return This->lock.ExclusiveLock([&] () -> BaseConcurencyArray&
+                    {
+                        if (This->count == 0)
+							return;
+
+                        QuickSort(This->array, 0, This->count - 1, lambda);
+                        return *this;
+                    });
+				}
+
+                template<typename Lambda>
                 T& FirstImpl(Lambda&& lambda) {
                     return This->lock.ShareLock([&]() -> T& {
                         for (SizeT i = 0; i < This->count; i++)
