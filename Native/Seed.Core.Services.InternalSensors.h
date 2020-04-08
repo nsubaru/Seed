@@ -30,6 +30,13 @@ namespace Seed
 				SizeT CurrentMemBlkCount() const {
 					return Memory::CurrentTotalAllocatedMemBlks();
 				}
+
+				SizeT CpuCount() const;
+
+				SizeT MemoryPageSize() const;
+
+				SizeT PhysicalMemorySize() const;
+
 			};
 		}
 	}

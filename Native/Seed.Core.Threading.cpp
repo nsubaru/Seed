@@ -262,9 +262,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, ThreadableType* thread) noe
 
 #pragma runtime_checks("", off)
 #pragma check_stack(off)
-__declspec(noreturn, noinline, safebuffers) void InteruptThread() {
-	Throw(Seed::InteruptException(ExceptionPosition));
-}
+extern __declspec(noreturn, noinline, safebuffers) void InteruptThread();
 #pragma check_stack(on)
 #pragma runtime_checks("", restore)
 
