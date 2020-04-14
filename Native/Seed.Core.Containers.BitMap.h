@@ -52,6 +52,83 @@ namespace Seed {
 					}
 				}
 
+				constexpr SizeT FindBitSequalFrom(SizeT StartPosition, SizeT RequireCount) {
+					if (StartPosition == 0)
+					{
+						return FindBitSequal(RequireCount);
+					}
+					else
+					{
+						SizeT RangeSize;
+						Boolean IsFound = false;
+
+						SizeT bitInFirstCluster = StartPosition % BitCountInFragment;
+						SizeT startCluster = StartPosition / BitCountInFragment;
+
+						for (SizeT bit = bitInFirstCluster; bit < BitCountInFragment; bit++)
+						{
+							if (!Bits::BitCheck(bitMap[startCluster], bit))
+								if (IsFound == false)
+								{
+									RangeSize = 0; IsFound = true;
+								}
+								else
+								{
+									RangeSize++;
+									if (RangeSize == RequireCount)
+										return ((byte * BitCountInFragment) + bit) - RequireCount;
+								}
+							else
+								if (IsFound == true)
+									IsFound = false;
+						}
+
+						for (SizeT byte = startCluster + 1; byte < FullClustersCount; byte++)
+						{
+							if (bitMap[byte] == Math::Max<T>())
+								continue;
+							for (SizeT bit = 0; bit < BitCountInFragment; bit++)
+							{
+								if (!Bits::BitCheck(bitMap[byte], bit))
+									if (IsFound == false)
+									{
+										RangeSize = 0; IsFound = true;
+									}
+									else
+									{
+										RangeSize++;
+										if (RangeSize == RequireCount)
+											return ((byte * BitCountInFragment) + bit) - RequireCount;
+									}
+								else
+									if (IsFound == true)
+										IsFound = false;
+							}
+						}
+						if constexpr (FullClustersCount < Size)
+						{
+							for (SizeT bit = 0; bit < BitCountInFragment; bit++)
+							{
+								if (!Bits::BitCheck(bitMap[FullClustersCount], bit))
+									if (IsFound == false)
+									{
+										RangeSize = 0; IsFound = true;
+									}
+									else
+									{
+										RangeSize++;
+										if (RangeSize == RequireCount)
+											return ((FullClustersCount * BitCountInFragment) + bit) - RequireCount;
+									}
+								else
+									if (IsFound == true)
+										IsFound = false;
+							}
+						}
+						return -1;
+					}
+				}
+
 				constexpr SizeT FindBitSequal(SizeT RequireCount)
 				{
 					SizeT RangeSize;
@@ -79,6 +156,7 @@ namespace Seed {
 						}
 					}
 					if constexpr (FullClustersCount < Size)
+					{
 						for (SizeT bit = 0; bit < BitCountInFragment; bit++)
 						{
 							if (!Bits::BitCheck(bitMap[FullClustersCount], bit))
@@ -96,6 +174,7 @@ namespace Seed {
 								if (IsFound == true)
 									IsFound = false;
 						}
+					}
 					return -1;
 				};
 

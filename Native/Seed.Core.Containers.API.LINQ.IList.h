@@ -41,7 +41,7 @@ namespace Seed {
 					/// Видалення елементів які підпадають під умову FilteringLambda
 					/// </summary>
 					/// <typeparam name="FilteringLambda">Тип лямбди з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</typeparam>
-					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&) або bool(*)(const T&amp;, SizeT)</param>
+					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<
 						typename FilteringLambda,

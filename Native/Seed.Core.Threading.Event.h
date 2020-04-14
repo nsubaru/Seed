@@ -65,7 +65,39 @@ namespace Seed {
 				forceinline void Reset() {
 					Internals::ResetNtEvent(data->handle);
 				}
-
+			public:
+				/// <summary>
+				/// Явне перетворення до дескриптора ОС
+				/// </summary>
+				/// <returns>Вертає дескриптор системи який звязаний з даним об'єктом подіх</returns>
+				InternalApiCall explicit operator Handle() {
+					return data->handle;
+				}
+			public:
+				/// <summary>
+				/// Тип події(чи ручне скидання стану події чи функції ОС самі це роблять автоматично)
+				/// </summary>
+				/// <returns>True якщо подія автоматисно скидає свій стан при считувані</returns>
+				Boolean GetIsManualReset() const {
+					return data->IsManualReset;
+				}
+				/// <summary>
+				/// Ім'я або пустий рядок якщо подія безімена
+				/// </summary>
+				/// <returns>Рядок з іменем або пустий якщо безіменні</returns>
+				const String& GetName() const {
+					return data->Name;
+				}
+			public:
+				/// <summary>
+				/// Тип події(чи ручне скидання стану події чи функції ОС самі це роблять автоматично)
+				/// </summary>
+				Boolean Property(GetIsManualReset) IsManualReset;
+				/// <summary>
+				/// Ім'я або пустий рядок якщо подія безімена
+				/// </summary>
+				String Property(GetName) Name;
+			public:
 				friend void WaitForAll(Containers::Array<SynchronizeEvent>&& events);
 				friend void WaitForAny(Containers::Array<SynchronizeEvent>&& events);
 				friend void WaitForAll(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs);
