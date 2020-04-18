@@ -181,6 +181,19 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
+				forceinline BaseFixedArray& SortByLambdaImpl(Lambda&& lambda) {
+					if constexpr (TSize == 0)
+					{
+						return *this;
+					}
+					else
+					{
+						QuickSort(This->array, 0, TSize - 1, lambda);
+						return *this;
+					}
+				}
+
+				template<typename Lambda>
 				T& FirstImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < TSize; i++)
 						if (lambda(This->array[i]))

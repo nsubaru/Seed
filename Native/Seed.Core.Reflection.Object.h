@@ -83,19 +83,19 @@ namespace Seed
 						}
 					}
 
-					static constexpr auto MethodCaller = [] (const void* const& pMethod, void* thisPtr, DynamicObject& dynamic) -> DynamicObject
+					static constexpr auto MethodCaller = [] (const void* const& pMethod, DynamicObject& This, DynamicObject& dynamic) -> DynamicObject
 					{
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
 
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									(pThis->*method)();
+									((&pThis)->*method)();
 									return DynamicObject();
 								}
 								else
@@ -107,7 +107,7 @@ namespace Seed
 							{
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									return DynamicObject(Containers::Tuple<TRet>((pThis->*method)()));
+									return DynamicObject(Containers::Tuple<TRet>(((&pThis)->*method)()));
 								}
 								else
 								{
@@ -118,7 +118,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -127,7 +127,7 @@ namespace Seed
 								{
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>().CallWithArgsFromTuple([&] (TArgs&&... args) -> DynamicObject
 									{
-										(pThis->*method)(ForwardReference<TArgs>(args)...);
+										((&pThis)->*method)(ForwardReference<TArgs>(args)...);
 										return DynamicObject();
 									});
 								}
@@ -143,7 +143,7 @@ namespace Seed
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>()
 										.CallWithArgsFromTuple([&] (TypeTraits::RemoveCVRefV<TArgs>&&... args)
 									{
-										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>((pThis->*method)(args...)));
+										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>(((&pThis)->*method)(args...)));
 									});
 								}
 								else
@@ -207,19 +207,19 @@ namespace Seed
 						}
 					}
 
-					static constexpr auto MethodCaller = [] (const void* const& pMethod, void* thisPtr, DynamicObject& dynamic) -> DynamicObject
+					static constexpr auto MethodCaller = [] (const void* const& pMethod, DynamicObject& This, DynamicObject& dynamic) -> DynamicObject
 					{
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
 
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									(pThis->*method)();
+									((&pThis)->*method)();
 									return DynamicObject();
 								}
 								else
@@ -231,7 +231,7 @@ namespace Seed
 							{
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									return DynamicObject(Containers::Tuple<TRet>((pThis->*method)()));
+									return DynamicObject(Containers::Tuple<TRet>(((&pThis)->*method)()));
 								}
 								else
 								{
@@ -242,7 +242,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -251,7 +251,7 @@ namespace Seed
 								{
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>().CallWithArgsFromTuple([&] (TArgs&&... args) -> DynamicObject
 									{
-										(pThis->*method)(ForwardReference<TArgs>(args)...);
+										((&pThis)->*method)(ForwardReference<TArgs>(args)...);
 										return DynamicObject();
 									});
 								}
@@ -267,7 +267,7 @@ namespace Seed
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>()
 										.CallWithArgsFromTuple([&] (TypeTraits::RemoveCVRefV<TArgs>&&... args)
 									{
-										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>((pThis->*method)(args...)));
+										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>(((&pThis)->*method)(args...)));
 									});
 								}
 								else
@@ -331,19 +331,19 @@ namespace Seed
 						}
 					}
 
-					static constexpr auto MethodCaller = [] (const void* const& pMethod, void* thisPtr, DynamicObject& dynamic) -> DynamicObject
+					static constexpr auto MethodCaller = [] (const void* const& pMethod, DynamicObject& This, DynamicObject& dynamic) -> DynamicObject
 					{
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
 
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									(pThis->*method)();
+									((&pThis)->*method)();
 									return DynamicObject();
 								}
 								else
@@ -355,7 +355,7 @@ namespace Seed
 							{
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									return DynamicObject(Containers::Tuple<TRet>((pThis->*method)()));
+									return DynamicObject(Containers::Tuple<TRet>(((&pThis)->*method)()));
 								}
 								else
 								{
@@ -366,7 +366,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -375,7 +375,7 @@ namespace Seed
 								{
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>().CallWithArgsFromTuple([&] (TArgs&&... args) -> DynamicObject
 									{
-										(pThis->*method)(ForwardReference<TArgs>(args)...);
+										((&pThis)->*method)(ForwardReference<TArgs>(args)...);
 										return DynamicObject();
 									});
 								}
@@ -391,7 +391,7 @@ namespace Seed
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>()
 										.CallWithArgsFromTuple([&] (TypeTraits::RemoveCVRefV<TArgs>&&... args)
 									{
-										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>((pThis->*method)(args...)));
+										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>(((&pThis)->*method)(args...)));
 									});
 								}
 								else
@@ -455,19 +455,19 @@ namespace Seed
 						}
 					}
 
-					static constexpr auto MethodCaller = [] (const void* const& pMethod, void* thisPtr, DynamicObject& dynamic) -> DynamicObject
+					static constexpr auto MethodCaller = [] (const void* const& pMethod, DynamicObject& This, DynamicObject& dynamic) -> DynamicObject
 					{
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
 
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									(pThis->*method)();
+									((&pThis)->*method)();
 									return DynamicObject();
 								}
 								else
@@ -479,7 +479,7 @@ namespace Seed
 							{
 								if (dynamic.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 								{
-									return DynamicObject(Containers::Tuple<TRet>((pThis->*method)()));
+									return DynamicObject(Containers::Tuple<TRet>(((&pThis)->*method)()));
 								}
 								else
 								{
@@ -490,7 +490,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass* pThis = reinterpret_cast<TClass*>(thisPtr);
+							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -499,7 +499,7 @@ namespace Seed
 								{
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>().CallWithArgsFromTuple([&] (TArgs&&... args) -> DynamicObject
 									{
-										(pThis->*method)(ForwardReference<TArgs>(args)...);
+										((&pThis)->*method)(ForwardReference<TArgs>(args)...);
 										return DynamicObject();
 									});
 								}
@@ -515,7 +515,7 @@ namespace Seed
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>()
 										.CallWithArgsFromTuple([&] (TypeTraits::RemoveCVRefV<TArgs>&&... args)
 									{
-										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>((pThis->*method)(args...)));
+										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>(((&pThis)->*method)(args...)));
 									});
 								}
 								else
@@ -592,13 +592,13 @@ namespace Seed
 				struct ObjectCtorAndDtor {
 					static_assert(Core::TypeTraits::IsConstructible<T, TArgs...>, "Can not construct class with this args");
 
-					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> void*
+					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> DynamicObject
 					{
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							if (args.GetImplementationTypeInfo() == typeid(Containers::Tuple<>))
 							{
-								return new T();
+								return DynamicObject(Containers::Tuple<T>());
 							}
 							else
 							{
@@ -611,7 +611,7 @@ namespace Seed
 							{
 								return args.GetValue<TArgs...>().CallWithArgsFromTuple([] (TArgs&&... args)
 								{
-									return new T(args...);
+									return DynamicObject(Containers::Tuple<T>(T(args...)));
 								});
 							}
 							else
@@ -621,10 +621,8 @@ namespace Seed
 						}
 					};
 
-					static constexpr auto UnifiedDtor = [] (void*& pObject)
+					static constexpr auto UnifiedDtor = [] (DynamicObject&& object)
 					{
-						delete static_cast<T*>(pObject);
-						pObject = nullptr;
 					};
 
 					static constexpr auto CtorArgsTypeName = CTTI::TypeName<Containers::Tuple<TArgs...>>();
@@ -636,15 +634,13 @@ namespace Seed
 
 				template<typename T>
 				struct ObjectNullCtorAndDtor {
-					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> void*
+					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> DynamicObject
 					{
 						Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
 					};
 
-					static constexpr auto UnifiedDtor = [] (void*& pObject)
+					static constexpr auto UnifiedDtor = [] (DynamicObject&& object)
 					{
-						delete static_cast<T*>(pObject);
-						pObject = nullptr;
 					};
 
 					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::TypeStringToArray(GenNGTypeString("`invalid`")());
@@ -681,15 +677,48 @@ namespace Seed
 						}
 					}
 				public:
+					using PropType = typename MethodCallDescriptor<TGet>::Ret;
+					using PropClass = typename MethodCallDescriptor<TGet>::Class;
 					static constexpr auto Name = Seed::Core::CTTI::Details::TypeStringToArray(TName());
-					static constexpr auto PropTypeName = MethodCallDescriptor<TGet>::RetTypeName;
+					static constexpr auto PropTypeName = CTTI::TypeName<PropType>();
 					static constexpr auto GetCaller = MethodCallDescriptor<TGet>::MethodCaller;
 					static constexpr auto pGet = GetT;
 					static constexpr auto PropTypeInformationGetter = MethodCallDescriptor<TGet>::TypeInformationGetter;
 					static constexpr bool IsRw = (TSetterMethods::Count != 0);
-					static constexpr bool IsSerelizable = MethodCallDescriptor<TGet>::IsRetSerilizable;
+					static constexpr bool IsValueSerilizable = MethodCallDescriptor<TGet>::IsRetSerilizable;
+					static constexpr auto SerilizeFunction = [] (const DynamicObject& data) -> Containers::Blob
+					{
+						if constexpr (IsValueSerilizable)
+						{
+							auto pObjGet = pGet;
+							auto emptyArgs = DynamicObject(Containers::Tuple<>());
+							//HACK: we know that getter use const object but for unification method caller lambda use object without 
+							//HACK: const modificator and we shoult remove it to get property value
+							auto propValue = GetCaller(reinterpret_cast<void*&>(pObjGet), const_cast<DynamicObject&>(data), emptyArgs)
+								.GetValue<PropType>()
+								.GetByIdx<0>();
+							return Serilization::Serilize(propValue);
+						}
+						else
+						{
+							Throw(NonSerelizableType(ExceptionPosition, PropTypeName));
+						}
+					};
+					static constexpr auto SerilizeTypeMetaData = [] () -> String
+					{
+						if constexpr (IsValueSerilizable)
+						{
+							return Serilization::MetaDataGen<PropType>();
+						}
+						else
+						{
+							return String();
+						}
+					};
+
 					using SetterMethods = TSetterMethods;
 
+					static_assert(MethodCallDescriptor<TGet>::IsConst, "Property getter should be const method");
 					static_assert(CheckSetterMethods(), "Invalid setters for property");
 				};
 
@@ -738,9 +767,9 @@ namespace Seed
 
 			class ObjectRTTIRecord final : IDisposable, public Serilization::ISerilizable<ObjectRTTIRecord> {
 			public:
-				using CtorCaller = void* (*)(DynamicObject&&);
-				using DtorCaller = void (*)(void*&);
-				using MethodCaller = DynamicObject(*)(const void* const&, void*, DynamicObject&);
+				using CtorCaller = DynamicObject (*)(DynamicObject&&);
+				using DtorCaller = void (*)(DynamicObject&&);
+				using MethodCaller = DynamicObject(*)(const void* const&, DynamicObject&, DynamicObject&);
 				using TypeInformationGetterType = Containers::List<DataTypeRecord>(*)();
 			public:
 				class MethodRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
@@ -895,7 +924,8 @@ namespace Seed
 
 				class PropertyRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
 				public:
-					using MethodCaller = DynamicObject(*)(const void* const&, void*, DynamicObject&);
+					using TSerilizationFunction = Containers::Blob(*)(const DynamicObject&);
+					using TSerilizationMetaDataGetter = String(*)();
 
 					struct CallerData {
 						MethodCaller Setter;
@@ -925,6 +955,9 @@ namespace Seed
 						Boolean IsRW;
 						const void* const& pGetter;
 						TypeInformationGetterType typeInformationGetter;
+						Boolean IsValueSerilizable;
+						TSerilizationFunction serilizationFunction;
+						TSerilizationMetaDataGetter serilizationMetaDataGetter;
 
 						RefCountT RefCount;
 
@@ -935,7 +968,10 @@ namespace Seed
 							Containers::List<CallerData> Setters,
 							Boolean IsRW,
 							const void* const& pGetter,
-							TypeInformationGetterType typeInformationGetter
+							TypeInformationGetterType typeInformationGetter,
+							Boolean IsValueSerilizable,
+							TSerilizationFunction serilizationFunction,
+							TSerilizationMetaDataGetter serilizationMetaDataGetter
 						) :
 							Name(Name),
 							PropTypeName(PropTypeName),
@@ -944,6 +980,9 @@ namespace Seed
 							IsRW(IsRW),
 							pGetter(pGetter),
 							typeInformationGetter(typeInformationGetter),
+							IsValueSerilizable(IsValueSerilizable),
+							serilizationFunction(serilizationFunction),
+							serilizationMetaDataGetter(serilizationMetaDataGetter),
 							RefCount(1) {}
 					};
 				private:
@@ -976,7 +1015,8 @@ namespace Seed
 					DefStructMetaData(Data,
 						DefStructFieldData(Data, Name),
 						DefStructFieldData(Data, IsRW),
-						DefStructFieldData(Data, PropTypeName)
+						DefStructFieldData(Data, PropTypeName),
+						DefStructFieldData(Data, IsValueSerilizable)
 					);
 				public:
 					template<typename TPropertyDescriptor>
@@ -988,7 +1028,10 @@ namespace Seed
 							GenSettersData<TPropertyDescriptor::SetterMethods, 0>(TypeTraits::TypeTag<TPropertyDescriptor::SetterMethods>{}),
 							TPropertyDescriptor::IsRw,
 							reinterpret_cast<const void* const&>(TPropertyDescriptor::pGet),
-							TPropertyDescriptor::PropTypeInformationGetter
+							TPropertyDescriptor::PropTypeInformationGetter,
+							TPropertyDescriptor::IsValueSerilizable,
+							TPropertyDescriptor::SerilizeFunction,
+							TPropertyDescriptor::SerilizeTypeMetaData
 						)) {}
 				public:
 					forceinline String GetName() const {
@@ -1019,12 +1062,32 @@ namespace Seed
 						return data->typeInformationGetter;
 					}
 
+					forceinline DynamicObject CallGetterForObject(DynamicObject& obj) const {
+						auto args = DynamicObject(Containers::Tuple<>());
+						return data->Getter(data->pGetter, obj, args);
+					}
+
+					forceinline Boolean GetIsSerilizable() const {
+						return data->IsValueSerilizable;
+					}
+
+					forceinline TSerilizationFunction GetSerilizableFunction() const {
+						return data->serilizationFunction;
+					}
+
+					forceinline TSerilizationMetaDataGetter GetSerilizableMetaDataGetter() const {
+						return data->serilizationMetaDataGetter;
+					}
+
 					String Property(GetName) Name;
 					String Property(GetPropTypeName) PropertieTypeName;
 					MethodCaller Property(GetGetter) Getter;
 					Containers::List<CallerData> Property(GetSetters) Setters;
 					Boolean Property(GetIsRW) IsRW;
 					TypeInformationGetterType Property(GetTypeInformationGetter) TypeInformationGetter;
+					Boolean Property(GetIsSerilizable) IsSerilizable;
+					TSerilizationFunction Property(GetSerilizableFunction) SerilizationFunction;
+					TSerilizationMetaDataGetter Property(GetSerilizableMetaDataGetter) SerilizableMetaDataGetter;
 				public:
 					RefCountClass(PropertyRTTIRecord, data);
 				};

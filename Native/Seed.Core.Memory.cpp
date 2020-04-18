@@ -189,7 +189,7 @@ void* GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 	//Вираховуєм точний адресс початку ділянки
 	SizeT AllignedAddress = Math::RoundToUpper(Address, AllocationReq) * AllocationReq;
 	//Отримуєм заголовок ділянки пам'яті
-	SizeT* RealPtr = (SizeT*)(AllignedAddress - 2);
+	SizeT* RealPtr = (SizeT*)(AllignedAddress - (2 * sizeof(SizeT)));
 	//Записуєм реальний початок ділянки пам'яті
 	RealPtr[0] = (SizeT)obj;
 	//Та розмір даних
@@ -235,13 +235,13 @@ void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq)
 	//Отримуєм покажчик на заголовок ділянки пам'яті
 	SizeT* Header = ((SizeT*)MemBlk) - 2;
 	//Отримуєм розмір даних в ділянці пам'яті
-	SizeT DataSize = Header[0];
+	SizeT DataSize = Header[1];
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
 	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
 		LogFree(DataSize, HeapData.AllocatedMemBlksCount + 1, L"Загальна");
 	}
 	//Отрмуєм покажчик на початок ділянки пам'яті
-	void* RealPtr = (void*)Header[1];
+	void* RealPtr = (void*)Header[0];
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + sizeof(SizeT) + AllocationReq + DataSize;
 	//Пробуєм звільнити ділянку пам'яті
@@ -368,7 +368,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	//Вираховуєм точний адресс початку ділянки
 	SizeT AllignedAddress = Math::RoundToUpper(Address, AllocationReq) * AllocationReq;
 	//Отримуєм заголовок ділянки пам'яті
-	SizeT* RealPtr = (SizeT*)(AllignedAddress)-2;
+	SizeT* RealPtr = (SizeT*)(AllignedAddress - (2 * sizeof(SizeT)));
 	//Записуєм реальний початок ділянки пам'яті
 	RealPtr[0] = (SizeT)obj;
 	//Та розмір даних

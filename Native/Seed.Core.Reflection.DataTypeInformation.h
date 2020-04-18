@@ -30,7 +30,7 @@ namespace Seed
 						}
 						else
 						{
-							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>()), typeid(T)));
+							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>())));
 						}
 					};
 
@@ -44,7 +44,7 @@ namespace Seed
 						}
 						else
 						{
-							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>()), typeid(T)));
+							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>())));
 						}
 					};
 

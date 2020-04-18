@@ -1,5 +1,6 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+#include "Seed.Core.Threading.LockPrimitives.h"
 
 #include "Seed.Core.CoreLog.h"
 #include "Seed.Core.CoreLog.Managed.h"
@@ -23,11 +24,20 @@
 //so we must use stack as storage for msg
 #pragma warning(disable: 6262)
 
-struct {
-	HANDLE handle;
-	IO_STATUS_BLOCK ioBlock;
-	RTL_CRITICAL_SECTION lock;
-} LogFile = { 0 };
+struct TLogFile {
+	HANDLE handle = nullptr;
+	IO_STATUS_BLOCK ioBlock = { 0 };
+	Seed::Threading::SRWLock lock = Seed::Threading::SRWLock();
+};
+
+//Статична функція отримання керуючої структури логування
+static TLogFile& GetLogFile() {
+	static TLogFile LogFileStructData;
+	return LogFileStructData;
+}
+
+//Дефайн отримання керуючої структури логування
+#define LogFile GetLogFile()
 
 void FormatCurrentTime(Seed::Char* buffer) {
 	using namespace Seed;
@@ -116,13 +126,11 @@ Seed::Boolean Seed::Core::Init::Loging() noexcept
 		sizeof(char) * 2,
 		NULL,
 		NULL);
-	RtlInitializeCriticalSection(&LogFile.lock);
 	if (!NT_SUCCESS(status)) return false;
 	return Seed::Core::toCoreLog(L"Запуск ядра...");
 }
 
-SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char* Value, Seed::SizeT Lenght)
-{
+SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::Char* Value, Seed::SizeT Lenght) {
 	if (Lenght > static_cast<SizeT>(Math::Max<Int16>()) - 22ULL)
 		return false;
 	Char raw[Math::Max<Int16>()] = { 0 };
@@ -132,18 +140,20 @@ SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::C
 	SizeT size = CStr::Size(raw);
 	CStr::Copy(L"\r\n", raw + size);
 	size += 2; size *= sizeof(wchar_t);
-	RtlEnterCriticalSection(&LogFile.lock);
-	NTSTATUS status = NtWriteFile( //-V107
-		LogFile.handle,
-		NULL,
-		NULL,
-		NULL,
-		&LogFile.ioBlock,
-		(void*)raw, //-V2005 //-V2533
-		(ULONG)size, //-V2005 //-V202 //-V2533
-		NULL,
-		NULL);
-	RtlLeaveCriticalSection(&LogFile.lock);
+	NTSTATUS status = STATUS_SUCCESS;
+	LogFile.lock.ExclusiveLock([&] ()
+	{
+		status = NtWriteFile( //-V107
+			LogFile.handle,
+			NULL,
+			NULL,
+			NULL,
+			&LogFile.ioBlock,
+			(void*) raw, //-V2005 //-V2533
+			(ULONG) size, //-V2005 //-V202 //-V2533
+			NULL,
+			NULL);
+	});
 	if (!NT_SUCCESS(status)) return false;
 	else return true;
 }
@@ -152,7 +162,6 @@ void Seed::Core::Stop::Loging() noexcept
 {
 	toCoreLog(L"Зупинка логування...");
 	NtClose(LogFile.handle);
-	RtlDeleteCriticalSection(&LogFile.lock);
 }
 
 bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::ExceptionString>& lines)
@@ -180,18 +189,20 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 			data = ExceptionString(raw) + data + NextLine();
 			SizeT bytesCount = data.Lenght;
 			bytesCount *= sizeof(wchar_t);
-			RtlEnterCriticalSection(&LogFile.lock);
-			NTSTATUS status = NtWriteFile( //-V107
-				LogFile.handle,
-				NULL,
-				NULL,
-				NULL,
-				&LogFile.ioBlock,
-				(void*)(Seed::ConstCharStr) data, //-V2005 //-V2533
-				(ULONG)bytesCount, //-V2005 //-V202 //-V2533
-				NULL,
-				NULL);
-			RtlLeaveCriticalSection(&LogFile.lock);
+			NTSTATUS status = STATUS_SUCCESS;
+			LogFile.lock.ExclusiveLock([&] ()
+			{
+				status = NtWriteFile( //-V107
+					LogFile.handle,
+					NULL,
+					NULL,
+					NULL,
+					&LogFile.ioBlock,
+					(void*) (Seed::ConstCharStr) data, //-V2005 //-V2533
+					(ULONG) bytesCount, //-V2005 //-V202 //-V2533
+					NULL,
+					NULL);
+			});
 			if (!NT_SUCCESS(status)) return false;
 			else return true;
 		}
@@ -210,32 +221,36 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 #include "Seed.Core.Services.CoreLogger.h"
 
 Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
+	Char* buffer = nullptr;
 	try
 	{
-		RtlEnterCriticalSection(&LogFile.lock);
-		FILE_STANDARD_INFORMATION logFileInfo;
-		NTSTATUS status = NtQueryInformationFile(
-			LogFile.handle, 
-			&LogFile.ioBlock, 
-			&logFileInfo, 
-			sizeof(FILE_STANDARD_INFORMATION), 
-			FileStandardInformation
-		);
+		NTSTATUS status = STATUS_SUCCESS;
+
+		LogFile.lock.ShareLock([&] ()
+		{
+			FILE_STANDARD_INFORMATION logFileInfo;
+			status = NtQueryInformationFile(
+				LogFile.handle,
+				&LogFile.ioBlock,
+				&logFileInfo,
+				sizeof(FILE_STANDARD_INFORMATION),
+				FileStandardInformation
+				);
+			if (!NT_SUCCESS(status))
+			{
+				Throw(NtException(ExceptionPosition, status));
+			}
+			SizeT bufferSize = logFileInfo.EndOfFile.QuadPart;
+			buffer = new Char[bufferSize];
+			Memory::MemBlkFill(buffer, bufferSize, 0);
+			LARGE_INTEGER offset = { 0 };
+			offset.QuadPart = sizeof(char) * 2;
+
+			status = NtReadFile(LogFile.handle, NULL, NULL, NULL, &LogFile.ioBlock, buffer, (ULONG) bufferSize, &offset, NULL);
+		});
+
 		if (!NT_SUCCESS(status))
 		{
-			Throw(NtException(ExceptionPosition, status));
-		}
-		SizeT bufferSize = logFileInfo.EndOfFile.QuadPart;
-		Char * buffer = new Char[bufferSize];
-		Memory::MemBlkFill(buffer, bufferSize, 0);
-
-		LARGE_INTEGER offset = { 0 };
-		offset.QuadPart = sizeof(char) * 2;
-
-		status = NtReadFile(LogFile.handle, NULL, NULL, NULL, &LogFile.ioBlock, buffer, (ULONG)bufferSize, &offset, NULL);
-		if (!NT_SUCCESS(status))
-		{
-			delete[] buffer;
 			Throw(NtException(ExceptionPosition, status));
 		}
 		SizeT textSize = 0;
@@ -250,13 +265,11 @@ Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
 		if(ret.LastIt != nullptr)
 			ret.Remove(ret.LastIt);
 		delete[] buffer;
-		RtlLeaveCriticalSection(&LogFile.lock);
-
 		return ret;
 	}
 	catch (...)
 	{
-		RtlLeaveCriticalSection(&LogFile.lock);
+		delete[] buffer;
 		ReThrow;
 	}
 }

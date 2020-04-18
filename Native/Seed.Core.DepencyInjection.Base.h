@@ -84,21 +84,35 @@ namespace Seed
 			class DepencyInjector final : IDisposable {
 			private:
 				using TResolverCtor = void* (*)(DepencyInjector & injector);
+				using TServiceDtor = void(*)(void*);
 				using TInterfaceCaster = void* (*)(void*);
 			private:
 				struct ServiceRecord {
 					TResolverCtor resolverCtor;
 					TInterfaceCaster interfaceCaster;
+					TServiceDtor serviceDtor;
 					Reflection::ObjectRTTIRecord rttiRecord;
 					void* objPtr;
+					
 
-					ServiceRecord(TResolverCtor resolverCtor, TInterfaceCaster interfaceCaster, Reflection::ObjectRTTIRecord && rttiRecord)
-						:resolverCtor(resolverCtor), interfaceCaster(interfaceCaster), rttiRecord(MoveRValue(rttiRecord)), objPtr(nullptr) {}
+					ServiceRecord(
+						TResolverCtor resolverCtor, 
+						TServiceDtor serviceDtor,
+						TInterfaceCaster interfaceCaster, 
+						Reflection::ObjectRTTIRecord && rttiRecord
+						) 
+					:
+						resolverCtor(resolverCtor), 
+						serviceDtor(serviceDtor),
+						interfaceCaster(interfaceCaster), 
+						rttiRecord(MoveRValue(rttiRecord)), 
+						objPtr(nullptr) 
+					{}
 
 					~ServiceRecord() {
 						if (objPtr != nullptr)
 						{
-							rttiRecord.DtorCallerFunction(objPtr);
+							serviceDtor(objPtr);
 							objPtr = nullptr;
 						}
 					}
@@ -162,39 +176,63 @@ namespace Seed
 					}
 					~IDI() {}
 				public:
-					forceinline Containers::List<String> GetAllServicesNames() {
+					forceinline Containers::List<String> GetAllServicesNames() const {
 						return di.GetAllServicesNames();
 					}
 
-					forceinline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) {
+					forceinline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) const {
 						return di.GetServiceRecordByName(name);
 					}
 
-					forceinline Containers::List<String> GetAllRegisteredObjects() {
+					forceinline Containers::List<String> GetAllRegisteredObjects() const {
 						return di.GetAllRegisteredObjects();
 					}
 
-					forceinline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) {
+					forceinline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) const {
 						return di.GetObjectRecordByName(name);
 					}
 
-					forceinline Containers::List<String> GetAllRegisteredDataTypes() {
+					forceinline Reflection::ObjectRTTIRecord GetObjectRecordByType(const TypeInfo& id) const {
+						return di.GetObjectRecordByType(id);
+					}
+
+					forceinline Boolean IsExistObjectRecordByName(const String& name) const {
+						return di.IsExistObjectRecordByName(name);
+					}
+
+					forceinline Boolean IsExistObjectRecordByType(const TypeInfo& id) const {
+						return di.IsExistObjectRecordByType(id);
+					}
+
+					forceinline Containers::List<String> GetAllRegisteredDataTypes() const {
 						return di.GetAllRegisteredDataTypes();
 					}
 
-					forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) {
+					forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) const {
 						return di.GetDataTypesRecordByName(name);
 					}
 
-					forceinline void RegisterObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) {
+					forceinline Reflection::DataTypeRecord GetDataTypesRecordByType(const TypeInfo& id) const {
+						return di.GetDataTypesRecordByType(id);
+					}
+
+					forceinline Boolean IsExistDataTypesRecordByName(const String& name) const {
+						return di.IsExistDataTypesRecordByName(name);
+					}
+
+					forceinline Boolean IsExistDataTypesRecordByType(const TypeInfo& type) const {
+						return di.IsExistDataTypesRecordByType(type);
+					}
+
+					forceinline void RegisterObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) const {
 						di.RegisterObjectType(objectRTTIRecord);
 					}
 
-					forceinline void RegisterObjectRTTIRecord(Reflection::ObjectRTTIRecord&& objectRTTIRecord) {
+					forceinline void RegisterObjectRTTIRecord(Reflection::ObjectRTTIRecord&& objectRTTIRecord) const {
 						di.RegisterObjectType(MoveRValue(objectRTTIRecord));
 					}
 
-					forceinline void RemoveObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) {
+					forceinline void RemoveObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) const {
 						di.RemoveObjectType(objectRTTIRecord);
 					}
 				private:
@@ -248,11 +286,16 @@ namespace Seed
 						else
 						{
 							return Containers::Tuple<TCtorArgs...>{injector.Resolve<TCtorArgs>() ... }
-								.CallWithArgsFromTuple([] (TCtorArgs&& ... args)
-								{
-									return new TService(args...);
-								});
+							.CallWithArgsFromTuple([] (TCtorArgs&& ... args)
+							{
+								return new TService(args...);
+							});
 						}
+					};
+
+					static constexpr auto ServiceDtor = [] (void* pServiceObj)->void
+					{
+						delete (TService*) pServiceObj;
 					};
 
 					if (rttiRecord.GetRTTITypeInfo() != typeid(TService))
@@ -260,6 +303,7 @@ namespace Seed
 
 					auto serviceRecord = SmartPtr<ServiceRecord>{ new ServiceRecord(
 						InjectorCtor,
+						ServiceDtor,
 						nullptr,
 						MoveRValue(rttiRecord)
 					) };
@@ -396,6 +440,18 @@ namespace Seed
 					return data->objectTypeTableForManagedLevel[name];
 				}
 
+				forceinline Reflection::ObjectRTTIRecord GetObjectRecordByType(const TypeInfo& id) {
+					return data->objectTypeTableForNativeLevel[&id];
+				}
+
+				forceinline Boolean IsExistObjectRecordByName(const String& name) {
+					return data->objectTypeTableForManagedLevel.IsExist(name);
+				}
+
+				forceinline Boolean IsExistObjectRecordByType(const TypeInfo& id) {
+					return data->objectTypeTableForNativeLevel.IsExist(&id);
+				}
+
 				forceinline Containers::List<String> GetAllRegisteredDataTypes() {
 					Containers::List<String> dataTypeNames;
 					data->dataTypeTableForManagedLevel.ForEachKey([&] (const String& str) mutable
@@ -407,6 +463,18 @@ namespace Seed
 
 				forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) {
 					return data->dataTypeTableForManagedLevel[name];
+				}
+
+				forceinline Reflection::DataTypeRecord GetDataTypesRecordByType(const TypeInfo& id) {
+					return data->dataTypeTableForNativeLevel[&id];
+				}
+
+				forceinline Boolean IsExistDataTypesRecordByName(const String& name) {
+					return data->dataTypeTableForManagedLevel.IsExist(name);
+				}
+
+				forceinline Boolean IsExistDataTypesRecordByType(const TypeInfo& id) {
+					return data->dataTypeTableForNativeLevel.IsExist(&id);
 				}
 			public:
 

@@ -206,28 +206,28 @@ namespace Seed
 
 							if constexpr (I + 1 < StructFieldsMetaData::Count)
 								return
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("[")()) +
 									FieldMetaData::FieldName.Resize<FieldMetaData::FieldName.Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldOffset)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldSize)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")())
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("]")())
 									+
 									TypeHintFieldsImp<I + 1>();
 							else
 								return
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("[")()) +
 									FieldMetaData::FieldName.Resize<FieldMetaData::FieldName.Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldOffset)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldSize)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("]")());
 						}
 						else
 						{

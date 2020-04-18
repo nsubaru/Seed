@@ -52,6 +52,83 @@ namespace Seed {
 					}
 				}
 
+				constexpr SizeT FindBitSequalFrom(SizeT StartPosition, SizeT RequireCount) {
+					if (StartPosition == 0)
+					{
+						return FindBitSequal(RequireCount);
+					}
+					else
+					{
+						SizeT RangeSize;
+						Boolean IsFound = false;
+
+						SizeT bitInFirstCluster = StartPosition % BitCountInFragment;
+						SizeT startCluster = StartPosition / BitCountInFragment;
+
+						for (SizeT bit = bitInFirstCluster; bit < BitCountInFragment; bit++)
+						{
+							if (!Bits::BitCheck(bitMap[startCluster], bit))
+								if (IsFound == false)
+								{
+									RangeSize = 0; IsFound = true;
+								}
+								else
+								{
+									RangeSize++;
+									if (RangeSize == RequireCount)
+										return ((byte * BitCountInFragment) + bit) - RequireCount;
+								}
+							else
+								if (IsFound == true)
+									IsFound = false;
+						}
+
+						for (SizeT byte = startCluster + 1; byte < FullClustersCount; byte++)
+						{
+							if (bitMap[byte] == Math::Max<T>())
+								continue;
+							for (SizeT bit = 0; bit < BitCountInFragment; bit++)
+							{
+								if (!Bits::BitCheck(bitMap[byte], bit))
+									if (IsFound == false)
+									{
+										RangeSize = 0; IsFound = true;
+									}
+									else
+									{
+										RangeSize++;
+										if (RangeSize == RequireCount)
+											return ((byte * BitCountInFragment) + bit) - RequireCount;
+									}
+								else
+									if (IsFound == true)
+										IsFound = false;
+							}
+						}
+						if constexpr (FullClustersCount < Size)
+						{
+							for (SizeT bit = 0; bit < BitCountInFragment; bit++)
+							{
+								if (!Bits::BitCheck(bitMap[FullClustersCount], bit))
+									if (IsFound == false)
+									{
+										RangeSize = 0; IsFound = true;
+									}
+									else
+									{
+										RangeSize++;
+										if (RangeSize == RequireCount)
+											return ((FullClustersCount * BitCountInFragment) + bit) - RequireCount;
+									}
+								else
+									if (IsFound == true)
+										IsFound = false;
+							}
+						}
+						return -1;
+					}
+				}
+
 				constexpr SizeT FindBitSequal(SizeT RequireCount)
 				{
 					SizeT RangeSize;
@@ -79,6 +156,7 @@ namespace Seed {
 						}
 					}
 					if constexpr (FullClustersCount < Size)
+					{
 						for (SizeT bit = 0; bit < BitCountInFragment; bit++)
 						{
 							if (!Bits::BitCheck(bitMap[FullClustersCount], bit))
@@ -96,6 +174,7 @@ namespace Seed {
 								if (IsFound == true)
 									IsFound = false;
 						}
+					}
 					return -1;
 				};
 
@@ -140,7 +219,7 @@ namespace Seed {
 						if (StartCluster - EndCluster > 1)
 						{
 							for (SizeT byte = StartCluster + 1; byte < EndCluster; byte++)
-								bitMap[byte] = Math::Max::T;
+								bitMap[byte] = Math::Max<T>();
 						}
 					}
 				};
@@ -208,7 +287,7 @@ namespace Seed {
 				{
 					if (Position > BitCount)
 						Throw(IndexOutOfRange(ExceptionPosition, Position, BitCount));
-					return !BitCheck(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
+					return !Bits::BitCheck(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 				};
 
 				forceinline constexpr void ResetAll()
@@ -225,13 +304,13 @@ namespace Seed {
 							Count += BitCountInFragment;
 						else
 							for (SizeT j = 0; j < BitCountInFragment; j++)
-								if (BitCheck(bitMap[byte], j))
+								if (Bits::BitCheck(bitMap[byte], j))
 									Count++;
 					}
 					if constexpr (FullClustersCount > Size)
 					{
 						for (SizeT j = 0; j < BitCountInFragment; j++)
-							if (BitCheck(bitMap[FullClustersCount], j))
+							if (Bits::BitCheck(bitMap[FullClustersCount], j))
 								Count++;
 					}
 					return Count;
@@ -246,10 +325,10 @@ namespace Seed {
 
 					for (SizeT i = 0; i < LastClusterBitsCount; i++)
 					{
-						if (Seed::BitCheck(this->bitMap[FullClustersCount], i) && Seed::BitCheck(Second.bitMap[FullClustersCount], i))
-							Seed::BitSet(this->bitMap[FullClustersCount], i);
+						if (Seed::Bits::BitCheck(this->bitMap[FullClustersCount], i) && Bits::BitCheck(Second.bitMap[FullClustersCount], i))
+							Bits::BitSet(this->bitMap[FullClustersCount], i);
 						else
-							Seed::BitReset(this->bitMap[FullClustersCount], i);
+							Bits::BitReset(this->bitMap[FullClustersCount], i);
 					}
 				}
 
@@ -262,10 +341,10 @@ namespace Seed {
 
 					for (SizeT i = 0; i < LastClusterBitsCount; i++)
 					{
-						if (Seed::BitCheck(this->bitMap[FullClustersCount], i) || Seed::BitCheck(Second.bitMap[FullClustersCount], i))
-							Bits::Seed::BitSet(this->bitMap[FullClustersCount], i);
+						if (Bits::BitCheck(this->bitMap[FullClustersCount], i) || Bits::BitCheck(Second.bitMap[FullClustersCount], i))
+							Bits::BitSet(this->bitMap[FullClustersCount], i);
 						else
-							Bits::Seed::BitReset(this->bitMap[FullClustersCount], i);
+							Bits::BitReset(this->bitMap[FullClustersCount], i);
 					}
 				}
 
@@ -279,7 +358,7 @@ namespace Seed {
 
 					for (SizeT i = 0; i < LastClusterBitsCount; i++)
 					{
-						if (Seed::BitCheck(this->bitMap[FullClustersCount], i) == Seed::BitCheck(Second.bitMap[FullClustersCount], i))
+						if (Bits::BitCheck(this->bitMap[FullClustersCount], i) == Bits::BitCheck(Second.bitMap[FullClustersCount], i))
 							return false;
 					}
 					return true;
@@ -295,7 +374,7 @@ namespace Seed {
 
 					for (SizeT i = 0; i < LastClusterBitsCount; i++)
 					{
-						if (Seed::BitCheck(this->bitMap[FullClustersCount], i) == Seed::BitCheck(Second.bitMap[FullClustersCount], i))
+						if (Bits::BitCheck(this->bitMap[FullClustersCount], i) == Bits::BitCheck(Second.bitMap[FullClustersCount], i))
 							return true;
 					}
 					return false;
@@ -304,7 +383,7 @@ namespace Seed {
 				constexpr T& operator[](SizeT Index)
 				{
 					if (Index < Size)
-						return this->bitMap[Index]
+						return this->bitMap[Index];
 					else
 						Throw(IndexOutOfRange(ExceptionPosition, Index, Size));
 				}
@@ -312,7 +391,7 @@ namespace Seed {
 				constexpr const T& operator[](SizeT Index) const
 				{
 					if (Index < Size)
-						return this->bitMap[Index]
+						return this->bitMap[Index];
 					else
 						Throw(IndexOutOfRange(ExceptionPosition, Index, Size));
 				}

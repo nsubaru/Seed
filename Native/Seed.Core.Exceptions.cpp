@@ -458,7 +458,15 @@ NTSYSAPI USHORT NTAPI RtlCaptureStackBackTrace(
 );
 
 void Seed::Core::Exceptions::GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace) {
-	stackTrace.Count = RtlCaptureStackBackTrace(1, Exception::StackTraceRecord::MaxStackTraceItemCount, (PVOID*) stackTrace.FunctionAddress, NULL);
+	try
+	{
+		stackTrace.Count = RtlCaptureStackBackTrace(1, Exception::StackTraceRecord::MaxStackTraceItemCount, (PVOID*) stackTrace.FunctionAddress, NULL);
+	}
+	catch (...)
+	{
+		stackTrace.Count = 0;
+		ReThrow;
+	}
 }
 
 #pragma endregion

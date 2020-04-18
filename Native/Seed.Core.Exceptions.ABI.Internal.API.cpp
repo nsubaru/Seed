@@ -1691,6 +1691,7 @@ void * CxxCallCatchBlock(
 
     // exception caught successfully, reset this value
     GetThreadExceptionData()->_CatchStateInParent = INVALID_CATCH_SPECIFIC_STATE;
+    GetThreadExceptionData()->_curexception = nullptr;
     return continuationAddress;
 }
 
@@ -2083,5 +2084,18 @@ void DestroyStoredException(void*& ptr, void(*dealocator)(void*))
         ptr = nullptr;
     }
 }
+
+#pragma runtime_checks("", off)
+#pragma check_stack(off)
+__declspec(noreturn, noinline, safebuffers) void InteruptThread() {
+    if (GetThreadExceptionData()->_curexception != nullptr)
+    {
+         __DestructExceptionObject(reinterpret_cast<EHExceptionRecord*>(GetThreadExceptionData()->_curexception), TRUE);   // destroy the original object
+         GetThreadExceptionData()->_curexception = nullptr;
+    }
+	Throw(Seed::InteruptException(ExceptionPosition));
+}
+#pragma check_stack(on)
+#pragma runtime_checks("", restore)
 
 #pragma warning(pop)

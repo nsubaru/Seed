@@ -19,7 +19,7 @@ public:
 	void MethodB(bool State) {};
 	bool MethodC(bool State1, bool State2) { return State1 || State2; }
 
-	int GetA() {
+	int GetA() const {
 		return a;
 	}
 
@@ -40,7 +40,7 @@ public:
 	bool MethodC(bool State1, bool State2) { return State1 && State2; }
 	String MethodD(const List<String> & arg) { return arg.Aggregate([](String & result, const String& string) { result += string; }); } 
 
-	String GetText() {
+	String GetText() const {
 		return text;
 	}
 
@@ -52,7 +52,7 @@ public:
 		this->text = MoveRValue(text);
 	}
 
-	SizeT GetTextSize() {
+	SizeT GetTextSize() const {
 		return this->text.Lenght;
 	}
 
@@ -125,7 +125,7 @@ bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
 	auto dynObj = serviceRecord.CtorCallerFunction(Reflection::DynamicObject(Containers::Tuple<>()));
 	auto res = methodRecord.MethodCallerFunction(methodRecord.GetMethodPointer(), dynObj, args);
 	auto resValue = res.GetValue<int>().GetByIdx<0>();
-	serviceRecord.DtorCallerFunction(dynObj);
+	serviceRecord.DtorCallerFunction(MoveRValue(dynObj));
 	return resValue == 11;
 }
 

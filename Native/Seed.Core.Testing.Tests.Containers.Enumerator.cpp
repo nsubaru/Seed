@@ -46,8 +46,8 @@ bool Seed::Testing::Test::Containers::Enumerator::Excecute()
         list.Last([](const Int32& Value) {return Value < 10; }) == 9 &&
         array.Last([](const Int32& Value) {return Value < 10; }) == 9;
 
-    list.SortBy(false);
-    array.SortBy(false);
+    list.Sort(false);
+    array.Sort(false);
 
     const auto AggregateCmpSorted =
         list.Aggregate([](Int32& Value, const Int32& Item) {Value += Item; }, 0) == array.Aggregate([](Int32& Value, const Int32& Item) {Value += Item; }, 0);

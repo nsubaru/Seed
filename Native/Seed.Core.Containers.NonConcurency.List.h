@@ -1180,6 +1180,22 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
+				forceinline BaseList& SortByLambdaImpl(Lambda&& lambda) {
+					if (This->size == 0)
+						return;
+
+					This->root = mergeSort(This->root, lambda);
+
+					This->last = [&]() { //-V1047
+						elem* node = This->root;
+						while (node->next != nullptr)
+							node = node->next;
+						return node;
+					}();
+					return *this;
+				}
+
+				template<typename Lambda>
 				forceinline T& FirstImpl(Lambda&& lambda) {
 					elem* node = This->root;
 					while (node != nullptr)

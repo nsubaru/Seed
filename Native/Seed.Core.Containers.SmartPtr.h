@@ -15,6 +15,7 @@ namespace Seed {
 		protected:
 			virtual void Dispose() override final { delete This->ptr; }
 		public:
+			SmartPtr() : This(nullptr) {}
 			SmartPtr(T*&& ptr) : This(new Data(MoveRValue(ptr))) {}
 			RefCountClass(SmartPtr, This);
 
@@ -35,11 +36,11 @@ namespace Seed {
 				return This->ptr;
 			}
 
-			forceinline SizeT GetRefCount() {
+			forceinline SizeT GetRefCount() const {
 				return This->RefCount;
 			}
 
-			forceinline decltype(auto) GetTypeInfo() {
+			forceinline decltype(auto) GetTypeInfo() const {
 				return typeid(This->ptr);
 			}
 

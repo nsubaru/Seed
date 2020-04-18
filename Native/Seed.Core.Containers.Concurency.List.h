@@ -1265,23 +1265,53 @@ namespace Seed {
 				}
 
 				forceinline BaseConcurencyList& SortByImpl(bool IsDescending = true) {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyList& {
-						if (IsDescending) {
-							auto l = [](const T& V1, const T& V2) { return V1 < V2; };
+					return This->lock.ExclusiveLock([&] () -> BaseConcurencyList&
+					{
+						if (IsDescending)
+						{
+							auto l = [] (const T& V1, const T& V2)
+							{
+								return V1 < V2;
+							};
 							This->root = mergeSort(This->root, l);
 						}
-						else {
-							auto l = [](const T& V1, const T& V2) { return V1 > V2; };
+						else
+						{
+							auto l = [] (const T& V1, const T& V2)
+							{
+								return V1 > V2;
+							};
 							This->root = mergeSort(This->root, l);
 						}
-						This->last = [&]() {
+						This->last = [&] ()
+						{
 							elem* node = This->root;
 							while (node->next != nullptr)
 								node = node->next;
 							return node;
 						}();
 						return *this;
-						});
+					});
+				}
+
+				template<typename Lambda>
+				forceinline BaseConcurencyList& SortByLambdaImpl(Lambda&& lambda) {
+					return This->lock.ExclusiveLock([&] () -> BaseConcurencyList&
+					{
+						if (This->size == 0)
+							return *this;
+
+						This->root = mergeSort(This->root, lambda);
+
+						This->last = [&] ()
+						{ 
+							elem* node = This->root;
+							while (node->next != nullptr)
+								node = node->next;
+							return node;
+						}();
+						return *this;
+					});
 				}
 
 				template<typename Lambda>
