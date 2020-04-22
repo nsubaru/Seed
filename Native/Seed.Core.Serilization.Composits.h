@@ -111,8 +111,11 @@ namespace Seed
 				constexpr bool IsSerilizableStruct = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Struct
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
+				template<typename T>
+				constexpr bool IsSerilizableStructIsClass = CTTI::TypeTraits::CTTITypeMetaData<T>::IsConvertibleToTuple;
+
 				template<typename THeap, typename TStruct>
-				struct BaseSerlizationHandler<THeap, TStruct, typename TypeTraits::EnableIfV<IsSerilizableStruct<TStruct>, void>> {
+				struct BaseSerlizationHandler<THeap, TStruct, typename TypeTraits::EnableIfV<IsSerilizableStruct<TStruct> && !IsSerilizableStructIsClass<TStruct>, void>> {
 					using StructFieldsMetaData = typename CTTI::TypeTraits::CTTITypeMetaData<TStruct>::Fields;
 					using ISerilizable = CTTI::TypeTraits::ISerilizable<TStruct>;
 

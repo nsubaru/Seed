@@ -23,7 +23,7 @@ namespace Seed
 				ExceptionString Property(GetAssertMessage) AssertMessage;
 			public:
 				virtual ExceptionString toString() const override final {
-					return ExceptionString(exeptionName)
+					return ExceptionString(exceptionName)
 						+ ExceptionString(L". ")
 						+ assertMessage
 						+ ExceptionString(L". ")

@@ -31,7 +31,7 @@ namespace Seed
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
                     return ExceptionString::Combine({
-                        ExceptionString(exeptionName),
+                        ExceptionString(exceptionName),
                         ExceptionString(L". Ім'я типу: "), typeName, ExceptionString(L". "),
                         location.toString(), ExceptionString(L". ")
                     });
@@ -249,9 +249,18 @@ namespace Seed
             template<typename THeap, typename T>
             forceinline Containers::BaseArray<THeap, Byte> BaseSerilize(const T& Object) {
                 SizeT rawStreamSize = Details::BaseSerlizationHandler<THeap, T>::DataSize(Object);
-                Byte* rawStream = new Byte[rawStreamSize];
-                SizeT offset = 0;
-                Details::BaseSerlizationHandler<THeap, T>::SerilizeImpl(Object, rawStream, offset);
+                Byte* rawStream = nullptr;
+                try
+                {
+                    rawStream = new Byte[rawStreamSize];
+                    SizeT offset = 0;
+                    Details::BaseSerlizationHandler<THeap, T>::SerilizeImpl(Object, rawStream, offset);
+                }
+                catch (...)
+                {
+                    delete[] rawStream;
+                    ReThrow;
+                }
                 return Containers::BaseArray<THeap, Byte>(MoveRValue(rawStream), rawStreamSize);
             }
 

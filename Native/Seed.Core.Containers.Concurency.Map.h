@@ -524,6 +524,22 @@ namespace Seed {
 						return *this;
 					}
 
+					///<summary>Переходить до наступного елемента</summary>
+					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
+					///<returns>Силку на цей ітератор</returns>
+					forceinline Iterator& operator++(int)
+					{
+						return Iterator(Next(item));
+					}
+
+					///<summary>Переходить до попереднього елемента</summary>
+					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
+					///<returns>Силка на цей ітератор</returns>
+					forceinline Iterator& operator--(int)
+					{
+						return Iterator(Prev(item));
+					}
+
 					///<summary>Порівняння ітераторів</summary>
 					///<param name = "other">Лівий операнд</param>
 					///<returns><c>true</c>Якщо не рівні</returns>

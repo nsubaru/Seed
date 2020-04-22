@@ -410,10 +410,10 @@ namespace Seed {
 						if (Key.Lenght == 0)
 							Throw(NullPointException(ExceptionPosition));
 						if (This == nullptr)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(NotFoundException(ExceptionPosition, L"Invalid Key"));
 						NodeLex* node = find(This->node, Key);
 						if (node == nullptr)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(NotFoundException(ExceptionPosition, L"Invalid Key"));
 						return node->data->Value;
 						});
 				}
@@ -424,10 +424,10 @@ namespace Seed {
 						if (Key.Lenght == 0)
 							Throw(NullPointException(ExceptionPosition));
 						if (This == nullptr)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(NotFoundException(ExceptionPosition, L"Invalid Key"));
 						NodeLex* node = find(This->node, Key);
 						if (node == nullptr)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(NotFoundException(ExceptionPosition, L"Invalid Key"));
 						return node->data->Value;
 						});
 				}

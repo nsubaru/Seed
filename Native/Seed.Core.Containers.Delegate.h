@@ -25,7 +25,7 @@ namespace Seed {
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
                     return ExceptionString::Combine({
-                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        ExceptionString(exceptionName), ExceptionString(L". "),
                         Location.toString(), ExceptionString(L".")
                     });
                 }
@@ -46,7 +46,7 @@ namespace Seed {
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
                     return ExceptionString::Combine({
-                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        ExceptionString(exceptionName), ExceptionString(L". "),
                         Location.toString(), ExceptionString(L".")
                     });
                 }
@@ -67,7 +67,7 @@ namespace Seed {
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
                    return ExceptionString::Combine({
-                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        ExceptionString(exceptionName), ExceptionString(L". "),
                         Location.toString(), ExceptionString(L".")
                    });
                 }

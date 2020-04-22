@@ -93,7 +93,7 @@ namespace Seed {
 				///<summary>Місце генерації даної помилки</summary>
 				ExeptionLocation location;
 				///<summary>Ім'я помилки</summary>
-				ConstString exeptionName;
+				ConstString exceptionName;
 
 				StackTraceRecord stackTrace;
 			private:
@@ -107,7 +107,7 @@ namespace Seed {
 				///<param name = 'Name'>Ім'я помилки</param>
 				///<returns>Екземпляр класу Exeption</returns>
 				forceinline Exception(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& ExeptionName) noexcept
-					:location({ File, FunctName, Line, GetTargetThreadID() }), exeptionName(ExeptionName), stackTrace({ 0 }) 
+					:location({ File, FunctName, Line, GetTargetThreadID() }), exceptionName(ExeptionName), stackTrace({ 0 }) 
 				{
 					GetStackBackTrace((Seed::Exceptions::Exception::StackTraceRecord&)this->stackTrace);
 				}
@@ -115,7 +115,7 @@ namespace Seed {
 				///<summary>Вертає користувальницьку назву помилки</summary>
 				forceinline const ConstString& GetExceptioName() const
 				{
-					return exeptionName;
+					return exceptionName;
 				}
 
 				///<summary>Вертає місце генерації помилки</summary>
@@ -144,7 +144,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const = 0 {
 					return ExceptionString::Combine({
-						ExceptionString(L"Невідома помилка з повідомлення "), ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(L"Невідома помилка з повідомлення "), ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString()
 						});
 				}
@@ -196,7 +196,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -249,7 +249,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName),
+						ExceptionString(exceptionName),
 						ExceptionString(L" за адресом "), ExceptionString::toString(GetMemoryAddress()),
 						ExceptionString(L" при спробі "),
 						((GetAccessType() == Types::Read) ?		ExceptionString(L"читання. ") :
@@ -276,7 +276,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -309,7 +309,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -331,7 +331,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -353,7 +353,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -383,7 +383,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -419,7 +419,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -472,7 +472,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName),
+						ExceptionString(exceptionName),
 						ExceptionString(L" в "), ExceptionString(HeapName), ExceptionString(L" кучі "),
 						ExceptionString(L" при виділені "), ExceptionString::toString(TryAllocate),
 						ExceptionString(L" байт, на момент виникнення помилки було виділено "),
@@ -500,7 +500,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -522,7 +522,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -544,7 +544,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -582,7 +582,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName),
+						ExceptionString(exceptionName),
 						ExceptionString(L". При спробі отримати доступ до елемента за індексом "), ExceptionString::toString(RequiredIndex),
 						ExceptionString(L" якщо максимальний дозволений індекс "), ExceptionString::toString(MaxAllowedIndex),
 						ExceptionString(L". "),
@@ -625,7 +625,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName),
+						ExceptionString(exceptionName),
 						ExceptionString(L". Очікуваний тип: "), ExceptionString((Char*) RequiredType.GetCxxName()),
 						ExceptionString(L". Фактичний тип: "), ExceptionString((Char*) ActuallyType.GetCxxName()),
 						ExceptionString(L". "),
@@ -667,7 +667,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName),
+						ExceptionString(exceptionName),
 						ExceptionString(L". Невірний "), ArgNameValue,
 						ExceptionString(L" аргумент. Додатковий опис: "),
 						ExceptionString(DescriptionValue), ExceptionString(L". "),
@@ -700,7 +700,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -730,7 +730,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName),
+						ExceptionString(exceptionName),
 						ExceptionString(L". Запрошений розмір "), ExceptionString::toString(requiredSize),
 						location.toString(), ExceptionString(L". ")
 					});
@@ -750,7 +750,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -771,7 +771,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -794,7 +794,7 @@ namespace Seed {
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName),
+						ExceptionString(exceptionName),
 						ExceptionString(L". Системний виклик вернув код "),
 						BaseString<Memory::ExceptionHeap>::UInt64asHex(statusCode), ExceptionString(L". "),
 						location.toString(),
