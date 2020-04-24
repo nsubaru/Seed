@@ -11,6 +11,9 @@ namespace Seed {
 			template<typename THeap, typename T>
 			class BaseVList;
 
+			// <summary>
+            /// Масив
+            /// </summary>
 			template<typename THeap, typename T>
 			class BaseArray final :
 				Seed::IDisposable,
@@ -325,7 +328,15 @@ namespace Seed {
 			public:
 #pragma warning(push)
 #pragma warning(disable: 6386)
+				/// <summary>
+                /// Конструктор масиву з нульвою довжиною
+                /// </summary>
 				forceinline BaseArray() : This(new Data()) {}
+
+				/// <summary>
+                /// Конструктор з списку елементів
+                /// </summary>
+                /// <param name="list">Список елементів</param>
 				BaseArray(InitilizerList<T>&& list) : This(new Data()) {
 					if (list.size() != 0) {
 						This->count = list.size();
@@ -337,12 +348,23 @@ namespace Seed {
 						}
 					}
 				}
+
+				/// <summary>
+                /// Конструктор з кількістю елементів
+                /// </summary>
+                /// <param name="StartCount"></param>
 				forceinline BaseArray(SizeT StartCount) : This(new Data()) {
 					if (StartCount != 0) {
 						This->array = new T[StartCount];
 						This->count = StartCount;
 					}
 				}
+
+				/// <summary>
+                /// Внутрішній констуктор з с-масиву і кількості елементів
+                /// </summary>
+                /// <param name="Array">Покажчик на масив елементів</param>
+                /// <param name="StartCount">Кількість елементів</param>
 				InternalApiCall BaseArray(const T* Array, SizeT StartCount) : This(new Data()) {
 					if (StartCount != 0) {
 						This->array = new T[StartCount];
@@ -359,12 +381,26 @@ namespace Seed {
 					}
 				}
 
+				/// <summary>
+                /// Внутрішній констуктор з rvalue силки на с-масив і кількості елементів
+                /// </summary>
+                /// <param name="Array">Rvalue силка на с-масив</param>
+                /// <param name="StartCount">Кількість елементів</param>
 				InternalApiCall BaseArray(T*&& Array, SizeT StartCount) : This(new Data(MoveRValue(Array), StartCount))
 				{}
 
+				/// <summary>
+                /// Оператор отримання голого покажкика на елементи масиву
+                /// </summary>
+                /// <returns></returns>
 				forceinline InternalApiCall operator const T* const() const { return This->array; }
 #pragma warning(pop)
 			public:
+				/// <summary>
+                /// Оператор доступу до елементів масиву
+                /// </summary>
+                /// <param name="Index">Номер елемента</param>
+                /// <returns>Силка на елемент</returns>
 				forceinline T& operator[](SizeT Index) {
 					if (Index < This->count)
                     {
@@ -376,6 +412,11 @@ namespace Seed {
                     }
 				}
 
+				/// <summary>
+                /// Константний оператор доступу до елементів масиву
+                /// </summary>
+                /// <param name="Index">Номер елемента</param>
+                /// <returns>Константна силка на елемент</returns>
 				forceinline const T& operator[](SizeT Index) const {
 					if (Index < This->count)
                     {
@@ -388,8 +429,11 @@ namespace Seed {
 				}
 #pragma warning(push)
 #pragma warning(disable: 4996)
-				///<summary>Зміна розміру</summary>
-				///<param name = 'NewSize'>Новий розмір масиву</param>
+				/// <summary>
+                /// Зміна розміру
+                /// </summary>
+                /// <param name="NewSize">Новий розмір масиву</param>
+                /// <returns>Силка на поточний об'єкт</returns>
 				forceinline BaseArray& Resize(SizeT NewSize) {
 					if (this->This->array == nullptr || this->This->count == 0)
 					{
@@ -421,6 +465,10 @@ namespace Seed {
 					return *this;
 				}
 
+				/// <summary>
+                /// Клонування масиву
+                /// </summary>
+                /// <returns>Вертає новий масив з копією всіх елементів</returns>
 				virtual BaseArray Clone() const override final {
 					return BaseArray(This->array, This->count);
 				}
@@ -431,32 +479,59 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 			public:
+				/// <summary>
+                /// Вертає поточну кількість елементів
+                /// </summary>
+                /// <returns></returns>
 				forceinline SizeT GetCount() const { return This->count; }
+
+				/// <summary>
+                /// Кількість елементів
+                /// </summary>
 				SizeT Property(GetCount) Count;
 
+				/// <summary>
+                /// Вертає сирий покажчик на елементи масиву
+                /// </summary>
+                /// <returns></returns>
 				forceinline const T* const GetRaw() const { return This->array; }
 			public:
 				RefCountClass(BaseArray, This);
 			};
 
+			/// <summary>
+            /// Масив в простій кучі
+            /// </summary>
 			namespace {
 				template<typename T>
 				using Array = BaseArray<Seed::Core::Memory::Heap, T>;
 			}
 
+			// <summary>
+            /// Масив в захищеній кучі
+            /// </summary>
 			namespace {
 				template<typename T>
 				using SensitiveArray = BaseArray<Seed::Core::Memory::SensitiveDataHeap, T>;
 			}
 
+			/// <summary>
+			/// Масив байтів в простій кучі
+			/// </summary>
 			namespace {
 				using Blob = BaseArray<Seed::Core::Memory::Heap, Byte>;
 			}
 
+			/// <summary>
+			/// Масив в захищеній кучі
+			/// </summary>
 			namespace {
 				using SensitiveBlob = BaseArray<Seed::Core::Memory::SensitiveDataHeap, Byte>;
 			}
 
+			/// <summary>
+            /// VList - список масивів, гібрид масиву і списку
+            /// </summary>
 			template<typename THeap, typename T>
 			class BaseVList final :
 				Seed::IDisposable,
@@ -509,17 +584,36 @@ namespace Seed {
 			private:
 				Data* This;
 			public:
+				/// <summary>
+                /// Пустий конструктор створює пустий екземпляр об'єкта
+                /// </summary>
 				forceinline BaseVList() : This(new Data()) {}
+
+				/// <summary>
+                /// Конструктор з списку ініціалізації, переміщає елементи в поточний об'єкт
+                /// </summary>
+                /// <param name="list">Список елементів</param>
 				BaseVList(InitilizerList<T>&& list) : This(new Data(list.size())) {
 					auto it = list.begin();
 					for (SizeT i = 0; i < list.size(); i++)
 					{
-						This->root->arr[i] = *it; ++it;
+						This->root->arr[i] = MoveRValue(*it); ++it;
 					}
 				}
+
+				/// <summary>
+                /// Конструктор з масиву елементів
+                /// </summary>
+                /// <param name="array">Масив елементів</param>
 				forceinline BaseVList(const BaseArray<THeap, T>& array) : This(nullptr) {
 					this->This = new Data(array.This->count, static_cast<T*&>(array.This->array));
 				}
+
+				/// <summary>
+                /// Конструктор з rvalue силки на масив, якщо масиву більше ніде не використовується 
+                /// то даний об'єкт оптимізовано стане власником елементів 
+                /// </summary>
+                /// <param name="array">RValue силка на масив</param>
 				forceinline BaseVList(BaseArray<THeap, T>&& array) : This(nullptr) {
 					if (--array.This->RefCount == 0) {
 						This = new Data(array.This->count, MoveRValue(array.This->array));
@@ -530,6 +624,11 @@ namespace Seed {
 					}
 				}
 			public:
+				/// <summary>
+                /// Константний оператор доступу до елементів об'єкта
+                /// </summary>
+                /// <param name="Index">Індекс елемента</param>
+                /// <returns>Константна силка на елемент</returns>
 				const T& operator[](SizeT Index) const {
 					if (Index >= This->count)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
@@ -545,6 +644,12 @@ namespace Seed {
 						}
 					}
 				}
+
+				/// <summary>
+                /// Оператор доступу до елементів об'єкта
+                /// </summary>
+                /// <param name="Index">Індекс елемента</param>
+                /// <returns>Силка на елемент</returns>
 				T& operator[](SizeT Index) {
 					if (Index >= This->count)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
@@ -561,6 +666,11 @@ namespace Seed {
 					}
 				}
 			public:
+				/// <summary>
+                /// Оператор додавання масиву до об'єкта, копіює елементи в поточний об'єкт
+                /// </summary>
+                /// <param name="array">Масив елементів</param>
+                /// <returns>Силку на поточний об'єкт</returns>
 				BaseVList& operator+=(const BaseArray<THeap, T>& array) {
 					if (This->root == nullptr)
 						This->root = This->last = new Node(array.This->count);
@@ -573,6 +683,14 @@ namespace Seed {
 					}
 					return *this;
 				}
+
+				/// <summary>
+                /// Оптимізований оператор додавання масиву до об'єкта, 
+                /// якщо масив більше ніде не використовується то відбудеться передача елементів без копіювання,
+                /// інакше елементи будуть скопійовані
+                /// </summary>
+                /// <param name="array">RValue силка на масив</param>
+                /// <returns>Силка на поточний елемент</returns>
 				BaseVList& operator+=(BaseArray<THeap, T>&& array) {
 					if (array.This->RefCount == 1) {
 						if(This->root == nullptr)
@@ -600,6 +718,10 @@ namespace Seed {
 					}
 				}
 			public:
+				/// <summary>
+                /// Перетворення даного об'єкта в масив
+                /// </summary>
+                /// <returns>Масив з елементами з даного об'єкта</returns>
 				BaseArray<THeap, T> ToArray() {
 					BaseArray<THeap, T> array(this->This->count);
 					Node* node = This->root;
@@ -616,6 +738,10 @@ namespace Seed {
                     return array;
 				}
 
+				/// <summary>
+                /// Клонування об'єктів
+                /// </summary>
+                /// <returns>Новий об'єкт з копією всіх елементів</returns>
 				virtual BaseVList Clone() const override final {
 					BaseVList result;
 					if (this->This->root != nullptr) {
@@ -632,8 +758,16 @@ namespace Seed {
 					return result;
 				}
 			public:
-				forceinline SizeT GetCount() const { return This->count; }
-				SizeT Property(GetCount) Count;
+				/// <summary>
+                /// Кількість елементів в об'єкті
+                /// </summary>
+                /// <returns>Поточна кількість елементів в об'єктів</returns>
+                forceinline SizeT GetCount() const { return This->count; }
+
+                /// <summary>
+                /// Поточна кількість елементів в об'єктів
+                /// </summary>
+                SizeT Property(GetCount) Count;
 
 				template<typename U>
 				friend void Seed::Core::Swap(U& a, U& b);
@@ -1000,11 +1134,17 @@ namespace Seed {
 				RefCountClass(BaseVList, This)
 			};
 
+			/// <summary>
+			/// Список масивів з оптимізованим додаванням масивів
+			/// </summary>
 			namespace {
 				template<typename T>
 				using VList = BaseVList<Seed::Core::Memory::Heap, T>;
 			}
 
+			/// <summary>
+			/// Список масивів з оптимізованим додаванням масивів в захищеній кучі
+			/// </summary>
 			namespace {
 				template<typename T>
 				using SensitiveVList = BaseVList<Seed::Core::Memory::SensitiveDataHeap, T>;

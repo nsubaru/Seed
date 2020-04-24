@@ -8,6 +8,7 @@ namespace Seed {
 		namespace CTTI {
 			namespace TypeNameSpecializations {
 				static constexpr auto CLASS_TYPE_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("class ")());
+				static constexpr auto STRUCT_TYPE_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("struct ")());
 				static constexpr auto CONST_MODIFICATOR_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("const ")());
 				static constexpr auto VOLATILE_MODIFICATOR_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("volatile ")());
 
@@ -16,6 +17,9 @@ namespace Seed {
 					constexpr static auto TypeName() {
 						if constexpr (CTTI::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
 							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
+						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(STRUCT_TYPE_NAME))
+							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - STRUCT_TYPE_NAME.Count>();
+
 						else if constexpr (Core::TypeTraits::IsConstV<T>&& Core::TypeTraits::IsVolatileV<T>)
 						{
 							using U = Core::TypeTraits::RemoveCV<T>;

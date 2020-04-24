@@ -25,7 +25,7 @@ bool Seed::Core::Testing::Test::CTTI::ToTuple::Excecute() {
 
 	constexpr auto data = Data{ 1,2,3 };
 
-	//auto tupleData = Core::CTTI::TypeTraits::CTTITypeMetaData<Data>::ToTuple(data);
+	auto tupleData = Core::CTTI::TypeTraits::CTTITypeMetaData<Data>::ToTuple(data);
 
-	return true;//(tupleData.GetByIdx<0>() + tupleData.GetByIdx<1>() + tupleData.GetByIdx<2>()) == 6;
+	return (tupleData.GetByIdx<0>() + tupleData.GetByIdx<1>() + tupleData.GetByIdx<2>()) == 6;
 }

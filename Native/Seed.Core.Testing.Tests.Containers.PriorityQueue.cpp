@@ -20,7 +20,7 @@ bool Seed::Core::Testing::Test::Containers::SimpleTypePriorityQueueTest::Excecut
 
 	if (IsCopyValid) {
 		while (!queue.IsEmpty) {
-			bool state = queue.Dequeu() == copy.Dequeu();
+			bool state = queue.Dequeue() == copy.Dequeue();
 			IsCopyValid = (IsCopyValid) ?  state : IsCopyValid;
 		}
 	}
@@ -43,7 +43,7 @@ bool Seed::Core::Testing::Test::Containers::ComplexTypePriorityQueueTest::Excecu
 
 	if (IsCopyValid) {
 		while (!queue.IsEmpty) {
-			bool state = queue.Dequeu() == copy.Dequeu();
+			bool state = queue.Dequeue() == copy.Dequeue();
 			IsCopyValid = (IsCopyValid) ? state : IsCopyValid;
 		}
 	}
@@ -66,7 +66,7 @@ bool Seed::Core::Testing::Test::Containers::SimpleTypeConcurencyPriorityQueueTes
 
 	if (IsCopyValid) {
 		while (!queue.IsEmpty) {
-			bool state = queue.Dequeu() == copy.Dequeu();
+			bool state = queue.Dequeue() == copy.Dequeue();
 			IsCopyValid = (IsCopyValid) ? state : IsCopyValid;
 		}
 	}
@@ -89,7 +89,7 @@ bool Seed::Core::Testing::Test::Containers::ComplexTypeConcurencyPriorityQueueTe
 
 	if (IsCopyValid) {
 		while (!queue.IsEmpty) {
-			bool state = queue.Dequeu() == copy.Dequeu();
+			bool state = queue.Dequeue() == copy.Dequeue();
 			IsCopyValid = (IsCopyValid) ? state : IsCopyValid;
 		}
 	}

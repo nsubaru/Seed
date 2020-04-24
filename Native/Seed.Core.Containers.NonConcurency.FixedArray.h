@@ -8,6 +8,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Масив з фіксованою кількістю елементів
+			/// </summary>
 			template<typename THeap, SizeT TSize, typename T>
 			class BaseFixedArray final :
 				Seed::IDisposable,
@@ -270,8 +273,17 @@ namespace Seed {
 			public:
 #pragma warning(push)
 #pragma warning(disable: 6386)
+				/// <summary>
+				/// Пустий конструктор ініціалізовує масив стандартним значенням
+				/// </summary>
 				forceinline constexpr BaseFixedArray() : This(new Data()) {}
 
+				/// <summary>
+				/// Конструктор з списку ініціалізації, копіює всі елементи з списку, 
+				/// якщо їх більше то тільки ті які влізли, 
+				/// менше то решта залишаються ініціалізовані стандартним значення
+				/// </summary>
+				/// <param name="list">Список елементів</param>
 				constexpr BaseFixedArray(InitilizerList<T>&& list) : This(new Data()) {
 					if (list.size() != 0) {
 						SizeT ActuallyCopyied = (TSize < list.size()) ? TSize : list.size();
@@ -279,12 +291,17 @@ namespace Seed {
 						SizeT i;
 						for (i = 0; i < ActuallyCopyied; i++)
 						{
-							This->array[i] = *it; it++;
+							This->array[i] = MoveRValue(*it); it++;
 						}
 					}
 				}
 #pragma warning(pop)
 			public:
+				/// <summary>
+				/// Оператор доступу до елементів масиву
+				/// </summary>
+				/// <param name="Index"></param>
+				/// <returns>Силка на елементи</returns>
 				forceinline constexpr T& operator[](SizeT Index) {
 					if (Index < TSize)
 					{
@@ -295,6 +312,12 @@ namespace Seed {
 						Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, TSize);
 					}
 				}
+
+				/// <summary>
+				/// Константний оператор доступу до елементів масиву
+				/// </summary>
+				/// <param name="Index"></param>
+				/// <returns>Константна силка на елементи</returns>
 				forceinline constexpr const T& operator[](SizeT Index) const {
 					if (Index < TSize)
 					{
@@ -308,6 +331,10 @@ namespace Seed {
 
 #pragma warning(push)
 #pragma warning(disable : 4996)
+				/// <summary>
+				/// Клонує об'єкт масиву
+				/// </summary>
+				/// <returns>Новий об'єкт з копією всіх елементів</returns>
 				virtual BaseFixedArray Clone() const override final {
 					BaseFixedArray result;
 					if constexpr (TypeTraits::IsPodV<T>) {
@@ -329,11 +356,17 @@ namespace Seed {
 				RefCountClass(BaseFixedArray, This)
 			};
 
+			/// <summary>
+			/// Масив з фіксованою кількістю елементів
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using FixedArray = BaseFixedArray<Seed::Core::Memory::Heap, TSize, T>;
 			}
 
+			/// <summary>
+			/// Масив з фіксованою кількістю елементів в захищеній кучі
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using SensitiveFixedArray = BaseFixedArray<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;

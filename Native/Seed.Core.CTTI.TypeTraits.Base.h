@@ -30,6 +30,8 @@ namespace Seed
 					POD,
 					Struct,
 					Dynamic,
+					Object,
+					Interface,
 					Undefine = Math::Max<UInt8>()
 				};
 

@@ -8,6 +8,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Стек елементів
+			/// </summary>
 			template<typename THeap, typename T>
 			class BaseDynamicStack :
 				public LINQ::IDynamicStack<BaseDynamicStack, THeap, T, false>,
@@ -31,15 +34,24 @@ namespace Seed {
 					This->count = This->bufferSize = 0;
 				}
 			public:
+				/// <summary>
+				/// Пустий конструктор ініціалізовує стек з стандартною максимальною кількістю елементів
+				/// </summary>
 				forceinline BaseDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
 
+				/// <summary>
+				/// Конструктор з списку ініціалізації, 
+				/// переміщає елементи з списку, розмір ставить 
+				/// як суму кількості елементів плюс стандартну кількість елементів
+				/// </summary>
+				/// <param name="list">Список елементів</param>
 				BaseDynamicStack(InitilizerList<T>&& list) {
 					if (list.size() != 0) {
 						This = new Data(list.size() + CurrentSettings().MemoryManager.StackReserveSize);
 						auto it = list.begin();
 						SizeT i = list.size();
 						do {
-							i--; This->stack[i] = *it; it++;
+							i--; This->stack[i] = MoveRValue(*it); it++;
 						} while (i != 0);
 						This->count = list.size();
 					}
@@ -48,6 +60,11 @@ namespace Seed {
 					}
 				}
 
+				/// <summary>
+				/// Додає елемент в стек, якщо стек заповнений 
+				/// то він розширюється на кількість задану в налаштуваннях
+				/// </summary>
+				/// <param name="item">Силка на елемент</param>
 				forceinline void Push(const T& item) {
 					if (This->count == This->bufferSize) {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
@@ -56,6 +73,11 @@ namespace Seed {
 					This->count++;
 				}
 
+				/// <summary>
+				/// Додає елемент в стек, якщо стек заповнений 
+				/// то він розширюється на кількість задану в налаштуваннях
+				/// </summary>
+				/// <param name="item">RValue силка на елемент</param>
 				forceinline void Push(T&& item) {
 					if (This->count == This->bufferSize) {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
@@ -64,6 +86,10 @@ namespace Seed {
 					This->count++;
 				}
 
+				/// <summary>
+				/// Виймає елемент з стеку, якщо стек пустий то генерує помилку
+				/// </summary>
+				/// <returns>Вийннятий елемент з стеку</returns>
 				forceinline T Pop() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -71,6 +97,11 @@ namespace Seed {
 					return MoveRValue(This->stack[This->count]);
 				}
 
+				/// <summary>
+				/// Вертає верхній елемент без виймання з стеку, 
+				/// якщо стек пустий то генерує помилку
+				/// </summary>
+				/// <returns>Константна силка на елемент</returns>
 				forceinline const T& Top() const {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -78,6 +109,10 @@ namespace Seed {
 					return This->stack[This->count];
 				}
 
+				/// <summary>
+				/// Вертає верхній елемент без виймання з стеку
+				/// </summary>
+				/// <returns>Константна силка на елемент</returns>
 				forceinline const T& Top() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -85,10 +120,17 @@ namespace Seed {
 					return This->stack[This->count];
 				}
 
+				/// <summary>
+				/// Розширення стеку на задану кількість елементів
+				/// </summary>
+				/// <param name="AdditionalSize">Кількість на яку необхідно розширити стек</param>
 				forceinline void ExtendBuffer(SizeT AdditionalSize) {
 					ExtendBufferImpl(AdditionalSize);
 				}
 
+				/// <summary>
+				/// Стиснення розміру стек до поточної кількості елементів
+				/// </summary>
 				void Shrink() {
 					T* newBuffer = new T[This->count];
 					for (SizeT i = 0; i < This->count; i++)
@@ -100,6 +142,10 @@ namespace Seed {
 					This->bufferSize = This->count;
 				}
 
+				/// <summary>
+				/// Клонування об'єкту стека
+				/// </summary>
+				/// <returns>Нови об'єкт стеку з копією елементів</returns>
 				virtual BaseDynamicStack Clone() const override final {
 					BaseDynamicStack result;
 					result.This->bufferSize = This->bufferSize;
@@ -112,10 +158,21 @@ namespace Seed {
 					return result;
 				}
 
+				///<summary>Оптимізований обмін</summary>
+				///<param name = 'A'>Перший елемент</param>
+				///<param name = 'B'>Другий елемент</param>
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
+				/// <summary>
+				/// Кількість елементів в стеку
+				/// </summary>
+				/// <returns>Поточна кількість елементів в стеку</returns>
 				forceinline SizeT GetCount() const { return This->count; }
+
+				/// <summary>
+				/// Поточна кількість елементів в стеку
+				/// </summary>
 				SizeT Property(GetCount) Count;
 
 				RefCountClass(BaseDynamicStack, This)
@@ -362,12 +419,17 @@ namespace Seed {
 				}
 			};
 
-
+			/// <summary>
+			/// Стек елементів
+			/// </summary>
 			namespace {
 				template<typename T>
 				using DynamicStack = BaseDynamicStack<Seed::Core::Memory::Heap, T>;
 			}
 
+			/// <summary>
+			/// Стек елементів в захищеній кучі
+			/// </summary>
 			namespace {
 				template<typename T>
 				using SensitiveDynamicStack = BaseDynamicStack<Seed::Core::Memory::SensitiveDataHeap, T>;

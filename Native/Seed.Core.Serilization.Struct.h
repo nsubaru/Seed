@@ -9,20 +9,12 @@ namespace Seed
 		{
 			namespace Details
 			{
-				struct TestStruct {
-					Int32 A;
-					String B;
-
-					StructCttiDef(TestStruct, 
-						DefStructFieldData(TestStruct, A),
-						DefStructFieldData(TestStruct, B)
-					);
-				};
-
-				constexpr auto v = IsSerilizableStruct<TestStruct> && IsSerilizableStructIsClass<TestStruct>;
+				template<typename T>
+				constexpr bool IsSerilizableStruct = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Struct
+					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, typename TStruct>
-				struct BaseSerlizationHandler<THeap, TStruct, typename TypeTraits::EnableIfV<IsSerilizableStruct<TStruct> && IsSerilizableStructIsClass<TStruct>, void>> {
+				struct BaseSerlizationHandler<THeap, TStruct, typename TypeTraits::EnableIfV<IsSerilizableStruct<TStruct>, void>> {
 					using StructFieldsMetaData = typename CTTI::TypeTraits::CTTITypeMetaData<TStruct>::Fields;
 
 					template<SizeT I = 0>

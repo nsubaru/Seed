@@ -13,6 +13,23 @@ namespace Seed
             {
                 namespace Details
                 {
+                    template<
+                        typename T, 
+                        bool TIsConst, 
+                        bool TIsVolatile,
+                        bool TIsSerilizable,
+                        bool TIsConvertibleToTuple
+                    >
+                    struct CTTIStructTypeDataImpl
+                        : BaseCTTITypeDataImpl<
+                        T,
+                        EType::Struct,
+                        TIsSerilizable,
+                        TIsConst,
+                        TIsVolatile,
+                        TIsConvertibleToTuple
+                        > {};
+
                     template<typename T>
                     struct CTTITypeDataSpecialization<
                         T,

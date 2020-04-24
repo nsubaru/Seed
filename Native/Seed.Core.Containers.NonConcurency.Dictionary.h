@@ -9,7 +9,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
-			//Шаблон словника слів який виконує швидкісний пошук слова
+			/// <summary>
+			/// Шаблон словника слів який виконує швидкісний пошук слова
+			/// </summary>
 			template<typename THeap, typename TString, typename TData>
 			class BaseDictionary :
 				public Memory::Allocator<THeap>,
@@ -338,9 +340,15 @@ namespace Seed {
 					This->count = 0;
 				}
 			public:
-				//Конструктор
+				/// <summary>
+				/// Пустий конструктор який ініціалізовує пустий словник
+				/// </summary>
 				forceinline BaseDictionary() :This(new RootNode()) {};
-				///<summary>Конструктор</summary>
+
+				/// <summary>
+				/// Конструктор з списку пар і ключів
+				/// </summary>
+				/// <param name="pairs">Список пар і ключів</param>
 				BaseDictionary(InitilizerList<BasePair<THeap, TString, TData>>&& pairs) : This(new RootNode())
 				{
 					for (auto&& it : pairs) {
@@ -348,48 +356,87 @@ namespace Seed {
 					}
 				}
 
-				//Вставка елемента в систему по назві і значенню
+				
+				/// <summary>
+				/// Вставка елемента в словник по ключу і значенню
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <param name="value">Значення</param>
+				/// <returns>Силка на поточний об'єкт</returns>
 				forceinline BaseDictionary& Insert(const TString& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ key, value };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
-				//Вставка елемента в систему по назві і значенню
+
+				
+				/// <summary>
+				/// Вставка елемента в словник по ключу і значенню
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <param name="value">Значення</param>
+				/// <returns>Силка на поточний об'єкт</returns>
 				forceinline BaseDictionary& Insert(TString&& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), value };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
-				//Вставка елемента в систему по назві і значенню
+				
+				/// <summary>
+				/// Вставка елемента в словник по ключу і значенню
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <param name="value">Значення</param>
+				/// <returns>Силка на поточний об'єкт</returns>
 				forceinline BaseDictionary& Insert(const TString& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ key, MoveRValue(value) };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
-				//Вставка елемента в систему по назві і значенню
+				
+				/// <summary>
+				/// Вставка елемента в словник по ключу і значенню
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <param name="value">Значення</param>
+				/// <returns>Силка на поточний об'єкт</returns>
 				forceinline BaseDictionary& Insert(TString&& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), MoveRValue(value) };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
-				//Вставка елемента в систему по назві і значенню
+				
+				/// <summary>
+				/// Вставка елемента в словник по ключу і значенню
+				/// </summary>
+				/// <param name="data">Пара ключ і значення</param>
+				/// <returns>Силка на поточний об'єкт</returns>
 				forceinline BaseDictionary& Insert(Pair&& data) {
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
 				}
-				//Вставка елемента в систему по назві і значенню
+				
+				/// <summary>
+				/// Вставка елемента в словник по ключу і значенню
+				/// </summary>
+				/// <param name="data">Пара ключ і значення</param>
+				/// <returns>Силка на поточний об'єкт</returns>
 				forceinline BaseDictionary& Insert(const Pair& data) {
 					This->node = insert(This->node, MoveRValue(Pair(data)));
 					++This->count;
 					return *this;
 				}
 
-				//Пошук елемента за ключом
+				/// <summary>
+				/// Пошук значення по ключу
+				/// </summary>
+				/// <param name="Key">Ключ</param>
+				/// <returns>Константна силка на значення</returns>
 				forceinline const TData& Find(const TString& Key) const {
 					if (Key.Lenght == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -401,7 +448,11 @@ namespace Seed {
 					return node->data->Value;
 				}
 
-				//Пошук елемента за ключом
+				/// <summary>
+				/// Пошук значення по ключу
+				/// </summary>
+				/// <param name="Key">Ключ</param>
+				/// <returns>Силка на значення</returns>
 				forceinline TData& Find(const TString& Key) {
 					if (Key.Lenght == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -413,39 +464,75 @@ namespace Seed {
 					return node->data->Value;
 				}
 
+				/// <summary>
+				/// Оператор вибірки елемента по ключу
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <returns>Силка на значення</returns>
 				forceinline TData& operator[](const TString& key) {
 					return Find(key);
 				}
 
+				/// <summary>
+				/// Оператор вибірки елемента по ключу
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <returns>Силка на значення</returns>
 				forceinline TData& operator[](TString&& key) {
 					return Find(key);
 				}
 
+				/// <summary>
+				/// Константний оператор вибірки елемента по ключу
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <returns>Константна силка на значення</returns>
 				forceinline const TData& operator[](const TString& key) const {
 					return Find(key);
 				}
 
+				/// <summary>
+				/// Константний оператор вибірки елемента по ключу
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <returns>Константна силка на значення</returns>
 				forceinline const TData& operator[](TString&& key) const {
 					return Find(key);
 				}
 
-				//Провірка чи дерево пусте
+				/// <summary>
+				/// Провірка чи словник пустий
+				/// </summary>
+				/// <returns>true якщо словник пустий</returns>
 				forceinline Boolean IsEmpty() const { return This->RefCount == 0 ? false : true; }
 
-				//Провірки чи є елемент з заданим ключем
+				/// <summary>
+				/// Перевірка чи є елемент з заданим ключом в словнику
+				/// </summary>
+				/// <param name="Key">Ключ по якому шукають елемент</param>
+				/// <returns>true якщо елемент існує</returns>
 				forceinline Boolean IsExist(const TString& Key) const {
 					if (This == nullptr) return false;
 					NodeLex* node = find(This->node, Key);
 					return (node == nullptr || node->data == nullptr) ? false : true;
 				}
 
+				/// <summary>
+				/// Перевірка чи є елемент з заданим ключом в словнику
+				/// </summary>
+				/// <param name="Key">Ключ по якому шукають елемент</param>
+				/// <returns>true якщо елемент існує</returns>
 				forceinline Boolean IsExist(TString&& Key) const {
 					if (This == nullptr) return false;
 					NodeLex* node = find(This->node, Key);
 					return (node == nullptr || node->data == nullptr) ? false : true;
 				}
 
-				//Видалення елемента з системи дерев
+				/// <summary>
+				/// Видалення елемента по ключу
+				/// </summary>
+				/// <param name="Key">Ключ по якому елемент шукається</param>
+				/// <returns>Силка на поточний об'єкт</returns>
 				BaseDictionary& Remove(const TString& Key) {
 					bool flag = false;
 					This->node = remove_node(This->node, Key, flag);
@@ -453,20 +540,33 @@ namespace Seed {
 					return *this;
 				}
 
-				//Кількість елемент в системі
+				/// <summary>
+				/// Кількість елементів в словнику
+				/// </summary>
+				/// <returns>Поточна кількість елементів в словнику</returns>
 				forceinline SizeT GetCount() const {
 					return This->count;
 				}
 
+				/// <summary>
+				/// Поточна кількість елементів в словнику
+				/// </summary>
 				SizeT Property(GetCount) Count;
 
-				//Повертає ассоціативний масив з лексикона
+				/// <summary>
+				/// Копіювання елементів в ассоціативний масив
+				/// </summary>
+				/// <returns>Асоціативний масив з елементами з словника</returns>
 				forceinline BaseMap<THeap, TString, TData> ToMap() {
 					BaseMap<THeap, TString, TData> ret_val;
 					ToMap(This, ret_val);
 					return ret_val;
 				}
 
+				/// <summary>
+				/// Клонування об'єкта
+				/// </summary>
+				/// <returns>Вертає новий словник з копією елементів</returns>
 				forceinline virtual BaseDictionary Clone() const override {
 					BaseDictionary result;
 					result.This->node = create_lex_copy(This->node);
@@ -841,13 +941,23 @@ namespace Seed {
 #pragma endregion
 			};
 
-			//Швидкісний словник з стандартним алокатором пам'яті
-			template<typename T>
-			using Dictionary = BaseDictionary<Memory::Heap, BaseString<Memory::Heap>, T>;
+			/// <summary>
+			/// Словник з швидкісним пошуком елементів по ключу
+			/// </summary>
+			namespace
+			{
+				template<typename T>
+				using Dictionary = BaseDictionary<Memory::Heap, BaseString<Memory::Heap>, T>;
+			}
 
-			//Швидкісний словник з захищеним алокатором пам'яті
-			template<typename T>
-			using SensitiveDictionary = BaseDictionary<Memory::SensitiveDataHeap, BaseString<Memory::Heap>, T>;
+			/// <summary>
+			/// Словник з швидкісним пошуком елементів по ключу та захищеним алокатором пам'яті
+			/// </summary>
+			namespace
+			{
+				template<typename T>
+				using SensitiveDictionary = BaseDictionary<Memory::SensitiveDataHeap, BaseString<Memory::Heap>, T>;
+			}
 		}
 
 		namespace TypeTraits {

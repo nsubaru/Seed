@@ -51,6 +51,7 @@ namespace Seed
                         };
                     };
 
+
                     template<
                         typename T, 
                         bool TIsConst, 
@@ -58,10 +59,10 @@ namespace Seed
                         bool TIsSerilizable,
                         bool TIsConvertibleToTuple
                     >
-                    struct CTTIStructTypeDataImpl
+                    struct CTTIObjectTypeDataImpl
                         : BaseCTTITypeDataImpl<
                         T,
-                        EType::Struct,
+                        EType::Object,
                         TIsSerilizable,
                         TIsConst,
                         TIsVolatile,
@@ -73,7 +74,7 @@ namespace Seed
                         T, 
                         typename Seed::Core::TypeTraits::EnableIfV<Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
                     >
-                        : CTTIStructTypeDataImpl<
+                        : CTTIObjectTypeDataImpl<
                         typename Seed::TypeTraits::RemoveCV<T>, 
                         Seed::TypeTraits::IsConstV<T>, 
                         Seed::TypeTraits::IsVolatileV<T>,
@@ -95,7 +96,7 @@ namespace Seed
                     friend struct Details::CTTITypeDataSpecialization;
 
                     template<typename T, bool TIsConst, bool TIsVolatile, bool TIsSerilizable, bool TIsConvertibleToTuple>
-                    friend struct Details::CTTIStructTypeDataImpl;
+                    friend struct Details::CTTIObjectTypeDataImpl;
 
 					template<typename THeap, typename T, typename Enable>
 					friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;

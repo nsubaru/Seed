@@ -10,6 +10,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Масив з фіксованою кількістю елементів і підтримкою багатопотоковості
+			/// </summary>
 			template<typename THeap, SizeT TSize, typename T>
 			class BaseConcurencyFixedArray final :
 				Seed::IDisposable,
@@ -308,8 +311,17 @@ namespace Seed {
 			public:
 #pragma warning(push)
 #pragma warning(disable: 6386)
-				forceinline  constexpr BaseConcurencyFixedArray() : This(new Data()) {}
+				/// <summary>
+				/// Пустий конструктор ініціалізовує масив стандартним значенням
+				/// </summary>
+				forceinline constexpr BaseConcurencyFixedArray() : This(new Data()) {}
 
+				/// <summary>
+				/// Конструктор з списку ініціалізації, копіює всі елементи з списку, 
+				/// якщо їх більше то тільки ті які влізли, 
+				/// менше то решта залишаються ініціалізовані стандартним значення
+				/// </summary>
+				/// <param name="list">Список елементів</param>
 				constexpr BaseConcurencyFixedArray(InitilizerList<T>&& list) : This(new Data()) {
 					if (list.size() != 0) {
 						SizeT ActuallyCopyied = (TSize < list.size()) ? TSize : list.size();
@@ -317,12 +329,17 @@ namespace Seed {
 						SizeT i;
 						for (i = 0; i < ActuallyCopyied; i++)
 						{
-							This->array[i] = *it; it++;
+							This->array[i] = MoveRValue(*it); it++;
 						}
 					}
 				}
 #pragma warning(pop)
 			public:
+				/// <summary>
+				/// Оператор доступу до елементів масиву
+				/// </summary>
+				/// <param name="Index"></param>
+				/// <returns>Силка на елементи</returns>
 				forceinline constexpr T& operator[](SizeT Index) {
 					return This->lock.ShareLock([&]() -> T& {
 						if (Index < TSize)
@@ -335,6 +352,12 @@ namespace Seed {
 						}
 						});
 				}
+
+				/// <summary>
+				/// Константний оператор доступу до елементів масиву
+				/// </summary>
+				/// <param name="Index"></param>
+				/// <returns>Константна силка на елементи</returns>
 				forceinline constexpr const T& operator[](SizeT Index) const {
 					return This->lock.ShareLock([&]() -> const T& {
 						if (Index < TSize)
@@ -349,6 +372,10 @@ namespace Seed {
 				}
 #pragma warning(push)
 #pragma warning(disable : 4996)
+				/// <summary>
+				/// Клонує об'єкт масиву
+				/// </summary>
+				/// <returns>Новий об'єкт з копією всіх елементів</returns>
 				virtual BaseConcurencyFixedArray Clone() const override final {
 					return This->lock.ShareLock([&]() {
 						BaseConcurencyFixedArray result;
@@ -371,11 +398,17 @@ namespace Seed {
 				RefCountClass(BaseConcurencyFixedArray, This)
 			};
 
+			/// <summary>
+			/// Масив з фіксованою кількістю елементів і підтримкою багатопотоковості
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using ConcurencyFixedArray = BaseConcurencyFixedArray<Seed::Core::Memory::Heap, TSize, T>;
 			}
 
+			/// <summary>
+			/// Масив з фіксованою кількістю елементів і підтримкою багатопотоковості в захищеній кучі
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using ConcurencySensitiveFixedArray = BaseConcurencyFixedArray<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;

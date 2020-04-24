@@ -583,28 +583,48 @@ namespace Seed {
 					friend void Seed::Core::Swap(U& A, U& B);
 
 #pragma region Ctor, Dtor, copy operators
-
+					/// <summary>
+					/// Копіювальний конструктор
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(const Iterator& iterator) : item(iterator.item) {
 						if (item != nullptr)
 							item->RefCount++;
 					}
 
+					/// <summary>
+					/// Конструктор переміщення
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(Iterator&& iterator) : item(iterator.item) {
 						iterator.item = nullptr;
 					}
 
+					/// <summary>
+					/// Оператор копіювання
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
+					/// <returns>Силка на поточний елемент</returns>
 					forceinline Iterator& operator=(const Iterator& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(iterator);
 						return *this;
 					}
 
+					/// <summary>
+					/// Оператор переміщення
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
+					/// <returns>Силка на поточний елемент</returns>
 					forceinline Iterator& operator=(Iterator&& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(MoveRValue(iterator));
 						return *this;
 					}
 
+					/// <summary>
+					/// Деструктор
+					/// </summary>
 					forceinline ~Iterator() {
 						if (item != nullptr)
 						{
@@ -761,16 +781,30 @@ namespace Seed {
 					return node->value;
 				}
 
+				/// <summary>
+				/// Перевірка чи елемент з заданим ключом існує
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <returns>true якщо елемент існує</returns>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
 				forceinline bool IsExist(const UKey& key) const {
 					return Find(This->root, key) != nullptr;
 				}
 
+				/// <summary>
+				/// Перевірка чи елемент з заданим ключом існує
+				/// </summary>
+				/// <param name="key">Ключ</param>
+				/// <returns>true якщо елемент існує</returns>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
 				forceinline bool IsExist(UKey&& key) const {
 					return Find(This->root, key) != nullptr;
 				}
 
+				/// <summary>
+				/// Клонування об'єкта
+				/// </summary>
+				/// <returns>Вертає новий об'єкт з копією всіх елементів</returns>
 				forceinline virtual BaseMap Clone() const override final {
 					BaseMap result;
 					result.This->count = This->count;

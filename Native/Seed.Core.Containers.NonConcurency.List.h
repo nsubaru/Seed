@@ -549,27 +549,48 @@ namespace Seed {
 					template<typename U>
 					friend void Seed::Core::Swap(U& A, U& B);
 #pragma region Ctor, Dtor, copy operators
+					/// <summary>
+					/// Копіювальний конструктор ітератора
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(const Iterator& iterator) : This(iterator.This) {
 						if (This != nullptr)
 							This->RefCount++;
 					}
 
+					/// <summary>
+					/// Конструктор переміщення
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(Iterator&& iterator) : This(iterator.This) {
 						iterator.This = nullptr;
 					}
 
+					/// <summary>
+					/// Оператор присвоєння
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
+					/// <returns>Силка на поточний об'єкт</returns>
 					forceinline Iterator& operator=(const Iterator& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(iterator);
 						return *this;
 					}
 
+					/// <summary>
+					/// Оператор переміщення
+					/// </summary>
+					/// <param name="iterator">Оригинал</param>
+					/// <returns>Силка на поточний об'єкт</returns>
 					forceinline Iterator& operator=(Iterator&& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(MoveRValue(iterator));
 						return *this;
 					}
 
+					/// <summary>
+					/// Деструктор
+					/// </summary>
 					forceinline ~Iterator() {
 						if (This != nullptr)
 						{
@@ -680,6 +701,11 @@ namespace Seed {
 					return *this;
 				}
 
+				/// <summary>
+				/// Оператор рівності
+				/// </summary>
+				/// <param name="second">Лівий список</param>
+				/// <returns>true якщо всі елементи рівні і їх кількість теж</returns>
 				forceinline Boolean operator==(const BaseList& second) {
 					if (this->Count == second.Count) {
 						auto it1 = this->This->root;

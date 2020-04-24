@@ -44,7 +44,7 @@ namespace Seed
         void Removing() const
         {
             for (SizeT i = 0; i < This->itemsCount; i++) {
-                This->sharedData.queue.Dequeu();
+                This->sharedData.queue.Dequeue();
                 ++This->sharedData.removedCount;
             }
         }

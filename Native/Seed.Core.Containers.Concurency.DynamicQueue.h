@@ -10,6 +10,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Черга з підтримкою багатопотоковості, також вона реалізовує контроль потоку
+			/// </summary>
 			template<typename THeap, typename T>
 			class BaseConcurencyDynamicQueue final :
 				public LINQ::IDynamicStack<BaseConcurencyDynamicQueue, THeap, T, true>,
@@ -60,10 +63,21 @@ namespace Seed {
 					}
 				}
 			public:
+				/// <summary>
+				/// Пустий конструктор конкуретної черги
+				/// </summary>
 				forceinline BaseConcurencyDynamicQueue() : This(new Data()) {}
 
+				/// <summary>
+				/// Конструктор черги з певною максимальною кількістю елементів
+				/// </summary>
+				/// <param name="startCount">Максимальна кількість елементів в черзі</param>
 				forceinline BaseConcurencyDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
 
+				/// <summary>
+				/// Конструктор черги з елементами з списку ініціалізації
+				/// </summary>
+				/// <param name="list">Список ініціалізації</param>
 				BaseConcurencyDynamicQueue(InitilizerList<T>&& list) : BaseConcurencyDynamicQueue() {
 					if (list.size() != 0) {
 						SizeT actuallyCopyied = list.size();
@@ -71,13 +85,20 @@ namespace Seed {
 						This->queue = new T[This->bufferSize];
 						auto it = list.begin();
 						for (SizeT i = 0; i < actuallyCopyied; i++) {
-							This->queue[i] = *it; ++it;
+							This->queue[i] = MoveRValue(*it); ++it;
 						}
 						This->rear = This->count = actuallyCopyied;
 						This->front = 0;
 					}
 				}
 
+				/// <summary>
+				/// Додавання елементів до черги
+				/// </summary>
+				/// <param name="value">Значення елемента</param>
+				/// <param name="isResizeIfFull">Якщо true то чергу розширить автоматично при потребі, 
+				/// якщо false і черга немає місця то вона зупинить виконання команди 
+				/// до моменту коли зявиться місце в черзі</param>
 				void Enqueue(const T& value, bool isResizeIfFull = false) {
 					This->flowControler.Produce([&]() {
 						if (++This->count > This->bufferSize) {
@@ -93,6 +114,13 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Оптимізоване додавання елементів до черги
+				/// </summary>
+				/// <param name="value">RValue до </param>
+				/// <param name="isResizeIfFull">Якщо true то чергу розширить автоматично при потребі, 
+				/// якщо false і черга немає місця то вона зупинить виконання команди 
+				/// до моменту коли зявиться місце в черзі</param>
 				void Enqueue(T&& Value, bool IsResizeIfFull = false) {
 					This->flowControler.Produce([&, Value = MoveRValue(Value)]() mutable {
 						if (++This->count > This->bufferSize) {
@@ -108,6 +136,12 @@ namespace Seed {
 					});
 				}
 
+
+				/// <summary>
+				/// Виймання елемента з черги, якщо елементів немає 
+				/// то метод зупинить виконання потоку до моменту появи елемента
+				/// </summary>
+				/// <returns>Значення елементу</returns>
 				T Dequeue() {
 					return This->flowControler.Concume([&]() {
 						while (This->count == 0) This->flowControler.WaitForProducer();
@@ -120,6 +154,10 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Вертає значення елемента без виймання з черги
+				/// </summary>
+				/// <returns></returns>
 				forceinline const T& Top() {
 					return This->flowControler.SharedLock([&]() {
 						if (This->front == This->rear)
@@ -128,6 +166,10 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Вертає значення елемента без виймання з черги
+				/// </summary>
+				/// <returns></returns>
 				forceinline const T& Top() const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->front == This->rear)
@@ -136,12 +178,19 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Розширення черги на задану кількість елемент
+				/// </summary>
+				/// <param name="AdditionalSize">Кількість на яку збільшити треба</param>
 				forceinline void Extend(SizeT AdditionalSize) {
 					This->flowControler.ExclusiveLock([&]() {
 						ExtendImpl(AdditionalSize);
 						});
 				}
 
+				/// <summary>
+				/// Зменшити розмір черги до поточної кількості елементів
+				/// </summary>
 				void Shrink() {
 					This->flowControler.ExclusiveLock([&]() {
 						const SizeT newSize = This->count;
@@ -159,9 +208,21 @@ namespace Seed {
 				template<typename TU>
 				forceinline friend void Seed::Core::Swap(TU& a, TU& b);
 
+				/// <summary>
+				/// Кількість елементів в черзі
+				/// </summary>
+				/// <returns>Поточна кількість елементів</returns>
 				forceinline SizeT GetCount() const { return This->count; }
+
+				/// <summary>
+				/// Поточна кількість елементів
+				/// </summary>
 				SizeT Property(GetCount) Count;
 
+				/// <summary>
+				/// Клонування об'єкта
+				/// </summary>
+				/// <returns>Новий об'єкт з копією елементів</returns>
 				virtual BaseConcurencyDynamicQueue Clone() const override final {
 					if constexpr (TypeTraits::IsConstructible<T>)
 					{
@@ -522,11 +583,17 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Черга з підтримкою багатопотоковості, також вона реалізовує контроль потоку
+			/// </summary>
 			namespace {
 				template<typename T>
 				using ConcurencyDynamicQueue = BaseConcurencyDynamicQueue<Seed::Core::Memory::Heap, T>;
 			}
 
+			/// <summary>
+			/// Черга з підтримкою багатопотоковості в захищеній кучі, також вона реалізовує контроль потоку
+			/// </summary>
 			namespace {
 				template<typename T>
 				using ConcurencySensitiveDynamicQueue = BaseConcurencyDynamicQueue<Seed::Core::Memory::SensitiveDataHeap, T>;

@@ -9,6 +9,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Черга з фіксованою максимальною кількістю, контролем потоку і підтримкою багатопотоковості
+			/// </summary>
 			template<typename THeap, SizeT TSize, typename T>
 			class BaseConcurencyFixedQueue :
 				public LINQ::IFixedQueue<BaseConcurencyFixedQueue, THeap, T, TSize, true>,
@@ -42,21 +45,33 @@ namespace Seed {
 			protected:
 				forceinline virtual void Dispose() final override {}
 			public:
+				/// <summary>
+				/// Пустий конструктор ініціалізовує пусту чергу
+				/// </summary>
 				forceinline BaseConcurencyFixedQueue() : This(new Data()) {}
 
+				/// <summary>
+				/// Конструктор з списку елементів, якщо елементів забагато то решта ігнорується
+				/// </summary>
+				/// <param name="list">Список елементів</param>
 				forceinline BaseConcurencyFixedQueue(InitilizerList<T>&& list) : BaseConcurencyFixedQueue() {
 					if (list.size() != 0) {
 						SizeT ActuallyCopyied = (TSize < list.size()) ? TSize : list.size();
 						auto it = list.begin();
 						SizeT i = ActuallyCopyied;
 						for (SizeT i = 0; i < ActuallyCopyied; i++) {
-							This->queue[i] = *it; it++;
+							This->queue[i] = MoveRValue(*it); it++;
 						}
 						This->rear = This->count = ActuallyCopyied;
 						This->front = 0;
 					}
 				}
 
+				/// <summary>
+				/// Додавання елемента до черги, 
+				/// якщо в черзі немає місця то потік очікує звільнення місця
+				/// </summary>
+				/// <param name="Value">Значення елемента</param>
 				forceinline void Enqueue(const T& Value) {
 					This->flowControler.Produce([&]() {
 						if (++This->count > TSize)
@@ -67,6 +82,11 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Додавання елемента до черги, 
+				/// якщо в черзі немає місця то потік очікує звільнення місця
+				/// </summary>
+				/// <param name="Value">Значення елемента</param>
 				forceinline void Enqueue(T&& Value) {
 					This->flowControler.Produce([&, Value = MoveRValue(Value)]() {
 						if (++This->count > TSize)
@@ -77,6 +97,10 @@ namespace Seed {
 					});
 				}
 
+				/// <summary>
+				/// Виймає елемент з черги, якщо черга пуста то призупиняє виконання потоку
+				/// </summary>
+				/// <returns>Вийнятий елемент</returns>
 				forceinline T Dequeue() {
 					return This->flowControler.Concume([&]() -> T {
 						if (This->count == 0)
@@ -88,6 +112,10 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
+				/// </summary>
+				/// <returns>Значення елемента</returns>
 				forceinline const T& Top() {
 					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->front == This->rear)
@@ -96,6 +124,10 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
+				/// </summary>
+				/// <returns>Значення елемента</returns>
 				forceinline const T& Top() const {
 					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->front == This->rear)
@@ -107,9 +139,21 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
+				/// <summary>
+				/// Вертає кількість елементів в черзі
+				/// </summary>
+				/// <returns>Поточна кількість елементів в черзі</returns>
 				forceinline SizeT GetCount() const { return This->count; }
+
+				/// <summary>
+				/// Поточна кількість елементів в черзі
+				/// </summary>
 				SizeT Property(GetCount) Count;
 
+				/// <summary>
+				/// Клонує об'єкт
+				/// </summary>
+				/// <returns>Вертає новий об'єкт з копією всіх</returns>
 				virtual BaseConcurencyFixedQueue Clone() const override final {
 					BaseConcurencyFixedQueue result;
 					result.This->front = This->front;
@@ -422,11 +466,19 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Черга з фіксованою максимальною кількістю в прості кучі, 
+			/// контролем потоку і підтримкою багатопотоковості
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using ConcurencyFixedQueue = BaseConcurencyFixedQueue<Seed::Core::Memory::Heap, TSize, T>;
 			}
 
+			/// <summary>
+			/// Черга з фіксованою максимальною кількістю в захищеній кучі, 
+			/// контролем потоку і підтримкою багатопотоковості
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using ConcurencySensitiveFixedQueue = BaseConcurencyFixedQueue<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;
