@@ -311,7 +311,7 @@ namespace Seed {
             {
                 if (this->data == nullptr)
                     Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(this->data), NullPointException::Types::Read));
-                if (this->data->func    tion->IsEnded() || this->data->function->IsStarted())
+                if (this->data->function->IsEnded() || this->data->function->IsStarted())
                     Throw(TryReStartDelegate(ExceptionPosition));
                 this->data->function->Init();
             }
