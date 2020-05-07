@@ -2120,6 +2120,46 @@ namespace Seed {
                 );
             }
 
+            /// <summary>
+            /// Провіря чи поточна рядкова змінна містить текст з заданої
+            /// </summary>
+            /// <param name="item">Задана змінна</param>
+            /// <returns>true якщо тескт з item міститься в поточній змінній</returns>
+            bool Containe(const BaseString& item) const {
+                if (item.Lenght == this->Lenght && this->Lenght == 0)
+                    return true;
+
+                if (item.CurrentSize > this->CurrentSize)
+                    return false;
+
+                if (item.CurrentSize == this->CurrentSize)
+                    return *this == item;
+
+                auto searchSize = (this->CurrentSize - item.CurrentSize) + 1;
+                for (SizeT i = 0; i < searchSize; i++)
+                {
+                    if (this->str[i] != item.str[0])
+                    {
+                        continue;
+                    }
+
+                    bool found = true;
+                    for (SizeT j = 0; j < item.CurrentSize; j++)
+                    {
+                        if (this->str[i + j] != item.str[j])
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+
+                    if (found)
+                        return true;
+                }
+
+                return false;
+            }
+
             ///<summary>Конвертор для строк з різним алокатором</summary>
             ///<param name = "NewBase">Новий алокатор</summary>
             ///<returns>Копія рядка алокована алокатором NewBase</returns>
