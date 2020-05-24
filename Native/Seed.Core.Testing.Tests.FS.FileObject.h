@@ -30,14 +30,6 @@ namespace Seed
                     class ReadFile final : public ITest {
                         virtual bool Excecute() override;
                     };
-
-                    //class WriteUsingTextProvider final : public ITest {
-                    //    virtual bool Excecute() override;
-                    //};
-
-                    //class ReadUsingTextProvider final : public ITest {
-                    //    virtual bool Excecute() override;
-                    //};
 				}
 			}
 		}

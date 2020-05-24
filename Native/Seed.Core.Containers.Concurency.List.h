@@ -1229,7 +1229,7 @@ namespace Seed {
 							node = node->next;
 							index++;
 						}
-						return MoveRValue(value)s;
+						return MoveRValue(value);
 						});
 				}
 

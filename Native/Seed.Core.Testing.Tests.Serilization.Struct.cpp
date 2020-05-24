@@ -1,9 +1,12 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Testing.Tests.Serilization.Struct.h"
 
 bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 	struct Data {
 		SizeT CountNonCopyRecord;
-		Containers::Map<ID, Containers::Tuple<String, Containers::Array<Int32>, Containers::Dictionary<ID>>> Records;
+		Core::Containers::Map<ID, Core::Containers::Tuple<String, Core::Containers::Array<Int32>, Core::Containers::Dictionary<ID>>> Records;
 
 		StructCttiDef(Data, 
 			DefStructFieldData(Data, CountNonCopyRecord),
@@ -16,7 +19,7 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 
 	Asserts::AssertTrue([&]
 	{
-		return String(Core::Serilization::CTTIMetaDataGen<Data>()).Lenght > 0;
+		return Core::String(Core::Serilization::CTTIMetaDataGen<Data>()).Lenght > 0;
 	});
 
 	auto schema = Core::Serilization::MetaDataGen<Data>();
@@ -57,7 +60,7 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 
 			bool isAllItemsAreInDictionaries = true;
 
-			dataIt->Value.GetByIdx<2>().ForEach([&] (const Containers::Pair<String, ID>& item)
+			dataIt->Value.GetByIdx<2>().ForEach([&] (const Core::Containers::Pair<String, ID>& item)
 			{
 				try
 				{

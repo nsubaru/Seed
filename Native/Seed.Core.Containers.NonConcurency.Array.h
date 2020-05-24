@@ -960,7 +960,7 @@ namespace Seed {
 							nodeStartIndex += node->size;
 							node = node->next;
 						}
-						lambda(val, node->arr[i - nodeStartIndex]);
+						lambda(result, node->arr[i - nodeStartIndex]);
 					}
 					return MoveRValue(result);
 				}
@@ -1162,12 +1162,12 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseArray<THeap, T>& A, Containers::BaseArray<THeap, T>) {
+		forceinline void Swap(Containers::BaseArray<THeap, T>& A, Containers::BaseArray<THeap, T> B) {
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseVList<THeap, T>& A, Containers::BaseVList<THeap, T>) {
+		forceinline void Swap(Containers::BaseVList<THeap, T>& A, Containers::BaseVList<THeap, T> B) {
 			Swap(A.This, B.This);
 		}
 	}

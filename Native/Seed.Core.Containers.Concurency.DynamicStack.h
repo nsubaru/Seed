@@ -381,7 +381,7 @@ namespace Seed {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 						SizeT i = This->count;
-						SizeT Index - -1;
+						SizeT Index = -1;
 						do {
 							i--;
 							if (lambda(This->stack[i]))

@@ -810,11 +810,11 @@ namespace Seed {
 
 #pragma region Throw
 ///<summary>Вертає тип або тип результату функції\методу<\summary>
-template<class Type>
+template<typename Type>
 using ThrowableObj = typename Seed::Core::TypeTraits::ConditionT <
 	Seed::Core::TypeTraits::IsFunction<Type>::State,
 	typename Seed::Core::TypeTraits::ResultOfT<Type>::Type,
-	typename Type
+	Type
 >::Result;
 
 ///<summary>Вертає <c>True</c> якщо цей об'єкт ж помилкою чи вертає в якості результату об'єкт помилки</summary>
@@ -838,7 +838,8 @@ InternalApiCall forceinline void __declspec(noreturn) __cxxrethrow() { throw; } 
 	///<param name = 'ExceptionObj'>Об'єкт помилки або функція яка вертає такий об'єкт</param>
 	#define Throw(ExceptionObj) \
 	do{ \
-		static_assert(IsThrowable<decltype(ExceptionObj)>() | Seed::TypeTraits::IsSameV<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>, \
+		static_assert(IsThrowable<decltype(ExceptionObj)>::State || \
+			Seed::Core::TypeTraits::IsSameT<Seed::Exceptions::InteruptException, decltype(ExceptionObj)>::State, \
 		"Only Seed::Exception and derived classes cant be throw as exception"); \
 		__assume(IsThrowable<decltype(ExceptionObj)>()); \
 		__pragma(warning(push)); \

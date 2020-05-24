@@ -99,7 +99,7 @@ Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto& cfg = CurrentSettings().MemoryManager.DefaultHeap;
+	auto cfg = CurrentSettings().MemoryManager.DefaultHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
@@ -277,7 +277,7 @@ Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto& cfg = CurrentSettings().MemoryManager.SensitiveDataHeap;
+	auto cfg = CurrentSettings().MemoryManager.SensitiveDataHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
@@ -572,10 +572,6 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void Seed::Core::Memory::MemBlk
 #pragma endregion
 #pragma region Init and stop
 
-Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {
-	return Seed::Core::Memory::Init();
-}
-
 Seed::Boolean Seed::Core::Memory::Init()
 {
 	Memory::Heap::Init();
@@ -589,6 +585,10 @@ void Seed::Core::Memory::Stop()
 	Memory::SensitiveDataHeap::Stop();
 	Memory::Heap::Stop();
 	toCoreLog(L"Підсистема оперативної пам'яті зупинена успішно");
+}
+
+Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {
+	return Seed::Core::Memory::Init();
 }
 
 void Seed::Core::Stop::MemoryManagment() noexcept

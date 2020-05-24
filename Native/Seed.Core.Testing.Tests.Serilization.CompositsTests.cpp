@@ -19,7 +19,7 @@ bool Seed::Core::Testing::Test::Serilization::SimpleTypeTupleSerilization::Excec
 }
 
 bool Seed::Core::Testing::Test::Serilization::ComplexTypeTupleSerilization::Excecute() {
-	auto tuple = Seed::Core::Containers::Tuple<String, Containers::Array<Int32>, Containers::List<Int32>, Boolean>
+	auto tuple = Seed::Core::Containers::Tuple<String, Core::Containers::Array<Int32>, Core::Containers::List<Int32>, Boolean>
 				{L"test",{1,2,3,4},{1,2,3,4},true};
 
 	auto stream = Core::Serilization::Serilize(tuple);
@@ -104,7 +104,7 @@ bool Seed::Core::Testing::Test::Serilization::TupleTypeTupleSerilization::Excecu
 }
 
 bool Seed::Core::Testing::Test::Serilization::CustomStructSerilization::Excecute() {
-	auto data = CTTI::TypeTraits::SerilizableClass();
+	auto data = Core::CTTI::TypeTraits::SerilizableClass();
 	data.Name() = L"Test";
 	data.Storage() = {{L"one", L"1"}, {L"two", L"2"}, {L"three", L"3"}};
 
@@ -121,9 +121,9 @@ bool Seed::Core::Testing::Test::Serilization::CustomStructSerilization::Excecute
 
 		bool result = true;
 
-		data.Storage().ForEach([&](const Containers::Pair<String, String> & dataItem){
+		data.Storage().ForEach([&](const Core::Containers::Pair<String, String> & dataItem){
 			bool found = false;
-			deserelizedData.Storage().ForEach([&](const Containers::Pair<String, String> & deserelizedDataItem){
+			deserelizedData.Storage().ForEach([&](const Core::Containers::Pair<String, String> & deserelizedDataItem){
 				if(dataItem == deserelizedDataItem)
 					if(!found)
 						found = true;

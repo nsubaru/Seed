@@ -161,7 +161,7 @@ namespace Seed {
 						) 
 				{
 					auto it = list.begin();
-					auto copyItemsCount = MaxSize > list.size() : list.size() : MaxSize;
+					auto copyItemsCount = MaxSize > list.size() ? list.size() : MaxSize;
 					for (SizeT i = 0; i <copyItemsCount; i++, ++it)
 					{
 						This->heap = merge(This->heap, new Node(MoveRValue(*it)));
@@ -356,7 +356,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="newMaxSize">Нова максимальна кількість</param>
 				void SetMaxSize(SizeT newMaxSize) {
-					if (newMaxSize < This->Count || newMaxSIze < CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)
+					if (newMaxSize < This->Count || newMaxSize < CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)
 						Throw(
 							InvalidArgumentException(
 								ExceptionPosition,
@@ -649,7 +649,7 @@ namespace Seed {
 				static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					Node* it = node;
 					do {
-						lambda(it->data.Key, Index); Index++:
+						lambda(it->data.Key, Index); Index++;
 						if (it->child != nullptr)
 							ForEachKeyImplWithIndex(it->child, Index, lambda);
 						it = it->next;
@@ -728,7 +728,7 @@ namespace Seed {
 				static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda, Node* startNode = nullptr) {
 					Node* it = node;
 					do {
-						lambda(it->data.Value, Index); Index++:
+						lambda(it->data.Value, Index); Index++;
 						if (it->child != nullptr)
 							ForEachValueImplWithIndex(it->child, Index, lambda);
 						it = it->next;

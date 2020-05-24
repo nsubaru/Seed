@@ -748,7 +748,7 @@ namespace Seed {
                 /// <param name="array">RValue силка на масив</param>
                 /// <returns>Силка на поточний елемент</returns>
                 BaseConcurencyVList& operator+=(BaseConcurencyArray<THeap, T>&& array) {
-                    return This->lock.ExclusiveLock([&, array = MoveRValue(array)]() -> BaseConcurencyVList& mutable {
+                    return This->lock.ExclusiveLock([&, array = MoveRValue(array)]() mutable -> BaseConcurencyVList& {
                         if (--array.This->RefCount == 0) {
                             if (This->root == nullptr)
                                 This->last = This->root = new Node(array.This->count, MoveRValue(array.This->array));
@@ -1044,7 +1044,7 @@ namespace Seed {
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
-                            lambda(val, node->arr[i - nodeStartIndex]);
+                            lambda(result, node->arr[i - nodeStartIndex]);
                         }
                         return MoveRValue(result);
                         }));
@@ -1235,12 +1235,14 @@ namespace Seed {
                 template<typename Lambda>
                 SizeT GetCountIfImpl(Lambda&& lambda) {
                     return This->lock.ShareLock([&]() {
+                        Node* node = This->root;
                         SizeT selectedCount = 0;
+                        SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
                             if (nodeStartIndex + i = node->size) {
                                 nodeStartIndex += node->size;
-                                tmp = node; node = node->next; delete[] node->arr; delete node;
+                                node = node->next;
                             }
                             if (lambda(node->arr[i - nodeStartIndex]))
                                 selectedCount++;
@@ -1281,13 +1283,13 @@ namespace Seed {
         }
 
         template<typename THeap, typename T>
-        forceinline void Swap(Containers::BaseConcurencyArray<THeap, T>& A, Containers::BaseConcurencyArray<THeap, T>) {
+        forceinline void Swap(Containers::BaseConcurencyArray<THeap, T>& A, Containers::BaseConcurencyArray<THeap, T> B) {
             //TODO: Interlocked Exchange
             Swap(A.This, B.This);
         }
 
         template<typename THeap, typename T>
-        forceinline void Swap(Containers::BaseConcurencyVList<THeap, T>& A, Containers::BaseConcurencyVList<THeap, T>) {
+        forceinline void Swap(Containers::BaseConcurencyVList<THeap, T>& A, Containers::BaseConcurencyVList<THeap, T> B) {
             //TODO: Interlocked Exchange
             Swap(A.This, B.This);
         }

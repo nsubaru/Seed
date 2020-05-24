@@ -1750,7 +1750,7 @@ namespace Seed {
 #pragma endregion
 
             template<typename T>
-            using RemoveCVRefV = typename RemoveCV<typename RemoveRefV<T>>;
+            using RemoveCVRefV = RemoveCV<RemoveRefV<T>>;
         }
     }
 }

@@ -37,6 +37,9 @@ namespace Seed
 
 				SizeT PhysicalMemorySize() const;
 
+				auto KernelVersion() const {
+					return CurrentSettings::GetCurrentKernelVersion();
+				}
 			};
 		}
 	}

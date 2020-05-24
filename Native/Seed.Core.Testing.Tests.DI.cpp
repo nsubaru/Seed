@@ -121,8 +121,8 @@ bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
 	{
 		return record.Name == L"Method4";
 	});
-	auto args = Reflection::DynamicObject(Containers::Tuple<int, double>(10, 1.0));
-	auto dynObj = serviceRecord.CtorCallerFunction(Reflection::DynamicObject(Containers::Tuple<>()));
+	auto args = Reflection::DynamicObject(Seed::Core::Containers::Tuple<int, double>(10, 1.0));
+	auto dynObj = serviceRecord.CtorCallerFunction(Reflection::DynamicObject(Seed::Core::Containers::Tuple<>()));
 	auto res = methodRecord.MethodCallerFunction(methodRecord.GetMethodPointer(), dynObj, args);
 	auto resValue = res.GetValue<int>().GetByIdx<0>();
 	serviceRecord.DtorCallerFunction(MoveRValue(dynObj));
@@ -130,7 +130,9 @@ bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
 }
 
 bool Seed::Core::Testing::Test::DI::DataTypeInformation::Excecute() {
-	auto typeData = Reflection::DataTypeRecord(TypeTraits::TypeTag<Containers::Tuple<String, Containers::List<String>>>{});
+	auto typeData = Seed::Core::Reflection::DataTypeRecord(
+		TypeTraits::TypeTag<Seed::Core::Containers::Tuple<String, Seed::Core::Containers::List<String>>>{});
+
 	return typeData.TypeName.Lenght != 0;
 }
 

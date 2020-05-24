@@ -96,7 +96,7 @@ namespace Seed {
 								{
 									RangeSize++;
 									if (RangeSize == RequireCount)
-										return ((byte * BitCountInFragment) + bit) - RequireCount;
+										return ((StartPosition * BitCountInFragment) + bit) - RequireCount;
 								}
 							else
 								if (IsFound == true)

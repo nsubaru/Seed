@@ -714,7 +714,7 @@ namespace Seed {
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TString, TData>&, SizeT>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyDictionary& {
 							SizeT index = 0;
-							ForEachImplWithIndex(node, index, lambda);
+							ForEachImplWithIndex(This, index, lambda);
 							return *this;
 							});
 					}
@@ -908,7 +908,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TData&, SizeT>) {
-						return tree->lock.ShareLock([&]() -> const BaseConcurencyDictionary& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyDictionary& {
 							SizeT index = 0;
 							ForEachValueImplWithIndex(This, index, lambda);
 							return *this;
@@ -930,7 +930,7 @@ namespace Seed {
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TData&, SizeT> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TData&, SizeT>) {
-						return tree->lock.ShareLock([&]() -> BaseConcurencyDictionary& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyDictionary& {
 							SizeT index = 0;
 							ForEachValueImplWithIndex(This, index, lambda);
 							return *this;

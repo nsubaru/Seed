@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Testing.Tests.FS.FileObject.h"
 
 #include "Seed.Core.FS.h"
@@ -34,8 +37,8 @@ bool Seed::Core::Testing::Test::FS::WriteFile::Excecute() {
 bool Seed::Core::Testing::Test::FS::ReadFile::Excecute() {
 	constexpr auto itemCount = 20;
 
-	auto output = Containers::Blob(itemCount);
-	auto input = Containers::Blob::Generate([] (SizeT index)
+	auto output = Core::Containers::Blob(itemCount);
+	auto input = Core::Containers::Blob::Generate([] (SizeT index)
 	{
 		return static_cast<UInt8>(index);
 	}, itemCount);

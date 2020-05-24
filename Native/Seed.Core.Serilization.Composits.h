@@ -239,7 +239,7 @@ namespace Seed
 					constexpr forceinline static auto TypeMetaDataFieldsImp(){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
-							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
+							using FieldMetaData = StructFieldsMetaData::ItemType<I>;
 							using Type = typename FieldMetaData::Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData::Count)

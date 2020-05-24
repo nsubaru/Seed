@@ -295,7 +295,7 @@ namespace Seed {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					SizeT i = This->count;
-					SizeT Index - -1;
+					SizeT Index = -1;
 					do {
 						i--;
 						if (lambda(This->stack[i]))
@@ -319,7 +319,7 @@ namespace Seed {
 							return static_cast<T&>(This->array[i]);
 					} while (i != 0);
 
-					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0)
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
 				template<typename Lambda>

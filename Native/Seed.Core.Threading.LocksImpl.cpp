@@ -71,8 +71,10 @@ void Seed::Core::Threading::Internals::ResetNtEvent(void* handle) {
 	NtResetEvent(handle, &state);
 }
 
+#include "Seed.Core.Exceptions.h"
+
 void Seed::Core::Threading::Internals::__CxxRethrowImpl() {
-	throw;
+	ReThrow;
 }
 
 #pragma warning(pop)

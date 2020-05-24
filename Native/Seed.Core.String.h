@@ -21,7 +21,7 @@ namespace Seed {
 #pragma warning(disable: 4996)
 #pragma warning(disable: 4251)
         template<class THeap>
-        class BaseString final :  //-V553
+        class BaseString final :
             public Memory::Allocator<THeap>, 
             public Containers::LINQ::IString<BaseString,THeap,UChar,false>
             {
@@ -1336,7 +1336,7 @@ namespace Seed {
                 if (this->CurrentSize == 0 || this->Lenght == 0)
                     Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
                 if (this->CurrentSize > Math::MaxNumberCount<T>())
-                    throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+                    Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 
                 if constexpr (TypeTraits::IsSameV<TypeTraits::Unsigned<T>, T>) {
                     Math::SafeInt<T> ret;

@@ -82,6 +82,9 @@ namespace Seed {
 						}
 					}
 
+					//Поточна версія ядра
+					DefaultSettings.SettingsVersion = CurrentSettings::GetCurrentKernelVersion();
+
 					return DefaultSettings;
 				}
 			}

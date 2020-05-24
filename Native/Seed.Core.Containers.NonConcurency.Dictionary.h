@@ -680,7 +680,7 @@ namespace Seed {
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TString, TData>&, SizeT> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TString, TData>&, SizeT>) {
 						SizeT index = 0;
-						ForEachImplWithIndex(node, index, lambda);
+						ForEachImplWithIndex(This, index, lambda);
 						return *this;
 					}
 					else {

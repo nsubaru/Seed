@@ -148,14 +148,14 @@ namespace Seed {
 				/// <param name="MaxSize">Максимальний розмір, якщо в спику більше елементів то вони проігноруються</param>
 				/// <param name="list">Список елементів</param>
 				forceinline BasePriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : 
-					BaseConcurencyPriorityQueue(
+					BasePriorityQueue(
 						MaxSize > list.size() ? 
 						MaxSize : 
 						list.size()
 						) 
 				{
 					auto it = list.begin();
-					auto copyItemsCount = MaxSize > list.size() : list.size() : MaxSize;
+					auto copyItemsCount = MaxSize > list.size() ? list.size() : MaxSize;
 					for (SizeT i = 0; i <copyItemsCount; i++, ++it)
 					{
 						This->heap = merge(This->heap, new Node(MoveRValue(*it)));
@@ -333,7 +333,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="newMaxSize">Нова максимальна кількість</param>
 				void SetMaxSize(SizeT newMaxSize) {
-					if (newMaxSize < This->Count || newMaxSIze < CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)
+					if (newMaxSize < This->Count || newMaxSize < CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)
 						Throw(
 							InvalidArgumentException(
 								ExceptionPosition,

@@ -45,7 +45,7 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto& cfg = CurrentSettings().MemoryManager.ExceptionHeap;
+	auto cfg = CurrentSettings().MemoryManager.ExceptionHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;

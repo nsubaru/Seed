@@ -3,47 +3,46 @@
 
 #include "Seed.Core.Exceptions.h"
 
-void Seed::Core::Internals::Exceptions::ThrowNullPointException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT Addr, UInt8 Type)
-{
+void Seed::Core::Internals::Exceptions::ThrowNullPointException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT Addr, UInt8 Type) {
 	Throw(NullPointException(File, FunctName, Line, Addr, static_cast<NullPointException::Types>(Type)));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowStringToLong(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line, const Seed::SizeT RequiredSize)
-{
+void Seed::Core::Internals::Exceptions::ThrowStringToLong(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line, const Seed::SizeT RequiredSize) {
 	Throw(StringToLong(File, Function, Line, RequiredSize));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowNullPointException(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)
-{
+void Seed::Core::Internals::Exceptions::ThrowNullPointException(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(NullPointException(File, Function, Line));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)
-{
+void Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(IntegerOverflowException(File, Function, Line));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowInvalidFormatException(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)
-{
+void Seed::Core::Internals::Exceptions::ThrowInvalidFormatException(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(InvalidFormatException(File, Function, Line));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowIndexOutOfRange(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line, const Seed::SizeT Required, const Seed::SizeT MaxAllowed)
-{
+void Seed::Core::Internals::Exceptions::ThrowIndexOutOfRange(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line, const Seed::SizeT Required, const Seed::SizeT MaxAllowed) {
 	Throw(IndexOutOfRange(File, Function, Line, Required, MaxAllowed));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowEndNodeNotDeferencable(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)
-{
+void Seed::Core::Internals::Exceptions::ThrowEndNodeNotDeferencable(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(EndNodeNotDeferencable(File, Function, Line));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowNotImplemented(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)
-{
+void Seed::Core::Internals::Exceptions::ThrowNotImplemented(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(NotImplementedException(File, Function, Line));
 }
 
-void Seed::Core::Internals::Exceptions::ThrowKeyAlredyExist(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line)
-{
+void Seed::Core::Internals::Exceptions::ThrowKeyAlredyExist(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(KeyAllredyExistException(File, Function, Line));
+}
+
+void Seed::Core::Internals::Exceptions::ThrowInternalError(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
+	Throw(InternalError(File, Function, Line));
+}
+
+void Seed::Core::Internals::Exceptions::ThrowDivideByZero(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
+	Throw(DivideByZero(File, Function, Line));
 }
