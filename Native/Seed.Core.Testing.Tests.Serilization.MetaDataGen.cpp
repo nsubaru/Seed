@@ -5,13 +5,13 @@
 
 bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 	auto metaData = Core::Serilization::MetaDataGen<
-		Containers::Tuple<
-			Containers::Dictionary<
-				Containers::List<
-					Containers::FixedArray<10, Int32>
+		Core::Containers::Tuple<
+			Core::Containers::Dictionary<
+				Core::Containers::List<
+					Core::Containers::FixedArray<10, Int32>
 				>
 			>, 
-			Containers::PriorityQueue<
+			Core::Containers::PriorityQueue<
 				Int32, 
 				String
 			>, 
@@ -20,13 +20,13 @@ bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 	>();
 
 	constexpr auto MetaDataConstExpr = Core::Serilization::CTTIMetaDataGen<
-		Containers::Tuple<
-			Containers::Dictionary<
-				Containers::List<
-					Containers::FixedArray<10, Int32>
+		Core::Containers::Tuple<
+			Core::Containers::Dictionary<
+				Core::Containers::List<
+					Core::Containers::FixedArray<10, Int32>
 				>
 			>, 
-			Containers::PriorityQueue<
+			Core::Containers::PriorityQueue<
 				Int32, 
 				String
 			>, 
@@ -38,7 +38,7 @@ bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 }
 
 bool Seed::Core::Testing::Test::Serilization::CustomStructMetaDataGen::Excecute() {
-	auto metaData = Core::Serilization::MetaDataGen<CTTI::TypeTraits::SerilizableClass>();
+	auto metaData = Core::Serilization::MetaDataGen<Core::CTTI::TypeTraits::SerilizableClass>();
 
 	return metaData.Lenght != 0;
 }

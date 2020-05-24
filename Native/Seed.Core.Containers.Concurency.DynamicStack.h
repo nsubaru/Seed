@@ -10,6 +10,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Стек з підтримкою багатопоточності
+			/// </summary>
 			template<typename THeap, typename T>
 			class BaseConcurencyDynamicStack :
 				public LINQ::IDynamicStack<BaseConcurencyDynamicStack, THeap, T, true>,
@@ -34,15 +37,24 @@ namespace Seed {
 					This->count = This->bufferSize = 0;
 				}
 			public:
+				/// <summary>
+				/// Пустий конструктор ініціалізовує стек з стандартною максимальною кількістю елементів
+				/// </summary>
 				forceinline BaseConcurencyDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
 
+				/// <summary>
+				/// Конструктор з списку ініціалізації, 
+				/// переміщає елементи з списку, розмір ставить 
+				/// як суму кількості елементів плюс стандартну кількість елементів
+				/// </summary>
+				/// <param name="list">Список елементів</param>
 				BaseConcurencyDynamicStack(InitilizerList<T>&& list) {
 					if (list.size() != 0) {
 						This = new Data(list.size() + CurrentSettings().MemoryManager.StackReserveSize);
 						auto it = list.begin();
 						SizeT i = list.size();
 						do {
-							i--; This->stack[i] = *it; it++;
+							i--; This->stack[i] = MoveRValue(*it); it++;
 						} while (i != 0);
 						This->count = list.size();
 					}
@@ -51,6 +63,11 @@ namespace Seed {
 					}
 				}
 
+				/// <summary>
+				/// Додає елемент в стек, якщо стек заповнений 
+				/// то він розширюється на кількість задану в налаштуваннях
+				/// </summary>
+				/// <param name="item">Силка на елемент</param>
 				forceinline void Push(const T& item) {
 					return This->lock.ExclusiveLock([&]() mutable {
 						if (This->count == This->bufferSize) {
@@ -61,6 +78,11 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Додає елемент в стек, якщо стек заповнений 
+				/// то він розширюється на кількість задану в налаштуваннях
+				/// </summary>
+				/// <param name="item">RValue силка на елемент</param>
 				forceinline void Push(T&& item) {
 					return This->lock.ExclusiveLock([&, item = MoveRValue(item)]() mutable {
 						if (This->count == This->bufferSize) {
@@ -71,6 +93,10 @@ namespace Seed {
 					});
 				}
 
+				/// <summary>
+				/// Виймає елемент з стеку, якщо стек пустий то генерує помилку
+				/// </summary>
+				/// <returns>Вийннятий елемент з стеку</returns>
 				forceinline T Pop() {
 					return This->lock.ExclusiveLock([&]() mutable {
 						if (This->count == 0)
@@ -80,6 +106,11 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Вертає верхній елемент без виймання з стеку, 
+				/// якщо стек пустий то генерує помилку
+				/// </summary>
+				/// <returns>Константна силка на елемент</returns>
 				forceinline const T& Top() const {
 					return This->lock.ShareLock([&]() mutable -> const T& {
 						if (This->count == 0)
@@ -89,6 +120,10 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Вертає верхній елемент без виймання з стеку
+				/// </summary>
+				/// <returns>Константна силка на елемент</returns>
 				forceinline const T& Top() {
 					return This->lock.ShareLock([&]() mutable -> const T& {
 						if (This->count == 0)
@@ -98,12 +133,19 @@ namespace Seed {
 						});
 				}
 
+				/// <summary>
+				/// Розширення стеку на задану кількість елементів
+				/// </summary>
+				/// <param name="AdditionalSize">Кількість на яку необхідно розширити стек</param>
 				forceinline void ExtendBuffer(SizeT AdditionalSize) {
 					This->lock.ExclusiveLock([&]() mutable {
 						ExtendBufferImpl(AdditionalSize);
 						});
 				}
 
+				/// <summary>
+				/// Стиснення розміру стек до поточної кількості елементів
+				/// </summary>
 				void Shrink() {
 					This->lock.ExclusiveLock([&]() mutable {
 						T* newBuffer = new T[This->count];
@@ -123,9 +165,21 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
+				/// <summary>
+				/// Кількість елементів в стеку
+				/// </summary>
+				/// <returns>Поточна кількість елементів в стеку</returns>
 				forceinline SizeT GetCount() const { return This->count; }
+
+				/// <summary>
+				/// Поточна кількість елементів в стеку
+				/// </summary>
 				SizeT Property(GetCount) Count;
 
+				/// <summary>
+				/// Клонування об'єкту стека
+				/// </summary>
+				/// <returns>Нови об'єкт стеку з копією елементів</returns>
 				virtual BaseConcurencyDynamicStack Clone() const override final {
 					return This->lock.ShareLock([&]() {
 						BaseConcurencyDynamicStack result;
@@ -327,7 +381,7 @@ namespace Seed {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 						SizeT i = This->count;
-						SizeT Index - -1;
+						SizeT Index = -1;
 						do {
 							i--;
 							if (lambda(This->stack[i]))
@@ -433,11 +487,17 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Стек з підтримкою багатопоточності
+			/// </summary>
 			namespace {
 				template<typename T>
 				using ConcurencyDynamicStack = BaseConcurencyDynamicStack<Seed::Core::Memory::Heap, T>;
 			}
 
+			/// <summary>
+			/// Стек з підтримкою багатопоточності в захищеній кучі
+			/// </summary>
 			namespace {
 				template<typename T>
 				using ConcurencySensitiveDynamicStack = BaseConcurencyDynamicStack<Seed::Core::Memory::SensitiveDataHeap, T>;

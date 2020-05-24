@@ -3,6 +3,9 @@
 
 namespace Seed {
 	inline namespace Core {
+		/// <summary>
+		/// Розумний покажчик, сам автоматично видаляє покажчик при зникненні посилань на об'єкт
+		/// </summary>
 		template<typename T>
 		class SmartPtr : IDisposable {
 			struct Data {
@@ -15,36 +18,75 @@ namespace Seed {
 		protected:
 			virtual void Dispose() override final { delete This->ptr; }
 		public:
+			/// <summary>
+			/// Пустий конструктор ініціалізує покажчик невірним значення, 
+			/// при використані такого об'єкт буде виникати NPE
+			/// </summary>
 			SmartPtr() : This(nullptr) {}
+			/// <summary>
+			/// Конструктор з rvalue силки на покажчик
+			/// </summary>
+			/// <param name="ptr">Rvalue силки на покажчик</param>
 			SmartPtr(T*&& ptr) : This(new Data(MoveRValue(ptr))) {}
-			RefCountClass(SmartPtr, This);
-
+			
+			/// <summary>
+			/// Оператор розіменування
+			/// </summary>
+			/// <returns>Силка на об'єкт</returns>
 			forceinline T& operator*()
 			{
 				return *This->ptr;
 			}
+
+			/// <summary>
+			/// Оператор розіменування
+			/// </summary>
+			/// <returns>Силка на об'єкт</returns>
 			forceinline const T& operator*() const
 			{
 				return *This->ptr;
 			}
+
+			/// <summary>
+			/// Оператор доступу до полів\методів
+			/// </summary>
+			/// <returns>Покажчик на об'єкт</returns>
 			forceinline T* operator->()
 			{
 				return This->ptr;
 			}
+
+			/// <summary>
+			/// Оператор доступу до полів\методів
+			/// </summary>
+			/// <returns>Покажчик на об'єкт</returns>
 			forceinline const T* operator->() const
 			{
 				return This->ptr;
 			}
 
+			/// <summary>
+			/// Кількість силок на даний об'єкт
+			/// </summary>
+			/// <returns>Кількість силок</returns>
 			forceinline SizeT GetRefCount() const {
 				return This->RefCount;
 			}
 
+			/// <summary>
+			/// Тип значення
+			/// </summary>
+			/// <returns>Cxx RTTI об'єкт типу</returns>
 			forceinline decltype(auto) GetTypeInfo() const {
 				return typeid(This->ptr);
 			}
 
+			/// <summary>
+			/// Кількість силок
+			/// </summary>
 			SizeT Property(GetRefCount) RefCount;
+		public:
+			RefCountClass(SmartPtr, This);
 		};
 	}
 }

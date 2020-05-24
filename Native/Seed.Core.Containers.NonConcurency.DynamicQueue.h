@@ -8,6 +8,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Черга елементів
+			/// </summary>
 			template<typename THeap, typename T>
 			class BaseDynamicQueue final
 			:
@@ -58,10 +61,21 @@ namespace Seed {
 					}
 				}
 			public:
+				/// <summary>
+				/// Пустий конструктор конкуретної черги
+				/// </summary>
 				forceinline BaseDynamicQueue() : This(new Data()) {}
 
+				/// <summary>
+				/// Конструктор черги з певною максимальною кількістю елементів
+				/// </summary>
+				/// <param name="startCount">Максимальна кількість елементів в черзі</param>
 				forceinline BaseDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
 
+				/// <summary>
+				/// Конструктор черги з елементами з списку ініціалізації
+				/// </summary>
+				/// <param name="list">Список ініціалізації</param>
 				BaseDynamicQueue(InitilizerList<T>&& list) : BaseDynamicQueue() {
 					if (list.size() != 0) {
 						SizeT actuallyCopyied = list.size();
@@ -69,13 +83,20 @@ namespace Seed {
 						This->queue = new T[This->bufferSize];
 						auto it = list.begin();
 						for (SizeT i = 0; i < actuallyCopyied; i++) {
-							This->queue[i] = *it; ++it;
+							This->queue[i] = MoveRValue(*it); ++it;
 						}
 						This->rear = This->count = actuallyCopyied;
 						This->front = 0;
 					}
 				}
 
+				/// <summary>
+				/// Додавання елементів до черги
+				/// </summary>
+				/// <param name="value">Значення елемента</param>
+				/// <param name="isResizeIfFull">Якщо true то чергу розширить автоматично при потребі, 
+				/// якщо false і черга немає місця то вона згенерує помилку
+				/// </param>
 				forceinline void Enqueue(const T& value, bool isResizeIfFull = false) {
 					if (++This->count > This->bufferSize) {
 						if (isResizeIfFull)
@@ -89,6 +110,13 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
+				/// <summary>
+				/// Оптимізоване додавання елементів до черги
+				/// </summary>
+				/// <param name="value">RValue до </param>
+				/// <param name="isResizeIfFull">Якщо true то чергу розширить автоматично при потребі, 
+				/// якщо false і черга немає місця то вона згенерує помилку
+				/// </param>
 				forceinline void Enqueue(T&& value, bool isResizeIfFull = false) {
 					if (++This->count > This->bufferSize) {
 						if (isResizeIfFull)
@@ -102,6 +130,11 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
+				/// <summary>
+				/// Виймання елемента з черги, якщо елементів немає 
+				/// то метод зупинить виконання потоку до моменту появи елемента
+				/// </summary>
+				/// <returns>Значення елементу</returns>
 				forceinline T Dequeue() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -113,22 +146,37 @@ namespace Seed {
 					return MoveRValue(res);
 				}
 
+				/// <summary>
+				/// Вертає значення елемента без виймання з черги
+				/// </summary>
+				/// <returns></returns>
 				forceinline const T& Top() {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
+				/// <summary>
+				/// Вертає значення елемента без виймання з черги
+				/// </summary>
+				/// <returns></returns>
 				forceinline const T& Top() const {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
+				/// <summary>
+				/// Розширення черги на задану кількість елемент
+				/// </summary>
+				/// <param name="AdditionalSize">Кількість на яку збільшити треба</param>
 				forceinline void Extend(SizeT additionalSize) {
 					ExtendImpl(additionalSize);
 				}
 
+				/// <summary>
+				/// Зменшити розмір черги до поточної кількості елементів
+				/// </summary>
 				void Shrink() {
 					const SizeT newSize = This->count;
 					T* newBuffer = new T[newSize];
@@ -144,9 +192,21 @@ namespace Seed {
 				template<typename TU>
 				friend void Seed::Core::Swap(TU& a, TU& b);
 
+				/// <summary>
+				/// Кількість елементів в черзі
+				/// </summary>
+				/// <returns>Поточна кількість елементів</returns>
 				forceinline SizeT GetCount() const { return This->count; }
+
+				/// <summary>
+				/// Поточна кількість елементів
+				/// </summary>
 				SizeT Property(GetCount) Count;
 
+				/// <summary>
+				/// Клонування об'єкта
+				/// </summary>
+				/// <returns>Новий об'єкт з копією елементів</returns>
 				virtual BaseDynamicQueue Clone() const override final {
 					if constexpr (TypeTraits::IsConstructible<T>)
 					{
@@ -450,11 +510,17 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Черга елементів
+			/// </summary>
 			namespace {
 				template<typename T>
 				using DynamicQueue = BaseDynamicQueue<Seed::Core::Memory::Heap, T>;
 			}
 
+			/// <summary>
+			/// Черга елементів в захищеній кучі
+			/// </summary>
 			namespace {
 				template<typename T>
 				using SensitiveDynamicQueue = BaseDynamicQueue<Seed::Core::Memory::SensitiveDataHeap, T>;

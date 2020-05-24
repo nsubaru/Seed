@@ -8,8 +8,10 @@ namespace Seed {
 	{
 		namespace Containers
 		{
-			//Бітова карта незміного розміру, кількість бітів вказується аргументом BitCount
-			//BitCount не може бути більший ніж (2 * 1024 * 1024 * 1024 * 8) - 1, тобто 2Гб - 1 байт
+			/// <summary>
+			/// Бітова карта незміного розміру, кількість бітів вказується аргументом BitCount
+			/// BitCount не може бути більший ніж (2 * 1024 * 1024 * 1024 * 8) - 1, тобто 2Гб - 1 байт
+			/// </summary>
 			template<typename THeap, SizeT BitCount, typename T>
 			class BaseBitMapT : 
 				public Memory::Allocator<THeap>,
@@ -26,14 +28,26 @@ namespace Seed {
 				static constexpr SizeT LastClusterBitsCount = BitCount - (FullClustersCount * BitCountInFragment);
 				
 			public:
+				/// <summary>
+				/// Розмір карти в кількості бітів
+				/// </summary>
+				/// <returns>Кількість бітів</returns>
 				forceinline constexpr SizeT GetCount()
 				{
 					return BitCount;
 				}
+
+				/// <summary>
+				/// Кількість біьів
+				/// </summary>
 				SizeT Property(GetCount) Count;
 			private:
 				T bitMap[Size] = { 0 };
 			public:
+				/// <summary>
+				/// Конструктор, якщо виставлений флаг то відбудеться заповнення бітової карти
+				/// </summary>
+				/// <param name="IsSetAll">Якщо true то бітова карта створюється заповненою</param>
 				forceinline constexpr BaseBitMapT(Boolean IsSetAll = false)
 				{
 					if (IsSetAll)
@@ -52,6 +66,12 @@ namespace Seed {
 					}
 				}
 
+				/// <summary>
+				/// Пошук суцільної ділянки певного розміру
+				/// </summary>
+				/// <param name="StartPosition">Стартова позиція</param>
+				/// <param name="RequireCount">Запрошуваний розмір ділянки</param>
+				/// <returns>Номер першого елемента знайденої ділянки або -1 якщо не вдалось найти таку ділянку</returns>
 				constexpr SizeT FindBitSequalFrom(SizeT StartPosition, SizeT RequireCount) {
 					if (StartPosition == 0)
 					{
@@ -76,7 +96,7 @@ namespace Seed {
 								{
 									RangeSize++;
 									if (RangeSize == RequireCount)
-										return ((byte * BitCountInFragment) + bit) - RequireCount;
+										return ((StartPosition * BitCountInFragment) + bit) - RequireCount;
 								}
 							else
 								if (IsFound == true)
@@ -129,6 +149,11 @@ namespace Seed {
 					}
 				}
 
+				/// <summary>
+				/// Пошук суцільної ділянки певного розміру
+				/// </summary>
+				/// <param name="RequireCount">Запрошуваний розмір ділянки</param>
+				/// <returns>Номер першого елемента знайденої ділянки або -1 якщо не вдалось найти таку ділянку</returns>
 				constexpr SizeT FindBitSequal(SizeT RequireCount)
 				{
 					SizeT RangeSize;
@@ -178,6 +203,11 @@ namespace Seed {
 					return -1;
 				};
 
+				/// <summary>
+				/// Заповнення заданої ділянки
+				/// </summary>
+				/// <param name="Position">Стартовий індекс</param>
+				/// <param name="BitsCount">Кількість елементів</param>
 				constexpr void SetBitSequal(SizeT Position, SizeT BitsCount)
 				{
 					if (Position + BitsCount > BitCount)
@@ -223,6 +253,12 @@ namespace Seed {
 						}
 					}
 				};
+
+				/// <summary>
+				/// Звільнення заданої ділянки
+				/// </summary>
+				/// <param name="Position">Індекс першого елемента</param>
+				/// <param name="BitsCount">Кількість бітів</param>
 				constexpr void ResetBitSequal(SizeT Position, SizeT BitsCount)
 				{
 					if (Position + BitsCount > BitCount)
@@ -269,6 +305,10 @@ namespace Seed {
 					}
 				};
 
+				/// <summary>
+				/// Виставлення біта
+				/// </summary>
+				/// <param name="Position">Індекс елемента</param>
 				constexpr void SetBit(SizeT Position)
 				{
 					if (Position > BitCount)
@@ -276,6 +316,10 @@ namespace Seed {
 					Bits::BitSet(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 				};
 
+				/// <summary>
+				/// Скидання біта
+				/// </summary>
+				/// <param name="Position">Індекс елемента</param>
 				constexpr void ResetBit(SizeT Position)
 				{
 					if (Position > BitCount)
@@ -283,6 +327,11 @@ namespace Seed {
 					Bits::BitReset(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 				};
 
+				/// <summary>
+				/// Провірка чи за заданою позицією біт вільний
+				/// </summary>
+				/// <param name="Position">Індекс елемента</param>
+				/// <returns>true якщо позиція вільна</returns>
 				constexpr Boolean IsZero(SizeT Position)
 				{
 					if (Position > BitCount)
@@ -290,11 +339,18 @@ namespace Seed {
 					return !Bits::BitCheck(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 				};
 
+				/// <summary>
+				/// Скидання всіх бітів(операція може бути достатньо довгою)
+				/// </summary>
 				forceinline constexpr void ResetAll()
 				{
 					Memory::MemBlkFill(bitMap, Size, 0);
 				};
 
+				/// <summary>
+				/// Підрахунок кількості встановлених бітів
+				/// </summary>
+				/// <returns></returns>
 				constexpr SizeT SettedBitCount()
 				{
 					SizeT Count = 0;
@@ -316,6 +372,11 @@ namespace Seed {
 					return Count;
 				};
 
+				/// <summary>
+				/// Об'єдання двох бітових карт через бітовe AND
+				/// </summary>
+				/// <param name="Second">Друга бітова карта</param>
+				/// <returns>Поточна бітова карта після операції</returns>
 				constexpr BaseBitMapT& operator&=(const BaseBitMapT& Second)
 				{
 					for (SizeT i = 0; i < FullClustersCount; i++)
@@ -332,6 +393,11 @@ namespace Seed {
 					}
 				}
 
+				/// <summary>
+				/// Об'єдання двох бітових карт через бітовe OR
+				/// </summary>
+				/// <param name="Second">Друга бітова карта</param>
+				/// <returns>Поточна бітова карта після операції</returns>
 				constexpr BaseBitMapT& operator|=(const BaseBitMapT& Second)
 				{
 					for (SizeT i = 0; i < FullClustersCount; i++)
@@ -348,6 +414,11 @@ namespace Seed {
 					}
 				}
 
+				/// <summary>
+				/// Оператор рівності двох бітових карт
+				/// </summary>
+				/// <param name="Second">Друга бітова карта</param>
+				/// <returns>true якщо карти ідентичні</returns>
 				constexpr bool operator==(BaseBitMapT& Second)
 				{
 					for (SizeT i = 0; i < FullClustersCount; i++)
@@ -364,6 +435,11 @@ namespace Seed {
 					return true;
 				}
 
+				/// <summary>
+				/// Оператор не рівності двох бітових карт
+				/// </summary>
+				/// <param name="Second">Друга бітова карта</param>
+				/// <returns>false якщо карти ідентичні</returns>
 				constexpr bool operator!=(BaseBitMapT& Second)
 				{
 					for (SizeT i = 0; i < FullClustersCount; i++)
@@ -380,6 +456,11 @@ namespace Seed {
 					return false;
 				}
 
+				/// <summary>
+				/// Оператор доступу до кластера бітів
+				/// </summary>
+				/// <param name="Index">Новер кластера</param>
+				/// <returns>Силка на кластер</returns>
 				constexpr T& operator[](SizeT Index)
 				{
 					if (Index < Size)
@@ -388,6 +469,11 @@ namespace Seed {
 						Throw(IndexOutOfRange(ExceptionPosition, Index, Size));
 				}
 
+				/// <summary>
+				/// Оператор доступу до кластера бітів
+				/// </summary>
+				/// <param name="Index">Новер кластера</param>
+				/// <returns>Силка на кластер</returns>
 				constexpr const T& operator[](SizeT Index) const
 				{
 					if (Index < Size)
@@ -606,12 +692,20 @@ namespace Seed {
 
 			};
 
+			/// <summary>
+			/// Бітова карта незміного розміру, кількість бітів вказується аргументом BitCount
+			/// BitCount не може бути більший ніж (2 * 1024 * 1024 * 1024 * 8) - 1, тобто 2Гб - 1 байт
+			/// </summary>
 			namespace
 			{
 				template<SizeT BitCount, typename T = Byte>
 				using BitMapT = BaseBitMapT<Memory::Heap, BitCount, T>;
 			}
 
+			/// <summary>
+			/// Бітова карта незміного розміру, кількість бітів вказується аргументом BitCount
+			/// BitCount не може бути більший ніж (2 * 1024 * 1024 * 1024 * 8) - 1, тобто 2Гб - 1 байт
+			/// </summary>
 			namespace
 			{
 				template<SizeT BitCount, typename T = Byte>

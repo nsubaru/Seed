@@ -10,6 +10,8 @@
 
 #include "Seed.Core.SettingsAPI.Default.h"
 
+#include "Seed.Core.Resources.h"
+
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
@@ -67,6 +69,10 @@ namespace Seed {
 
 		const CurrentSettings::VirtualSettingData& CurrentSettings::GetVirtualSettingDataRaw() {
 			return CurrentVirtualSettingsData;
+		}
+
+		CurrentSettings::KernelVersionT CurrentSettings::GetCurrentKernelVersion() {
+			return KernelVersionT{ 0,0,0, BuildNumber };
 		}
 
 		void CurrentSettings::SaveCurrentSettings()

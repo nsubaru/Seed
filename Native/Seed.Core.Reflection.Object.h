@@ -22,7 +22,7 @@ namespace Seed
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
-						ExceptionString(exeptionName), ExceptionString(L". "),
+						ExceptionString(exceptionName), ExceptionString(L". "),
 						location.toString(), ExceptionString(L". ")
 					});
 				}
@@ -100,7 +100,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -111,7 +111,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -133,7 +133,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -148,7 +148,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -224,7 +224,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -235,7 +235,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -257,7 +257,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -272,7 +272,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -348,7 +348,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -359,7 +359,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -381,7 +381,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -396,7 +396,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -472,7 +472,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -483,7 +483,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -505,7 +505,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 							else
@@ -520,7 +520,7 @@ namespace Seed
 								}
 								else
 								{
-									Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+									Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 								}
 							}
 						}
@@ -602,7 +602,7 @@ namespace Seed
 							}
 							else
 							{
-								Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+								Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 							}
 						}
 						else
@@ -616,7 +616,7 @@ namespace Seed
 							}
 							else
 							{
-								Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+								Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 							}
 						}
 					};
@@ -636,7 +636,7 @@ namespace Seed
 				struct ObjectNullCtorAndDtor {
 					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> DynamicObject
 					{
-						Throw(InvlaidDynamicFunctionArgs(ExceptionPosition));
+						Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 					};
 
 					static constexpr auto UnifiedDtor = [] (DynamicObject&& object)
@@ -662,7 +662,7 @@ namespace Seed
 						else
 						{
 							return (
-								TypeTraits::IsSameV<typename TSetterMethods::ItemType<I>::Ret, void> &&
+								TypeTraits::IsSameT<typename TSetterMethods::ItemType<I>::Ret, void>::State &&
 									TSetterMethods::ItemType<0>::Args::Count == 1 &&
 									TypeTraits::IsSameV<
 										typename TypeTraits::RemoveCV<
@@ -693,7 +693,7 @@ namespace Seed
 							auto pObjGet = pGet;
 							auto emptyArgs = DynamicObject(Containers::Tuple<>());
 							//HACK: we know that getter use const object but for unification method caller lambda use object without 
-							//HACK: const modificator and we shoult remove it to get property value
+							//HACK: const modificator and we should remove it to get property value
 							auto propValue = GetCaller(reinterpret_cast<void*&>(pObjGet), const_cast<DynamicObject&>(data), emptyArgs)
 								.GetValue<PropType>()
 								.GetByIdx<0>();
@@ -701,7 +701,7 @@ namespace Seed
 						}
 						else
 						{
-							Throw(NonSerelizableType(ExceptionPosition, PropTypeName));
+							Throw(NonSerelizableType(__FILE__, "", __LINE__, PropTypeName));
 						}
 					};
 					static constexpr auto SerilizeTypeMetaData = [] () -> String
@@ -753,9 +753,9 @@ namespace Seed
 						else
 						{
 							return
-								TypeTraits::IsSameV<
-								Methods::ItemType<TId>::MethodClass,
-								TObj>
+								TypeTraits::IsSameT<
+								typename Methods::ItemType<TId>::MethodClass,
+								TObj>::State
 								&&
 								IsAllMethodsHaveCorrectClassImpl<TId + 1>();
 						}

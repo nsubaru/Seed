@@ -108,13 +108,13 @@ namespace Seed
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableStruct = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Struct
+				constexpr bool IsSerilizableObject = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Object
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
-				template<typename THeap, typename TStruct>
-				struct BaseSerlizationHandler<THeap, TStruct, typename TypeTraits::EnableIfV<IsSerilizableStruct<TStruct>, void>> {
-					using StructFieldsMetaData = typename CTTI::TypeTraits::CTTITypeMetaData<TStruct>::Fields;
-					using ISerilizable = CTTI::TypeTraits::ISerilizable<TStruct>;
+				template<typename THeap, typename TObject>
+				struct BaseSerlizationHandler<THeap, TObject, typename TypeTraits::EnableIfV<IsSerilizableObject<TObject>, void>> {
+					using StructFieldsMetaData = typename CTTI::TypeTraits::CTTITypeMetaData<TObject>::Fields;
+					using ISerilizable = CTTI::TypeTraits::ISerilizable<TObject>;
 
 					template<SizeT I = 0>
 					forceinline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset) {
@@ -239,7 +239,7 @@ namespace Seed
 					constexpr forceinline static auto TypeMetaDataFieldsImp(){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
-							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
+							using FieldMetaData = StructFieldsMetaData::ItemType<I>;
 							using Type = typename FieldMetaData::Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData::Count)
@@ -255,12 +255,12 @@ namespace Seed
 						}
 					}
 
-					forceinline static void SerilizeImpl(const TStruct& data, Byte* rawStream, SizeT& offset) {
+					forceinline static void SerilizeImpl(const TObject& data, Byte* rawStream, SizeT& offset) {
 						const auto& iSerelizeable = static_cast<const ISerilizable&>(data);
 						SerelizeFieldsImpl(iSerelizeable.GetDataPtr(), rawStream, offset);
 					}
 
-					forceinline static void DeserelizeImpl(TStruct& data, const Byte* rawStream, SizeT& offset) {
+					forceinline static void DeserelizeImpl(TObject& data, const Byte* rawStream, SizeT& offset) {
 						auto& iSerelizeable = static_cast<ISerilizable&>(data);
 						DeserelizeFieldsImp(iSerelizeable.GetDataPtr(), rawStream, offset);
 					}
@@ -269,7 +269,7 @@ namespace Seed
 						return false;
 					}
 
-					forceinline static constexpr SizeT DataSize(const TStruct& data) {
+					forceinline static constexpr SizeT DataSize(const TObject& data) {
 						const auto& iSerelizeable = static_cast<const ISerilizable&>(data);
 						return DataSizeFieldsImp(iSerelizeable.GetDataPtr());
 					}
@@ -287,11 +287,11 @@ namespace Seed
 					forceinline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
-                            CTTI::TypeName<TStruct>().Resize<CTTI::TypeName<TStruct>().Count - 1>() +
+                            CTTI::TypeName<TObject>().Resize<CTTI::TypeName<TObject>().Count - 1>() +
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TStruct>::TypeClass)>() +
+                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TObject>::TypeClass)>() +
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            CTTI::Details::ToCharStr<sizeof(TStruct)>() +
+                            CTTI::Details::ToCharStr<sizeof(TObject)>() +
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
                             ConstexprSize() +
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +

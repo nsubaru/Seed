@@ -10,9 +10,9 @@
     </Expand>
   </Type>
   <Type Name="Seed::Core::Exceptions::Exception" Inheritable="true">
-    <DisplayString>{{Exception: {exeptionName.str, na}}}</DisplayString>
+    <DisplayString>{{Exception: {exceptionName.str, na}}}</DisplayString>
     <Expand>
-      <Item Name="Name">{exeptionName.str, na}</Item>
+      <Item Name="Name">exceptionName.str, su</Item>
       <ExpandedItem>location</ExpandedItem>
       <Item Name="StackTrace">stackTrace</Item>
     </Expand>

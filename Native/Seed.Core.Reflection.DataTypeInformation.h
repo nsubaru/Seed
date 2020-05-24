@@ -21,7 +21,7 @@ namespace Seed
 						{
 							if (data.GetImplementationTypeInfo() != typeid(T))
 							{
-								Throw(Reflection::InvlaidDynamicFunctionArgs(ExceptionPosition));
+								Throw(Reflection::InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
 							}
 							else
 							{
@@ -30,7 +30,7 @@ namespace Seed
 						}
 						else
 						{
-							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>())));
+							Throw(NonSerelizableType(__FILE__, "", __LINE__, ExceptionString(CTTI::TypeName<T>())));
 						}
 					};
 
@@ -44,7 +44,7 @@ namespace Seed
 						}
 						else
 						{
-							Throw(NonSerelizableType(ExceptionPosition, ExceptionString(CTTI::TypeName<T>())));
+							Throw(NonSerelizableType(__FILE__, "", __LINE__, ExceptionString(CTTI::TypeName<T>())));
 						}
 					};
 
@@ -56,7 +56,7 @@ namespace Seed
 						}
 						else
 						{
-							Throw(NullPointException(ExceptionPosition));
+							Throw(NullPointException(__FILE__, "", __LINE__));
 						}
 					};
 				};

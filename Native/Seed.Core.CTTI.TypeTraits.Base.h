@@ -30,6 +30,8 @@ namespace Seed
 					POD,
 					Struct,
 					Dynamic,
+					Object,
+					Interface,
 					Undefine = Math::Max<UInt8>()
 				};
 
@@ -38,7 +40,7 @@ namespace Seed
 				namespace Details
 				{
 #pragma region Base implementation
-					template<typename T, EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile>
+					template<typename T, EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile, bool TIsConvertibleToTuple = false>
 					struct BaseCTTITypeDataImpl
 					{
 						using Type = T;
@@ -49,6 +51,7 @@ namespace Seed
 						static constexpr Boolean IsVolatile = TIsVolatile;
 						static constexpr auto TypeName = CTTI::TypeName<T>();
 						static constexpr auto CXXTypeName = CTTI::CXXTypeName<T>();
+						static constexpr Boolean IsConvertibleToTuple = TIsConvertibleToTuple;
 
                         static constexpr Boolean IsContaineSubTypes =
                             !(
@@ -60,7 +63,7 @@ namespace Seed
 					};
 
 					template<EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile>
-					struct BaseCTTITypeDataImpl<void, TTypeClass, TIsSerilizable, TIsConst, TIsVolatile>
+					struct BaseCTTITypeDataImpl<void, TTypeClass, TIsSerilizable, TIsConst, TIsVolatile, false>
 					{
 						using Type = void;
 						static constexpr EType TypeClass = EType::Undefine;
@@ -70,6 +73,7 @@ namespace Seed
 						static constexpr Boolean IsVolatile = TIsVolatile;
 						static constexpr auto TypeName = CTTI::TypeName<void>();
 						static constexpr auto CXXTypeName = CTTI::CXXTypeName<void>();
+						static constexpr Boolean IsConvertibleToTuple = false;
 
                         static constexpr Boolean IsContaineSubTypes = false;
 					};
@@ -83,16 +87,6 @@ namespace Seed
                     struct CTTITypeDataSpecialization
 						: CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>>
 					{};
-
-                    //template<typename T>
-                    //struct CTTITypeDataSpecialization
-                    //    <
-                    //    T,
-                    //    typename Seed::Core::TypeTraits::EnableIfV<!Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
-                    //    >
-                    //    : CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>> {
-
-                    //};
 
 					template<typename T>
 					struct CTTITypeData : CTTITypeDataSpecialization<T>

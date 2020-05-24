@@ -8,6 +8,9 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+			/// <summary>
+			/// Черга з фіксованою максимальною кількістю
+			/// </summary>
 			template<typename THeap, SizeT TSize, typename T>
 			class BaseFixedQueue :
 				public LINQ::IFixedQueue<BaseFixedQueue, THeap, T, TSize, true>,
@@ -39,21 +42,33 @@ namespace Seed {
 			protected:
 				forceinline virtual void Dispose() final override {}
 			public:
+				/// <summary>
+				/// Пустий конструктор ініціалізовує пусту чергу
+				/// </summary>
 				forceinline BaseFixedQueue() : This(new Data()) {}
 
+				/// <summary>
+				/// Конструктор з списку елементів, якщо елементів забагато то решта ігнорується
+				/// </summary>
+				/// <param name="list">Список елементів</param>
 				BaseFixedQueue(InitilizerList<T>&& list) : BaseFixedQueue() {
 					if (list.size() != 0) {
 						SizeT ActuallyCopyied = (TSize < list.size()) ? TSize : list.size();
 						auto it = list.begin();
 						SizeT i = ActuallyCopyied;
 						for (SizeT i = 0; i < ActuallyCopyied; i++) {
-							This->queue[i] = *it; it++;
+							This->queue[i] = MoveRValue(*it); it++;
 						}
 						This->rear = This->count = ActuallyCopyied;
 						This->front = 0;
 					}
 				}
 
+				/// <summary>
+				/// Додавання елемента до черги, 
+				/// якщо в черзі немає місця то генерується помилка
+				/// </summary>
+				/// <param name="Value">Значення елемента</param>
 				forceinline void Enqueue(const T& Value) {
 					if (++This->count > TSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -62,6 +77,11 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
+				/// <summary>
+				/// Додавання елемента до черги, 
+				/// якщо в черзі немає місця то генерується помилка
+				/// </summary>
+				/// <param name="Value">Значення елемента</param>
 				forceinline void Enqueue(T&& Value) {
 					if (++This->count > TSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -70,6 +90,10 @@ namespace Seed {
 					This->rear = newRear;
 				}
 
+				/// <summary>
+				/// Виймає елемент з черги, якщо черга пуста то генерує помилку
+				/// </summary>
+				/// <returns>Вийнятий елемент</returns>
 				forceinline T Dequeue() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -79,12 +103,20 @@ namespace Seed {
 					return res;
 				}
 
+				/// <summary>
+				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
+				/// </summary>
+				/// <returns>Значення елемента</returns>
 				forceinline const T& Top() {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
+				/// <summary>
+				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
+				/// </summary>
+				/// <returns>Значення елемента</returns>
 				forceinline const T& Top() const {
 					if (This->front == This->rear)
 						Throw(NullPointException(ExceptionPosition));
@@ -94,9 +126,21 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
+				/// <summary>
+				/// Вертає кількість елементів в черзі
+				/// </summary>
+				/// <returns>Поточна кількість елементів в черзі</returns>
 				forceinline SizeT GetCount() const { return This->count; }
+
+				/// <summary>
+				/// Поточна кількість елементів в черзі
+				/// </summary>
 				SizeT Property(GetCount) Count;
 
+				/// <summary>
+				/// Клонує об'єкт
+				/// </summary>
+				/// <returns>Вертає новий об'єкт з копією всіх</returns>
 				virtual BaseFixedQueue Clone() const override final {
 					BaseFixedQueue result;
 					result.This->front = This->front;
@@ -378,11 +422,17 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Черга з фіксованою максимальною кількістю в простій кучі
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using FixedQueue = BaseFixedQueue<Seed::Core::Memory::Heap, TSize, T>;
 			}
 
+			/// <summary>
+			/// Черга з фіксованою максимальною кількістю в захищеній кучі
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using SensitiveFixedQueue = BaseFixedQueue<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;

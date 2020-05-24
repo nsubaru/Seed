@@ -145,8 +145,6 @@ namespace Seed {
 							lambda();
 
 							Internals::ReleaseLockExclusiveSRWLock(&lock);
-
-							return ret;
 						}
 						catch (...) {
 							Internals::ReleaseLockExclusiveSRWLock(&lock);

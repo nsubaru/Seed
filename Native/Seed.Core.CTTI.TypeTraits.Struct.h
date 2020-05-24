@@ -17,12 +17,17 @@ namespace Seed
 
                 namespace Details
                 {
-                    template<typename T, typename TypeStringT, SizeT Offset>
+                    template<typename TStruct, typename T, typename TypeStringT, SizeT Offset>
                     struct FieldTypeData : CTTITypeData<T> {
                         static constexpr auto FieldName = CTTI::Details::TypeStringToArray(TypeStringT());
                         static constexpr SizeT FieldSize = sizeof(T);
                         static constexpr SizeT FieldOffset = Offset;
                         using Type = T;
+                        using Struct = TStruct;
+
+                        static constexpr const Type& Selector(const Struct& data) {
+                            return *(Type*) (((Byte*) &data) + FieldOffset);
+                        }
                     };
 
 
@@ -40,21 +45,28 @@ namespace Seed
                         using Fields = typename Containers::Tuple<TFields...>;
 
                         static constexpr Boolean IsSerilizable = Seed::TypeTraits::OrPack(CTTITypeData<typename TFields::Type>::IsSerilizable...);
+                    
+                        constexpr static Containers::Tuple<typename TFields::Type...> ToTuple(const Type& data) {
+                            return Containers::Tuple<typename TFields::Type...>{TFields::Selector(data)...};
+                        };
                     };
+
 
                     template<
                         typename T, 
                         bool TIsConst, 
                         bool TIsVolatile,
-                        bool TIsSerilizable
+                        bool TIsSerilizable,
+                        bool TIsConvertibleToTuple
                     >
-                    struct CTTIStructTypeDataImpl
+                    struct CTTIObjectTypeDataImpl
                         : BaseCTTITypeDataImpl<
                         T,
-                        EType::Struct,
+                        EType::Object,
                         TIsSerilizable,
                         TIsConst,
-                        TIsVolatile
+                        TIsVolatile,
+                        TIsConvertibleToTuple
                         > {};
 
                     template<typename T>
@@ -62,13 +74,15 @@ namespace Seed
                         T, 
                         typename Seed::Core::TypeTraits::EnableIfV<Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
                     >
-                        : CTTIStructTypeDataImpl<
+                        : CTTIObjectTypeDataImpl<
                         typename Seed::TypeTraits::RemoveCV<T>, 
                         Seed::TypeTraits::IsConstV<T>, 
                         Seed::TypeTraits::IsVolatileV<T>,
-                        T::FieldMetaData::IsSerilizable
+                        T::FieldMetaData::IsSerilizable,
+                        false
                         > 
                     {
+                        static constexpr bool IsConvertibleToTuple = false;
                         using Fields = typename T::FieldMetaData::Fields;
                     };
                 }
@@ -81,8 +95,8 @@ namespace Seed
                     template<typename T, typename Enable>
                     friend struct Details::CTTITypeDataSpecialization;
 
-                    template<typename T, bool TIsConst, bool TIsVolatile, bool TIsSerilizable>
-                    friend struct Details::CTTIStructTypeDataImpl;
+                    template<typename T, bool TIsConst, bool TIsVolatile, bool TIsSerilizable, bool TIsConvertibleToTuple>
+                    friend struct Details::CTTIObjectTypeDataImpl;
 
 					template<typename THeap, typename T, typename Enable>
 					friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
@@ -91,7 +105,7 @@ namespace Seed
                 };
 
 #define DefStructFieldData(Struct, Name) \
-    Seed::Core::CTTI::TypeTraits::Details::FieldTypeData<decltype(Struct::Name), GenNGTypeString(#Name) , StructOffsetOfMember(Struct, Name)>
+    Seed::Core::CTTI::TypeTraits::Details::FieldTypeData<Struct, decltype(Struct::Name), GenNGTypeString(#Name) , StructOffsetOfMember(Struct, Name)>
 
 #define DefStructMetaData(Struct, ...) \
 using FieldMetaData = typename Seed::Core::CTTI::TypeTraits::Details::CustomStruct<Struct, __VA_ARGS__>

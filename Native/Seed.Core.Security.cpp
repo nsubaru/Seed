@@ -180,18 +180,23 @@ Seed::Boolean DisableDllExtensionPolicy() {
 	return NT_SUCCESS(status);
 }
 
+extern volatile Seed::Boolean isFirstBootInProcess;
+
 Seed::Boolean Seed::Core::Init::Protection() noexcept
 {
-	if (!DisableWin32kSystemCalls())
-		return false;
-	if (!DisableNonSystemFonts())
-		return false;
-	if (!DisableDllExtensionPolicy())
-		return false;
-	if (!DisableRemoteImage())
-		return false;
-	if (!DisableDynamicCode())
-		return false;
+	if (isFirstBootInProcess)
+	{
+		if (!DisableWin32kSystemCalls())
+			return false;
+		if (!DisableNonSystemFonts())
+			return false;
+		if (!DisableDllExtensionPolicy())
+			return false;
+		if (!DisableRemoteImage())
+			return false;
+		if (!DisableDynamicCode())
+			return false;
+	}
 
 	if (!InitModuleFilter())
 		return false;

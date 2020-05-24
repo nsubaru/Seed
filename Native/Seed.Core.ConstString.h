@@ -1,6 +1,10 @@
 #pragma once
 #include "Seed.Core.Base.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#pragma warning(disable: 4595)
+
 namespace Seed {
 	inline namespace Core {
 		class ConstAString;
@@ -8,52 +12,62 @@ namespace Seed {
 
 		namespace Internals {
 			namespace Exceptions {
-				__declspec(noreturn) void ThrowNullPointException(
+				InternalApiCall __declspec(noreturn) void ThrowNullPointException(
 					const ConstAString& File,
 					const ConstAString& FunctName,
 					SizeT Line,
 					SizeT Addr,
 					UInt8 Type);
 
-				__declspec(noreturn) void ThrowStringToLong(
+				InternalApiCall __declspec(noreturn) void ThrowStringToLong(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line,
 					const Seed::SizeT RequiredSize);
 
-				__declspec(noreturn) void ThrowNullPointException(
+				InternalApiCall __declspec(noreturn) void ThrowNullPointException(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
 
-				__declspec(noreturn) void ThrowIntegerOverflowException(
+				InternalApiCall __declspec(noreturn) void ThrowIntegerOverflowException(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
 
-				__declspec(noreturn) void ThrowInvalidFormatException(
+				InternalApiCall __declspec(noreturn) void ThrowInvalidFormatException(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
 
-				__declspec(noreturn) void ThrowIndexOutOfRange(
+				InternalApiCall __declspec(noreturn) void ThrowIndexOutOfRange(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line,
 					const Seed::SizeT Required,
 					const Seed::SizeT MaxAllowed);
 
-				__declspec(noreturn) void ThrowEndNodeNotDeferencable(
+				InternalApiCall __declspec(noreturn) void ThrowEndNodeNotDeferencable(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
 
-				__declspec(noreturn) void ThrowNotImplemented(
+				InternalApiCall __declspec(noreturn) void ThrowNotImplemented(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
 
-				__declspec(noreturn) void ThrowKeyAlredyExist(
+				InternalApiCall __declspec(noreturn) void ThrowKeyAlredyExist(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
+				InternalApiCall __declspec(noreturn) void ThrowInternalError(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
+				InternalApiCall __declspec(noreturn) void ThrowDivideByZero(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
@@ -145,3 +159,4 @@ namespace Seed {
 		};
 	}
 }
+#pragma warning(pop)

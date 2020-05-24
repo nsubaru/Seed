@@ -9,8 +9,11 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
+            /// <summary>
+            /// Стек з фіксованою максимальною кількістю елементів
+            /// </summary>
 			template<typename THeap, SizeT TSize, typename T>
-			class BaseFixedStack :
+			class BaseFixedStack final :
 				public LINQ::IFixedStack<BaseFixedStack, THeap, T, TSize, true>,
 				public IDisposable,
 				public IClonable<BaseFixedStack<THeap, TSize, T>>
@@ -28,20 +31,32 @@ namespace Seed {
 			protected:
 				forceinline virtual void Dispose() final override {}
 			public:
+				/// <summary>
+                /// Пустий конструктор
+                /// </summary>
 				forceinline BaseFixedStack() : This(new Data()) {}
 
+				/// <summary>
+                /// Конструктор з списку ініціалізаці, 
+                /// якщо в списку більше елементів решта ігнорується
+                /// </summary>
+                /// <param name="list">Список ініціалізації</param>
 				BaseFixedStack(InitilizerList<T>&& list) : This(new Data()) {
 					if (list.size() != 0) {
 						SizeT ActuallyCopyied = (TSize < list.size()) ? TSize : list.size();
 						auto it = list.begin();
 						SizeT i = ActuallyCopyied;
 						do {
-							i--; This->stack[i] = *it; it++;
+							i--; This->stack[i] = MoveRValue(*it); it++;
 						} while (i != 0);
 						This->count = ActuallyCopyied;
 					}
 				}
 
+				/// <summary>
+                /// Додає елемент в стек, якщо стек заповнений то генерує помилку
+                /// </summary>
+                /// <param name="item">Силка на елемент</param>
 				forceinline void Push(const T& item) {
 					if (This->count == TSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -49,6 +64,10 @@ namespace Seed {
 					This->count++;
 				}
 
+				/// <summary>
+                /// Додає елемент в стек, якщо стек заповнений то генерує помилку
+                /// </summary>
+                /// <param name="item">RValue силка на елемент</param>
 				forceinline void Push(T&& item) {
 					if (This->count == TSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -56,6 +75,10 @@ namespace Seed {
 					This->count++;
 				}
 
+				/// <summary>
+                /// Виймання з стеку елемента, якщо стек пустий то генерується помилка
+                /// </summary>
+                /// <returns></returns>
 				forceinline T Pop() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -63,6 +86,10 @@ namespace Seed {
 					return MoveRValue(This->stack[This->count]);
 				}
 
+				/// <summary>
+                /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
+                /// </summary>
+                /// <returns>Силка на вехній елемент</returns>
 				forceinline const T& Top() {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -70,6 +97,10 @@ namespace Seed {
 					return This->stack[This->count];
 				}
 
+				/// <summary>
+                /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
+                /// </summary>
+                /// <returns>Силка на вехній елемент</returns>
 				forceinline const T& Top() const {
 					if (This->count == 0)
 						Throw(NullPointException(ExceptionPosition));
@@ -80,9 +111,21 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
+				/// <summary>
+                /// Кількість елементів в стеку
+                /// </summary>
+                /// <returns>Поточна кількість елементів в стеку</returns>
 				forceinline SizeT GetCount() { return This->count; }
+
+				/// <summary>
+                /// оточна кількість елементів в стеку
+                /// </summary>
 				SizeT Property(GetCount) Count;
 
+				/// <summary>
+                /// Клонування стеку
+                /// </summary>
+                /// <returns>Стек з копією елементів</returns>
 				virtual BaseFixedStack Clone() const override final {
 					BaseFixedStack result;
 					result.This->count = This->count;
@@ -252,7 +295,7 @@ namespace Seed {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 					SizeT i = This->count;
-					SizeT Index - -1;
+					SizeT Index = -1;
 					do {
 						i--;
 						if (lambda(This->stack[i]))
@@ -276,7 +319,7 @@ namespace Seed {
 							return static_cast<T&>(This->array[i]);
 					} while (i != 0);
 
-					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0)
+					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
 				template<typename Lambda>
@@ -330,11 +373,17 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Стек з фіксованою максимальною кількістю елементів в стандартній кучі
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using FixedStack = BaseFixedStack<Seed::Core::Memory::Heap, TSize, T>;
 			}
 
+			/// <summary>
+			/// Стек з фіксованою максимальною кількістю елементів в захищеній кучі
+			/// </summary>
 			namespace {
 				template<SizeT TSize, typename T>
 				using SensitiveFixedStack = BaseFixedStack<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;

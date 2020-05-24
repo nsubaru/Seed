@@ -121,8 +121,20 @@ namespace Seed {
 					}
 				}
 			public:
+				/// <summary>
+				/// Пустий конструктор, максимальний розмір черги береться з налаштування ядра
+				/// </summary>
 				forceinline BasePriorityQueue() : This(new Tree(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)) {}
+				/// <summary>
+				/// Конструктор з максимальним розміром
+				/// </summary>
+				/// <param name="MaxSize">Максимальний розмір</param>
 				forceinline BasePriorityQueue(SizeT MaxSize) : This(new Tree(MaxSize)) {}
+				// <summary>
+				/// Конструктор з списку ініціалізації, 
+				/// розмір береться як сума кількості елементів і стандартний розмір з налаштувань
+				/// </summary>
+				/// <param name="list">Список елементів</param>
 				forceinline BasePriorityQueue(InitilizerList<Pair>&& list) :
 					BasePriorityQueue(CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize + list.size()){
 					for (auto&& item : list) {
@@ -130,13 +142,32 @@ namespace Seed {
 					}
 					This->Count = list.size();
 				}
-				forceinline BasePriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : BasePriorityQueue(MaxSize) {
-					for (auto&& item : list) {
-						This->heap = merge(This->heap, new Node(MoveRValue(item)));
+				// <summary>
+				/// Конструктор з макимальний розмір і списком елементів
+				/// </summary>
+				/// <param name="MaxSize">Максимальний розмір, якщо в спику більше елементів то вони проігноруються</param>
+				/// <param name="list">Список елементів</param>
+				forceinline BasePriorityQueue(SizeT MaxSize, InitilizerList<Pair>&& list) : 
+					BasePriorityQueue(
+						MaxSize > list.size() ? 
+						MaxSize : 
+						list.size()
+						) 
+				{
+					auto it = list.begin();
+					auto copyItemsCount = MaxSize > list.size() ? list.size() : MaxSize;
+					for (SizeT i = 0; i <copyItemsCount; i++, ++it)
+					{
+						This->heap = merge(This->heap, new Node(MoveRValue(*it)));
 					}
 					This->Count = list.size();
 				}
 
+				/// <summary>
+				/// Вставка елемента з пріоритетом і значенням
+				/// </summary>
+				/// <param name="priority">Пріоритет</param>
+				/// <param name="value">Значення</param>
 				forceinline void Insert(const TPriority& priority, const TValue& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -145,6 +176,11 @@ namespace Seed {
 					++this->This->Count;
 				}
 
+				/// <summary>
+				/// Вставка елемента з пріоритетом і значенням
+				/// </summary>
+				/// <param name="priority">Пріоритет</param>
+				/// <param name="value">Значення</param>
 				forceinline void Insert(TPriority&& priority, const TValue& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -153,6 +189,11 @@ namespace Seed {
 					++this->This->Count;
 				}
 
+				/// <summary>
+				/// Вставка елемента з пріоритетом і значенням
+				/// </summary>
+				/// <param name="priority">Пріоритет</param>
+				/// <param name="value">Значення</param>
 				forceinline void Insert(const TPriority& priority, TValue&& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -161,6 +202,11 @@ namespace Seed {
 					++this->This->Count;
 				}
 
+				/// <summary>
+				/// Вставка елемента з пріоритетом і значенням
+				/// </summary>
+				/// <param name="priority">Пріоритет</param>
+				/// <param name="value">Значення</param>
 				forceinline void Insert(TPriority&& priority, TValue&& key) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -169,6 +215,11 @@ namespace Seed {
 					++this->This->Count;
 				}
 
+				/// <summary>
+				/// Вставка елемента з пріоритетом і значенням
+				/// </summary>
+				/// <param name="priority">Пріоритет</param>
+				/// <param name="value">Значення</param>
 				forceinline void Insert(const Pair& itemValue) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -177,6 +228,11 @@ namespace Seed {
 					++this->This->Count;
 				}
 
+				/// <summary>
+				/// Вставка елемента з пріоритетом і значенням
+				/// </summary>
+				/// <param name="priority">Пріоритет</param>
+				/// <param name="value">Значення</param>
 				forceinline void Insert(Pair&& itemValue) {
 					if (this->This->Count == this->This->MaxSize)
 						Throw(NullPointException(ExceptionPosition));
@@ -185,19 +241,35 @@ namespace Seed {
 					++this->This->Count;
 				}
 
+				/// <summary>
+				/// Чи черга пуста
+				/// </summary>
+				/// <returns>Вертає true якщо черга пуста</returns>
 				forceinline bool GetIsEmpty() const {
 					return this->This->heap == nullptr || this->This->Count == 0;
 				}
 
+				/// <summary>
+				/// Вертає кількість елементів
+				/// </summary>
+				/// <returns>Кількість елементів в черзі</returns>
 				forceinline SizeT GetCount() const {
 					return this->This->Count;
 				}
 
-				forceinline const TPriority& getFirstItemPriority() {
+				/// <summary>
+				/// Вертає самий верщий пріоритет який ж активним в черзі
+				/// </summary>
+				/// <returns>Значення пріоритету</returns>
+				forceinline const TPriority& TopKey() {
 					return This->heap->data.Key;
 				}
 
-				forceinline const TPriority& discardFirstItem() {
+				/// <summary>
+				/// Забирає верхній елемент і вертаж його ключ лиш
+				/// </summary>
+				/// <returns>Ключ верхнього елементу</returns>
+				forceinline const TPriority& DiscardFirstItem() {
 					Node* old = This->heap;
 					This->heap = removeMinimum(This->heap);
 					const TPriority& ret = old->data.Key;
@@ -205,7 +277,11 @@ namespace Seed {
 					return ret;
 				}
 
-				forceinline TValue Dequeu() {
+				/// <summary>
+				/// Виймає верхній елемент і вертає його значення
+				/// </summary>
+				/// <returns>Значення елемента</returns>
+				forceinline TValue Dequeue() {
 					while (this->This->Count == 0) {
 						Throw(NullPointException(ExceptionPosition));
 					}
@@ -220,6 +296,10 @@ namespace Seed {
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 
+				/// <summary>
+				/// Клонування об'єкта
+				/// </summary>
+				/// <returns>Новий об'єкт з копією всіх елементів</returns>
 				forceinline virtual BasePriorityQueue Clone() const override final {
 					BasePriorityQueue result;
 
@@ -230,8 +310,44 @@ namespace Seed {
 					return result;
 				}
 
+				/// <summary>
+				/// True якщо черга пуста
+				/// </summary>
 				Boolean Property(GetIsEmpty) IsEmpty;
+
+				/// <summary>
+				/// Поточна кількість елементів в пріоритетній черзі
+				/// </summary>
 				SizeT Property(GetCount) Count;
+
+				/// <summary>
+				/// Вертає максимальну кількість елементів
+				/// </summary>
+				/// <returns>Максимальна кількість елементів</returns>
+				SizeT GetMaxSize() const {
+					return This->MaxSize;
+				}
+
+				/// <summary>
+				/// Встановлює максимальну кількість елементів яка не можу бути меншою ніж поточна кількість і та яка є стандартною
+				/// </summary>
+				/// <param name="newMaxSize">Нова максимальна кількість</param>
+				void SetMaxSize(SizeT newMaxSize) {
+					if (newMaxSize < This->Count || newMaxSize < CurrentSettings().MemoryManager.DefaultPriorityQueueMaxSize)
+						Throw(
+							InvalidArgumentException(
+								ExceptionPosition,
+								L"newMaxSize",
+								LR"(Нова максимальна кількість має бути не меншою ніж поточна кількість елементів і не меншою ніж станадартне значення)"
+								)
+							);
+					This->MaxSize = newMaxSize;
+				}
+
+				/// <summary>
+				/// Максимальний розмір черги
+				/// </summary>
+				SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 			private:
 				forceinline static Node* merge(Node* a, Node* b) {
 					if (a == nullptr) return b;
@@ -687,11 +803,15 @@ namespace Seed {
 				RefCountClass(BasePriorityQueue, This)
 			};
 
+			///<summary>Пріоритетна черга для обробки даних в порядку приходу з урахуванням пріоритету в чутливій кучі
+			///<para>Працює через фібоначеву кучу. Ітерація відсутня</para></summary>
 			namespace {
 				template<typename TKey, typename TVal>
 				using SensitivePriorityQueue = BasePriorityQueue<Seed::Core::Memory::SensitiveDataHeap, TKey, TVal>;
 			}
 
+			///<summary>Пріоритетна черга для обробки даних в порядку приходу з урахуванням пріоритету в простій кучі
+			///<para>Працює через фібоначеву кучу. Ітерація відсутня</para></summary>
 			namespace {
 				template<typename TKey, typename TVal>
 				using PriorityQueue = BasePriorityQueue<Seed::Core::Memory::Heap, TKey, TVal>;

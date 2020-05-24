@@ -11,6 +11,9 @@
 namespace Seed {
     inline namespace Core {
         namespace Containers {
+            /// <summary>
+            /// Стек з фіксованою максимальною кількістю елементів і пітримкою багатопотоковості
+            /// </summary>
             template<typename THeap, SizeT TSize, typename T>
             class BaseConcurencyFixedStack :
                 public LINQ::IFixedStack<BaseConcurencyFixedStack, THeap, T, TSize, true>,
@@ -31,20 +34,32 @@ namespace Seed {
             protected:
                 forceinline virtual void Dispose() final override {}
             public:
+                /// <summary>
+                /// Пустий конструктор
+                /// </summary>
                 forceinline BaseConcurencyFixedStack() : This(new Data()) {}
 
+                /// <summary>
+                /// Конструктор з списку ініціалізаці, 
+                /// якщо в списку більше елементів решта ігнорується
+                /// </summary>
+                /// <param name="list">Список ініціалізації</param>
                 BaseConcurencyFixedStack(InitilizerList<T>&& list) : This(new Data()) {
                     if (list.size() != 0) {
                         SizeT ActuallyCopyied = (TSize < list.size()) ? TSize : list.size();
                         auto it = list.begin();
                         SizeT i = ActuallyCopyied;
                         do {
-                            i--; This->stack[i] = *it; it++;
+                            i--; This->stack[i] = MoveRValue(*it); it++;
                         } while (i != 0);
                         This->count = ActuallyCopyied;
                     }
                 }
 
+                /// <summary>
+                /// Додає елемент в стек, якщо стек заповнений то генерує помилку
+                /// </summary>
+                /// <param name="item">Силка на елемент</param>
                 forceinline void Push(const T& item) {
                     This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == TSize)
@@ -54,6 +69,10 @@ namespace Seed {
                         });
                 }
 
+                /// <summary>
+                /// Додає елемент в стек, якщо стек заповнений то генерує помилку
+                /// </summary>
+                /// <param name="item">RValue силка на елемент</param>
                 forceinline void Push(T&& item) {
                     This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == TSize)
@@ -63,6 +82,10 @@ namespace Seed {
                         });
                 }
 
+                /// <summary>
+                /// Виймання з стеку елемента, якщо стек пустий то генерується помилка
+                /// </summary>
+                /// <returns></returns>
                 forceinline T Pop() {
                     return MoveRValue(This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == 0)
@@ -72,6 +95,10 @@ namespace Seed {
                         }));
                 }
 
+                /// <summary>
+                /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
+                /// </summary>
+                /// <returns>Силка на вехній елемент</returns>
                 forceinline const T& Top() {
                     return This->lock.ExclusiveLock([&]() mutable -> const T& {
                         if (This->count == 0)
@@ -81,6 +108,10 @@ namespace Seed {
                         });
                 }
 
+                /// <summary>
+                /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
+                /// </summary>
+                /// <returns>Силка на вехній елемент</returns>
                 forceinline const T& Top() const {
                     return This->lock.ExclusiveLock([&]() mutable -> const T& {
                         if (This->count == 0)
@@ -93,9 +124,21 @@ namespace Seed {
                 template<typename U>
                 friend void Seed::Core::Swap(U& A, U& B);
 
-               forceinline  SizeT GetCount() { return This->count; }
+                /// <summary>
+                /// Кількість елементів в стеку
+                /// </summary>
+                /// <returns>Поточна кількість елементів в стеку</returns>
+                forceinline  SizeT GetCount() { return This->count; }
+
+                /// <summary>
+                /// оточна кількість елементів в стеку
+                /// </summary>
                 SizeT Property(GetCount) Count;
 
+                /// <summary>
+                /// Клонування стеку
+                /// </summary>
+                /// <returns>Стек з копією елементів</returns>
                 virtual BaseConcurencyFixedStack Clone() const override final {
                     return This->lock.ShareLock([&]() {
                         BaseConcurencyFixedStack result;
@@ -134,7 +177,7 @@ namespace Seed {
                         return This->lock.ShareLock([&]() -> BaseConcurencyFixedStack& {
                             if (This->count == 0)
                                 return *this;
-                            for (SizeT i = This->count; x-- > 0;)
+                            for (SizeT i = This->count; i--> 0;)
                             {
                                 lambda(This->stack[i]);
                             }
@@ -288,7 +331,7 @@ namespace Seed {
                         if (This->count == 0)
                             Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
                         SizeT i = This->count;
-                        SizeT Index - -1;
+                        SizeT Index = -1;
                         do {
                             i--;
                             if (lambda(This->stack[i]))
@@ -377,11 +420,17 @@ namespace Seed {
                 }
             };
 
+            /// <summary>
+            /// Стек з фіксованою максимальною кількістю елементів і пітримкою багатопотоковості в загальній кучі
+            /// </summary>
             namespace {
                 template<SizeT TSize, typename T>
                 using ConcurencyFixedStack = BaseConcurencyFixedStack<Seed::Core::Memory::Heap, TSize, T>;
             }
 
+            /// <summary>
+            /// Стек з фіксованою максимальною кількістю елементів і пітримкою багатопотоковості в захищеній кучі
+            /// </summary>
             namespace {
                 template<SizeT TSize, typename T>
                 using ConcurencySensitiveFixedStack = BaseConcurencyFixedStack<Seed::Core::Memory::SensitiveDataHeap, TSize, T>;

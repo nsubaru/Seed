@@ -21,7 +21,7 @@ namespace Seed {
 #pragma warning(disable: 4996)
 #pragma warning(disable: 4251)
         template<class THeap>
-        class BaseString final :  //-V553
+        class BaseString final :
             public Memory::Allocator<THeap>, 
             public Containers::LINQ::IString<BaseString,THeap,UChar,false>
             {
@@ -1336,7 +1336,7 @@ namespace Seed {
                 if (this->CurrentSize == 0 || this->Lenght == 0)
                     Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(this), 0);
                 if (this->CurrentSize > Math::MaxNumberCount<T>())
-                    throw IntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+                    Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 
                 if constexpr (TypeTraits::IsSameV<TypeTraits::Unsigned<T>, T>) {
                     Math::SafeInt<T> ret;
@@ -2118,6 +2118,46 @@ namespace Seed {
                         )
                     )
                 );
+            }
+
+            /// <summary>
+            /// Провіря чи поточна рядкова змінна містить текст з заданої
+            /// </summary>
+            /// <param name="item">Задана змінна</param>
+            /// <returns>true якщо тескт з item міститься в поточній змінній</returns>
+            bool Containe(const BaseString& item) const {
+                if (item.Lenght == this->Lenght && this->Lenght == 0)
+                    return true;
+
+                if (item.CurrentSize > this->CurrentSize)
+                    return false;
+
+                if (item.CurrentSize == this->CurrentSize)
+                    return *this == item;
+
+                auto searchSize = (this->CurrentSize - item.CurrentSize) + 1;
+                for (SizeT i = 0; i < searchSize; i++)
+                {
+                    if (this->str[i] != item.str[0])
+                    {
+                        continue;
+                    }
+
+                    bool found = true;
+                    for (SizeT j = 0; j < item.CurrentSize; j++)
+                    {
+                        if (this->str[i + j] != item.str[j])
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+
+                    if (found)
+                        return true;
+                }
+
+                return false;
             }
 
             ///<summary>Конвертор для строк з різним алокатором</summary>

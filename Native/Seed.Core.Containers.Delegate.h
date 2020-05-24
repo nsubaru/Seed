@@ -9,7 +9,7 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4996)
     inline namespace Core {
-        inline namespace Exeptions {
+        inline namespace Exceptions {
             ///<summary>Спроба отримати результат не виконаної ще функції</summary>
             class SeedKernelCall CantGetResultNotInvokedFunction final : public Exception
             {
@@ -25,7 +25,7 @@ namespace Seed {
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
                     return ExceptionString::Combine({
-                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        ExceptionString(exceptionName), ExceptionString(L". "),
                         Location.toString(), ExceptionString(L".")
                     });
                 }
@@ -46,7 +46,7 @@ namespace Seed {
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
                     return ExceptionString::Combine({
-                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        ExceptionString(exceptionName), ExceptionString(L". "),
                         Location.toString(), ExceptionString(L".")
                     });
                 }
@@ -67,7 +67,7 @@ namespace Seed {
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
                 virtual ExceptionString toString() const override final {
                    return ExceptionString::Combine({
-                        ExceptionString(exeptionName), ExceptionString(L". "),
+                        ExceptionString(exceptionName), ExceptionString(L". "),
                         Location.toString(), ExceptionString(L".")
                    });
                 }
@@ -79,32 +79,53 @@ namespace Seed {
 
 namespace Seed {
     inline namespace Core {
-        //Батьківський клас для об'єкта функції з аргументами
+        /// <summary>
+        /// Батьківський клас для об'єкта функції з аргументами
+        /// </summary>
         class FunctionObj
         {
         protected:
-            //Вертає результат. Реалізація в TemplateFunctionT
+            /// <summary>
+            /// Вертає результат. Реалізація в TemplateFunctionT
+            /// </summary>
+            /// <param name="type">Запитуваний тип</param>
+            /// <returns>Покажчик на дані</returns>
             virtual void* __get_result(const TypeInfo& type) = 0;
         public:
-            //Виконує функцію. Реалізація в TemplateFunctionT
+            /// <summary>
+            /// Виконує функцію. Реалізація в TemplateFunctionT
+            /// </summary>
             virtual void Init() = 0;
-            //Вертає true якщо функція запущена. Реалізація в TemplateFunctionT
+
+            /// <summary>
+            /// Вертає true якщо функція запущена. Реалізація в TemplateFunctionT
+            /// </summary>
+            /// <returns>Вертає true якщо функція запущена</returns>
             virtual bool IsStarted() const noexcept = 0;
-            //Вертає true якщо функція завершила свою роботу.
-            //Якщо при виконанні викликано було помилку то функція буде важатись завершеною
-            //Але результату не буде і при спробі його отримати буде згенеровано помилку NullPointExeption
-            //Реалізація в TemplateFunctionT
+
+            /// <summary>
+            /// Вертає true якщо функція завершила свою роботу.
+            /// Якщо при виконанні викликано було помилку то функція буде важатись завершеною
+            /// Але результату не буде і при спробі його отримати буде згенеровано помилку NullPointExeption
+            /// Реалізація в TemplateFunctionT
+            /// </summary>
+            /// <returns>Вертає true якщо функція завершила роботу</returns>
             virtual bool IsEnded() const noexcept = 0;
-            //Вертає результат якщо він є і якщо його тип збігається
-            //Генерить наступні ексепшини
-            //- NullPointExeption якщо результату немає, або функція завершилась через генерування помилки
-            //- InvalidType якщо типи результату не коректний
+
+            /// <summary>
+            /// Вертає true якщо функція запущена
+            /// </summary>
+            /// <exception cref="Seed::Core::Exceptions::NullPointException">якщо результату немає, або функція завершилась через генерування помилки</exception>
+            /// <exception cref="Seed::Core::Exceptions::InvalidType">якщо типи результату не коректний</exception>
             template<typename T>
             forceinline T GetResult()
             {
                 return MoveRValue(*(T*)__get_result(typeid(T)));
             }
-            //Деструктор, для коректного видалення об'єкта який наслідує цей класс
+
+            /// <summary>
+            /// Деструктор, для коректного видалення об'єкта який наслідує цей класс
+            /// </summary>
             virtual ~FunctionObj() = 0
             {};
         };
@@ -222,9 +243,11 @@ public:
 
 namespace Seed {
     inline namespace Core {
-        //Делегат це об'єкт який інкапсулює, функцію з аргументами,
-        //тим самим дозволяючи її відкладено виконати,
-        //навіть в іншому потоці, apc якогось потоку чи пулі потоків
+        /// <summary>
+        /// Делегат це об'єкт який інкапсулює, функцію з аргументами,
+        /// тим самим дозволяючи її відкладено виконати,
+        /// навіть в іншому потоці, apc якогось потоку чи пулі потоків
+        /// </summary>
         class Delegate final : protected IDisposable
         {
         private:
@@ -245,25 +268,20 @@ namespace Seed {
                 delete data->function;
             }
         public:
-            //Конструктор з функції F і набору аргументів Args(може бути і без аргументів)
+            /// <summary>
+            /// Конструктор з функції F і набору аргументів Args(може бути і без аргументів)
+            /// </summary>
+            /// <param name="f">Функція(покажчик на неї)</param>
+            /// <param name="args">Аргументи функції</param>
             template<typename TF, typename ... TArgs>
             forceinline Delegate(TF f, TArgs... args) : data(new delegate(new TemplateFunctionT<TF, TArgs...>(f, ForwardReference<TArgs>(args)...)))
             {};
 
-            forceinline Delegate(const Delegate & Orig) :data(Orig.data) { ++data->RefCount; };
-            forceinline Delegate(Delegate && From) : data(From.data) { From.data = nullptr; };
-            forceinline Delegate & operator=(const Delegate & Orig){this->~Delegate(); this->Delegate::Delegate(Orig); return *this; };
-            forceinline Delegate & operator=(Delegate && From){if(this == &From) return *this; this->~Delegate(); this->Delegate::Delegate(Seed::MoveRValue(From)); return *this; };
-            forceinline virtual ~Delegate(){if (data != nullptr)
-            {
-                if (--data->RefCount == 0)
-                {
-                    this->Dispose();delete data;
-                }data = nullptr;
-            }};
-
-            //Вертає true якщо делегат виконується зараз
-            //генерує NullPointExeption, якщо делегат не валідний
+            /// <summary>
+            /// Вертає true якщо делегат виконується зараз
+            /// генерує NullPointExeption, якщо делегат не валідний
+            /// </summary>
+            /// <returns>Вертає true якщо делегат виконується зараз</returns>
             forceinline Boolean GetIsStarted() const
             {
                 if (this->data == nullptr)
@@ -271,8 +289,11 @@ namespace Seed {
                 return this->data->function->IsStarted();
             }
 
-            //Вертає true якщо виконання делегата завершене
-            //генерує NullPointExeption, якщо делегат не валідний
+            /// <summary>
+            /// Вертає true якщо виконання делегата завершене
+            /// генерує NullPointExeption, якщо делегат не валідний
+            /// </summary>
+            /// <returns>Вертає true якщо виконання делегата завершене</returns>
             forceinline Boolean GetIsEnded() const
             {
                 if (this->data == nullptr)
@@ -280,10 +301,12 @@ namespace Seed {
                 return this->data->function->IsEnded();
             }
 
-            //Запуск функції, можливий лиш раз, для отримання результату є функція GetResult<T>
-            //генерує наступні помилки:
-            //- NullPointExeption якщо дані делегата силаються на nullptr
-            //- AlredyExecuteOrExecuteEnded якщо делегат виконувався або виконується
+            /// <summary>
+            /// Запуск функції, можливий лиш раз, для отримання результату є функція GetResult
+            /// генерує наступні помилки:
+            /// </summary>
+            /// <exception cref="Seed::Core::Exceptions::NullPointException">якщо дані делегата силаються на nullptr</exception>
+            /// <exception cref="Seed::Core::Exceptions::TryReStartDelegate">якщо делегат виконувався або виконується</exception>
             forceinline void Init() volatile
             {
                 if (this->data == nullptr)
@@ -293,12 +316,15 @@ namespace Seed {
                 this->data->function->Init();
             }
 
-            //Вертає результат виконання делегата
-            //Генерує наступні помилки
-            //- NullPointExeption якщо делегат без функції(тобто не валідний) або функція ще не запушена
-            //або функція не завершилась бо було згенеровано ексепшн
-            //- AlredyExecute якщо функція в процесі виконання
-            //- InvalidType якщо тип T не збігаєтья з типом результату функції
+            /// <summary>
+            /// Вертає результат виконання делегата
+            /// </summary>
+            /// <exception cref="Seed::Core::Exceptions::NullPointException">якщо делегат без функції(тобто не валідний) або функція ще не запушена
+            /// або функція не завершилась бо було згенеровано ексепшн
+            /// </exception>
+            /// <exception cref=""Seed::Core::Exceptions::AlredyExecute>якщо функція в процесі виконання</exception>
+            /// <exception cref="InvalidType">якщо тип T не збігаєтья з типом результату функції</exception>
+            /// <returns>Значення результату функції</returns>
             template<typename T>
             forceinline T GetResult()
             {
@@ -310,12 +336,16 @@ namespace Seed {
                     Throw(AlredyExecute(ExceptionPosition));
                 return this->data->function->GetResult<T>();
             }
-            //Вертає результат виконання делегата
-            //Генерує наступні помилки
-            //- NullPointExeption якщо делегат без функції(тобто не валідний) або функція ще не запушена
-            //або функція не завершилась бо було згенеровано ексепшн
-            //- AlredyExecute якщо функція в процесі виконання
-            //- InvalidType якщо тип T не збігаєтья з типом результату функції
+
+            /// <summary>
+            /// Вертає результат виконання делегата
+            /// </summary>
+            /// <exception cref="Seed::Core::Exceptions::NullPointException">якщо делегат без функції(тобто не валідний) або функція ще не запушена
+            /// або функція не завершилась бо було згенеровано ексепшн
+            /// </exception>
+            /// <exception cref=""Seed::Core::Exceptions::AlredyExecute>якщо функція в процесі виконання</exception>
+            /// <exception cref="InvalidType">якщо тип T не збігаєтья з типом результату функції</exception>
+            /// <returns>Значення результату функції</returns>
             template<typename T>
             forceinline T GetResult() volatile
             {
@@ -328,17 +358,33 @@ namespace Seed {
                 return this->data->function->GetResult<T>();
             }
 
+            /// <summary>
+            /// Оператор функтор, виконує фукцію
+            /// </summary>
+            /// <returns>Вертає силку на даний об'єкт</returns>
             forceinline volatile Delegate& operator()() volatile {
                 this->Init();
                 return *this;
             }
 
+            /// <summary>
+            /// Оператор функтор, виконує фукцію
+            /// </summary>
+            /// <returns>Вертає силку на даний об'єкт</returns>
             forceinline Delegate& operator()() {
                 this->Init();
                 return *this;
             }
+
+            RefCountClass(Delegate, data);
         };
-        //Створює делегат з функцією F і аргументами Args(може бути і без аргументів)
+
+        /// <summary>
+        /// Створює делегат з функцією F і аргументами Args(може бути і без аргументів)
+        /// </summary>
+        /// <param name="f">Функція(покажчик на неї)</param>
+        /// <param name="args">Аргументи функції</param>
+        /// <returns>Об'єкт делегата</returns>
         template<typename F, typename ... Args>
         forceinline Delegate CreateAndPackFunctionObj(F f, Args... args)
         {

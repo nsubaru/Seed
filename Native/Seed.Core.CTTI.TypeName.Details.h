@@ -211,11 +211,6 @@ namespace Seed {
                         return *this;
                     }       
 
-                    template<SizeT Size2>
-                    constexpr bool IsStartWith(ConstexprArray<T, Size2> mask) {
-                        return Size == Size2;
-                    }
-
                     template<typename T2, SizeT N>
                     friend class ConstexprArray;
                 };

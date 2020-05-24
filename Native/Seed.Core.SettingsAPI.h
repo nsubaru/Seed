@@ -85,7 +85,24 @@ namespace Seed {
 				ThreadingCfg Threading;
 				///<summary>Налаштування сервісів ядра</summary>
 				KernelServiceConfigT KernelServiceConfig;
+
+				/// <summary>
+				/// Структура опису версії ядра
+				/// </summary>
+				struct KernelVersion {
+					UInt64 Major;
+					UInt64 Minor;
+					UInt64 StableBuildNumber;
+					UInt64 BuildNumber;
+				};
+
+				/// <summary>
+				/// Версія налаштувань
+				/// </summary>
+				KernelVersion SettingsVersion;
 			};
+
+			using KernelVersionT = SettingsData::KernelVersion;
 		private:
 			SeedKernelCall static const SettingsData& GetCurrentSettingDataRaw();
 			SeedKernelCall static SettingsData& SetCurrentSettingDataRaw();
@@ -99,7 +116,7 @@ namespace Seed {
 			static decltype(auto) GetCurrentSettingData(Lambda&& lambda) {
 				return GetSettingsLock().ShareLock([&] ()
 				{
-					return lambda(SetCurrentSettingDataRaw());
+					return lambda(GetCurrentSettingDataRaw());
 				});
 			}
 
@@ -826,6 +843,15 @@ namespace Seed {
 
 			ThreadingCfgT GetThreadinfConfig() { return ThreadingCfgT(); }
 			void SetThreadinfConfig(ThreadingCfgT) {}
+
+			KernelVersionT GetSettingsKernelVersion() {
+				return GetCurrentSettingData([] (auto data)
+				{
+					return data.SettingsVersion;
+				});
+			}
+
+			static KernelVersionT GetCurrentKernelVersion();
 		public:
 			///<summary>Налаштування менеджера пам'яті</summary>
 			MemoryManagerT Property(GetMemoryManager, SetMemoryManager) MemoryManager;
