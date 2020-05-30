@@ -94,3 +94,8 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 /// Гарантія компілятору унікальності адресу змінної
 /// </summary>
 #define restrict __restrict
+
+/// <summary>
+/// Стрілочна функція
+/// </summary>
+#define ArrowFunct(x) [](){ return x; }

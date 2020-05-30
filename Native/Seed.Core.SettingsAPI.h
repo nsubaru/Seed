@@ -69,7 +69,7 @@ namespace Seed {
 				};
 
 				///<summary>Налаштування сервісів ядра</summary>
-				struct KernelServiceConfigT {
+				struct KernelServicesConfigT {
 					///<summary>Налаштування планувальника задач</summary>
 					struct TaskShedulerCfgT {
 						///<summary>Стандартна роздільна здатність таймера для задач в планувальнику задач</summary>
@@ -84,7 +84,7 @@ namespace Seed {
 				///<summary>Налаштування багатопотоковості</summary>
 				ThreadingCfg Threading;
 				///<summary>Налаштування сервісів ядра</summary>
-				KernelServiceConfigT KernelServiceConfig;
+				KernelServicesConfigT KernelServicesConfig;
 
 				/// <summary>
 				/// Структура опису версії ядра
@@ -680,7 +680,7 @@ namespace Seed {
 				ThreadCfg Property(GetThread, SetThread) Thread;
 			};
 
-			class KernelServiceConfigT final {
+			class KernelServicesConfigT final {
 			public:
 				class TaskShedulerCfgT final {
 				public:
@@ -689,13 +689,13 @@ namespace Seed {
 					Int32 GetDefaultTimerProximity() {
 						return GetCurrentSettingData([] (auto data)
 						{
-							return data.KernelServiceConfig.TaskSheduler.DefaultTimerProximity;
+							return data.KernelServicesConfig.TaskSheduler.DefaultTimerProximity;
 						});
 					}
 					void SetDefaultTimerProximity(Int32 NewDefaultTimerProximity) {
 						SetCurrentSettingData([&] (auto CurrentSettingsData)
 						{
-							CurrentSettingsData.KernelServiceConfig.TaskSheduler.DefaultTimerProximity = NewDefaultTimerProximity;
+							CurrentSettingsData.KernelServicesConfig.TaskSheduler.DefaultTimerProximity = NewDefaultTimerProximity;
 						});
 					}
 				public:
@@ -838,8 +838,8 @@ namespace Seed {
 			MemoryManagerT GetMemoryManager() { return MemoryManagerT(); }
 			void SetMemoryManager(MemoryManagerT) {}
 
-			KernelServiceConfigT GetKernelServiceConfig() { return KernelServiceConfigT(); }
-			void SetKernelServiceConfig(KernelServiceConfigT) {}
+			KernelServicesConfigT GetKernelServicesConfig() { return KernelServicesConfigT(); }
+			void SetKernelServicesConfig(KernelServicesConfigT) {}
 
 			ThreadingCfgT GetThreadinfConfig() { return ThreadingCfgT(); }
 			void SetThreadinfConfig(ThreadingCfgT) {}
@@ -856,7 +856,7 @@ namespace Seed {
 			///<summary>Налаштування менеджера пам'яті</summary>
 			MemoryManagerT Property(GetMemoryManager, SetMemoryManager) MemoryManager;
 			///<summary>Налаштування сервісів ядра</summary>
-			KernelServiceConfigT Property(GetKernelServiceConfig, SetKernelServiceConfig) KernelService;
+			KernelServicesConfigT Property(GetKernelServicesConfig, SetKernelServicesConfig) KernelServices;
 			///<summary>Рантайм налаштування</summary>
 			VirtualSettingDataT Property(GetVirtualSettingData, SetVirtualSettingDataT) VirtualSetting;
 			///<summary>Налаштування багатопотоковості</summary>

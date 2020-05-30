@@ -36,6 +36,28 @@ namespace Seed
                         using ValueTypeMetaData = CTTITypeData<TValue>;
                     };
 
+                    //Lazy
+
+                    template<typename THeap, typename T, bool TIsConst, bool TIsVolatile>
+                    struct CTTITypeDataImpl<BaseLazy<THeap, T>, TIsConst, TIsVolatile> :
+                        BaseHeapCTTITypeData<BaseLazy<THeap, T>, THeap, EType::Box, true, TIsConst, TIsVolatile>
+                    {
+                        using ValueType = T;
+
+                        using ValueTypeMetaData = CTTITypeData<T>;
+                    };
+
+                    //SmartPtr
+
+                    //template<typename T, bool TIsConst, bool TIsVolatile>
+                    //struct CTTITypeDataImpl<SmartPtr<T>, TIsConst, TIsVolatile> :
+                    //    BaseHeapCTTITypeData<SmartPtr<T>, THeap, EType::Box, true, TIsConst, TIsVolatile>
+                    //{
+                    //    using ValueType = T;
+
+                    //    using ValueTypeMetaData = CTTITypeData<T>;
+                    //};
+
 #pragma region Collections
                     //Base implementation
 

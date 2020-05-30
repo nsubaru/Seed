@@ -728,7 +728,7 @@ namespace Seed
 
 					static constexpr auto RttiTypeInfo = [] () 
 					{
-						return &typeid(TObj);
+						return TypeRecord<TObj>();
 					};
 						
 					static constexpr auto UnifiedCtor = TObjectCtorAndDtor::UnifiedCtor;
@@ -1098,7 +1098,7 @@ namespace Seed
 					String CtorMetaDate;
 					CtorCaller ctorCaller;
 					DtorCaller dtorCaller;
-					const TypeInfo* RttiTypeInfo;
+					RTTI::RTTITypeRecord RttiTypeInfo;
 					Containers::List<MethodRTTIRecord> Methods;
 					Containers::List<PropertyRTTIRecord> Properties;
 					RefCountT RefCount;
@@ -1109,7 +1109,7 @@ namespace Seed
 						String&& ctorMetaDate,
 						CtorCaller ctorCaller,
 						DtorCaller dtorCaller,
-						const TypeInfo* RttiTypeInfo,
+						RTTI::RTTITypeRecord RttiTypeInfo,
 						Containers::List<MethodRTTIRecord>&& methods,
 						Containers::List<PropertyRTTIRecord>&& properties
 					) :
@@ -1218,8 +1218,8 @@ namespace Seed
 					return this->data->Properties;
 				}
 
-				forceinline const TypeInfo& GetRTTITypeInfo() const {
-					return *this->data->RttiTypeInfo;
+				forceinline RTTI::RTTITypeRecord GetRTTITypeInfo() const {
+					return this->data->RttiTypeInfo;
 				}
 
 				String Property(GetName) ClassName;

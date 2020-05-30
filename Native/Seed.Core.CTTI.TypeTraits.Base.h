@@ -22,6 +22,7 @@ namespace Seed
 					String,
 					FixedCollection,
 					AssociableCollection,
+					Box,
 					Tuple,
 					Pair,
 					Pointer,

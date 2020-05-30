@@ -3,6 +3,7 @@
 #include "Seed.Core.Containers.BitMap.h"
 #include "Seed.Core.Containers.Tuple.h"
 #include "Seed.Core.Containers.Pair.h"
+#include "Seed.Core.Containers.Lazy.h"
 //Common containers
 #include "Seed.Core.Containers.NonConcurency.h"
 #include "Seed.Core.Containers.Concurency.h"

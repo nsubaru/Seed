@@ -9,7 +9,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			enum class EThreadableTypes : UInt8 {
-				Thread, JobTask, SheduledTask, Unknown = 255
+				Thread, JobTask, ScheduledTask, Unknown = 255
 			};
 			enum class EThreadabledStates : UInt8 {
 				NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interupted, Unknown = 255
@@ -52,7 +52,7 @@ namespace Seed {
 			inline void Sleep(UInt64 ms) { Sleep(DateTime((DateTime::SecondInNtTime / 1000) * ms), true); }
 
 			enum class EJobStates :UInt8 {
-				NotStarted, Excecuting, Finished, ExceptionCatched, Unknown = 255
+				NotStarted, Executing, Finished, ExceptionCatched, Unknown = 255
 			};
 
 			interface IJob

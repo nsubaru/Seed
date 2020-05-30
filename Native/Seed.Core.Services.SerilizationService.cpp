@@ -82,24 +82,24 @@ Containers::Blob SerilizeObjectType(
 
 Containers::Blob Seed::Core::Services::SerilizationService::SerelizeDynObj(const Reflection::DynamicObject& data) {
 	//Try search type in object records storage by type name
-	if (This->idi.IsExistObjectRecordByName(data.GetTypeName()))
+	if (This->idi.IsExistDataTypesRecordByType(data.GetValueType()))
 	{
 		//if found get type record
-		auto typeRecord = This->idi.GetObjectRecordByName(data.GetTypeName());
+		auto typeRecord = This->idi.GetObjectRecordByType(data.GetValueType());
 		//check is serilizable if true then serilize properties else throw exception
 		if (IsSerilizableObjectType(typeRecord, This->idi)) {
 			return SerilizeObjectType(typeRecord, This->idi, data);
 		}
 		else
 		{
-			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetCxxTypeName()));
+			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetValueType().CxxTypeName));
 		}
 	} 
 	//else try search type in data types storage by type name
-	else if (This->idi.IsExistDataTypesRecordByName(data.GetTypeName()))
+	else if (This->idi.IsExistDataTypesRecordByType(data.GetValueType()))
 	{
 		//if found then get type record
-		auto typeRecord = This->idi.GetDataTypesRecordByName(data.GetTypeName());
+		auto typeRecord = This->idi.GetDataTypesRecordByType(data.GetValueType());
 		//check is serializable if true serilize using function in type record else throw exception
 		if (typeRecord.IsSerelizableType)
 		{
@@ -107,12 +107,12 @@ Containers::Blob Seed::Core::Services::SerilizationService::SerelizeDynObj(const
 		}
 		else
 		{
-			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetCxxTypeName()));
+			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetValueType().CxxTypeName));
 		}
 	}
 	else
 	{
-		Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetCxxTypeName()));
+		Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetValueType().CxxTypeName));
 	}
 }
 

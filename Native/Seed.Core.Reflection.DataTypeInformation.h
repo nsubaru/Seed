@@ -75,7 +75,7 @@ namespace Seed
 					DeSerelizeFunctionType deSerelizeFunction;
 					BuilderFunctionType builderFunction;
 
-					const TypeInfo& typeInfo;
+					RTTI::RTTITypeRecord typeInfo;
 
 					RefCountT RefCount;
 
@@ -87,7 +87,7 @@ namespace Seed
 						SerelizeFunctionType serelizeFunction,
 						DeSerelizeFunctionType deSerelizeFunction,
 						BuilderFunctionType builderFunction,
-						const TypeInfo& typeInfo
+						RTTI::RTTITypeRecord&& typeInfo
 					) :
 						typeName(MoveRValue(typeName)),
 						cxxTypeName(MoveRValue(cxxTypeName)),
@@ -96,7 +96,7 @@ namespace Seed
 						serelizeFunction(serelizeFunction),
 						deSerelizeFunction(deSerelizeFunction),
 						builderFunction(builderFunction),
-						typeInfo(typeInfo),
+						typeInfo(MoveRValue(typeInfo)),
 						RefCount(1)
 					{}
 				};
@@ -117,14 +117,14 @@ namespace Seed
 			public:
 				template<typename T>
 				DataTypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
-					CTTI::TypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
-					CTTI::CXXTypeName<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
-					Serilization::MetaDataGen<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>(),
-					CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::IsSerilizable,
-					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::SerelizeFrom,
-					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::DeserelizeToDynamic,
-					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>>::Builder,
-					typeid(TypeTraits::RemoveCV<TypeTraits::RemoveRefV<T>>)
+					CTTI::TypeName<TypeTraits::RemoveCVRefV<T>>(),
+					CTTI::CXXTypeName<TypeTraits::RemoveCVRefV<T>>(),
+					Serilization::MetaDataGen<TypeTraits::RemoveCVRefV<T>>(),
+					CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<T>>::IsSerilizable,
+					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCVRefV<T>>::SerelizeFrom,
+					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCVRefV<T>>::DeserelizeToDynamic,
+					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCVRefV<T>>::Builder,
+					RTTI::RTTITypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<T>>{})
 				))
 				{}
 
@@ -156,7 +156,7 @@ namespace Seed
 					return data->builderFunction;
 				}
 					
-				const TypeInfo& GetTypeInfo() const {
+				const RTTI::RTTITypeRecord& GetTypeInfo() const {
 					return data->typeInfo;
 				}
 
@@ -170,22 +170,42 @@ namespace Seed
 
 				RefCountClass(DataTypeRecord, data);
 			public:
-				bool operator==(const DataTypeRecord& other) {
+				bool operator==(const DataTypeRecord& other) const {
 					return this->data->typeInfo == other.data->typeInfo ||
 						this->data->cxxTypeName == other.data->cxxTypeName;
 				}
 
-				bool operator!=(const DataTypeRecord& other) {
+				bool operator!=(const DataTypeRecord& other) const {
 					return this->data->typeInfo != other.data->typeInfo &&
 						this->data->cxxTypeName != other.data->cxxTypeName;
 				}
 
-				bool operator==(const TypeInfo& other) {
+				bool operator==(const TypeInfo& other) const {
+					return this->data->typeInfo.TypeId() == other;
+				}
+
+				bool operator!=(const TypeInfo& other) const {
+					return this->data->typeInfo.TypeId() != other;
+				}
+
+				bool operator==(const RTTI::RTTITypeRecord & other) const {
 					return this->data->typeInfo == other;
 				}
 
-				bool operator!=(const TypeInfo& other) {
+				bool operator!=(const RTTI::RTTITypeRecord & other) const {
 					return this->data->typeInfo != other;
+				}
+
+				auto operator<=>(const RTTI::RTTITypeRecord& other) const {
+					return this->data->typeInfo <=> other;
+				}
+
+				friend auto operator<=>(const RTTI::RTTITypeRecord& other, const DataTypeRecord& item) {
+					return other <=> item.data->typeInfo;
+				}
+
+				friend auto operator<=>(const TypeInfo& other, const DataTypeRecord& item) {
+					return other.HashCode <=> item.data->typeInfo.TypeId().HashCode;
 				}
 			};
 		}

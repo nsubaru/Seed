@@ -78,7 +78,7 @@ namespace Seed {
 						//Планувальник задач
 						{
 							//Стандарт роздільна здатність таймера для планувальника задач
-							DefaultSettings.KernelServiceConfig.TaskSheduler.DefaultTimerProximity = 1 * DateTime::SecondInNtTime;
+							DefaultSettings.KernelServicesConfig.TaskSheduler.DefaultTimerProximity = 1 * DateTime::SecondInNtTime;
 						}
 					}
 
