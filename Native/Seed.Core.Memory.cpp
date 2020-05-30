@@ -29,7 +29,7 @@ using namespace Seed;
 using namespace Seed::Memory;
 
 ///<summary>Інформація про кучі</summary>
-static struct HeapDataT
+struct HeapDataT
 {
 	///<summary>Дескриптор кучі</summary>
 	Handle HeapHandle;
@@ -39,7 +39,7 @@ static struct HeapDataT
 	volatile SizeT AllocatedMemBlksCount;
 	///<summary>Фактичне використання пам'яті кучею</summary>
 	volatile SizeT CurrentHeapSize;
-} HeapData, SecureHeapData;
+};
 
 forceinline static HeapDataT& GetInternalHeapData() {
 	static HeapDataT InternalHeapData;
@@ -458,11 +458,6 @@ Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentHeapUsage() noexcept
 #pragma region Internal heap allocate and free
 DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapFree(void* MemBlk)
 {
-#if PreReleaseMode || DebugMode
-	using SafeString = BaseString<Memory::ExceptionHeap>;
-	toCoreLog(L"Звільнення пам'яті з комірки " + SafeString::UInt64asHex((SizeT)MemBlk) + L" ,номер операції " + SafeString::toString(InternalHeapData.AllocatedMemBlksCount));
-	RtlValidateHeap(RtlProcessHeap(), 0, nullptr);
-#endif
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Отримуєм покажчик на заголовок ділянки пам'яті
@@ -490,9 +485,6 @@ __declspec(allocator)
 #endif // !ReleaseMode
 DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed::SizeT Size)
 {
-#if PreReleaseMode || DebugMode
-	RtlValidateHeap(RtlProcessHeap(), 0, nullptr);
-#endif
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
 		Throw(OutOfMemory(__FILE__, __FUNCSIG__, __LINE__, InternalHeapName, Size, InternalHeapData.AllocatedMemory, InternalHeapData.AllocatedMemBlksCount));
@@ -510,10 +502,6 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed
 	InterlockedIncrementSizeTNoFence(&InternalHeapData.AllocatedMemBlksCount);
 	InterlockedExchangeAddSizeT(&InternalHeapData.AllocatedMemory, Size);
 	InterlockedExchangeAddSizeT(&InternalHeapData.CurrentHeapSize, FullSize);
-#if PreReleaseMode || DebugMode
-	using SafeString = BaseString<Memory::ExceptionHeap>;
-	toCoreLog(L"Алокація пам'яті під комірку " + SafeString::UInt64asHex((SizeT)(obj + 1)) + L" з номером " + SafeString::toString(InternalHeapData.AllocatedMemBlksCount));
-#endif
 	//Вертаєм покажчик на ділянку після заголовку
 	return obj + 1;
 }
