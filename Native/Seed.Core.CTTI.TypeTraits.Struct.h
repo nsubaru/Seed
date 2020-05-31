@@ -44,7 +44,7 @@ namespace Seed
                        
                         using Fields = typename Containers::Tuple<TFields...>;
 
-                        static constexpr Boolean IsSerilizable = Seed::TypeTraits::OrPack(CTTITypeData<typename TFields::Type>::IsSerilizable...);
+                        static constexpr Boolean IsSerilizable = Seed::TypeTraits::OrV(CTTITypeData<typename TFields::Type>::IsSerilizable...);
                     
                         constexpr static Containers::Tuple<typename TFields::Type...> ToTuple(const Type& data) {
                             return Containers::Tuple<typename TFields::Type...>{TFields::Selector(data)...};

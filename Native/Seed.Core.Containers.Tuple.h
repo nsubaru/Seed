@@ -259,7 +259,7 @@ namespace std
     template <size_t TI, typename ... TTypes>
     struct tuple_element<TI, Seed::Core::Containers::Tuple<TTypes...>> {
         using ItemType = typename Seed::Core::Containers::Tuple<TTypes...>::template ItemType<TI>;
-        using RefType = Seed::TypeTraits::AddLvalueReferenceT<ItemType>;
+        using RefType = Seed::TypeTraits::AddLvalueReferenceV<ItemType>;
         // ReSharper disable once CppInconsistentNaming
         using type = decltype(get<TI>(Seed::Core::Containers::Tuple<TTypes...>()));
     };
@@ -268,7 +268,7 @@ namespace std
     struct tuple_element<TI, const Seed::Core::Containers::Tuple<TTypes...>> {
         using ItemType = typename Seed::Core::Containers::Tuple<TTypes...>::template ItemType<TI>;
         using ConstItemType = Seed::TypeTraits::AddConstV<ItemType>;
-        using RefType = Seed::TypeTraits::AddLvalueReferenceT<ConstItemType>;
+        using RefType = Seed::TypeTraits::AddLvalueReferenceV<ConstItemType>;
         // ReSharper disable once CppInconsistentNaming
         using type = RefType;
     };
@@ -277,7 +277,7 @@ namespace std
     struct tuple_element<TI, volatile Seed::Core::Containers::Tuple<TTypes...>> {
         using ItemType = typename Seed::Core::Containers::Tuple<TTypes...>::template ItemType<TI>;
         using VolatileItemType = Seed::TypeTraits::AddVolatileV<ItemType>;
-        using RefType = Seed::TypeTraits::AddLvalueReferenceT<VolatileItemType>;
+        using RefType = Seed::TypeTraits::AddLvalueReferenceV<VolatileItemType>;
         // ReSharper disable once CppInconsistentNaming
         using type = RefType;
     };
@@ -286,7 +286,7 @@ namespace std
     struct tuple_element<TI, const volatile Seed::Core::Containers::Tuple<TTypes...>> {
         using ItemType = typename Seed::Core::Containers::Tuple<TTypes...>::template ItemType<TI>;
         using CVItemType = Seed::TypeTraits::AddCvV<ItemType>;
-        using RefType = Seed::TypeTraits::AddLvalueReferenceT<CVItemType>;
+        using RefType = Seed::TypeTraits::AddLvalueReferenceV<CVItemType>;
         // ReSharper disable once CppInconsistentNaming
         using type = RefType;
     };

@@ -11,13 +11,11 @@
 #include "Seed.Core.Base.BitOperations.h"
 #include "Seed.Core.Base.CStr.h"
 #include "Seed.Core.Base.Swap.h"
-#include "Seed.Core.Base.StaticAsserts.h"
+#include "Seed.Core.Base.TypeTraits.h"
 #include "Seed.Core.Base.UUID.h"
 #include "Seed.Core.Base.Internals.h"
-#include "Seed.Core.Base.Utils.h"
 
 #pragma warning(disable: 26439)
-
 
 /// <summary>
 /// Головний простір імен
@@ -185,59 +183,7 @@ __forceinline virtual ~ClassName(){if (This != nullptr) {if (--This->RefCount ==
 namespace Seed {
     inline namespace Core {
         namespace TypeTraits {
-            namespace Details
-            {
-            	/// <summary>
-            	/// Виклик функції через покажчик на неї(об'єкт з operator()) і аргументами
-            	/// </summary>
-            	/// <typeparam name="TF">Тип функції або об'єкт з operator()</typeparam>
-            	/// <typeparam name="TArgs">Типи аргументів</typeparam>
-    			/// <param name="f">Перший аргумент</param>
-    			/// <param name="args">Другий аргумент</param>
-                template <class TF, class... TArgs>
-                inline auto Invoke(TF&& f, TArgs&& ... args) ->
-                    decltype(Seed::ForwardReference<TF>(f)(Seed::ForwardReference<TArgs>(args)...)) {
-                    return Seed::ForwardReference<TF>(f)(Seed::ForwardReference<TArgs>(args)...);
-                }
-                template <class TBase, class T, class TDerived>
-                inline auto Invoke(T TBase::* pmd, TDerived&& ref) ->
-                    decltype(Seed::ForwardReference<TDerived>(ref).*pmd) {
-                    return Seed::ForwardReference<TDerived>(ref).*pmd;
-                }
 
-                template <class PMD, class TPointer>
-                inline auto Invoke(PMD&& pmd, TPointer&& ptr) ->
-                    decltype((*Seed::ForwardReference<TPointer>(ptr)).*Seed::ForwardReference<PMD>(pmd)) {
-                    return (*Seed::ForwardReference<TPointer>(ptr)).*Seed::ForwardReference<PMD>(pmd);
-                }
-
-                template <class TBase, class T, class TDerived, class... TArgs>
-                inline auto Invoke(T TBase::* pmf, TDerived&& ref, TArgs&& ... args) ->
-                    decltype((Seed::ForwardReference<TDerived>(ref).*pmf)(Seed::ForwardReference<TArgs>(args)...)) {
-                    return (Seed::ForwardReference<TDerived>(ref).*pmf)(Seed::ForwardReference<TArgs>(args)...);
-                }
-
-                template <class PMF, class TPointer, class... TArgs>
-                inline auto Invoke(PMF&& pmf, TPointer&& ptr, TArgs&& ... args) ->
-                    decltype(((*Seed::ForwardReference<TPointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<TArgs>(args)...)) {
-                    return ((*Seed::ForwardReference<TPointer>(ptr)).*Seed::ForwardReference<PMF>(pmf))(Seed::ForwardReference<TArgs>(args)...);
-                }
-            }
-        	
-            template <typename, typename = void>
-            struct ResultOfT {
-                using Type = VoidT<>;
-            };
-
-            template <typename TF, class...TArgs>
-            struct ResultOfT<TF(TArgs...),
-                decltype(void(Details::Invoke(TypeTraits::DeclVal<TF>(), TypeTraits::DeclVal<TArgs>()...)))> {
-                using Type = decltype(Details::Invoke(TypeTraits::DeclVal<TF>(), TypeTraits::DeclVal<TArgs>()...));
-            };
-
-            ///<summary>Тип без силки</summary>
-            template<typename T>
-            using ResultOfV = typename ResultOfT<T>::Type;
         }
     }
 }

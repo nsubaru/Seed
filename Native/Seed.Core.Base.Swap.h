@@ -1,6 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.Types.h"
-#include "Seed.Core.Base.Utils.h"
+#include "Seed.Core.Base.TypeTraits.h"
 
 namespace Seed {
 	inline namespace Core {

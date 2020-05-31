@@ -295,7 +295,7 @@ namespace Seed
                         : BaseCTTITypeDataImpl<
                         Containers::Tuple<Types...>,
                         EType::Tuple,
-                        Seed::TypeTraits::OrPack(CTTITypeData<Types>::IsSerilizable...),
+                        Seed::TypeTraits::OrV(CTTITypeData<Types>::IsSerilizable...),
                         TIsConst,
                         TIsVolatile
                         >
