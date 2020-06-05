@@ -27,7 +27,13 @@ namespace Seed
 
                     template<typename THeap, typename TKey, typename TValue, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BasePair<THeap, TKey, TValue>, TIsConst, TIsVolatile> :
-                        BaseHeapCTTITypeData<Containers::BasePair<THeap, TKey, TValue>, THeap, EType::Pair, true, TIsConst, TIsVolatile>
+                        BaseHeapCTTITypeData<
+                            Containers::BasePair<THeap, TKey, TValue>, 
+                            THeap, 
+                            EType::Pair, 
+                            CTTITypeData<TKey>::IsSerilizable && CTTITypeData<TValue>::IsSerilizable, 
+                            TIsConst, 
+                            TIsVolatile>
                     {
                         using KeyType = TKey;
                         using ValueType = TValue;
@@ -40,7 +46,7 @@ namespace Seed
 
                     template<typename THeap, typename T, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<BaseLazy<THeap, T>, TIsConst, TIsVolatile> :
-                        BaseHeapCTTITypeData<BaseLazy<THeap, T>, THeap, EType::Box, true, TIsConst, TIsVolatile>
+                        BaseHeapCTTITypeData<BaseLazy<THeap, T>, THeap, EType::Box, CTTITypeData<T>::IsSerilizable, TIsConst, TIsVolatile>
                     {
                         using ValueType = T;
 
@@ -49,21 +55,21 @@ namespace Seed
 
                     //SmartPtr
 
-                    //template<typename T, bool TIsConst, bool TIsVolatile>
-                    //struct CTTITypeDataImpl<SmartPtr<T>, TIsConst, TIsVolatile> :
-                    //    BaseHeapCTTITypeData<SmartPtr<T>, THeap, EType::Box, true, TIsConst, TIsVolatile>
-                    //{
-                    //    using ValueType = T;
+                    template<typename T, bool TIsConst, bool TIsVolatile>
+                    struct CTTITypeDataImpl<SmartPtr<T>, TIsConst, TIsVolatile> :
+                        BaseCTTITypeDataImpl<SmartPtr<T>, EType::Box, CTTITypeData<T>::IsSerilizable, TIsConst, TIsVolatile>
+                    {
+                        using ValueType = T;
 
-                    //    using ValueTypeMetaData = CTTITypeData<T>;
-                    //};
+                        using ValueTypeMetaData = CTTITypeData<T>;
+                    };
 
 #pragma region Collections
                     //Base implementation
 
-                    template<typename THeap, typename TCollection, typename TItemType, bool TIsConcurencySupport, bool TIsConst, bool TIsVolatile, bool TIsIndexable, bool TIsSeriizable = true>
+                    template<typename THeap, typename TCollection, typename TItemType, bool TIsConcurencySupport, bool TIsConst, bool TIsVolatile, bool TIsIndexable>
                     struct BaseLINQCollection :
-                        BaseICollection<THeap, TCollection, TItemType, TIsConcurencySupport, EType::Collection, TIsConst, TIsVolatile, TIsSeriizable>
+                        BaseICollection<THeap, TCollection, TItemType, TIsConcurencySupport, EType::Collection, TIsConst, TIsVolatile, CTTITypeData<TItemType>::IsSerilizable>
                     {
                         static constexpr Boolean IsIndexable = TIsIndexable;
                     };
@@ -85,12 +91,12 @@ namespace Seed
 
                     template<typename THeap, typename T, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseVList<THeap, T>, TIsConst, TIsVolatile> :
-                        BaseLINQCollection<THeap, Containers::BaseVList<THeap, T>, T, false, TIsConst, TIsVolatile, true, false>
+                        BaseLINQCollection<THeap, Containers::BaseVList<THeap, T>, T, false, TIsConst, TIsVolatile, true>
                     {};
 
                     template<typename THeap, typename T, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseConcurencyVList<THeap, T>, TIsConst, TIsVolatile> :
-                        BaseLINQCollection<THeap, Containers::BaseConcurencyVList<THeap, T>, T, true, TIsConst, TIsVolatile, true, false>
+                        BaseLINQCollection<THeap, Containers::BaseConcurencyVList<THeap, T>, T, true, TIsConst, TIsVolatile, true>
                     {};
 
                     //DynamicQueue
@@ -109,12 +115,12 @@ namespace Seed
 
                     template<typename THeap, typename T, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseDynamicStack<THeap, T>, TIsConst, TIsVolatile> :
-                        BaseLINQCollection<THeap, Containers::BaseDynamicStack<THeap, T>, T, false, TIsConst, TIsVolatile, true, false>
+                        BaseLINQCollection<THeap, Containers::BaseDynamicStack<THeap, T>, T, false, TIsConst, TIsVolatile, true>
                     {};
 
                     template<typename THeap, typename T, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseConcurencyDynamicStack<THeap, T>, TIsConst, TIsVolatile> :
-                        BaseLINQCollection<THeap, Containers::BaseConcurencyDynamicStack<THeap, T>, T, true, TIsConst, TIsVolatile, true, false>
+                        BaseLINQCollection<THeap, Containers::BaseConcurencyDynamicStack<THeap, T>, T, true, TIsConst, TIsVolatile, true>
                     {};
 
                     //List
@@ -132,9 +138,17 @@ namespace Seed
 #pragma region Fixed collection
                     //Base implementation
 
-                    template<typename THeap, typename TCollection, SizeT TSize, typename TItemType, bool TIsConcurencySupport, bool TIsConst, bool TIsVolatile, bool TIsFixedItemCount, bool TIsSeriizable = true>
+                    template<typename THeap, typename TCollection, SizeT TSize, typename TItemType, bool TIsConcurencySupport, bool TIsConst, bool TIsVolatile, bool TIsFixedItemCount>
                     struct BaseLINQFixedCollection :
-                        BaseICollection<THeap, TCollection, TItemType, TIsConcurencySupport, EType::FixedCollection, TIsConst, TIsVolatile, TIsSeriizable>
+                        BaseICollection<
+                            THeap, 
+                            TCollection, 
+                            TItemType, 
+                            TIsConcurencySupport, 
+                            EType::FixedCollection, 
+                            TIsConst, 
+                            TIsVolatile, 
+                            CTTITypeData<TItemType>::IsSerilizable>
                     {
                         static constexpr auto ItemCount = TSize;
                         static constexpr Boolean IsFixedItemCount = TIsFixedItemCount;
@@ -168,12 +182,12 @@ namespace Seed
 
                     template<typename THeap, typename T, SizeT TSize, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseFixedStack<THeap, TSize, T>, TIsConst, TIsVolatile> :
-                        BaseLINQFixedCollection<THeap, Containers::BaseFixedStack<THeap, TSize, T>, TSize, T, false, TIsConst, TIsVolatile, false, false>
+                        BaseLINQFixedCollection<THeap, Containers::BaseFixedStack<THeap, TSize, T>, TSize, T, false, TIsConst, TIsVolatile, false>
                     {};
 
                     template<typename THeap, typename T, SizeT TSize, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseConcurencyFixedStack<THeap, TSize, T>, TIsConst, TIsVolatile> :
-                        BaseLINQFixedCollection<THeap, Containers::BaseConcurencyFixedStack<THeap, TSize, T>, TSize, T, true, TIsConst, TIsVolatile, false, false>
+                        BaseLINQFixedCollection<THeap, Containers::BaseConcurencyFixedStack<THeap, TSize, T>, TSize, T, true, TIsConst, TIsVolatile, false>
                     {};
 #pragma endregion
 #pragma region Associable Collection
@@ -181,7 +195,14 @@ namespace Seed
 
                     template<typename THeap, typename TCollection, typename TPair, typename TKey, typename TValue, bool TIsConcurencySupport, bool TIsConst, bool TIsVolatile>
                     struct BaseLINQAssociableCollection :
-                        BaseICollection<THeap, TCollection, TPair, TIsConcurencySupport, EType::AssociableCollection, TIsConst, TIsVolatile>
+                        BaseICollection<
+                            THeap, 
+                            TCollection, 
+                            TPair, TIsConcurencySupport, 
+                            EType::AssociableCollection, 
+                            TIsConst, 
+                            TIsVolatile, 
+                            CTTITypeData<TPair>::IsSerilizable && CTTITypeData<TKey>::IsSerilizable && CTTITypeData<TValue>::IsSerilizable>
                     {
                         using PairType = TPair;
                         using KeyType = TKey;
@@ -281,7 +302,15 @@ namespace Seed
 
                     template<typename THeap, typename T, SizeT TSize, bool TIsConst, bool TIsVolatile>
                     struct CTTITypeDataImpl<Containers::BaseBitMapT<THeap, TSize, T>, TIsConst, TIsVolatile>
-                        : BaseLINQFixedCollection<THeap, Containers::BaseBitMapT<THeap, TSize, T>, Containers::BaseBitMapT<THeap, TSize, T>::Lenght, T, false, TIsConst, TIsVolatile, true>
+                        : BaseLINQFixedCollection<
+                            THeap, 
+                            Containers::BaseBitMapT<THeap, TSize, T>, 
+                            Containers::BaseBitMapT<THeap, TSize, T>::Lenght, 
+                            T, 
+                            false, 
+                            TIsConst, 
+                            TIsVolatile,
+                            true>
                     {
                         static constexpr SizeT FullBytesCount = Containers::BaseBitMapT<THeap, TSize, T>::FullClustersCount;
                         static constexpr SizeT LastByteBitsCount = Containers::BaseBitMapT<THeap, TSize, T>::LastClusterBitsCount;
