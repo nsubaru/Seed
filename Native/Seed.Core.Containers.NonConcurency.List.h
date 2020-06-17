@@ -1208,7 +1208,7 @@ namespace Seed {
 				template<typename Lambda>
 				forceinline BaseList& SortByLambdaImpl(Lambda&& lambda) {
 					if (This->size == 0)
-						return;
+						return *this;
 
 					This->root = mergeSort(This->root, lambda);
 

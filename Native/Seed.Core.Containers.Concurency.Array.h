@@ -363,6 +363,7 @@ namespace Seed {
                         }
                         delete[] this->This->array;
                         this->This->count = 0;
+                        return *this;
                         });
                 }
 
