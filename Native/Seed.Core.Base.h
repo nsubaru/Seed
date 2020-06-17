@@ -24,80 +24,85 @@ namespace Seed {
 	/// <summary>
 	/// Простір імен функцій ядра Рем
 	/// </summary>
-    inline namespace Core {
-    	/// <summary>
-    	/// Атомарний лічильник. Використовує функції InterlockedXXX
-    	/// </summary>
+    inline namespace Core
+    {
+        /// <summary>
+        /// Атомарний лічильник. Використовує функції InterlockedXXX
+        /// </summary>
         class RefCountT final {
         public:
             using CounterType = SizeT;
         private:
-        	/// <summary>
-        	/// Містить значення
-        	/// </summary>
+            /// <summary>
+            /// Містить значення
+            /// </summary>
             volatile CounterType count;
         public:
-        	/// <summary>
-        	/// Гетер
-        	/// </summary>
-        	/// <returns>Значення лічильника</returns>
-            SizeT GetValue() const { return count; }
+            /// <summary>
+            /// Гетер
+            /// </summary>
+            /// <returns>Значення лічильника</returns>
+            SizeT GetValue() const {
+                return count;
+            }
 
-        	/// <summary>
-        	/// Поточне значення лічильника
-        	/// </summary>
+            /// <summary>
+            /// Поточне значення лічильника
+            /// </summary>
             SizeT Property(GetValue) Value;
-        	
-        	/// <summary>
-        	/// Конструктор з SizeT
-        	/// </summary>
-        	/// <param name="count">Початкове значення</param>
+
+            /// <summary>
+            /// Конструктор з SizeT
+            /// </summary>
+            /// <param name="count">Початкове значення</param>
             constexpr __forceinline RefCountT(SizeT count = 0) :
                 count(count) {};
 
-        	/// <summary>
-        	/// Префіксний інкремент. Використовує функцію InterlockedIncrement для інкременту
-        	/// </summary>
-        	/// <returns>Вертає силку на елемент після інкременту</returns>
+            /// <summary>
+            /// Префіксний інкремент. Використовує функцію InterlockedIncrement для інкременту
+            /// </summary>
+            /// <returns>Вертає силку на елемент після інкременту</returns>
             __forceinline RefCountT& operator++() {
                 Interlocked::Increment(static_cast<volatile SizeT&>(this->count));
                 return *this;
             }
 
-        	/// <summary>
-        	/// Постфіксний інкремент. Використовує функцію InterlockedIncrement для інкременту
-        	/// </summary>
-        	/// <returns>Вертає копію елемента до інкременту</returns>
+            /// <summary>
+            /// Постфіксний інкремент. Використовує функцію InterlockedIncrement для інкременту
+            /// </summary>
+            /// <returns>Вертає копію елемента до інкременту</returns>
             __forceinline RefCountT operator++(int) {
                 auto cp = *this;
                 Interlocked::Increment(static_cast<volatile SizeT&>(this->count));
                 return cp;
             }
 
-        	/// <summary>
-        	/// Префіксний декремент. Використовує функцію InterlockedDecrement для декременту
-        	/// </summary>
-        	/// <returns>Вертає силку на поточне значення</returns>
+            /// <summary>
+            /// Префіксний декремент. Використовує функцію InterlockedDecrement для декременту
+            /// </summary>
+            /// <returns>Вертає силку на поточне значення</returns>
             __forceinline RefCountT& operator--() {
                 Interlocked::Decrement(static_cast<volatile SizeT&>(this->count));
                 return *this;
             }
 
-        	/// <summary>
-        	/// Постфіксний декремент. Використовує функцію InterlockedDecrementSize для декременту
-        	/// </summary>
-        	/// <returns>Вертає копію об'єкта до декременту</returns>
+            /// <summary>
+            /// Постфіксний декремент. Використовує функцію InterlockedDecrementSize для декременту
+            /// </summary>
+            /// <returns>Вертає копію об'єкта до декременту</returns>
             __forceinline RefCountT operator--(int) {
                 auto cp = *this;
                 Interlocked::Decrement(static_cast<volatile SizeT&>(this->count));
                 return cp;
             }
 
-        	/// <summary>
-        	/// Вертає значення в вигляді SizeT змінної
-        	/// </summary>
-        	/// <returns>Поточне значення об'єкта</returns>
-            constexpr __forceinline operator SizeT() const { return this->count; }
+            /// <summary>
+            /// Вертає значення в вигляді SizeT змінної
+            /// </summary>
+            /// <returns>Поточне значення об'єкта</returns>
+            constexpr __forceinline operator SizeT() const {
+                return this->count;
+            }
         };
 
     	/// <summary>

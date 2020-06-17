@@ -174,3 +174,84 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
     __ArrowFunct2,                      \
     __ArrowFunct1)                      \
     (__VA_ARGS__))
+
+
+/// <summary>
+/// Стрілочна функція без аргументів
+/// </summary>
+#define __ArrowFunctWithClosure1(ret) \
+    [&](){ return ret; }
+/// <summary>
+/// Стрілочна функція з одним аргументом
+/// </summary>
+#define __ArrowFunctWithClosure2(ret, x1) \
+    [&](auto x1){ return ret; }
+/// <summary>
+/// Стрілочна функція з двома аргументами
+/// </summary>
+#define __ArrowFunctWithClosure3(ret, x1, x2) \
+    [&](auto x1, auto x2){ return ret; }
+/// <summary>
+/// Стрілочна функція з трьома аргументами
+/// </summary>
+#define __ArrowFunctWithClosure4(ret, x1, x2, x3) \
+    [&](auto x1, auto x2, auto x3){ return ret; }
+/// <summary>
+/// Стрілочна функція з чотирьма аргументами
+/// </summary>
+#define __ArrowFunctWithClosure5(ret, x1, x2, x3, x4) \
+    [&](auto x1, auto x2, auto x3, auto x4){ return ret; }
+/// <summary>
+/// Стрілочна функція з п'ятьма аргументами
+/// </summary>
+#define __ArrowFunctWithClosure6(ret, x1, x2, x3, x4, x5) \
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5){ return ret; }
+/// <summary>
+/// Стрілочна функція з шістьма аргументами
+/// </summary>
+#define __ArrowFunctWithClosure7(ret, x1, x2, x3, x4, x5, x6) \
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6){ return ret; }
+/// <summary>
+/// Стрілочна функція з сімньма аргументами
+/// </summary>
+#define __ArrowFunctWithClosure8(ret, x1, x2, x3, x4, x5, x6, x7) \
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7){ return ret; }
+/// <summary>
+/// Стрілочна функція з вісьма аргументами
+/// </summary>
+#define __ArrowFunctWithClosure9(ret, x1, x2, x3, x4, x5, x6, x7, x8) \
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8){ return ret; }
+/// <summary>
+/// Стрілочна функція з девятьма аргументами
+/// </summary>
+#define __ArrowFunctWithClosure10(ret, x1, x2, x3, x4, x5, x6, x7, x8, x9) \
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9){ return ret; }
+/// <summary>
+/// Стрілочна функція з десятьма аргументами
+/// </summary>
+#define __ArrowFunctWithClosure11(ret, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) \
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9, auto x10){ return ret; }
+
+/// <summary>
+/// Вираз для визначення перегрузки макроса
+/// </summary>
+#define __ArrowFunctWithClosure_GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11, NAME,...) NAME
+
+/// <summary>
+/// Стрілочна функція з захопленням зміних
+/// </summary>
+/// <param name = "__VA_ARGS__">Вираз і аргументи</param>
+#define ArrowFunctWithClosure(...) EXPAND_VA_ARGS( \
+    __ArrowFunctWithClosure_GET_MACRO(__VA_ARGS__, \
+    __ArrowFunctWithClosure11,                     \
+    __ArrowFunctWithClosure10,                     \
+    __ArrowFunctWithClosure9,                      \
+    __ArrowFunctWithClosure8,                      \
+    __ArrowFunctWithClosure7,                      \
+    __ArrowFunctWithClosure6,                      \
+    __ArrowFunctWithClosure5,                      \
+    __ArrowFunctWithClosure4,                      \
+    __ArrowFunctWithClosure3,                      \
+    __ArrowFunctWithClosure2,                      \
+    __ArrowFunctWithClosure1)                      \
+    (__VA_ARGS__))

@@ -5,6 +5,7 @@
 #include "Seed.Core.Services.EventService.h"
 #include "Seed.Core.Services.ExcecutableStatusManagment.h"
 #include "Seed.Core.Services.ObjectNamespaceService.h"
+#include "Seed.Core.Services.HostPartitionProvider.h"
 #include "Seed.Core.Services.SerilizationService.h"
 
 #include "Seed.Core.DepencyInjection.h"

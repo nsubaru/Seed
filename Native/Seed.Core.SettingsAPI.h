@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.Base.h"
+#include "Seed.Core.SettingsAPI.ConstSettings.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
 
 namespace Seed {
@@ -140,72 +140,7 @@ namespace Seed {
 			SeedKernelCall static const VirtualSettingData& GetVirtualSettingDataRaw();
 		public:
 
-			/// <summary>
-			/// Статичні налаштування
-			/// </summary>
-			struct StaticSettingsData {
-				/// <summary>
-				/// Ім'я простору імен подій ядра Рем
-				/// </summary>
-				static constexpr Char KernelNamespaceName[] = L"\\Kernel";
-				/// <summary>
-				/// Ім'я простору імен подій виконавчої системи ядра Рем
-				/// </summary>
-				static constexpr Char KernelExcecutableNamespaceName[] = L"\\Kernel\\Excecutable";
-				/// <summary>
-				/// Ім'я події завершення системи
-				/// </summary>
-				static constexpr Char ShutdownEventName[] = L"\\Kernel\\Excecutable\\On Kernel Shutdown";
-				/// <summary>
-				/// Ім'я події перезагрузки системи
-				/// </summary>
-				static constexpr Char ReloadEventName[] = L"\\Kernel\\Excecutable\\On Kernel Reload";
-
-				/// <summary>
-				/// Ім'я події малої кількості вільної пам'яті в системі
-				/// </summary>
-				static constexpr Char HostCommitLowEventName[] = L"\\Host\\On Commit Low";
-				/// <summary>
-				/// Ім'я події інформування про зміни налаштувань ядра Рем
-				/// </summary>
-				static constexpr Char SettingsChangeEventName[] = L"\\Kernel\\Excecutable\\On Kernel Native Core Setting Change";
-
-				using TShutdownEventName = TypeTraits::AddReference<decltype(ShutdownEventName)>::Lvalue;
-				using TReloadEventName = TypeTraits::AddReference<decltype(ReloadEventName)>::Lvalue;
-				using TKernelNamespaceName = TypeTraits::AddReference<decltype(KernelNamespaceName)>::Lvalue;
-				using TKernelExcecutableNamespaceName = TypeTraits::AddReference<decltype(KernelExcecutableNamespaceName)>::Lvalue;
-				using THostCommitLowEventName = TypeTraits::AddReference<decltype(HostCommitLowEventName)>::Lvalue;
-				using TSettingsChangeEventName = TypeTraits::AddReference<decltype(SettingsChangeEventName)>::Lvalue;
-			};
-
-			struct ObjectManagerConfigurations {
-				/// <summary>
-				/// Шлях корення в об'єктному менеджері
-				/// </summary>
-				static constexpr Char RootPath[] = L"\\";
-				/// <summary>
-				/// Шлях провайдерів ядра в об'єктному менеджері
-				/// </summary>
-				static constexpr Char KernelPathName[] = L"Kernel";
-				/// <summary>
-				/// Шлях провайдерів хостової системи в об'єктному менеджері
-				/// </summary>
-				static constexpr Char HostPathName[] = L"Host";
-				/// <summary>
-				/// Шлях провайдерів віддалених систем в об'єктному менеджері
-				/// </summary>
-				static constexpr Char RemotePathName[] = L"Remote";
-
-				/// <summary>
-				/// Ліміт редіректів при обході шляху в об'єктном просторі
-				/// </summary>
-				static constexpr SizeT ToManyRedirectsTreshold = 10;
-
-				using TRootPath = TypeTraits::AddReference<decltype(RootPath)>::Lvalue;
-				using TKernelPathName = TypeTraits::AddReference<decltype(KernelPathName)>::Lvalue;
-				using THostPathName = TypeTraits::AddReference<decltype(HostPathName)>::Lvalue;
-				using TRemotePathName = TypeTraits::AddReference<decltype(RemotePathName)>::Lvalue;
-			};
+			
 		public:
 			class MemoryManagerT final {
 			public:
@@ -734,94 +669,135 @@ namespace Seed {
 			public:
 				StaticSettingsDataT() {} //-V730
 
-				constexpr StaticSettingsData::TShutdownEventName GetShutdownEventName() {
-					return StaticSettingsData::ShutdownEventName;
+				constexpr Settings::StaticSettingsData::TShutdownEventName GetShutdownEventName() {
+					return Settings::StaticSettingsData::ShutdownEventName;
 				}
 
-				constexpr StaticSettingsData::TReloadEventName GetReloadEventName() {
-					return StaticSettingsData::ReloadEventName;
+				constexpr Settings::StaticSettingsData::TReloadEventName GetReloadEventName() {
+					return Settings::StaticSettingsData::ReloadEventName;
 				}
 
-				constexpr StaticSettingsData::TKernelNamespaceName GetKernelNamespaceName() {
-					return StaticSettingsData::KernelNamespaceName;
+				constexpr Settings::StaticSettingsData::TKernelNamespaceName GetKernelNamespaceName() {
+					return Settings::StaticSettingsData::KernelNamespaceName;
 				}
 
-				constexpr StaticSettingsData::TKernelExcecutableNamespaceName GetKernelExcecutableNamespaceName() {
-					return StaticSettingsData::KernelExcecutableNamespaceName;
+				constexpr Settings::StaticSettingsData::TKernelExcecutableNamespaceName GetKernelExcecutableNamespaceName() {
+					return Settings::StaticSettingsData::KernelExcecutableNamespaceName;
 				}
 
-				constexpr StaticSettingsData::THostCommitLowEventName GetHostCommitLowEventName() {
-					return StaticSettingsData::HostCommitLowEventName;
+				constexpr Settings::StaticSettingsData::THostCommitLowEventName GetHostCommitLowEventName() {
+					return Settings::StaticSettingsData::HostCommitLowEventName;
 				}
 
-				constexpr StaticSettingsData::TSettingsChangeEventName GetSettingsChangeEventName() {
-					return StaticSettingsData::SettingsChangeEventName;
+				constexpr Settings::StaticSettingsData::TSettingsChangeEventName GetSettingsChangeEventName() {
+					return Settings::StaticSettingsData::SettingsChangeEventName;
 				}
 			public:
 				///<summary>Ім'я події завершення роботи ядра</summary>
-				StaticSettingsData::TShutdownEventName Property(GetShutdownEventName) ShutdownEventName;
+				Settings::StaticSettingsData::TShutdownEventName Property(GetShutdownEventName) ShutdownEventName;
 				///<summary>Ім'я події перезагрузки ядра</summary>
-				StaticSettingsData::TReloadEventName Property(GetReloadEventName) ReloadEventName;
+				Settings::StaticSettingsData::TReloadEventName Property(GetReloadEventName) ReloadEventName;
 
 				///<summary>Ім'я простору імен подій ядра Рем</summary>
-				StaticSettingsData::TKernelNamespaceName Property(GetKernelNamespaceName) KernelNamespaceName;
+				Settings::StaticSettingsData::TKernelNamespaceName Property(GetKernelNamespaceName) KernelNamespaceName;
 				///<summary>Ім'я простору імен подій виконавчої системи ядра Рем</summary>
-				StaticSettingsData::TKernelExcecutableNamespaceName Property(GetKernelExcecutableNamespaceName) KernelExcecutableNamespaceName;
+				Settings::StaticSettingsData::TKernelExcecutableNamespaceName Property(GetKernelExcecutableNamespaceName) KernelExcecutableNamespaceName;
 
 				/// <summary>
 				/// Ім'я події малої кількості вільної пам'яті в системі
 				/// </summary>
-				StaticSettingsData::THostCommitLowEventName Property(GetHostCommitLowEventName) HostCommitLowEventName;
+				Settings::StaticSettingsData::THostCommitLowEventName Property(GetHostCommitLowEventName) HostCommitLowEventName;
 				/// <summary>
 				/// Ім'я події інформування про зміни налаштувань ядра Рем
 				/// </summary>
-				StaticSettingsData::TSettingsChangeEventName Property(GetSettingsChangeEventName) SettingsChangeEventName;
+				Settings::StaticSettingsData::TSettingsChangeEventName Property(GetSettingsChangeEventName) SettingsChangeEventName;
 			};
 
 			class ObjectNamespaceConfigurationT final {
 			public:
 				constexpr ObjectNamespaceConfigurationT() {} //-V730
 
-				constexpr ObjectManagerConfigurations::TRootPath GetRootPath() {
-					return ObjectManagerConfigurations::RootPath;
+				constexpr Settings::ObjectManagerConfigurations::TRootPath GetRootPath() {
+					return Settings::ObjectManagerConfigurations::RootPath;
 				}
 
-				constexpr ObjectManagerConfigurations::TKernelPathName GetKernelPathName() {
-					return ObjectManagerConfigurations::KernelPathName;
+				constexpr Settings::ObjectManagerConfigurations::TKernelPathName GetKernelPathName() {
+					return Settings::ObjectManagerConfigurations::KernelPathName;
 				}
 
-				constexpr ObjectManagerConfigurations::THostPathName GetHostPathName() {
-					return ObjectManagerConfigurations::HostPathName;
+				constexpr Settings::ObjectManagerConfigurations::THostPathName GetHostPathName() {
+					return Settings::ObjectManagerConfigurations::HostPathName;
 				}
 
-				constexpr ObjectManagerConfigurations::TRemotePathName GetRemotePathName() {
-					return ObjectManagerConfigurations::RemotePathName;
+				constexpr Settings::ObjectManagerConfigurations::TRemotePathName GetRemotePathName() {
+					return Settings::ObjectManagerConfigurations::RemotePathName;
 				}
 
 				constexpr SizeT GetToManyRedirectsTreshold() {
-					return ObjectManagerConfigurations::ToManyRedirectsTreshold;
+					return Settings::ObjectManagerConfigurations::ToManyRedirectsTreshold;
 				}
 			public:
 				/// <summary>
 				/// Шлях корення в об'єктному менеджері
 				/// </summary>
-				ObjectManagerConfigurations::TRootPath Property(GetRootPath) RootPath;
+				Settings::ObjectManagerConfigurations::TRootPath Property(GetRootPath) RootPath;
 				/// <summary>
 				/// Шлях провайдерів ядра в об'єктному менеджері
 				/// </summary>
-				ObjectManagerConfigurations::TKernelPathName Property(GetKernelPathName) KernelPathName;
+				Settings::ObjectManagerConfigurations::TKernelPathName Property(GetKernelPathName) KernelPathName;
 				/// <summary>
 				/// Шлях провайдерів хостової системи в об'єктному менеджері
 				/// </summary>
-				ObjectManagerConfigurations::THostPathName Property(GetHostPathName) HostPathName;
+				Settings::ObjectManagerConfigurations::THostPathName Property(GetHostPathName) HostPathName;
 				/// <summary>
 				/// Шлях провайдерів віддалених систем в об'єктному менеджері
 				/// </summary>
-				ObjectManagerConfigurations::TRemotePathName Property(GetRemotePathName) RemotePathName;
+				Settings::ObjectManagerConfigurations::TRemotePathName Property(GetRemotePathName) RemotePathName;
 				/// <summary>
 				/// Ліміт редіректів при обході шляху в об'єктном просторі
 				/// </summary>
 				SizeT Property(GetToManyRedirectsTreshold) ToManyRedirectsTreshold;
+			};
+
+			/// <summary>
+			/// Налаштування менеджера розділів на хості ядра
+			/// </summary>
+			class PartitionManagerConfigurationT final {
+			public:
+				constexpr PartitionManagerConfigurationT() {} //-V730
+
+				constexpr Settings::PartitionManagerConfiguration::THostPartitionPath GetHostPartitionPath() {
+					return Settings::PartitionManagerConfiguration::HostPartitionPath;
+				}
+
+				constexpr Settings::PartitionManagerConfiguration::THostPartitionSymLink GetHostPartitionSymLink() {
+					return Settings::PartitionManagerConfiguration::HostPartitionSymLink;
+				}
+
+				constexpr Settings::PartitionManagerConfiguration::TKernelFsPathSymLink GetKernelFsPathSymLink() {
+					return Settings::PartitionManagerConfiguration::KernelFsPathSymLink;
+				}
+
+				constexpr Settings::PartitionManagerConfiguration::TKernelPartitionSymLink GetKernelPartitionSymLink() {
+					return Settings::PartitionManagerConfiguration::KernelPartitionSymLink;
+				}
+			public:
+				/// <summary>
+				/// Корінь менеджера розділів
+				/// </summary>
+				Settings::PartitionManagerConfiguration::THostPartitionPath Property(GetHostPartitionPath) HostPartitionPath;
+				/// <summary>
+				/// Розташування силки на розділ з операційною системою
+				/// </summary>
+				Settings::PartitionManagerConfiguration::THostPartitionSymLink Property(GetHostPartitionSymLink) HostPartitionSymLink;
+				/// <summary>
+				/// Розташування силки на розділ з ядром
+				/// </summary>
+				Settings::PartitionManagerConfiguration::TKernelFsPathSymLink Property(GetKernelFsPathSymLink) KernelFsPathSymLink;
+				/// <summary>
+				/// Розташування силки на директорію з ядром
+				/// </summary>
+				Settings::PartitionManagerConfiguration::TKernelPartitionSymLink Property(GetKernelPartitionSymLink) KernelPartitionSymLink;
 			};
 		public:
 			constexpr CurrentSettings() {};
@@ -844,6 +820,9 @@ namespace Seed {
 			ThreadingCfgT GetThreadinfConfig() { return ThreadingCfgT(); }
 			void SetThreadinfConfig(ThreadingCfgT) {}
 
+			constexpr PartitionManagerConfigurationT GetPartitionManagerConfiguration() { return PartitionManagerConfigurationT(); }
+			constexpr void SetPartitionManagerConfiguration(PartitionManagerConfigurationT) {}
+
 			KernelVersionT GetSettingsKernelVersion() {
 				return GetCurrentSettingData([] (auto data)
 				{
@@ -853,13 +832,21 @@ namespace Seed {
 
 			static KernelVersionT GetCurrentKernelVersion();
 		public:
-			///<summary>Налаштування менеджера пам'яті</summary>
+			/// <summary>
+			/// Налаштування менеджера пам'яті
+			/// </summary>
 			MemoryManagerT Property(GetMemoryManager, SetMemoryManager) MemoryManager;
-			///<summary>Налаштування сервісів ядра</summary>
+			/// <summary>
+			/// Налаштування сервісів ядра
+			/// </summary>
 			KernelServicesConfigT Property(GetKernelServicesConfig, SetKernelServicesConfig) KernelServices;
-			///<summary>Рантайм налаштування</summary>
+			/// <summary>
+			/// Рантайм налаштування
+			/// </summary>
 			VirtualSettingDataT Property(GetVirtualSettingData, SetVirtualSettingDataT) VirtualSetting;
-			///<summary>Налаштування багатопотоковості</summary>
+			/// <summary>
+			/// Налаштування багатопотоковості
+			/// </summary>
 			ThreadingCfgT Property(GetThreadinfConfig, SetThreadinfConfig) Threading;
 			/// <summary>
 			/// Статичні налаштування ядра
@@ -869,6 +856,10 @@ namespace Seed {
 			/// Налаштування менеджера глобальних об'єктів
 			/// </summary>
 			ObjectNamespaceConfigurationT Property(GetObjectNamespaceConfiguration, SetObjectNamespaceConfiguration) ObjectNamespaceConfiguration;
+			/// <summary>
+			/// Налаштування менеджера розділіва хоста
+			/// </summary>
+			PartitionManagerConfigurationT Property(GetPartitionManagerConfiguration, SetPartitionManagerConfiguration) PartitionManagerConfiguration;
 		public:
 			void SaveCurrentSettings();
 		};
