@@ -11,9 +11,11 @@ namespace Seed
             {
                 namespace FS
                 {
-                    class QueryPath final : public ITest {
-                        virtual bool Excecute() override;
-                    };
+                    namespace API {
+                        class QueryPath final : public ITest {
+                            virtual bool Excecute() override;
+                        };
+                    }
 				}
 			}
 		}
