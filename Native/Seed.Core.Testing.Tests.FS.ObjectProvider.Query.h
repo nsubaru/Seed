@@ -11,6 +11,10 @@ namespace Seed {
 			class QueryUsersFolder final : public TestClass<QueryWindowsFolder> {
 				virtual bool Excecute() override;
 			};
+
+			class QuerySystem32Folder final : public TestClass<QuerySystem32Folder> {
+				virtual bool Excecute() override;
+			};
 		}
 	}
 }
