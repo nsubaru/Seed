@@ -11,7 +11,7 @@ namespace Seed
             {
                 namespace CTTI
                 {
-                    class ToTuple final : public ITest {
+                    class ToTuple final : public TestClass<ToTuple> {
                         virtual bool Excecute() override;
                     };
                 }

@@ -12,7 +12,7 @@ namespace Seed
             {
                 namespace MultiThreading
                 {
-                    class ProducerAndConcumer final : public ITest {
+                    class ProducerAndConcumer final : public TestClass<ProducerAndConcumer> {
                         virtual bool Excecute() override;
                     };
 				}

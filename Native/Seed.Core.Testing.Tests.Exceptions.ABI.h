@@ -6,11 +6,11 @@ namespace Seed {
 		namespace Testing {
 			namespace Test {
 				namespace Exceptions {
-					class Abi final : public ITest {
+					class Abi final : public TestClass<Abi> {
 						virtual bool Excecute() override;
 					};
 
-					class StoringException final : public ITest {
+					class StoringException final : public TestClass<StoringException> {
 						virtual bool Excecute() override;
 					};
 				}

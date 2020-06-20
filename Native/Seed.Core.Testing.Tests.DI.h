@@ -12,19 +12,19 @@ namespace Seed
             {
                 namespace DI
                 {
-                    class RegisterService final : public ITest {
+                    class RegisterService final : public TestClass<RegisterService> {
                         virtual bool Excecute() override;
                     };
 
-                    class CallServiceMethodByNameAndArgs : public ITest {
+                    class CallServiceMethodByNameAndArgs : public TestClass<CallServiceMethodByNameAndArgs> {
                         virtual bool Excecute() override;
                     };
 
-                    class DataTypeInformation : public ITest {
+                    class DataTypeInformation : public TestClass<DataTypeInformation> {
                         virtual bool Excecute() override;
                     };
 
-                    class ResolveServiceByDI : public ITest {
+                    class ResolveServiceByDI : public TestClass<ResolveServiceByDI> {
                         virtual bool Excecute() override;
                     };
 				}

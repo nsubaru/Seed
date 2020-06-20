@@ -12,7 +12,7 @@ namespace Seed
             {
                 namespace Serilization
                 {
-                    class StructSerilization final : public ITest {
+                    class StructSerilization final : public TestClass<StructSerilization> {
                         virtual bool Excecute() override;
                     };
                 }

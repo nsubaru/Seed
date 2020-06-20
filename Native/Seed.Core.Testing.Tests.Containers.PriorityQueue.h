@@ -8,19 +8,19 @@ namespace Seed {
 		namespace Testing {
 			namespace Test {
 				namespace Containers {
-					class SimpleTypePriorityQueueTest : public ITest {
+					class SimpleTypePriorityQueueTest : public TestClass<SimpleTypePriorityQueueTest> {
 						virtual bool Excecute() override;
 					};
 
-					class SimpleTypeConcurencyPriorityQueueTest : public ITest {
+					class SimpleTypeConcurencyPriorityQueueTest : public TestClass<SimpleTypeConcurencyPriorityQueueTest> {
 						virtual bool Excecute() override;
 					};
 
-					class ComplexTypePriorityQueueTest : public ITest {
+					class ComplexTypePriorityQueueTest : public TestClass<ComplexTypePriorityQueueTest> {
 						virtual bool Excecute() override;
 					};
 
-					class ComplexTypeConcurencyPriorityQueueTest : public ITest {
+					class ComplexTypeConcurencyPriorityQueueTest : public TestClass<ComplexTypeConcurencyPriorityQueueTest> {
 						virtual bool Excecute() override;
 					};
 				}
