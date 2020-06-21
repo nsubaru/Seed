@@ -71,7 +71,7 @@ namespace Seed {
 				/// <param name="Value">Значення елемента</param>
 				forceinline void Enqueue(const T& Value) {
 					if (++This->count > TSize)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(FullQueueException(ExceptionPosition, TSize));
 					SizeT newRear = (This->rear + 1) % TSize;
 					This->queue[This->rear] = Value;
 					This->rear = newRear;
@@ -84,7 +84,7 @@ namespace Seed {
 				/// <param name="Value">Значення елемента</param>
 				forceinline void Enqueue(T&& Value) {
 					if (++This->count > TSize)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(FullQueueException(ExceptionPosition, TSize));
 					SizeT newRear = (This->rear + 1) % TSize;
 					This->queue[This->rear] = MoveRValue(Value);
 					This->rear = newRear;
@@ -96,7 +96,7 @@ namespace Seed {
 				/// <returns>Вийнятий елемент</returns>
 				forceinline T Dequeue() {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyQueueException(ExceptionPosition));
 					T res = MoveRValue(This->queue[This->front]);
 					This->front = (This->front + 1) % TSize;
 					--This->count; //-V803
@@ -109,7 +109,7 @@ namespace Seed {
 				/// <returns>Значення елемента</returns>
 				forceinline const T& Top() {
 					if (This->front == This->rear)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
@@ -119,7 +119,7 @@ namespace Seed {
 				/// <returns>Значення елемента</returns>
 				forceinline const T& Top() const {
 					if (This->front == This->rear)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 

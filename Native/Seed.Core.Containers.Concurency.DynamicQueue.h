@@ -156,24 +156,26 @@ namespace Seed {
 
 				/// <summary>
 				/// Вертає значення елемента без виймання з черги
+				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
 				forceinline const T& Top() {
 					return This->flowControler.SharedLock([&]() {
 						if (This->front == This->rear)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
 						});
 				}
 
 				/// <summary>
 				/// Вертає значення елемента без виймання з черги
+				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
 				forceinline const T& Top() const {
 					return This->flowControler.SharedLock([&]() {
 						if (This->front == This->rear)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
 						});
 				}

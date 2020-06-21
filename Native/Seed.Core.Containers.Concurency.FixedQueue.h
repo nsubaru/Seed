@@ -119,7 +119,7 @@ namespace Seed {
 				forceinline const T& Top() {
 					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->front == This->rear)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
 						});
 				}
@@ -131,7 +131,7 @@ namespace Seed {
 				forceinline const T& Top() const {
 					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->front == This->rear)
-							Throw(NullPointException(ExceptionPosition));
+							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
 						});
 				}

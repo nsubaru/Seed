@@ -102,7 +102,7 @@ namespace Seed {
 						if (isResizeIfFull)
 							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
 						else
-							Throw(NullPointException(ExceptionPosition));
+							Throw(FullQueueException(ExceptionPosition, This->bufferSize));
 					}
 
 					SizeT newRear = (This->rear + 1) % This->bufferSize;
@@ -122,7 +122,7 @@ namespace Seed {
 						if (isResizeIfFull)
 							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
 						else
-							Throw(NullPointException(ExceptionPosition));
+							Throw(FullQueueException(ExceptionPosition, This->bufferSize));
 					}
 
 					SizeT newRear = (This->rear + 1) % This->bufferSize;
@@ -132,12 +132,12 @@ namespace Seed {
 
 				/// <summary>
 				/// Виймання елемента з черги, якщо елементів немає 
-				/// то метод зупинить виконання потоку до моменту появи елемента
+				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns>Значення елементу</returns>
 				forceinline T Dequeue() {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyQueueException(ExceptionPosition));
 
 					T res = MoveRValue(This->queue[This->front]);
 					This->front = (This->front + 1) % This->bufferSize;
@@ -148,21 +148,23 @@ namespace Seed {
 
 				/// <summary>
 				/// Вертає значення елемента без виймання з черги
+				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
 				forceinline const T& Top() {
 					if (This->front == This->rear)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 
 				/// <summary>
 				/// Вертає значення елемента без виймання з черги
+				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
 				forceinline const T& Top() const {
 					if (This->front == This->rear)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
 				}
 

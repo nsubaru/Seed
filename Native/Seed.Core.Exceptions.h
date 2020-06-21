@@ -777,6 +777,9 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Виключення в NT функції
+			/// </summary>
 			class SeedKernelCall NtException : public Exception {
 			private:
 				///<summary>NtStatus code операції</summary>
@@ -791,7 +794,7 @@ namespace Seed {
 					noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 				{}
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName),
@@ -803,6 +806,140 @@ namespace Seed {
 				}
 
 				virtual ~NtException() {}
+			};
+
+			/// <summary>
+			/// Переповнення стеку
+			/// </summary>
+			class FullStackException : public Exception {
+			private:
+				///<summary>Максимальний допустимий розмір стеку</summary>
+				SizeT maxSize;
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				///<param name = 'maxSize'>Максимальний допустимий розмір стеку</param>
+				FullStackException(const ConstAString& File, const ConstAString& FuncName, SizeT Line, SizeT maxSize)
+					noexcept : Exception(File, FuncName, Line, L"Перевищено максимальний розмір стеку"), maxSize(maxSize)
+				{}
+
+				/// <summary>
+				/// Getter для максимального розміру стеку
+				/// </summary>
+				SizeT GetMaxSize() const {
+					return maxSize;
+				}
+
+				///<summary>Максимальний допустимий розмір стеку</summary>
+				SizeT Property(GetMaxSize) MaxSize;
+
+				///<summary>Текстове представлення інформації про помилку</summary>
+				virtual ExceptionString toString() const override {
+					return ExceptionString::Combine({
+						ExceptionString(exceptionName),
+						ExceptionString(L". Максимальний допустимий розмір - "),
+						ExceptionString::toString(maxSize),
+						ExceptionString(L". "),
+						location.toString(),
+						ExceptionString(L". ")
+					});
+				}
+
+				virtual ~FullStackException() {}
+			};
+
+			/// <summary>
+			/// Порожній стек
+			/// </summary>
+			class EmptyStackException : public Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				EmptyStackException(const ConstAString& File, const ConstAString& FuncName, SizeT Line)
+					noexcept : Exception(File, FuncName, Line, L"Спроба вийняти елементи з пустого стеку.")
+				{}
+
+				///<summary>Текстове представлення інформації про помилку</summary>
+				virtual ExceptionString toString() const override {
+					return ExceptionString::Combine({
+						ExceptionString(exceptionName),
+						location.toString(),
+						ExceptionString(L". ")
+						});
+				}
+
+				virtual ~EmptyStackException() {}
+			};
+
+			/// <summary>
+			/// Переповнення черги
+			/// </summary>
+			class FullQueueException : public Exception {
+			private:
+				///<summary>Максимальний допустимий розмір черги</summary>
+				SizeT maxSize;
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				///<param name = 'maxSize'>Максимальний допустимий розмір черги</param>
+				FullQueueException(const ConstAString& File, const ConstAString& FuncName, SizeT Line, SizeT maxSize)
+					noexcept : Exception(File, FuncName, Line, L"Перевищено максимальний розмір черги"), maxSize(maxSize)
+				{}
+
+				/// <summary>
+				/// Getter для максимального розміру розміру черги
+				/// </summary>
+				SizeT GetMaxSize() const {
+					return maxSize;
+				}
+
+				///<summary>Максимальний допустимий розмір стеку</summary>
+				SizeT Property(GetMaxSize) MaxSize;
+
+				///<summary>Текстове представлення інформації про помилку</summary>
+				virtual ExceptionString toString() const override {
+					return ExceptionString::Combine({
+						ExceptionString(exceptionName),
+						ExceptionString(L". Максимальний допустимий розмір - "),
+						ExceptionString::toString(maxSize),
+						ExceptionString(L". "),
+						location.toString(),
+						ExceptionString(L". ")
+						});
+				}
+
+				virtual ~FullQueueException() {}
+			};
+
+			/// <summary>
+			/// Порожня черга
+			/// </summary>
+			class EmptyQueueException : public Exception {
+			public:
+				///<summary>Конструктор помилки</summary>
+				///<param name = 'File'>Файл в якому згенерована помилка</param>
+				///<param name = 'FunctName'>Ім'я функції</param>
+				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				EmptyQueueException(const ConstAString& File, const ConstAString& FuncName, SizeT Line)
+					noexcept : Exception(File, FuncName, Line, L"Спроба вийняти елементи з пустої черги.")
+				{}
+
+				///<summary>Текстове представлення інформації про помилку</summary>
+				virtual ExceptionString toString() const override {
+					return ExceptionString::Combine({
+						ExceptionString(exceptionName),
+						location.toString(),
+						ExceptionString(L". ")
+						});
+				}
+
+				virtual ~EmptyQueueException() {}
 			};
 		}
 	}

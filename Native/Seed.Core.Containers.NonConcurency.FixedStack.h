@@ -59,7 +59,7 @@ namespace Seed {
                 /// <param name="item">Силка на елемент</param>
 				forceinline void Push(const T& item) {
 					if (This->count == TSize)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(FullStackException(ExceptionPosition, TSize));
 					This->stack[This->count] = item;
 					This->count++;
 				}
@@ -70,7 +70,7 @@ namespace Seed {
                 /// <param name="item">RValue силка на елемент</param>
 				forceinline void Push(T&& item) {
 					if (This->count == TSize)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(FullStackException(ExceptionPosition, TSize));
 					This->stack[This->count] = MoveRValue(item);
 					This->count++;
 				}
@@ -81,7 +81,7 @@ namespace Seed {
                 /// <returns></returns>
 				forceinline T Pop() {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyStackException(ExceptionPosition));
 					This->count--;
 					return MoveRValue(This->stack[This->count]);
 				}
@@ -92,7 +92,7 @@ namespace Seed {
                 /// <returns>Силка на вехній елемент</returns>
 				forceinline const T& Top() {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyStackException(ExceptionPosition));
 					This->count--;
 					return This->stack[This->count];
 				}
@@ -103,7 +103,7 @@ namespace Seed {
                 /// <returns>Силка на вехній елемент</returns>
 				forceinline const T& Top() const {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyStackException(ExceptionPosition));
 					This->count--;
 					return This->stack[This->count];
 				}
