@@ -1,6 +1,7 @@
 #pragma once
-#include "Seed.Core.Testing.Base.h"
 #include "Seed.Core.Serilization.h"
+
+#include "Seed.Core.Testing.Base.h"
 
 namespace Seed
 {

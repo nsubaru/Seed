@@ -1,9 +1,8 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+#include "Seed.Core.FS.h"
 
 #include "Seed.Core.Testing.Tests.FS.FileObject.h"
-
-#include "Seed.Core.FS.h"
 
 bool Seed::Core::Testing::Test::FS::CreateFile::Excecute() {
 	Core::FS::RawCreateFile(".\\test", Core::FS::File::ReadMode | Core::FS::File::DeleteMode, true).Delete();
