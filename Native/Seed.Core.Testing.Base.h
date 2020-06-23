@@ -8,12 +8,20 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Testing {
-			class ITest {
-			public:
-				virtual ~ITest() = default;
-				virtual bool Excecute() = 0;
-			};
+            /// <summary>
+            /// Інтерфейс тесту
+            /// </summary>
+            interface ITest {
+                /// <summary>
+                /// Виконує тест
+                /// </summary>
+                /// <returns>якщо true тест пройшов успішно</returns>
+                bool Excecute() = 0;
+            };
 
+            /// <summary>
+            /// Базовий класс тесту
+            /// </summary>
             class BaseTest {
             protected:
                 friend void LoadTest(String&& name, ITest*&& instance);
@@ -21,6 +29,9 @@ namespace Seed {
                 virtual ~BaseTest() = 0 {}
             };
 
+            /// <summary>
+            /// Класс тесту
+            /// </summary>
             template<typename TTest>
             class TestClass : BaseTest, public ITest {
             private:
@@ -29,10 +40,18 @@ namespace Seed {
                     return true;
                 }
             private:
-                inline static bool Result = GenTestRecord();
+                inline static volatile bool Result = GenTestRecord();
             public:
                 virtual ~TestClass() {}
             };
+
+            /// <summary>
+            /// Запис про тест
+            /// </summary>
+            namespace
+            {
+                using TestRecord = Containers::Pair<String, ITest*>;
+            }
 		}
 	}
 }
