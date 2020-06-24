@@ -3,6 +3,8 @@
 
 #include "Seed.Core.Testing.Tests.CTTI.ToTuple.h"
 
+#include "Seed.Core.CTTI.h"
+
 bool Seed::Core::Testing::Test::CTTI::ToTuple::Excecute() {
 	struct Data {
 		Int32 a;

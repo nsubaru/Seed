@@ -8,19 +8,19 @@ namespace Seed {
 		namespace Testing {
 			namespace Test {
 				namespace Containers {
-					class SimpleTypeArrayTest : public ITest {
+					class SimpleTypeArrayTest : public TestClass<SimpleTypeArrayTest> {
 						virtual bool Excecute() override;
 					};
 
-					class SimpleTypeConcurencyArrayTest : public ITest {
+					class SimpleTypeConcurencyArrayTest : public TestClass<SimpleTypeConcurencyArrayTest> {
 						virtual bool Excecute() override;
 					};
 
-					class ComplexTypeArrayTest : public ITest {
+					class ComplexTypeArrayTest : public TestClass<ComplexTypeArrayTest> {
 						virtual bool Excecute() override;
 					};
 
-					class ComplexTypeConcurencyArrayTest : public ITest {
+					class ComplexTypeConcurencyArrayTest : public TestClass<ComplexTypeConcurencyArrayTest> {
 						virtual bool Excecute() override;
 					};
 				}

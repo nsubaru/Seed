@@ -11,27 +11,27 @@ namespace Seed
             {
                 namespace Text
                 {
-                    class StringCtor final : public ITest {
+                    class StringCtor final : public TestClass<StringCtor> {
                         virtual bool Excecute() override;
                     };
 
-                    class StringComparing final : public ITest {
+                    class StringComparing final : public TestClass<StringComparing> {
                         virtual bool Excecute() override;
                     };
 
-                    class StringOrdering final : public ITest {
+                    class StringOrdering final : public TestClass<StringOrdering> {
                         virtual bool Excecute() override;
                     };
 
-                    class StringContactanation final : public ITest {
+                    class StringContactanation final : public TestClass<StringContactanation> {
                         virtual bool Excecute() override;
                     };
 
-                    class StringDoubleFloatConvert final : public ITest {
+                    class StringDoubleFloatConvert final : public TestClass<StringDoubleFloatConvert> {
                         virtual bool Excecute() override;
                     };
 
-                    class StringIntConvert final : public ITest {
+                    class StringIntConvert final : public TestClass<StringIntConvert> {
                         virtual bool Excecute() override;
                     };
 				}

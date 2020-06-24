@@ -12,27 +12,27 @@ namespace Seed
             {
                 namespace Serilization
                 {
-                    class LogicSerilization : public ITest {
+                    class LogicSerilization : public TestClass<LogicSerilization> {
                         virtual bool Excecute() override;
                     };
 
-                    class NumericSerilization : public ITest {
+                    class NumericSerilization : public TestClass<NumericSerilization> {
                         virtual bool Excecute() override;
                     };
 
-                    class FloatPointSerilization : public ITest {
+                    class FloatPointSerilization : public TestClass<FloatPointSerilization> {
                         virtual bool Excecute() override;
                     };
 
-                    class CharacterSerilization : public ITest {
+                    class CharacterSerilization : public TestClass<CharacterSerilization> {
                         virtual bool Excecute() override;
                     };
 
-                    class CFixedArraySerilization : public ITest {
+                    class CFixedArraySerilization : public TestClass<CFixedArraySerilization> {
                         virtual bool Excecute() override;
                     };
 
-                    class PrimitiveMetaData : public ITest {
+                    class PrimitiveMetaData : public TestClass<PrimitiveMetaData> {
                         virtual bool Excecute() override;
                     };
                 }

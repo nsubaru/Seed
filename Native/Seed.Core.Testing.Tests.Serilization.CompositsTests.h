@@ -12,19 +12,19 @@ namespace Seed
             {
                 namespace Serilization
                 {
-                    class SimpleTypeTupleSerilization final : public ITest {
+                    class SimpleTypeTupleSerilization final : public TestClass<SimpleTypeTupleSerilization> {
                         virtual bool Excecute() override;
                     };
 
-					class ComplexTypeTupleSerilization final : public ITest {
+					class ComplexTypeTupleSerilization final : public TestClass<ComplexTypeTupleSerilization> {
                         virtual bool Excecute() override;
                     };
 
-					class TupleTypeTupleSerilization final : public ITest {
+					class TupleTypeTupleSerilization final : public TestClass<TupleTypeTupleSerilization> {
                         virtual bool Excecute() override;
                     };
 
-					class CustomStructSerilization final : public ITest {
+					class CustomStructSerilization final : public TestClass<CustomStructSerilization> {
                         virtual bool Excecute() override;
                     };
 				}

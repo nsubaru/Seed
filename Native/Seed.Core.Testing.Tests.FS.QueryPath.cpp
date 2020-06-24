@@ -4,7 +4,7 @@
 
 #include "Seed.Core.Testing.Tests.FS.QueryPath.h"
 
-bool Seed::Core::Testing::Test::FS::QueryPath::Excecute() {
+bool Seed::Core::Testing::Test::FS::API::QueryPath::Excecute() {
 	Asserts::AssertTrue([] ()
 	{
 		return Core::FS::QueryFilesInDirectory(L".\\").Any([] (const Core::FS::FSObjectInformation& object)
