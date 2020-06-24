@@ -777,6 +777,9 @@ namespace Seed {
 				}
 			};
 
+			/// <summary>
+			/// Помилка системного виклику NT ядра
+			/// </summary>
 			class SeedKernelCall NtException : public Exception {
 			private:
 				///<summary>NtStatus code операції</summary>
