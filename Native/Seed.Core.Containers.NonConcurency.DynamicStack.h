@@ -92,7 +92,7 @@ namespace Seed {
 				/// <returns>Вийннятий елемент з стеку</returns>
 				forceinline T Pop() {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyStackException(ExceptionPosition));
 					This->count--;
 					return MoveRValue(This->stack[This->count]);
 				}
@@ -104,18 +104,19 @@ namespace Seed {
 				/// <returns>Константна силка на елемент</returns>
 				forceinline const T& Top() const {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyStackException(ExceptionPosition));
 					This->count--;
 					return This->stack[This->count];
 				}
 
 				/// <summary>
 				/// Вертає верхній елемент без виймання з стеку
+				/// якщо стек пустий то генерує помилку
 				/// </summary>
 				/// <returns>Константна силка на елемент</returns>
 				forceinline const T& Top() {
 					if (This->count == 0)
-						Throw(NullPointException(ExceptionPosition));
+						Throw(EmptyStackException(ExceptionPosition));
 					This->count--;
 					return This->stack[This->count];
 				}

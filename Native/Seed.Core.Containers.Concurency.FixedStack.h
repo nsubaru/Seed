@@ -63,7 +63,7 @@ namespace Seed {
                 forceinline void Push(const T& item) {
                     This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == TSize)
-                            Throw(NullPointException(ExceptionPosition));
+                            Throw(FullStackException(ExceptionPosition, TSize));
                         This->stack[This->count] = item;
                         This->count++;
                         });
@@ -76,7 +76,7 @@ namespace Seed {
                 forceinline void Push(T&& item) {
                     This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == TSize)
-                            Throw(NullPointException(ExceptionPosition));
+                            Throw(FullStackException(ExceptionPosition, TSize));
                         This->stack[This->count] = MoveRValue(item);
                         This->count++;
                         });
@@ -89,7 +89,7 @@ namespace Seed {
                 forceinline T Pop() {
                     return MoveRValue(This->lock.ExclusiveLock([&]() mutable {
                         if (This->count == 0)
-                            Throw(NullPointException(ExceptionPosition));
+                            Throw(EmptyStackException(ExceptionPosition));
                         This->count--;
                         return MoveRValue(This->stack[This->count]);
                         }));
@@ -102,7 +102,7 @@ namespace Seed {
                 forceinline const T& Top() {
                     return This->lock.ExclusiveLock([&]() mutable -> const T& {
                         if (This->count == 0)
-                            Throw(NullPointException(ExceptionPosition));
+                            Throw(EmptyStackException(ExceptionPosition));
                         This->count--;
                         return This->stack[This->count];
                         });
@@ -115,7 +115,7 @@ namespace Seed {
                 forceinline const T& Top() const {
                     return This->lock.ExclusiveLock([&]() mutable -> const T& {
                         if (This->count == 0)
-                            Throw(NullPointException(ExceptionPosition));
+                            Throw(EmptyStackException(ExceptionPosition));
                         This->count--;
                         return This->stack[This->count];
                         });
