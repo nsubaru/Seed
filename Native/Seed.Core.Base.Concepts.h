@@ -18,7 +18,7 @@ namespace Seed {
 				return lambda(args...);
 			}
 
-			constexpr auto r = Invoke(l, 1, 2.0);
+			constexpr auto r = Invoke(l, 1, 2);
 		}
 	}
 }

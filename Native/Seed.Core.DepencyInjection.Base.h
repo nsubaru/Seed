@@ -602,7 +602,7 @@ namespace Seed
 					return data->dataTypeTableForManagedLevel[name];
 				}
 
-				// <summary>
+				/// <summary>
 				/// Вертає мета інформація про тип даних за записом про тип
 				/// </summary>
 				/// <param name="name">Запис про типх</param>
