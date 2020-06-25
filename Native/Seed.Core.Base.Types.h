@@ -139,6 +139,11 @@ __forceinline constexpr Seed::Core::Bytes operator "" Gb(const unsigned long lon
 	using namespace Seed;
 	return size * 1024Mb;
 }
+
+__forceinline constexpr Seed::SizeT operator "" Sz(const unsigned long long size) {
+	using namespace Seed;
+	return static_cast<Seed::SizeT>(size);
+}
 #pragma warning(pop)
 
 // ReSharper disable CppInconsistentNaming

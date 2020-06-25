@@ -8,19 +8,23 @@ namespace Seed
 	{
 		namespace RTTI
 		{
-			class SeedKernelCall RTTITypeRecord : IDisposable, Serilization::ISerilizable<RTTITypeRecord>
+			class RTTITypeRecord : IDisposable
 			{
+				using Getter = String(*)();
+
 				struct Data {
-					String TypeName;
-					String CxxTypeName;
+					Lazy<String> TypeName;
+					Lazy<String> CxxTypeName;
+
+
 					CTTI::TypeTraits::EType TypeClass;
 					Boolean IsSerilizeable;
 					const TypeInfo* rttiTypeInfo;
 					RefCountT RefCount;
 
 					Data(
-						String && TypeName, 
-						String && CxxTypeName, 
+						Lazy<String> && TypeName, 
+						Lazy<String> && CxxTypeName, 
 						CTTI::TypeTraits::EType TypeClass, 
 						Boolean IsSerilizeable, 
 						const TypeInfo* rttiTypeInfo
@@ -34,61 +38,85 @@ namespace Seed
 				};
 			protected:
 				virtual void Dispose() override {}
-				virtual Byte* GetDataPtr() const { return reinterpret_cast<Byte*>(data);}
 			private:
 				Data * data;
 			public:
-				DefStructMetaData(Data, 
-					DefStructFieldData(Data, TypeName),
-					DefStructFieldData(Data, CxxTypeName),
-					DefStructFieldData(Data, TypeClass),
-					DefStructFieldData(Data, IsSerilizeable)
-					);
-
 				RefCountClass(RTTITypeRecord, data);
 
 				template<typename T>
-				RTTITypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
-					CTTI::TypeTraits::CTTITypeMetaData<T>::TypeName,
-					CTTI::TypeTraits::CTTITypeMetaData<T>::CXXTypeName,
+				forceinline RTTITypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
+					Lazy<String>(ArrowFunct(String(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeName))),
+					Lazy<String>(ArrowFunct(String(CTTI::TypeTraits::CTTITypeMetaData<T>::CXXTypeName))),
 					CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
 					CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable,
 					&typeid(T)
 				))
 				{}
 
-				const String& GetTypeName() { return data->TypeName; }
-				const String& GetCxxTypeName() { return data->CxxTypeName; }
-				CTTI::TypeTraits::EType GetCxxTypeClass() { return data->TypeClass; }
-				Boolean GetIsSerilizeable() { return data->IsSerilizeable; }
-				const auto& TypeId() {return *data->rttiTypeInfo; }
+				forceinline const String& GetTypeName() {
+					return *data->TypeName;
+				}
+
+				forceinline const String& GetCxxTypeName() {
+					return *data->CxxTypeName;
+				}
+
+				forceinline CTTI::TypeTraits::EType GetCxxTypeClass() {
+					return data->TypeClass;
+				}
+
+				forceinline Boolean GetIsSerilizeable() {
+					return data->IsSerilizeable;
+				}
+
+				forceinline const auto& TypeId() {
+					return *data->rttiTypeInfo;
+				}
+
+				forceinline ID GetHashCode() {
+					return data->rttiTypeInfo->GetHashCode();
+				}
 			public:
-				bool operator==(const RTTITypeRecord& other) const {
-					return this->data->rttiTypeInfo == other.data->rttiTypeInfo;
+				String					Property(GetTypeName)		TypeName;
+				String					Property(GetCxxTypeName)	CxxTypeName;
+				CTTI::TypeTraits::EType Property(GetCxxTypeClass)	CxxTypeClass;
+				Boolean					Property(GetIsSerilizeable) IsSerilizeable;
+				ID						Property(GetHashCode)		HashCode;
+			public:
+				forceinline auto operator==(const RTTITypeRecord& other) const {
+					return *this->data->rttiTypeInfo == *other.data->rttiTypeInfo;
 				}
 
-				bool operator!=(const RTTITypeRecord& other) const {
-					return this->data->rttiTypeInfo != other.data->rttiTypeInfo;
+				forceinline auto operator!=(const RTTITypeRecord& other) const {
+					return *this->data->rttiTypeInfo != *other.data->rttiTypeInfo;
 				}
 
-				bool operator<(const RTTITypeRecord& other) const {
-					return this->data->rttiTypeInfo < other.data->rttiTypeInfo;
+				forceinline auto operator<=>(const RTTITypeRecord& other) const {
+					return this->data->rttiTypeInfo->HashCode <=> other.data->rttiTypeInfo->HashCode;
 				}
 
-				bool operator>(const RTTITypeRecord& other) const {
-					return this->data->rttiTypeInfo > other.data->rttiTypeInfo;
+				forceinline auto operator==(const TypeInfo& other) const {
+					return *this->data->rttiTypeInfo == other;
 				}
 
-				bool operator<=(const RTTITypeRecord& other) const {
-					return this->data->rttiTypeInfo <= other.data->rttiTypeInfo;
+				forceinline auto operator!=(const TypeInfo& other) const {
+					return *this->data->rttiTypeInfo != other;
 				}
 
-				bool operator>=(const RTTITypeRecord& other) const {
-					return this->data->rttiTypeInfo >= other.data->rttiTypeInfo;
+				forceinline friend auto operator==(const TypeInfo& other, const RTTITypeRecord& item) {
+					return other == *item.data->rttiTypeInfo;
+				}
+
+				forceinline friend auto operator!=(const TypeInfo& other, const RTTITypeRecord& item) {
+					return other == *item.data->rttiTypeInfo;
+				}
+
+				forceinline friend auto operator<=>(const TypeInfo& other, const RTTITypeRecord& item) {
+					return other.HashCode <=> item.data->rttiTypeInfo->HashCode;
 				}
 			};
 
-			class SeedKernelCall RTTIFunction : IDisposable, Serilization::ISerilizable<RTTITypeRecord> {
+			class RTTIFunction : IDisposable, public Serilization::ISerilizable<RTTITypeRecord> {
 				struct Data{
 					RTTITypeRecord FunctionRecord;
 					RTTITypeRecord FunctionRetRecord;
@@ -137,7 +165,7 @@ namespace Seed
 				const auto& FunctionTypeId() { return data->FunctionRecord.TypeId(); }
 			};
 
-			class SeedKernelCall RTTIMethod : IDisposable, Serilization::ISerilizable<RTTITypeRecord> {
+			class RTTIMethod : IDisposable, Serilization::ISerilizable<RTTITypeRecord> {
 				struct Data{
 					RTTITypeRecord MethodRecord;
 					RTTITypeRecord MethodClassRecord;
@@ -221,4 +249,9 @@ namespace Seed
 			};
 		}
 	}
+}
+
+template<typename T>
+forceinline Seed::Core::RTTI::RTTITypeRecord TypeRecord() {
+	return Seed::Core::RTTI::RTTITypeRecord(Seed::Core::TypeTraits::TypeTag<T>{});
 }

@@ -362,7 +362,9 @@ namespace Seed {
                             lambda(MoveRValue(This->array[i]));
                         }
                         delete[] this->This->array;
+                        this->This->array = nullptr;
                         this->This->count = 0;
+                        return *this;
                         });
                 }
 

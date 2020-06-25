@@ -1,21 +1,22 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+#include "Seed.Core.FS.h"
 
 #include "Seed.Core.Testing.Tests.FS.FileObject.h"
 
 #include "Seed.Core.FS.h"
 
-bool Seed::Core::Testing::Test::FS::CreateFile::Excecute() {
+bool Seed::Core::Testing::Test::FS::API::CreateFile::Excecute() {
 	Core::FS::RawCreateFile(".\\test", Core::FS::File::ReadMode | Core::FS::File::DeleteMode, true).Delete();
 	return true;
 }
 
-bool Seed::Core::Testing::Test::FS::DeleteFile::Excecute() {
+bool Seed::Core::Testing::Test::FS::API::DeleteFile::Excecute() {
 	Core::FS::RawCreateFile(".\\test", Core::FS::File::ReadMode | Core::FS::File::DeleteMode, true).Delete();
 	return true;
 }
 
-bool Seed::Core::Testing::Test::FS::OpenExist::Excecute() {
+bool Seed::Core::Testing::Test::FS::API::OpenExist::Excecute() {
 	{
 		Core::FS::RawCreateFile(".\\test", Core::FS::File::ReadMode, true);
 	}
@@ -25,7 +26,7 @@ bool Seed::Core::Testing::Test::FS::OpenExist::Excecute() {
 	return true;
 }
 
-bool Seed::Core::Testing::Test::FS::WriteFile::Excecute() {
+bool Seed::Core::Testing::Test::FS::API::WriteFile::Excecute() {
 	auto file = Core::FS::RawCreateFile(".\\test", Core::FS::File::WriteMode | Core::FS::File::DeleteMode, true);
 	
 	file.Write(L"test"S);
@@ -34,7 +35,7 @@ bool Seed::Core::Testing::Test::FS::WriteFile::Excecute() {
 	return true;
 }
 
-bool Seed::Core::Testing::Test::FS::ReadFile::Excecute() {
+bool Seed::Core::Testing::Test::FS::API::ReadFile::Excecute() {
 	constexpr auto itemCount = 20;
 
 	auto output = Core::Containers::Blob(itemCount);

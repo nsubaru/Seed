@@ -11,25 +11,27 @@ namespace Seed
             {
                 namespace FS
                 {
-                    class CreateFile final : public ITest {
-                        virtual bool Excecute() override;
-                    };
+                    namespace API {
+                        class CreateFile final : public TestClass<CreateFile> {
+                            virtual bool Excecute() override;
+                        };
 
-                    class DeleteFile final : public ITest {
-                        virtual bool Excecute() override;
-                    };
+                        class DeleteFile final : public TestClass<DeleteFile> {
+                            virtual bool Excecute() override;
+                        };
 
-                    class OpenExist final : public ITest {
-                        virtual bool Excecute() override;
-                    };
+                        class OpenExist final : public TestClass<OpenExist> {
+                            virtual bool Excecute() override;
+                        };
 
-                    class WriteFile final : public ITest {
-                        virtual bool Excecute() override;
-                    };
+                        class WriteFile final : public TestClass<WriteFile> {
+                            virtual bool Excecute() override;
+                        };
 
-                    class ReadFile final : public ITest {
-                        virtual bool Excecute() override;
-                    };
+                        class ReadFile final : public TestClass<ReadFile> {
+                            virtual bool Excecute() override;
+                        };
+                    }
 				}
 			}
 		}

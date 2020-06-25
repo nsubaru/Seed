@@ -11,7 +11,7 @@ namespace Seed
             {
                 namespace Crypt
                 {
-                    class Random final : public ITest {
+                    class Random final : public TestClass<Random> {
                         virtual bool Excecute() override;
                     };
                 }

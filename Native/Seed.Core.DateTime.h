@@ -6,91 +6,252 @@ namespace Seed {
 		//Клас часу
 		class SeedKernelCall DateTime;
 
-		//Клас дати
+		/// <summary>
+		/// Клас дати
+		/// </summary>
 		class SeedKernelCall Date {
 		public:
-			//Окремі поля
-			UInt16 Year, Month, WeekDay, Day, Hour, Minutes, Second, MiliSecond;
-			//Конструктор
+			/// <summary>
+			/// Рік
+			/// </summary>
+			UInt16 Year;
+			/// <summary>
+			/// Місяць
+			/// </summary>
+			UInt16 Month;
+			/// <summary>
+			/// День тижня
+			/// </summary>
+			UInt16 WeekDay;
+			/// <summary>
+			/// День місяця
+			/// </summary>
+			UInt16 Day;
+			/// <summary>
+			/// Година
+			/// </summary>
+			UInt16 Hour;
+			/// <summary>
+			/// Хвилина
+			/// </summary>
+			UInt16 Minutes;
+			/// <summary>
+			/// Секунда
+			/// </summary>
+			UInt16 Second;
+			/// <summary>
+			/// Мілісекунда
+			/// </summary>
+			UInt16 MiliSecond;
+
+			/// <summary>
+			/// Пустий конструктор, ініціалізує даьу 1600.0.0 0:0:0.0
+			/// </summary>
 			constexpr Date() noexcept :Year(1600), Month(0), WeekDay(0), Day(0), Hour(0), Minutes(0), Second(0), MiliSecond(0) {};
-			//Конструктор з дати і часу
+			/// <summary>
+			/// Конструктор з дати і часу
+			/// </summary>
+			/// <param name="Year">Рік</param>
+			/// <param name="Month">Місяць</param>
+			/// <param name="WeekDay">День тижня</param>
+			/// <param name="Day">День місяця</param>
+			/// <param name="Hour">Година</param>
+			/// <param name="Minutes">Хвилина</param>
+			/// <param name="Seconds">Секунда</param>
+			/// <param name="MiliSeconds">Мілісекунда</param>
 			constexpr Date(UInt16 Year, UInt16 Month, UInt16 WeekDay, UInt16 Day,
 				UInt16 Hour, UInt16 Minutes, UInt16 Seconds, UInt16 MiliSeconds)
 				noexcept :Year(Year), Month(Month), WeekDay(WeekDay), Day(Day),
 				Hour(Hour), Minutes(Minutes), Second(Seconds), MiliSecond(MiliSeconds) {};
 
-			//Конструктор з об'єкта клас час
+			/// <summary>
+			/// Конструктор з об'єкта класу час
+			/// </summary>
+			/// <param name="time">Об'єкт класу час</param>
 			Date(const DateTime& time);
-			//Конвертація в час
+			/// <summary>
+			/// Конвертація в час
+			/// </summary>
+			/// <returns>Об'єкт часу</returns>
 			operator Seed::Core::DateTime() const;
+
 			~Date() {};
 		};
 
 		//Клас відносної дати
 		class SeedKernelCall DateSpan {
 		public:
-			//Окремі поля
-			UInt16 Year, Month, WeekDay, Day, Hour, Minutes, Second, MiliSecond;
-			//Конструктор
+			/// <summary>
+			/// Рік
+			/// </summary>
+			UInt16 Year;
+			/// <summary>
+			/// Місяць
+			/// </summary>
+			UInt16 Month;
+			/// <summary>
+			/// День тижня
+			/// </summary>
+			UInt16 WeekDay;
+			/// <summary>
+			/// День місяця
+			/// </summary>
+			UInt16 Day;
+			/// <summary>
+			/// Година
+			/// </summary>
+			UInt16 Hour;
+			/// <summary>
+			/// Хвилина
+			/// </summary>
+			UInt16 Minutes;
+			/// <summary>
+			/// Секунда
+			/// </summary>
+			UInt16 Second;
+			/// <summary>
+			/// Мілісекунда
+			/// </summary>
+			UInt16 MiliSecond;
+
+			/// <summary>
+			/// Пустий конструктор, ініціалізує даьу 1600.0.0 0:0:0.0
+			/// </summary>
 			constexpr DateSpan() noexcept :Year(1600), Month(0), WeekDay(0), Day(0), Hour(0), Minutes(0), Second(0), MiliSecond(0) {};
-			//Конструктор з дати і часу
+			
+			/// <summary>
+			/// Конструктор з дати і часу
+			/// </summary>
+			/// <param name="Year">Рік</param>
+			/// <param name="Month">Місяць</param>
+			/// <param name="WeekDay">День тижня</param>
+			/// <param name="Day">День місяця</param>
+			/// <param name="Hour">Година</param>
+			/// <param name="Minutes">Хвилина</param>
+			/// <param name="Seconds">Секунда</param>
+			/// <param name="MiliSeconds">Мілісекунда</param>
 			constexpr DateSpan(UInt16 Year, UInt16 Month, UInt16 WeekDay, UInt16 Day,
 				UInt16 Hour, UInt16 Minutes, UInt16 Seconds, UInt16 MiliSeconds)
 				noexcept :Year(Year), Month(Month), WeekDay(WeekDay), Day(Day),
 				Hour(Hour), Minutes(Minutes), Second(Seconds), MiliSecond(MiliSeconds) {};
 
-			//Конструктор з об'єкта клас час
+			/// <summary>
+			/// Конструктор з об'єкта класу час
+			/// </summary>
+			/// <param name="time">Об'єкт класу час</param>
 			DateSpan(const DateTime& time);
-			//Конвертація в час
+			/// <summary>
+			/// Конвертація в час
+			/// </summary>
+			/// <returns>Об'єкт часу</returns>
 			operator Seed::Core::DateTime() const;
 			~DateSpan() {};
 		};
 
-		//Клас часу оптимізований під швидку арифметику
+		/// <summary>
+		/// Клас часу оптимізований під швидку арифметику
+		/// </summary>
 		class SeedKernelCall DateTime {
 		private:
 			UInt64 time_ms = 0;
 		public:
-			//Пустий конструктор
+			/// <summary>
+			/// Пустий конструктор
+			/// </summary>
 			constexpr DateTime() = default;//-V730
-			//Конструктор з задаванням 100 наносекндних інтервалах
+			/// <summary>
+			/// Конструктор з задаванням 100 наносекндних інтервалах
+			/// </summary>
 			constexpr DateTime(UInt64 time) :time_ms(time) {}; //-V730
-			//Копіювальний конструктор
+			/// <summary>
+			/// Копіювальний конструктор
+			/// </summary>
 			constexpr DateTime(const DateTime& orig) :time_ms(orig.time_ms) {}; //-V730
-			//Оператор додавання до
+			/// <summary>
+			/// Оператор додавання до поточного часу
+			/// </summary>
+			/// <param name="time">Правий операнд</param>
+			/// <returns>Посилання на поточний об'єкт</returns>
 			constexpr DateTime& operator+=(DateTime time) { this->time_ms += time.time_ms; return *this; }
-			//Оператор віднімання від
+			/// <summary>
+			/// Оператор віднімання від поточного часу
+			/// </summary>
+			/// <param name="time">Правий операнд</param>
+			/// <returns>Посилання на поточний об'єкт</returns>
 			constexpr DateTime& operator-=(DateTime time) { this->time_ms -= time.time_ms; return *this; }
-			//Оператор додавання
+			/// <summary>
+			/// Оператор додавання
+			/// </summary>
+			/// <param name="time1">Лівий операнд</param>
+			/// <param name="time2">Правий операнд</param>
+			/// <returns>Результат операції</returns>
 			constexpr friend DateTime operator+(DateTime time1, DateTime time2) { return time1.time_ms + time2.time_ms; }
-			//Оператор віднімання
+			/// <summary>
+			/// Оператор віднімання
+			/// </summary>
+			/// <param name="time1">Лівий операнд</param>
+			/// <param name="time2">Правий операнд</param>
+			/// <returns>Результат операції</returns>
 			constexpr friend DateTime operator-(DateTime time1, DateTime time2) { return time1.time_ms - time2.time_ms; }
-			//Вертає кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
+			/// <summary>
+			/// Вертає кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
+			/// </summary>
+			/// <returns>Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року</returns>
 			constexpr UInt64 GetMsFrom1600() const volatile { return time_ms; }
+			/// <summary>
+			/// Встановлює час як кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
+			/// </summary>
+			/// <param name="AbsoluteTime">Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року</param>
 			constexpr void SetMsFrom1600(UInt64 AbsoluteTime) volatile { this->time_ms = AbsoluteTime; }
-			//Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
+			/// <summary>
+			/// Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
+			/// </summary>
 			UInt64 Property(GetMsFrom1600, SetMsFrom1600) TimeFromStartEpoch;
-			//Вертає кількість 100 наносекудних інтервалів
+			/// <summary>
+			/// Вертає кількість 100 наносекудних інтервалів у відносному форматі
+			/// </summary>
+			/// <returns></returns>
 			constexpr UInt64 GetAsRelativeTime() const volatile { return -static_cast<Int64>(time_ms); }
-			//Кількість 100 наносекудних інтервалів
+			/// <summary>
+			/// Кількість 100 наносекудних інтервалів у відносному форматі
+			/// </summary>
 			UInt64 Property(GetAsRelativeTime) RelativeTime;
-			//Вертає поточний системний час
-			//по грінвінському часовому поясі
+			/// <summary>
+			/// Вертає поточний системний час по грінвінському часовому поясі
+			/// </summary>
+			/// <returns>Поточний системний час по грінвінському часовому поясі</returns>
 			static DateTime GetCurrentSystemTimeData();
-			//Вертає поточний локальний час
-			//в часовому поясі користувача чи системи
+			/// <summary>
+			/// Вертає поточний локальний час в часовому поясі користувача чи системи
+			/// </summary>
+			/// <returns>Поточний локальний час в часовому поясі користувача чи системи</returns>
 			static DateTime GetCurrentLocalTimeData();
-			//Конвертуючий конструктор
+			/// <summary>
+			/// Конвертуючий конструктор
+			/// </summary>
 			friend Date::Date(const DateTime& time);
-			//Конвертуючий конструктор
+			/// <summary>
+			/// Конвертуючий конструктор
+			/// </summary>
 			friend DateSpan::DateSpan(const DateTime& time);
-
+			/// <summary>
+			/// Оператор присвоєння
+			/// </summary>
+			/// <param name="newValue">Правий операнд</param>
+			/// <returns>Посилання на поточний об'єки</returns>
 			DateTime& operator=(DateTime newValue) {
 				 this->time_ms = newValue.time_ms; return *this;
 			}
-
+			/// <summary>
+			/// Оператор присвоєння
+			/// </summary>
+			/// <param name="newValue">Правий операнд</param>
+			/// <returns>Посилання на поточний об'єки</returns>
 			volatile DateTime& operator=(const volatile DateTime& newValue) volatile { this->time_ms = newValue.time_ms; return *this; }
 
+			/// <summary>
+			/// Кількість інтервалів в секунді
+			/// </summary>
 			static constexpr UInt64 SecondInNtTime = 1000ULL * 10000ULL;
 		};
 

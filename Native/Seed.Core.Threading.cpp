@@ -185,7 +185,7 @@ namespace Seed {
 
 				virtual UInt64 GetID() const { return thread->This->TID; }
 
-				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::SheduledTask; }
+				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::ScheduledTask; }
 				virtual EThreadabledStates GetThreadabledState() const { return thread->This->State; }
 
 				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }

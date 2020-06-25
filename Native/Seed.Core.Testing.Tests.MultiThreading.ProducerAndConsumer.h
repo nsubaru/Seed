@@ -1,6 +1,7 @@
 #pragma once
-#include "Seed.Core.Testing.Base.h"
 #include "Seed.Core.Serilization.h"
+
+#include "Seed.Core.Testing.Base.h"
 
 namespace Seed
 {
@@ -12,7 +13,7 @@ namespace Seed
             {
                 namespace MultiThreading
                 {
-                    class ProducerAndConcumer final : public ITest {
+                    class ProducerAndConcumer final : public TestClass<ProducerAndConcumer> {
                         virtual bool Excecute() override;
                     };
 				}

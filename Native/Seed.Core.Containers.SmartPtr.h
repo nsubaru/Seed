@@ -86,7 +86,15 @@ namespace Seed {
 			/// </summary>
 			SizeT Property(GetRefCount) RefCount;
 		public:
+			template<typename T>
+            friend void Seed::Core::Swap(T& a, T& b);
+		public:
 			RefCountClass(SmartPtr, This);
 		};
+
+		template<typename T>
+        void Swap(SmartPtr<T>& a, SmartPtr<T>& b) {
+            Swap(a.This, b.This);
+        }
 	}
 }

@@ -6,197 +6,56 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Math {
+			/// <summary>
+			/// Значення константи PI
+			/// </summary>
 			inline constexpr Double Pi = Internal::Pi();
+			/// <summary>
+			/// Значення константи E
+			/// </summary>
 			inline constexpr Double E = Internal::E();
-
-			//forceinline constexpr Double Pow(Double What, Double By) {
-			//	auto constexprLambda = [](Double What, Double Base, Double By) constexpr {
-			//		return
-			//	};
-			//	if constexpr (IS_CONSTEXPR(constexprLambda))
-			//		return constexprLambda(What, What, By);
-			//	else
-			//		return Details::RuntimePow(What, By);
-			//}
-
-			//constexpr Double res = Pow(6.0, 2.0);
-
-			//forceinline constexpr Float Pow(Float What, Float By) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprPow(What, What, By)))
-			//		return Details::ConstexprPow(What, What, By);
-			//	else
-			//		return Details::RuntimePow(What, By);
-			//}
-			//forceinline constexpr UInt64 Pow(UInt64 What, UInt8 By) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprPow(What, What, By)))
-			//		return Details::ConstexprPow(What, What, By);
-			//	else
-			//		return Details::RuntimePow(What, By);
-			//}
-
-			//forceinline constexpr Double Exp(Double By) {
-			//	extern forceinline constexpr Double ConstexprExp(Double X, Double Res);
-			//	if constexpr (IS_CONSTEXPR(Seed::Core::Details::ConstexprExp(By)))
-			//		return Details::ConstexprExp(By);
-			//	else return Details::RuntimeExp(By);
-			//}
-
-			//constexpr Double expRes = Exp(50.0L);
-
-			//forceinline constexpr Double Sin(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprSin(Rad)))
-			//		return Details::ConstexprSin(Rad);
-			//	else
-			//		return Details::RuntimeSin(Rad);
-			//}
-
-			//forceinline constexpr Double Cos(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprCos(Rad)))
-			//		return Details::ConstexprCos(Rad);
-			//	else
-			//		return Details::RuntimeCos(Rad);
-			//}
-
-			//forceinline constexpr Double Tan(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprTan(Rad)))
-			//		return Details::ConstexprTan(Rad);
-			//	else
-			//		return Details::RuntimeTan(Rad);
-			//}
-
-			//forceinline constexpr Double Ctan(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprCtan(Rad)))
-			//		return Details::ConstexprCtan(Rad);
-			//	else
-			//		return Details::RuntimeCtan(Rad);
-			//}
-
-			//forceinline constexpr Double ACos(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprACos(Rad)))
-			//		return Details::ConstexprACos(Rad);
-			//	else
-			//		return Details::RuntimeACos(Rad);
-			//}
-
-			//forceinline constexpr Double ASin(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprASin(Rad)))
-			//		return Details::ConstexprASin(Rad);
-			//	else
-			//		return Details::RuntimeASin(Rad);
-			//}
-
-			//forceinline constexpr Double ATan(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprATan(Rad)))
-			//		return Details::ConstexprATan(Rad);
-			//	else
-			//		return Details::RuntimeATan(Rad);
-			//}
-
-			//forceinline constexpr Double ACtan(Double Rad) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprACtan(Rad)))
-			//		return Details::ConstexprCtan(Rad);
-			//	else
-			//		return Details::RuntimeACtan(Rad);
-			//}
-
-			//forceinline constexpr Double Sqrt(Double Val) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprSqrt(Val)))
-			//		return Details::ConstexprSqrt(Val);
-			//	else
-			//		return Details::RuntimeCtan(Val);
-			//}
-
-			//forceinline constexpr Int8 Abs(Int8 Val) {
-			//	return Details::ConstexprAbs(Val);
-			//}
-
-			//forceinline constexpr Int16 Abs(Int16 Val) {
-			//	return Details::ConstexprAbs(Val);
-			//}
-			//forceinline constexpr Int32 Abs(Int32 Val) {
-			//	return Details::ConstexprAbs(Val);
-			//}
-			//forceinline constexpr Int64 Abs(Int64 Val) {
-			//	return Details::ConstexprAbs(Val);
-			//}
-			//forceinline constexpr Float Abs(Float Val) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprAbs(Val)))
-			//		return Details::ConstexprAbs(Val);
-			//	else
-			//		return Details::RuntimeAbs(Val);
-			//}
-
-			//forceinline constexpr Double Abs(Double Val) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprAbs(Val)))
-			//		return Details::ConstexprAbs(Val);
-			//	else
-			//		return Details::RuntimeAbs(Val);
-			//}
-
-			//forceinline constexpr Boolean Sign(Int8 Val) {
-			//	return ((Val) & ((Seed::Int8)1 << 7));
-			//}
-			//forceinline constexpr Boolean Sign(Int16 Val) {
-			//	return ((Val) & ((Seed::Int16)1 << 15));
-			//}
-			//forceinline constexpr Boolean Sign(Int32 Val) {
-			//	return ((Val) & ((Seed::Int32)1 << 31));
-			//}
-			//forceinline constexpr Boolean Sign(Int64 Val) {
-			//	return ((Val) & ((Seed::Int64)1 << 63));
-			//}
-			//forceinline constexpr Boolean Sign(Float Val) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprSign(Val)))
-			//		return Details::ConstexprSign(Val);
-			//	else
-			//		return Details::RuntimeAbs(Val);
-			//}
-			//forceinline constexpr Boolean Sign(Double Val) {
-			//	if constexpr (IS_CONSTEXPR(Details::ConstexprSign(Val)))
-			//		return Details::ConstexprSign(Val);
-			//	else
-			//		return Details::RuntimeAbs(Val);
-			//}
-
-			//forceinline constexpr Boolean GetNumberByPos(const UInt64 Number, const UInt8 Pos) {
-			//	return Number % Pow(10ULL, Pos + 1) / Pow(10ULL, Pos + 1);
-			//}
-
-			//forceinline constexpr Float Ceil(Float Val) { return Details::Ceil(Val); }
-			//forceinline constexpr Double Ceil(Double Val) { return Details::Ceil(Val); }
-
-			//forceinline constexpr Float Floor(Float Val) { return Details::Floor(Val); }
-			//forceinline constexpr Double Floor(Double Val) { return Details::Floor(Val); }
-
-			//forceinline constexpr Double ModD(Double Val, Double & IntPart) { return Details::ModD(Val, IntPart); }
-			//forceinline constexpr Float ModD(Float Val, Float & IntPart) { return Details::ModD(Val, IntPart); }
-
-			//forceinline constexpr Float Log2(Float X);
-			//forceinline constexpr Double Log2(Double X);
-
-			//forceinline constexpr Float Log10(Float X);
-			//forceinline constexpr Double Log10(Double X);
-
-			//forceinline constexpr Float Log(Float Base, Float X);
-			//forceinline constexpr Double Log(Double Base, Double X);
 #pragma region Abs
+			/// <summary>
+			/// Обчислює модуль числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>Модуль числа</returns>
 			forceinline constexpr Int8 Abs(Int8 Val)
 			{
 				return Internal::ConstexprAbs(Val);
 			}
-
+			/// <summary>
+			/// Обчислює модуль числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>Модуль числа</returns>
 			forceinline constexpr Int16 Abs(Int16 Val)
 			{
 				return Internal::ConstexprAbs(Val);
 			}
+			/// <summary>
+			/// Обчислює модуль числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>Модуль числа</returns>
 			forceinline constexpr Int32 Abs(Int32 Val)
 			{
 				return Internal::ConstexprAbs(Val);
 			}
+			/// <summary>
+			/// Обчислює модуль числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>Модуль числа</returns>
 			forceinline constexpr Int64 Abs(Int64 Val)
 			{
 				return Internal::ConstexprAbs(Val);
 			}
+			/// <summary>
+			/// Обчислює модуль числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>Модуль числа</returns>
 			forceinline constexpr Float Abs(Float Val)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprAbs(Val)))
@@ -204,7 +63,11 @@ namespace Seed {
 				else
 					return Internal::RuntimeAbs(Val);
 			}
-
+			/// <summary>
+			/// Обчислює модуль числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>Модуль числа</returns>
 			forceinline constexpr Double Abs(Double Val)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprAbs(Val)))
@@ -214,6 +77,12 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region Pow
+			/// <summary>
+			/// Приведення числа до степені x^y
+			/// </summary>
+			/// <param name="X">Число яке приводиться до степені</param>
+			/// <param name="Y">Число степеней</param>
+			/// <returns>Результат</returns>
 			forceinline constexpr UInt64 Pow(UInt64 X, UInt8 Y)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprPow(X, Y)))
@@ -221,6 +90,12 @@ namespace Seed {
 				else
 					return Internal::RuntimePow(X, Y);
 			}
+			/// <summary>
+			/// Приведення числа до степені x^y
+			/// </summary>
+			/// <param name="X">Число яке приводиться до степені</param>
+			/// <param name="Y">Число степеней</param>
+			/// <returns>Результат</returns>
 			forceinline constexpr Double Pow(Double X, Int32 Y)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprPow(X, Y)))
@@ -228,6 +103,12 @@ namespace Seed {
 				else
 					return Internal::RuntimePow(X, Y);
 			}
+			/// <summary>
+			/// Приведення числа до степені x^y
+			/// </summary>
+			/// <param name="X">Число яке приводиться до степені</param>
+			/// <param name="Y">Число степеней</param>
+			/// <returns>Результат</returns>
 			forceinline constexpr Double Pow(Double X, Double Y)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprPow(X, Y)))
@@ -237,6 +118,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region Log
+			/// <summary>
+			/// Обчислює натуральний логарифм з числа
+			/// </summary>
+			/// <param name="X">Вхідне значення</param>
+			/// <returns>Натуральний логарифм</returns>
 			forceinline constexpr Double Ln(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprLn(X)))
@@ -244,10 +130,20 @@ namespace Seed {
 				else
 					return Internal::RuntimeLn(X);
 			}
+			/// <summary>
+			/// Обчислює натуральний логарифм з числа
+			/// </summary>
+			/// <param name="X">Вхідне значення</param>
+			/// <returns>Натуральний логарифм</returns>
 			forceinline constexpr Double Lg(Double X)
 			{
 				return Ln(X);
 			}
+			/// <summary>
+			/// Обчислює логарифм за основою 2 з числа
+			/// </summary>
+			/// <param name="X">Вхідне значення</param>
+			/// <returns>Логарифм за основою 2</returns>
 			forceinline constexpr Double Log2(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprLog2(X)))
@@ -257,6 +153,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region Sqrt
+			/// <summary>
+			/// Обчислює корінь квадратний з числа
+			/// </summary>
+			/// <param name="X">Вхідне значення</param>
+			/// <returns>Корінь квадратний з числа</returns>
 			forceinline constexpr Double Sqrt(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprSqrt(X)))
@@ -265,8 +166,12 @@ namespace Seed {
 					return Internal::RuntimeSqrt(X);
 			}
 #pragma endregion
-
 #pragma region Sin
+			/// <summary>
+			/// Обчислює синус з числа
+			/// </summary>
+			/// <param name="X">Значення в радіанах</param>
+			/// <returns>Синус числа</returns>
 			forceinline constexpr Double Sin(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprSin(X)))
@@ -275,8 +180,12 @@ namespace Seed {
 					return Internal::RuntimeSin(X);
 			}
 #pragma endregion
-
 #pragma region Cos
+			/// <summary>
+			/// Обчислює косинус з числа
+			/// </summary>
+			/// <param name="X">Значення в радіанах</param>
+			/// <returns>Косинус числа</returns>
 			forceinline constexpr Double Cos(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprCos(X)))
@@ -286,6 +195,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region Tan
+			/// <summary>
+			/// Обчислює тангенс з числа
+			/// </summary>
+			/// <param name="X">Значення в радіанах</param>
+			/// <returns>Тангенс числа</returns>
 			forceinline constexpr Double Tan(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprTan(X)))
@@ -295,6 +209,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region CTan
+			/// <summary>
+			/// Обчислює котангенс з числа
+			/// </summary>
+			/// <param name="X">Значення в радіанах</param>
+			/// <returns>Котангенс числа</returns>
 			forceinline constexpr Double CTan(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprCtan(X)))
@@ -304,6 +223,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region ASin
+			/// <summary>
+			/// Обчислює кут в радіанах за синусом кута
+			/// </summary>
+			/// <param name="X">Синус кута</param>
+			/// <returns>Кут в радіанах</returns>
 			forceinline constexpr Double ASin(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprASin(X)))
@@ -313,6 +237,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region ACos
+			/// <summary>
+			/// Обчислює кут в радіанах за косинусом кута
+			/// </summary>
+			/// <param name="X">Косинус кута</param>
+			/// <returns>Кут в радіанах</returns>
 			forceinline constexpr Double ACos(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprACos(X)))
@@ -322,6 +251,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region ATan
+			/// <summary>
+			/// Обчислює кут в радіанах за тангенсом кута
+			/// </summary>
+			/// <param name="X">Тангенс кута</param>
+			/// <returns>Кут в радіанах</returns>
 			forceinline constexpr Double ATan(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprATan(X)))
@@ -331,6 +265,11 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region ACtan
+			/// <summary>
+			/// Обчислює кут в радіанах за котангенсом кута
+			/// </summary>
+			/// <param name="X">Котангенс кута</param>
+			/// <returns>Кут в радіанах</returns>
 			forceinline constexpr Double ACtan(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprACtan(X)))
@@ -340,22 +279,47 @@ namespace Seed {
 			}
 #pragma endregion
 #pragma region Sign
+			/// <summary>
+			/// Визначає знак числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>true якщо додатнє</returns>
 			forceinline constexpr Boolean Sign(Int8 Val)
 			{
 				return ((Val) & ((Seed::Int8)1 << 7)); //-V2533
 			}
+			/// <summary>
+			/// Визначає знак числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>true якщо додатнє</returns>
 			forceinline constexpr Boolean Sign(Int16 Val)
 			{
 				return ((Val) & ((Seed::Int16)1 << 15)); //-V2533
 			}
+			/// <summary>
+			/// Визначає знак числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>true якщо додатнє</returns>
 			forceinline constexpr Boolean Sign(Int32 Val)
 			{
 				return ((Val) & ((Seed::Int32)1 << 31)); //-V2533
 			}
+			/// <summary>
+			/// Визначає знак числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>true якщо додатнє</returns>
 			forceinline constexpr Boolean Sign(Int64 Val)
 			{
 				return ((Val) & ((Seed::Int64)1 << 63)); //-V2533
 			}
+			/// <summary>
+			/// Визначає знак числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>true якщо додатнє</returns>
 			forceinline constexpr Boolean Sign(Float Val)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprSign(Val)))
@@ -363,6 +327,11 @@ namespace Seed {
 				else
 					return Internal::RuntimeAbs(Val);
 			}
+			/// <summary>
+			/// Визначає знак числа
+			/// </summary>
+			/// <param name="Val">Вхідне число</param>
+			/// <returns>true якщо додатнє</returns>
 			forceinline constexpr Boolean Sign(Double Val)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprSign(Val)))
@@ -370,7 +339,12 @@ namespace Seed {
 				else
 					return Internal::RuntimeAbs(Val);
 			}
-
+			/// <summary>
+			/// Вертає число за позицією в десятковому вигляді
+			/// </summary>
+			/// <param name="Number">Вхідне число</param>
+			/// <param name="Pos">Позиція від нуля з права на ліво</param>
+			/// <returns>Значення за відповідною позицією</returns>
 			forceinline constexpr UInt8 GetNumberByPos(const UInt64 Number, const UInt8 Pos)
 			{
 				return static_cast<UInt8>(
@@ -378,7 +352,11 @@ namespace Seed {
 					);
 			}
 #pragma endregion
-
+			/// <summary>
+			/// Експонента з числа: e^x
+			/// </summary>
+			/// <param name="X">Вхідне число</param>
+			/// <returns>Результат функції</returns>
 			forceinline constexpr Double Exp(Double X)
 			{
 				if constexpr (IS_CONSTEXPR(Internal::ConstexprExp(X)))
@@ -386,19 +364,39 @@ namespace Seed {
 				else
 					return Internal::RuntimeExp(X);
 			}
-
+			/// <summary>
+			/// Розділяє число на цілу і дійсну частину
+			/// </summary>
+			/// <param name="X">Вхідне число</param>
+			/// <param name="Y">Вихідна ціла частина числа</param>
+			/// <returns>Дійсна частина числа</returns>
 			forceinline Double ModD(Double X, Double& Y) {
 				return Internal::ModD(X, Y);
 			}
-
+			/// <summary>
+			/// Розділяє число на цілу і дійсну частину
+			/// </summary>
+			/// <param name="X">Вхідне число</param>
+			/// <param name="Y">Вихідна ціла частина числа</param>
+			/// <returns>Дійсна частина числа</returns>
 			forceinline Float ModD(Float X, Float& Y) {
 				return Internal::ModD(X, Y);
 			}
-
+			/// <summary>
+			/// Порівняння дійсних чисел з урахування погрішності
+			/// </summary>
+			/// <param name="first">Перше число</param>
+			/// <param name="second">Друге число</param>
+			/// <returns>true якщо числа рівні з урахування погрішності</returns>
 			forceinline constexpr bool Equals(Float first, Float second){
 				return Abs(first - second) <= Epsilon<Double>();
 			}
-
+			/// <summary>
+			/// Порівняння дійсних чисел з урахування погрішності
+			/// </summary>
+			/// <param name="first">Перше число</param>
+			/// <param name="second">Друге число</param>
+			/// <returns>true якщо числа рівні з урахування погрішності</returns>
 			forceinline constexpr bool Equals(Double first, Double second){
 				return Abs(first - second) <= Epsilon<Double>();
 			}

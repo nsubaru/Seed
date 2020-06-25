@@ -1,6 +1,7 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
+#include "Seed.Core.CoreLog.Managed.h"
 #include "Seed.Core.Threading.TLS.GlobalTLSBlock.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
@@ -13,6 +14,86 @@ static DWORD const xp_timeout = 100; // ms
 static int const uninitialized = 0;
 static int const being_initialized = -1;
 static int const epoch_start = INT_MIN;
+
+extern void* InternalHeapFree(void* MemBlk);
+extern void* InternalHeapAllocate(Seed::SizeT Size);
+
+class InternalHeap final: public Seed::Memory::BasicHeap {
+public:
+    ///<summary>Виділення пам'яті</summary>
+	///<param name='Size'>Розмір ділянки в байтах</param>
+	///<returns>Виділену ділянку</returns>
+    virtual void* Allocate(Seed::SizeT Size) final {
+        return InternalHeapAllocate(Size);
+    }
+	///<summary>Вирівнняне виділення пам'яті</summary>
+	///<param name='Size'>Розмір ділянки в байтах</param>
+	///<param name='AllocationReq'>Границя вирівнювання</param>
+	///<returns>Виділену ділянку</returns>
+    virtual void* AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq) final {
+        Throw(Seed::NotImplementedException(ExceptionPosition));
+    }
+
+	///<summary>Звільнення пам'яті</summary>
+	///<param name='MemBlk'>Блок пам'яті який звільняється</param>
+    virtual void* Free(void* MemBlk) final {
+        return InternalHeapFree(MemBlk);
+    }
+	///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
+	///<param name='MemBlk'>Блок пам'яті який звільняється</param>
+	///<param name='AllocationReq'>Границя вирівнювання</param>
+    virtual void* AllignedFree(void* MemBlk, Seed::SizeT AllocationReq) final {
+        Throw(Seed::NotImplementedException(ExceptionPosition));
+    }
+
+	///<summary>Кількість виділених блоків даних</summary>
+    virtual Seed::SizeT CurrentMemBlkCount() noexcept final {
+        return Seed::Core::Memory::CurrentInternalHeapAllocatedMemBlks();
+    }
+	///<summary>Розмір виділеної пам'яті в байтах</summary>
+    virtual Seed::SizeT CurrentAllocatedMemory() noexcept final {
+        return Seed::Core::Memory::CurrentInternalHeapAllocatedMemory();
+    }
+	///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
+    virtual Seed::SizeT CurrentHeapUsage() noexcept final {
+        return Seed::Core::Memory::CurrentInternalHeapHeapsUsage();
+    }
+};
+
+static Seed::Core::Containers::BaseList<InternalHeap, Seed::SizeT>* TSStorage = nullptr;
+
+void registerTSSVariable(int* const pOnce) {
+    if (TSStorage == nullptr)
+    {
+        TSStorage = new Seed::Core::Containers::BaseList<InternalHeap, Seed::SizeT>();
+    }
+    (*TSStorage) += (Seed::SizeT) pOnce;
+}
+
+void unRegisterTSSVariable() {
+    TSStorage->RemoveAll([] (Seed::SizeT&& ppOnce)
+    {
+        auto pOnce = (int*) ppOnce;
+        try
+        {
+            *pOnce = uninitialized;
+        }
+        catch (Seed::Exception& ex)
+        {
+            Seed::toCoreLog(
+                L"Warning: exception on TSS unregister on address: " + 
+                Seed::ExceptionString::toString(pOnce) + 
+                " exception information: ", ex);
+        }
+        catch (...)
+        {
+            Seed::toCoreLog(L"Warning: uknown exception on TSS unregister on address: " + Seed::ExceptionString::toString(pOnce));
+        }
+    });
+
+    delete TSStorage;
+    TSStorage = nullptr;
+}
 
 // Access to these variables is guarded in the below functions.  They may only
 // be modified while the lock is held.  _Tss_epoch is readable from user
@@ -45,7 +126,7 @@ extern "C" void __cdecl _Init_thread_notify()
 // timeout expires.  The signal may be missed because the sleeping threads may be
 // stolen by the kernel to service an APC, or due to the race condition between the
 // unlock call and the WaitForSingleObject call.
-extern "C" void __cdecl _Init_thread_wait(LARGE_INTEGER timeout)
+extern "C" extern void __cdecl _Init_thread_wait(LARGE_INTEGER timeout)
 {
     RtlSleepConditionVariableSRW(&g_tss_cv, &g_tss_srw, &timeout, 0);
 }
@@ -54,7 +135,7 @@ extern "C" void __cdecl _Init_thread_wait(LARGE_INTEGER timeout)
 // this function before the variable has completed initialization, this thread
 // will perform initialization.  All other threads are blocked until the
 // initialization completes or fails due to an exception.
-extern "C"  void __cdecl _Init_thread_header(int* const pOnce) noexcept
+extern "C" extern void __cdecl _Init_thread_header(int* const pOnce) noexcept
 {
     _Init_thread_lock();
 
@@ -91,7 +172,7 @@ extern "C"  void __cdecl _Init_thread_header(int* const pOnce) noexcept
 // Abort processing of the initializer due to an exception.  Reset the state
 // to uninitialized and release waiting threads (one of which will take over
 // initialization, any remaining will again sleep).
-extern "C"  void __cdecl _Init_thread_abort(int* const pOnce) noexcept
+extern "C" extern void __cdecl _Init_thread_abort(int* const pOnce) noexcept
 {
     _Init_thread_lock();
     *pOnce = uninitialized;
@@ -102,7 +183,7 @@ extern "C"  void __cdecl _Init_thread_abort(int* const pOnce) noexcept
 // Called by the thread that completes initialization of a variable.
 // Increment the global and per thread counters, mark the variable as
 // initialized, and release waiting threads.
-extern "C"  void __cdecl _Init_thread_footer(int* const pOnce) noexcept
+extern "C" extern void __cdecl _Init_thread_footer(int* const pOnce) noexcept
 {
     _Init_thread_lock();
     ++_Init_global_epoch;
@@ -110,4 +191,5 @@ extern "C"  void __cdecl _Init_thread_footer(int* const pOnce) noexcept
     _Init_thread_epoch = _Init_global_epoch;
     _Init_thread_unlock();
     _Init_thread_notify();
+    registerTSSVariable(pOnce);
 }

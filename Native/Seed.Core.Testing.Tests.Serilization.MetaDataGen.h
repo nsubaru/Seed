@@ -12,11 +12,11 @@ namespace Seed
             {
                 namespace Serilization
                 {
-                    class ComplexMetaDataGen final : public ITest {
+                    class ComplexMetaDataGen final : public TestClass<ComplexMetaDataGen> {
                         virtual bool Excecute() override;
                     };
 
-					class CustomStructMetaDataGen final : public ITest {
+					class CustomStructMetaDataGen final : public TestClass<CustomStructMetaDataGen> {
                         virtual bool Excecute() override;
                     };
 				}

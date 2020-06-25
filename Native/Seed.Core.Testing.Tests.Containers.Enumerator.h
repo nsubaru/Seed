@@ -8,7 +8,7 @@ namespace Seed {
 		namespace Testing {
 			namespace Test {
 				namespace Containers {
-					class Enumerator final : public ITest {
+					class Enumerator final : public TestClass<Enumerator> {
 						virtual bool Excecute() override;
 					};
 				}

@@ -170,32 +170,22 @@ namespace Seed {
 					Internals::Exceptions::ThrowInternalError(__FILE__, __FUNCSIG__, __LINE__);
 				}
 #pragma warning(pop)
-
-				//constexpr forceinline bool operator<(SafeInt second) {
-				//	return this->value < second.value;
-				//}
-
-				//constexpr forceinline bool operator>(SafeInt second) {
-				//	return this->value > second.value;
-				//}
-				//constexpr forceinline bool operator<=(SafeInt second) {
-				//	return this->value <= second.value;
-				//}
-				//constexpr forceinline bool operator>=(SafeInt second) {
-				//	return this->value >= second.value;
-				//}
-				//constexpr forceinline bool operator==(SafeInt second) {
-				//	return this->value == second.value;
-				//}
-				//constexpr forceinline bool operator!=(SafeInt second) {
-				//	return this->value != second.value;
-				//}
-
+				/// <summary>
+				/// Оператор універсального порівняння
+				/// </summary>
+				/// <param name="second">Друге число</param>
+				/// <returns>Результат порівняння</returns>
 				constexpr forceinline auto operator<=>(SafeInt second) {
 					return this->value <=> second.value;
 				}
-
+				/// <summary>
+				/// Вертає значення числа
+				/// </summary>
+				/// <returns>Значення числа</returns>
 				constexpr forceinline Int GetValue() { return value; }
+				/// <summary>
+				/// Значення числа
+				/// </summary>
 				Int Property(GetValue) Value;
 			};
 
@@ -211,6 +201,9 @@ namespace Seed {
 #pragma endregion
 
 #pragma region ConvertUnsignedToSigned
+			/// <summary>
+			/// Перетворює в знаковий тип числа з перевіркою на переповнення
+			/// </summary>
 			template<typename T>
 			TypeTraits::Signed<T> ConvertUnsignedToSigned(TypeTraits::Unsigned<T> From) {
 				if (From > static_cast<TypeTraits::Unsigned<T>>(Max<TypeTraits::Signed<T>>()))

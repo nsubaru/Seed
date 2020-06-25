@@ -14,7 +14,7 @@ namespace Seed
 	{
 		namespace Testing
 		{
-			class SeedKernelCall TestResult : IDisposable, public Serilization::ISerilizable<TestResult> {
+			class TestResult : IDisposable, public Serilization::ISerilizable<TestResult> {
 			public:
 				enum class EStatus : UInt8 {
 					Success, Failure, Exception
