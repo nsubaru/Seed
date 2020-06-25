@@ -5,7 +5,6 @@
 
 #ifndef __GUID_DEFINED
 #define __GUID_DEFINED
-///<summary>128-бітний унікальний ідентифікатор</summary>
 typedef struct _GUID {
 	unsigned long  Data1;
 	unsigned short Data2;

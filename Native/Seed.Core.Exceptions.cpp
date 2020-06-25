@@ -21,16 +21,11 @@
 
 using namespace Seed;
 
-///<summary>Інформація про кучу помилок</summary>
 struct ExceptionsHeapT
 {
-	///<summary>Дескриптор кучі</summary>
 	Seed::Handle HeapHandle;
-	///<summary>Поточне використання кучі</summary>
 	volatile Seed::SizeT AllocatedMemory;
-	///<summary>Поточна кількість виділених блоків</summary>
 	volatile Seed::SizeT AllocatedMemBlksCount;
-	///<summary>Фактичне використання пам'яті кучею</summary>
 	volatile Seed::SizeT CurrentHeapSize;
 };
 

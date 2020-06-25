@@ -28,16 +28,11 @@
 using namespace Seed;
 using namespace Seed::Memory;
 
-///<summary>Інформація про кучі</summary>
 struct HeapDataT
 {
-	///<summary>Дескриптор кучі</summary>
 	Handle HeapHandle;
-	///<summary>Поточне використання кучі</summary>
 	volatile SizeT AllocatedMemory;
-	///<summary>Поточна кількість виділених блоків</summary>
 	volatile SizeT AllocatedMemBlksCount;
-	///<summary>Фактичне використання пам'яті кучею</summary>
 	volatile SizeT CurrentHeapSize;
 };
 

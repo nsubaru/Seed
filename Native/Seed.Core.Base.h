@@ -12,6 +12,7 @@
 #include "Seed.Core.Base.CStr.h"
 #include "Seed.Core.Base.Swap.h"
 #include "Seed.Core.Base.TypeTraits.h"
+#include "Seed.Core.Base.Concepts.h"
 #include "Seed.Core.Base.UUID.h"
 #include "Seed.Core.Base.Internals.h"
 
