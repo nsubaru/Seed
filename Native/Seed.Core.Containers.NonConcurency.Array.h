@@ -17,7 +17,6 @@ namespace Seed {
 			template<typename THeap, typename T>
 			class BaseArray final :
 				Seed::IDisposable,
-				public IClonable<BaseArray<THeap, T>>,
 				public Memory::Allocator<THeap>,
 				public LINQ::IArray<BaseArray, THeap, T, false> {
 			private:
@@ -87,16 +86,18 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 
-				template<typename LambdaT>
-				BaseArray& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
+				template<typename TLambda>
+				BaseArray& ForEachImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
+                                  TypeTraits::IsInvockable<TLambda, T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
 							lambda(This->array[i]);
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT> ||
+                                       TypeTraits::IsInvockable<TLambda, T&, SizeT>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
 							lambda(This->array[i], i);
@@ -108,16 +109,16 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				const BaseArray& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+				template<typename TLambda>
+				const BaseArray& ForEachImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
 							lambda(This->array[i]);
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						for (SizeT i = 0; i < This->count; i++)
 						{
 							lambda(This->array[i], i);
@@ -129,18 +130,21 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				BaseArray& ForEachImpl(LambdaT&& lambda, SizeT count) {
+				template<typename TLambda>
+				BaseArray& ForEachImpl(TLambda&& lambda, SizeT count) {
 					if (count > this->Count)
 						count = this->Count;
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
+
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
+                                  TypeTraits::IsInvockable<TLambda, T&>) {
 						for (SizeT i = 0; i < count; i++)
 						{
 							lambda(This->array[i]);
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT> ||
+                                       TypeTraits::IsInvockable<TLambda, T&, SizeT>) {
 						for (SizeT i = 0; i < count; i++)
 						{
 							lambda(This->array[i], i);
@@ -152,18 +156,19 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				const BaseArray& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+				template<typename TLambda>
+				const BaseArray& ForEachImpl(TLambda&& lambda, SizeT count) const {
 					if (count > this->Count)
 						count = this->Count;
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
 						for (SizeT i = 0; i < count; i++)
 						{
 							lambda(This->array[i]);
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						for (SizeT i = 0; i < count; i++)
 						{
 							lambda(This->array[i], i);
@@ -174,10 +179,63 @@ namespace Seed {
 						static_assert(false);
 					}
 				}
+
+				template<typename TLambda>
+                BaseArray& ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT count) {
+                    if (startIndex > this->Count)
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __LINE__, __FUNCSIG__);
+                    if (startIndex + count > this->Count)
+                        count = this->Count - startIndex;
+
+                    if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
+                                  TypeTraits::IsInvockable<TLambda, T&>) {
+                        for (SizeT i = startIndex; i < count; i++)
+                        {
+                            lambda(This->array[i]);
+                        }
+                        return *this;
+                    }
+                    else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT> ||
+                                       TypeTraits::IsInvockable<TLambda, T&, SizeT>) {
+                        for (SizeT i = startIndex; i < count; i++)
+                        {
+                            lambda(This->array[i], i);
+                        }
+                        return *this;
+                    }
+                    else {
+                        static_assert(false);
+                    }
+                }
+
+                template<typename TLambda>
+                const BaseArray& ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT count) const {
+                    if (startIndex > this->Count)
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __LINE__, __FUNCSIG__, startIndex, this->Count);
+                    if (startIndex + count > this->Count)
+                        count = this->Count - startIndex;
+
+                    if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
+                        for (SizeT i = startIndex; i < count; i++)
+                        {
+                            lambda(This->array[i]);
+                        }
+                        return *this;
+                    }
+                    else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
+                        for (SizeT i = startIndex; i < count; i++)
+                        {
+                            lambda(This->array[i], i);
+                        }
+                        return *this;
+                    }
+                    else {
+                        static_assert(false);
+                    }
+                }
 			protected:
-
-				template<typename U, typename Lambda>
-				U AggregateImpl(Lambda&& lambda) const {
+				template<typename U, typename TLambda>
+				U AggregateImpl(TLambda&& lambda) const {
 					U val = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
@@ -186,8 +244,8 @@ namespace Seed {
 					return val;
 				}
 
-				template<typename U, typename Lambda>
-				U AggregateImpl(Lambda&& lambda, const U& Value) const {
+				template<typename U, typename TLambda>
+				U AggregateImpl(TLambda&& lambda, const U& Value) const {
 					U result = Value;
 					for (SizeT i = 0; i < This->count; i++)
 					{
@@ -196,8 +254,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename U, typename Lambda>
-				U AggregateImpl(Lambda&& lambda, U&& Value) const {
+				template<typename U, typename TLambda>
+				U AggregateImpl(TLambda&& lambda, U&& Value) const {
 					for (SizeT i = 0; i < This->count; i++)
 					{
 						lambda(Value, This->array[i]);
@@ -207,8 +265,8 @@ namespace Seed {
 
 				forceinline bool AnyImpl() const { return This->count > 0; }
 
-				template<typename Lambda>
-				bool AnyImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				bool AnyImpl(TLambda&& lambda) const {
 					for (SizeT i = 0; i < This->count; i++)
 					{
 						if (lambda(This->array[i]))
@@ -217,8 +275,8 @@ namespace Seed {
 					return false;
 				}
 
-				template<typename Lambda>
-				bool AllImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				bool AllImpl(TLambda&& lambda) const {
 					for (SizeT i = 0; i < This->count; i++)
 					{
 						if (!lambda(This->array[i]))
@@ -239,8 +297,8 @@ namespace Seed {
 					return *this;
 				}
 
-				template<typename Lambda>
-				forceinline BaseArray& SortByLambdaImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				forceinline BaseArray& SortByLambdaImpl(TLambda&& lambda) {
 					if (This->count == 0)
 						return;
 
@@ -248,8 +306,8 @@ namespace Seed {
 					return *this;
 				}
 
-				template<typename Lambda>
-				T& FirstImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				T& FirstImpl(TLambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++)
 						if (lambda(This->array[i]))
 							return static_cast<T&>(This->array[i]);
@@ -257,8 +315,8 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				template<typename Lambda>
-				T& LastImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				T& LastImpl(TLambda&& lambda) {
 					SizeT Index = -1;
 					for (SizeT i = 0; i < This->count; i++)
 						if (lambda(This->array[i]))
@@ -270,8 +328,8 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				template<typename Lambda>
-				const T& FirstImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				const T& FirstImpl(TLambda&& lambda) const {
 					for (SizeT i = 0; i < This->count; i++)
 						if (lambda(This->array[i]))
 							return static_cast<T&>(This->array[i]);
@@ -279,8 +337,8 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				template<typename Lambda>
-				const T& LastImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				const T& LastImpl(TLambda&& lambda) const {
 					SizeT Index = -1;
 					for (SizeT i = 0; i < This->count; i++)
 						if (lambda(This->array[i]))
@@ -314,8 +372,8 @@ namespace Seed {
 					return *this;
 				}
 
-				template<typename Lambda>
-				forceinline BaseArray& RemoveAllImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				forceinline BaseArray& RemoveAllImpl(TLambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->array[i]));
 					}
@@ -469,9 +527,33 @@ namespace Seed {
                 /// Клонування масиву
                 /// </summary>
                 /// <returns>Вертає новий масив з копією всіх елементів</returns>
-				virtual BaseArray Clone() const override final {
+                template<typename = void> requires (Concepts::IsClonable<T>) 
+                BaseArray Clone() const {
 					return BaseArray(This->array, This->count);
-				}
+                }
+
+				/// <summary>
+				/// Клонування масиву з використанням користувальницької лямбди або функтора
+				/// </summary>
+				/// <param name="lambda">Лямбда або функтор який виконає клонування всіх елементів</param>
+                template<typename TLambda> requires (Concepts::InvockableWithResult<TLambda, T, const T&>)
+                BaseArray Clone(TLambda&& lambda) const {
+                    T* array = nullptr;
+                    try
+                    {
+                        array = new T[This->count];
+                        for (SizeT i = 0ui64; i < This->count; i++)
+                        {
+                            array[i] = lambda(This->array[i]);
+                        }
+
+                        return BaseConcurencyArray(MoveRValue(array), This->count);
+                    }
+                    catch (...)
+                    {
+                        delete[] array;
+                    }
+                }
 #pragma warning(pop)
 				///<summary>Оптимізований обмін</summary>
 				///<param name = 'A'>Перший елемент</param>
@@ -535,17 +617,17 @@ namespace Seed {
 			template<typename THeap, typename T>
 			class BaseVList final :
 				Seed::IDisposable,
-				public IClonable<BaseVList<THeap, T>>,
 				public Memory::Allocator<THeap>,
 				public LINQ::IArray<BaseVList, THeap, T, false> {
 			private:
-				struct Node {
+				struct Node : public Memory::Allocator<THeap> {
 					T* restrict arr;
 					SizeT size;
 					Node* next;
 
 					forceinline Node(SizeT size) : size(size), arr(new T[size]), next(nullptr) {}
 					forceinline Node(SizeT size, T*&& arr) : size(size), arr(arr), next(nullptr) {}
+					template<typename> requires (Concepts::IsClonable<T>)
 					forceinline Node(SizeT size, const T*& arr) : size(size), arr(new T[size]), next(nullptr) {
 						if constexpr (TypeTraits::IsPodV<T>) {
 							Memory::Copy(arr, this->arr, sizeof(T) * size);
@@ -557,6 +639,7 @@ namespace Seed {
 							}
 						}
 					}
+					template<typename> requires (Concepts::IsClonable<T>)
 					forceinline Node(SizeT size, T*& arr) : size(size), arr(new T[size]), next(nullptr) {
 						if constexpr (TypeTraits::IsPodV<T>) {
 							Memory::Copy(arr, this->arr, sizeof(T) * size);
@@ -570,7 +653,7 @@ namespace Seed {
 					}
 				};
 
-				struct Data {
+				struct Data : public Memory::Allocator<THeap> {
 					RefCountT RefCount;
 					RefCountT count;
 					Node* root;
@@ -617,6 +700,8 @@ namespace Seed {
 				forceinline BaseVList(BaseArray<THeap, T>&& array) : This(nullptr) {
 					if (--array.This->RefCount == 0) {
 						This = new Data(array.This->count, MoveRValue(array.This->array));
+						delete array.This;
+						array.This = nullptr;
 					}
 					else {
 						this->BaseVList::BaseVList(array);
@@ -742,7 +827,8 @@ namespace Seed {
                 /// Клонування об'єктів
                 /// </summary>
                 /// <returns>Новий об'єкт з копією всіх елементів</returns>
-				virtual BaseVList Clone() const override final {
+                template<typename = void> requires (Concepts::IsClonable<T>) 
+				BaseVList Clone() const {
 					BaseVList result;
 					if (this->This->root != nullptr) {
 						result.This->root = result.This->last = new Node(this->This->root->size, this->This->root->arr);
@@ -750,6 +836,30 @@ namespace Seed {
 							Node* node = this->This->last;
 							while (node != nullptr) {
 								result.This->last = result.This->last->next = new Node(node->size, node->arr);
+								node = node->next;
+							}
+						}
+						result.This->count = this->This->count;
+					}
+					return result;
+				}
+				/// <summary>
+                /// Клонування об'єктів
+                /// </summary>
+                /// <returns>Новий об'єкт з копією всіх елементів</returns>
+                template<typename TLambda> requires (Concepts::InvockableWithResult<TLambda, T, const T&>)
+				BaseVList Clone(TLambda&& lambda) const {
+					BaseVList result;
+					if (this->This->root != nullptr) {
+						result.This->root = result.This->last = new Node(this->This->root->size, this->This->root->arr);
+						if (this->This->root != this->This->last) {
+							Node* node = this->This->last;
+							while (node != nullptr) {
+								result.This->last = result.This->last->next = new Node(node->size);
+								for (SizeT i = 0; i < node->size; i++)
+								{
+									result.This->last->arr[i] = lambda(node->arr[i]);
+								}
 								node = node->next;
 							}
 						}
@@ -796,9 +906,9 @@ namespace Seed {
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
-				template<typename LambdaT>
-				BaseVList& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
+				template<typename TLambda>
+				BaseVList& ForEachImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, T&> || TypeTraits::IsInvockable<TLambda, const T&>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
@@ -811,7 +921,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, T&, SizeT> || TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
@@ -829,9 +939,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				const BaseVList& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+				template<typename TLambda>
+				const BaseVList& ForEachImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
@@ -844,7 +954,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < This->count; i++)
@@ -862,11 +972,12 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				BaseVList& ForEachImpl(LambdaT&& lambda, SizeT count) {
+				template<typename TLambda>
+				BaseVList& ForEachImpl(TLambda&& lambda, SizeT count) {
 					if (count > this->Count)
 						count = this->Count;
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
+
+					if constexpr (TypeTraits::IsInvockable<TLambda, T&> || TypeTraits::IsInvockable<TLambda, const T&>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
@@ -879,7 +990,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, T&, SizeT> || TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
@@ -897,11 +1008,12 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				const BaseVList& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+				template<typename TLambda>
+				const BaseVList& ForEachImpl(TLambda&& lambda, SizeT count) const {
 					if (count > this->Count)
 						count = this->Count;
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>) {
+
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
@@ -914,7 +1026,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						Node* node = This->root;
 						SizeT nodeStartIndex = 0;
 						for (SizeT i = 0; i < count; i++)
@@ -933,8 +1045,8 @@ namespace Seed {
 				}
 
 			protected:
-				template<typename U, typename LambdaT>
-				U AggregateImpl(LambdaT&& lambda) const {
+				template<typename U, typename TLambda>
+				U AggregateImpl(TLambda&& lambda) const {
 					U val = U();
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
@@ -949,8 +1061,8 @@ namespace Seed {
 					return val;
 				}
 
-				template<typename U, typename LambdaT>
-				U AggregateImpl(LambdaT&& lambda, const U& Value) const {
+				template<typename U, typename TLambda>
+				U AggregateImpl(TLambda&& lambda, const U& Value) const {
 					T result = Value;
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
@@ -965,8 +1077,8 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				template<typename U, typename LambdaT>
-				U AggregateImpl(LambdaT&& lambda, U&& Value) const {
+				template<typename U, typename TLambda>
+				U AggregateImpl(TLambda&& lambda, U&& Value) const {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -982,8 +1094,8 @@ namespace Seed {
 
 				forceinline bool AnyImpl() const { return This->count > 0; }
 
-				template<typename Lambda>
-				bool AnyImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				bool AnyImpl(TLambda&& lambda) const {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -998,8 +1110,8 @@ namespace Seed {
 					return false;
 				}
 
-				template<typename Lambda>
-				bool AllImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				bool AllImpl(TLambda&& lambda) const {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -1014,8 +1126,8 @@ namespace Seed {
 					return true;
 				}
 
-				template<typename Lambda>
-				T& FirstImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				T& FirstImpl(TLambda&& lambda) {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -1031,8 +1143,8 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				template<typename Lambda>
-				T& LastImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				T& LastImpl(TLambda&& lambda) {
 					Node* node = This->root;
 					Node* last = nullptr;
 					SizeT nodeStartIndex = 0;
@@ -1053,8 +1165,8 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				template<typename Lambda>
-				const T& FirstImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				const T& FirstImpl(TLambda&& lambda) const {
 					Node* node = This->root;
 					SizeT nodeStartIndex = 0;
 					for (SizeT i = 0; i < This->count; i++)
@@ -1070,8 +1182,8 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				template<typename Lambda>
-				const T& LastImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				const T& LastImpl(TLambda&& lambda) const {
 					Node* node = This->root;
 					Node* last = nullptr;
 					SizeT nodeStartIndex = 0;
@@ -1113,8 +1225,8 @@ namespace Seed {
 					return *this;
 				}
 
-				template<typename Lambda>
-				BaseVList& RemoveAllImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				BaseVList& RemoveAllImpl(TLambda&& lambda) {
 					Node* node = This->root;
 					Node* tmp;
 					SizeT nodeStartIndex = 0;

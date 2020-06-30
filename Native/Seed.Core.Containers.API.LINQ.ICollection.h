@@ -285,15 +285,10 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&amp;) або void(*)(T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, T&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, T&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline ThisCollection& ForEach(Lambda&& lambda) {
+					template<typename Lambda> 
+					requires (Concepts::Invockable<Lambda, T&> || Concepts::Invockable<Lambda, T&, SizeT> ||
+							  Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					forceinline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -303,16 +298,9 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&amp;) або void(*)(const T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<
-						typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const T&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const T&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
+					template<typename Lambda> 
+					requires (Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -323,15 +311,10 @@ namespace Seed {
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&amp;) або void(*)(T&amp;, SizeT)</param>
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, T&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, T&, SizeT>::State
-						>,
-						bool
-					> = true>
-						ThisCollection& ForEach(Lambda&& lambda, SizeT сount) {
+					template<typename Lambda> 
+					requires (Concepts::Invockable<Lambda, T&> || Concepts::Invockable<Lambda, T&, SizeT> ||
+							  Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					forceinline ThisCollection& ForEach(Lambda&& lambda, SizeT сount) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), сount);
 					}
 
@@ -342,16 +325,9 @@ namespace Seed {
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&amp;) або void(*)(const T&amp;, SizeT)</param>
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<
-						typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const T&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const T&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT count) const {
+					template<typename Lambda> 
+					requires (Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT count) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), count);
 					}
 				public:

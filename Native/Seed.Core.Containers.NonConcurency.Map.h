@@ -839,7 +839,7 @@ namespace Seed {
 
 				template<typename LambdaT>
 				forceinline const BaseMap& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
+					if constexpr (TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -847,7 +847,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -863,8 +863,8 @@ namespace Seed {
 
 				template<typename LambdaT>
 				forceinline BaseMap& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TKey, TValue>&> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
+					if constexpr (TypeTraits::IsInvockable<LambdaT, BasePair<THeap, TKey, TValue>&> ||
+						TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -872,8 +872,8 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TKey, TValue>&, SizeT> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<LambdaT, BasePair<THeap, TKey, TValue>&, SizeT> ||
+						TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -1003,8 +1003,8 @@ namespace Seed {
 
 				template<typename LambdaT>
 				forceinline BaseMap& ForEachValueImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TValue&> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&>) {
+					if constexpr (TypeTraits::IsInvockable<LambdaT, TValue&> ||
+						TypeTraits::IsInvockable<LambdaT, const TValue&>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -1012,8 +1012,8 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TValue&, SizeT> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<LambdaT, TValue&, SizeT> ||
+						TypeTraits::IsInvockable<LambdaT, const TValue&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{

@@ -30,15 +30,11 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда функція яку викличе для кожної пари ключ значення може приймати або пару або пару і номер</param>
 					/// <returns>Силку на колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TPair&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TPair&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline ThisCollection& ForEach(Lambda&& lambda) {
+					template<typename TLambda>
+						requires 
+							(Concepts::Invockable<TLambda, TPair&> || Concepts::Invockable<TLambda, TPair&, SizeT> ||
+							Concepts::Invockable<TLambda, const TPair&> || Concepts::Invockable<TLambda, const TPair&, SizeT>)
+						forceinline ThisCollection& ForEach(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -48,16 +44,9 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда функція яку викличе для кожної пари ключ значення може приймати або силку пару або її і номер</param>
 					/// <returns>Константну силку на колекцію</returns>
-					template<
-						typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TPair&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TPair&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
+					template<typename TLambda>
+						requires Concepts::Invockable<TLambda, const TPair&> || Concepts::Invockable<TLambda, const TPair&, SizeT>
+						forceinline const ThisCollection& ForEach(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 				public:
@@ -67,15 +56,9 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда яку викличе для кожного ключа, може приймати константну силку на ключ або її і номер елемента</param>
 					/// <returns>Силку на колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TKey&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TKey&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline ThisCollection& ForEachKey(Lambda&& lambda) {
+					template<typename TLambda>
+					requires Concepts::Invockable<TLambda, const TKey&> || Concepts::Invockable<TLambda, const TKey&, SizeT>
+						forceinline ThisCollection& ForEachKey(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
 
@@ -85,15 +68,9 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда яку викличе для кожного ключа, може приймати константну силку на ключ або її і номер елемента</param>
 					/// <returns>Константну силку на колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TKey&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TKey&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline const ThisCollection& ForEachKey(Lambda&& lambda) const {
+					template<typename TLambda>
+					requires Concepts::Invockable<TLambda, const TKey&> || Concepts::Invockable<TLambda, const TKey&, SizeT>
+						forceinline const ThisCollection& ForEachKey(TLambda&& lambda) const {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
 				public:
@@ -103,15 +80,9 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда яку викличе для кожного значення, може приймати силку на значення або її і номер елемента</param>
 					/// <returns>Силку на колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TValue&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TValue&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline ThisCollection& ForEachValue(Lambda&& lambda) {
+					template<typename TLambda>
+					requires Concepts::Invockable<TLambda, TValue&> || Concepts::Invockable<TLambda, TValue&, SizeT>
+						forceinline ThisCollection& ForEachValue(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
 
@@ -121,15 +92,9 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда яку викличе для кожного значення, може приймати силку на значення або її і номер елемента</param>
 					/// <returns>Константну силку на колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TValue&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TValue&, SizeT>::State
-						>,
-						bool
-					> = true>
-						forceinline const ThisCollection& ForEachValue(Lambda&& lambda) const {
+					template<typename TLambda>
+					requires Concepts::Invockable<TLambda, const TValue&> || Concepts::Invockable<TLambda, const TValue&, SizeT>
+						forceinline const ThisCollection& ForEachValue(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
 				public:
@@ -147,14 +112,9 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда, приймає rvalue силку на пару</param>
 					/// <returns>Силку на колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TPair&&>::State
-						>,
-						bool
-					> = true>
-						forceinline ThisCollection& RemoveAllWith(Lambda && lambda) {
+					template<typename TLambda>
+					requires Concepts::Invockable<TLambda, TPair&&>
+						forceinline ThisCollection& RemoveAllWith(TLambda && lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllWithImpl(MoveRValue(lambda));
 					}
 				public:
@@ -169,23 +129,19 @@ namespace Seed {
 					/// <returns>Колекція з копією всіх елементів</returns>
 					template<
 						template<typename THeap, typename U> class NewCollection,
-						typename Lambda,
-						typename FilterLambda, 
+						typename TLambda,
+						typename TFilterLambda, 
 						typename UHeap, 
-						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
-						TypeTraits::EnableIfTV<
-							TypeTraits::LogicConst<
-								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TPair&> &&
-								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TPair&> &&
-								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<UHeap, U>>
-								>,
-							bool> 
-						= true
+						typename U = TypeTraits::InvockableResult<Lambda, const TPair&>
 					>
-					NewCollection<UHeap, U> CopyToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						requires   (Concepts::Invockable<TLambda, const TPair&> &&
+									Concepts::Invockable<TFilterLambda, const TPair&> &&
+									Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<UHeap, U>>&&
+									Concepts::IsSame<bool, TypeTraits::InvockableResult<TFilterLambda, const TPair&>>)
+					NewCollection<UHeap, U> CopyToCollection(TFilterLambda&& filterLambda, TLambda&& lambda) const {
 						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
 						{
-							FilterLambda filterCopy = filterLambda;
+							TFilterLambda filterCopy = filterLambda;
 							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this)
 								.GetCountIf(MoveRValue(filterCopy)));
 
@@ -225,22 +181,18 @@ namespace Seed {
 					/// <returns>Колекція з копією всіх елементів</returns>
 					template<
 						template<typename U> class NewCollection,
-						typename Lambda,
-						typename FilterLambda,  
-						typename U = TypeTraits::LambdaType<Lambda>::ReturnType,
-						TypeTraits::EnableIfTV<
-							TypeTraits::LogicConst<
-								TypeTraits::IsLambdaConvertibleV<Lambda, U, const TPair&> &&
-								TypeTraits::IsLambdaConvertibleV<FilterLambda, bool, const TPair&> &&
-								TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<U>>
-								>,
-							bool> 
-						= true
+						typename TLambda,
+						typename TFilterLambda,  
+						typename U = TypeTraits::InvockableResult<Lambda, const TPair&>
 					>
-					NewCollection<U> CopyToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
+						requires(Concepts::Invockable<TLambda, const TPair&> &&
+								 Concepts::Invockable<TFilterLambda, const TPair&> &&
+								 Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<U>> &&
+								 Concepts::IsSame<bool, TypeTraits::InvockableResult<TFilterLambda, const TPair&>>)
+					NewCollection<U> CopyToCollection(TFilterLambda&& filterLambda, TLambda&& lambda) const {
 						if constexpr (NewCollection<U>::IsDynamic == false)
 						{
-							FilterLambda filterCopy = filterLambda;
+							TFilterLambda filterCopy = filterLambda;
 							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this)
 								.GetCountIf(MoveRValue(filterCopy)));
 

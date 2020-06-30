@@ -5,20 +5,37 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Concepts {
-			template<typename TLambda, typename ... TArgs>
-			concept Invockable = TypeTraits::IsInvockable<TLambda, TArgs...>;
+			/// <summary>
+			/// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs
+			/// </summary>
+			template<typename TCallable, typename ... TArgs>
+			concept Invockable = TypeTraits::IsInvockable<TCallable, TArgs...>;
 
-			constexpr auto l = [] (int a, int b)
-			{
-				return a + b;
-			};
+			/// <summary>
+			/// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs
+			/// і вертає заданий тип TRet
+			/// </summary>
+			template<typename TCallable, typename TRet, typename ... TArgs>
+			concept InvockableWithResult = TypeTraits::IsInvockable<TCallable, TArgs...> &&
+				TypeTraits::IsSameV<typename TypeTraits::InvockableResult<TCallable, TArgs...>, TRet>;
 
-			template<typename TLambda, typename ... TArgs> requires Invockable<TLambda, TArgs...>
-			constexpr auto Invoke(TLambda lambda, TArgs... args ) {
-				return lambda(args...);
-			}
+			/// <summary>
+			/// Перевірка чи тип T наслідується від типу U
+			/// </summary>
+			template<typename T, typename U>
+			concept IsBasedOn = TypeTraits::IsBasedOnV<T, U>;
 
-			constexpr auto r = Invoke(l, 1, 2);
+			/// <summary>
+			/// Перевірка чи тип T і U є одним і тим самим типом
+			/// </summary>
+			template<typename T, typename U>
+			concept IsSame = TypeTraits::IsSameV<T, U>;
+
+			template<typename T, typename U>
+			concept IsConvertible = TypeTraits::IsConvertible<T, U>;
+
+			template<typename T>
+			concept IsPod = TypeTraits::IsPodV<T>;
 		}
 	}
 }

@@ -95,6 +95,7 @@ namespace Seed
 				template<typename Void, typename Callable, typename ... TTypes>
 				struct InvokeTraits {
 					using Invockable = LogicFalse;
+                    using Result = VoidT<>;
 				};
 
 				template<typename Callable, typename ... TTypes>
@@ -104,9 +105,15 @@ namespace Seed
 				};
 			}
 
+            /// <summary>
+            /// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs
+            /// </summary>
 			template<typename TCallable, typename ... TArgs>
 			constexpr Boolean IsInvockable = Details::InvokeTraits<void, TCallable, TArgs...>::Invockable::State;
 
+            /// <summary>
+            /// Тип повернення при виклику TCallable з набіром аргументів TArgs
+            /// </summary>
 			template<typename TCallable, typename ... TArgs>
 			using InvockableResult = typename Details::InvokeTraits<void, TCallable, TArgs...>::Invockable::Result;
 		}

@@ -13,6 +13,7 @@
 #include "Seed.Core.Base.Swap.h"
 #include "Seed.Core.Base.TypeTraits.h"
 #include "Seed.Core.Base.Concepts.h"
+#include "Seed.Core.Base.IClonable.h"
 #include "Seed.Core.Base.UUID.h"
 #include "Seed.Core.Base.Internals.h"
 
@@ -117,20 +118,6 @@ namespace Seed {
                 Swap(Array[i], Array[(size - 1) - i]);
             }
         }
-
-    	/// <summary>
-    	/// Інтерфейс клонування
-    	/// </summary>
-        template<typename T>
-        class IClonable  // NOLINT
-        {
-        public:
-	        /// <summary>
-        	/// Метод клонування
-        	/// </summary>
-        	/// <returns>Вертає повну копію об'єкта</returns>
-            virtual T Clone() const = 0;
-        };
 
     	/// <summary>
     	/// Інтерфейс звільнення ресурсів з класу з підрахунком силок
