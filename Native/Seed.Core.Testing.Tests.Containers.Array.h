@@ -8,21 +8,126 @@ namespace Seed {
 		namespace Testing {
 			namespace Test {
 				namespace Containers {
-					class SimpleTypeArrayTest : public TestClass<SimpleTypeArrayTest> {
-						virtual bool Excecute() override;
-					};
+					namespace Array
+					{
+						namespace NonConcurency
+						{
+							class ForEachTest : public TestClass<ForEachTest> {
+								virtual bool Excecute() override;
+							};
 
-					class SimpleTypeConcurencyArrayTest : public TestClass<SimpleTypeConcurencyArrayTest> {
-						virtual bool Excecute() override;
-					};
+							class ForEachFromTest : public TestClass<ForEachTest> {
+								virtual bool Excecute() override;
+							};
 
-					class ComplexTypeArrayTest : public TestClass<ComplexTypeArrayTest> {
-						virtual bool Excecute() override;
-					};
+							class ForEachFromToTest : public TestClass<ForEachTest> {
+								virtual bool Excecute() override;
+							};
 
-					class ComplexTypeConcurencyArrayTest : public TestClass<ComplexTypeConcurencyArrayTest> {
-						virtual bool Excecute() override;
-					};
+							class AgregateSimpleItemsTypeTest : public TestClass<AgregateSimpleItemsTypeTest> {
+								virtual bool Excecute() override;
+							};
+
+							class AgregateConvertionsItemsTypeTest : public TestClass<AgregateSimpleItemsTypeTest> {
+								virtual bool Excecute() override;
+							};
+
+							class AnyEmpty : public TestClass<AnyEmpty> {
+								virtual bool Excecute() override;
+							};
+
+							class AnyWithItem : public TestClass<AnyWithItem> {
+								virtual bool Excecute() override;
+							};
+
+							class AnyWithCondition : public TestClass<AnyWithCondition> {
+								virtual bool Excecute() override;
+							};
+
+							class AllWithCondition : public TestClass<AllWithCondition> {
+								virtual bool Excecute() override;
+							};
+
+							class CloneArrayWithPods : public TestClass<CloneArrayWithPods> {
+								virtual bool Excecute() override;
+							};
+
+							class CloneArrayWithClonableItems : public TestClass<CloneArrayWithClonableItems> {
+								virtual bool Excecute() override;
+							};
+
+							class ResizeArray : public TestClass<ResizeArray> {
+								virtual bool Excecute() override;
+							};
+
+							class FirstCondition : public TestClass<FirstCondition> {
+								virtual bool Excecute() override;
+							};
+
+							class LastCondition : public TestClass<LastCondition> {
+								virtual bool Excecute() override;
+							};
+						}
+
+						namespace Concurency
+						{
+							class ForEachTest : public TestClass<ForEachTest> {
+								virtual bool Excecute() override;
+							};
+
+							class ForEachFromTest : public TestClass<ForEachTest> {
+								virtual bool Excecute() override;
+							};
+
+							class ForEachFromToTest : public TestClass<ForEachTest> {
+								virtual bool Excecute() override;
+							};
+
+							class AgregateSimpleItemsTypeTest : public TestClass<AgregateSimpleItemsTypeTest> {
+								virtual bool Excecute() override;
+							};
+
+							class AgregateConvertionsItemsTypeTest : public TestClass<AgregateSimpleItemsTypeTest> {
+								virtual bool Excecute() override;
+							};
+
+							class AnyEmpty : public TestClass<AnyEmpty> {
+								virtual bool Excecute() override;
+							};
+
+							class AnyWithItem : public TestClass<AnyWithItem> {
+								virtual bool Excecute() override;
+							};
+
+							class AnyWithCondition : public TestClass<AnyWithCondition> {
+								virtual bool Excecute() override;
+							};
+
+							class AllWithCondition : public TestClass<AllWithCondition> {
+								virtual bool Excecute() override;
+							};
+
+							class CloneArrayWithPods : public TestClass<CloneArrayWithPods> {
+								virtual bool Excecute() override;
+							};
+
+							class CloneArrayWithClonableItems : public TestClass<CloneArrayWithClonableItems> {
+								virtual bool Excecute() override;
+							};
+
+							class ResizeArray : public TestClass<ResizeArray> {
+								virtual bool Excecute() override;
+							};
+
+							class FirstCondition : public TestClass<FirstCondition> {
+								virtual bool Excecute() override;
+							};
+
+							class LastCondition : public TestClass<LastCondition> {
+								virtual bool Excecute() override;
+							};
+						}
+					}
 				}
 			}
 		}

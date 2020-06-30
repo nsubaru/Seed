@@ -23,14 +23,12 @@ namespace Seed
         namespace Concepts
         {
             template<typename T>
-            concept HasCloneMethod = requires {
-                {
-                    T::Clone()
-                } -> IsConvertible<T>; 
+            concept HasCloneMethod = requires(const T & t) {
+                t.Clone();
             };
 
             template<typename T>
-            concept InheritClone = IsBasedOn<T, IClonable<T>>;
+            concept InheritClone = IsBasedOn<IClonable<T>, T>;
 
             template<typename T>
             concept IsClonable = IsPod<T> || InheritClone<T> || HasCloneMethod<T>;

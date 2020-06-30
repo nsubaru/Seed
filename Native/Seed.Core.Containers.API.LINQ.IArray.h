@@ -27,8 +27,8 @@ namespace Seed {
 					/// <param name="startIndex">Індекс першого елемента який потрібно пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
-					requires (Concepts::Invockable<Lambda, T&> || Concepts::Invockable<Lambda, T&, SizeT> ||
-							  Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
+							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
 					forceinline ThisCollection& ForEach(Lambda&& lambda, SizeT startIndex = Math::Min<SizeT>(), SizeT сount = Math::Max<SizeT>()) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), startIndex, сount);
 					}
@@ -42,7 +42,7 @@ namespace Seed {
 					/// <param name="startIndex">Індекс першого елемента який потрібно пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
-					requires (Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
 					forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT startIndex = Math::Min<SizeT>(), SizeT count = Math::Max<SizeT>()) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), startIndex, count);
 					}

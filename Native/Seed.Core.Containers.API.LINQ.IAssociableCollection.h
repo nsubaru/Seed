@@ -32,8 +32,8 @@ namespace Seed {
 					/// <returns>Силку на колекцію</returns>
 					template<typename TLambda>
 						requires 
-							(Concepts::Invockable<TLambda, TPair&> || Concepts::Invockable<TLambda, TPair&, SizeT> ||
-							Concepts::Invockable<TLambda, const TPair&> || Concepts::Invockable<TLambda, const TPair&, SizeT>)
+							(Concepts::IsInvockable<TLambda, TPair&> || Concepts::IsInvockable<TLambda, TPair&, SizeT> ||
+							Concepts::IsInvockable<TLambda, const TPair&> || Concepts::IsInvockable<TLambda, const TPair&, SizeT>)
 						forceinline ThisCollection& ForEach(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
@@ -45,7 +45,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда функція яку викличе для кожної пари ключ значення може приймати або силку пару або її і номер</param>
 					/// <returns>Константну силку на колекцію</returns>
 					template<typename TLambda>
-						requires Concepts::Invockable<TLambda, const TPair&> || Concepts::Invockable<TLambda, const TPair&, SizeT>
+						requires Concepts::IsInvockable<TLambda, const TPair&> || Concepts::IsInvockable<TLambda, const TPair&, SizeT>
 						forceinline const ThisCollection& ForEach(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
@@ -57,7 +57,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда яку викличе для кожного ключа, може приймати константну силку на ключ або її і номер елемента</param>
 					/// <returns>Силку на колекцію</returns>
 					template<typename TLambda>
-					requires Concepts::Invockable<TLambda, const TKey&> || Concepts::Invockable<TLambda, const TKey&, SizeT>
+					requires Concepts::IsInvockable<TLambda, const TKey&> || Concepts::IsInvockable<TLambda, const TKey&, SizeT>
 						forceinline ThisCollection& ForEachKey(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
@@ -69,7 +69,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда яку викличе для кожного ключа, може приймати константну силку на ключ або її і номер елемента</param>
 					/// <returns>Константну силку на колекцію</returns>
 					template<typename TLambda>
-					requires Concepts::Invockable<TLambda, const TKey&> || Concepts::Invockable<TLambda, const TKey&, SizeT>
+					requires Concepts::IsInvockable<TLambda, const TKey&> || Concepts::IsInvockable<TLambda, const TKey&, SizeT>
 						forceinline const ThisCollection& ForEachKey(TLambda&& lambda) const {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
@@ -81,7 +81,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда яку викличе для кожного значення, може приймати силку на значення або її і номер елемента</param>
 					/// <returns>Силку на колекцію</returns>
 					template<typename TLambda>
-					requires Concepts::Invockable<TLambda, TValue&> || Concepts::Invockable<TLambda, TValue&, SizeT>
+					requires Concepts::IsInvockable<TLambda, TValue&> || Concepts::IsInvockable<TLambda, TValue&, SizeT>
 						forceinline ThisCollection& ForEachValue(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
@@ -93,7 +93,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда яку викличе для кожного значення, може приймати силку на значення або її і номер елемента</param>
 					/// <returns>Константну силку на колекцію</returns>
 					template<typename TLambda>
-					requires Concepts::Invockable<TLambda, const TValue&> || Concepts::Invockable<TLambda, const TValue&, SizeT>
+					requires Concepts::IsInvockable<TLambda, const TValue&> || Concepts::IsInvockable<TLambda, const TValue&, SizeT>
 						forceinline const ThisCollection& ForEachValue(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
@@ -113,7 +113,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда, приймає rvalue силку на пару</param>
 					/// <returns>Силку на колекцію</returns>
 					template<typename TLambda>
-					requires Concepts::Invockable<TLambda, TPair&&>
+					requires Concepts::IsInvockable<TLambda, TPair&&>
 						forceinline ThisCollection& RemoveAllWith(TLambda && lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllWithImpl(MoveRValue(lambda));
 					}
@@ -134,8 +134,8 @@ namespace Seed {
 						typename UHeap, 
 						typename U = TypeTraits::InvockableResult<Lambda, const TPair&>
 					>
-						requires   (Concepts::Invockable<TLambda, const TPair&> &&
-									Concepts::Invockable<TFilterLambda, const TPair&> &&
+						requires   (Concepts::IsInvockable<TLambda, const TPair&> &&
+									Concepts::IsInvockable<TFilterLambda, const TPair&> &&
 									Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<UHeap, U>>&&
 									Concepts::IsSame<bool, TypeTraits::InvockableResult<TFilterLambda, const TPair&>>)
 					NewCollection<UHeap, U> CopyToCollection(TFilterLambda&& filterLambda, TLambda&& lambda) const {
@@ -185,8 +185,8 @@ namespace Seed {
 						typename TFilterLambda,  
 						typename U = TypeTraits::InvockableResult<Lambda, const TPair&>
 					>
-						requires(Concepts::Invockable<TLambda, const TPair&> &&
-								 Concepts::Invockable<TFilterLambda, const TPair&> &&
+						requires(Concepts::IsInvockable<TLambda, const TPair&> &&
+								 Concepts::IsInvockable<TFilterLambda, const TPair&> &&
 								 Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<U>> &&
 								 Concepts::IsSame<bool, TypeTraits::InvockableResult<TFilterLambda, const TPair&>>)
 					NewCollection<U> CopyToCollection(TFilterLambda&& filterLambda, TLambda&& lambda) const {

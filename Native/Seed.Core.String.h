@@ -23,7 +23,8 @@ namespace Seed {
         template<class THeap>
         class BaseString final :
             public Memory::Allocator<THeap>, 
-            public Containers::LINQ::IString<BaseString,THeap,UChar,false>
+            public Containers::LINQ::IString<BaseString,THeap,UChar,false>,
+            public IClonable<BaseString<THeap>>
             {
         private:
             ///<summary>Покажчик на рядковий масив</summary>
@@ -2166,6 +2167,10 @@ namespace Seed {
             template<typename NewBase>
             operator BaseString<NewBase>() const {
                 return BaseString<NewBase>((const CharStr)(ConstCharStr)*this);
+            }
+
+            virtual BaseString Clone() const override {
+                return BaseString(*this);
             }
 
             ///<summary>Оптимізований обмін рядками a і b</summary>

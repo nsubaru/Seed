@@ -199,7 +199,7 @@ namespace Seed {
                 template<typename TLambda>
                 BaseConcurencyArray& ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT count) {
                     if (startIndex > this->Count)
-                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __LINE__, __FUNCSIG__, startIndex, this->Count);
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, startIndex, this->Count);
                     if (startIndex + count > this->Count)
                         count = this->Count - startIndex;
 
@@ -599,13 +599,25 @@ namespace Seed {
                 /// <returns>Вертає новий масив з копією всіх елементів</returns>
                 template<typename = void> requires (Concepts::IsClonable<T>) 
                 BaseConcurencyArray Clone() const {
-                    return This->lock.SharedLock([&] () -> BaseConcurencyArray
+                    return This->lock.ShareLock([&] () -> BaseConcurencyArray
                     {
-                        return BaseConcurencyArray(This->array, This->count);
+                        if constexpr (TypeTraits::IsPodV<T>)
+                        {
+                            return BaseConcurencyArray(This->array, This->count);
+                        }
+                        else
+                        {
+                            auto array = BaseConcurencyArray(This->array, This->count);
+                            for (SizeT i = 0; i < This->count; i++)
+                            {
+                                array.This->array[i] = This->array[i].Clone();
+                            }
+                            return MoveRValue(array);
+                        }
                     });
                 }
 
-                template<typename TLambda> requires (Concepts::InvockableWithResult<TLambda, T, const T&>)
+                template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
                 BaseConcurencyArray Clone(TLambda&& lambda) const {
                     return This->lock.ShareLock([&] () -> BaseConcurencyArray
                     {

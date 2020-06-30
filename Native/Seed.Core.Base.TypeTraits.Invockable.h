@@ -101,7 +101,7 @@ namespace Seed
 				template<typename Callable, typename ... TTypes>
 				struct InvokeTraits<VoidT<decltype(Invoke(DeclVal<Callable>(), DeclVal<TTypes>()...))>, Callable, TTypes...> {
 					using Invockable = LogicTrue;
-					using Result = decltype(Invoke(DeclVal<Callable>(), DeclVal<TTypes>()...));
+					using Result = typename decltype(Invoke(DeclVal<Callable>(), DeclVal<TTypes>()...));
 				};
 			}
 
@@ -115,7 +115,7 @@ namespace Seed
             /// Тип повернення при виклику TCallable з набіром аргументів TArgs
             /// </summary>
 			template<typename TCallable, typename ... TArgs>
-			using InvockableResult = typename Details::InvokeTraits<void, TCallable, TArgs...>::Invockable::Result;
+			using InvockableResult = typename Details::InvokeTraits<void, TCallable, TArgs...>::Result;
 		}
 	}
 }

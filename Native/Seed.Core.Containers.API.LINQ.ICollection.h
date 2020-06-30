@@ -286,8 +286,8 @@ namespace Seed {
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&amp;) або void(*)(T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
-					requires (Concepts::Invockable<Lambda, T&> || Concepts::Invockable<Lambda, T&, SizeT> ||
-							  Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
+							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
 					forceinline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
@@ -299,7 +299,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&amp;) або void(*)(const T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
-					requires (Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
 					forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
@@ -312,8 +312,8 @@ namespace Seed {
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
-					requires (Concepts::Invockable<Lambda, T&> || Concepts::Invockable<Lambda, T&, SizeT> ||
-							  Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
+							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
 					forceinline ThisCollection& ForEach(Lambda&& lambda, SizeT сount) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), сount);
 					}
@@ -326,7 +326,7 @@ namespace Seed {
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
-					requires (Concepts::Invockable<Lambda, const T&> || Concepts::Invockable<Lambda, const T&, SizeT>)
+					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
 					forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT count) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), count);
 					}
@@ -337,7 +337,8 @@ namespace Seed {
 					/// <typeparam name="U">Вихідний тип</typeparam>
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
-					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
+					template<typename U = T, typename Lambda>
+					requires Concepts::IsInvockable<Lambda, U&, const T&>
 					forceinline U Aggregate(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), U());
 					}
@@ -350,7 +351,8 @@ namespace Seed {
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
-					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
+					template<typename U = T, typename Lambda>
+					requires Concepts::IsInvockable<Lambda, U&, const T&> 
 					forceinline U Aggregate(Lambda&& lambda, const U& startValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), startValue);
 					}
@@ -363,7 +365,8 @@ namespace Seed {
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
-					template<typename U = T, typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, U&, const T&>::State>, bool> = true>
+					template<typename U = T, typename Lambda>
+					requires Concepts::IsInvockable<Lambda, U&, const T&>
 					forceinline U Aggregate(Lambda&& lambda, U&& startValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(startValue));
 					}
@@ -381,7 +384,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
 					forceinline bool Any(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
@@ -391,7 +395,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
 					forceinline bool All(Lambda&& lambda) const  {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
@@ -401,7 +406,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
 					forceinline T& First(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
@@ -421,7 +427,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
 					forceinline const T& First(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
@@ -431,7 +438,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
 					forceinline const T& Last(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
@@ -449,7 +457,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="Lambda">Лямбда формату void(*)(T&amp;&amp;)</param>
 					/// <returns>Силку на поточний об'єкт колекції</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockable<Lambda, T&&>
 					forceinline ThisCollection& RemoveAll(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl(MoveRValue(lambda));
 					}
@@ -459,7 +468,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Кількість елементів які підпадають під умову</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
 					forceinline SizeT GetCountIf(Lambda && lambda) {
 						return static_cast<ThisCollection&>(*this).GetCountIfImpl(MoveRValue(lambda));
 					}
@@ -469,14 +479,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="generator">Функція генератор формату T(*)() або T(*)(SizeT)</param>
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
-					template<typename Lambda, 
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-							TypeTraits::IsLambdaConvertibleT<Lambda, T>::State ||
-							TypeTraits::IsLambdaConvertibleT<Lambda, T, SizeT>::State
-						>
-						, bool> = true>
-					forceinline static ThisCollection Generate(Lambda generator, SizeT count) {
+					template<typename TLambda> 
+					requires Concepts::IsInvockableWithResult<TLambda, T> || Concepts::IsInvockableWithResult<TLambda, T, SizeT>
+					forceinline static ThisCollection Generate(TLambda&& generator, SizeT count) {
 						if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, T>::State)
 						{
 							if constexpr (!ThisCollection::IsDynamic)

@@ -9,15 +9,15 @@ namespace Seed {
 			/// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs
 			/// </summary>
 			template<typename TCallable, typename ... TArgs>
-			concept Invockable = TypeTraits::IsInvockable<TCallable, TArgs...>;
+			concept IsInvockable = TypeTraits::IsInvockable<TCallable, TArgs...>;
 
 			/// <summary>
 			/// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs
 			/// і вертає заданий тип TRet
 			/// </summary>
 			template<typename TCallable, typename TRet, typename ... TArgs>
-			concept InvockableWithResult = TypeTraits::IsInvockable<TCallable, TArgs...> &&
-				TypeTraits::IsSameV<typename TypeTraits::InvockableResult<TCallable, TArgs...>, TRet>;
+			concept IsInvockableWithResult = TypeTraits::IsInvockable<TCallable, TArgs...> &&
+				TypeTraits::IsConvertible<typename TypeTraits::InvockableResult<TCallable, TArgs...>, TRet>;
 
 			/// <summary>
 			/// Перевірка чи тип T наслідується від типу U
@@ -36,6 +36,9 @@ namespace Seed {
 
 			template<typename T>
 			concept IsPod = TypeTraits::IsPodV<T>;
+
+			template<typename T, typename ... TArgs>
+			concept IsConstructibleWith = TypeTraits::IsConstructible<T, TArgs...>;
 		}
 	}
 }

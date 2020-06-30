@@ -183,7 +183,7 @@ namespace Seed {
 				template<typename TLambda>
                 BaseArray& ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT count) {
                     if (startIndex > this->Count)
-                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __LINE__, __FUNCSIG__);
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, startIndex, this->Count);
                     if (startIndex + count > this->Count)
                         count = this->Count - startIndex;
 
@@ -211,7 +211,7 @@ namespace Seed {
                 template<typename TLambda>
                 const BaseArray& ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT count) const {
                     if (startIndex > this->Count)
-                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __LINE__, __FUNCSIG__, startIndex, this->Count);
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, startIndex, this->Count);
                     if (startIndex + count > this->Count)
                         count = this->Count - startIndex;
 
@@ -529,14 +529,26 @@ namespace Seed {
                 /// <returns>Вертає новий масив з копією всіх елементів</returns>
                 template<typename = void> requires (Concepts::IsClonable<T>) 
                 BaseArray Clone() const {
-					return BaseArray(This->array, This->count);
+					if constexpr (TypeTraits::IsPodV<T>)
+                    {
+                        return BaseArray(This->array, This->count);
+                    }
+                    else
+                    {
+                        auto array = BaseArray(This->array, This->count);
+                        for (SizeT i = 0; i < This->count; i++)
+                        {
+                            array.This->array[i] = This->array[i].Clone();
+                        }
+                        return array;
+                    }
                 }
 
 				/// <summary>
 				/// Клонування масиву з використанням користувальницької лямбди або функтора
 				/// </summary>
 				/// <param name="lambda">Лямбда або функтор який виконає клонування всіх елементів</param>
-                template<typename TLambda> requires (Concepts::InvockableWithResult<TLambda, T, const T&>)
+                template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
                 BaseArray Clone(TLambda&& lambda) const {
                     T* array = nullptr;
                     try
@@ -547,7 +559,7 @@ namespace Seed {
                             array[i] = lambda(This->array[i]);
                         }
 
-                        return BaseConcurencyArray(MoveRValue(array), This->count);
+                        return BaseArray(MoveRValue(array), This->count);
                     }
                     catch (...)
                     {
@@ -847,7 +859,7 @@ namespace Seed {
                 /// Клонування об'єктів
                 /// </summary>
                 /// <returns>Новий об'єкт з копією всіх елементів</returns>
-                template<typename TLambda> requires (Concepts::InvockableWithResult<TLambda, T, const T&>)
+                template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
 				BaseVList Clone(TLambda&& lambda) const {
 					BaseVList result;
 					if (this->This->root != nullptr) {
