@@ -10,7 +10,7 @@ namespace Seed
 		namespace Reflection
 		{
 			///<summary>Неможливо викликати динамічну функцію з даним набором аргументів</summary>
-			class SeedKernelCall InvlaidDynamicFunctionArgs : public Exception {
+			class InvlaidDynamicFunctionArgs : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>

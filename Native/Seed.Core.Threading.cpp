@@ -223,6 +223,7 @@ void Seed::Core::Threading::UnRegisterThread(Thread* thread)
 {
 	ReSetName(thread->This->hThread);
 	AllActiveThreadable->Remove(thread->This->This);
+	thread->This->State = EThreadabledStates::Ended;
 	DestroyTls();
 }
 
@@ -286,13 +287,33 @@ bool Seed::Core::Threading::MainThread(Delegate&& delegate)
 	MainThread->This->TID =  reinterpret_cast<SizeT>(NtCurrentThreadId());
 	MainThread->RefreshName();
 	EntryPoint(MainThread->This->delegate, MainThread);
+	//Interupt and wait for interupting each exist theradable
 	AllActiveThreadable->ForEach([](SmartPtr<IThreadable>& thread) {
-		toCoreLog(L"Попередження: Об'єкт з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
-		thread->Interupt();
-		});
+		toCoreLog(L"Попередження: Потік з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
+		thread->Interupt()
+			.Join(CurrentSettings().Threading.Thread.StopKernelThreadsTimeout);
+	});
+	//Kill each exist thread
+	AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread)
+	{
+		if (thread->GetThreadableType() == EThreadableTypes::Thread)
+			{
+			if (thread->GetThreadabledState() != EThreadabledStates::Ended || 
+				thread->GetThreadabledState() != EThreadabledStates::Interupted)
+			{
+				auto& threadObj = dynamic_cast<Thread&>(*thread);
+				KillThread(threadObj, STATUS_INTERNAL_ERROR);
+			}
+		}
+	});
+
 	AllActiveThreadable->RemoveAll([](SmartPtr<IThreadable>&& thread) {thread->Join(); });
 	delete AllActiveThreadable;
 	return true;
+}
+
+void Seed::Core::Threading::KillThread(Thread& target, UInt32 statusCode) {
+	NtTerminateThread(target.This->hThread, statusCode);
 }
 
 void Seed::Core::Threading::Thread::RefreshName()
@@ -317,7 +338,7 @@ Thread& Seed::Core::Threading::Thread::Start()
 {
 	if (this->This->This != nullptr)
 		Throw(ThreadableAlredyStarted(ExceptionPosition));
-	toCoreLog(String(L"Запуск потоку з ім'ям \"") + this->GetName() + L"\" з потоку з ID " + String::toString(Threading::GetTID()));
+
 	this->This->AbortEvent = new SynchronizeEvent();
 	CLIENT_ID id;
 	size_t stack_max = 10485760, stack_alloc = 524288;
@@ -334,6 +355,7 @@ Thread& Seed::Core::Threading::Thread::Start()
 		&id);
 	this->This->State = EThreadabledStates::Starting;
 	this->This->TID = reinterpret_cast<SizeT>(id.UniqueThread);
+	toCoreLog(String::Combine({ L"Запуск потоку з ім'ям \"", this->GetName(), L"\" з ID ", String::toString(this->This->TID), L" з потоку з ID ", String::toString(Threading::GetTID()) }));
 	return *this;
 }
 
@@ -468,6 +490,7 @@ void Seed::Core::Threading::UnRegisterThread(JobPool* thread)
 	--thread->This->Parrent->JobsCounts;
 	ReSetName(thread->This->hThread);
 	NtClose(thread->This->hThread);
+	thread->This->State = EThreadabledStates::Ended;
 	DestroyTls();
 }
 
@@ -715,6 +738,7 @@ void Seed::Core::Threading::UnRegisterThread(SheduledJob* thread)
 	AllActiveThreadable->Remove(thread->This->This);
 	ReSetName(thread->This->hThread);
 	NtClose(thread->This->hThread);
+	thread->This->State = EThreadabledStates::Ended;
 	if(thread->This->RemainingPeriodsCount == 0 && thread->This->PeriodsCount != 1)
 		TpReleaseTimer(reinterpret_cast<PTP_TIMER>(thread->This->hTask));
 	DestroyTls();

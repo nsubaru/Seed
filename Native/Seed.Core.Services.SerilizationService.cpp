@@ -71,11 +71,13 @@ Containers::Blob SerilizeObjectType(
 	const Reflection::ObjectRTTIRecord& typeRecord, 
 	const DI::IDI& idi, 
 	const Reflection::DynamicObject& object) {
-	return typeRecord.Properties.Aggregate([&] (Containers::VList<Byte>& buffer, const Reflection::ObjectRTTIRecord::PropertyRTTIRecord& typeProperty) -> void
+	return typeRecord.Properties.Aggregate([&] (const Containers::VList<Byte>& buffer, const Reflection::ObjectRTTIRecord::PropertyRTTIRecord& typeProperty)
 	{
 		//We know that getter didn't change object value but getter caller for unification use non const object
 		//so we should remove const modificator from object
-		SerilizeObjectTypeImpl(typeRecord, idi, const_cast<Reflection::DynamicObject&>(object), typeProperty, buffer);
+		Containers::VList<Byte> localbuffer = buffer;
+		SerilizeObjectTypeImpl(typeRecord, idi, const_cast<Reflection::DynamicObject&>(object), typeProperty, localbuffer);
+		return localbuffer;
 	}, Containers::VList<Byte>())
 		.ToArray();
 }

@@ -24,16 +24,11 @@ namespace Seed {
 					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</param>
 					/// <param name="lambda">Лямбда яка знищує елементи з сигнатурою void(*)(T&amp;&amp;)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<
-						typename Lambda,
-						typename FilteringLambda,
-						TypeTraits::EnableIfTV<TypeTraits::LogicConst<
-						(TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State ||
-							TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State) &&
-							(TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State ||
-								TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State)
-					>, bool> = true>
-						forceinline ListType& RemoveIf(FilteringLambda filter, Lambda&& lambda) {
+					template<typename TLambda, typename TFilteringLambda>
+					requires(Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&> ||
+							 Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&, SizeT>) &&
+							(Concepts::IsInvockable<TLambda, T&&> || Concepts::IsInvockable<TLambda, T&&, SizeT>)
+						forceinline ListType& RemoveIf(TFilteringLambda&& filter, TLambda&& lambda) {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(filter), MoveRValue(lambda));
 					}
 
@@ -43,13 +38,10 @@ namespace Seed {
 					/// <typeparam name="FilteringLambda">Тип лямбди з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</typeparam>
 					/// <param name="filter">Лямбда з сигнатурою bool(*)(const T&amp;) або bool(*)(const T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<
-						typename FilteringLambda,
-						TypeTraits::EnableIfTV<TypeTraits::LogicConst<
-							(TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&>::State ||
-								TypeTraits::IsLambdaConvertibleT<FilteringLambda, Boolean, const T&, SizeT>::State)
-					>, bool> = true>
-						forceinline ListType& RemoveIf(FilteringLambda filter) {
+					template<typename TFilteringLambda>
+					requires Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&> ||
+							 Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&, SizeT>
+					forceinline ListType& RemoveIf(TFilteringLambda&& filter) {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(filter), [] (T&&){});
 					}
 				public:

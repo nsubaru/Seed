@@ -10,7 +10,7 @@ namespace Seed {
 		namespace Memory {
 #pragma region Heaps classes
 			///<summary>Базовий клас куч</summary>
-			interface SeedKernelCall BasicHeap {
+			interface BasicHeap {
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<returns>Виділену ділянку</returns>
@@ -30,15 +30,15 @@ namespace Seed {
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) = 0;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SizeT CurrentMemBlkCount() noexcept = 0;
+				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept = 0;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentAllocatedMemory() noexcept = 0;
+				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept = 0;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentHeapUsage() noexcept = 0;
+				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept = 0;
 			};
 
 			///<summary>Загальна куча</summary>
-			class SeedKernelCall Heap final : public BasicHeap{
+			class Heap final : public BasicHeap{
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -55,44 +55,32 @@ namespace Seed {
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<returns>Виділену ділянку</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) override final {
-					extern void* GenericAllocate(SizeT Size);
-					return GenericAllocate(Size);
-				}
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) override final;
 				///<summary>Вирівнняне виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
 				///<returns>Виділену ділянку</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) override final {
-					extern void* GenericAllignedAllocate(SizeT Size, SizeT AllocationReq);
-					return GenericAllignedAllocate(Size, AllocationReq);
-				}
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) override final;
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) override final {
-					extern void* GenericFree(void* MemBlk);
-					return GenericFree(MemBlk);
-				}
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) override final;
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) override final {
-					extern void* GenericAllignedFree(void* MemBlk, SizeT AllocationReq);
-					return GenericAllignedFree(MemBlk, AllocationReq);
-				}
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) override final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SizeT CurrentMemBlkCount() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept override final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentAllocatedMemory() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept override final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentHeapUsage() noexcept;
+				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept;
 			};
 
 			///<summary>Захищена куча</summary>
 			///<remarks>Перед виділенням і після звільнення відбувається обнулення пам'яті</remarks>
-			class SeedKernelCall SensitiveDataHeap final : public BasicHeap{
+			class SensitiveDataHeap final : public BasicHeap{
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -109,27 +97,27 @@ namespace Seed {
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<returns>Виділену ділянку</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) override final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) override final;
 				///<summary>Вирівнняне виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
 				///<returns>Виділену ділянку або</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) override final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) override final;
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) override final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) override final;
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) override final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) override final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SizeT CurrentMemBlkCount() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept override final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentAllocatedMemory() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept override final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentHeapUsage() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept override final;
 			};
 #pragma endregion
 
@@ -138,7 +126,7 @@ namespace Seed {
 			///<para>Відповідає за виділення та звільнення пам'яті</para>
 			///</summary>
 			template<class HeapClass>
-			class SeedKernelCall Allocator {
+			class Allocator {
 				static_assert(TypeTraits::IsBasedOn<Memory::BasicHeap, HeapClass>(), L"HeapClass in not heap");
 			private:
 				///<value>Куча з якої відбуватиметься виділення</value>
@@ -250,7 +238,7 @@ namespace Seed {
 			///<param name='Source'>Ділянка пам'яті яка копіюється</param>
 			///<param name='Destination'>Ділянка пам'яті куда копіюється</param>
 			///<param name='Size'>Кількість байт як потрібно скопіювати</param>
-			DeprecatedCall("Низькорівнева робота з пам'ятю") void Copy(
+			SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void Copy(
 				const void* Source,
 				void* Destination,
 				SizeT Size);
@@ -259,7 +247,7 @@ namespace Seed {
 			///<param name='MemBlk'>Блок пам'яті</param>
 			///<param name='Size'>Розмір в байтах ділянки пам'яті</param>
 			///<param name='Filler'>Значення яким заповнить ділянку пам'яті</param>
-			DeprecatedCall("Низькорівнева робота з пам'ятю") void MemBlkFill(
+			SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void MemBlkFill(
 				void* MemBlk,
 				SizeT Size,
 				const Byte Filler);
@@ -276,16 +264,14 @@ namespace Seed {
 ///<returns>Вертає ділянку пам'яті</returns>
 [[nodiscard]]
 inline void* __cdecl operator new(Seed::SizeT Size) {
-	extern void* GenericAllocate(Seed::SizeT Size);
-	return GenericAllocate(Size);
+	return Seed::Memory::Allocator<Seed::Memory::Heap>::operator new(Size);
 }
 ///<summary>Оператор виділення масиву об'єктів</summary>
 ///<param name = "Size">Розмір масиву об'єктів</param>
 ///<returns>Вертає ділянку пам'яті</returns>
 [[nodiscard]]
 inline void* __cdecl operator new[](Seed::SizeT Size) {
-	extern void* GenericAllocate(Seed::SizeT Size);
-	return GenericAllocate(Size);
+	return Seed::Memory::Allocator<Seed::Memory::Heap>::operator new[](Size);
 }
 ///<summary>Оператор виділення одиночного об'єкта з специфічним вирівнюванням</summary>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
@@ -293,8 +279,7 @@ inline void* __cdecl operator new[](Seed::SizeT Size) {
 ///<returns>Вертає ділянку пам'яті</returns>
 [[nodiscard]]
 inline void* __cdecl operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
-	extern void* GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq);
-	return GenericAllignedAllocate(Size, (Seed::SizeT)Allign);
+	return Seed::Memory::Allocator<Seed::Memory::Heap>::operator new(Size, Allign);
 }
 ///<summary>Оператор виділення масиву об'єктів з специфічним вирівнюванням</summary>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
@@ -302,64 +287,55 @@ inline void* __cdecl operator new(Seed::SizeT Size, Seed::AllignRequirements All
 ///<returns>Вертає ділянку пам'яті</returns>
 [[nodiscard]]
 inline void* __cdecl operator new[](Seed::SizeT Size, Seed::AllignRequirements Allign) {
-	extern void* GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq);
-	return GenericAllignedAllocate(Size, (Seed::SizeT)Allign);
+	return Seed::Memory::Allocator<Seed::Memory::Heap>::operator new[](Size, Allign);
 }
 ///<summary>Оператор видалення одиночного об'єкту</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 inline void __cdecl operator delete(void* MemBlk) {
-	extern void* GenericFree(void* MemBlk);
-	GenericFree(MemBlk);
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete(MemBlk);
 }
 ///<summary>Оператор видалення масиву об'єктів</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 inline void __cdecl operator delete[](void* MemBlk) {
-	extern void* GenericFree(void* MemBlk);
-	GenericFree(MemBlk);
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete[](MemBlk);
 }
 ///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Allign">Границя вирівнювання</param>
 inline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirements Allign) {
-	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
-	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete(MemBlk, Allign);
 }
 ///<summary>Оператор видалення масиву об'єктів з специфічним вирівннюванням</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Allign">Границя вирівнювання</param>
 inline void __cdecl operator delete[](void* MemBlk, Seed::AllignRequirements Allign) {
-	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
-	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete[](MemBlk, Allign);
 }
 ///<summary>Оператор видалення одиночного об'єкту з передачею розміру об'єкта</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
-inline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size) {
-	extern void* GenericFree(void* MemBlk);
-	GenericFree(MemBlk);
+inline void __cdecl operator delete(void* MemBlk, [[maybe_unused]] Seed::SizeT Size) {
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete(MemBlk);
 }
 ///<summary>Оператор видалення масиву об'єктів з передачею розміру об'єкта</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
-inline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size) {
-	extern void* GenericFree(void* MemBlk);
-	GenericFree(MemBlk);
+inline void __cdecl operator delete[](void* MemBlk, [[maybe_unused]] Seed::SizeT Size) {
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete[](MemBlk);
 }
 ///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням та розміром</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Allign">Границя вирівнювання</param>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
-inline void __cdecl operator delete(void* MemBlk, Seed::SizeT Size, Seed::AllignRequirements Allign) {
-	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
-	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
+inline void __cdecl operator delete(void* MemBlk, [[maybe_unused]] Seed::SizeT Size, Seed::AllignRequirements Allign) {
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete(MemBlk, Allign);
 }
 ///<summary>Оператор видалення масиву об'єктів з специфічним вирівннюванням та розміром</summary>
 ///<param name = "MemBlk">Ділянка пам'яті</param>
 ///<param name = "Allign">Границя вирівнювання</param>
 ///<param name = "Size">Розмір ділянки пам'яті</param>
-inline void __cdecl operator delete[](void* MemBlk, Seed::SizeT Size, Seed::AllignRequirements Allign) {
-	extern void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq);
-	GenericAllignedFree(MemBlk, (Seed::SizeT)Allign);
+inline void __cdecl operator delete[](void* MemBlk, [[maybe_unused]] Seed::SizeT Size, Seed::AllignRequirements Allign) {
+	Seed::Memory::Allocator<Seed::Memory::Heap>::operator delete[](MemBlk, Allign);
 }
 #pragma warning(pop)
 #pragma endregion

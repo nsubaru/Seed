@@ -44,7 +44,7 @@ namespace Seed
 			};
 
 			///<summary>Помилка реєстрації сервісу</summary>
-			class SeedKernelCall DIRegisterService : public Exception {
+			class DIRegisterService : public Exception {
 			private:
 				/// <summary>
 				/// Тип який DI не зумів знайти

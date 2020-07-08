@@ -261,12 +261,12 @@ namespace Seed {
                 template<typename U, typename TLambda>
                 U AggregateImpl(TLambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
-                        U val = U();
+                        U result = U();
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            lambda(val, This->array[i]);
+                            result = lambda(result, This->array[i]);
                         }
-                        return val;
+                        return result;
                         }));
                 }
 
@@ -276,20 +276,20 @@ namespace Seed {
                         U result = Value;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            lambda(result, This->array[i]);
+                            result = lambda(result, This->array[i]);
                         }
                         return MoveRValue(result);
                         }));
                 }
 
                 template<typename U, typename TLambda>
-                U AggregateImpl(TLambda&& lambda, U&& Value) const {
+                U AggregateImpl(TLambda&& lambda, U&& result) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() {
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            lambda(Value, This->array[i]);
+                            result = lambda(result, This->array[i]);
                         }
-                        return MoveRValue(Value);
+                        return MoveRValue(result);
                         }));
                 }
 
@@ -576,7 +576,7 @@ namespace Seed {
                                 T* buf = new T[NewSize];
                                 SizeT CopySize = (NewSize > This->count) ? This->count : NewSize;
                                 if constexpr (TypeTraits::IsPodV<T>) {
-                                    Memory::Copy(This->array, buf, CopySize);
+                                    Memory::Copy(This->array, buf, CopySize * sizeof(T));
                                 }
                                 else {
                                     for (SizeT i = 0; i < CopySize; i++)

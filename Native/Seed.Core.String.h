@@ -2106,16 +2106,10 @@ namespace Seed {
             /// <returns>Рядоку який є сумою масиву вхідних рядків</returns>
             forceinline static BaseString Combine(Containers::Array<BaseString>&& strings) {
                 return strings.Aggregate(
-                    [&] (BaseString& res, const BaseString& item)
-                    {
-                        res += item;
-                    }, 
+                    ArrowFunct(x, y, x + y),
                     BaseString(
                         strings.Aggregate<SizeT>(
-                            [&] (SizeT& sz, const BaseString& str)
-                            {
-                                sz += str.Lenght;
-                            }
+                            ArrowFunct(x, y, x + y.Lenght)
                         )
                     )
                 );

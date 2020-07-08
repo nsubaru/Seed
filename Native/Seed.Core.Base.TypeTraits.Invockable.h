@@ -116,6 +116,13 @@ namespace Seed
             /// </summary>
 			template<typename TCallable, typename ... TArgs>
 			using InvockableResult = typename Details::InvokeTraits<void, TCallable, TArgs...>::Result;
+
+            /// <summary>
+            /// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs і результатом TRet
+            /// </summary>
+            template<typename TCallable, typename TRet, typename ... TArgs>
+			constexpr Boolean IsInvockableWithResult = TypeTraits::IsInvockable<TCallable, TArgs...> &&
+				TypeTraits::IsConvertible<typename TypeTraits::InvockableResult<TCallable, TArgs...>, TRet>;
 		}
 	}
 }

@@ -239,7 +239,7 @@ namespace Seed {
 					U val = 0;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						lambda(val, This->array[i]);
+						val = lambda(val, This->array[i]);
 					}
 					return val;
 				}
@@ -249,7 +249,7 @@ namespace Seed {
 					U result = Value;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						lambda(result, This->array[i]);
+						val = lambda(result, This->array[i]);
 					}
 					return MoveRValue(result);
 				}
@@ -258,7 +258,7 @@ namespace Seed {
 				U AggregateImpl(TLambda&& lambda, U&& Value) const {
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						lambda(Value, This->array[i]);
+						Value = lambda(Value, This->array[i]);
 					}
 					return MoveRValue(Value);
 				}
@@ -507,7 +507,7 @@ namespace Seed {
 							T* buf = new T[NewSize];
 							SizeT CopySize = (NewSize > This->count) ? This->count : NewSize;
 							if constexpr (TypeTraits::IsPodV<T>) {
-								Memory::Copy(This->array, buf, CopySize);
+								Memory::Copy(This->array, buf, CopySize * sizeof(T));
 							}
 							else {
 								for (SizeT i = 0; i < CopySize; i++)

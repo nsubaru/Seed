@@ -128,7 +128,7 @@ void Seed::Core::Memory::Heap::Stop() noexcept
 #ifndef ReleaseMode
 __declspec(allocator)
 #endif // !ReleaseMode
-void* GenericAllocate(Seed::SizeT Size)
+void * Seed::Core::Memory::Heap::Allocate(SizeT Size)
 {
 	//якщо включено логуванн€ вид≥леннь\зв≥льненнь пам'€ть то в≥дпов≥дно логуЇм дан≥
 	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
@@ -159,12 +159,12 @@ void* GenericAllocate(Seed::SizeT Size)
 #ifndef ReleaseMode
 __declspec(allocator)
 #endif // !ReleaseMode
-void* GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
+void * Seed::Core::Memory::Heap::AllignedAllocate(SizeT Size, SizeT AllocationReq)
 {
 	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне,
 	//а отже викликаЇм просте вид≥ленн€ пам'€т≥
 	if (AllocationReq == 0 || AllocationReq == 1)
-		return GenericAllocate(Size);
+		return Allocate(Size);
 	//якщо включено логуванн€ вид≥леннь\зв≥льненнь пам'€ть то в≥дпов≥дно логуЇм дан≥
 	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
 		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
@@ -192,12 +192,12 @@ void* GenericAllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq)
 	//јтомарно оновлюЇм статитистику
 	InterlockedIncrementSizeTNoFence(&HeapData.AllocatedMemBlksCount);
 	InterlockedExchangeAddSizeT(&HeapData.AllocatedMemory, Size);
-	InterlockedExchangeAddSizeT(&HeapData.CurrentHeapSize, Size + Size + sizeof(SizeT) + sizeof(SizeT));
+	InterlockedExchangeAddSizeT(&HeapData.CurrentHeapSize, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT));
 	//¬ертаЇм покажчик на початок даних
 	return (void*)AllignedAddress;
 }
 
-void* GenericFree(void* MemBlk)
+void * Seed::Core::Memory::Heap::Free(void * MemBlk)
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
@@ -223,10 +223,14 @@ void* GenericFree(void* MemBlk)
 	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
-void* GenericAllignedFree(void* MemBlk, Seed::SizeT AllocationReq)
+void * Seed::Core::Memory::Heap::AllignedFree(void * MemBlk, SizeT AllocationReq)
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
+	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне,
+	//а отже викликаЇм просте вид≥ленн€ пам'€т≥
+	if (AllocationReq == 0 || AllocationReq == 1)
+		return Free(MemBlk);
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
 	SizeT* Header = ((SizeT*)MemBlk) - 2;
 	//ќтримуЇм розм≥р даних в д≥л€нц≥ пам'€т≥
@@ -371,7 +375,7 @@ DeprecatedCall("Ќизькор≥внева робота з пам'€тю") void* Seed::Core::Memory::Sensi
 	//јтомарно оновлюЇм статитистику
 	InterlockedIncrementSizeTNoFence(&SecureHeapData.AllocatedMemBlksCount);
 	InterlockedExchangeAddSizeT(&SecureHeapData.AllocatedMemory, Size);
-	InterlockedExchangeAddSizeT(&SecureHeapData.CurrentHeapSize, Size + Size + sizeof(SizeT) + sizeof(SizeT));
+	InterlockedExchangeAddSizeT(&SecureHeapData.CurrentHeapSize, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT));
 	//¬ертаЇм покажчик на початок даних
 	return (void*)AllignedAddress;
 }

@@ -49,10 +49,12 @@ namespace Seed {
 			private:
 				Data* This = nullptr;
 			private:
-				friend extern void RegisterThread(Thread* thread);
-				friend extern void UnRegisterThread(Thread* thread);
-				friend extern volatile Delegate& ThreadEntryPoint(Thread* thread);
-				friend extern bool MainThread(Delegate&& delegate);
+				SeedKernelCall friend void RegisterThread(Thread* thread);
+				SeedKernelCall friend void UnRegisterThread(Thread* thread);
+				SeedKernelCall friend volatile Delegate& ThreadEntryPoint(Thread* thread);
+				SeedKernelCall friend bool MainThread(Delegate&& delegate);
+
+				friend void KillThread(Thread& target, UInt32 statusCode);
 			private:
 				SeedKernelCall void RefreshName();
 			protected:

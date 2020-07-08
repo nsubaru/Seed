@@ -12,7 +12,7 @@ namespace Seed {
 				Thread, JobTask, ScheduledTask, Unknown = 255
 			};
 			enum class EThreadabledStates : UInt8 {
-				NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interupted, Unknown = 255
+				NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interupted, Ended, Unknown = 255
 			};
 			enum class EThreadableCodeType : UInt8 {
 				Native, Managed, Unknown = 255

@@ -63,6 +63,8 @@ namespace Seed {
 						SizeT StackMaxSize;
 						///<summary>Максиальний розмір стеку потоків</summary>
 						SizeT StackStartSize;
+						/// <summary> Таймаут очікуванння на потоки при завершені роботи ядра </summary>
+						SizeT StopKernelThreadsTimeout;
 					};
 					///<summary>Налаштування потоків</summary>
 					ThreadCfg Thread;
@@ -599,11 +601,26 @@ namespace Seed {
 							CurrentSettingsData.Threading.Thread.StackMaxSize = NewSize;
 						});
 					}
+
+					SizeT GetStopKernelThreadsTimeout() {
+						return GetCurrentSettingData([] (auto data)
+						{
+							return data.Threading.Thread.StopKernelThreadsTimeout;
+						});
+					}
+					void SetStopKernelThreadsTimeout(SizeT NewStopKernelThreadsTimeout) {
+						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						{
+							CurrentSettingsData.Threading.Thread.StopKernelThreadsTimeout = NewStopKernelThreadsTimeout;
+						});
+					}
 				public:
 					///<summary>Стартовий розмір стеку у потоків</summary>
 					SizeT Property(GetStackStartSize, SetStackStartSize) StackStartSize;
 					///<summary>Максимальний розмір стеку у потоків</summary>
 					SizeT Property(GetStackMaxSize, SetStackMaxSize) StackMaxSize;
+					///<summary>Таймаут очікуванння на потоки при завершені роботи ядра</summary>
+					SizeT Property(GetStopKernelThreadsTimeout, SetStopKernelThreadsTimeout) StopKernelThreadsTimeout;
 				};
 			public:
 				ThreadingCfgT() {}

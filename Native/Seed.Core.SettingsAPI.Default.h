@@ -15,11 +15,11 @@ namespace Seed {
 					//Менеджер пам'яті
 					{
 						//Секція стандартного алокатора пам'яті
-						DefaultSettings.MainMemoryManager.DefaultHeap.StartSize = 2Mb;
+						DefaultSettings.MainMemoryManager.DefaultHeap.StartSize = 40Mb;
 						DefaultSettings.MainMemoryManager.DefaultHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
 						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalСhecks = { 0xf };
-						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = false;
+						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = true;
 #elif DebugMode
 						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalСhecks = { 0xf };
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = true;
@@ -28,7 +28,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = false;
 #endif
 						//Секція захищеного алокатора пам'яті
-						DefaultSettings.MainMemoryManager.SensitiveDataHeap.StartSize = 1Mb;
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.StartSize = 20Mb;
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.AdditionalСhecks = { 0xf };
@@ -41,7 +41,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = false;
 #endif
 						//Секція алокатора пам'яті для обробника помилок
-						DefaultSettings.MainMemoryManager.ExceptionHeap.StartSize = 20Mb;
+						DefaultSettings.MainMemoryManager.ExceptionHeap.StartSize = 80Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
 						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalСhecks = { 0xf };
@@ -70,6 +70,8 @@ namespace Seed {
 						{
 							DefaultSettings.Threading.Thread.StackStartSize = 5Mb;
 							DefaultSettings.Threading.Thread.StackMaxSize = 10Mb;
+							DefaultSettings.Threading.Thread.StopKernelThreadsTimeout = 
+								static_cast<DateTime>(DateSpan(0, 0, 0, 0, 0, 3, 0, 0)).GetAsRelativeTime();
 						}
 					}
 

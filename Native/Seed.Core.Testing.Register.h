@@ -25,7 +25,7 @@ namespace Seed {
 				static inline Containers::List<String> LoadedTests() {
 					return GetAllTests().CopyTo<Containers::List>([] (const TestRecord& record)
 					{
-						return record.Key;
+						return record.Key.TypeName;
 					});
 				}
 			};

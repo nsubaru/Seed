@@ -16,8 +16,7 @@ namespace Seed {
 			/// і вертає заданий тип TRet
 			/// </summary>
 			template<typename TCallable, typename TRet, typename ... TArgs>
-			concept IsInvockableWithResult = TypeTraits::IsInvockable<TCallable, TArgs...> &&
-				TypeTraits::IsConvertible<typename TypeTraits::InvockableResult<TCallable, TArgs...>, TRet>;
+			concept IsInvockableWithResult = TypeTraits::IsInvockableWithResult<TCallable, TRet, TArgs...>;
 
 			/// <summary>
 			/// Перевірка чи тип T наслідується від типу U
@@ -39,6 +38,26 @@ namespace Seed {
 
 			template<typename T, typename ... TArgs>
 			concept IsConstructibleWith = TypeTraits::IsConstructible<T, TArgs...>;
+
+			template<typename T>
+			concept IsDefaultConstructible = TypeTraits::IsConstructible<T>;
+
+			template<typename T, typename U>
+			concept IsComparableWith = requires(T x, U y) {
+				{ x == y } -> IsSame<bool>;
+				{ x != y } -> IsSame<bool>;
+				{ x <= y } -> IsSame<bool>;
+				{ x >= y } -> IsSame<bool>;
+
+				{ x < y } -> IsSame<bool>;
+				{ x > y } -> IsSame<bool>;
+			};
+
+			template<typename T, typename U>
+			concept HaveEqual = requires(T x, U y) {{ x == y } -> IsSame<bool>; };
+
+			template<typename T, typename U>
+			concept HaveNotEqual = requires(T x, U y) {{ x != y } -> IsSame<bool>; };
 		}
 	}
 }

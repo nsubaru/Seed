@@ -76,7 +76,7 @@ namespace Seed
 bool Seed::Testing::Test::MultiThreading::ProducerAndConcumer::Excecute()
 {
     constexpr SizeT itemCountPerThread = 10000;
-	const Processing processing(itemCountPerThread);
+	Processing processing(itemCountPerThread);
 
 	Threading::Thread creatingThread1(L"PriorityQueue Test: Creating Thread 1", Delegate([](Processing& processing) {processing.Creating(); }, processing));
 	Threading::Thread creatingThread2(L"PriorityQueue Test: Creating Thread 2", Delegate([](Processing& processing) {processing.Creating(); }, processing));

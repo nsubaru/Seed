@@ -15,10 +15,12 @@ inline auto& TestsStorage()
 	return tests;
 }
 
-void Seed::Core::Testing::LoadTest(Seed::Core::String&& name, Seed::Core::Testing::ITest*&& instance)
+SizeT Seed::Core::Testing::LoadTest(RTTI::RTTITypeRecord&& typeRecord, ITest&(*testObjGenerator)())
 {
 	auto& tests = TestsStorage();
-	tests += {MoveRValue(name), MoveRValue(instance)};
+	auto testAddress = tests.Count;
+	tests += {MoveRValue(typeRecord), testObjGenerator};
+	return testAddress;
 }
 
 inline List<TestRecord> & Seed::Core::Testing::TestRegister::GetAllTests()
@@ -31,38 +33,38 @@ TestPackResult Seed::Core::Testing::TestRegister::RunAllTest() {
 	toCoreLog(L"Запуск тестів...");
 	DateTime startTime = DateTime::GetCurrentSystemTimeData();
 
-	GetAllTests().ForEach([&](const TestRecord& record) {
+	GetAllTests().ForEach([&](TestRecord& record) {
 		DateTime testDurration = DateTime::GetCurrentSystemTimeData();
 		try
 		{
-			if (record.Value->Excecute())
+			if (record.Value().Excecute())
 			{
-				toCoreLog(L"Тест \"" + record.Key + L"\" успішно пройдено");
+				toCoreLog(L"Тест \"" + record.Key.TypeName + L"\" успішно пройдено");
 				testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-				results += {record.Key, TestResult::EStatus::Success, "", testDurration};
+				results += {record.Key.TypeName, TestResult::EStatus::Success, "", testDurration};
 			}
 			else
 			{
-				toCoreLog(L"Тест \"" + record.Key + L"\" не пройдено");
+				toCoreLog(L"Тест \"" + record.Key.TypeName + L"\" не пройдено");
 				testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-				results += {record.Key, TestResult::EStatus::Failure, L"Вернув false", testDurration};
+				results += {record.Key.TypeName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
 			}
 		}
 		catch (Asserts::AssertException & ex)
 		{
-			toCoreLog(L"Спрацював ассерт в тесті \"" + record.Key + L"\": " + ex.AssertMessage);
+			toCoreLog(L"Спрацював ассерт в тесті \"" + record.Key.TypeName + L"\": " + ex.AssertMessage);
 			testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-			results += {record.Key, TestResult::EStatus::Failure, ex.toString(), testDurration};
+			results += {record.Key.TypeName, TestResult::EStatus::Failure, ex.toString(), testDurration};
 		}
 		catch (Exception & ex) {
-			toCoreLog(L"При обробці тесту " + record.Key + L" виникла помилка ", ex);
+			toCoreLog(L"При обробці тесту " + record.Key.TypeName + L" виникла помилка ", ex);
 			testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-			results += {record.Key, TestResult::EStatus::Exception, ex.toString(), testDurration};
+			results += {record.Key.TypeName, TestResult::EStatus::Exception, ex.toString(), testDurration};
 		}
 		catch (...) {
-			toCoreLog(L"При обробці тесту " + record.Key + L" виникла непередбачувана помилка");
+			toCoreLog(L"При обробці тесту " + record.Key.TypeName + L" виникла непередбачувана помилка");
 			testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-			results += {record.Key, TestResult::EStatus::Exception, L"Uknown", testDurration};
+			results += {record.Key.TypeName, TestResult::EStatus::Exception, L"Uknown", testDurration};
 		}
 		});
 

@@ -338,7 +338,7 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					template<typename U = T, typename Lambda>
-					requires Concepts::IsInvockable<Lambda, U&, const T&>
+					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&>
 					forceinline U Aggregate(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), U());
 					}
@@ -351,8 +351,8 @@ namespace Seed {
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
-					template<typename U = T, typename Lambda>
-					requires Concepts::IsInvockable<Lambda, U&, const T&> 
+					template<typename U, typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&> 
 					forceinline U Aggregate(Lambda&& lambda, const U& startValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), startValue);
 					}
@@ -365,8 +365,8 @@ namespace Seed {
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
-					template<typename U = T, typename Lambda>
-					requires Concepts::IsInvockable<Lambda, U&, const T&>
+					template<typename U, typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&>
 					forceinline U Aggregate(Lambda&& lambda, U&& startValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(startValue));
 					}
@@ -417,7 +417,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&>::State>, bool> = true>
+					template<typename Lambda>
+					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
 					forceinline T& Last(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
@@ -482,7 +483,7 @@ namespace Seed {
 					template<typename TLambda> 
 					requires Concepts::IsInvockableWithResult<TLambda, T> || Concepts::IsInvockableWithResult<TLambda, T, SizeT>
 					forceinline static ThisCollection Generate(TLambda&& generator, SizeT count) {
-						if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, T>::State)
+						if constexpr (TypeTraits::IsInvockableWithResult<TLambda, T>)
 						{
 							if constexpr (!ThisCollection::IsDynamic)
 							{
