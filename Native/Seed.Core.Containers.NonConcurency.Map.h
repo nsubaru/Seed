@@ -589,7 +589,7 @@ namespace Seed {
 					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(const Iterator& iterator) : item(iterator.item) {
 						if (item != nullptr)
-							item->RefCount++;
+							++item->RefCount;
 					}
 
 					/// <summary>
@@ -837,9 +837,9 @@ namespace Seed {
 						ForEachImplWithoutIndex(node->right, lambda);
 				}
 
-				template<typename LambdaT>
-				forceinline const BaseMap& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&>) {
+				template<typename TLambda>
+				forceinline const BaseMap& ForEachImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -847,7 +847,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -861,10 +861,10 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				forceinline BaseMap& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsInvockable<LambdaT, BasePair<THeap, TKey, TValue>&> ||
-						TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&>) {
+				template<typename TLambda>
+				forceinline BaseMap& ForEachImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, BasePair<THeap, TKey, TValue>&> ||
+						TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -872,8 +872,8 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsInvockable<LambdaT, BasePair<THeap, TKey, TValue>&, SizeT> ||
-						TypeTraits::IsInvockable<LambdaT, const BasePair<THeap, TKey, TValue>&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, BasePair<THeap, TKey, TValue>&, SizeT> ||
+						TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -906,9 +906,9 @@ namespace Seed {
 						ForEachKeyImplWithoutIndex(node->right, lambda);
 				}
 
-				template<typename LambdaT>
-				forceinline BaseMap& ForEachKeyImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
+				template<typename TLambda>
+				forceinline BaseMap& ForEachKeyImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&>) {
 						return This->lock.ShareLock([&]() -> BaseMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -918,7 +918,7 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&, SizeT>) {
 						return This->lock.ShareLock([&]() -> BaseMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -934,9 +934,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				forceinline const BaseMap& ForEachKeyImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
+				template<typename TLambda>
+				forceinline const BaseMap& ForEachKeyImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -944,7 +944,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -977,9 +977,9 @@ namespace Seed {
 						ForEachValueImplWithoutIndex(node->right, lambda);
 				}
 
-				template<typename LambdaT>
-				forceinline const BaseMap& ForEachValueImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&> ) {
+				template<typename TLambda>
+				forceinline const BaseMap& ForEachValueImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&> ) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -987,7 +987,7 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -1001,10 +1001,10 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				forceinline BaseMap& ForEachValueImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsInvockable<LambdaT, TValue&> ||
-						TypeTraits::IsInvockable<LambdaT, const TValue&>) {
+				template<typename TLambda>
+				forceinline BaseMap& ForEachValueImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, TValue&> ||
+						TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{
@@ -1012,8 +1012,8 @@ namespace Seed {
 						}
 						return *this;
 					}
-					else if constexpr (TypeTraits::IsInvockable<LambdaT, TValue&, SizeT> ||
-						TypeTraits::IsInvockable<LambdaT, const TValue&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, TValue&, SizeT> ||
+						TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&, SizeT>) {
 						auto node = this->This->root;
 						if (node != nullptr)
 						{

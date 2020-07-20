@@ -35,6 +35,14 @@ static TLogFile& GetLogFile() {
 	static TLogFile LogFileStructData;
 	return LogFileStructData;
 }
+namespace Seed
+{
+	inline namespace Core
+	{
+		extern void SendLogMsgToEvent(const Seed::Char* Value, Seed::SizeT Lenght);
+	}
+}
+
 
 //Дефайн отримання керуючої структури логування
 #define LogFile GetLogFile()
@@ -139,8 +147,9 @@ SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::C
 	CStr::Copy(Value, raw + 22);
 	SizeT size = CStr::Size(raw);
 	CStr::Copy(L"\r\n", raw + size);
-	size += 2; size *= sizeof(wchar_t);
 	NTSTATUS status = STATUS_SUCCESS;
+	Seed::Core::SendLogMsgToEvent(raw, size);
+	size += 2; size *= sizeof(wchar_t);
 	LogFile.lock.ExclusiveLock([&] ()
 	{
 		status = NtWriteFile( //-V107
@@ -186,9 +195,14 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 			FormatCurrentTime(raw);
 			raw[21] = L' ';
 			raw[22] = L'\0';
-			data = ExceptionString(raw) + data + NextLine();
+			data = ExceptionString(raw) + data;
+			
+			Seed::Core::SendLogMsgToEvent((Seed::ConstCharStr) data, data.Lenght);
+
+			data +=  NextLine();
 			SizeT bytesCount = data.Lenght;
 			bytesCount *= sizeof(wchar_t);
+
 			NTSTATUS status = STATUS_SUCCESS;
 			LogFile.lock.ExclusiveLock([&] ()
 			{

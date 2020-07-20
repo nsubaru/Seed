@@ -84,7 +84,7 @@ Containers::Blob SerilizeObjectType(
 
 Containers::Blob Seed::Core::Services::SerilizationService::SerelizeDynObj(const Reflection::DynamicObject& data) {
 	//Try search type in object records storage by type name
-	if (This->idi.IsExistDataTypesRecordByType(data.GetValueType()))
+	if (This->idi.IsExistObjectRecordByType(data.GetValueType()))
 	{
 		//if found get type record
 		auto typeRecord = This->idi.GetObjectRecordByType(data.GetValueType());
@@ -94,7 +94,7 @@ Containers::Blob Seed::Core::Services::SerilizationService::SerelizeDynObj(const
 		}
 		else
 		{
-			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetValueType().CxxTypeName));
+			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetValueType().CxxTypeName)); //-V807
 		}
 	} 
 	//else try search type in data types storage by type name

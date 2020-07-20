@@ -19,7 +19,7 @@ namespace Seed {
 			concept IsInvockableWithResult = TypeTraits::IsInvockableWithResult<TCallable, TRet, TArgs...>;
 
 			/// <summary>
-			/// Перевірка чи тип T наслідується від типу U
+			/// Перевірка чи тип U наслідується від типу T
 			/// </summary>
 			template<typename T, typename U>
 			concept IsBasedOn = TypeTraits::IsBasedOnV<T, U>;

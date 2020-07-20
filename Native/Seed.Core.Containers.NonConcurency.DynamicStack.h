@@ -70,7 +70,7 @@ namespace Seed {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 					}
 					This->stack[This->count] = item;
-					This->count++;
+					++This->count;
 				}
 
 				/// <summary>
@@ -83,7 +83,7 @@ namespace Seed {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 					}
 					This->stack[This->count] = MoveRValue(item);
-					This->count++;
+					++This->count;
 				}
 
 				/// <summary>
@@ -93,7 +93,7 @@ namespace Seed {
 				forceinline T Pop() {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
-					This->count--;
+					--This->count;
 					return MoveRValue(This->stack[This->count]);
 				}
 
@@ -105,7 +105,7 @@ namespace Seed {
 				forceinline const T& Top() const {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
-					This->count--;
+					--This->count;
 					return This->stack[This->count];
 				}
 
@@ -117,7 +117,7 @@ namespace Seed {
 				forceinline const T& Top() {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
-					This->count--;
+					--This->count;
 					return This->stack[This->count];
 				}
 

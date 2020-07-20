@@ -232,7 +232,7 @@ namespace Seed {
 						else
 						{
 							this->This = this->This->next;
-							if (This != nullptr) This->RefCount++;
+							if (this->This != nullptr) This->RefCount++;
 							return node;
 						}
 					}
@@ -252,7 +252,7 @@ namespace Seed {
 						else
 						{
 							this->This = this->This->prev;
-							if (This != nullptr) This->RefCount++;
+							if (this->This != nullptr) This->RefCount++;
 							return node;
 						}
 					}
@@ -272,7 +272,7 @@ namespace Seed {
 						else
 						{
 							this->This = this->This->next;
-							if (This != nullptr) This->RefCount++;
+							if (this->This != nullptr) This->RefCount++;
 						}
 						return *this;
 					}
@@ -291,7 +291,7 @@ namespace Seed {
 						else
 						{
 							this->This = this->This->prev;
-							if (This != nullptr) This->RefCount++;
+							if (this->This != nullptr) This->RefCount++;
 							return *this;
 						}
 					}
@@ -554,7 +554,7 @@ namespace Seed {
 					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(const Iterator& iterator) : This(iterator.This) {
 						if (This != nullptr)
-							This->RefCount++;
+							++This->RefCount;
 					}
 
 					/// <summary>
@@ -687,7 +687,8 @@ namespace Seed {
 						}
 
 						OtherList.This->root->prev = this->This->last;
-						this->This->last = this->This->last->next = OtherList.This->root;
+						this->This->last->next = OtherList.This->root;
+						this->This->last = OtherList.This->last;
 						this->This->size = this->This->size + OtherList.This->size;
 						OtherList.This->root = OtherList.This->last = nullptr;
 						OtherList.This->size = 0;

@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "Seed.Core.Threading.h"
 
 #include "Seed.Core.SettingsAPI.h"
@@ -82,7 +85,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::CloneListW
 
 			++listIt; ++cloneIt;
 		}
-		return true;
+		return !(list.IsSameAs(clone));
 	});
 	return true;
 }
@@ -103,7 +106,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::CloneListW
 		list.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))),
 		clone.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))));
 
-	return true;
+	return !(list.IsSameAs(clone));
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::FirstConditionList::Excecute() {
@@ -212,7 +215,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::CloneListWith
 
 			++listIt; ++cloneIt;
 		}
-		return true;
+		return !(list.IsSameAs(clone));
 	});
 	return true;
 }
@@ -233,7 +236,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::CloneListWith
 		list.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))),
 		clone.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))));
 
-	return true;
+	return !(list.IsSameAs(clone));
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::FirstConditionList::Excecute() {
@@ -291,7 +294,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::MultiThreadConcurency::It
 		.ForEach(ArrowFunct(thread, thread.Join()))
 		.ForEach([&] (Core::Threading::Thread& thread)
 		{
-			thread, Asserts::AssertEqual(thread.GetThreadResult<int>(), sharedList.Count);
+			Asserts::AssertEqual(thread.GetThreadResult<int>(), sharedList.Count);
 		});
 
 	return true;

@@ -74,7 +74,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::CloneArra
 				return false;
 		}
 
-		return true;
+		return !orig.IsSameAs(copy);
 	});
 
 	return true;
@@ -92,7 +92,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::CloneArra
 				return false;
 		}
 
-		return true;
+		return !orig.IsSameAs(copy);
 	});
 
 	return true;
@@ -177,7 +177,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::CloneArrayWi
 				return false;
 		}
 
-		return true;
+		return !(orig.IsSameAs(copy));
 	});
 
 	return true;
@@ -195,7 +195,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::CloneArrayWi
 				return false;
 		}
 
-		return true;
+		return !(orig.IsSameAs(copy));
 	});
 
 	return true;

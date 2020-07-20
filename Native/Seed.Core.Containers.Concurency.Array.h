@@ -617,6 +617,11 @@ namespace Seed {
                     });
                 }
 
+                /// <summary>
+                /// Клонування масиву
+                /// </summary>
+                /// <param name="lambda">Функція задопомогою якої відбувається клонування</param>
+                /// <returns>Вертає новий масив з копією всіх елементів</returns>
                 template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
                 BaseConcurencyArray Clone(TLambda&& lambda) const {
                     return This->lock.ShareLock([&] () -> BaseConcurencyArray
@@ -887,7 +892,7 @@ namespace Seed {
                 /// </summary>
                 /// <returns>Масив з елементами з даного об'єкта</returns>
                 BaseConcurencyArray<THeap, T> ToArray() {
-                    This->lock.ShareLock([&]() mutable {
+                    return This->lock.ShareLock([&]() mutable -> BaseConcurencyArray<THeap, T> {
                         BaseConcurencyArray<THeap, T> array(this->This->count);
                         Node* node = This->root;
                         SizeT nodeStartIndex = 0;
@@ -900,6 +905,7 @@ namespace Seed {
                             }
                             array.This->array[i] = node->arr[i - nodeStartIndex];
                         }
+                        return array;
                         });
                 }
             public:
@@ -978,7 +984,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < This->count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -993,7 +999,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < This->count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -1015,7 +1021,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < This->count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -1030,7 +1036,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < This->count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -1055,7 +1061,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -1070,7 +1076,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -1095,7 +1101,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -1110,7 +1116,7 @@ namespace Seed {
                             SizeT nodeStartIndex = 0;
                             for (SizeT i = 0; i < count; i++)
                             {
-                                if (nodeStartIndex + i = node->size) {
+                                if (i - nodeStartIndex = node->size) { //-V559
                                     nodeStartIndex += node->size;
                                     node = node->next;
                                 }
@@ -1133,7 +1139,7 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
@@ -1151,7 +1157,7 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
@@ -1168,7 +1174,7 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
@@ -1187,7 +1193,7 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
@@ -1205,7 +1211,7 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
@@ -1223,12 +1229,14 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
                             if (lambda(node->arr[i - nodeStartIndex]))
+                            {
                                 return node->arr[i - nodeStartIndex];
+                            }
                         }
 
                         Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
@@ -1244,11 +1252,12 @@ namespace Seed {
                         SizeT index = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
-                            if (lambda(node->arr[i - nodeStartIndex])) {
+                            if (lambda(node->arr[i - nodeStartIndex]))
+                            {
                                 last = node; index = i - nodeStartIndex;
                             }
                         }
@@ -1266,12 +1275,14 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
                             if (lambda(node->arr[i - nodeStartIndex]))
+                            {
                                 return node->arr[i - nodeStartIndex];
+                            }
                         }
 
                         Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
@@ -1287,7 +1298,7 @@ namespace Seed {
                         SizeT index = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }
@@ -1333,9 +1344,9 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
-                                tmp = node; node = node->next; delete[] node->arr; delete node;
+                                tmp = node; node = node->next; delete[] node->arr; delete node; node = tmp;
                             }
                             lambda(MoveRValue(node->arr[i - nodeStartIndex]));
                         }
@@ -1351,7 +1362,7 @@ namespace Seed {
                         SizeT nodeStartIndex = 0;
                         for (SizeT i = 0; i < This->count; i++)
                         {
-                            if (nodeStartIndex + i = node->size) {
+                            if (i - nodeStartIndex = node->size) { //-V559
                                 nodeStartIndex += node->size;
                                 node = node->next;
                             }

@@ -122,6 +122,33 @@ namespace Seed
 				if (lambda())
 					Throw(AssertNotEqualException(ExceptionPosition));
 			}
+
+			template<typename TException, typename TLambda>
+			requires Concepts::IsInvockable<TLambda> && Concepts::IsBasedOn<Exceptions::Exception, TException>//&& Concepts::IsException<TException>
+			static void AssertThrowException(TLambda&& lambda) {
+				try
+				{
+					lambda();
+				}
+				catch ([[maybe_unused]] TException& ex)
+				{
+					return;
+				}
+				Throw(AssertNotEqualException(ExceptionPosition));
+			}
+
+			template<typename TException, typename TLambda>
+			requires Concepts::IsInvockable<TLambda> && Concepts::IsBasedOn<Exceptions::Exception, TException>//&& Concepts::IsException<TException>
+				static void AssertNoThrowException(TLambda&& lambda) {
+				try
+				{
+					lambda();
+				}
+				catch ([[maybe_unused]] TException& ex)
+				{
+					Throw(AssertNotEqualException(ExceptionPosition));
+				}
+			}
 		};
 	}
 }

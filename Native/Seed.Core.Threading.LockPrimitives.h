@@ -45,9 +45,18 @@ namespace Seed {
 					{
 						Internals::AcquireLockExclusiveSRWLock(&lock);
 						try {
-							decltype(Funct()) ret(Funct());
-							Internals::ReleaseLockExclusiveSRWLock(&lock);
-							return ret;
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(Funct())>)
+							{
+								decltype(Funct()) ret(Funct());
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								return ret;
+							}
+							else
+							{
+								decltype(Funct()) ret(MoveRValue(Funct()));
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								return ret;
+							}
 						}
 						catch (...) {
 							Internals::ReleaseLockExclusiveSRWLock(&lock);
@@ -77,9 +86,18 @@ namespace Seed {
 					{
 						Internals::AcquireLockSharedSRWLock(&lock);
 						try {
-							decltype(Funct()) ret(Funct());
-							Internals::ReleaseLockSharedSRWLock(&lock);
-							return ret;
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(Funct())>)
+							{
+								decltype(Funct()) ret(Funct());
+								Internals::ReleaseLockSharedSRWLock(&lock);
+								return ret;
+							}
+							else
+							{
+								decltype(Funct()) ret(MoveRValue(Funct()));
+								Internals::ReleaseLockSharedSRWLock(&lock);
+								return ret;
+							}
 						}
 						catch (...) {
 							Internals::ReleaseLockSharedSRWLock(&lock);
@@ -94,6 +112,7 @@ namespace Seed {
 					{
 						if (!Internals::TryAcquireLockSharedSRWLock(&lock))
 							return false;
+
 						try {
 							Funct();
 						}
@@ -101,6 +120,7 @@ namespace Seed {
 							Internals::ReleaseLockSharedSRWLock(&lock);
 							Internals::__CxxRethrowImpl();
 						}
+
 						Internals::ReleaseLockSharedSRWLock(&lock);
 						return true;
 					}

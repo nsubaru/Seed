@@ -298,7 +298,7 @@ bool Seed::Core::Threading::MainThread(Delegate&& delegate)
 	{
 		if (thread->GetThreadableType() == EThreadableTypes::Thread)
 			{
-			if (thread->GetThreadabledState() != EThreadabledStates::Ended || 
+			if (thread->GetThreadabledState() != EThreadabledStates::Ended && 
 				thread->GetThreadabledState() != EThreadabledStates::Interupted)
 			{
 				auto& threadObj = dynamic_cast<Thread&>(*thread);

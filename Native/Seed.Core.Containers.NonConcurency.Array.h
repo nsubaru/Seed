@@ -564,6 +564,7 @@ namespace Seed {
                     catch (...)
                     {
                         delete[] array;
+						throw;
                     }
                 }
 #pragma warning(pop)

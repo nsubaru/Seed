@@ -228,7 +228,7 @@ namespace Seed {
             ///<summary>Конструктор з стартовим резервованим розміром</summary>
             ///<param name = "StartSize">Стартовий розмір в кількості символів без нуль-термінатора</param>
             ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-            BaseString(SizeT StartSize) {
+            explicit BaseString(SizeT StartSize) {
                 if (StartSize > Math::Max<SizeT>())
                     Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize);
                 if (StartSize == 0 || StartSize < CurrentSettings().MemoryManager.StringReserveSize)
@@ -1209,7 +1209,7 @@ namespace Seed {
             ///<params name = "val">Логічне значення</params>
             ///<returns><c>"True"</c> якщо <c>val == true</c> інакше <c>"False"</c></returns>
             forceinline static BaseString toString(Boolean val) {
-                if (val) return BaseString(L"True"); else return BaseString(L"False");
+                if (val) return BaseString(L"true"); else return BaseString(L"false");
             }
             ///<summary>Конвертація логічного значення до рядка вертає вміст рядка <c>IfTrue</c> або <c>IfFalse</c></summary>
             ///<params name = "val">Логічне значення</params>

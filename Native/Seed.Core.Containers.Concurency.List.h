@@ -232,7 +232,7 @@ namespace Seed {
 						Iterator node(*this);
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-						This->RefCount--;
+						--This->RefCount;
 						if (this->This->father == nullptr)
 						{
 							//якщо батька в елемента немаЇ значить контейнер знищений ≥ в≥дпов≥дно сус≥дн≥х елемент≥в немаЇ
@@ -244,7 +244,7 @@ namespace Seed {
 							return this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->next;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) ++This->RefCount;
 									return node;
 								});
 						}
@@ -255,7 +255,7 @@ namespace Seed {
 						Iterator node(*this);
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-						This->RefCount--;
+						--This->RefCount;
 						if (This->father == nullptr)
 						{
 							//якщо батька в елемента немаЇ значить контейнер знищений ≥ в≥дпов≥дно сус≥дн≥х елемент≥в немаЇ
@@ -267,7 +267,7 @@ namespace Seed {
 							return this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->prev;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) This->RefCount++;
 									return node;
 								});
 						}
@@ -277,7 +277,7 @@ namespace Seed {
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-						This->RefCount--;
+						--This->RefCount;
 						if (This->father == nullptr)
 						{
 							//якщо батька в елемента немаЇ значить контейнер знищений ≥ в≥дпов≥дно сус≥дн≥х елемент≥в немаЇ
@@ -290,7 +290,7 @@ namespace Seed {
 							this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->next;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) ++This->RefCount;
 								});
 						}
 						return *this;
@@ -312,7 +312,7 @@ namespace Seed {
 							return this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->prev;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) ++This->RefCount;
 									return *this;
 								});
 						}
@@ -601,7 +601,7 @@ namespace Seed {
 					/// <param name="iterator">ќригинал</param>
 					forceinline Iterator(const Iterator& iterator) : This(iterator.This) {
 						if (This != nullptr)
-							This->RefCount++;
+							++This->RefCount;
 					}
 
 					/// <summary>
@@ -739,7 +739,8 @@ namespace Seed {
 							}
 
 							OtherList.This->root->prev = this->This->last;
-							this->This->last = this->This->last->next = OtherList.This->root;
+							this->This->last->next = OtherList.This->root;
+							this->This->last = OtherList.This->last;
 							this->This->size = this->This->size + OtherList.This->size;
 							OtherList.This->root = OtherList.This->last = nullptr;
 							OtherList.This->size = 0;
@@ -1462,7 +1463,7 @@ namespace Seed {
 					else {
 						this->This->last->prev->next = this->This->last = new elem(Value, this->This, this->This->last);
 					}
-					this->This->size++;
+					++this->This->size;
 				}
 
 				forceinline void UnsafeAdd(T&& Value) {
@@ -1472,7 +1473,7 @@ namespace Seed {
 					else {
 						this->This->last->prev->next = this->This->last = new elem(MoveRValue(Value), this->This, this->This->last);
 					}
-					this->This->size++;
+					++this->This->size;
 				}
 
 				forceinline BaseConcurencyList& RemoveAllImpl() {

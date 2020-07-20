@@ -357,9 +357,6 @@ namespace Seed {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-					if (This->count == 0)
-						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
-
 					T* item = nullptr;
 
 					for (SizeT i = 0; i < This->count; i++)

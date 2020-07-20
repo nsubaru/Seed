@@ -132,7 +132,7 @@ namespace Seed {
 						typename TLambda,
 						typename TFilterLambda, 
 						typename UHeap, 
-						typename U = TypeTraits::InvockableResult<Lambda, const TPair&>
+						typename U = TypeTraits::InvockableResult<TLambda, const TPair&>
 					>
 						requires   (Concepts::IsInvockable<TLambda, const TPair&> &&
 									Concepts::IsInvockable<TFilterLambda, const TPair&> &&
@@ -183,7 +183,7 @@ namespace Seed {
 						template<typename U> class NewCollection,
 						typename TLambda,
 						typename TFilterLambda,  
-						typename U = TypeTraits::InvockableResult<Lambda, const TPair&>
+						typename U = TypeTraits::InvockableResult<TLambda, const TPair&>
 					>
 						requires(Concepts::IsInvockable<TLambda, const TPair&> &&
 								 Concepts::IsInvockable<TFilterLambda, const TPair&> &&

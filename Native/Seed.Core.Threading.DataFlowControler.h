@@ -48,13 +48,26 @@ namespace Seed {
 							Internals::AcquireLockExclusiveSRWLock(&lock);
 							isProducerWork = true;
 
-							decltype(lambda()) ret(MoveRValue(lambda()));
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(lambda())>)
+							{
+								decltype(lambda()) ret(lambda());
 
-							isProducerWork = false;
-							Internals::ReleaseLockExclusiveSRWLock(&lock);
-							Internals::WakeOneCondVal(&concumer);
+								isProducerWork = false;
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								Internals::WakeOneCondVal(&concumer);
 
-							return ret;
+								return ret;
+							}
+							else
+							{
+								decltype(lambda()) ret(MoveRValue(lambda()));
+
+								isProducerWork = false;
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								Internals::WakeOneCondVal(&concumer);
+
+								return ret;
+							}
 						}
 						catch (...) {
 							isProducerWork = false;
@@ -88,13 +101,26 @@ namespace Seed {
 							Internals::AcquireLockExclusiveSRWLock(&lock);
 							isConcumerWork = true;
 
-							decltype(lambda()) ret(MoveRValue(lambda()));
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(lambda())>)
+							{
+								decltype(lambda()) ret(lambda());
 
-							isConcumerWork = false;
-							Internals::ReleaseLockExclusiveSRWLock(&lock);
-							Internals::WakeOneCondVal(&producer);
+								isConcumerWork = false;
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								Internals::WakeOneCondVal(&producer);
 
-							return ret;
+								return ret;
+							}
+							else
+							{
+								decltype(lambda()) ret(MoveRValue(lambda()));
+
+								isConcumerWork = false;
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								Internals::WakeOneCondVal(&producer);
+
+								return ret;
+							}
 						}
 						catch (...) {
 							isConcumerWork = false;
@@ -120,14 +146,26 @@ namespace Seed {
 						}
 					}
 					else {
-						try {
+						try
+						{
 							Internals::AcquireLockSharedSRWLock(&lock);
 
-							decltype(lambda()) ret(MoveRValue(lambda()));
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(lambda())>)
+							{
+								decltype(lambda()) ret(lambda());
 
-							Internals::ReleaseLockSharedSRWLock(&lock);
+								Internals::ReleaseLockSharedSRWLock(&lock);
 
-							return ret;
+								return ret;
+							}
+							else
+							{
+								decltype(lambda()) ret(MoveRValue(lambda()));
+
+								Internals::ReleaseLockSharedSRWLock(&lock);
+
+								return ret;
+							}
 						}
 						catch (...) {
 							Internals::ReleaseLockExclusiveSRWLock(&lock);
@@ -155,11 +193,22 @@ namespace Seed {
 						try {
 							Internals::AcquireLockExclusiveSRWLock(&lock);
 
-							decltype(lambda()) ret(MoveRValue(lambda()));
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(lambda())>)
+							{
+								decltype(lambda()) ret(lambda());
 
-							Internals::ReleaseLockExclusiveSRWLock(&lock);
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
 
-							return ret;
+								return ret;
+							}
+							else
+							{
+								decltype(lambda()) ret(MoveRValue(lambda()));
+
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+
+								return ret;
+							}
 						}
 						catch (...) {
 							Internals::ReleaseLockExclusiveSRWLock(&lock);

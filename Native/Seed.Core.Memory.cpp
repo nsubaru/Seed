@@ -94,7 +94,7 @@ Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto cfg = CurrentSettings().MemoryManager.DefaultHeap;
+	auto& cfg = CurrentSettings().MemoryManager.DefaultHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
@@ -201,6 +201,10 @@ void * Seed::Core::Memory::Heap::Free(void * MemBlk)
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
+	//якщо включено логуванн€ вид≥леннь\зв≥льненнь пам'€ть то в≥дпов≥дно перев≥р€Їм ц≥л≥сн≥сть куч≥
+	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
+		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	}
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
 	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//ќтримуЇм розм≥р д≥л€нки пам'€т≥
@@ -227,6 +231,10 @@ void * Seed::Core::Memory::Heap::AllignedFree(void * MemBlk, SizeT AllocationReq
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
+	//якщо включено логуванн€ вид≥леннь\зв≥льненнь пам'€ть то в≥дпов≥дно перев≥р€Їм ц≥л≥сн≥сть куч≥
+	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
+		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	}
 	//якщо вир≥вннюванн€ 0 або 1 то це означаЇ що вир≥внюванн€ не потр≥бне,
 	//а отже викликаЇм просте вид≥ленн€ пам'€т≥
 	if (AllocationReq == 0 || AllocationReq == 1)
@@ -276,7 +284,7 @@ Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto cfg = CurrentSettings().MemoryManager.SensitiveDataHeap;
+	auto& cfg = CurrentSettings().MemoryManager.SensitiveDataHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
@@ -384,6 +392,10 @@ DeprecatedCall("Ќизькор≥внева робота з пам'€тю") void* Seed::Core::Memory::Sensi
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
+	//якщо включено логуванн€ вид≥леннь\зв≥льненнь пам'€ть то в≥дпов≥дно перев≥р€Їм ц≥л≥сн≥сть куч≥
+	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
+		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	}
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
 	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
 	//ќтримуЇм розм≥р д≥л€нки пам'€т≥
@@ -412,6 +424,10 @@ DeprecatedCall("Ќизькор≥внева робота з пам'€тю") void* Seed::Core::Memory::Sensi
 {
 	//якщо покажчик nullptr то н≥чого не потр≥бно робити бо в≥н ≥ так в≥льний
 	if (MemBlk == nullptr) return nullptr;
+	//якщо включено логуванн€ вид≥леннь\зв≥льненнь пам'€ть то в≥дпов≥дно перев≥р€Їм ц≥л≥сн≥сть куч≥
+	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
+		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	}
 	//ќтримуЇм покажчик на заголовок д≥л€нки пам'€т≥
 	SizeT* Header = ((SizeT*)MemBlk) - 2;
 	//ќтрмуЇм покажчик на початок д≥л€нки пам'€т≥

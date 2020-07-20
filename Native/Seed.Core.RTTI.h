@@ -108,7 +108,7 @@ namespace Seed
 				}
 
 				forceinline friend auto operator!=(const TypeInfo& other, const RTTITypeRecord& item) {
-					return other == *item.data->rttiTypeInfo;
+					return other != *item.data->rttiTypeInfo;
 				}
 
 				forceinline friend auto operator<=>(const TypeInfo& other, const RTTITypeRecord& item) {

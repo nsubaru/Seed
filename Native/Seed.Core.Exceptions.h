@@ -942,6 +942,15 @@ namespace Seed {
 				virtual ~EmptyQueueException() {}
 			};
 		}
+
+		namespace Concepts
+		{
+			/// <summary>
+			/// Перевірка чи заданий тип є типом помилки(Seed::Core::Exception або похідний від нього клас)
+			/// </summary>
+			template<typename T>
+			concept IsException = IsSame<T, Exceptions::Exception> || IsBasedOn<Exceptions::Exception, T>;
+		}
 	}
 }
 
