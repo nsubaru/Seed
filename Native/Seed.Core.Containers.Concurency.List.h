@@ -14,8 +14,7 @@ namespace Seed {
 			class BaseConcurencyList final :
 				protected IDisposable,
 				public Memory::Allocator<THeap>,
-				public LINQ::IList<BaseConcurencyList, THeap, T, true>,
-				public IClonable<BaseConcurencyList<THeap, T>>
+				public LINQ::IList<BaseConcurencyList, THeap, T, true>
 			{
 			private:
 #pragma region Internal storage struct
@@ -140,8 +139,8 @@ namespace Seed {
 						});
 				}
 			private:
-				template<typename Lambda>
-				elem* merge(elem* first, elem* second, Lambda& lambda)
+				template<typename TLambda>
+				elem* merge(elem* first, elem* second, TLambda& lambda)
 				{
 					// If first linked list is empty
 					if (!first)
@@ -168,9 +167,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename Lambda>
+				template<typename TLambda>
 				// Function to do merge sort
-				elem* mergeSort(elem* head, Lambda& lambda)
+				elem* mergeSort(elem* head, TLambda& lambda)
 				{
 					if (!head || !head->next)
 						return head;
@@ -184,10 +183,10 @@ namespace Seed {
 					return merge(head, second, lambda);
 				}
 
-				template<typename Lambda>
+				template<typename TLambda>
 				// Split a doubly linked list (DLL) into 2 DLLs of
 				// half sizes
-				elem* split(elem* head, Lambda& lambda)
+				elem* split(elem* head, TLambda& lambda)
 				{
 					elem* fast = head, * slow = head;
 					while (fast->next && fast->next->next)
@@ -208,7 +207,7 @@ namespace Seed {
 				///Саме для цього аідбувається підрахунок силок для елементів списка, а не списку в цілому
 				///</para>
 				///</summary>
-				class Iterator final
+				class Iterator final : public Memory::Allocator<THeap>
 				{
 					friend class BaseConcurencyList;
 				private:
@@ -233,7 +232,7 @@ namespace Seed {
 						Iterator node(*this);
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-						This->RefCount--;
+						--This->RefCount;
 						if (this->This->father == nullptr)
 						{
 							//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
@@ -245,7 +244,7 @@ namespace Seed {
 							return this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->next;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) ++This->RefCount;
 									return node;
 								});
 						}
@@ -256,7 +255,7 @@ namespace Seed {
 						Iterator node(*this);
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-						This->RefCount--;
+						--This->RefCount;
 						if (This->father == nullptr)
 						{
 							//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
@@ -268,7 +267,7 @@ namespace Seed {
 							return this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->prev;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) This->RefCount++;
 									return node;
 								});
 						}
@@ -278,7 +277,7 @@ namespace Seed {
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
-						This->RefCount--;
+						--This->RefCount;
 						if (This->father == nullptr)
 						{
 							//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
@@ -291,7 +290,7 @@ namespace Seed {
 							this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->next;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) ++This->RefCount;
 								});
 						}
 						return *this;
@@ -313,7 +312,7 @@ namespace Seed {
 							return this->This->father->lock.ShareLock([&]()
 								{
 									this->This = this->This->prev;
-									if (This != nullptr) This->RefCount++;
+									if (this->This != nullptr) ++This->RefCount;
 									return *this;
 								});
 						}
@@ -602,7 +601,7 @@ namespace Seed {
 					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(const Iterator& iterator) : This(iterator.This) {
 						if (This != nullptr)
-							This->RefCount++;
+							++This->RefCount;
 					}
 
 					/// <summary>
@@ -661,7 +660,6 @@ namespace Seed {
 				///<param name = "list">Список ініціалізації</param>
 				BaseConcurencyList(InitilizerList<T>&& list)
 				{
-					////TODO: Write optimized InitilizerList ctors
 					This = new list_data;
 					if (list.size() == 0) return;
 					this->This->size = list.size();
@@ -741,7 +739,8 @@ namespace Seed {
 							}
 
 							OtherList.This->root->prev = this->This->last;
-							this->This->last = this->This->last->next = OtherList.This->root;
+							this->This->last->next = OtherList.This->root;
+							this->This->last = OtherList.This->last;
 							this->This->size = this->This->size + OtherList.This->size;
 							OtherList.This->root = OtherList.This->last = nullptr;
 							OtherList.This->size = 0;
@@ -1006,25 +1005,55 @@ namespace Seed {
 				RefCountClass(BaseConcurencyList, This)
 			public:
 				/// <summary>
-				/// Клонування об'єкта
-				/// </summary>
-				/// <returns>Новий об'єки з копією всіх елементів</returns>
-				virtual BaseConcurencyList Clone() const override final {
-					return This->lock.ShareLock([&]() {
+                /// Клонування масиву
+                /// </summary>
+                /// <returns>Вертає новий масив з копією всіх елементів</returns>
+                template<typename = void> requires (Concepts::IsClonable<T>) 
+                BaseConcurencyList Clone() const {
+					return This->lock.ShareLock([&]() inlinelambda {
 						BaseConcurencyList result;
 						result.This->size = This->size;
 						elem* node = This->root;
 						if (node != nullptr) {
-							This->root = This->last = new elem(node->value, result.This);
+							result.This->root = result.This->last = new elem(node->value, result.This);
 							node = node->next;
 							while (node != nullptr) {
-								This->last = This->last->prev = new elem(node->value, result.This, This->last);
+								if constexpr (TypeTraits::IsPodV<T>)
+								{
+									result.This->last = result.This->last->next = new elem(node->value, result.This, result.This->last);
+								}
+								else
+								{
+									result.This->last = result.This->last->next = new elem(node->value.Clone(), result.This, result.This->last);
+								}
 								node = node->next;
 							}
 						}
 						return result;
 						});
-				}
+                }
+
+				/// <summary>
+				/// Клонування масиву з використанням користувальницької лямбди або функтора
+				/// </summary>
+				/// <param name="lambda">Лямбда або функтор який виконає клонування всіх елементів</param>
+                template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
+                BaseConcurencyList Clone(TLambda&& lambda) const {
+					return This->lock.ShareLock([&]() inlinelambda {
+						BaseConcurencyList result;
+						result.This->size = This->size;
+						elem* node = This->root;
+						if (node != nullptr) {
+							This->root = result.This->last = new elem(node->value, result.This);
+							node = node->next;
+							while (node != nullptr) {
+								result.This->last = result.This->last->next = new elem(lambda(node->value), result.This, result.This->last);
+								node = node->next;
+							}
+						}
+						return result;
+						});
+                }
 			protected:
 				template<template<typename, typename> typename, typename, typename, Boolean, Boolean>
 				friend class LINQ::ICollection;
@@ -1041,9 +1070,10 @@ namespace Seed {
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
-				template<typename Lambda>
-				BaseConcurencyList& ForEachImpl(Lambda&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
+				template<typename TLambda>
+				BaseConcurencyList& ForEachImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
+                                  TypeTraits::IsInvockable<TLambda, T&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
 							auto node = this->This->root;
 							while (node != nullptr) {
@@ -1053,7 +1083,8 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT> ||
+                                       TypeTraits::IsInvockable<TLambda, T&, SizeT>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
 							auto node = this->This->root;
 							SizeT index = 0;
@@ -1070,9 +1101,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename Lambda>
-				const BaseConcurencyList& ForEachImpl(Lambda&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
+				template<typename TLambda>
+				const BaseConcurencyList& ForEachImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyList& {
 							auto node = this->This->root;
 							while (node != nullptr) {
@@ -1082,7 +1113,7 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyList& {
 							auto node = this->This->root;
 							SizeT index = 0;
@@ -1099,9 +1130,10 @@ namespace Seed {
 					}
 				}
 
-				template<typename Lambda>
-				BaseConcurencyList& ForEachImpl(Lambda&& lambda, SizeT count) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
+				template<typename TLambda>
+				BaseConcurencyList& ForEachImpl(TLambda&& lambda, SizeT count) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
+                                  TypeTraits::IsInvockable<TLambda, T&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
 							if (count > this->This->size)
 							{
@@ -1126,7 +1158,8 @@ namespace Seed {
 							}
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT> ||
+                                       TypeTraits::IsInvockable<TLambda, T&, SizeT>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
 							if (count > this->This->size)
 							{
@@ -1158,9 +1191,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename Lambda>
-				const BaseConcurencyList& ForEachImpl(Lambda&& lambda, SizeT count) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
+				template<typename TLambda>
+				const BaseConcurencyList& ForEachImpl(TLambda&& lambda, SizeT count) const {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
 							if (count > this->This->size)
 							{
@@ -1185,7 +1218,7 @@ namespace Seed {
 							}
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
 							if (count > this->This->size)
 							{
@@ -1218,14 +1251,14 @@ namespace Seed {
 				}
 
 			protected:
-				template<typename U, typename Lambda>
-				forceinline U AggregateImpl(Lambda&& lambda) const {
+				template<typename U, typename TLambda>
+				forceinline U AggregateImpl(TLambda&& lambda) const {
 					return this->This->lock.ShareLock([&]() {
 						U value;
 						auto node = this->This->root;
 						SizeT index = 0;
 						while (node != nullptr) {
-							lambda(value, node->value);
+							value = lambda(value, node->value);
 							node = node->next;
 							index++;
 						}
@@ -1233,14 +1266,14 @@ namespace Seed {
 						});
 				}
 
-				template<typename U, typename Lambda>
-				forceinline T AggregateImpl(Lambda&& lambda, const U& Value) const {
+				template<typename U, typename TLambda>
+				forceinline T AggregateImpl(TLambda&& lambda, const U& value) const {
 					return this->This->lock.ShareLock([&]() {
 						auto node = this->This->root;
-						U result = Value;
+						U result = value;
 						SizeT index = 0;
 						while (node != nullptr) {
-							lambda(result, node->value);
+							result = lambda(result, node->value);
 							node = node->next;
 							index++;
 						}
@@ -1248,24 +1281,24 @@ namespace Seed {
 						});
 				}
 
-				template<typename U, typename Lambda>
-				forceinline U AggregateImpl(Lambda&& lambda, U&& Value) const {
+				template<typename U, typename TLambda>
+				forceinline U AggregateImpl(TLambda&& lambda, U&& value) const {
 					return this->This->lock.ShareLock([&]() {
 						auto node = this->This->root;
 						SizeT index = 0;
 						while (node != nullptr) {
-							lambda(Value, node->value);
+							value = lambda(value, node->value);
 							node = node->next;
 							index++;
 						}
-						return MoveRValue(Value);
+						return MoveRValue(value);
 						});
 				}
 
 				forceinline bool AnyImpl() const { return this->This->size > 0; }
 
-				template<typename Lambda>
-				forceinline bool AnyImpl(Lambda lambda) const {
+				template<typename TLambda>
+				forceinline bool AnyImpl(TLambda lambda) const {
 					return this->This->lock.ShareLock([&]() {
 						auto node = this->This->root;
 						SizeT index = 0;
@@ -1279,8 +1312,8 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				forceinline bool AllImpl(Lambda lambda) const {
+				template<typename TLambda>
+				forceinline bool AllImpl(TLambda lambda) const {
 					return this->This->lock.ShareLock([&]() {
 						auto node = this->This->root;
 						SizeT index = 0;
@@ -1324,8 +1357,8 @@ namespace Seed {
 					});
 				}
 
-				template<typename Lambda>
-				forceinline BaseConcurencyList& SortByLambdaImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				forceinline BaseConcurencyList& SortByLambdaImpl(TLambda&& lambda) {
 					return This->lock.ExclusiveLock([&] () -> BaseConcurencyList&
 					{
 						if (This->size == 0)
@@ -1344,8 +1377,8 @@ namespace Seed {
 					});
 				}
 
-				template<typename Lambda>
-				forceinline T& FirstImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				forceinline T& FirstImpl(TLambda&& lambda) {
 					return This->lock.ShareLock([&]() -> T& {
 						elem* node = This->root;
 						while (node != nullptr)
@@ -1358,8 +1391,8 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				forceinline T& LastImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				forceinline T& LastImpl(TLambda&& lambda) {
 					return This->lock.ShareLock([&]() -> T& {
 						elem* node = This->root;
 						elem* selected = nullptr;
@@ -1375,8 +1408,8 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				forceinline const T& FirstImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				forceinline const T& FirstImpl(TLambda&& lambda) const {
 					return This->lock.ShareLock([&]() -> const T& {
 						elem* node = This->root;
 						while (node != nullptr)
@@ -1389,8 +1422,8 @@ namespace Seed {
 						});
 				}
 
-				template<typename Lambda>
-				forceinline const T& LastImpl(Lambda&& lambda) const {
+				template<typename TLambda>
+				forceinline const T& LastImpl(TLambda&& lambda) const {
 					return This->lock.ShareLock([&]() -> const T& {
 						elem* node = This->root;
 						elem* selected = nullptr;
@@ -1430,7 +1463,7 @@ namespace Seed {
 					else {
 						this->This->last->prev->next = this->This->last = new elem(Value, this->This, this->This->last);
 					}
-					this->This->size++;
+					++this->This->size;
 				}
 
 				forceinline void UnsafeAdd(T&& Value) {
@@ -1440,7 +1473,7 @@ namespace Seed {
 					else {
 						this->This->last->prev->next = this->This->last = new elem(MoveRValue(Value), this->This, this->This->last);
 					}
-					this->This->size++;
+					++this->This->size;
 				}
 
 				forceinline BaseConcurencyList& RemoveAllImpl() {
@@ -1466,8 +1499,8 @@ namespace Seed {
 					});
 				}
 
-				template<typename Lambda>
-				forceinline BaseConcurencyList& RemoveAllImpl(Lambda && lambda) {
+				template<typename TLambda>
+				forceinline BaseConcurencyList& RemoveAllImpl(TLambda && lambda) {
 					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
 					{
 						elem* node;
@@ -1491,8 +1524,8 @@ namespace Seed {
 					});
 				}
 
-				template<typename FilterLambda, typename Lambda>
-				forceinline BaseConcurencyList& RemoveIfFilterAndLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
+				template<typename TFilterLambda, typename TLambda>
+				forceinline BaseConcurencyList& RemoveIfFilterAndLambdaWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
 					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
 						{
 							if (This == nullptr)
@@ -1547,8 +1580,8 @@ namespace Seed {
 					);
 				}
 
-				template<typename FilterLambda, typename Lambda>
-				BaseConcurencyList& RemoveIfFilterWithIndex(FilterLambda&& filter, Lambda&& lambda) {
+				template<typename TFilterLambda, typename TLambda>
+				BaseConcurencyList& RemoveIfFilterWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
 					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
 						{
 							if (This == nullptr)
@@ -1603,8 +1636,8 @@ namespace Seed {
 					);
 				}
 
-				template<typename FilterLambda, typename Lambda>
-				BaseConcurencyList& RemoveIfLambdaWithIndex(FilterLambda&& filter, Lambda&& lambda) {
+				template<typename TFilterLambda, typename TLambda>
+				BaseConcurencyList& RemoveIfLambdaWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
 					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
 						{
 							if (This == nullptr)
@@ -1659,8 +1692,8 @@ namespace Seed {
 					);
 				}
 
-				template<typename FilterLambda, typename Lambda>
-				BaseConcurencyList& RemoveIfFilterAndLambdaWithoutIndex(FilterLambda&& filter, Lambda&& lambda) {
+				template<typename TFilterLambda, typename TLambda>
+				BaseConcurencyList& RemoveIfFilterAndLambdaWithoutIndex(TFilterLambda&& filter, TLambda&& lambda) {
 					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
 						{
 							if (This == nullptr)
@@ -1715,30 +1748,30 @@ namespace Seed {
 					);
 				}
 
-				template<typename FilterLambda, typename Lambda>
-				forceinline BaseConcurencyList& RemoveIfImpl(FilterLambda&& filter, Lambda&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&>::State) {
+				template<typename TFilterLambda, typename TLambda>
+				forceinline BaseConcurencyList& RemoveIfImpl(TFilterLambda&& filter, TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, T&&>&&
+						TypeTraits::IsInvockableWithResult<TFilterLambda, Boolean, const T&>) {
 						return RemoveIfFilterAndLambdaWithoutIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&, SizeT>::State) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, void, T&&>&&
+						TypeTraits::IsInvockableWithResult<TFilterLambda, Boolean, const T&, SizeT>) {
 						return RemoveIfFilterWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&>::State) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, void, T&&, SizeT>&&
+						TypeTraits::IsInvockableWithResult<TFilterLambda, Boolean, const T&>) {
 						return RemoveIfLambdaWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, void, T&&, SizeT>::State&&
-						TypeTraits::IsLambdaConvertibleT<FilterLambda, Boolean, const T&, SizeT>::State) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, void, T&&, SizeT>&&
+						TypeTraits::IsInvockableWithResult<TFilterLambda, Boolean, const T&, SizeT>) {
 						return RemoveIfFilterAndLambdaWithIndex(MoveRValue(filter), MoveRValue(lambda));
 					}
 					else
 						static_assert(false);
 				}
 
-				template<typename Lambda>
-				forceinline SizeT GetCountIfImpl(Lambda&& lambda) {
+				template<typename TLambda>
+				forceinline SizeT GetCountIfImpl(TLambda&& lambda) {
 					return This->lock.ShareLock([&]() {
 						SizeT selectedCount = 0;
 

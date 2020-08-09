@@ -26,7 +26,7 @@ namespace Seed {
 				///<summary>Виконує <see cref="Funct"/> з еклюзивним блокуванням</summary>
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
-				template<typename T>
+				template<typename T> requires Concepts::IsInvockable<T>
 				forceinline decltype(auto) ExclusiveLock(T& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
@@ -45,9 +45,18 @@ namespace Seed {
 					{
 						Internals::AcquireLockExclusiveSRWLock(&lock);
 						try {
-							decltype(Funct()) ret(Funct());
-							Internals::ReleaseLockExclusiveSRWLock(&lock);
-							return ret;
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(Funct())>)
+							{
+								decltype(Funct()) ret(Funct());
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								return ret;
+							}
+							else
+							{
+								decltype(Funct()) ret(MoveRValue(Funct()));
+								Internals::ReleaseLockExclusiveSRWLock(&lock);
+								return ret;
+							}
 						}
 						catch (...) {
 							Internals::ReleaseLockExclusiveSRWLock(&lock);
@@ -58,8 +67,8 @@ namespace Seed {
 				///<summary>Виконує <see cref="Funct"/> з cпільни блокуванням</summary>
 				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
-				template<typename T>
-				forceinline decltype(auto) ShareLock(T& Funct)
+				template<typename T> requires Concepts::IsInvockable<T>
+				forceinline decltype(auto) ShareLock(T&& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
@@ -77,9 +86,18 @@ namespace Seed {
 					{
 						Internals::AcquireLockSharedSRWLock(&lock);
 						try {
-							decltype(Funct()) ret(Funct());
-							Internals::ReleaseLockSharedSRWLock(&lock);
-							return ret;
+							if constexpr (TypeTraits::IsLValueReferenceV<decltype(Funct())>)
+							{
+								decltype(Funct()) ret(Funct());
+								Internals::ReleaseLockSharedSRWLock(&lock);
+								return ret;
+							}
+							else
+							{
+								decltype(Funct()) ret(MoveRValue(Funct()));
+								Internals::ReleaseLockSharedSRWLock(&lock);
+								return ret;
+							}
 						}
 						catch (...) {
 							Internals::ReleaseLockSharedSRWLock(&lock);
@@ -88,12 +106,13 @@ namespace Seed {
 					}
 				}
 
-				template<typename T>
-				forceinline Boolean TryInShareLock(T& Funct) {
+				template<typename T> requires Concepts::IsInvockableWithResult<T, void>
+				forceinline Boolean TryInShareLock(T&& Funct) {
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
 						if (!Internals::TryAcquireLockSharedSRWLock(&lock))
 							return false;
+
 						try {
 							Funct();
 						}
@@ -101,6 +120,7 @@ namespace Seed {
 							Internals::ReleaseLockSharedSRWLock(&lock);
 							Internals::__CxxRethrowImpl();
 						}
+
 						Internals::ReleaseLockSharedSRWLock(&lock);
 						return true;
 					}

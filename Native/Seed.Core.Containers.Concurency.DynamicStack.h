@@ -74,7 +74,7 @@ namespace Seed {
 							ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 						}
 						This->stack[This->count] = item;
-						This->count++;
+						++This->count;
 						});
 				}
 
@@ -89,7 +89,7 @@ namespace Seed {
 							ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 						}
 						This->stack[This->count] = MoveRValue(item);
-						This->count++;
+						++This->count;
 					});
 				}
 
@@ -101,7 +101,7 @@ namespace Seed {
 					return This->lock.ExclusiveLock([&]() mutable {
 						if (This->count == 0)
 							Throw(EmptyStackException(ExceptionPosition));
-						This->count--;
+						--This->count;
 						return MoveRValue(This->stack[This->count]);
 						});
 				}
@@ -115,7 +115,7 @@ namespace Seed {
 					return This->lock.ShareLock([&]() mutable -> const T& {
 						if (This->count == 0)
 							Throw(EmptyStackException(ExceptionPosition));
-						This->count--;
+						--This->count;
 						return This->stack[This->count];
 						});
 				}
@@ -129,7 +129,7 @@ namespace Seed {
 					return This->lock.ShareLock([&]() mutable -> const T& {
 						if (This->count == 0)
 							Throw(EmptyStackException(ExceptionPosition));
-						This->count--;
+						--This->count;
 						return This->stack[This->count];
 						});
 				}

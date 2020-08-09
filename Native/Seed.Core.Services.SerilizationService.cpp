@@ -71,18 +71,20 @@ Containers::Blob SerilizeObjectType(
 	const Reflection::ObjectRTTIRecord& typeRecord, 
 	const DI::IDI& idi, 
 	const Reflection::DynamicObject& object) {
-	return typeRecord.Properties.Aggregate([&] (Containers::VList<Byte>& buffer, const Reflection::ObjectRTTIRecord::PropertyRTTIRecord& typeProperty) -> void
+	return typeRecord.Properties.Aggregate([&] (const Containers::VList<Byte>& buffer, const Reflection::ObjectRTTIRecord::PropertyRTTIRecord& typeProperty)
 	{
 		//We know that getter didn't change object value but getter caller for unification use non const object
 		//so we should remove const modificator from object
-		SerilizeObjectTypeImpl(typeRecord, idi, const_cast<Reflection::DynamicObject&>(object), typeProperty, buffer);
+		Containers::VList<Byte> localbuffer = buffer;
+		SerilizeObjectTypeImpl(typeRecord, idi, const_cast<Reflection::DynamicObject&>(object), typeProperty, localbuffer);
+		return localbuffer;
 	}, Containers::VList<Byte>())
 		.ToArray();
 }
 
 Containers::Blob Seed::Core::Services::SerilizationService::SerelizeDynObj(const Reflection::DynamicObject& data) {
 	//Try search type in object records storage by type name
-	if (This->idi.IsExistDataTypesRecordByType(data.GetValueType()))
+	if (This->idi.IsExistObjectRecordByType(data.GetValueType()))
 	{
 		//if found get type record
 		auto typeRecord = This->idi.GetObjectRecordByType(data.GetValueType());
@@ -92,7 +94,7 @@ Containers::Blob Seed::Core::Services::SerilizationService::SerelizeDynObj(const
 		}
 		else
 		{
-			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetValueType().CxxTypeName));
+			Throw(Reflection::NonSerelizableType(ExceptionPosition, data.GetValueType().CxxTypeName)); //-V807
 		}
 	} 
 	//else try search type in data types storage by type name

@@ -19,54 +19,54 @@ namespace Seed {
                 /// <summary>
                 /// Пустий конструктор
                 /// </summary>
-                BasePair() : key(), value() {}
+                forceinline BasePair() : key(), value() {}
                 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                BasePair(const TKey& key, const TValue& value) : key(key), value(value) {}
+                forceinline BasePair(const TKey& key, const TValue& value) : key(key), value(value) {}
 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                BasePair(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
+                forceinline BasePair(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                BasePair(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
+                forceinline BasePair(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                BasePair(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
+                forceinline BasePair(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
 
                 /// <summary>
                 /// Конструктор копіювання
                 /// </summary>
                 /// <param name="other">Оригинал</param>
-                BasePair(const BasePair& other) : key(other.key), value(other.value) {}
+                forceinline BasePair(const BasePair& other) : key(other.key), value(other.value) {}
 
                 /// <summary>
                 /// Конструктор переміщення
                 /// </summary>
                 /// <param name="other">Оригинал</param>
-                BasePair(BasePair&& other) : key(MoveRValue(other.key)), value(MoveRValue(other.value)) {}
+                forceinline BasePair(BasePair&& other) : key(MoveRValue(other.key)), value(MoveRValue(other.value)) {}
 
                 /// <summary>
                 /// Оператор копіювання
                 /// </summary>
                 /// <param name="other">Оригинал</param>
                 /// <returns>Силку на даний об'єкт</returns>
-                BasePair& operator=(const BasePair& other) {
+                forceinline BasePair& operator=(const BasePair& other) {
                     this->~BasePair();
                     this->BasePair::BasePair(other);
                     return  *this;
@@ -77,7 +77,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="other">Оригинал</param>
                 /// <returns>Силку на даний об'єкт</returns>
-                BasePair& operator=(BasePair&& other) {
+                forceinline BasePair& operator=(BasePair&& other) {
                     this->~BasePair();
                     this->BasePair::BasePair(MoveRValue(other));
                     return *this;
@@ -88,7 +88,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="other">Лівий операнд</param>
                 /// <returns>Вертає true якщо і ключ і значення рівні</returns>
-            	bool operator==(const BasePair & other) const
+            	forceinline bool operator==(const BasePair & other) const
                 {
 	                return this->key == other.key && this->value == other.value;
                 }
@@ -98,7 +98,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="other">Лівий операнд</param>
                 /// <returns>Вертає true якщо або ключ або значення не рівні</returns>
-            	bool operator!=(const BasePair & other) const
+            	forceinline bool operator!=(const BasePair & other) const
                 {
 	                return this->key != other.key || this->value != other.value;
                 }
@@ -107,31 +107,31 @@ namespace Seed {
                 /// Вертає ключ
                 /// </summary>
                 /// <returns>Ключ</returns>
-                const TKey& GetKey() const { return key; }
+                forceinline const TKey& GetKey() const { return key; }
 
                 /// <summary>
                 /// Вертає значення
                 /// </summary>
                 /// <returns>Значення</returns>
-                TValue& GetValue() { return value; }
+                forceinline TValue& GetValue() { return value; }
 
                 /// <summary>
                 /// Вертає значення
                 /// </summary>
                 /// <returns>Значення</returns>
-                const TValue& GetValue() const { return value; }
+                forceinline const TValue& GetValue() const { return value; }
 
                 /// <summary>
                 /// Встановлює нове значення
                 /// </summary>
                 /// <param name="newValue">Нове значення</param>
-                void SetValue(const TValue& newValue) { value = newValue; }
+                forceinline void SetValue(const TValue& newValue) { value = newValue; }
 
                 /// <summary>
                 /// Встановлює нове значення
                 /// </summary>
                 /// <param name="newValue">Нове значення</param>
-                void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
+                forceinline void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
 
                 template<typename T>
                 friend void Seed::Core::Swap(T& a, T& b);
@@ -145,6 +145,40 @@ namespace Seed {
                 /// Значення
                 /// </summary>
                 TValue Property(GetValue, SetValue) Value;
+            public:
+                /// <summary>
+                /// Клонує об'єкт якщо він підтримує клонування
+                /// </summary>
+                /// <returns>Клонований об'єкт</returns>
+                template<typename = void> requires Concepts::IsClonable<TKey> && Concepts::IsClonable<TValue>
+                forceinline BasePair Clone() const {
+                    if constexpr (TypeTraits::IsPodV<TKey> && TypeTraits::IsPodV<TValue>)
+                    {
+                        return BasePair(this->key, this->value);
+                    }
+                    else if constexpr (TypeTraits::IsPodV<TKey>)
+                    {
+                        return BasePair(this->key.Clone(), this->value);
+                    }
+                    else if constexpr (TypeTraits::IsPodV<TValue>)
+                    {
+                        return BasePair(this->key, this->value.Clone());
+                    }
+                    else
+                    {
+                        return BasePair(this->key.Clone(), this->value.Clone());
+                    }
+                }
+
+                /// <summary>
+                /// Клонує об'єкт з використанням лямбди lambda яка створює інстанс об'єкта
+                /// </summary>
+                /// <param name="lambda">Функція, лямбда або функтор який створює інстанс об'єкта на основі існуючого</param>
+                /// <returns>Клонований об'єкт</returns>
+                template<typename TLambda> requires Concepts::IsInvockableWithResult<TLambda, BasePair, const BasePair&> 
+                forceinline BasePair Clone(TLambda&& lambda) const {
+                    return BasePair(lambda(*this));
+                }
             private:
                 TKey key;
                 TValue value;

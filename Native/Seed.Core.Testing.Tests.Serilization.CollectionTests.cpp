@@ -81,6 +81,7 @@ bool Seed::Testing::Test::Serilization::DynamicQueue::Excecute()
 
 	auto stream = Core::Serilization::Serilize(queue);
 	decltype(queue) deserelizedQueue;
+	Core::Serilization::Deserilize(stream, deserelizedQueue);
 
 	if(queue.Count != deserelizedQueue.Count)
 		return false;

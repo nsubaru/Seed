@@ -38,7 +38,7 @@ public:
 	void MethodA() {};
 	void MethodB(bool State) {};
 	bool MethodC(bool State1, bool State2) { return State1 && State2; }
-	String MethodD(const List<String> & arg) { return arg.Aggregate([](String & result, const String& string) { result += string; }); } 
+	String MethodD(const List<String> & arg) { return arg.Aggregate([](const String & result, const String& string) { return result + string; }); } 
 
 	String GetText() const {
 		return text;

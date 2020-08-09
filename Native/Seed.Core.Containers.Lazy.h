@@ -12,7 +12,7 @@ namespace Seed
 		/// Лінивий об'єкт
 		/// </summary>
         template<typename THeap, typename T>
-        class BaseLazy final : Memory::Allocator<THeap>, IDisposable {
+        class BaseLazy final : Memory::Allocator<THeap>, IDisposable { //-V1052
         public:
             using LazyGetter = T(*)();
         private:
@@ -106,7 +106,7 @@ namespace Seed
 			/// Оператор доступу до полів\методів
 			/// </summary>
 			/// <returns>Покажчик на об'єкт</returns>
-			forceinline T*&& operator->() &&
+			forceinline T*&& operator->() && //-V659
 			{
 				CheckIsExistOrGetNew();
 				T* value = MoveRValue(This->value);

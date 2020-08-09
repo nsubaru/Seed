@@ -154,10 +154,12 @@ namespace Seed
 						}
 						else
 						{
-							return data.Aggregate([](SizeT & size, const T & item)
+							return data.Aggregate(
+								[] (const SizeT& size, const T& item) -> SizeT
 								{
-									size += BaseSerlizationHandler<THeap, T>::DataSize(item);
-								}, 0ui64) + sizeof(SizeT);
+									return size + BaseSerlizationHandler<THeap, T>::DataSize(item);
+								},0Sz) 
+								+ sizeof(SizeT);
 						}
 					}
 

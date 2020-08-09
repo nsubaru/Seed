@@ -16,8 +16,7 @@ namespace Seed {
 			class BaseConcurencyDictionary :
 				public Memory::Allocator<THeap>,
 				public LINQ::IDictionary<BaseConcurencyDictionary, THeap, TString, TData, BasePair<THeap, TString, TData>, true>,
-				public IDisposable,
-				public IClonable<BaseConcurencyDictionary<THeap, TString, TData>>
+				public IDisposable
 			{
 				static_assert(TypeTraits::IsSameV<TString, BaseString<THeap>>, "BaseConcurencyDictionary key must be BaseString<THeap>");
 			private:
@@ -304,6 +303,36 @@ namespace Seed {
 					if (This == nullptr) return nullptr;
 					RootNode* copy = new RootNode();
 					if (This->node != nullptr) copy->node = create_lex_copy(This->node);
+					copy->RefCount = This->RefCount;
+					return copy;
+				}
+
+				//Копіювання елементів піддерева
+				template<typename = void> requires Concepts::IsClonable<TString> && Concepts::IsClonable<TData> 
+				NodeSym* create_lex_clone_copy(NodeSym*& orig) const {
+					NodeSym* copy = new NodeSym(orig->key);
+					if (orig->data != nullptr) copy->data = create_lex_clone_copy(orig->data);
+					if (orig->left != nullptr) copy->left = create_lex_clone_copy(orig->left);
+					if (orig->right != nullptr) copy->right = create_lex_clone_copy(orig->right);
+					copy->height = orig->height;
+					return copy;
+				}
+				//Копіювання піддерева
+				template<typename = void> requires Concepts::IsClonable<TString> && Concepts::IsClonable<TData> 
+				NodeLex* create_lex_clone_copy(NodeLex*& orig) const {
+					NodeLex* copy = new NodeLex(orig->count);
+					if (orig->node_root != nullptr) copy->node_root = create_lex_clone_copy(orig->node_root);
+					if (orig->data != nullptr) {
+						copy->data = new BasePair<THeap, TString, TData>(orig->data->Clone());
+					}
+					return copy;
+				}
+				//Копіювання системи дерев
+				template<typename = void> requires Concepts::IsClonable<TString> && Concepts::IsClonable<TData> 
+				RootNode* create_lex_clone_copy(RootNode* This) const { //-V688
+					if (This == nullptr) return nullptr;
+					RootNode* copy = new RootNode();
+					if (This->node != nullptr) copy->node = create_lex_clone_copy(This->node);
 					copy->RefCount = This->RefCount;
 					return copy;
 				}
@@ -595,12 +624,13 @@ namespace Seed {
 				/// Клонування об'єкта
 				/// </summary>
 				/// <returns>Вертає новий словник з копією елементів</returns>
-				virtual BaseConcurencyDictionary Clone() const override {
+				template<typename = void> requires Concepts::IsClonable<TString> && Concepts::IsClonable<TData> 
+				BaseConcurencyDictionary Clone() const {
 					return This->lock.ShareLock([&]() {
-						BaseConcurencyDictionary result;
-						result.This->node = create_lex_copy(This->node);
-						result.This->count = This->count;
-						return result;
+							BaseConcurencyDictionary result;
+							result.This->node = create_lex_clone_copy(This->node);
+							result.This->count = This->count;
+							return result;
 						});
 				}
 

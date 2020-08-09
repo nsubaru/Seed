@@ -26,6 +26,10 @@ CurrentSettings::VirtualSettingData CurrentVirtualSettingsData;
 
 CurrentSettings::SettingsData oldCurrentSettingsData;
 
+Threading::SRWLock& GetSettingsLockObj() {
+	static Threading::SRWLock settingsLock;
+	return settingsLock;
+}
 
 namespace Seed {
 	inline namespace Core {
@@ -65,6 +69,10 @@ namespace Seed {
 			{
 				toCoreLog(L"Перехоплено невідому помилку при обробці зміни налаштувань ядра");
 			}
+		}
+
+		Threading::SRWLock& CurrentSettings::GetSettingsLock() {
+			return GetSettingsLockObj();
 		}
 
 		const CurrentSettings::VirtualSettingData& CurrentSettings::GetVirtualSettingDataRaw() {

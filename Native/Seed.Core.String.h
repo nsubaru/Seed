@@ -23,7 +23,8 @@ namespace Seed {
         template<class THeap>
         class BaseString final :
             public Memory::Allocator<THeap>, 
-            public Containers::LINQ::IString<BaseString,THeap,UChar,false>
+            public Containers::LINQ::IString<BaseString,THeap,UChar,false>,
+            public IClonable<BaseString<THeap>>
             {
         private:
             ///<summary>Покажчик на рядковий масив</summary>
@@ -227,7 +228,7 @@ namespace Seed {
             ///<summary>Конструктор з стартовим резервованим розміром</summary>
             ///<param name = "StartSize">Стартовий розмір в кількості символів без нуль-термінатора</param>
             ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-            BaseString(SizeT StartSize) {
+            explicit BaseString(SizeT StartSize) {
                 if (StartSize > Math::Max<SizeT>())
                     Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize);
                 if (StartSize == 0 || StartSize < CurrentSettings().MemoryManager.StringReserveSize)
@@ -1208,7 +1209,7 @@ namespace Seed {
             ///<params name = "val">Логічне значення</params>
             ///<returns><c>"True"</c> якщо <c>val == true</c> інакше <c>"False"</c></returns>
             forceinline static BaseString toString(Boolean val) {
-                if (val) return BaseString(L"True"); else return BaseString(L"False");
+                if (val) return BaseString(L"true"); else return BaseString(L"false");
             }
             ///<summary>Конвертація логічного значення до рядка вертає вміст рядка <c>IfTrue</c> або <c>IfFalse</c></summary>
             ///<params name = "val">Логічне значення</params>
@@ -2105,16 +2106,10 @@ namespace Seed {
             /// <returns>Рядоку який є сумою масиву вхідних рядків</returns>
             forceinline static BaseString Combine(Containers::Array<BaseString>&& strings) {
                 return strings.Aggregate(
-                    [&] (BaseString& res, const BaseString& item)
-                    {
-                        res += item;
-                    }, 
+                    ArrowFunct(x, y, x + y),
                     BaseString(
                         strings.Aggregate<SizeT>(
-                            [&] (SizeT& sz, const BaseString& str)
-                            {
-                                sz += str.Lenght;
-                            }
+                            ArrowFunct(x, y, x + y.Lenght)
                         )
                     )
                 );
@@ -2166,6 +2161,10 @@ namespace Seed {
             template<typename NewBase>
             operator BaseString<NewBase>() const {
                 return BaseString<NewBase>((const CharStr)(ConstCharStr)*this);
+            }
+
+            virtual BaseString Clone() const override {
+                return BaseString(*this);
             }
 
             ///<summary>Оптимізований обмін рядками a і b</summary>

@@ -13,6 +13,7 @@
 #include "Seed.Core.Base.Swap.h"
 #include "Seed.Core.Base.TypeTraits.h"
 #include "Seed.Core.Base.Concepts.h"
+#include "Seed.Core.Base.IClonable.h"
 #include "Seed.Core.Base.UUID.h"
 #include "Seed.Core.Base.Internals.h"
 
@@ -119,20 +120,6 @@ namespace Seed {
         }
 
     	/// <summary>
-    	/// Інтерфейс клонування
-    	/// </summary>
-        template<typename T>
-        class IClonable  // NOLINT
-        {
-        public:
-	        /// <summary>
-        	/// Метод клонування
-        	/// </summary>
-        	/// <returns>Вертає повну копію об'єкта</returns>
-            virtual T Clone() const = 0;
-        };
-
-    	/// <summary>
     	/// Інтерфейс звільнення ресурсів з класу з підрахунком силок
     	/// </summary>
         class IDisposable // NOLINT
@@ -183,6 +170,9 @@ __forceinline ClassName(ClassName && From) : This(From.This) { From.This = nullp
 __forceinline ClassName & operator=(const ClassName & Orig){this->~ClassName(); this->ClassName::ClassName(Orig); return *this; }; \
 /**<summary>Оператор переміщення</summary><param name = "Orig">Оригинал</param><returns>Силка на поточний елемент</returns>*/ \
 __forceinline ClassName & operator=(ClassName && From){if(this == &From) return *this; this->~ClassName(); this->ClassName::ClassName(Seed::MoveRValue(From)); return *this; }; \
+/**<summary>Перевіряє чи об'єкти є посиланням на той ж інстанс даних</summary>*/\
+/**<returns>true якщо об'єкти є посиланням на той ж інстанс даних</returns>*/\
+__forceinline bool IsSameAs(const ClassName& other) { return this->This == other.This; } \
 /**<summary>Деструктор</summary>*/ \
 __forceinline virtual ~ClassName(){if (This != nullptr) {if (--This->RefCount == 0) {this->Dispose();delete This;}This = nullptr;}}
 

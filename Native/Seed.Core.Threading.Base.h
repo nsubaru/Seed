@@ -12,7 +12,7 @@ namespace Seed {
 				Thread, JobTask, ScheduledTask, Unknown = 255
 			};
 			enum class EThreadabledStates : UInt8 {
-				NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interupted, Unknown = 255
+				NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interupted, Ended, Unknown = 255
 			};
 			enum class EThreadableCodeType : UInt8 {
 				Native, Managed, Unknown = 255
@@ -65,7 +65,7 @@ namespace Seed {
 			};
 
 			///<summary>Неіснуючий потік або він не є керований через Core</summary>
-			class InvalidThread final : public Exception
+			class InvalidThread final : public Exception //-V1052
 			{
 			private:
 				///<summary>ID не існуючого потоку</summary>
@@ -121,7 +121,7 @@ namespace Seed {
 				forceinline virtual ~InvalidThreadObj() override final {}
 			};
 			///<summary>Запуск запущеного об'єкта</summary>
-			class ThreadableAlredyStarted final : public Exception
+			class ThreadableAlredyStarted final : public Exception //-V1052
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -144,7 +144,7 @@ namespace Seed {
 			};
 
 			///<summary>Взаємне блокування</summary>
-			class DedlockExpected final : public Exception
+			class DedlockExpected final : public Exception //-V1052
 			{
 			public:
 				///<summary>Конструктор помилки</summary>

@@ -11,7 +11,7 @@ namespace Seed {
     inline namespace Core {
         inline namespace Exceptions {
             ///<summary>Спроба отримати результат не виконаної ще функції</summary>
-            class SeedKernelCall CantGetResultNotInvokedFunction final : public Exception
+            class CantGetResultNotInvokedFunction final : public Exception
             {
             public:
                 ///<summary>Генерація помилки спроби отримати результат не виконаної ще функції</summary>
@@ -32,7 +32,7 @@ namespace Seed {
             };
 
             ///<summary>Спроба повторно запусти вже виконаний делегат або який виконується зараз</summary>
-            class SeedKernelCall TryReStartDelegate final : public Exception
+            class TryReStartDelegate final : public Exception
             {
             public:
                 ///<summary>Генерація помилки спроби повторно запусти вже виконаний делегат або який виконується зараз</summary>
@@ -53,7 +53,7 @@ namespace Seed {
             };
 
             ///<summary>Делегат в процесі виконання</summary>
-            class SeedKernelCall AlredyExecute final : public Exception
+            class AlredyExecute final : public Exception
             {
             public:
                 ///<summary>Конструктор помилки</summary>
@@ -136,32 +136,21 @@ namespace Seed {
 //фактично функція з аргументами
 //Так як батьківським класом є FunctionObj то можна тримати покажчик на FunctionObj
 //незалежно від типу самої функції
-template<typename F, typename ... Args>
+template<typename TF, typename ... TArgs>
 class TemplateFunctionT final :public Seed::Core::FunctionObj
 {
-    static forceinline decltype(auto) call(F f, Seed::Containers::Tuple<Args...> args)
-    {
-        if constexpr (Seed::TypeTraits::IsSameV<decltype(args.CallWithArgsFromTuple(f)), void>){
-            args.CallWithArgsFromTuple(f);
-        }
-        else
-        {
-            return args.CallWithArgsFromTuple(f);
-        }
-    }
-
     //Функція
-    F f;
+    TF f;
     //Контейнер для результату
     void* result;
     //Контейнер для аргументів
-    Seed::Containers::Tuple<Args...> args;
+    Seed::Containers::Tuple<TArgs...> args;
     //Флаг завершення виконання функції
     volatile bool isEnded = false;
     //Флаг запуску функції
     volatile bool isStarted = false;
 
-    using retType = Seed::TypeTraits::RemoveRefV<decltype(call(f, args))>;
+    using retType = typename Seed::TypeTraits::RemoveCVRefV<decltype(args.CallWithArgsFromTuple(f))>;
 protected:
     //Вертає результат
     //Генерить наступні ексепшини
@@ -170,14 +159,19 @@ protected:
     forceinline virtual void* __get_result(const Seed::TypeInfo& type) override final
     {
         if constexpr (Seed::Core::TypeTraits::IsSameT<retType, void>::State)
+        {
             Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(void), type));
-        else if (result == nullptr)
-            Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
+        }
         else
         {
-            if (typeid(decltype(call(f, args))).GetHashCode() != type.GetHashCode())
-                Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(retType), type));
-            return result;
+            if (result == nullptr)
+                Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
+            else
+            {
+                if (typeid(retType) != type)
+                    Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(retType), type));
+                return result;
+            }
         }
     }
 public:
@@ -193,15 +187,15 @@ public:
             {
                 //Якщо ні то запамятовує результат в покажчику res
                 //В який переміщає конструктором переміщення результат
-                result = new retType(call(f, args));
+                result = new retType(args.CallWithArgsFromTuple(f));
             }
             //Якщо функція вертає void то просто викликаєм її
             else
             {
-                call(f, args);
+                args.CallWithArgsFromTuple(f);
             }
             //NOTE: Знищення аргументів(якщо цього не робити то модливі циклічні силки в деяких випадках)
-            args.~Tuple<Args...>();
+            args.~Tuple<TArgs...>();
         }
         catch ([[maybe_unused]] Seed::InteruptException&) { //-V2010
             isEnded = true;
@@ -216,7 +210,8 @@ public:
         isEnded = true;
     }
     //Конструктор, ініціалізує тупл з аргументами, обнулює покажчик на результат, і запам'ятовує функцію
-    forceinline TemplateFunctionT(F f, Args&&... args) : f(f), result(nullptr), args(Seed::ForwardReference<Args>(args)...)
+    template<typename TF, typename ... TArgs>
+    forceinline TemplateFunctionT(TF&& f, TArgs&&... args) : f(Seed::Core::ForwardReference<TF>(f)), result(nullptr), args(Seed::Core::ForwardReference<TArgs>(args)...)
     {}
     //Вертає true якщо функція запущена була
     forceinline virtual bool IsStarted() const noexcept override final
@@ -232,7 +227,7 @@ public:
     //Деструктор, видаляє результат якщо він є
     forceinline virtual ~TemplateFunctionT() override final
     {
-        if constexpr (!Seed::Core::TypeTraits::IsSameT<decltype(call(f, args)), void>::State)
+        if constexpr (!Seed::Core::TypeTraits::IsSameT<retType, void>::State)
             if (result != nullptr)
             {
                 delete reinterpret_cast<Seed::TypeTraits::AddPointer<retType>>(result);
@@ -240,6 +235,9 @@ public:
             }
     }
 };
+//
+//template<typename TF, typename ... TArgs>
+//TemplateFunctionT(TF&& f, TArgs&&... args)->TemplateFunctionT<TF&&, Seed::TypeTraits::SpecialDecayT<TArgs>...>;
 
 namespace Seed {
     inline namespace Core {
@@ -274,7 +272,8 @@ namespace Seed {
             /// <param name="f">Функція(покажчик на неї)</param>
             /// <param name="args">Аргументи функції</param>
             template<typename TF, typename ... TArgs>
-            forceinline Delegate(TF f, TArgs... args) : data(new delegate(new TemplateFunctionT<TF, TArgs...>(f, ForwardReference<TArgs>(args)...)))
+            requires Concepts::IsInvockable<TF, TArgs...>
+            forceinline Delegate(TF&& f, TArgs&&... args) : data(new delegate(new TemplateFunctionT<TF, TArgs...>(ForwardReference<TF>(f), ForwardReference<TArgs>(args)...)))
             {};
 
             /// <summary>
@@ -385,10 +384,11 @@ namespace Seed {
         /// <param name="f">Функція(покажчик на неї)</param>
         /// <param name="args">Аргументи функції</param>
         /// <returns>Об'єкт делегата</returns>
-        template<typename F, typename ... Args>
-        forceinline Delegate CreateAndPackFunctionObj(F f, Args... args)
+        template<typename TF, typename ... TArgs>
+        requires Concepts::IsInvockable<TF, TArgs...>
+        forceinline Delegate CreateAndPackFunctionObj(TF&& f, TArgs&&... args)
         {
-            return Delegate(f, args...);
+            return Delegate(Seed::Core::ForwardReference<TF>(f), Seed::Core::ForwardReference<TArgs>(args)...);
         }
     }
 };

@@ -63,6 +63,8 @@ namespace Seed {
 						SizeT StackMaxSize;
 						///<summary>Ìàêñèàëüíèé ğîçì³ğ ñòåêó ïîòîê³â</summary>
 						SizeT StackStartSize;
+						/// <summary> Òàéìàóò î÷³êóâàíííÿ íà ïîòîêè ïğè çàâåğøåí³ ğîáîòè ÿäğà </summary>
+						SizeT StopKernelThreadsTimeout;
 					};
 					///<summary>Íàëàøòóâàííÿ ïîòîê³â</summary>
 					ThreadCfg Thread;
@@ -107,10 +109,7 @@ namespace Seed {
 			SeedKernelCall static const SettingsData& GetCurrentSettingDataRaw();
 			SeedKernelCall static SettingsData& SetCurrentSettingDataRaw();
 			SeedKernelCall static void InformAboutSettingsChange();
-			forceinline static Threading::SRWLock& GetSettingsLock() {
-				static Threading::SRWLock settingsLock;
-				return settingsLock;
-			}
+			static Threading::SRWLock& GetSettingsLock();
 		private:
 			template<typename Lambda>
 			static decltype(auto) GetCurrentSettingData(Lambda&& lambda) {
@@ -125,8 +124,8 @@ namespace Seed {
 				GetSettingsLock().ExclusiveLock([&] ()
 				{
 					lambda(SetCurrentSettingDataRaw());
-					InformAboutSettingsChange();
 				});
+				InformAboutSettingsChange();
 			}
 		public:
 			///<summary>Íàëàøòóâàííÿ ñåğåäîâèùà</summary>
@@ -149,39 +148,39 @@ namespace Seed {
 					DefaultHeapT() {} //-V730
 				public:
 					SizeT GetStartSize() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.DefaultHeap.StartSize;
 						});
 					}
 					void SetStartSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto data)
+						SetCurrentSettingData([&] (auto& data)
 						{
 							data.MainMemoryManager.DefaultHeap.StartSize = NewSize;
 						});
 					}
 
 					SizeT GetMaxSize() {
-						return GetCurrentSettingData([&] (auto data)
+						return GetCurrentSettingData([&] (auto& data)
 						{
 							return data.MainMemoryManager.DefaultHeap.MaxSize;
 						});
 					}
 					void SetMaxSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.DefaultHeap.MaxSize = NewSize;
 						});
 					}
 
 					Boolean GetHeapFreeCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_FREE_CHECK == 0x1;
 						});
 					}
 					void SetHeapFreeCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_FREE_CHECK = (NewState) ? 0x1 : 0x0;
 						});
@@ -194,46 +193,46 @@ namespace Seed {
 						});
 					}
 					void SetHeapTailCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_TAIL_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapArgsCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_ARGS_CHECK == 0x1;
 						});
 					}
 					void SetHeapArgsCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_ARGS_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapValidationChecks() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL == 0x1;
 						});
 					}
 					void SetHeapValidationChecks(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapAllocsLogging() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree;
 						});
 					}
 					void SetHeapAllocsLogging(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree = NewState;
 						});
@@ -264,72 +263,72 @@ namespace Seed {
 					SensitiveDataHeapT() {} //-V730
 				public:
 					SizeT GetStartSize() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.StartSize;
 						});
 					}
 					void SetStartSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.StartSize = NewSize;
 						});
 					}
 
 					SizeT GetMaxSize() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.MaxSize;
 						});
 					}
 					void SetMaxSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.MaxSize = NewSize;
 						});
 					}
 
 					Boolean GetHeapFreeCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_FREE_CHECK == 0x1;
 						});
 					}
 					void SetHeapFreeCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_FREE_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapTailCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_TAIL_CHECK == 0x1;
 						});
 					}
 					void SetHeapTailCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_TAIL_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapArgsCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_ARGS_CHECK == 0x1;
 						});
 					}
 					void SetHeapArgsCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_ARGS_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapValidationChecks() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL == 0x1;
 						});
@@ -342,7 +341,7 @@ namespace Seed {
 					}
 
 					Boolean GetHeapAllocsLogging() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree;
 						});
@@ -379,78 +378,78 @@ namespace Seed {
 					ExceptionHeapT() {} //-V730
 				public:
 					SizeT GetStartSize() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.StartSize;
 						});
 					}
 					void SetStartSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.StartSize = NewSize;
 						});
 					}
 
 					SizeT GetMaxSize() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.MaxSize;
 						});
 					}
 					void SetMaxSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.MaxSize = NewSize;
 						});
 					}
 
 					Boolean GetHeapFreeCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_FREE_CHECK == 0x1;
 						});
 					}
 					void SetHeapFreeCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_FREE_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapTailCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_TAIL_CHECK == 0x1;
 						});
 					}
 					void SetHeapTailCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_TAIL_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapArgsCheck() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_ARGS_CHECK == 0x1;
 						});
 					}
 					void SetHeapArgsCheck(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_ARGS_CHECK = (NewState) ? 0x1 : 0x0;
 						});
 					}
 
 					Boolean GetHeapValidationChecks() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL == 0x1;
 						});
 					}
 					void SetHeapValidationChecks(Boolean NewState) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL = (NewState) ? 0x1 : 0x0;
 						});
@@ -485,65 +484,65 @@ namespace Seed {
 				void SetExceptionHeap(ExceptionHeapT) {}
 
 				SizeT GetStringReserveSize() {
-					return GetCurrentSettingData([] (auto data)
+					return GetCurrentSettingData([] (auto& data)
 					{
 						return data.MainMemoryManager.StringReserveSize;
 					});
 				}
 				void SetStringReserveSize(SizeT NewSize) {
-					SetCurrentSettingData([&] (auto CurrentSettingsData)
+					SetCurrentSettingData([&] (auto& CurrentSettingsData)
 					{
 						CurrentSettingsData.MainMemoryManager.StringReserveSize = NewSize;
 					});
 				}
 
 				SizeT GetDefaultPriorityQueueMaxSize() {
-					return GetCurrentSettingData([] (auto data)
+					return GetCurrentSettingData([] (auto& data)
 					{
 						return data.MainMemoryManager.DefaultPriorityQueueMaxSize;
 					});
 				}
 				void SetDefaultPriorityQueueMaxSize(SizeT NewSize) {
-					SetCurrentSettingData([&] (auto CurrentSettingsData)
+					SetCurrentSettingData([&] (auto& CurrentSettingsData)
 					{
 						CurrentSettingsData.MainMemoryManager.DefaultPriorityQueueMaxSize = NewSize;
 					});
 				}
 
 				SizeT GetStackReserveSize() {
-					return GetCurrentSettingData([] (auto data)
+					return GetCurrentSettingData([] (auto& data)
 					{
 						return data.MainMemoryManager.DynamicStackReserveSize;
 					});
 				}
 				void SetStackReserveSize(SizeT NewSize) {
-					SetCurrentSettingData([&] (auto CurrentSettingsData)
+					SetCurrentSettingData([&] (auto& CurrentSettingsData)
 					{
 						CurrentSettingsData.MainMemoryManager.DynamicStackReserveSize = NewSize;
 					});
 				}
 
 				SizeT GetQueueReserveSize() {
-					return GetCurrentSettingData([] (auto data)
+					return GetCurrentSettingData([] (auto& data)
 					{
 						return data.MainMemoryManager.DynamicQueueReserveSize;
 					});
 				}
 				void SetQueueReserveSize(SizeT NewSize) {
-					SetCurrentSettingData([&] (auto CurrentSettingsData)
+					SetCurrentSettingData([&] (auto& CurrentSettingsData)
 					{
 						CurrentSettingsData.MainMemoryManager.DynamicQueueReserveSize = NewSize;
 					});
 				}
 
 				SizeT GetDynamicCircularBufferStartSize() {
-					return GetCurrentSettingData([] (auto data)
+					return GetCurrentSettingData([] (auto& data)
 					{
 						return data.MainMemoryManager.DynamicCircularBufferStartSize;
 					});
 				}
 				void SetDynamicCircularBufferStartSize(SizeT NewSize) {
-					SetCurrentSettingData([&] (auto CurrentSettingsData)
+					SetCurrentSettingData([&] (auto& CurrentSettingsData)
 					{
 						CurrentSettingsData.MainMemoryManager.DynamicCircularBufferStartSize = NewSize;
 					});
@@ -575,28 +574,41 @@ namespace Seed {
 					ThreadCfg() {}
 
 					SizeT GetStackStartSize() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.Threading.Thread.StackStartSize;
 						});
 					}
 					void SetStackStartSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.Threading.Thread.StackStartSize = NewSize;
 						});
 					}
 
 					SizeT GetStackMaxSize() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.Threading.Thread.StackMaxSize;
 						});
 					}
 					void SetStackMaxSize(SizeT NewSize) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.Threading.Thread.StackMaxSize = NewSize;
+						});
+					}
+
+					SizeT GetStopKernelThreadsTimeout() {
+						return GetCurrentSettingData([] (auto& data)
+						{
+							return data.Threading.Thread.StopKernelThreadsTimeout;
+						});
+					}
+					void SetStopKernelThreadsTimeout(SizeT NewStopKernelThreadsTimeout) {
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
+						{
+							CurrentSettingsData.Threading.Thread.StopKernelThreadsTimeout = NewStopKernelThreadsTimeout;
 						});
 					}
 				public:
@@ -604,6 +616,8 @@ namespace Seed {
 					SizeT Property(GetStackStartSize, SetStackStartSize) StackStartSize;
 					///<summary>Ìàêñèìàëüíèé ğîçì³ğ ñòåêó ó ïîòîê³â</summary>
 					SizeT Property(GetStackMaxSize, SetStackMaxSize) StackMaxSize;
+					///<summary>Òàéìàóò î÷³êóâàíííÿ íà ïîòîêè ïğè çàâåğøåí³ ğîáîòè ÿäğà</summary>
+					SizeT Property(GetStopKernelThreadsTimeout, SetStopKernelThreadsTimeout) StopKernelThreadsTimeout;
 				};
 			public:
 				ThreadingCfgT() {}
@@ -622,13 +636,13 @@ namespace Seed {
 					TaskShedulerCfgT() {} //-V730
 
 					Int32 GetDefaultTimerProximity() {
-						return GetCurrentSettingData([] (auto data)
+						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.KernelServicesConfig.TaskSheduler.DefaultTimerProximity;
 						});
 					}
 					void SetDefaultTimerProximity(Int32 NewDefaultTimerProximity) {
-						SetCurrentSettingData([&] (auto CurrentSettingsData)
+						SetCurrentSettingData([&] (auto& CurrentSettingsData)
 						{
 							CurrentSettingsData.KernelServicesConfig.TaskSheduler.DefaultTimerProximity = NewDefaultTimerProximity;
 						});
@@ -692,6 +706,10 @@ namespace Seed {
 				constexpr Settings::StaticSettingsData::TSettingsChangeEventName GetSettingsChangeEventName() {
 					return Settings::StaticSettingsData::SettingsChangeEventName;
 				}
+
+				constexpr Settings::StaticSettingsData::TOnLogWriteEventName GetOnLogWriteEventName() {
+					return Settings::StaticSettingsData::OnLogWriteEventName;
+				}
 			public:
 				///<summary>²ì'ÿ ïîä³¿ çàâåğøåííÿ ğîáîòè ÿäğà</summary>
 				Settings::StaticSettingsData::TShutdownEventName Property(GetShutdownEventName) ShutdownEventName;
@@ -711,6 +729,10 @@ namespace Seed {
 				/// ²ì'ÿ ïîä³¿ ³íôîğìóâàííÿ ïğî çì³íè íàëàøòóâàíü ÿäğà Ğåì
 				/// </summary>
 				Settings::StaticSettingsData::TSettingsChangeEventName Property(GetSettingsChangeEventName) SettingsChangeEventName;
+				/// <summary>
+				/// ²ì'ÿ ïîä³¿ çàïèñó â ëîãè
+				/// </summary>
+				Settings::StaticSettingsData::TOnLogWriteEventName Property(GetOnLogWriteEventName) OnLogWriteEventName;
 			};
 
 			class ObjectNamespaceConfigurationT final {

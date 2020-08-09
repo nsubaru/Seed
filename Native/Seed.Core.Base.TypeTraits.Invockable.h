@@ -95,20 +95,34 @@ namespace Seed
 				template<typename Void, typename Callable, typename ... TTypes>
 				struct InvokeTraits {
 					using Invockable = LogicFalse;
+                    using Result = VoidT<>;
 				};
 
 				template<typename Callable, typename ... TTypes>
 				struct InvokeTraits<VoidT<decltype(Invoke(DeclVal<Callable>(), DeclVal<TTypes>()...))>, Callable, TTypes...> {
 					using Invockable = LogicTrue;
-					using Result = decltype(Invoke(DeclVal<Callable>(), DeclVal<TTypes>()...));
+					using Result = typename decltype(Invoke(DeclVal<Callable>(), DeclVal<TTypes>()...));
 				};
 			}
 
+            /// <summary>
+            /// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs
+            /// </summary>
 			template<typename TCallable, typename ... TArgs>
 			constexpr Boolean IsInvockable = Details::InvokeTraits<void, TCallable, TArgs...>::Invockable::State;
 
+            /// <summary>
+            /// Тип повернення при виклику TCallable з набіром аргументів TArgs
+            /// </summary>
 			template<typename TCallable, typename ... TArgs>
-			using InvockableResult = typename Details::InvokeTraits<void, TCallable, TArgs...>::Invockable::Result;
+			using InvockableResult = typename Details::InvokeTraits<void, TCallable, TArgs...>::Result;
+
+            /// <summary>
+            /// Перевірка чи тип TCallable можна викликати з набіром аргументів TArgs і результатом TRet
+            /// </summary>
+            template<typename TCallable, typename TRet, typename ... TArgs>
+			constexpr Boolean IsInvockableWithResult = TypeTraits::IsInvockable<TCallable, TArgs...> &&
+				TypeTraits::IsConvertible<typename TypeTraits::InvockableResult<TCallable, TArgs...>, TRet>;
 		}
 	}
 }

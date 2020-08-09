@@ -16,8 +16,7 @@ namespace Seed {
 			template<typename THeap, typename T>
 			class BaseConcurencyDynamicQueue final :
 				public LINQ::IDynamicStack<BaseConcurencyDynamicQueue, THeap, T, true>,
-				public IDisposable,
-				public IClonable<BaseConcurencyDynamicQueue<THeap, T>>
+				public IDisposable
 			{
 			private:
 				struct Data {
@@ -97,11 +96,11 @@ namespace Seed {
 				/// </summary>
 				/// <param name="value">Значення елемента</param>
 				/// <param name="isResizeIfFull">Якщо true то чергу розширить автоматично при потребі, 
-				/// якщо false і черга немає місця то вона зупинить виконання команди 
+				/// якщо false і черга немає місця то вона зупинить виконання команди
 				/// до моменту коли зявиться місце в черзі</param>
 				void Enqueue(const T& value, bool isResizeIfFull = false) {
 					This->flowControler.Produce([&]() {
-						if (++This->count > This->bufferSize) {
+						if (This->count >= This->bufferSize) {
 							if (!isResizeIfFull)
 								This->flowControler.WaitForConcumer();
 							else
@@ -111,6 +110,7 @@ namespace Seed {
 						SizeT newRear = (This->rear + 1) % This->bufferSize;
 						This->queue[This->rear] = value;
 						This->rear = newRear;
+						++This->count;
 						});
 				}
 
@@ -123,7 +123,7 @@ namespace Seed {
 				/// до моменту коли зявиться місце в черзі</param>
 				void Enqueue(T&& Value, bool IsResizeIfFull = false) {
 					This->flowControler.Produce([&, Value = MoveRValue(Value)]() mutable {
-						if (++This->count > This->bufferSize) {
+						if (This->count >= This->bufferSize) {
 							if (!IsResizeIfFull)
 								This->flowControler.WaitForConcumer();
 							else
@@ -133,6 +133,7 @@ namespace Seed {
 						SizeT newRear = (This->rear + 1) % This->bufferSize;
 						This->queue[This->rear] = MoveRValue(Value);
 						This->rear = newRear;
+						++This->count;
 					});
 				}
 
@@ -146,11 +147,11 @@ namespace Seed {
 					return This->flowControler.Concume([&]() {
 						while (This->count == 0) This->flowControler.WaitForProducer();
 
-						T res = MoveRValue(This->queue[This->front]);
+						T res = This->queue[This->front];
 						This->front = (This->front + 1) % This->bufferSize;
 						--This->count;
 
-						return MoveRValue(res);
+						return res;
 						});
 				}
 
@@ -160,7 +161,7 @@ namespace Seed {
 				/// </summary>
 				/// <returns></returns>
 				forceinline const T& Top() {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->front == This->rear)
 							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
@@ -173,7 +174,7 @@ namespace Seed {
 				/// </summary>
 				/// <returns></returns>
 				forceinline const T& Top() const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->front == This->rear)
 							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
@@ -219,52 +220,85 @@ namespace Seed {
 				/// <summary>
 				/// Поточна кількість елементів
 				/// </summary>
-				SizeT Property(GetCount) Count;
+				SizeT Property(GetCount) Count;				/// <summary>
+				/// Максимальна елементів в черзі
+				/// </summary>
+				/// <returns>Максимальна кількість елементів</returns>
+				forceinline SizeT GetMaxCount() const { return This->bufferSize; }
 
 				/// <summary>
-				/// Клонування об'єкта
+				/// Максимальна кількість елементів
 				/// </summary>
-				/// <returns>Новий об'єкт з копією елементів</returns>
-				virtual BaseConcurencyDynamicQueue Clone() const override final {
-					if constexpr (TypeTraits::IsConstructible<T>)
-					{
-						return This->flowControler.SharedLock([&] ()
-						{
-							BaseConcurencyDynamicQueue result;
-							result.This->queue = new T[This->bufferSize];
-							result.This->front = This->front;
-							result.This->rear = This->rear;
-							result.This->count = This->count;
-							result.This->bufferSize = This->bufferSize;
-							for (SizeT i = 0; i < This->count; i++)
-							{
-								(*result.This)[i] = (*This)[i];
-							}
-							return result;
-						});
-					}
-					else if constexpr (TypeTraits::IsBasedOnV<IClonable<T>, T>)
-					{
-						return This->flowControler.SharedLock([&] ()
-						{
-							BaseConcurencyDynamicQueue result;
-							result.This->queue = new T[This->bufferSize];
-							result.This->front = This->front;
-							result.This->rear = This->rear;
-							result.This->count = This->count;
-							result.This->bufferSize = This->bufferSize;
-							for (SizeT i = 0; i < This->count; i++)
-							{
-								(*result.This)[i] = (*This)[i].Clone();
-							}
-							return result;
-						});
-					}
-					else
-					{
-						Throw(NotImplementedException(ExceptionPosition));
-					}
+				SizeT Property(GetMaxCount) MaxCount;
+
+				/// <summary>
+				/// Вказує чи черга заповнена
+				/// </summary>
+				/// <returns>Вказує чи черга заповнена</returns>
+				Boolean GetIsFull() const {
+					return This->count == This->bufferSize;
 				}
+
+				/// <summary>
+				/// Вказує чи черга заповнена
+				/// </summary>
+				Boolean Property(GetIsFull) IsFull;
+
+				/// <summary>
+                /// Клонування масиву
+                /// </summary>
+                /// <returns>Вертає новий масив з копією всіх елементів</returns>
+                template<typename = void> requires (Concepts::IsClonable<T>) 
+                BaseConcurencyDynamicQueue Clone() const {
+                    if constexpr (TypeTraits::IsPodV<T>)
+                    {
+						return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue
+						{
+							auto item = BaseConcurencyDynamicQueue(this->This->count);
+							Memory::Copy(this->This->queue, item.This->queue, sizeof(T) * this->This->count);
+							item.This->front = this->This->front;
+							item.This->rear = this->This->rear;
+							item.This->count = this->This->count;
+							return item;
+						});
+                    }
+                    else
+                    {
+						return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue
+						{
+							auto item = BaseConcurencyDynamicQueue(this->This->count);
+							for (SizeT i = 0; i < This->count; i++)
+							{
+								item.This->queue[i] = This->queue[i].Clone();
+							}
+							item.This->front = this->This->front;
+							item.This->rear = this->This->rear;
+							item.This->count = this->This->count;
+							return item;
+						});
+                    }
+                }
+
+				/// <summary>
+                /// Клонування масиву
+                /// </summary>
+                /// <param name="lambda">Функція задопомогою якої відбувається клонування</param>
+                /// <returns>Вертає новий масив з копією всіх елементів</returns>
+                template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
+                BaseConcurencyDynamicQueue Clone(TLambda&& lambda) const {
+					return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue
+					{
+						auto item = BaseConcurencyDynamicQueue(this->This->count);
+						for (SizeT i = 0; i < This->count; i++)
+						{
+							item.This->queue[i] = lambda(This->queue[i]);
+						}
+						item.This->front = this->This->front;
+						item.This->rear = this->This->rear;
+						item.This->count = this->This->count;
+						return item;
+					});
+                }
 
 				RefCountClass(BaseConcurencyDynamicQueue, This)
 			private:
@@ -278,6 +312,7 @@ namespace Seed {
 					This->front = 0; This->rear = This->count;
 					delete This->queue;
 					This->queue = newBuffer;
+					This->bufferSize = newSize;
 				}
 			protected:
 				template <
@@ -324,10 +359,10 @@ namespace Seed {
 #pragma warning(push)
 #pragma warning(disable: 4172)
 
-				template<typename TLambdaT>
-				BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, T&> ||
-						TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
+				template<typename TLambda>
+				BaseConcurencyDynamicQueue& ForEachImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, T&> ||
+						TypeTraits::IsInvockable<TLambda, const T&>) {
 
 						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
 							for (SizeT i = 0; i < This->count; i++)
@@ -337,13 +372,13 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, T&, SizeT> ||
-						TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, T&, SizeT> ||
+						TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 
 						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
 							SizeT index = 0;
 
-							for (SizeT i = 0; i < This->count; i++, index)
+							for (SizeT i = 0; i < This->count; i++, index++)
 							{
 								lambda((*This)[i], index);
 							}
@@ -359,9 +394,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename TLambdaT>
-				const BaseConcurencyDynamicQueue& ForEachImpl(TLambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&>) {
+				template<typename TLambda>
+				const BaseConcurencyDynamicQueue& ForEachImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
 						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
 							for (SizeT i = 0; i < This->count; i++)
 							{
@@ -370,11 +405,83 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<TLambdaT, void, const T&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
 							SizeT Index = 0;
 
-							for (SizeT i = 0; i < This->count; i++, Index)
+							for (SizeT i = 0; i < This->count; i++, Index++)
+							{
+								lambda((*This)[i], Index);
+							}
+
+							return *this;
+							});
+					}
+					else {
+						// ReSharper disable once CppStaticAssertFailure
+						static_assert(false);
+						__assume(false);
+						return *this;
+					}
+				}
+
+				template<typename TLambda>
+				BaseConcurencyDynamicQueue& ForEachImpl(TLambda&& lambda, SizeT requiredCount) {
+					if (requiredCount > this->Count)
+                        requiredCount = this->Count;
+
+					if constexpr (TypeTraits::IsInvockable<TLambda, T&> ||
+						TypeTraits::IsInvockable<TLambda, const T&>) {
+
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+							for (SizeT i = 0; i < requiredCount; i++)
+							{
+								lambda((*This)[i]);
+							}
+							return *this;
+							});
+					}
+					else if constexpr (TypeTraits::IsInvockable<TLambda, T&, SizeT> ||
+						TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
+
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+							SizeT index = 0;
+
+							for (SizeT i = 0; i < requiredCount; i++, index++)
+							{
+								lambda((*This)[i], index);
+							}
+
+							return *this;
+							});
+					}
+					else {
+						// ReSharper disable once CppStaticAssertFailure
+						static_assert(false);
+						__assume(false);
+						return *this;
+					}
+				}
+
+				template<typename TLambda>
+				const BaseConcurencyDynamicQueue& ForEachImpl(TLambda&& lambda, SizeT requiredCount) const {
+					if (requiredCount > this->Count)
+                        requiredCount = this->Count;
+
+					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
+							for (SizeT i = 0; i < requiredCount; i++)
+							{
+								lambda((*This)[i]);
+							}
+							return *this;
+							});
+					}
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
+							SizeT Index = 0;
+
+							for (SizeT i = 0; i < requiredCount; i++, Index++)
 							{
 								lambda((*This)[i], Index);
 							}
@@ -401,7 +508,7 @@ namespace Seed {
 
 						for (SizeT i = 0; i < This->count; i++)
 						{
-							lambda(result, (*This)[i]);
+							result = lambda(result, (*This)[i]);
 						}
 
 						return MoveRValue(result);
@@ -418,7 +525,7 @@ namespace Seed {
 
 						for (SizeT i = 0; i < This->count; i++)
 						{
-							lambda(result, (*This)[i]);
+							result = lambda(result, (*This)[i]);
 						}
 
 						return MoveRValue(result);
@@ -435,7 +542,7 @@ namespace Seed {
 
 						for (SizeT i = 0; i < This->count; i++)
 						{
-							lambda(result, (*This)[i]);
+							result = lambda(result, (*This)[i]);
 						}
 
 						return MoveRValue(result);
@@ -478,7 +585,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& FirstImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() -> T& {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -490,11 +597,11 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& LastImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() -> T& {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-						T& ret = This->queue[(This->rear == 0) ? This->bufferSize - 1 : This->rear - 1];
+						T& ret = This->queue[(This->rear == 0) ? This->bufferSize - 1 : This->rear];
 
 						return ret;
 						});
@@ -502,7 +609,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& FirstImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -514,11 +621,11 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& LastImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() -> const T& {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
-						T& ret = This->queue[(This->rear == 0) ? This->bufferSize - 1 : This->rear - 1];
+						T& ret = This->queue[(This->rear == 0) ? This->bufferSize - 1 : This->rear];
 
 						return ret;
 						});
@@ -536,10 +643,14 @@ namespace Seed {
 
 				forceinline void UnsafeSet(const T& value, SizeT index) {
 					This->queue[index] = value;
+					This->rear = index;
+					This->count = This->bufferSize;
 				}
 
 				forceinline void UnsafeSet(T&& value, SizeT index) {
 					This->queue[index] = MoveRValue(value);
+					This->rear = index;
+					This->count = This->bufferSize;
 				}
 
 				BaseConcurencyDynamicQueue& RemoveAllImpl() {

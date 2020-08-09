@@ -26,7 +26,7 @@ namespace Seed {
 		/// <summary>
 		/// Клас унікального ідентифікатора UUID сумісного з GUID який використовується в ядрі Windows
 		/// </summary>
-		class SeedKernelCall UUID {
+		class UUID {
 		private:
 			/// <summary>
 			/// значення об'єкту

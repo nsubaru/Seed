@@ -4,12 +4,31 @@
 
 namespace Seed {
 	inline namespace Core {
-		namespace Math {
+		namespace Math
+		{
 #pragma region SafeInt
+			namespace Internal
+			{
+				class SafeIntBase {
+				protected:
+					inline SafeIntBase() = default;
+					inline SafeIntBase(const SafeIntBase&) = default;
+					inline SafeIntBase(SafeIntBase&&) = default;
+
+					static unsigned __int64 _umul128Impl(
+					   unsigned __int64 Multiplier,
+					   unsigned __int64 Multiplicand,
+					   unsigned __int64 *HighProduct
+					);
+
+					~SafeIntBase() {}
+				};
+			}
+
 			///<summary>Класс чисел з безпечними операціями</summary>
 			///<param name = "T">Тип який буде базою, може бути лиш unsigned int будь-яклї розрядності</param>
-			template<typename T>
-			class SafeInt final {
+			template<typename T> requires TypeTraits::IsSigned<T> || TypeTraits::IsUnsigned<T>
+			class SafeInt final : Internal::SafeIntBase {
 			private:
 				///Тип числа
 				using Int = TypeTraits::Unsigned<T>;
@@ -30,7 +49,7 @@ namespace Seed {
 					if (static_cast<Int>(this->value + second.value) >= this->value)
 						return static_cast<Int>(this->value + second.value);
 					else
-						Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
 				///<summary>Віднімання двох чисел</summary>
@@ -41,7 +60,7 @@ namespace Seed {
 					if (this->value >= second.value)
 						return static_cast<Int>(this->value - second.value);
 					else
-						Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
 #pragma warning(push)
@@ -54,40 +73,40 @@ namespace Seed {
 				constexpr forceinline SafeInt operator*(SafeInt second) {
 					if constexpr (TypeTraits::IsSameV<Int, UInt8>)
 					{
-						UInt16 res = this->value * second.value;
+						UInt16 res = static_cast<UInt16>(this->value) * second.value;
 						if (res > Math::Max<Int>())
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
 					}
 					else if constexpr (TypeTraits::IsSameV<Int, UInt16>)
 					{
-						UInt32 res = this->value * second.value;
+						UInt32 res = static_cast<UInt32>(this->value) * second.value;
 						if (res > Math::Max<Int>())
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
 					}
 					else if constexpr (TypeTraits::IsSameV<Int, UInt32>)
 					{
-						UInt64 res = this->value * second.value;
+						UInt64 res = static_cast<UInt64>(this->value) * second.value;
 						if (res > Math::Max<Int>())
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return static_cast<Int>(res);
 					}
 					else if constexpr (TypeTraits::IsSameV<Int, UInt64>)
 					{
 						UInt64 res[2];
-						_umul128(this->value, second.value, res);
+						res[0] = _umul128Impl(this->value, second.value, &res[1]);
 						UInt32 res = this->value * second.value;
 						if (res[1] > 0)
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return res;
 					}
 					//Unreacheable code
-					Internals::Exceptions::ThrowInternalError(__FILE__, __FUNCSIG__, __LINE__);
+					Seed::Core::Internals::Exceptions::ThrowInternalError(__FILE__, __FUNCSIG__, __LINE__);
 				}
 #pragma warning(pop)
 
@@ -97,7 +116,7 @@ namespace Seed {
 				///<returns>Результат операції</returns>
 				constexpr forceinline SafeInt operator/(SafeInt second) {
 					if (second.value == 0)
-						Internals::Exceptions::ThrowDivideByZero(__FILE__, __FUNCSIG__, __LINE__);
+						Seed::Core::Internals::Exceptions::ThrowDivideByZero(__FILE__, __FUNCSIG__, __LINE__);
 					else
 						return this->value / second.value;
 				}
@@ -110,7 +129,7 @@ namespace Seed {
 					if (static_cast<Int>(this->value + second.value) >= this->value)
 						return this->value = static_cast<Int>(this->value + second.value);
 					else
-						Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
 				///<summary>Віднімання від поточного числа</summary>
@@ -121,7 +140,7 @@ namespace Seed {
 					if (this->value >= second.value)
 						return this->value = static_cast<Int>(this->value - second.value);
 					else
-						Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				}
 
 #pragma warning(push)
@@ -137,7 +156,7 @@ namespace Seed {
 					{
 						UInt16 res = this->value * second.value;
 						if (res > Math::Max<Int>())
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
 					}
@@ -145,7 +164,7 @@ namespace Seed {
 					{
 						UInt32 res = this->value * second.value;
 						if (res > Math::Max<Int>())
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
 					}
@@ -153,21 +172,21 @@ namespace Seed {
 					{
 						UInt64 res = static_cast<UInt64>(this->value) * static_cast<UInt64>(second.value);
 						if (res > Math::Max<Int>())
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
 							return this->value = static_cast<Int>(res);
 					}
 					else if constexpr (TypeTraits::IsSameV<Int, UInt64>)
 					{
-						UInt64 res;
-						res = this->value * second.value;
-						if (__umulh(this->value, second.value) > 0)
-							Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+						UInt64 res[2];
+						_umul128Impl(this->value, second.value, res);
+						if (res[1] > 0)
+							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
-							return this->value = res;
+							return this->value = res[0];
 					}
 					//Unreacheable code
-					Internals::Exceptions::ThrowInternalError(__FILE__, __FUNCSIG__, __LINE__);
+					Seed::Core::Internals::Exceptions::ThrowInternalError(__FILE__, __FUNCSIG__, __LINE__);
 				}
 #pragma warning(pop)
 				/// <summary>
@@ -207,7 +226,7 @@ namespace Seed {
 			template<typename T>
 			TypeTraits::Signed<T> ConvertUnsignedToSigned(TypeTraits::Unsigned<T> From) {
 				if (From > static_cast<TypeTraits::Unsigned<T>>(Max<TypeTraits::Signed<T>>()))
-					Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
+					Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 				return static_cast<TypeTraits::Signed<T>>(From);
 			}
 #pragma endregion

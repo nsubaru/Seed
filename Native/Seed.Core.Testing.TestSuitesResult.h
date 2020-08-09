@@ -7,7 +7,7 @@ namespace Seed
 	{
 		namespace Testing
 		{
-			class TestSuiteResults final : IDisposable{
+			class TestSuiteResults final : IDisposable{ //-V1052
 			private:
 				struct Node {
 					Containers::Map<String, Node> Namespaces;

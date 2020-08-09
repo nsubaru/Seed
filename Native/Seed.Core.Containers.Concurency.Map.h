@@ -599,7 +599,7 @@ namespace Seed {
 					/// <param name="iterator">Оригинал</param>
 					forceinline Iterator(const Iterator& iterator) : item(iterator.item) {
 						if (item != nullptr)
-							item->RefCount++;
+							++item->RefCount;
 					}
 
 					/// <summary>
@@ -873,9 +873,9 @@ namespace Seed {
 						ForEachImplWithoutIndex(node->right, lambda);
 				}
 
-				template<typename LambdaT>
-				forceinline const BaseConcurencyMap& ForEachImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
+				template<typename TLambda>
+				forceinline const BaseConcurencyMap& ForEachImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&>) { 
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -885,7 +885,7 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>) { 
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -901,10 +901,10 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				forceinline BaseConcurencyMap& ForEachImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TKey, TValue>&> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&>) {
+				template<typename TLambda>
+				forceinline BaseConcurencyMap& ForEachImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockable<TLambda, BasePair<THeap, TKey, TValue>&> || 
+						TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&>) { 
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -914,8 +914,8 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TKey, TValue>&, SizeT> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TKey, TValue>&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockable<TLambda, BasePair<THeap, TKey, TValue>&, SizeT> ||
+						TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>) { 
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -950,9 +950,9 @@ namespace Seed {
 						ForEachKeyImplWithoutIndex(node->right, lambda);
 				}
 
-				template<typename LambdaT>
-				forceinline BaseConcurencyMap& ForEachKeyImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
+				template<typename TLambda>
+				forceinline BaseConcurencyMap& ForEachKeyImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -962,7 +962,7 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&, SizeT>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -978,9 +978,9 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				forceinline const BaseConcurencyMap& ForEachKeyImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&>) {
+				template<typename TLambda>
+				forceinline const BaseConcurencyMap& ForEachKeyImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -990,7 +990,7 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TKey&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&, SizeT>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -1025,9 +1025,9 @@ namespace Seed {
 						ForEachValueImplWithoutIndex(node->right, lambda);
 				}
 
-				template<typename LambdaT>
-				forceinline const BaseConcurencyMap& ForEachValueImpl(LambdaT&& lambda) const {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&> ) {
+				template<typename TLambda>
+				forceinline const BaseConcurencyMap& ForEachValueImpl(TLambda&& lambda) const {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&> ) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -1037,7 +1037,7 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&, SizeT>) {
 						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -1053,10 +1053,10 @@ namespace Seed {
 					}
 				}
 
-				template<typename LambdaT>
-				forceinline BaseConcurencyMap& ForEachValueImpl(LambdaT&& lambda) {
-					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TValue&> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&>) {
+				template<typename TLambda>
+				forceinline BaseConcurencyMap& ForEachValueImpl(TLambda&& lambda) {
+					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, TValue&> ||
+						TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)
@@ -1066,8 +1066,8 @@ namespace Seed {
 							return *this;
 							});
 					}
-					else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TValue&, SizeT> ||
-						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TValue&, SizeT>) {
+					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, TValue&, SizeT> ||
+						TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&, SizeT>) {
 						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
 							auto node = this->This->root;
 							if (node != nullptr)

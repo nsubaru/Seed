@@ -11,32 +11,32 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Memory {
-			class SeedKernelCall ExceptionHeap : public BasicHeap {
+			class ExceptionHeap final : public BasicHeap {
 			public:
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<returns>Виділену ділянку</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) final;
 				///<summary>Вирівнняне виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
 				///<returns>Виділену ділянку</returns>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) final;
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SizeT CurrentMemBlkCount() noexcept final;
+				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentAllocatedMemory() noexcept final;
+				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SizeT CurrentHeapUsage() noexcept final;
+				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept final;
 
 				ExceptionHeap& operator=(const ExceptionHeap&) = delete;
 			};
@@ -48,12 +48,12 @@ namespace Seed {
 		///<summary>Підсистема помилок в рантаймі</summary>
 		inline namespace Exceptions {
 			///<summary>Класс базової помилки</summary>
-			class SeedKernelCall Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
+			class Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
 			public:
 				/// <summary>
 				/// Сховище стеку викликів
 				/// </summary>
-				struct SeedKernelCall StackTraceRecord {
+				struct StackTraceRecord {
 					/// <summary>
 					/// Максимальна кількість адресів функцій які можуть зберігатись в сховищі
 					/// </summary>
@@ -70,7 +70,7 @@ namespace Seed {
 				};
 
 				///<summary>Місце генерації помилки</summary>
-				struct SeedKernelCall ExeptionLocation {
+				struct ExeptionLocation {
 					///<summary>Ім'я файла</summary>
 					ConstAString File;
 					///<summary>Ім'я функції</summary>
@@ -97,8 +97,8 @@ namespace Seed {
 
 				StackTraceRecord stackTrace;
 			private:
-				static ID GetTargetThreadID();
-				friend void GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace);
+				static SeedKernelCall ID GetTargetThreadID();
+				friend SeedKernelCall void GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace);
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -152,7 +152,7 @@ namespace Seed {
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
 				virtual ~Exception() {}
 			public:
-				class SeedKernelCall RawException final : IDisposable {
+				class RawException final : IDisposable {
 				private:
 					struct Data : Memory::Allocator<Memory::ExceptionHeap> {
 						void* ptr;
@@ -178,12 +178,12 @@ namespace Seed {
 					friend Exception;
 				};
 			public:
-				static RawException StoreCurrentException();
-				static void ThrowRawException(RawException& exception);
+				static SeedKernelCall RawException StoreCurrentException();
+				static SeedKernelCall void ThrowRawException(RawException& exception);
 			};
 
 			///<summary>Ділення на ноль</summary>
-			class SeedKernelCall DivideByZero final : public Exception {
+			class DivideByZero final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -211,7 +211,7 @@ namespace Seed {
 			///<para> - Execute - спроба виконати команду за неіснуючим адресом</para>
 			///<para>Тому помилка містить інформацію про тип доступу та адресс який пробували використати</para>
 			///</summary>
-			class SeedKernelCall NullPointException final : public Exception {
+			class NullPointException final : public Exception {
 			public:
 				///<summary> Можливі варіанти помилки</summary>
 				enum class Types : UInt8 { Read, Write, Execute };
@@ -263,7 +263,7 @@ namespace Seed {
 			};
 
 			///<summary>Використання невалідного дескриптора</summary>
-			class SeedKernelCall InvalidHandleUsage final : public Exception {
+			class InvalidHandleUsage final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -287,7 +287,7 @@ namespace Seed {
 			/// <summary>
 			/// Не знайдено 
 			/// </summary>
-			class SeedKernelCall NotFoundException : public Exception {
+			class NotFoundException : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -318,7 +318,7 @@ namespace Seed {
 			};
 
 			///<summary>Неможливо перетворити тип</summary>
-			class SeedKernelCall BadCast final : public Exception {
+			class BadCast final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -340,7 +340,7 @@ namespace Seed {
 			};
 
 			///<summary>Неможливо викликати віртуальну функцію</summary>
-			class SeedKernelCall BadPureCall final : public Exception {
+			class BadPureCall final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -362,7 +362,7 @@ namespace Seed {
 			};
 
 			///<summary>Вже існує</summary>
-			class SeedKernelCall AllredyExistException : public Exception {
+			class AllredyExistException : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -392,7 +392,7 @@ namespace Seed {
 			};
 
 			///<summary>Ключ вжк існує</summary>
-			class SeedKernelCall KeyAllredyExistException : public AllredyExistException {
+			class KeyAllredyExistException : public AllredyExistException {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -406,7 +406,7 @@ namespace Seed {
 			};
 
 			///<summary>Некоректний тип помилки</summary>
-			class SeedKernelCall BadException final : public Exception {
+			class BadException final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -428,7 +428,7 @@ namespace Seed {
 			};
 
 			///<summary>Недостатньо оперативної пам'яті для операції</summary>
-			class SeedKernelCall OutOfMemory final : public Exception {
+			class OutOfMemory final : public Exception {
 			private:
 				///<summary>Ім'я кучі</summary>
 				ConstString HeapName;
@@ -487,7 +487,7 @@ namespace Seed {
 			};
 
 			///<summary>Внутрішня помилка ядра</summary>
-			class SeedKernelCall InternalError final : public Exception {
+			class InternalError final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -509,7 +509,7 @@ namespace Seed {
 			};
 
 			///<summary>Невірний формат</summary>
-			class SeedKernelCall InvalidFormatException : public Exception {
+			class InvalidFormatException : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -531,7 +531,7 @@ namespace Seed {
 			};
 
 			///<summary>Невірний формат</summary>
-			class SeedKernelCall NotImplementedException final : public Exception {
+			class NotImplementedException final : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -553,7 +553,7 @@ namespace Seed {
 			};
 
 			///<summary>Доступ до елемента який знаходится за межею розмірів</summary>
-			class SeedKernelCall IndexOutOfRange : public Exception {
+			class IndexOutOfRange : public Exception {
 			private:
 				SizeT Index;
 				SizeT MaxIndex;
@@ -595,7 +595,7 @@ namespace Seed {
 			};
 
 			///<summary>Некоректний тип</summary>
-			class SeedKernelCall InvalidTypeException final : public Exception {
+			class InvalidTypeException final : public Exception {
 			private:
 				const TypeInfo& requiredType;
 				const TypeInfo& actuallyType;
@@ -637,7 +637,7 @@ namespace Seed {
 			};
 
 			///<summary>Невірний аргумент</summary>
-			class SeedKernelCall InvalidArgumentException final : public Exception {
+			class InvalidArgumentException final : public Exception {
 			private:
 				///<summary>Ім'я аргумента</summary>
 				ConstString ArgNameValue;
@@ -680,7 +680,7 @@ namespace Seed {
 			};
 
 			///<summary>Операцію перервано</summary>
-			class SeedKernelCall InteruptException final : protected Exception
+			class InteruptException final : protected Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -709,7 +709,7 @@ namespace Seed {
 			};
 
 			///<summary>Рядок має завеликий розмір</summary>
-			class SeedKernelCall StringToLong final : public Exception {
+			class StringToLong final : public Exception {
 			private:
 				///<summary>Запрошений розмір</summary>
 				SizeT requiredSize;
@@ -738,7 +738,7 @@ namespace Seed {
 			};
 
 			///<summary>Цілочисельне переповнення</summary>
-			class SeedKernelCall IntegerOverflowException : public Exception {
+			class IntegerOverflowException : public Exception {
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -757,7 +757,7 @@ namespace Seed {
 			};
 
 			///<summary>Ітератор на кінець не є визначеним</summary>
-			class SeedKernelCall EndNodeNotDeferencable final : public Exception
+			class EndNodeNotDeferencable final : public Exception
 			{
 			public:
 				///<summary>Конструктор помилки</summary>
@@ -780,7 +780,7 @@ namespace Seed {
 			/// <summary>
 			/// Виключення в NT функції
 			/// </summary>
-			class SeedKernelCall NtException : public Exception {
+			class NtException : public Exception {
 			private:
 				///<summary>NtStatus code операції</summary>
 				Int64 statusCode;
@@ -941,6 +941,15 @@ namespace Seed {
 
 				virtual ~EmptyQueueException() {}
 			};
+		}
+
+		namespace Concepts
+		{
+			/// <summary>
+			/// Перевірка чи заданий тип є типом помилки(Seed::Core::Exception або похідний від нього клас)
+			/// </summary>
+			template<typename T>
+			concept IsException = IsSame<T, Exceptions::Exception> || IsBasedOn<Exceptions::Exception, T>;
 		}
 	}
 }

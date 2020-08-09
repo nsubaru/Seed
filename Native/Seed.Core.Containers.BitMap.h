@@ -353,23 +353,23 @@ namespace Seed {
 				/// <returns></returns>
 				constexpr SizeT SettedBitCount()
 				{
-					SizeT Count = 0;
+					SizeT settedCount = 0;
 					for (SizeT byte = 0; byte < FullClustersCount; byte++)
 					{
 						if (bitMap[byte] == 0)
-							Count += BitCountInFragment;
+							settedCount += BitCountInFragment;
 						else
 							for (SizeT j = 0; j < BitCountInFragment; j++)
 								if (Bits::BitCheck(bitMap[byte], j))
-									Count++;
+									settedCount++;
 					}
 					if constexpr (FullClustersCount > Size)
 					{
 						for (SizeT j = 0; j < BitCountInFragment; j++)
 							if (Bits::BitCheck(bitMap[FullClustersCount], j))
-								Count++;
+								settedCount++;
 					}
-					return Count;
+					return settedCount;
 				};
 
 				/// <summary>

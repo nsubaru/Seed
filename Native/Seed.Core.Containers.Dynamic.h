@@ -13,7 +13,7 @@ namespace Seed
             /// <summary>
             /// Динамічний об'єкт, тип даних відомий при виконанні, містить кортеж змінних
             /// </summary>
-            class Dynamic final : protected IDisposable, public IClonable<Dynamic> {
+            class Dynamic final : protected IDisposable, public IClonable<Dynamic> { //-V1052
             private:
                 /// <summary>
                 /// Інтерфейс динамічного типу
@@ -90,6 +90,12 @@ namespace Seed
                     /// <param name="other"></param>
                     DynamicImpl(const DynamicImpl& other) : data(other.data) {}
 
+                    /// <summary>
+                    /// Конструктор переміщення
+                    /// </summary>
+                    /// <param name="other"></param>
+                    DynamicImpl(DynamicImpl&& other) : data(MoveRValue(other.data)) {}
+
                 public:
                     /// <summary>
                     /// Конструктор з пакету змінних
@@ -102,6 +108,28 @@ namespace Seed
                     /// </summary>
                     /// <param name="types">Пакет змінних</param>
                     DynamicImpl(Tuple<TTypes...>&& types) : data(ForwardReference<Tuple<TTypes...>>(types)) {}
+
+                    /// <summary>
+                    /// Оператор присвоєння
+                    /// </summary>
+                    /// <param name="other">Лівий операнд</param>
+                    /// <returns>Посилання на поточний об'єкт</returns>
+                    DynamicImpl& operator=(const DynamicImpl& other) {
+                        this->~DynamicImpl();
+                        this->DynamicImpl::DynamicImpl(other);
+                        return *this;
+                    }
+
+                    /// <summary>
+                    /// Оператор присвоєння
+                    /// </summary>
+                    /// <param name="other">Лівий операнд</param>
+                    /// <returns>Посилання на поточний об'єкт</returns>
+                    DynamicImpl& operator=(DynamicImpl&& other) {
+                        this->~DynamicImpl();
+                        this->DynamicImpl::DynamicImpl(MoveRValue(other));
+                        return *this;
+                    }
 
                     /// <summary>
                     /// Клонування імплементації dynamic
@@ -194,7 +222,7 @@ namespace Seed
                 /// </summary>
                 /// <param name="other">Оригинал</param>
                 Dynamic(Dynamic& other) : This(other.This) {
-                    other.This->RefCount++;
+                    ++other.This->RefCount;
                 }
 
                 /// <summary>

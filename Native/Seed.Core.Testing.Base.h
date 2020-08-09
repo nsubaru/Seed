@@ -2,6 +2,7 @@
 #include "Seed.Core.Containers.h"
 #include "Seed.Core.String.h"
 #include "Seed.Core.CTTI.h"
+#include "Seed.Core.RTTI.h"
 
 #include "Seed.Core.Testing.Asserts.h"
 
@@ -20,27 +21,23 @@ namespace Seed {
             };
 
             /// <summary>
-            /// Базовий класс тесту
-            /// </summary>
-            class BaseTest {
-            protected:
-                friend void LoadTest(String&& name, ITest*&& instance);
-            public:
-                virtual ~BaseTest() = 0 {}
-            };
-
-            /// <summary>
             /// Класс тесту
             /// </summary>
             template<typename TTest>
-            class TestClass : BaseTest, public ITest {
+            class TestClass : public ITest {
             private:
-                static bool GenTestRecord() {
-                    LoadTest(Core::CTTI::TypeName<TTest>(), (ITest*)new TTest());
-                    return true;
+                friend SizeT LoadTest(RTTI::RTTITypeRecord&& typeRecord, ITest&(*testObjGenerator)());
+            private:
+                static volatile void* volatile GenTestRecord() {
+                    return (volatile void*) LoadTest(TypeRecord<TTest>(), [] () -> ITest&
+                    {
+                        static auto test = TTest();
+                        return test;
+                    });
                 }
             private:
-                inline static volatile bool Result = GenTestRecord();
+#pragma section(".TEST$a",read)
+                [[maybe_unused]] __declspec(allocate(".TEST$a")) inline static volatile void* volatile Result = GenTestRecord();
             public:
                 virtual ~TestClass() {}
             };
@@ -50,7 +47,7 @@ namespace Seed {
             /// </summary>
             namespace
             {
-                using TestRecord = Containers::Pair<String, ITest*>;
+                using TestRecord = Containers::Pair<Core::RTTI::RTTITypeRecord, ITest&(*)()>;
             }
 		}
 	}

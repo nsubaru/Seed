@@ -15,39 +15,39 @@ namespace Seed {
 					//Ìåíåäæåğ ïàì'ÿò³
 					{
 						//Ñåêö³ÿ ñòàíäàğòíîãî àëîêàòîğà ïàì'ÿò³
-						DefaultSettings.MainMemoryManager.DefaultHeap.StartSize = 2Mb;
+						DefaultSettings.MainMemoryManager.DefaultHeap.StartSize = 40Mb;
 						DefaultSettings.MainMemoryManager.DefaultHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
-						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalÑhecks = { 0xf };
+						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalÑhecks = { 0x1, 0x1, 0x1, 0x1 };
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
-						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalÑhecks = { 0xf };
+						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalÑhecks = { 0x1, 0x1, 0x1, 0x1 };
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = true;
 #else
 						DefaultSettings.MainMemoryManager.DefaultHeap.AdditionalÑhecks = { 0 };
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = false;
 #endif
 						//Ñåêö³ÿ çàõèùåíîãî àëîêàòîğà ïàì'ÿò³
-						DefaultSettings.MainMemoryManager.SensitiveDataHeap.StartSize = 1Mb;
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.StartSize = 20Mb;
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
-						DefaultSettings.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks = { 0xf };
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks = { 0x1, 0x1, 0x1, 0x1 };
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
-						DefaultSettings.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks = { 0xf };
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks = { 0x1, 0x1, 0x1 };
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = true;
 #else
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks = { 0 };
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = false;
 #endif
 						//Ñåêö³ÿ àëîêàòîğà ïàì'ÿò³ äëÿ îáğîáíèêà ïîìèëîê
-						DefaultSettings.MainMemoryManager.ExceptionHeap.StartSize = 20Mb;
+						DefaultSettings.MainMemoryManager.ExceptionHeap.StartSize = 80Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
-						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalÑhecks = { 0xf };
+						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalÑhecks = { 0x1, 0x1, 0x1, 0x1 };
 						DefaultSettings.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
-						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalÑhecks = { 0xf };
+						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalÑhecks = { 0x1, 0x1, 0x1, 0x1 };
 						DefaultSettings.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree = true;
 #else
 						DefaultSettings.MainMemoryManager.ExceptionHeap.AdditionalÑhecks = { 0 };
@@ -70,6 +70,8 @@ namespace Seed {
 						{
 							DefaultSettings.Threading.Thread.StackStartSize = 5Mb;
 							DefaultSettings.Threading.Thread.StackMaxSize = 10Mb;
+							DefaultSettings.Threading.Thread.StopKernelThreadsTimeout = 
+								static_cast<DateTime>(DateSpan(0, 0, 0, 0, 0, 3, 0, 0)).GetAsRelativeTime();
 						}
 					}
 

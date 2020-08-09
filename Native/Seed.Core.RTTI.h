@@ -53,27 +53,27 @@ namespace Seed
 				))
 				{}
 
-				forceinline const String& GetTypeName() {
+				forceinline const String& GetTypeName() const {
 					return *data->TypeName;
 				}
 
-				forceinline const String& GetCxxTypeName() {
+				forceinline const String& GetCxxTypeName() const {
 					return *data->CxxTypeName;
 				}
 
-				forceinline CTTI::TypeTraits::EType GetCxxTypeClass() {
+				forceinline CTTI::TypeTraits::EType GetCxxTypeClass() const {
 					return data->TypeClass;
 				}
 
-				forceinline Boolean GetIsSerilizeable() {
+				forceinline Boolean GetIsSerilizeable() const {
 					return data->IsSerilizeable;
 				}
 
-				forceinline const auto& TypeId() {
+				forceinline const auto& TypeId() const {
 					return *data->rttiTypeInfo;
 				}
 
-				forceinline ID GetHashCode() {
+				forceinline ID GetHashCode() const {
 					return data->rttiTypeInfo->GetHashCode();
 				}
 			public:
@@ -108,7 +108,7 @@ namespace Seed
 				}
 
 				forceinline friend auto operator!=(const TypeInfo& other, const RTTITypeRecord& item) {
-					return other == *item.data->rttiTypeInfo;
+					return other != *item.data->rttiTypeInfo;
 				}
 
 				forceinline friend auto operator<=>(const TypeInfo& other, const RTTITypeRecord& item) {
@@ -116,7 +116,7 @@ namespace Seed
 				}
 			};
 
-			class RTTIFunction : IDisposable, public Serilization::ISerilizable<RTTITypeRecord> {
+			class RTTIFunction : IDisposable, public Serilization::ISerilizable<RTTIFunction> {
 				struct Data{
 					RTTITypeRecord FunctionRecord;
 					RTTITypeRecord FunctionRetRecord;
@@ -165,7 +165,7 @@ namespace Seed
 				const auto& FunctionTypeId() { return data->FunctionRecord.TypeId(); }
 			};
 
-			class RTTIMethod : IDisposable, Serilization::ISerilizable<RTTITypeRecord> {
+			class RTTIMethod : IDisposable, Serilization::ISerilizable<RTTIMethod> {
 				struct Data{
 					RTTITypeRecord MethodRecord;
 					RTTITypeRecord MethodClassRecord;
