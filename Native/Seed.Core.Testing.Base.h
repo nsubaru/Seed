@@ -21,20 +21,12 @@ namespace Seed {
             };
 
             /// <summary>
-            /// Базовий класс тесту
-            /// </summary>
-            class BaseTest {
-            protected:
-                friend SizeT LoadTest(RTTI::RTTITypeRecord&& typeRecord, ITest&(*testObjGenerator)());
-            public:
-                virtual ~BaseTest() = 0 {}
-            };
-
-            /// <summary>
             /// Класс тесту
             /// </summary>
             template<typename TTest>
-            class TestClass : BaseTest, public ITest {
+            class TestClass : public ITest {
+            private:
+                friend SizeT LoadTest(RTTI::RTTITypeRecord&& typeRecord, ITest&(*testObjGenerator)());
             private:
                 static volatile void* volatile GenTestRecord() {
                     return (volatile void*) LoadTest(TypeRecord<TTest>(), [] () -> ITest&

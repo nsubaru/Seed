@@ -26,6 +26,10 @@ CurrentSettings::VirtualSettingData CurrentVirtualSettingsData;
 
 CurrentSettings::SettingsData oldCurrentSettingsData;
 
+Threading::SRWLock& GetSettingsLockObj() {
+	static Threading::SRWLock settingsLock;
+	return settingsLock;
+}
 
 namespace Seed {
 	inline namespace Core {
@@ -41,11 +45,6 @@ namespace Seed {
 		TChangeSettingCallback& GetChangeSettingCallback() {
 			static TChangeSettingCallback callback = nullptr;
 			return callback;
-		}
-
-		Threading::SRWLock& GetSettingsLockObj() {
-			static Threading::SRWLock settingsLock;
-			return settingsLock;
 		}
 
 		const CurrentSettings::SettingsData& CurrentSettings::GetCurrentSettingDataRaw() {

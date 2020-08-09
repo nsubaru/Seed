@@ -139,17 +139,6 @@ namespace Seed {
 template<typename TF, typename ... TArgs>
 class TemplateFunctionT final :public Seed::Core::FunctionObj
 {
-    static forceinline decltype(auto) call(TF f, Seed::Containers::Tuple<TArgs...> args)
-    {
-        if constexpr (Seed::TypeTraits::IsSameV<decltype(args.CallWithArgsFromTuple(f)), void>){
-            args.CallWithArgsFromTuple(f);
-        }
-        else
-        {
-            return args.CallWithArgsFromTuple(f);
-        }
-    }
-
     //Функція
     TF f;
     //Контейнер для результату
@@ -161,7 +150,7 @@ class TemplateFunctionT final :public Seed::Core::FunctionObj
     //Флаг запуску функції
     volatile bool isStarted = false;
 
-    using retType = typename Seed::TypeTraits::RemoveCVRefV<decltype(call(f, args))>;
+    using retType = typename Seed::TypeTraits::RemoveCVRefV<decltype(args.CallWithArgsFromTuple(f))>;
 protected:
     //Вертає результат
     //Генерить наступні ексепшини
@@ -170,14 +159,19 @@ protected:
     forceinline virtual void* __get_result(const Seed::TypeInfo& type) override final
     {
         if constexpr (Seed::Core::TypeTraits::IsSameT<retType, void>::State)
+        {
             Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(void), type));
-        else if (result == nullptr)
-            Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
+        }
         else
         {
-            if (typeid(decltype(call(f, args))).GetHashCode() != type.GetHashCode())
-                Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(retType), type));
-            return result;
+            if (result == nullptr)
+                Throw(Seed::NullPointException(ExceptionPosition, reinterpret_cast<Seed::SizeT>(this->result), Seed::NullPointException::Types::Read));
+            else
+            {
+                if (typeid(retType) != type)
+                    Throw(Seed::InvalidTypeException(ExceptionPosition, typeid(retType), type));
+                return result;
+            }
         }
     }
 public:
@@ -193,12 +187,12 @@ public:
             {
                 //Якщо ні то запамятовує результат в покажчику res
                 //В який переміщає конструктором переміщення результат
-                result = new retType(call(f, args));
+                result = new retType(args.CallWithArgsFromTuple(f));
             }
             //Якщо функція вертає void то просто викликаєм її
             else
             {
-                call(f, args);
+                args.CallWithArgsFromTuple(f);
             }
             //NOTE: Знищення аргументів(якщо цього не робити то модливі циклічні силки в деяких випадках)
             args.~Tuple<TArgs...>();
@@ -233,7 +227,7 @@ public:
     //Деструктор, видаляє результат якщо він є
     forceinline virtual ~TemplateFunctionT() override final
     {
-        if constexpr (!Seed::Core::TypeTraits::IsSameT<decltype(call(f, args)), void>::State)
+        if constexpr (!Seed::Core::TypeTraits::IsSameT<retType, void>::State)
             if (result != nullptr)
             {
                 delete reinterpret_cast<Seed::TypeTraits::AddPointer<retType>>(result);
@@ -241,6 +235,9 @@ public:
             }
     }
 };
+//
+//template<typename TF, typename ... TArgs>
+//TemplateFunctionT(TF&& f, TArgs&&... args)->TemplateFunctionT<TF&&, Seed::TypeTraits::SpecialDecayT<TArgs>...>;
 
 namespace Seed {
     inline namespace Core {

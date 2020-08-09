@@ -82,7 +82,7 @@ namespace Seed
 				template<typename ... TTypes>
 				DynamicObject(const Containers::Tuple<TTypes...>& tuple) : data(new Data(new DynamicImpl(tuple))) {}
 				template<typename ... TTypes>
-				DynamicObject(Containers::Tuple<TTypes...>&& tuple) : data(new Data(MoveRValue(new DynamicImpl(MoveRValue(tuple))))) {}
+				DynamicObject(Containers::Tuple<TTypes...>&& tuple) : data(new Data(new DynamicImpl(MoveRValue(tuple)))) {}
 
 				RTTI::RTTITypeRecord GetValueType() const { return data->impl->GetValueType(); }
 				String GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }

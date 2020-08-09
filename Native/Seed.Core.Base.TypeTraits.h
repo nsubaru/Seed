@@ -14,3 +14,4 @@
 #include "Seed.Core.Base.TypeTraits.Function.h"
 #include "Seed.Core.Base.TypeTraits.Lambda.h"
 #include "Seed.Core.Base.TypeTraits.Invockable.h"
+#include "Seed.Core.Base.TypeTraits.ReferenceWraper.h"
