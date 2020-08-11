@@ -690,6 +690,9 @@ namespace Seed
 					{
 						if constexpr (IsValueSerilizable)
 						{
+							//TODO: temp solution for compiling. Think how pass TypeRegistry
+							auto registry = Core::Serilization::TypesRegistry();
+
 							auto pObjGet = pGet;
 							auto emptyArgs = DynamicObject(Containers::Tuple<>());
 							//HACK: we know that getter use const object but for unification method caller lambda use object without 
@@ -697,7 +700,7 @@ namespace Seed
 							auto propValue = GetCaller(reinterpret_cast<void*&>(pObjGet), const_cast<DynamicObject&>(data), emptyArgs)
 								.GetValue<PropType>()
 								.GetByIdx<0>();
-							return Serilization::Serilize(propValue);
+							return Serilization::Serilize(propValue, registry);
 						}
 						else
 						{

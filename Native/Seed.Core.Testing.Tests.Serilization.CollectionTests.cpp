@@ -2,25 +2,32 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Testing,Tests.Serilization.CollectionTests.h"
+#include "Seed.Core.Serilization.h"
+#include "Seed.Core.RTTI.h"
+#include "Seed.Core.Reflection.h"
 
 bool Seed::Core::Testing::Test::Serilization::StringSerilization::Excecute() {
+	auto registry = Core::Serilization::TypesRegistry();
+
     String Value = __FUNCSIG__;
-    const auto stream = Core::Serilization::Serilize(Value);
+    const auto stream = Core::Serilization::Serilize(Value, registry);
     decltype(Value) deserelizedValue;
-     Core::Serilization::Deserilize(stream, deserelizedValue);
+     Core::Serilization::Deserilize(stream, deserelizedValue, registry);
     return Value == deserelizedValue;
 }
 
 bool Seed::Core::Testing::Test::Serilization::ArraySerilization::Excecute() {
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto array = Containers::Array<Containers::Array<SizeT>>::Generate([](){
 			return Containers::Array<SizeT>::Generate([](SizeT Index){
 				return Index * 10;
 			}, 100);
 		}, 100);
 
-	const auto stream = Core::Serilization::Serilize(array);
+	const auto stream = Core::Serilization::Serilize(array, registry);
 	decltype(array) deserelizedArray;
-	Core::Serilization::Deserilize(stream, deserelizedArray);
+	Core::Serilization::Deserilize(stream, deserelizedArray, registry);
 	for (SizeT i = 0; i < 100; i++)
 	{
 		for (SizeT j = 0; j < 100; j++)
@@ -34,15 +41,17 @@ bool Seed::Core::Testing::Test::Serilization::ArraySerilization::Excecute() {
 }
 
 bool Seed::Core::Testing::Test::Serilization::ListSerilization::Excecute() {
-		auto list = Containers::List<Containers::List<SizeT>>::Generate([](){
-			return Containers::List<SizeT>::Generate([](SizeT Index){
-				return Index * 10;
-			}, 100);
-		}, 100);
+	auto registry = Core::Serilization::TypesRegistry();
 
-		const auto stream =  Core::Serilization::Serilize(list);
+	auto list = Containers::List<Containers::List<SizeT>>::Generate([](){
+		return Containers::List<SizeT>::Generate([](SizeT Index){
+			return Index * 10;
+		}, 100);
+	}, 100);
+
+	const auto stream =  Core::Serilization::Serilize(list, registry);
 	decltype(list) deserelizedList;
-	 Core::Serilization::Deserilize(stream, deserelizedList);
+	Core::Serilization::Deserilize(stream, deserelizedList, registry);
 
 	if(list.Count != deserelizedList.Count)
 		return false;
@@ -73,15 +82,17 @@ bool Seed::Core::Testing::Test::Serilization::ListSerilization::Excecute() {
 
 bool Seed::Testing::Test::Serilization::DynamicQueue::Excecute()
 {
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto queue = Containers::DynamicQueue<Containers::DynamicQueue<SizeT>>::Generate([](){
 		return Containers::DynamicQueue<SizeT>::Generate([](SizeT index){
 			return index * 10;
 		}, 100);
 	}, 100);
 
-	auto stream = Core::Serilization::Serilize(queue);
+	auto stream = Core::Serilization::Serilize(queue, registry);
 	decltype(queue) deserelizedQueue;
-	Core::Serilization::Deserilize(stream, deserelizedQueue);
+	Core::Serilization::Deserilize(stream, deserelizedQueue, registry);
 
 	if(queue.Count != deserelizedQueue.Count)
 		return false;
@@ -106,6 +117,8 @@ bool Seed::Testing::Test::Serilization::DynamicQueue::Excecute()
 
 bool Seed::Testing::Test::Serilization::FixedArray::Excecute()
 {
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto array = Core::Containers::FixedArray<10, Core::Containers::FixedArray<10, SizeT>>::Generate([](SizeT i)
 		{
 			return Core::Containers::FixedArray<10, SizeT>::Generate([&](SizeT j)
@@ -114,10 +127,10 @@ bool Seed::Testing::Test::Serilization::FixedArray::Excecute()
 				});
 		});
 
-	const auto stream = Core::Serilization::Serilize(array);
+	const auto stream = Core::Serilization::Serilize(array, registry);
 
 	decltype(array) deserelizedArray;
-	Core::Serilization::Deserilize(stream, deserelizedArray);
+	Core::Serilization::Deserilize(stream, deserelizedArray, registry);
 
 	if(array.Count != deserelizedArray.Count)
 		return false;
@@ -136,6 +149,8 @@ bool Seed::Testing::Test::Serilization::FixedArray::Excecute()
 
 bool Seed::Testing::Test::Serilization::FixedQueue::Excecute()
 {
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto queue = Core::Containers::FixedQueue<10, Core::Containers::FixedQueue<10, Int32>>{
 		{1,2,3,4,5},
 		{1,2,3,4,5},
@@ -143,10 +158,10 @@ bool Seed::Testing::Test::Serilization::FixedQueue::Excecute()
 		{1,2,3,4,5}
 	};
 
-	const auto stream = Core::Serilization::Serilize(queue);
+	const auto stream = Core::Serilization::Serilize(queue, registry);
 
 	decltype(queue) deserelizedQueue;
-	Core::Serilization::Deserilize(stream, deserelizedQueue);
+	Core::Serilization::Deserilize(stream, deserelizedQueue, registry);
 
 	if(queue.Count != deserelizedQueue.Count)
 		return false;
@@ -171,6 +186,8 @@ bool Seed::Testing::Test::Serilization::FixedQueue::Excecute()
 
 bool Seed::Testing::Test::Serilization::Dictionary::Excecute()
 {
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto dictionary = Core::Containers::Dictionary<Int32>{
 		{L"один", 1},
 		{L"два", 2},
@@ -183,10 +200,10 @@ bool Seed::Testing::Test::Serilization::Dictionary::Excecute()
 		{L"дев'ять", 9},
 	};
 
-	const auto stream = Core::Serilization::Serilize(dictionary);
+	const auto stream = Core::Serilization::Serilize(dictionary, registry);
 	decltype(dictionary) deserelizedDictionary;
 
-	Core::Serilization::Deserilize(stream,deserelizedDictionary);
+	Core::Serilization::Deserilize(stream,deserelizedDictionary, registry);
 
 	if(dictionary.Count != deserelizedDictionary.Count)
 		return false;
@@ -213,6 +230,8 @@ bool Seed::Testing::Test::Serilization::Dictionary::Excecute()
 
 bool Seed::Testing::Test::Serilization::Map::Excecute()
 {
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto map = Core::Containers::Map<String, Int32>{
 		{L"один", 1},
 		{L"два", 2},
@@ -225,10 +244,10 @@ bool Seed::Testing::Test::Serilization::Map::Excecute()
 		{L"дев'ять", 9},
 	};
 
-	const auto stream = Core::Serilization::Serilize(map);
+	const auto stream = Core::Serilization::Serilize(map, registry);
 	decltype(map) deserelizedMap;
 
-	Core::Serilization::Deserilize(stream,deserelizedMap);
+	Core::Serilization::Deserilize(stream,deserelizedMap, registry);
 
 	if(map.Count != deserelizedMap.Count)
 		return false;
@@ -250,6 +269,8 @@ bool Seed::Testing::Test::Serilization::Map::Excecute()
 
 bool Seed::Testing::Test::Serilization::PriorityQueue::Excecute()
 {
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto priortyQueue = Containers::PriorityQueue<Int32, String>{
 		{1, "один"},
 		{1, "два"},
@@ -263,10 +284,10 @@ bool Seed::Testing::Test::Serilization::PriorityQueue::Excecute()
 		{2, "десять"}
 	};
 
-	const auto stream = Core::Serilization::Serilize(priortyQueue);
+	const auto stream = Core::Serilization::Serilize(priortyQueue, registry);
 	decltype(priortyQueue) deserelizedPriortyQueue;
 
-	Core::Serilization::Deserilize(stream,deserelizedPriortyQueue);
+	Core::Serilization::Deserilize(stream,deserelizedPriortyQueue, registry);
 
 	if(priortyQueue.Count != deserelizedPriortyQueue.Count)
 		return false;

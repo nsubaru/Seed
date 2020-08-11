@@ -217,6 +217,24 @@ namespace Seed
                 }
             };
         }
+
+        namespace TypeTraits
+        {
+            template<typename T>
+            struct IsTupleT : LogicFalse {};
+
+            template<typename ... Types>
+            struct IsTupleT<Containers::Tuple<Types...>> : LogicTrue {};
+
+            template<typename T>
+            constexpr bool IsTupleV = IsTupleT<T>::State;
+        }
+
+        namespace Concepts
+        {
+            template<typename T>
+            concept Tuple = TypeTraits::IsTupleV<T>;
+        }
     }
 }
 

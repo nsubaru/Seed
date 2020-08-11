@@ -18,36 +18,36 @@ namespace Seed
 					using Tuple = TTuple<TTypes...>;
 
 					template<SizeT Index = 0>
-					forceinline static void SerilizeTupleItem(const Tuple& data, Byte* rawStream, SizeT& offset){
+					forceinline static void SerilizeTupleItem(const Tuple& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
 						if constexpr(Index == sizeof...(TTypes))
 							return;
 						else{
 							using Type = typename Tuple::ItemType<Index>;
-							BaseSerlizationHandler<THeap, Type>::SerilizeImpl(data.GetByIdx<Index>(), rawStream, offset);
-							SerilizeTupleItem<Index + 1>(data, rawStream, offset);
+							BaseSerlizationHandler<THeap, Type>::SerilizeImpl(data.GetByIdx<Index>(), rawStream, offset, registry);
+							SerilizeTupleItem<Index + 1>(data, rawStream, offset, registry);
 						}
 					}
 
 					template<SizeT Index = 0>
-					forceinline static void DeserelizeTupleItem(Tuple& data, const Byte* rawStream, SizeT& offset){
+					forceinline static void DeserelizeTupleItem(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
 						if constexpr(Index == sizeof...(TTypes))
 							return;
 						else{
 							using Type = typename Tuple::ItemType<Index>;
-							BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(data.GetByIdx<Index>(), rawStream, offset);
-							DeserelizeTupleItem<Index + 1>(data, rawStream, offset);
+							BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(data.GetByIdx<Index>(), rawStream, offset, registry);
+							DeserelizeTupleItem<Index + 1>(data, rawStream, offset, registry);
 						}
 					}
 
 					template<SizeT Index = 0>
-					forceinline static SizeT DataSizeTuppleItem(const Tuple& data){
+					forceinline static SizeT DataSizeTuppleItem(const Tuple& data, UnusedData const TypesRegistry& registry){
 						if constexpr(Index == sizeof...(TTypes))
 							return 0;
 						else{
 							using Type = typename Tuple::ItemType<Index>;
-							return BaseSerlizationHandler<THeap, Type>::DataSize(data.GetByIdx<Index>())
+							return BaseSerlizationHandler<THeap, Type>::DataSize(data.GetByIdx<Index>(), registry)
 								+
-							DataSizeTuppleItem<Index + 1>(data);
+							DataSizeTuppleItem<Index + 1>(data, registry);
 						}
 					}
 
@@ -63,16 +63,16 @@ namespace Seed
 						}
 					}
 
-					forceinline static void SerilizeImpl(const Tuple& data, Byte* rawStream, SizeT& offset) {
-						SerilizeTupleItem(data, rawStream, offset);
+					forceinline static void SerilizeImpl(const Tuple& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						SerilizeTupleItem(data, rawStream, offset, registry);
 					}
 
 					forceinline static constexpr Boolean IsMemCopy() {
 						return false;
 					}
 
-					forceinline static constexpr SizeT DataSize(const Tuple& data) {
-						return DataSizeTuppleItem(data);
+					forceinline static constexpr SizeT DataSize(const Tuple& data, UnusedData const TypesRegistry& registry) {
+						return DataSizeTuppleItem(data, registry);
 					}
 
 					forceinline static constexpr auto TypeHint() {
@@ -102,8 +102,8 @@ namespace Seed
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
                     }
 
-					forceinline static void DeserelizeImpl(Tuple& data, const Byte* rawStream, SizeT& offset) {
-						DeserelizeTupleItem(data, rawStream, offset);
+					forceinline static void DeserelizeImpl(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						DeserelizeTupleItem(data, rawStream, offset, registry);
 					}
 				};
 
@@ -117,7 +117,7 @@ namespace Seed
 					using ISerilizable = CTTI::TypeTraits::ISerilizable<TObject>;
 
 					template<SizeT I = 0>
-					forceinline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset) {
+					forceinline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						if constexpr (I < StructFieldsMetaData::Count)
 						
 						{
@@ -128,15 +128,15 @@ namespace Seed
 								BaseSerlizationHandler<THeap, Type>::SerilizeImpl(
 									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
 									rawStream, 
-									offset);
-								SerelizeFieldsImpl<I + 1>(fiedsPtr, rawStream, offset);
+									offset, registry);
+								SerelizeFieldsImpl<I + 1>(fiedsPtr, rawStream, offset, registry);
 							}
 							else
 							{
 								BaseSerlizationHandler<THeap, Type>::SerilizeImpl(
 									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
 									rawStream, 
-									offset);
+									offset, registry);
 							}
 						}
 						else
@@ -147,7 +147,7 @@ namespace Seed
 
 					
 					template<SizeT I = 0>
-					forceinline static void DeserelizeFieldsImp(Byte * fiedsPtr, const Byte* rawStream, SizeT& offset){
+					forceinline static void DeserelizeFieldsImp(Byte * fiedsPtr, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -157,14 +157,14 @@ namespace Seed
 								BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(
 									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
 									rawStream, 
-									offset);
-								DeserelizeFieldsImp<I + 1>(fiedsPtr, rawStream, offset);
+									offset, registry);
+								DeserelizeFieldsImp<I + 1>(fiedsPtr, rawStream, offset, registry);
 							}
 							else{
 								BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(
 									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
 									rawStream, 
-									offset);
+									offset, registry);
 							}
 						}
 						else
@@ -174,7 +174,7 @@ namespace Seed
 					}
 
 					template<SizeT I = 0>
-					forceinline static SizeT DataSizeFieldsImp(Byte * fiedsPtr){
+					forceinline static SizeT DataSizeFieldsImp(Byte * fiedsPtr, UnusedData const TypesRegistry& registry){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -183,13 +183,13 @@ namespace Seed
 							if constexpr (I + 1 < StructFieldsMetaData::Count)
 								return 
 									BaseSerlizationHandler<THeap, Type>::DataSize(
-										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset))
+										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), registry)
 									+
-									DataSizeFieldsImp<I + 1>(fiedsPtr);
+									DataSizeFieldsImp<I + 1>(fiedsPtr, registry);
 							else
 								return
 									BaseSerlizationHandler<THeap, Type>::DataSize(
-										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset));
+										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), registry);
 						}
 						else
 						{
@@ -255,23 +255,23 @@ namespace Seed
 						}
 					}
 
-					forceinline static void SerilizeImpl(const TObject& data, Byte* rawStream, SizeT& offset) {
+					forceinline static void SerilizeImpl(const TObject& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						const auto& iSerelizeable = static_cast<const ISerilizable&>(data);
-						SerelizeFieldsImpl(iSerelizeable.GetDataPtr(), rawStream, offset);
+						SerelizeFieldsImpl(iSerelizeable.GetDataPtr(), rawStream, offset, registry);
 					}
 
-					forceinline static void DeserelizeImpl(TObject& data, const Byte* rawStream, SizeT& offset) {
+					forceinline static void DeserelizeImpl(TObject& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						auto& iSerelizeable = static_cast<ISerilizable&>(data);
-						DeserelizeFieldsImp(iSerelizeable.GetDataPtr(), rawStream, offset);
+						DeserelizeFieldsImp(iSerelizeable.GetDataPtr(), rawStream, offset, registry);
 					}
 
 					forceinline static constexpr Boolean IsMemCopy() {
 						return false;
 					}
 
-					forceinline static constexpr SizeT DataSize(const TObject& data) {
+					forceinline static constexpr SizeT DataSize(const TObject& data, UnusedData const TypesRegistry& registry) {
 						const auto& iSerelizeable = static_cast<const ISerilizable&>(data);
-						return DataSizeFieldsImp(iSerelizeable.GetDataPtr());
+						return DataSizeFieldsImp(iSerelizeable.GetDataPtr(), registry);
 					}
 
 					forceinline static constexpr auto TypeHint() {

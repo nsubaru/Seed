@@ -18,11 +18,11 @@ namespace Seed
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsSerilizableEnum<T>, void>> {
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         Memory::Copy(reinterpret_cast<const Byte*>(&data), rawStream + offset, sizeof(T)); offset += sizeof(T);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data) {
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(T);
                     }
 
@@ -40,7 +40,7 @@ namespace Seed
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         data = *(reinterpret_cast<const T*>(rawStream + offset)); offset += sizeof(T);
                     }
 
@@ -67,12 +67,12 @@ namespace Seed
                     using T = DateTime;
                     using TValue = typename CTTI::TypeTraits::CTTITypeMetaData<T>::NumericType;
 
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         auto value = data.TimeFromStartEpoch;
                         Memory::Copy(reinterpret_cast<const Byte*>(&value), rawStream + offset, sizeof(TValue)); offset += sizeof(TValue);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data) {
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(TValue);
                     }
 
@@ -90,7 +90,7 @@ namespace Seed
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         data = *(reinterpret_cast<const TValue*>(rawStream + offset)); offset += sizeof(T);
                     }
 
@@ -118,12 +118,12 @@ namespace Seed
                     using PlainTime = typename CTTI::TypeTraits::CTTITypeMetaData<T>::PlainTime;
                     using TValue = typename CTTI::TypeTraits::CTTITypeMetaData<PlainTime>::NumericType;
 
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         auto value = static_cast<PlainTime>(data).TimeFromStartEpoch;
                         Memory::Copy(reinterpret_cast<const Byte*>(&value), rawStream + offset, sizeof(TValue)); offset += sizeof(TValue);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data) {
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(TValue);
                     }
 
@@ -141,7 +141,7 @@ namespace Seed
                             CTTI::Details::ToCharStr<sizeof(TValue)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         auto value = *(reinterpret_cast<const TValue*>(rawStream + offset)); offset += sizeof(T);
                         data = T(PlainTime(value));
                     }
@@ -170,12 +170,12 @@ namespace Seed
                     using PlainTime = typename CTTI::TypeTraits::CTTITypeMetaData<T>::PlainTime;
                     using TValue = typename CTTI::TypeTraits::CTTITypeMetaData<PlainTime>::NumericType;
 
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         auto value = static_cast<PlainTime>(data).TimeFromStartEpoch;
                         Memory::Copy(reinterpret_cast<const Byte*>(&value), rawStream + offset, sizeof(TValue)); offset += sizeof(TValue);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data) {
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(TValue);
                     }
 
@@ -193,7 +193,7 @@ namespace Seed
                             CTTI::Details::ToCharStr<sizeof(TValue)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         auto value = *(reinterpret_cast<const TValue*>(rawStream + offset)); offset += sizeof(T);
                         data = T(PlainTime(value));
                     }

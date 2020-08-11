@@ -184,3 +184,36 @@ bool Seed::Core::Testing::Test::DI::ResolveServiceByDI::Excecute() {
 
 	return serviceB.MethodC(true, true);
 }
+
+#include "Seed.Core.Services.h"
+
+bool Seed::Core::Testing::Test::DI::TestSerilizationService::Excecute() {
+	using SerilizationServiceDefinition = ObjectDefinition(
+		Core::Services::SerilizationService,
+		NullCtorDescription(Core::Services::SerilizationService),
+		ObjectMethodsDefs(
+			MethodDescription(Core::Services::SerilizationService, SerelizeDynObj),
+			MethodDescription(Core::Services::SerilizationService, DeserelizeDynObj),
+			MethodDescription(Core::Services::SerilizationService, GetTypeMetaDataDynObj)
+		),
+		ObjectPropsDefs()
+	);
+
+	auto injector = Core::DI::DepencyInjector();
+	injector.Register<Core::Services::SerilizationService, Core::DI::IDI>
+			(TypeTraits::TypeTag<SerilizationServiceDefinition>{});
+
+	auto serilizationService = injector.Resolve<Core::Services::SerilizationService>();
+
+	auto dynamic = Dynamic(10);
+
+	auto serilizedDynamic = serilizationService.Serelize(dynamic);
+
+	auto dynamicDeserilized = serilizationService.Deserelize<Dynamic>(serilizedDynamic);
+
+	Asserts::AssertEqual(
+		dynamic.GetVariables<int>().GetByIdx<0>(), 
+		dynamicDeserilized.GetVariables<int>().GetByIdx<0>());
+
+	return true;
+}

@@ -6,6 +6,231 @@ namespace Seed
 {
 	inline namespace Core
 	{
+		namespace CTTI
+		{
+			namespace TypeTraits
+			{
+				namespace Details
+				{
+					template<bool TIsConst, bool TIsVolatile> 
+					struct CTTITypeDataImpl<Containers::Dynamic, TIsConst, TIsVolatile> 
+						: BaseCTTITypeDataImpl<Containers::Dynamic, EType::Dynamic, true, TIsConst, TIsVolatile>
+					{};
+
+					template<bool TIsConst, bool TIsVolatile> 
+					struct CTTITypeDataImpl<Reflection::DynamicObject, TIsConst, TIsVolatile> 
+						: BaseCTTITypeDataImpl<Reflection::DynamicObject, EType::Dynamic, true, TIsConst, TIsVolatile>
+					{};
+				}
+			}
+		}
+
+		namespace Serilization
+		{
+			namespace Details
+			{
+				template<typename THeap, typename T>
+                struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<TypeTraits::IsSameV<T, Containers::Dynamic>, void>> {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						{
+							return item.Key == data.Type;
+						}))
+						{
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							{
+								return item.Key == data.Type;
+							});
+
+							BaseSerlizationHandler<THeap, TypeTraits::DecayV<decltype(record.Key.CxxTypeName)>>::SerilizeImpl
+								(record.Key.CxxTypeName, rawStream, offset, registry);
+
+							record.Value.SerelizeToDynamicFunction(data, rawStream, offset, registry);
+						}
+						else
+						{
+							Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+						}
+                    }
+
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						{
+							return item.Key == data.Type;
+						}))
+						{
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							{
+								return item.Key == data.Type;
+							});
+
+							return record.Value.DataSizeDynamicFunction(data, registry) +
+								BaseSerlizationHandler<THeap, TypeTraits::DecayV<decltype(record.Key.CxxTypeName)>>::
+								DataSize(record.Key.CxxTypeName, registry);
+						}
+						else
+						{
+							Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+						}
+                    }
+
+                    forceinline static constexpr Boolean IsMemCopy() {
+                        return false;
+                    }
+
+                    forceinline static constexpr auto TypeHint() {
+                        return
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
+                    }
+
+                    forceinline static constexpr auto ConstexprSize() {
+                        return
+                            CTTI::Details::ToCharStr<sizeof(T)>();
+                    }
+
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						String cxxTypeName;
+						
+						BaseSerlizationHandler<THeap, String>::DeserelizeImpl(cxxTypeName, rawStream, offset, registry);
+
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						{
+							return item.Key.CxxTypeName == cxxTypeName;
+						}))
+						{
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							{
+								return item.Key.CxxTypeName == cxxTypeName;
+							});
+
+							record.Value.DeSerelizeToDynamicFunction(data, rawStream, offset, registry);
+						}
+						else
+						{
+							Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+						}
+                    }
+
+                    forceinline static constexpr auto TypeMetaData() {
+                        return
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<sizeof(T)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            ConstexprSize() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            TypeHint() +
+							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                    }
+                };
+
+				template<typename THeap, typename T>
+                struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<TypeTraits::IsSameV<T, Reflection::DynamicObject>, void>> {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						{
+							return item.Key == data.ValueType;
+						}))
+						{
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							{
+								return item.Key == data.ValueType;
+							});
+
+							BaseSerlizationHandler<THeap, TypeTraits::DecayV<decltype(record.Key.CxxTypeName)>>::SerilizeImpl
+								(record.Key.CxxTypeName, rawStream, offset, registry);
+
+							record.Value.SerelizeFunction(data, rawStream, offset, registry);
+						}
+						else
+						{
+							Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+						}
+                    }
+
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						{
+							return item.Key == data.ValueType;
+						}))
+						{
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							{
+								return item.Key == data.ValueType;
+							});
+
+							return record.Value.DataSizeFunction(data, registry) +
+								BaseSerlizationHandler<THeap, TypeTraits::DecayV<decltype(record.Key.CxxTypeName)>>::
+								DataSize(record.Key.CxxTypeName, registry);
+						}
+						else
+						{
+							Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+						}
+                    }
+
+                    forceinline static constexpr Boolean IsMemCopy() {
+                        return false;
+                    }
+
+                    forceinline static constexpr auto TypeHint() {
+                        return
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
+                    }
+
+                    forceinline static constexpr auto ConstexprSize() {
+                        return
+                            CTTI::Details::ToCharStr<sizeof(T)>();
+                    }
+
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						String cxxTypeName;
+						
+						BaseSerlizationHandler<THeap, String>::DeserelizeImpl(cxxTypeName, rawStream, offset, registry);
+
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						{
+							return item.Key.CxxTypeName == cxxTypeName;
+						}))
+						{
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							{
+								return item.Key.CxxTypeName == cxxTypeName;
+							});
+
+							record.Value.DeSerelizeFunction(data, rawStream, offset, registry);
+						}
+						else
+						{
+							Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+						}
+                    }
+
+                    forceinline static constexpr auto TypeMetaData() {
+                        return
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::ToCharStr<sizeof(T)>() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            ConstexprSize() +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            TypeHint() +
+							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
+                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                    }
+                };
+			}
+		}
+
 		namespace Services
 		{
 			class SerilizationService final : public IDisposable {
@@ -25,13 +250,13 @@ namespace Seed
 			public:
 				template<typename T>
 				Containers::Blob Serelize(const T& data) {
-					return Serilization::Serilize(data);
+					return Serilization::Serilize(data, This->idi.GetTypesRegistry());
 				}
 
-				template<typename T>
+				template<typename T> requires Concepts::IsConstructibleWith<T>
 				T Deserelize(const Containers::Blob& data) {
 					T val = T();
-					Serilization::Deserilize(data, val);
+					Serilization::Deserilize(data, val, This->idi.GetTypesRegistry());
 					return val;
 				}
 
@@ -40,12 +265,15 @@ namespace Seed
 					return Serilization::MetaDataGen<T>();
 				}
 
-				Containers::Blob SerelizeDynObj(const Reflection::DynamicObject& data);
+				Containers::Blob SerelizeDynObj(const Reflection::DynamicObject& data) {
+					return Serelize(data);
+				}
 
-				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data);
+				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data) {
+					return Deserelize<Reflection::DynamicObject>(data);
+				}
 
 				String GetTypeMetaDataDynObj(const Reflection::DynamicObject& data);
-
 			public:
 				RefCountClass(SerilizationService, This);
 			};

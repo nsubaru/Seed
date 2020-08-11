@@ -10,6 +10,16 @@ namespace Seed
 {
     inline namespace Core
     {
+        namespace Reflection
+        {
+            class DataTypeRecord;
+        }
+
+        namespace RTTI
+        {
+            class RTTITypeRecord;
+        }
+
         namespace Serilization
         {
             ///<summary>Не можливо серелізувати або десерелізувати даний тип</summary>
@@ -40,6 +50,8 @@ namespace Seed
 				virtual ~NonSerelizableType() {}
 			};
 
+            using TypesRegistry = Containers::ConcurencyList<Containers::Pair<RTTI::RTTITypeRecord, Reflection::DataTypeRecord>>;
+
             namespace Details
             {
 #if __has_include("Seed.Core.Containers.API.LINQ.Base.h")
@@ -53,12 +65,12 @@ namespace Seed
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsNotSerlizable<T>, void>> {
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
                         __assume(false);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data) {
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(data);
                     }
 
@@ -76,7 +88,7 @@ namespace Seed
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                          Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
                     }
 
@@ -111,11 +123,11 @@ namespace Seed
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T,typename TypeTraits::EnableIfV<IsSerilizablePrimitive<T>, void>> {
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         Memory::Copy(reinterpret_cast<const Byte*>(&data), rawStream + offset, sizeof(T)); offset += sizeof(T);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data) {
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(data);
                     }
 
@@ -133,7 +145,7 @@ namespace Seed
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         data = *(reinterpret_cast<const T*>(rawStream + offset)); offset += sizeof(T);
                     }
 
@@ -164,10 +176,10 @@ namespace Seed
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsCFixedArraySerlizable<T>, void>> {
                     using ItemType = typename CTTI::TypeTraits::CTTITypeMetaData<T>::ItemType::Type;
 
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset) {
+                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         if constexpr (IsMemCopy())
                         {
-                            SizeT dataSize = DataSize(data);
+                            SizeT dataSize = DataSize(data, registry);
                             Memory::Copy(reinterpret_cast<const Byte*>(&data), rawStream + offset, dataSize); 
                             offset += dataSize;
                         }
@@ -175,13 +187,13 @@ namespace Seed
                         {
                             for (SizeT i = 0; i < CTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
                             {
-                                BaseSerlizationHandler<THeap, ItemType>::SerilizeImpl(data[i], rawStream, offset);
+                                BaseSerlizationHandler<THeap, ItemType>::SerilizeImpl(data[i], rawStream, offset, registry);
                             }
                         }
                         
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data) {
+                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         if constexpr (IsMemCopy())
                         {
                             return sizeof(ItemType) * CTTI::TypeTraits::CTTITypeMetaData<T>::Count;
@@ -211,10 +223,10 @@ namespace Seed
                             CTTI::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<T>::Count>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset) {
+                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         if constexpr (IsMemCopy())
                         {
-                            SizeT dataSize = DataSize(data);
+                            SizeT dataSize = sizeof(T);
                             Memory::Copy(rawStream + offset, data, dataSize); offset += dataSize;
                         }
                         else
@@ -222,7 +234,7 @@ namespace Seed
                             SizeT Size = 1;
                             for (SizeT i = 0; i < CTTI::TypeTraits::CTTITypeMetaData<T>::Count; i++)
                             {
-                                Size *= BaseSerlizationHandler<THeap, ItemType>::DeserelizeImpl(data[i], rawStream, offset);
+                                Size *= BaseSerlizationHandler<THeap, ItemType>::DeserelizeImpl(data[i], rawStream, offset, registry);
                             }
                         }
                     }
@@ -247,14 +259,14 @@ namespace Seed
             }
 
             template<typename THeap, typename T>
-            forceinline Containers::BaseArray<THeap, Byte> BaseSerilize(const T& Object) {
-                SizeT rawStreamSize = Details::BaseSerlizationHandler<THeap, T>::DataSize(Object);
+            forceinline Containers::BaseArray<THeap, Byte> BaseSerilize(const T& Object, UnusedData const TypesRegistry& registry) {
+                SizeT rawStreamSize = Details::BaseSerlizationHandler<THeap, T>::DataSize(Object, registry);
                 Byte* rawStream = nullptr;
                 try
                 {
                     rawStream = new Byte[rawStreamSize];
                     SizeT offset = 0;
-                    Details::BaseSerlizationHandler<THeap, T>::SerilizeImpl(Object, rawStream, offset);
+                    Details::BaseSerlizationHandler<THeap, T>::SerilizeImpl(Object, rawStream, offset, registry);
                 }
                 catch (...)
                 {
@@ -265,30 +277,30 @@ namespace Seed
             }
 
             template<typename THeap, typename T>
-            forceinline void BaseDeserilize(const Containers::BaseArray<THeap, Byte>& stream, T& Object) {
+            forceinline void BaseDeserilize(const Containers::BaseArray<THeap, Byte>& stream, T& Object, UnusedData const TypesRegistry& registry) {
                 const Byte* rawStream = (const Byte*) stream;
                 SizeT offset = 0;
-                Details::BaseSerlizationHandler<THeap, T>::DeserelizeImpl(Object, rawStream, offset);
+                Details::BaseSerlizationHandler<THeap, T>::DeserelizeImpl(Object, rawStream, offset, registry);
             }
 
             template<typename T>
-            forceinline Containers::Array<Byte> Serilize(const T& Object) {
-                return BaseSerilize<Memory::Heap, T>(Object);
+            forceinline Containers::Array<Byte> Serilize(const T& Object, UnusedData const TypesRegistry& registry) {
+                return BaseSerilize<Memory::Heap, T>(Object, registry);
             }
 
             template<typename T>
-            forceinline Containers::SensitiveArray<Byte> SensitiveSerilize(const T& Object) {
-                return BaseSerilize<Memory::SensitiveDataHeap, T>(Object);
+            forceinline Containers::SensitiveArray<Byte> SensitiveSerilize(const T& Object, UnusedData const TypesRegistry& registry) {
+                return BaseSerilize<Memory::SensitiveDataHeap, T>(Object, registry);
             }
 
             template<typename T>
-            forceinline void Deserilize(const Containers::Array<Byte> & stream, T& Object) {
-                BaseDeserilize<Memory::Heap, T>(stream, Object);
+            forceinline void Deserilize(const Containers::Array<Byte> & stream, T& Object, UnusedData const TypesRegistry& registry) {
+                BaseDeserilize<Memory::Heap, T>(stream, Object, registry);
             }
 
             template<typename T>
-            forceinline T SensitiveDeserilize(const Containers::Array<Byte>& stream, T& Object) {
-                BaseDeserilize<Memory::SensitiveDataHeap, T>(stream, Object);
+            forceinline T SensitiveDeserilize(const Containers::Array<Byte>& stream, T& Object, UnusedData const TypesRegistry& registry) {
+                BaseDeserilize<Memory::SensitiveDataHeap, T>(stream, Object, registry);
             }
 
             template<typename THeap, typename T>

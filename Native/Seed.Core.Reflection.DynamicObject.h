@@ -65,6 +65,17 @@ namespace Seed
 					virtual ~DynamicImpl() override {}
 				};
 			private:
+				template<typename T>
+				struct _ {};
+
+				template<typename ... TTypes>
+				struct _<Containers::Tuple<TTypes...>> {
+					constexpr static auto __ = [] (IDynamicImpl* impl) -> Containers::Tuple<TTypes...>
+					{
+						return dynamic_cast<DynamicImpl<TTypes...>*>(impl)->GetValue();
+					};
+				};
+			private:
 				struct Data{
 					IDynamicImpl* impl;
 					RefCountT RefCount;
@@ -84,8 +95,8 @@ namespace Seed
 				template<typename ... TTypes>
 				DynamicObject(Containers::Tuple<TTypes...>&& tuple) : data(new Data(new DynamicImpl(MoveRValue(tuple)))) {}
 
-				RTTI::RTTITypeRecord GetValueType() const { return data->impl->GetValueType(); }
-				String GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }
+				const RTTI::RTTITypeRecord& GetValueType() const { return data->impl->GetValueType(); }
+				const String& GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }
 
 				const TypeInfo& GetImplementationTypeInfo() const { return data->impl->GetImplementationTypeInfo(); }
 
@@ -110,6 +121,33 @@ namespace Seed
 						Throw(NullPointException(ExceptionPosition));
 					}
 				}
+
+				template<typename TTuple> requires Concepts::Tuple<TTuple>
+				TTuple GetTuple() {
+					
+					if(typeid(TTuple) == GetImplementationTypeInfo()){
+						return _<TTuple>::__(data->impl);
+					}
+					else
+					{
+						Throw(NullPointException(ExceptionPosition));
+					}
+				}
+
+				template<typename TTuple> requires Concepts::Tuple<TTuple>
+				const TTuple GetTuple() const {
+					
+					if(typeid(TTuple) == GetImplementationTypeInfo()){
+						return _<TTuple>::__(data->impl);
+					}
+					else
+					{
+						Throw(NullPointException(ExceptionPosition));
+					}
+				}
+
+				RTTI::RTTITypeRecord Property(GetValueType) ValueType;
+				String Property(GetSerilizationMetadata) SerilizationMetadata;
 
 				RefCountClass(DynamicObject, data);
 			};
