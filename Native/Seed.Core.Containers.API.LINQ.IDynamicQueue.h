@@ -16,7 +16,7 @@ namespace Seed {
 				class IDynamicQueue : 
 					public ICollection<TDynamicQueue, THeap, T, false, TIsConcurencySuport> {
 				public:
-					forceinline virtual ~IDynamicQueue() = 0 {};
+					ForceInline virtual ~IDynamicQueue() = 0 {};
 				};
 			}
 		}

@@ -32,7 +32,7 @@ namespace Seed {
 				/// Розмір карти в кількості бітів
 				/// </summary>
 				/// <returns>Кількість бітів</returns>
-				forceinline constexpr SizeT GetCount()
+				ForceInline constexpr SizeT GetCount()
 				{
 					return BitCount;
 				}
@@ -48,7 +48,7 @@ namespace Seed {
 				/// Конструктор, якщо виставлений флаг то відбудеться заповнення бітової карти
 				/// </summary>
 				/// <param name="IsSetAll">Якщо true то бітова карта створюється заповненою</param>
-				forceinline constexpr BaseBitMapT(Boolean IsSetAll = false)
+				ForceInline constexpr BaseBitMapT(Boolean IsSetAll = false)
 				{
 					if (IsSetAll)
 					{
@@ -342,7 +342,7 @@ namespace Seed {
 				/// <summary>
 				/// Скидання всіх бітів(операція може бути достатньо довгою)
 				/// </summary>
-				forceinline constexpr void ResetAll()
+				ForceInline constexpr void ResetAll()
 				{
 					Memory::MemBlkFill(bitMap, Size, 0);
 				};
@@ -497,7 +497,7 @@ namespace Seed {
 #pragma warning(disable: 4172)
 
 				template<typename LambdaT>
-				forceinline BaseBitMapT& ForEachImpl(LambdaT&& lambda)
+				ForceInline BaseBitMapT& ForEachImpl(LambdaT&& lambda)
 				{
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>)
 					{
@@ -522,7 +522,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				forceinline const BaseBitMapT& ForEachImpl(LambdaT&& lambda) const
+				ForceInline const BaseBitMapT& ForEachImpl(LambdaT&& lambda) const
 				{
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const T&>)
 					{
@@ -547,7 +547,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				forceinline U AggregateImpl(LambdaT&& lambda) const
+				ForceInline U AggregateImpl(LambdaT&& lambda) const
 				{
 					U val = U();
 					for (SizeT i = 0; i < Size; i++)
@@ -558,7 +558,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				forceinline T AggregateImpl(LambdaT&& lambda, const U& Value) const
+				ForceInline T AggregateImpl(LambdaT&& lambda, const U& Value) const
 				{
 					U result = Value;
 					for (SizeT i = 0; i < Size; i++)
@@ -569,7 +569,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename LambdaT>
-				forceinline U AggregateImpl(LambdaT&& lambda, U&& Value) const
+				ForceInline U AggregateImpl(LambdaT&& lambda, U&& Value) const
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{
@@ -584,7 +584,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline bool AnyImpl(Lambda&& lambda) const
+				ForceInline bool AnyImpl(Lambda&& lambda) const
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{
@@ -595,7 +595,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline bool AllImpl(Lambda&& lambda) const
+				ForceInline bool AllImpl(Lambda&& lambda) const
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{
@@ -653,7 +653,7 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				forceinline BaseBitMapT& ReverseImpl()
+				ForceInline BaseBitMapT& ReverseImpl()
 				{
 					for (SizeT i = 0; i < Size / 2; i++)
 					{
@@ -662,24 +662,24 @@ namespace Seed {
 					return *this;
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index)
+				ForceInline void UnsafeSet(const T& Value, SizeT Index)
 				{
 					bitMap[Index] = Value;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index)
+				ForceInline void UnsafeSet(T&& Value, SizeT Index)
 				{
 					bitMap[Index] = MoveRValue(Value);
 				}
 
-				forceinline BaseBitMapT& RemoveAllImpl()
+				ForceInline BaseBitMapT& RemoveAllImpl()
 				{
 					this->ResetAll();
 					return *this;
 				}
 
 				template<typename Lambda>
-				forceinline BaseBitMapT& RemoveAllImpl(Lambda&& lambda)
+				ForceInline BaseBitMapT& RemoveAllImpl(Lambda&& lambda)
 				{
 					for (SizeT i = 0; i < Size; i++)
 					{

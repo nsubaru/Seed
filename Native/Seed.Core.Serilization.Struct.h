@@ -18,7 +18,7 @@ namespace Seed
 					using StructFieldsMetaData = typename CTTI::TypeTraits::CTTITypeMetaData<TStruct>::Fields;
 
 					template<SizeT I = 0>
-					forceinline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -47,7 +47,7 @@ namespace Seed
 
 					
 					template<SizeT I = 0>
-					forceinline static void DeserelizeFieldsImp(Byte * fiedsPtr, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
+					ForceInline static void DeserelizeFieldsImp(Byte * fiedsPtr, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -74,7 +74,7 @@ namespace Seed
 					}
 
 					template<SizeT I = 0>
-					forceinline static SizeT DataSizeFieldsImp(Byte * fiedsPtr, UnusedData const TypesRegistry& registry){
+					ForceInline static SizeT DataSizeFieldsImp(Byte * fiedsPtr, UnusedData const TypesRegistry& registry){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -98,7 +98,7 @@ namespace Seed
 					}
 
 					template<SizeT I = 0>
-					constexpr forceinline static auto TypeHintFieldsImp(){
+					constexpr ForceInline static auto TypeHintFieldsImp(){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -136,7 +136,7 @@ namespace Seed
 					}
 
 					template<SizeT I = 0>
-					constexpr forceinline static auto TypeMetaDataFieldsImp(){
+					constexpr ForceInline static auto TypeMetaDataFieldsImp(){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -155,33 +155,33 @@ namespace Seed
 						}
 					}
 
-					forceinline static void SerilizeImpl(const TStruct& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void SerilizeImpl(const TStruct& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						SerelizeFieldsImpl((Byte*)&data, rawStream, offset, registry);
 					}
 
-					forceinline static void DeserelizeImpl(TStruct& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void DeserelizeImpl(TStruct& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						DeserelizeFieldsImp((Byte*)&data, rawStream, offset, registry);
 					}
 
-					forceinline static constexpr Boolean IsMemCopy() {
+					ForceInline static constexpr Boolean IsMemCopy() {
 						return false;
 					}
 
-					forceinline static constexpr SizeT DataSize(const TStruct& data, UnusedData const TypesRegistry& registry) {
+					ForceInline static constexpr SizeT DataSize(const TStruct& data, UnusedData const TypesRegistry& registry) {
 						return DataSizeFieldsImp((Byte*)&data, registry);
 					}
 
-					forceinline static constexpr auto TypeHint() {
+					ForceInline static constexpr auto TypeHint() {
 						return
 							TypeHintFieldsImp();
 					}
 
-					forceinline static constexpr auto ConstexprSize() {
+					ForceInline static constexpr auto ConstexprSize() {
 						return
 							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
 					}
 
-					forceinline static constexpr auto TypeMetaData() {
+					ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<TStruct>().Resize<CTTI::TypeName<TStruct>().Count - 1>() +

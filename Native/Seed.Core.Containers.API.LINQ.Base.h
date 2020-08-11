@@ -72,15 +72,15 @@ namespace Seed {
                 /// <summary>
                 /// Базовий клас для загальних колекцій
                 /// </summary>
-				class ICollectionGenericBase { public: forceinline virtual ~ICollectionGenericBase() = 0 {}; };
+				class ICollectionGenericBase { public: ForceInline virtual ~ICollectionGenericBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для фіксованих колекцій
                 /// </summary>
-				class IFixedCollectionGenericBase { public: forceinline virtual ~IFixedCollectionGenericBase() = 0 {}; };
+				class IFixedCollectionGenericBase { public: ForceInline virtual ~IFixedCollectionGenericBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для асоціативних колекцій
                 /// </summary>
-				class IAssociableCollectionGenericBase { public: forceinline virtual ~IAssociableCollectionGenericBase() = 0 {}; };
+				class IAssociableCollectionGenericBase { public: ForceInline virtual ~IAssociableCollectionGenericBase() = 0 {}; };
 #pragma region LINQ for one typearg Collection
 
                 /// <summary>
@@ -123,7 +123,7 @@ namespace Seed {
 						if (ignoreSizeMismatch) {
 							if (TNewFixedCollection::FixedSize == thisCollectionRef.Count || TNewFixedCollection::FixedSize > thisCollectionRef.Count) {
 								TNewFixedCollection instance;
-								thisCollectionRef.ForEach([&](const T& item, SizeT index) {
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda {
                                         if constexpr(TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
 								        {
                                             instance.UnsafeSet(item.Clone(), index);
@@ -137,7 +137,7 @@ namespace Seed {
 							}
 							else {
 								TNewFixedCollection instance;
-								thisCollectionRef.ForEach([&](const T& item, SizeT index) {
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda {
                                     if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                     {
                                         instance.UnsafeSet(item.Clone(), index);
@@ -186,7 +186,7 @@ namespace Seed {
 						if (ignoreSizeMismatch) {
 							if (TNewFixedCollection::FixedSize == thisCollectionRef.Count || TNewFixedCollection::FixedSize > thisCollectionRef.Count) {
 								TNewFixedCollection instance;
-								thisCollectionRef.ForEach([&](const T& item, SizeT index) {
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda {
                                     if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                     {
                                         instance.UnsafeSet(item.Clone(), index);
@@ -200,7 +200,7 @@ namespace Seed {
 							}
 							else {
 								TNewFixedCollection instance;
-								thisCollectionRef.ForEach([&](const T& item, SizeT index) {
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda {
                                     if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                     {
                                         instance.UnsafeSet(item.Clone(), index);
@@ -222,7 +222,7 @@ namespace Seed {
                                                                             TNewFixedCollection::FixedSize);
 							else {
 								TNewFixedCollection instance;
-								thisCollectionRef.ForEach([&](const T& item, SizeT index) {
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda {
                                     if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                     {
                                         instance.UnsafeSet(item.Clone(), index);
@@ -296,7 +296,7 @@ namespace Seed {
 						if constexpr (!TNewCollection::IsDynamic) {
 							auto thisCollectionRef = static_cast<const TCollection<THeap, TSize, T>&>(*this);
 							TNewCollection instance(thisCollectionRef.Count);
-                            thisCollectionRef.ForEach([&] (const T& value, SizeT index)
+                            thisCollectionRef.ForEach([&] (const T& value, SizeT index) InlineLambda
                             {
                                 if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                 {
@@ -313,7 +313,7 @@ namespace Seed {
 						else {
 							auto thisCollectionRef = static_cast<const TCollection<THeap, TSize, T>&>(*this);
 							TNewCollection instance;
-                            thisCollectionRef.ForEach([&] (const T& value)
+                            thisCollectionRef.ForEach([&] (const T& value) InlineLambda
                             {
                                 if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                 {
@@ -346,7 +346,7 @@ namespace Seed {
 						if constexpr (!TNewCollection::IsDynamic) {
 							auto thisCollectionRef = static_cast<const TCollection<THeap, TSize, T>&>(*this);
 							TNewCollection instance(thisCollectionRef.Count);
-							thisCollectionRef.ForEach([&](const T& value, SizeT index) {
+							thisCollectionRef.ForEach([&](const T& value, SizeT index) InlineLambda {
                                 if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                 {
                                     instance.UnsafeSet(value.Clone(), index);
@@ -361,7 +361,7 @@ namespace Seed {
 						else {
 							auto thisCollectionRef = static_cast<const TCollection<THeap, TSize, T>&>(*this);
 							TNewCollection instance;
-							thisCollectionRef.ForEach([&](const T& value) {
+							thisCollectionRef.ForEach([&](const T& value) InlineLambda {
                                 if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
                                 {
                                     instance.UnsafeAdd(value.Clone());
@@ -392,7 +392,7 @@ namespace Seed {
 						if constexpr (!TNewCollection::IsDynamic) {
 							auto thisCollectionRef = static_cast<const TCollection<THeap, TSize, T>&>(*this);
 							TNewCollection instance(thisCollectionRef.Count);
-							thisCollectionRef.RemoceAll([&](T&& value, SizeT index) {
+							thisCollectionRef.RemoceAll([&](T&& value, SizeT index) InlineLambda {
 								instance.UnsafeSet(MoveRValue(value), index);
 								});
 							return instance;
@@ -400,14 +400,14 @@ namespace Seed {
 						else {
 							auto thisCollectionRef = static_cast<const TCollection<THeap, TSize, T>&>(*this);
 							TNewCollection instance;
-							thisCollectionRef.RemoceAll([&](T&& value) {
+							thisCollectionRef.RemoceAll([&](T&& value) InlineLambda {
 								instance.UnsafeAdd(MoveRValue(value));
 								});
 							return instance;
 						}
 					}
 				public:
-					forceinline virtual ~IFixedCollectionBase() = 0 {}
+					ForceInline virtual ~IFixedCollectionBase() = 0 {}
 				};
 #pragma endregion
 #pragma region LINQ for associable Collection
@@ -458,7 +458,7 @@ namespace Seed {
 					public TAssociableLinq<TCollection<THeap, TKey, TValue>, THeap, TKey, TValue, TPair, true>
 				{
 				public:
-					forceinline virtual ~IAssociableCollectionBase() = 0 {}
+					ForceInline virtual ~IAssociableCollectionBase() = 0 {}
 				};
 #pragma endregion
 #pragma region LINQ for Pair
@@ -513,7 +513,7 @@ namespace Seed {
 				template<template<typename THeap> typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
 				class IStringCollectionBaseLinq : public TStringLinq<TString<THeap>, THeap, TChar, TIsConcurencySuport> {
 				public:
-					forceinline virtual ~IStringCollectionBaseLinq() = 0 {};
+					ForceInline virtual ~IStringCollectionBaseLinq() = 0 {};
 				};
 #pragma endregion
 			}

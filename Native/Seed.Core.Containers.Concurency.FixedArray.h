@@ -26,12 +26,12 @@ namespace Seed {
 					Threading::SRWLock lock;
 					T array[TSize] = {};
 
-					forceinline Data() : RefCount(1), lock() {}
+					ForceInline Data() : RefCount(1), lock() {}
 				};
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() override {}
+				ForceInline virtual void Dispose() override {}
 			private:
 				template<typename Lambda>
 				void QuickSort(T* A, SizeT p, SizeT r, Lambda& lambda) {
@@ -82,7 +82,7 @@ namespace Seed {
 				template<typename Lambda>
 				BaseConcurencyFixedArray& ForEachImpl(Lambda&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyFixedArray& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
 							for (SizeT i = 0; i < TSize; i++)
 							{
 								lambda(This->array[i]);
@@ -91,7 +91,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyFixedArray& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
 							for (SizeT i = 0; i < TSize; i++)
 							{
 								lambda(This->array[i], i);
@@ -107,7 +107,7 @@ namespace Seed {
 				template<typename Lambda>
 				const BaseConcurencyFixedArray& ForEachImpl(Lambda&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
-						return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedArray& {
+						return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedArray& InlineLambda {
 							for (SizeT i = 0; i < TSize; i++)
 							{
 								lambda(This->array[i]);
@@ -116,7 +116,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
-						return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedArray& {
+						return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedArray& InlineLambda {
 							for (SizeT i = 0; i < TSize; i++)
 							{
 								lambda(This->array[i], i);
@@ -131,7 +131,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda{
 						U val = U();
 						for (SizeT i = 0; i < TSize; i++)
 						{
@@ -142,7 +142,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename Lambda>
-				U AggregateImpl(Lambda&& lambda, const U& Value) const {
+				U AggregateImpl(Lambda&& lambda, const U& Value) const InlineLambda {
 					return MoveRValue(this->This->lock.ShareLock([&]() {
 						U result = Value;
 						for (SizeT i = 0; i < TSize; i++)
@@ -155,7 +155,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda, U&& Value) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						for (SizeT i = 0; i < TSize; i++)
 						{
 							lambda(Value, This->array[i]);
@@ -164,11 +164,11 @@ namespace Seed {
 						}));
 				}
 
-				forceinline bool AnyImpl() const { return TSize > 0; }
+				ForceInline bool AnyImpl() const { return TSize > 0; }
 
 				template<typename Lambda>
 				bool AnyImpl(Lambda&& lambda) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						for (SizeT i = 0; i < TSize; i++)
 						{
 							if (lambda(This->array[i]))
@@ -180,7 +180,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				bool AllImpl(Lambda&& lambda) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						for (SizeT i = 0; i < TSize; i++)
 						{
 							if (!lambda(This->array[i]))
@@ -190,8 +190,8 @@ namespace Seed {
 						}));
 				}
 
-				forceinline BaseConcurencyFixedArray& SortByImpl(bool IsDescending = true) {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& {
+				ForceInline BaseConcurencyFixedArray& SortByImpl(bool IsDescending = true) {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
 						if (IsDescending) {
 							auto l = [](const T& V1, const T& V2) { return V1 < V2; };
 							QuickSort(This->array, 0, TSize - 1, l);
@@ -205,14 +205,14 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline BaseConcurencyFixedArray& SortByLambdaImpl(Lambda&& lambda) {
+				ForceInline BaseConcurencyFixedArray& SortByLambdaImpl(Lambda&& lambda) {
 					if constexpr (TSize == 0)
 					{
 						return *this;
 					}
 					else
 					{
-						return This->lock.ExclusiveLock([&] () -> BaseConcurencyFixedArray&
+						return This->lock.ExclusiveLock([&] () -> BaseConcurencyFixedArray& InlineLambda
 						{
 							QuickSort(This->array, 0, TSize - 1, lambda);
 							return *this;
@@ -222,7 +222,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& FirstImpl(Lambda&& lambda) {
-					return This->lock.ShareLock([&]() -> T& {
+					return This->lock.ShareLock([&]() -> T& InlineLambda {
 						for (SizeT i = 0; i < TSize; i++)
 							if (lambda(This->array[i]))
 								return static_cast<T&>(This->array[i]);
@@ -233,7 +233,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& LastImpl(Lambda&& lambda) {
-					return This->lock.ShareLock([&]() -> T& {
+					return This->lock.ShareLock([&]() -> T& InlineLambda {
 						SizeT Index = -1;
 						for (SizeT i = 0; i < TSize; i++)
 							if (lambda(This->array[i]))
@@ -248,7 +248,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& FirstImpl(Lambda&& lambda) const {
-					return This->lock.ShareLock([&]() -> const T& {
+					return This->lock.ShareLock([&]() -> const T& InlineLambda {
 						for (SizeT i = 0; i < TSize; i++)
 							if (lambda(This->array[i]))
 								return static_cast<T&>(This->array[i]);
@@ -259,7 +259,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& LastImpl(Lambda&& lambda) const {
-					return This->lock.ShareLock([&]() -> const T& {
+					return This->lock.ShareLock([&]() -> const T& InlineLambda {
 						SizeT Index = -1;
 						for (SizeT i = 0; i < TSize; i++)
 							if (lambda(This->array[i]))
@@ -273,7 +273,7 @@ namespace Seed {
 				}
 
 				BaseConcurencyFixedArray& ReverseImpl() {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
 						for (SizeT i = 0; i < TSize / 2; i++) {
 							Seed::Core::Swap(static_cast<T&>(This->array[i]), static_cast<T&>(This->array[(TSize - 1) - i]));
 						}
@@ -281,16 +281,16 @@ namespace Seed {
 						});
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->array[Index] = Value;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->array[Index] = MoveRValue(Value);
 				}
 
 				BaseConcurencyFixedArray& RemoveAllImpl() {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
 						for (SizeT i = 0; i < TSize; i++) {
 							This->array[i].~T();
 						}
@@ -300,7 +300,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				BaseConcurencyFixedArray& RemoveAllImpl(Lambda&& lambda) {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
 						for (SizeT i = 0; i < TSize; i++) {
 							lambda(MoveRValue(This->array[i]));
 						}
@@ -314,7 +314,7 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор ініціалізовує масив стандартним значенням
 				/// </summary>
-				forceinline constexpr BaseConcurencyFixedArray() : This(new Data()) {}
+				ForceInline constexpr BaseConcurencyFixedArray() : This(new Data()) {}
 
 				/// <summary>
 				/// Конструктор з списку ініціалізації, копіює всі елементи з списку, 
@@ -340,8 +340,8 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Index"></param>
 				/// <returns>Силка на елементи</returns>
-				forceinline constexpr T& operator[](SizeT Index) {
-					return This->lock.ShareLock([&]() -> T& {
+				ForceInline constexpr T& operator[](SizeT Index) {
+					return This->lock.ShareLock([&]() -> T& InlineLambda {
 						if (Index < TSize)
 						{
 							return This->array[Index];
@@ -358,8 +358,8 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Index"></param>
 				/// <returns>Константна силка на елементи</returns>
-				forceinline constexpr const T& operator[](SizeT Index) const {
-					return This->lock.ShareLock([&]() -> const T& {
+				ForceInline constexpr const T& operator[](SizeT Index) const {
+					return This->lock.ShareLock([&]() -> const T& InlineLambda {
 						if (Index < TSize)
 						{
 							return This->array[Index];
@@ -377,7 +377,7 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Новий об'єкт з копією всіх елементів</returns>
 				virtual BaseConcurencyFixedArray Clone() const override final {
-					return This->lock.ShareLock([&]() {
+					return This->lock.ShareLock([&]() InlineLambda {
 						BaseConcurencyFixedArray result;
 						if constexpr (TypeTraits::IsPodV<T>) {
 							Memory::Copy(This->array, result.This->array, TSize * sizeof(T));
@@ -423,7 +423,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		forceinline void Swap(Containers::BaseConcurencyFixedArray<THeap, TSize, T>& A, Containers::BaseConcurencyFixedArray<THeap, TSize, T>& B) {
+		ForceInline void Swap(Containers::BaseConcurencyFixedArray<THeap, TSize, T>& A, Containers::BaseConcurencyFixedArray<THeap, TSize, T>& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}

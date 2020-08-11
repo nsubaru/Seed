@@ -27,12 +27,12 @@ namespace Seed {
 					Threading::SRWLock lock;
 					T* restrict stack;
 
-					forceinline Data(SizeT bufferSize) : count(0), RefCount(1), lock(), stack(new T[bufferSize]), bufferSize(bufferSize) {}
+					ForceInline Data(SizeT bufferSize) : count(0), RefCount(1), lock(), stack(new T[bufferSize]), bufferSize(bufferSize) {}
 				};
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() final override {
+				ForceInline virtual void Dispose() final override {
 					delete[] This->stack;
 					This->count = This->bufferSize = 0;
 				}
@@ -40,7 +40,7 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор ініціалізовує стек з стандартною максимальною кількістю елементів
 				/// </summary>
-				forceinline BaseConcurencyDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
+				ForceInline BaseConcurencyDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
 
 				/// <summary>
 				/// Конструктор з списку ініціалізації, 
@@ -68,8 +68,8 @@ namespace Seed {
 				/// то він розширюється на кількість задану в налаштуваннях
 				/// </summary>
 				/// <param name="item">Силка на елемент</param>
-				forceinline void Push(const T& item) {
-					return This->lock.ExclusiveLock([&]() mutable {
+				ForceInline void Push(const T& item) {
+					return This->lock.ExclusiveLock([&]() mutable InlineLambda {
 						if (This->count == This->bufferSize) {
 							ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 						}
@@ -83,8 +83,8 @@ namespace Seed {
 				/// то він розширюється на кількість задану в налаштуваннях
 				/// </summary>
 				/// <param name="item">RValue силка на елемент</param>
-				forceinline void Push(T&& item) {
-					return This->lock.ExclusiveLock([&, item = MoveRValue(item)]() mutable {
+				ForceInline void Push(T&& item) {
+					return This->lock.ExclusiveLock([&, item = MoveRValue(item)]() mutable InlineLambda {
 						if (This->count == This->bufferSize) {
 							ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 						}
@@ -97,8 +97,8 @@ namespace Seed {
 				/// Виймає елемент з стеку, якщо стек пустий то генерує помилку
 				/// </summary>
 				/// <returns>Вийннятий елемент з стеку</returns>
-				forceinline T Pop() {
-					return This->lock.ExclusiveLock([&]() mutable {
+				ForceInline T Pop() {
+					return This->lock.ExclusiveLock([&]() mutable InlineLambda {
 						if (This->count == 0)
 							Throw(EmptyStackException(ExceptionPosition));
 						--This->count;
@@ -111,8 +111,8 @@ namespace Seed {
 				/// якщо стек пустий то генерує помилку
 				/// </summary>
 				/// <returns>Константна силка на елемент</returns>
-				forceinline const T& Top() const {
-					return This->lock.ShareLock([&]() mutable -> const T& {
+				ForceInline const T& Top() const {
+					return This->lock.ShareLock([&]() mutable -> const T& InlineLambda {
 						if (This->count == 0)
 							Throw(EmptyStackException(ExceptionPosition));
 						--This->count;
@@ -125,8 +125,8 @@ namespace Seed {
 				/// якщо стек пустий то генерує помилку
 				/// </summary>
 				/// <returns>Константна силка на елемент</returns>
-				forceinline const T& Top() {
-					return This->lock.ShareLock([&]() mutable -> const T& {
+				ForceInline const T& Top() {
+					return This->lock.ShareLock([&]() mutable -> const T& InlineLambda {
 						if (This->count == 0)
 							Throw(EmptyStackException(ExceptionPosition));
 						--This->count;
@@ -138,8 +138,8 @@ namespace Seed {
 				/// Розширення стеку на задану кількість елементів
 				/// </summary>
 				/// <param name="AdditionalSize">Кількість на яку необхідно розширити стек</param>
-				forceinline void ExtendBuffer(SizeT AdditionalSize) {
-					This->lock.ExclusiveLock([&]() mutable {
+				ForceInline void ExtendBuffer(SizeT AdditionalSize) {
+					This->lock.ExclusiveLock([&]() mutable InlineLambda {
 						ExtendBufferImpl(AdditionalSize);
 						});
 				}
@@ -148,7 +148,7 @@ namespace Seed {
 				/// Стиснення розміру стек до поточної кількості елементів
 				/// </summary>
 				void Shrink() {
-					This->lock.ExclusiveLock([&]() mutable {
+					This->lock.ExclusiveLock([&]() mutable InlineLambda {
 						T* newBuffer = new T[This->count];
 						for (SizeT i = 0; i < This->count; i++)
 						{
@@ -170,7 +170,7 @@ namespace Seed {
 				/// Кількість елементів в стеку
 				/// </summary>
 				/// <returns>Поточна кількість елементів в стеку</returns>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 
 				/// <summary>
 				/// Поточна кількість елементів в стеку
@@ -182,7 +182,7 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Нови об'єкт стеку з копією елементів</returns>
 				virtual BaseConcurencyDynamicStack Clone() const override final {
-					return This->lock.ShareLock([&]() {
+					return This->lock.ShareLock([&]() InlineLambda {
 						BaseConcurencyDynamicStack result;
 						result.This->bufferSize = This->bufferSize;
 						result.This->count = This->count;
@@ -197,7 +197,7 @@ namespace Seed {
 
 				RefCountClass(BaseConcurencyDynamicStack, This)
 			private:
-				void ExtendBufferImpl(SizeT AdditionalSize) {
+				void ExtendBufferImpl(SizeT AdditionalSize) InlineLambda {
 					T* newBuffer = new T[This->bufferSize + AdditionalSize];
 					for (SizeT i = 0; i < This->count; i++)
 					{
@@ -224,7 +224,7 @@ namespace Seed {
 				template<typename Lambda>
 				BaseConcurencyDynamicStack& ForEachImpl(Lambda&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyDynamicStack& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
 							if (This->count == 0)
 								return *this;
 							SizeT i = This->count;
@@ -236,7 +236,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyDynamicStack& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
 							if (This->count == 0)
 								return *this;
 							SizeT i = This->count;
@@ -255,7 +255,7 @@ namespace Seed {
 				template<typename Lambda>
 				const BaseConcurencyDynamicStack& ForEachImpl(Lambda&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
-						return this->This->lock.ShareLock([&]() -> const BaseConcurencyDynamicStack& {
+						return this->This->lock.ShareLock([&]() -> const BaseConcurencyDynamicStack& InlineLambda {
 							if (This->count == 0)
 								return *this;
 							SizeT i = This->count;
@@ -267,7 +267,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
-						return this->This->lock.ShareLock([&]() -> const BaseConcurencyDynamicStack& {
+						return this->This->lock.ShareLock([&]() -> const BaseConcurencyDynamicStack& InlineLambda {
 							if (This->count == 0)
 								return *this;
 							SizeT i = This->count;
@@ -285,7 +285,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 
 						if (This->count == 0)
 							return U();
@@ -301,7 +301,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda, const U& Value) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						U result = Value;
 						if (This->count == 0)
 							return result;
@@ -316,7 +316,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda, U&& Value) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						if (This->count == 0)
 							return Value;
 						SizeT i = This->count;
@@ -328,11 +328,11 @@ namespace Seed {
 						}));
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
 				bool AnyImpl(Lambda&& lambda) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						if (This->count == 0)
 							return false;
 						SizeT i = This->count;
@@ -347,7 +347,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				bool AllImpl(Lambda&& lambda) const {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						if (This->count == 0)
 							return false;
 						SizeT i = This->count;
@@ -362,7 +362,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& FirstImpl(Lambda&& lambda) {
-					return This->lock.ShareLock([&]() -> T& {
+					return This->lock.ShareLock([&]() -> T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 						SizeT i = This->count;
@@ -378,7 +378,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& LastImpl(Lambda&& lambda) {
-					return This->lock.ShareLock([&]() -> T& {
+					return This->lock.ShareLock([&]() -> T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 						SizeT i = This->count;
@@ -398,7 +398,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& FirstImpl(Lambda&& lambda) const {
-					return This->lock.ShareLock([&]() -> const T& {
+					return This->lock.ShareLock([&]() -> const T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 						SizeT i = This->count;
@@ -414,7 +414,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& LastImpl(Lambda&& lambda) const {
-					return This->lock.ShareLock([&]() -> const T& {
+					return This->lock.ShareLock([&]() -> const T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 						SizeT i = This->count;
@@ -433,7 +433,7 @@ namespace Seed {
 				}
 
 				BaseConcurencyDynamicStack& ReverseImpl() {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
 						for (SizeT i = 0; i < This->count / 2; i++) {
 							Swap(This->stack[i], This->stack[(This->count - 1) - i]);
 						}
@@ -441,18 +441,18 @@ namespace Seed {
 						});
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = Value;
 					This->count = Index + 1;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 				}
 
 				BaseConcurencyDynamicStack& RemoveAllImpl() {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
 						delete[] This->stack;
 						This->count = This->bufferSize = 0;
 						return *this;
@@ -461,7 +461,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				BaseConcurencyDynamicStack& RemoveAllImpl(Lambda&& lambda) {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
 						for (SizeT i = 0; i < This->count; i++) {
 							lambda(MoveRValue(This->stack[i]));
 						}
@@ -473,7 +473,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				SizeT GetCountIfImpl(Lambda&& lambda) {
-					return This->lock.ShareLock([&]() {
+					return This->lock.ShareLock([&]() InlineLambda {
 						SizeT selectedCount = 0;
 
 						SizeT i = This->count;
@@ -513,7 +513,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseConcurencyDynamicStack<THeap, T>& A, Containers::BaseConcurencyDynamicStack<THeap, T>& B) {
+		ForceInline void Swap(Containers::BaseConcurencyDynamicStack<THeap, T>& A, Containers::BaseConcurencyDynamicStack<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

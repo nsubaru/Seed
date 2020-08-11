@@ -38,21 +38,21 @@ namespace Seed {
 					T value;
 
 					///<summary>Пустий конструктор</summary>
-					forceinline elem() :
+					ForceInline elem() :
 						father(nullptr), next(nullptr), prev(nullptr),
 						RefCount(1), value()
 					{};
 					///<summary>Конструктор з присвоєнням значення</summary>
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
-					forceinline elem(const T& obj, list_data* This) :
+					ForceInline elem(const T& obj, list_data* This) :
 						father(This), next(nullptr), prev(nullptr),
 						RefCount(1), value(obj)
 					{};
 					///<summary>Конструктор з переміщенням значення</summary>
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
-					forceinline elem(T&& obj, list_data* This) :
+					ForceInline elem(T&& obj, list_data* This) :
 						father(This), next(nullptr), prev(nullptr),
 						RefCount(1), value(MoveRValue(obj))
 					{};
@@ -60,7 +60,7 @@ namespace Seed {
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
-					forceinline elem(const T& obj, list_data* This, elem* prev) : //-V730
+					ForceInline elem(const T& obj, list_data* This, elem* prev) : //-V730
 						father(This), prev(prev), next(nullptr),
 						RefCount(1), value(obj)
 					{};
@@ -68,7 +68,7 @@ namespace Seed {
 					///<param name = "obj">Значення елемента</param>
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
-					forceinline elem(T&& obj, list_data* This, elem* prev) : //-V730
+					ForceInline elem(T&& obj, list_data* This, elem* prev) : //-V730
 						father(This), prev(prev), next(nullptr),
 						RefCount(1), value(MoveRValue(obj))
 					{};
@@ -77,7 +77,7 @@ namespace Seed {
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
 					///<param name = "next">Покажчик на наступний елемент</param>
-					forceinline elem(const T& obj, list_data* This, elem* prev, elem* next) :
+					ForceInline elem(const T& obj, list_data* This, elem* prev, elem* next) :
 						father(This), prev(prev), next(next),
 						RefCount(1), value(obj)
 					{};
@@ -86,7 +86,7 @@ namespace Seed {
 					///<param name = "This">Покажчик на об'єкт списка який є власником нового елемента</param>
 					///<param name = "prev">Покажчик на попередній елемент</param>
 					///<param name = "next">Покажчик на наступний елемент</param>
-					forceinline elem(T&& obj, list_data* This, elem* prev, elem* next) :
+					ForceInline elem(T&& obj, list_data* This, elem* prev, elem* next) :
 						father(This), prev(prev), next(next),
 						RefCount(1), value(MoveRValue(obj))
 					{};
@@ -108,7 +108,7 @@ namespace Seed {
 					Threading::SRWLock lock;
 
 					///<summary>Конструктор, заповнює початкові дані</summary>
-					forceinline list_data() :
+					ForceInline list_data() :
 						root(nullptr),
 						last(nullptr),
 						size(0),
@@ -120,7 +120,7 @@ namespace Seed {
 				list_data* This;
 			protected:
 				virtual void Dispose() override final {
-					this->This->lock.ExclusiveLock([&]()
+					this->This->lock.ExclusiveLock([&]() InlineLambda
 						{
 							elem* node;
 							while (this->This->root != nullptr)
@@ -216,13 +216,13 @@ namespace Seed {
 				private:
 					///<summary>Конструктор з елемента списку</summary>
 					///<param name = "This">Покажчик на елемент</param>
-					forceinline Iterator(elem* This) :This(This)
+					ForceInline Iterator(elem* This) :This(This)
 					{
 						if (This != nullptr) ++This->RefCount;
 					}
 				public:
 					///<summary>Пустий конструктор</summary>
-					forceinline Iterator() :This(nullptr)
+					ForceInline Iterator() :This(nullptr)
 					{};
 #pragma region Operators
 #pragma region Iterator Ariphmetic
@@ -241,7 +241,7 @@ namespace Seed {
 						}
 						else
 						{
-							return this->This->father->lock.ShareLock([&]()
+							return this->This->father->lock.ShareLock([&]() InlineLambda
 								{
 									this->This = this->This->next;
 									if (this->This != nullptr) ++This->RefCount;
@@ -264,7 +264,7 @@ namespace Seed {
 						}
 						else
 						{
-							return this->This->father->lock.ShareLock([&]()
+							return this->This->father->lock.ShareLock([&]() InlineLambda
 								{
 									this->This = this->This->prev;
 									if (this->This != nullptr) This->RefCount++;
@@ -287,7 +287,7 @@ namespace Seed {
 						}
 						else
 						{
-							this->This->father->lock.ShareLock([&]()
+							this->This->father->lock.ShareLock([&]() InlineLambda
 								{
 									this->This = this->This->next;
 									if (this->This != nullptr) ++This->RefCount;
@@ -309,7 +309,7 @@ namespace Seed {
 						}
 						else
 						{
-							return this->This->father->lock.ShareLock([&]()
+							return this->This->father->lock.ShareLock([&]() InlineLambda
 								{
 									this->This = this->This->prev;
 									if (this->This != nullptr) ++This->RefCount;
@@ -321,24 +321,24 @@ namespace Seed {
 #pragma region Comparing
 					///<summary>Оператор рівності двох ітераторів</summary>
 					///<param name = "seconde">Правий ітератор</param>
-					forceinline bool operator==(const Iterator& second) const
+					ForceInline bool operator==(const Iterator& second) const
 					{
 						return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(second.This);
 					}
 					///<summary>Оператор не рівності двох ітераторів</summary>
 					///<param name = "seconde">Правий ітератор</param>
-					forceinline bool operator!=(const Iterator& second) const
+					ForceInline bool operator!=(const Iterator& second) const
 					{
 						return reinterpret_cast<SizeT>(This) != reinterpret_cast<SizeT>(second.This);
 					}
 
 					///<summary>Оператор рівності з nullptr</summary>
-					forceinline bool operator==(const Seed::NullptrT) const
+					ForceInline bool operator==(const Seed::NullptrT) const
 					{
 						return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(nullptr);
 					}
 					///<summary>Оператор не рівності з nullptr</summary>
-					forceinline bool operator!=(const Seed::NullptrT) const
+					ForceInline bool operator!=(const Seed::NullptrT) const
 					{
 						return This != nullptr;
 					}
@@ -347,7 +347,7 @@ namespace Seed {
 #pragma region Data access operators
 					///<summary>Оператор розіменування ітератора</summary>
 					///<returns>Значення елемента</returns>
-					forceinline T& operator*()
+					ForceInline T& operator*()
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -355,7 +355,7 @@ namespace Seed {
 					}
 					///<summary>Константний оператор розіменування ітератора</summary>
 					///<returns>Константне значення елемента</returns>
-					forceinline const T& operator*() const
+					ForceInline const T& operator*() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -363,7 +363,7 @@ namespace Seed {
 					}
 					///<summary>Оператор доступу до полів/методів структури/класу</summary>
 					///<returns>Покажчик на елемент</returns>
-					forceinline T* operator->()
+					ForceInline T* operator->()
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -371,7 +371,7 @@ namespace Seed {
 					}
 					///<summary>Константний оператор доступу до полів/методів структури/класу</summary>
 					///<returns>Константний покажчик на елемент</returns>
-					forceinline const T* operator->() const
+					ForceInline const T* operator->() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -381,7 +381,7 @@ namespace Seed {
 #pragma endregion
 #pragma region Iterator move
 					///<summary>Вертає наступний елемент</summary>
-					forceinline const Iterator Next() const
+					ForceInline const Iterator Next() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -389,14 +389,14 @@ namespace Seed {
 							//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
 							return Iterator(nullptr);
 						else
-							return This->father->lock.ShareLock([&]()
+							return This->father->lock.ShareLock([&]() InlineLambda
 								{
 									return Iterator(This->next);
 								});
 					}
 
 					///<summary>Попередній елемент</summary>
-					forceinline const Iterator Prev() const
+					ForceInline const Iterator Prev() const
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -404,7 +404,7 @@ namespace Seed {
 							//Якщо батька в елемента немає значить контейнер знищений і відповідно сусідніх елементів немає
 							return Iterator(nullptr);
 						else
-							return This->father->lock.ShareLock([&]()
+							return This->father->lock.ShareLock([&]() InlineLambda
 								{
 									return Iterator(This->prev);
 								});
@@ -425,7 +425,7 @@ namespace Seed {
 						}
 						else
 							//Якщо власник існує то видалення виконується в екслюзивному блокуванні
-							this->This->father->lock.ExclusiveLock([&]()
+							this->This->father->lock.ExclusiveLock([&]() InlineLambda
 								{
 									__assume(this->This->father != nullptr);
 									if (this->This->next == nullptr && this->This->prev == nullptr)
@@ -474,19 +474,19 @@ namespace Seed {
 #pragma region Adding element to list by iterator
 					///<summary>Вставка елемента після заданого</summary>
 					///<param name = "Value">Значення нового елемента</summary>
-					forceinline Iterator Insert(const T& Value)
+					ForceInline Iterator Insert(const T& Value)
 					{
 						return AddAfter(Value);
 					}
 					///<summary>Оптимізована вставка елемента після заданого</summary>
 					///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
-					forceinline Iterator Insert(T&& Value)
+					ForceInline Iterator Insert(T&& Value)
 					{
 						return AddAfter(MoveRValue(Value));
 					}
 					///<summary>Вставка елемента після поточного</summary>
 					///<param name = "Value">Значення нового елемента</summary>
-					forceinline Iterator AddAfter(const T& Value)
+					ForceInline Iterator AddAfter(const T& Value)
 					{
 
 						if (This == nullptr)
@@ -494,7 +494,7 @@ namespace Seed {
 						if (This->father == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 						//Виконується в екслюзивному блокуванні
-						return This->father->lock.ExclusiveLock([&]() mutable
+						return This->father->lock.ExclusiveLock([&]() mutable InlineLambda
 							{
 								//Створення нового елемента
 								auto newAfter = new elem(Value, This->father, This, this->This->next);
@@ -513,14 +513,14 @@ namespace Seed {
 					}
 					///<summary>Оптимізована вставка елемента після поточного</summary>
 					///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
-					forceinline Iterator AddAfter(T&& Value)
+					ForceInline Iterator AddAfter(T&& Value)
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
 						if (This->father == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 						//Виконується в екслюзивному блокуванні
-						return This->father->lock.ExclusiveLock([&, Value = MoveRValue(Value)]() mutable
+						return This->father->lock.ExclusiveLock([&, Value = MoveRValue(Value)]() mutable InlineLambda
 						{
 							//Створення нового елемента
 							auto newAfter = new elem(MoveRValue(Value), This->father, This, this->This->next);
@@ -539,14 +539,14 @@ namespace Seed {
 					}
 					///<summary>Вставка елемента перед поточним</summary>
 					///<param name = "Value">Значення нового елемента</summary>
-					forceinline Iterator AddBefore(const T& Value)
+					ForceInline Iterator AddBefore(const T& Value)
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
 						if (This->father == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 						//Виконується в екслюзивному блокуванні
-						return This->father->lock.ExclusiveLock([&]() mutable
+						return This->father->lock.ExclusiveLock([&]() mutable InlineLambda
 							{
 								//Створення нового елемента
 								auto newBefore = new elem(Value, This->father, nullptr, this->This->father->root);
@@ -565,14 +565,14 @@ namespace Seed {
 					}
 					///<summary>Оптимізована вставка елемента перед поточним</summary>
 					///<param name = "Value">rvalue силка на елемент для ідеальної передачі значення в ново створений елемент</param>
-					forceinline Iterator AddBefore(T&& Value)
+					ForceInline Iterator AddBefore(T&& Value)
 					{
 						if (This == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 						if (This->father == nullptr)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, reinterpret_cast<SizeT>(This->father), 0);
 						//Виконується в екслюзивному блокуванні
-						return This->father->lock.ExclusiveLock([&]() mutable
+						return This->father->lock.ExclusiveLock([&]() mutable InlineLambda
 							{
 								//Створення нового елемента
 								auto newBefore = new elem(MoveRValue(Value), This->father, nullptr, this->This->father->root);
@@ -599,7 +599,7 @@ namespace Seed {
 					/// Копіювальний конструктор ітератора
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
-					forceinline Iterator(const Iterator& iterator) : This(iterator.This) {
+					ForceInline Iterator(const Iterator& iterator) : This(iterator.This) {
 						if (This != nullptr)
 							++This->RefCount;
 					}
@@ -608,7 +608,7 @@ namespace Seed {
 					/// Конструктор переміщення
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
-					forceinline Iterator(Iterator&& iterator) : This(iterator.This) {
+					ForceInline Iterator(Iterator&& iterator) : This(iterator.This) {
 						iterator.This = nullptr;
 					}
 
@@ -617,7 +617,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
 					/// <returns>Силка на поточний об'єкт</returns>
-					forceinline Iterator& operator=(const Iterator& iterator) {
+					ForceInline Iterator& operator=(const Iterator& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(iterator);
 						return *this;
@@ -628,7 +628,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
 					/// <returns>Силка на поточний об'єкт</returns>
-					forceinline Iterator& operator=(Iterator&& iterator) {
+					ForceInline Iterator& operator=(Iterator&& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(MoveRValue(iterator));
 						return *this;
@@ -637,7 +637,7 @@ namespace Seed {
 					/// <summary>
 					/// Деструктор
 					/// </summary>
-					forceinline ~Iterator() {
+					ForceInline ~Iterator() {
 						if (This != nullptr)
 						{
 							if (--This->RefCount == 0)
@@ -653,7 +653,7 @@ namespace Seed {
 				friend Iterator;
 
 				///<summary>Пустий конструктор</summary>
-				forceinline BaseConcurencyList() :This(new list_data)
+				ForceInline BaseConcurencyList() :This(new list_data)
 				{};
 
 				///<summary>Конструктор через list-initializer</summary>
@@ -681,13 +681,13 @@ namespace Seed {
 
 				///<summary>Оператор додавання значення в кінець списку</summary>
 				///<param name = "Value">Значення нового елемента</param>
-				forceinline BaseConcurencyList& operator+=(const T& Value)
+				ForceInline BaseConcurencyList& operator+=(const T& Value)
 				{
 					this->AddLast(Value); return *this;
 				}
 				///<summary>Оптимізований оператор додавання значення в кінець списку</summary>
 				///<param name = "Value">rvalue силка на значення нового елемента</param>
-				forceinline BaseConcurencyList& operator+=(T&& Value)
+				ForceInline BaseConcurencyList& operator+=(T&& Value)
 				{
 					this->AddLast(MoveRValue(Value)); return *this;
 				}
@@ -695,14 +695,14 @@ namespace Seed {
 				///<summary>Додавання елементів списку OtherList в кінець цього списку</summary>
 				///<param name = "OtherList">Другий список</param>
 				///<returns>Силку на поточний список</returns>
-				forceinline BaseConcurencyList& operator+=(const BaseConcurencyList& OtherList) {
+				ForceInline BaseConcurencyList& operator+=(const BaseConcurencyList& OtherList) {
 					if (OtherList.This == this->This)
 						return *this;
 
 					if (OtherList.This->size == 0)
 						return *this;
-					this->This->lock.ExclusiveLock([&]() {
-						OtherList.This->lock.ShareLock([&]() {
+					this->This->lock.ExclusiveLock([&]() InlineLambda {
+						OtherList.This->lock.ShareLock([&]() InlineLambda {
 							auto node = OtherList.This->root;
 							while (node != nullptr) {
 								this->This->last->next = new elem(node->value, this->This, this->This->last);
@@ -718,7 +718,7 @@ namespace Seed {
 				///<summary>Оптимізована додавання елементів до даного списку</summary>
 				///<param name = "OtherList">Другий список</param>
 				///<returns>Силку на поточний список</returns>
-				forceinline BaseConcurencyList& operator+=(BaseConcurencyList&& OtherList) {
+				ForceInline BaseConcurencyList& operator+=(BaseConcurencyList&& OtherList) {
 					if (OtherList.This == this->This)
 						return *this;
 
@@ -729,7 +729,7 @@ namespace Seed {
 					//Ignore OtherList.This->root == null as if it true than OtherList.This->size == 0
 #pragma warning(push)
 #pragma warning(disable: 28182)
-						return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& {
+						return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda {
 							__assume(OtherList.This->root != nullptr);
 							auto item = OtherList.This->root;
 							while (item != nullptr)
@@ -761,7 +761,7 @@ namespace Seed {
 				/// <returns>true якщо всі елементи рівні і їх кількість теж</returns>
 				Boolean operator==(const BaseConcurencyList& second) {
 					if (this->Count == second.Count) {
-						return this->This->lock.ShareLock([&]()
+						return this->This->lock.ShareLock([&]() InlineLambda
 							{
 								auto it1 = this->This->root;
 								auto it2 = second.This->root;
@@ -780,13 +780,13 @@ namespace Seed {
 #pragma endregion
 #pragma region Item count methods
 				///<summary>Вертає true якщо список пустий</summary>
-				forceinline Boolean IsEmpty() const
+				ForceInline Boolean IsEmpty() const
 				{
 					return (this->This == nullptr || this->This->size == 0);
 				}
 
 				///<summary>Вертає кількість елементів в списку</summary>
-				forceinline virtual SizeT GetCount() const
+				ForceInline virtual SizeT GetCount() const
 				{
 					return IsEmpty() ? 0ull : (SizeT)This->size; //-V2517
 				}
@@ -797,43 +797,43 @@ namespace Seed {
 #pragma region Iterators
 #pragma region Gettter
 				///<summary>Одержання ітератора на перший елемент</summary>
-				forceinline Iterator GetRoot()
+				ForceInline Iterator GetRoot()
 				{
 					if (This == nullptr) return GetEnd();
-					return this->This->lock.ShareLock([&]()
+					return this->This->lock.ShareLock([&]() InlineLambda
 						{
 							return Iterator(This->root);
 						});
 				}
 				///<summary>Одержання ітератора на останій елемент</summary>
-				forceinline Iterator GetLast()
+				ForceInline Iterator GetLast()
 				{
 					if (This == nullptr) return GetEnd();
-					return this->This->lock.ShareLock([&]()
+					return this->This->lock.ShareLock([&]() InlineLambda
 						{
 							return Iterator(This->last);
 						});
 				}
 				///<summary>Константне одержання ітератора на перший елемент</summary>
-				forceinline const Iterator GetRoot() const
+				ForceInline const Iterator GetRoot() const
 				{
 					if (This == nullptr) return GetEnd();
-					return this->This->lock.ShareLock([&]()
+					return this->This->lock.ShareLock([&]() InlineLambda
 						{
 							return Iterator(This->root);
 						});
 				}
 				///<summary>Константне одержання ітератора на останій елемент</summary>
-				forceinline const Iterator GetLast() const
+				ForceInline const Iterator GetLast() const
 				{
 					if (This == nullptr) return GetEnd();
-					return this->This->lock.ShareLock([&]()
+					return this->This->lock.ShareLock([&]() InlineLambda
 						{
 							return Iterator(This->last);
 						});
 				}
 				///<summary>Одержання нуль ітератора на кінець списку</summary>
-				forceinline static Iterator GetEnd()
+				ForceInline static Iterator GetEnd()
 				{
 					return Iterator(nullptr);
 				}
@@ -864,7 +864,7 @@ namespace Seed {
 						return This->last;
 					}
 					//Виконується в ексклюзивній блокировці
-					return this->This->lock.ExclusiveLock([&]() mutable
+					return this->This->lock.ExclusiveLock([&]() mutable InlineLambda
 						{
 							this->This->last = this->This->last->next = new elem(Value, This, This->last);
 							++This->size;
@@ -890,7 +890,7 @@ namespace Seed {
 						return This->last;
 					}
 					//Виконується в ексклюзивній блокировці
-					return this->This->lock.ExclusiveLock([&]() mutable
+					return this->This->lock.ExclusiveLock([&]() mutable InlineLambda
 						{
 							this->This->last = this->This->last->next = new elem(MoveRValue(Value), This, This->last);
 							++This->size;
@@ -929,17 +929,17 @@ namespace Seed {
 			public:
 #pragma region For each support methods
 				///<summary>Вертає константний ітератор на початок для циклу з перебором</summary>
-				forceinline const Iterator begin() const
+				ForceInline const Iterator begin() const
 				{
 					return GetRoot();
 				}
 				///<summary>Вертає константний ітератор на кінець для циклу з перебором</summary>
-				forceinline const Iterator end() const
+				ForceInline const Iterator end() const
 				{
 					return nullptr;
 				}
 				///<summary>Вертає ітератор на початок для циклу з перебором</summary>
-				forceinline Iterator begin()
+				ForceInline Iterator begin()
 				{
 					return GetRoot();
 				}
@@ -958,7 +958,7 @@ namespace Seed {
 					}
 					else
 						//Якщо власник існує то видалення виконується в екслюзивному блокуванні
-						node.This->father->lock.ExclusiveLock([&]()
+						node.This->father->lock.ExclusiveLock([&]() InlineLambda
 							{
 								__assume(node.This->father != nullptr);
 								if (node.This->next == nullptr && node.This->prev == nullptr)
@@ -1010,7 +1010,7 @@ namespace Seed {
                 /// <returns>Вертає новий масив з копією всіх елементів</returns>
                 template<typename = void> requires (Concepts::IsClonable<T>) 
                 BaseConcurencyList Clone() const {
-					return This->lock.ShareLock([&]() inlinelambda {
+					return This->lock.ShareLock([&]() InlineLambda {
 						BaseConcurencyList result;
 						result.This->size = This->size;
 						elem* node = This->root;
@@ -1039,7 +1039,7 @@ namespace Seed {
 				/// <param name="lambda">Лямбда або функтор який виконає клонування всіх елементів</param>
                 template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
                 BaseConcurencyList Clone(TLambda&& lambda) const {
-					return This->lock.ShareLock([&]() inlinelambda {
+					return This->lock.ShareLock([&]() InlineLambda {
 						BaseConcurencyList result;
 						result.This->size = This->size;
 						elem* node = This->root;
@@ -1074,7 +1074,7 @@ namespace Seed {
 				BaseConcurencyList& ForEachImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
                                   TypeTraits::IsInvockable<TLambda, T&>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyList& InlineLambda {
 							auto node = this->This->root;
 							while (node != nullptr) {
 								lambda(node->value);
@@ -1085,7 +1085,7 @@ namespace Seed {
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT> ||
                                        TypeTraits::IsInvockable<TLambda, T&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyList& InlineLambda {
 							auto node = this->This->root;
 							SizeT index = 0;
 							while (node != nullptr) {
@@ -1104,7 +1104,7 @@ namespace Seed {
 				template<typename TLambda>
 				const BaseConcurencyList& ForEachImpl(TLambda&& lambda) const {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
-						return This->lock.ShareLock([&]() -> const BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyList& InlineLambda {
 							auto node = this->This->root;
 							while (node != nullptr) {
 								lambda(node->value);
@@ -1114,7 +1114,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
-						return This->lock.ShareLock([&]() -> const BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyList& InlineLambda {
 							auto node = this->This->root;
 							SizeT index = 0;
 							while (node != nullptr) {
@@ -1134,7 +1134,7 @@ namespace Seed {
 				BaseConcurencyList& ForEachImpl(TLambda&& lambda, SizeT count) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
                                   TypeTraits::IsInvockable<TLambda, T&>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyList& InlineLambda {
 							if (count > this->This->size)
 							{
 								auto node = this->This->root;
@@ -1160,7 +1160,7 @@ namespace Seed {
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT> ||
                                        TypeTraits::IsInvockable<TLambda, T&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyList& InlineLambda {
 							if (count > this->This->size)
 							{
 								auto node = this->This->root;
@@ -1194,7 +1194,7 @@ namespace Seed {
 				template<typename TLambda>
 				const BaseConcurencyList& ForEachImpl(TLambda&& lambda, SizeT count) const {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyList& InlineLambda {
 							if (count > this->This->size)
 							{
 								auto node = this->This->root;
@@ -1219,7 +1219,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyList& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyList& InlineLambda {
 							if (count > this->This->size)
 							{
 								auto node = this->This->root;
@@ -1252,8 +1252,8 @@ namespace Seed {
 
 			protected:
 				template<typename U, typename TLambda>
-				forceinline U AggregateImpl(TLambda&& lambda) const {
-					return this->This->lock.ShareLock([&]() {
+				ForceInline U AggregateImpl(TLambda&& lambda) const {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						U value;
 						auto node = this->This->root;
 						SizeT index = 0;
@@ -1267,8 +1267,8 @@ namespace Seed {
 				}
 
 				template<typename U, typename TLambda>
-				forceinline T AggregateImpl(TLambda&& lambda, const U& value) const {
-					return this->This->lock.ShareLock([&]() {
+				ForceInline T AggregateImpl(TLambda&& lambda, const U& value) const {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						auto node = this->This->root;
 						U result = value;
 						SizeT index = 0;
@@ -1282,8 +1282,8 @@ namespace Seed {
 				}
 
 				template<typename U, typename TLambda>
-				forceinline U AggregateImpl(TLambda&& lambda, U&& value) const {
-					return this->This->lock.ShareLock([&]() {
+				ForceInline U AggregateImpl(TLambda&& lambda, U&& value) const {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						auto node = this->This->root;
 						SizeT index = 0;
 						while (node != nullptr) {
@@ -1295,11 +1295,11 @@ namespace Seed {
 						});
 				}
 
-				forceinline bool AnyImpl() const { return this->This->size > 0; }
+				ForceInline bool AnyImpl() const { return this->This->size > 0; }
 
 				template<typename TLambda>
-				forceinline bool AnyImpl(TLambda lambda) const {
-					return this->This->lock.ShareLock([&]() {
+				ForceInline bool AnyImpl(TLambda lambda) const {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						auto node = this->This->root;
 						SizeT index = 0;
 						while (node != nullptr) {
@@ -1313,8 +1313,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline bool AllImpl(TLambda lambda) const {
-					return this->This->lock.ShareLock([&]() {
+				ForceInline bool AllImpl(TLambda lambda) const {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						auto node = this->This->root;
 						SizeT index = 0;
 						while (node != nullptr) {
@@ -1327,8 +1327,8 @@ namespace Seed {
 						});
 				}
 
-				forceinline BaseConcurencyList& SortByImpl(bool IsDescending = true) {
-					return This->lock.ExclusiveLock([&] () -> BaseConcurencyList&
+				ForceInline BaseConcurencyList& SortByImpl(bool IsDescending = true) {
+					return This->lock.ExclusiveLock([&] () -> BaseConcurencyList& InlineLambda
 					{
 						if (IsDescending)
 						{
@@ -1358,8 +1358,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseConcurencyList& SortByLambdaImpl(TLambda&& lambda) {
-					return This->lock.ExclusiveLock([&] () -> BaseConcurencyList&
+				ForceInline BaseConcurencyList& SortByLambdaImpl(TLambda&& lambda) {
+					return This->lock.ExclusiveLock([&] () -> BaseConcurencyList& InlineLambda
 					{
 						if (This->size == 0)
 							return *this;
@@ -1378,8 +1378,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline T& FirstImpl(TLambda&& lambda) {
-					return This->lock.ShareLock([&]() -> T& {
+				ForceInline T& FirstImpl(TLambda&& lambda) {
+					return This->lock.ShareLock([&]() -> T& InlineLambda {
 						elem* node = This->root;
 						while (node != nullptr)
 							if (lambda(node->value))
@@ -1392,8 +1392,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline T& LastImpl(TLambda&& lambda) {
-					return This->lock.ShareLock([&]() -> T& {
+				ForceInline T& LastImpl(TLambda&& lambda) {
+					return This->lock.ShareLock([&]() -> T& InlineLambda {
 						elem* node = This->root;
 						elem* selected = nullptr;
 						while (node != nullptr) {
@@ -1409,8 +1409,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline const T& FirstImpl(TLambda&& lambda) const {
-					return This->lock.ShareLock([&]() -> const T& {
+				ForceInline const T& FirstImpl(TLambda&& lambda) const {
+					return This->lock.ShareLock([&]() -> const T& InlineLambda {
 						elem* node = This->root;
 						while (node != nullptr)
 							if (lambda(node->value))
@@ -1423,8 +1423,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline const T& LastImpl(TLambda&& lambda) const {
-					return This->lock.ShareLock([&]() -> const T& {
+				ForceInline const T& LastImpl(TLambda&& lambda) const {
+					return This->lock.ShareLock([&]() -> const T& InlineLambda {
 						elem* node = This->root;
 						elem* selected = nullptr;
 						while (node != nullptr) {
@@ -1440,8 +1440,8 @@ namespace Seed {
 						});
 				}
 
-				forceinline BaseConcurencyList& ReverseImpl() {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyList& {
+				ForceInline BaseConcurencyList& ReverseImpl() {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda {
 						elem* temp = nullptr;
 						elem* current = This->root;
 
@@ -1456,7 +1456,7 @@ namespace Seed {
 					});
 				}
 
-				forceinline void UnsafeAdd(const T& Value) {
+				ForceInline void UnsafeAdd(const T& Value) {
 					if (this->This->root == nullptr) {
 						this->This->root = this->This->last = new elem(Value, this->This);
 					}
@@ -1466,7 +1466,7 @@ namespace Seed {
 					++this->This->size;
 				}
 
-				forceinline void UnsafeAdd(T&& Value) {
+				ForceInline void UnsafeAdd(T&& Value) {
 					if (this->This->root == nullptr) {
 						this->This->root = this->This->last = new elem(MoveRValue(Value), this->This);
 					}
@@ -1476,8 +1476,8 @@ namespace Seed {
 					++this->This->size;
 				}
 
-				forceinline BaseConcurencyList& RemoveAllImpl() {
-					return this->This->lock.ExclusiveLock([&] () -> BaseConcurencyList&
+				ForceInline BaseConcurencyList& RemoveAllImpl() {
+					return this->This->lock.ExclusiveLock([&] () -> BaseConcurencyList& InlineLambda
 					{
 						elem* node;
 						while (this->This->root != nullptr)
@@ -1500,8 +1500,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseConcurencyList& RemoveAllImpl(TLambda && lambda) {
-					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
+				ForceInline BaseConcurencyList& RemoveAllImpl(TLambda && lambda) {
+					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda
 					{
 						elem* node;
 						while (this->This->root != nullptr)
@@ -1525,8 +1525,8 @@ namespace Seed {
 				}
 
 				template<typename TFilterLambda, typename TLambda>
-				forceinline BaseConcurencyList& RemoveIfFilterAndLambdaWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
-					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
+				ForceInline BaseConcurencyList& RemoveIfFilterAndLambdaWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
+					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda
 						{
 							if (This == nullptr)
 								return *this;
@@ -1582,7 +1582,7 @@ namespace Seed {
 
 				template<typename TFilterLambda, typename TLambda>
 				BaseConcurencyList& RemoveIfFilterWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
-					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
+					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda
 						{
 							if (This == nullptr)
 								return *this;
@@ -1638,7 +1638,7 @@ namespace Seed {
 
 				template<typename TFilterLambda, typename TLambda>
 				BaseConcurencyList& RemoveIfLambdaWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
-					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
+					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda
 						{
 							if (This == nullptr)
 								return *this;
@@ -1694,7 +1694,7 @@ namespace Seed {
 
 				template<typename TFilterLambda, typename TLambda>
 				BaseConcurencyList& RemoveIfFilterAndLambdaWithoutIndex(TFilterLambda&& filter, TLambda&& lambda) {
-					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList&
+					return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda
 						{
 							if (This == nullptr)
 								return *this;
@@ -1749,7 +1749,7 @@ namespace Seed {
 				}
 
 				template<typename TFilterLambda, typename TLambda>
-				forceinline BaseConcurencyList& RemoveIfImpl(TFilterLambda&& filter, TLambda&& lambda) {
+				ForceInline BaseConcurencyList& RemoveIfImpl(TFilterLambda&& filter, TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, T&&>&&
 						TypeTraits::IsInvockableWithResult<TFilterLambda, Boolean, const T&>) {
 						return RemoveIfFilterAndLambdaWithoutIndex(MoveRValue(filter), MoveRValue(lambda));
@@ -1771,8 +1771,8 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline SizeT GetCountIfImpl(TLambda&& lambda) {
-					return This->lock.ShareLock([&]() {
+				ForceInline SizeT GetCountIfImpl(TLambda&& lambda) {
+					return This->lock.ShareLock([&]() InlineLambda {
 						SizeT selectedCount = 0;
 
 						auto node = this->This->root;
@@ -1828,13 +1828,13 @@ namespace Seed {
 
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseConcurencyList<THeap, T>& A, Containers::BaseConcurencyList<THeap, T>& B) {
+		ForceInline void Swap(Containers::BaseConcurencyList<THeap, T>& A, Containers::BaseConcurencyList<THeap, T>& B) {
 			//TODO: Interlocked exchange
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(typename Containers::BaseConcurencyList<THeap, T>::Iterator& A, typename Containers::BaseConcurencyList<THeap, T>::Iterator& B) {
+		ForceInline void Swap(typename Containers::BaseConcurencyList<THeap, T>::Iterator& A, typename Containers::BaseConcurencyList<THeap, T>::Iterator& B) {
 			//TODO: Interlocked exchange
 			Swap(A.This, B.This);
 		}

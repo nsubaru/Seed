@@ -117,7 +117,7 @@ bool Seed::Core::Testing::Test::DI::RegisterService::Excecute() {
 
 bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
 	auto serviceRecord = Reflection::ObjectRTTIRecord(TypeTraits::TypeTag<TestObject1Definition>{});
-	auto methodRecord = serviceRecord.Methods.First([] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& record)
+	auto methodRecord = serviceRecord.Methods.First([] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& record) InlineLambda
 	{
 		return record.Name == L"Method4";
 	});

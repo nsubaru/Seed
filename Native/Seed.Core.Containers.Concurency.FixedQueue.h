@@ -27,11 +27,11 @@ namespace Seed {
 					T queue[TSize];
 					Threading::DataFlowControler flowControler;
 
-					forceinline T& operator[](SizeT Index) {
+					ForceInline T& operator[](SizeT Index) {
 						return queue[(front + Index) % TSize];
 					}
 
-					forceinline Data() :
+					ForceInline Data() :
 						front(0),
 						rear(0),
 						count(0),
@@ -43,18 +43,18 @@ namespace Seed {
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() final override {}
+				ForceInline virtual void Dispose() final override {}
 			public:
 				/// <summary>
 				/// Пустий конструктор ініціалізовує пусту чергу
 				/// </summary>
-				forceinline BaseConcurencyFixedQueue() : This(new Data()) {}
+				ForceInline BaseConcurencyFixedQueue() : This(new Data()) {}
 
 				/// <summary>
 				/// Конструктор з списку елементів, якщо елементів забагато то решта ігнорується
 				/// </summary>
 				/// <param name="list">Список елементів</param>
-				forceinline BaseConcurencyFixedQueue(InitilizerList<T>&& list) : BaseConcurencyFixedQueue() {
+				ForceInline BaseConcurencyFixedQueue(InitilizerList<T>&& list) : BaseConcurencyFixedQueue() {
 					if (list.size() != 0) {
 						SizeT ActuallyCopyied = (TSize < list.size()) ? TSize : list.size();
 						auto it = list.begin();
@@ -72,8 +72,8 @@ namespace Seed {
 				/// якщо в черзі немає місця то потік очікує звільнення місця
 				/// </summary>
 				/// <param name="Value">Значення елемента</param>
-				forceinline void Enqueue(const T& Value) {
-					This->flowControler.Produce([&]() {
+				ForceInline void Enqueue(const T& Value) {
+					This->flowControler.Produce([&]() InlineLambda {
 						if (++This->count > TSize)
 							This->flowControler.WaitForConcumer();
 						SizeT newRear = (This->rear + 1) % TSize;
@@ -87,8 +87,8 @@ namespace Seed {
 				/// якщо в черзі немає місця то потік очікує звільнення місця
 				/// </summary>
 				/// <param name="Value">Значення елемента</param>
-				forceinline void Enqueue(T&& Value) {
-					This->flowControler.Produce([&, Value = MoveRValue(Value)]() {
+				ForceInline void Enqueue(T&& Value) {
+					This->flowControler.Produce([&, Value = MoveRValue(Value)]() InlineLambda {
 						if (++This->count > TSize)
 							This->flowControler.WaitForConcumer();
 						SizeT newRear = (This->rear + 1) % TSize;
@@ -101,8 +101,8 @@ namespace Seed {
 				/// Виймає елемент з черги, якщо черга пуста то призупиняє виконання потоку
 				/// </summary>
 				/// <returns>Вийнятий елемент</returns>
-				forceinline T Dequeue() {
-					return This->flowControler.Concume([&]() -> T {
+				ForceInline T Dequeue() {
+					return This->flowControler.Concume([&]() -> T InlineLambda {
 						if (This->count == 0)
 							This->flowControler.WaitForProducer();
 						T res = MoveRValue(This->queue[This->front]);
@@ -116,8 +116,8 @@ namespace Seed {
 				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
 				/// </summary>
 				/// <returns>Значення елемента</returns>
-				forceinline const T& Top() {
-					return This->flowControler.SharedLock([&]() -> const T& {
+				ForceInline const T& Top() {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->front == This->rear)
 							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
@@ -128,8 +128,8 @@ namespace Seed {
 				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
 				/// </summary>
 				/// <returns>Значення елемента</returns>
-				forceinline const T& Top() const {
-					return This->flowControler.SharedLock([&]() -> const T& {
+				ForceInline const T& Top() const {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->front == This->rear)
 							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
@@ -143,7 +143,7 @@ namespace Seed {
 				/// Вертає кількість елементів в черзі
 				/// </summary>
 				/// <returns>Поточна кількість елементів в черзі</returns>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 
 				/// <summary>
 				/// Поточна кількість елементів в черзі
@@ -186,7 +186,7 @@ namespace Seed {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&> ||
 						TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
 
-						return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& {
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& InlineLambda {
 							for (SizeT i = 0; i < This->count; i++)
 							{
 								lambda((*This)[i]);
@@ -197,7 +197,7 @@ namespace Seed {
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT> ||
 						TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
 
-						return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& {
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& InlineLambda {
 							SizeT Index = 0;
 
 							for (SizeT i = 0; i < This->count; i++, Index)
@@ -216,7 +216,7 @@ namespace Seed {
 				template<typename Lambda>
 				const BaseConcurencyFixedQueue& ForEachImpl(Lambda&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyFixedQueue& {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyFixedQueue& InlineLambda {
 							for (SizeT i = 0; i < This->count; i++)
 							{
 								lambda((*This)[i]);
@@ -225,7 +225,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyFixedQueue& {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyFixedQueue& InlineLambda {
 							SizeT Index = 0;
 
 							for (SizeT i = 0; i < This->count; i++, Index)
@@ -243,7 +243,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() InlineLambda {
 						U result = U();
 
 						if (This->count == 0) {
@@ -261,7 +261,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda, const U& Value) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() InlineLambda {
 						U result = Value;
 						if (This->count == 0) {
 							ReleaseLockSharedSRWLock(&This->Lock);
@@ -279,7 +279,7 @@ namespace Seed {
 
 				template<typename U, typename Lambda>
 				U AggregateImpl(Lambda&& lambda, U&& Value) const {
-					return This->flowControler.SharedLock([&, Value = MoveRValue(Value)]() mutable {
+					return This->flowControler.SharedLock([&, Value = MoveRValue(Value)]() mutable InlineLambda {
 						U result = MoveRValue(Value);
 
 						if (This->count == 0)
@@ -294,11 +294,11 @@ namespace Seed {
 					});
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
 				bool AnyImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() InlineLambda {
 						if (This->count == 0)
 							return false;
 
@@ -314,7 +314,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				bool AllImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() InlineLambda {
 						if (This->count == 0)
 							return false;
 
@@ -330,7 +330,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& FirstImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&]() -> T& {
+					return This->flowControler.SharedLock([&]() -> T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -348,7 +348,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& LastImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&]() -> T& {
+					return This->flowControler.SharedLock([&]() -> T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -375,7 +375,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& FirstImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() -> const T& {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -393,7 +393,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& LastImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() -> const T& {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -419,7 +419,7 @@ namespace Seed {
 				}
 
 				BaseConcurencyFixedQueue& ReverseImpl() {
-					return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& {
+					return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& InlineLambda {
 						for (SizeT i = 0; i < This->count / 2; i++)
 						{
 							Seed::Swap((*This)[i], (*This)[(This->count - 1) - i]);
@@ -428,20 +428,20 @@ namespace Seed {
 						});
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->queue[Index] = Value;
 					This->count = Index;
 					This->rear = Index;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->queue[Index] = MoveRValue(Value);
 					This->count = Index;
 					This->rear = Index;
 				}
 
-				forceinline BaseConcurencyFixedQueue& RemoveAllImpl() {
-					return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& {
+				ForceInline BaseConcurencyFixedQueue& RemoveAllImpl() {
+					return This->flowControler.SharedLock([&]() -> BaseConcurencyFixedQueue& InlineLambda {
 						if (This->count == 0)
 							return *this;
 						for (SizeT i = 0; i < This->count; i++)
@@ -453,8 +453,8 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline BaseConcurencyFixedQueue& RemoveAllImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&, lambda = MoveRValue(lambda)]()->BaseConcurencyFixedQueue& {
+				ForceInline BaseConcurencyFixedQueue& RemoveAllImpl(Lambda&& lambda) {
+					return This->flowControler.SharedLock([&, lambda = MoveRValue(lambda)]()->BaseConcurencyFixedQueue& InlineLambda {
 						if (This->count == 0)
 							return *this;
 						for (SizeT i = 0; i < This->count; i++)
@@ -493,7 +493,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		forceinline void Swap(Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& A, Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& B) {
+		ForceInline void Swap(Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& A, Containers::BaseConcurencyFixedQueue<THeap, TSize, T>& B) {
 			//TODO: Interlooked exchange
 			Swap(A.This, B.This);
 		}

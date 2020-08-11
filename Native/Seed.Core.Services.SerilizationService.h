@@ -31,13 +31,13 @@ namespace Seed
 			{
 				template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<TypeTraits::IsSameV<T, Containers::Dynamic>, void>> {
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+                    ForceInline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 						{
 							return item.Key == data.Type;
 						}))
 						{
-							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 							{
 								return item.Key == data.Type;
 							});
@@ -53,13 +53,13 @@ namespace Seed
 						}
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
-						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+                    ForceInline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 						{
 							return item.Key == data.Type;
 						}))
 						{
-							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 							{
 								return item.Key == data.Type;
 							});
@@ -74,31 +74,31 @@ namespace Seed
 						}
                     }
 
-                    forceinline static constexpr Boolean IsMemCopy() {
+                    ForceInline static constexpr Boolean IsMemCopy() {
                         return false;
                     }
 
-                    forceinline static constexpr auto TypeHint() {
+                    ForceInline static constexpr auto TypeHint() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
                     }
 
-                    forceinline static constexpr auto ConstexprSize() {
+                    ForceInline static constexpr auto ConstexprSize() {
                         return
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						String cxxTypeName;
 						
 						BaseSerlizationHandler<THeap, String>::DeserelizeImpl(cxxTypeName, rawStream, offset, registry);
 
-						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 						{
 							return item.Key.CxxTypeName == cxxTypeName;
 						}))
 						{
-							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 							{
 								return item.Key.CxxTypeName == cxxTypeName;
 							});
@@ -111,7 +111,7 @@ namespace Seed
 						}
                     }
 
-                    forceinline static constexpr auto TypeMetaData() {
+                    ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
@@ -131,13 +131,13 @@ namespace Seed
 
 				template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<TypeTraits::IsSameV<T, Reflection::DynamicObject>, void>> {
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+                    ForceInline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 						{
 							return item.Key == data.ValueType;
 						}))
 						{
-							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 							{
 								return item.Key == data.ValueType;
 							});
@@ -153,13 +153,13 @@ namespace Seed
 						}
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
-						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+                    ForceInline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 						{
 							return item.Key == data.ValueType;
 						}))
 						{
-							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 							{
 								return item.Key == data.ValueType;
 							});
@@ -174,31 +174,31 @@ namespace Seed
 						}
                     }
 
-                    forceinline static constexpr Boolean IsMemCopy() {
+                    ForceInline static constexpr Boolean IsMemCopy() {
                         return false;
                     }
 
-                    forceinline static constexpr auto TypeHint() {
+                    ForceInline static constexpr auto TypeHint() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
                     }
 
-                    forceinline static constexpr auto ConstexprSize() {
+                    ForceInline static constexpr auto ConstexprSize() {
                         return
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						String cxxTypeName;
 						
 						BaseSerlizationHandler<THeap, String>::DeserelizeImpl(cxxTypeName, rawStream, offset, registry);
 
-						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+						if (registry.Any([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 						{
 							return item.Key.CxxTypeName == cxxTypeName;
 						}))
 						{
-							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item)
+							auto& record = registry.First([&] (const CTTI::TypeTraits::CTTITypeMetaData<TypesRegistry>::ItemType& item) InlineLambda
 							{
 								return item.Key.CxxTypeName == cxxTypeName;
 							});
@@ -211,7 +211,7 @@ namespace Seed
 						}
                     }
 
-                    forceinline static constexpr auto TypeMetaData() {
+                    ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +

@@ -23,7 +23,7 @@ namespace Seed {
 				/// </summary>
 				/// <returns></returns>
 				static inline Containers::List<String> LoadedTests() {
-					return GetAllTests().CopyTo<Containers::List>([] (const TestRecord& record)
+					return GetAllTests().CopyTo<Containers::List>([] (const TestRecord& record) InlineLambda
 					{
 						return record.Key.TypeName;
 					});

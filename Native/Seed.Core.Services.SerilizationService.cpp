@@ -8,12 +8,12 @@ using namespace Seed;
 String Seed::Core::Services::SerilizationService::GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) {
 	auto& typeRegistry = This->idi.GetTypesRegistry();
 
-	if (typeRegistry.Any([&] (const auto& item)
+	if (typeRegistry.Any([&] (const auto& item) InlineLambda
 	{
 		return item.Key == data.ValueType;
 	}))
 	{
-		auto typeRecord = typeRegistry.First([&] (const auto& item)
+		auto typeRecord = typeRegistry.First([&] (const auto& item) InlineLambda
 		{
 			return item.Key == data.ValueType;
 		});

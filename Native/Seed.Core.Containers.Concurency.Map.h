@@ -23,15 +23,15 @@ namespace Seed {
 					BasePair<THeap, TKey, TValue> data;
 
 					///<summary>Гетер ключа</summary>
-					forceinline const TKey& GetKey() const { return data.Key; }
+					ForceInline const TKey& GetKey() const { return data.Key; }
 					///<summary>Гетер значення</summary>
-					forceinline TValue& GetValue() { return data.Value; }
+					ForceInline TValue& GetValue() { return data.Value; }
 					///<summary>Гетер значення</summary>
-					forceinline const TValue& GetValue() const { return data.Value; }
+					ForceInline const TValue& GetValue() const { return data.Value; }
 					///<summary>Сеттер значення</summary>
-					forceinline void SetValue(const TValue& newValue) { data.Value = newValue; }
+					ForceInline void SetValue(const TValue& newValue) { data.Value = newValue; }
 					///<summary>Оптимізований сеттер значення</summary>
-					forceinline void SetValue(TValue&& newValue) { data.Value = MoveRValue(newValue); }
+					ForceInline void SetValue(TValue&& newValue) { data.Value = MoveRValue(newValue); }
 
 					///<summary>Ключ</summary>
 					TKey Property(GetKey) key;
@@ -54,27 +54,27 @@ namespace Seed {
 					RefCountT RefCount;
 
 					///<summary>Конструктор копіювання ключа і значення</summary>
-					forceinline Node(const TKey& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					ForceInline Node(const TKey& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор переміщення значення і копіювання значення</summary>
-					forceinline Node(TKey&& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>((MoveRValue(key)), value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					ForceInline Node(TKey&& key, const TValue& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>((MoveRValue(key)), value)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{}
 
 					///<summary>Конструктор копіювання значення і переміщення значення</summary>
-					forceinline Node(const TKey& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					ForceInline Node(const TKey& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(key, MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор переміщення і значення і ключа</summary>
-					forceinline Node(TKey&& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(MoveRValue(key), MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					ForceInline Node(TKey&& key, TValue&& value, Node* father, Tree* This) : data(BasePair<THeap, TKey, TValue>(MoveRValue(key), MoveRValue(value))), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор копіювання пари ключ і значення</summary>
-					forceinline Node(const BasePair<THeap, TKey, TValue>& data, Node* father, Tree* This) : data(data), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					ForceInline Node(const BasePair<THeap, TKey, TValue>& data, Node* father, Tree* This) : data(data), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					///<summary>Конструктор переміщення пари ключ і значення</summary>
-					forceinline Node(BasePair<THeap, TKey, TValue>&& data, Node* father, Tree* This) : data(MoveRValue(data)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
+					ForceInline Node(BasePair<THeap, TKey, TValue>&& data, Node* father, Tree* This) : data(MoveRValue(data)), height(1), father(father), This(This), right(nullptr), left(nullptr), RefCount(1)
 					{};
 
 					friend BaseConcurencyMap;
@@ -94,13 +94,13 @@ namespace Seed {
 
 					RefCountT RefCount;
 
-					forceinline Tree() : root(nullptr), count(0), lock(), RefCount(1) {}
+					ForceInline Tree() : root(nullptr), count(0), lock(), RefCount(1) {}
 				};
 			private:
 				///<summary>Дані об'єкта</summary>
 				Tree* This;
 			protected:
-				forceinline virtual void Dispose() final override {
+				ForceInline virtual void Dispose() final override {
 					This->lock.ExclusiveLock([&]() {
 						DestroyTree(This->root);
 						});
@@ -111,7 +111,7 @@ namespace Seed {
 				///<param name = "key">Ключ по якому шукає</param>
 				///<returns>Елемент дерева або <c>nullptr<c></returns>
 				template<typename UKey>
-				forceinline static Node* Find(Node* node, const UKey& key) {
+				ForceInline static Node* Find(Node* node, const UKey& key) {
 					if (node == nullptr)
 						return nullptr;
 					if (node->key == key)
@@ -126,21 +126,21 @@ namespace Seed {
 				///<summary>Обчислення висоти дерева</summary>
 				///<param name = "node">Елемент для якого відбувається обчилення</summary>
 				///<returns>Значення висоти</summary>
-				forceinline static UInt16 Height(Node* node)
+				ForceInline static UInt16 Height(Node* node)
 				{
 					return node ? node->height : 0;
 				}
 				///<summary>Обчислює різницю висот правого і лівого під елемента</summary>
 				///<param name = "node">Батьківський елемент</param>
 				///<returns>Відємне значення вказує що у правого вища висота, додатнє - у лівого, 0 рівні по висоті</returns>
-				forceinline static Int16 BFactor(Node* node)
+				ForceInline static Int16 BFactor(Node* node)
 				{
 					return  Height(node->right) - Height(node->left);
 				}
 
 				///<summary>Переобчислює висоту даного елемента</summary>
 				///<param name = "node">Елемент для якого оновлюється значення висоти</param>
-				forceinline static void FixHeight(Node* node)
+				ForceInline static void FixHeight(Node* node)
 				{
 					UInt16 HLeft = Height(node->left);
 					UInt16 HRight = Height(node->right);
@@ -150,7 +150,7 @@ namespace Seed {
 				///<summary>Правий малий поворот дерева</summary>
 				///<param name = "node">Елемент відносно якого відбувається поворот</param>
 				///<returns>Новий батьківський елемент</summary>
-				forceinline static Node* RotateRight(Node* node)
+				ForceInline static Node* RotateRight(Node* node)
 				{
 					Node* left = node->left;
 					Node* node_father = node->father;
@@ -173,7 +173,7 @@ namespace Seed {
 				///<summary>Лвий малий поворот дерева</summary>
 				///<param name = "node">Елемент відносно якого відбувається поворот</param>
 				///<returns>Новий батьківський елемент</summary>
-				static forceinline Node* RotateLeft(Node* node)
+				static ForceInline Node* RotateLeft(Node* node)
 				{
 					Node* right = node->right;
 					Node* node_father = node->father;
@@ -223,7 +223,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline Node* Insert(Node* node, const TKey& key, const TValue& value, Node* father)
+				ForceInline Node* Insert(Node* node, const TKey& key, const TValue& value, Node* father)
 				{
 					if (!node) return new Node(key, value, father, this->This);
 					if (key < node->key)
@@ -242,7 +242,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline Node* Insert(Node* node, TKey&& key, const TValue& value, Node* father)
+				ForceInline Node* Insert(Node* node, TKey&& key, const TValue& value, Node* father)
 				{
 					if (!node) return new Node(MoveRValue(key), value, father, this->This);
 					if (key < node->key)
@@ -261,7 +261,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline Node* Insert(Node* node, const TKey& key, TValue&& value, Node* father)
+				ForceInline Node* Insert(Node* node, const TKey& key, TValue&& value, Node* father)
 				{
 					if (!node) return new Node(key, MoveRValue(value), father, this->This);
 					if (key < node->key)
@@ -280,7 +280,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline Node* Insert(Node* node, TKey&& key, TValue&& value, Node* father)
+				ForceInline Node* Insert(Node* node, TKey&& key, TValue&& value, Node* father)
 				{
 					if (!node) return new Node(MoveRValue(key), MoveRValue(value), father, this->This);
 					if (key < node->key)
@@ -298,7 +298,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline Node* Insert(Node* node, const BasePair<THeap, TKey, TValue>& pair, Node* father)
+				ForceInline Node* Insert(Node* node, const BasePair<THeap, TKey, TValue>& pair, Node* father)
 				{
 					if (!node) return new Node(pair, father, this->This);
 					if (pair.Key < node->key)
@@ -316,7 +316,7 @@ namespace Seed {
 				///<param name = "value">Нове значення</param>
 				///<returns>Новий батьківський елемент</returns>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline Node* Insert(Node* node, BasePair<THeap, TKey, TValue>&& pair, Node* father)
+				ForceInline Node* Insert(Node* node, BasePair<THeap, TKey, TValue>&& pair, Node* father)
 				{
 					if (!node) return new Node(MoveRValue(pair), father, this->This);
 					if (pair.Key < node->key)
@@ -332,7 +332,7 @@ namespace Seed {
 				///<summary>Рекурсивний пошук мінімального елемента в дереві</summary>
 				///<param name = "node">Кореневий елемент</summary>
 				///<returns>Мінімальний елемент</returns>
-				forceinline static Node* FindMin(Node* node)
+				ForceInline static Node* FindMin(Node* node)
 				{
 					return node->left ? FindMin(node->left) : node;
 				}
@@ -340,7 +340,7 @@ namespace Seed {
 				///<summary>Рекурсивний пошук максимального елемента в дереві</summary>
 				///<param name = "node">Кореневий елемент</summary>
 				///<returns>Максимальний елемент</returns>
-				forceinline static Node* FindMax(Node* node)
+				ForceInline static Node* FindMax(Node* node)
 				{
 					return node->right ? FindMax(node->right) : node;
 				}
@@ -348,7 +348,7 @@ namespace Seed {
 				///<summary>Рекурсивне видалення мінімального елемента</summary>
 				///<param name = "node">Батьківський елемент</param>
 				///<returns>Батьківський елемент</returns>
-				forceinline static Node* RemoveMin(Node* node)
+				ForceInline static Node* RemoveMin(Node* node)
 				{
 					if (node->left == nullptr)
 						return node->right;
@@ -361,7 +361,7 @@ namespace Seed {
 				///<param name = "key">Ключ</param>
 				///<returns>Батьківський елемент</returns>
 				template<typename UKey>
-				forceinline static Node* Remove(Node* node, const UKey& key)
+				ForceInline static Node* Remove(Node* node, const UKey& key)
 				{
 					if (!node) return nullptr;
 					if (node->key > key)
@@ -384,7 +384,7 @@ namespace Seed {
 
 				///<summary>Рекурсивне знищеання дерева</summary>
 				///<param name = "root">Батьківський елемент</param>
-				forceinline static Node* DestroyTree(Node* root) //-V688
+				ForceInline static Node* DestroyTree(Node* root) //-V688
 				{
 					if (root != nullptr)
 					{
@@ -411,7 +411,7 @@ namespace Seed {
 				///<param name = "parrent">Батьківський елемент в новому дереві</param>
 				///<param name = "owner">Поінтеер на нове дерево</param>
 				///<returns>Поінтер на новий елемент з під елементами</returns>
-				forceinline static Node* copyTree(Node* node, Node * parrent, Tree * owner) {
+				ForceInline static Node* copyTree(Node* node, Node * parrent, Tree * owner) {
 					Node* newNode = new Node(node->key, node->value, parrent, owner);
 					newNode->height = node->height;
 					if (node->left != nullptr)
@@ -430,7 +430,7 @@ namespace Seed {
 					if (node == nullptr)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
 					if (node->This != nullptr) {
-						return node->This->lock.ShareLock([&]() {
+						return node->This->lock.ShareLock([&]() InlineLambda {
 							--node->RefCount;
 							if (node->right != nullptr) {
 								Node* ret = FindMin(node->right);
@@ -466,7 +466,7 @@ namespace Seed {
 					if (node == nullptr)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
 					if (node->This != nullptr) {
-						return node->This->lock.ShareLock([&]() {
+						return node->This->lock.ShareLock([&]() InlineLambda {
 							--node->RefCount;
 							if (node->left != nullptr) {
 								Node* ret = FindMax(node->left);
@@ -501,15 +501,15 @@ namespace Seed {
 					///<summary>Покажчик на елемент</summary>
 					Node* item;
 					///<summary>Конструктор з елемента</summary>
-					forceinline Iterator(Node* item) : item(item) { if (item != nullptr) ++item->RefCount; };
+					ForceInline Iterator(Node* item) : item(item) { if (item != nullptr) ++item->RefCount; };
 				public:
 					///<summary>Конструктор</summary>
-					forceinline Iterator() : item(nullptr) {};
+					ForceInline Iterator() : item(nullptr) {};
 
 					///<summary>Переходить до наступного елемента</summary>
 					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
 					///<returns>Силку на цей ітератор</returns>
-					forceinline Iterator& operator++()
+					ForceInline Iterator& operator++()
 					{
 						this->item = Next(item);
 						return *this;
@@ -518,7 +518,7 @@ namespace Seed {
 					///<summary>Переходить до попереднього елемента</summary>
 					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
 					///<returns>Силка на цей ітератор</returns>
-					forceinline Iterator& operator--()
+					ForceInline Iterator& operator--()
 					{
 						this->item = Prev(item);
 						return *this;
@@ -527,7 +527,7 @@ namespace Seed {
 					///<summary>Переходить до наступного елемента</summary>
 					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
 					///<returns>Силку на цей ітератор</returns>
-					forceinline Iterator& operator++(int)
+					ForceInline Iterator& operator++(int)
 					{
 						return Iterator(Next(item));
 					}
@@ -535,7 +535,7 @@ namespace Seed {
 					///<summary>Переходить до попереднього елемента</summary>
 					///<exception cref = "Seed::NullPointException">Якщо це нуль-ітератор</c></exception>
 					///<returns>Силка на цей ітератор</returns>
-					forceinline Iterator& operator--(int)
+					ForceInline Iterator& operator--(int)
 					{
 						return Iterator(Prev(item));
 					}
@@ -543,7 +543,7 @@ namespace Seed {
 					///<summary>Порівняння ітераторів</summary>
 					///<param name = "other">Лівий операнд</param>
 					///<returns><c>true</c>Якщо не рівні</returns>
-					forceinline bool operator!=(const Iterator& other)
+					ForceInline bool operator!=(const Iterator& other)
 					{
 						if (this->item == nullptr && other.item == nullptr)
 							return false;
@@ -556,35 +556,35 @@ namespace Seed {
 					///<summary>Порівняння з нуль-ітератором</summary>
 					///<param name = "other"><c>nullptr</c></param>
 					///<returns><c>true</c>Якщо це нуль-ітератор</returns>
-					forceinline bool operator!=(const NullptrT&)
+					ForceInline bool operator!=(const NullptrT&)
 					{
 						return this->item != nullptr;
 					}
 
 					///<summary>Операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					forceinline auto* operator->()
+					ForceInline auto* operator->()
 					{
 						return &this->item->data;
 					};
 
 					///<summary>Операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					forceinline auto& operator*()
+					ForceInline auto& operator*()
 					{
 						return this->item->data;
 					}
 
 					///<summary>Константна операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					forceinline const auto* operator->() const
+					ForceInline const auto* operator->() const
 					{
 						return &this->item->data;
 					};
 
 					///<summary>Константна операція доступу до елемента</summary>
 					///<returns>Вертає поінтер силку на елемент</returns>
-					forceinline const auto& operator*() const
+					ForceInline const auto& operator*() const
 					{
 						return this->item->data;
 					}
@@ -597,7 +597,7 @@ namespace Seed {
 					/// Копіювальний конструктор
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
-					forceinline Iterator(const Iterator& iterator) : item(iterator.item) {
+					ForceInline Iterator(const Iterator& iterator) : item(iterator.item) {
 						if (item != nullptr)
 							++item->RefCount;
 					}
@@ -606,7 +606,7 @@ namespace Seed {
 					/// Конструктор переміщення
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
-					forceinline Iterator(Iterator&& iterator) : item(iterator.item) {
+					ForceInline Iterator(Iterator&& iterator) : item(iterator.item) {
 						iterator.item = nullptr;
 					}
 
@@ -615,7 +615,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
 					/// <returns>Силка на поточний елемент</returns>
-					forceinline Iterator& operator=(const Iterator& iterator) {
+					ForceInline Iterator& operator=(const Iterator& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(iterator);
 						return *this;
@@ -626,7 +626,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="iterator">Оригинал</param>
 					/// <returns>Силка на поточний елемент</returns>
-					forceinline Iterator& operator=(Iterator&& iterator) {
+					ForceInline Iterator& operator=(Iterator&& iterator) {
 						this->~Iterator();
 						this->Iterator::Iterator(MoveRValue(iterator));
 						return *this;
@@ -635,7 +635,7 @@ namespace Seed {
 					/// <summary>
 					/// Деструктор
 					/// </summary>
-					forceinline ~Iterator() {
+					ForceInline ~Iterator() {
 						if (item != nullptr)
 						{
 							if (--item->RefCount == 0)
@@ -652,38 +652,38 @@ namespace Seed {
 
 				///<summary>Вертає ітератор на пергий елемент</summary>
 				///<returns>Ітератор на перший елемент</returns>
-				forceinline Iterator First()
+				ForceInline Iterator First()
 				{
-					return this->This->lock.ShareLock([&]() {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						return Iterator(FindMin(This->root));
 						});
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
 				///<returns>Ітератор на останій елемент</returns>
-				forceinline Iterator Last()
+				ForceInline Iterator Last()
 				{
-					return this->This->lock.ShareLock([&]() {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						return Iterator(FindMax(This->root));
 						});
 				}
 				///<summary>Вертає ітератор на перший елемент</summary>
 				///<returns>Ітератор на перший елемент</returns>
-				forceinline Iterator begin()
+				ForceInline Iterator begin()
 				{
-					return this->This->lock.ShareLock([&]() {
+					return this->This->lock.ShareLock([&]() InlineLambda {
 						return First();
 						});
 				}
 				///<summary>Вертає ітератор на останій елемент</summary>
 				///<returns>Ітератор на останій елемент</returns>
-				forceinline const Iterator end()
+				ForceInline const Iterator end()
 				{
 					return Iterator(nullptr);
 				}
 
 			public:
 				///<summary>Конструктор</summary>
-				forceinline BaseConcurencyMap() :This(new Tree)
+				ForceInline BaseConcurencyMap() :This(new Tree)
 				{}
 
 				///<summary>Конструктор</summary>
@@ -701,16 +701,16 @@ namespace Seed {
 				RefCountClass(BaseConcurencyMap, This);
 
 				///<summary>Вертає кількість елементів в асоціативному масиві</summary>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 				///<value>Кількість елементів в асоціативному масиві</value>
 				SizeT Property(GetCount) Count;
 
 				///<summary>Вставка нового елемента</summary>
 				///<param name = "pair">Пара ключ і значення</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline void Insert(const BasePair<THeap, TKey, TValue>& pair)
+				ForceInline void Insert(const BasePair<THeap, TKey, TValue>& pair)
 				{
-					This->lock.ExclusiveLock([&]() {
+					This->lock.ExclusiveLock([&]() InlineLambda {
 						This->root = Insert(This->root, pair, nullptr);
 						++This->count;
 						});
@@ -719,9 +719,9 @@ namespace Seed {
 				///<summary>Вставка нового елемента</summary>
 				///<param name = "pair">Пара ключ і значення</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline void Insert(BasePair<THeap, TKey, TValue>&& pair)
+				ForceInline void Insert(BasePair<THeap, TKey, TValue>&& pair)
 				{
-					This->lock.ExclusiveLock([&]() {
+					This->lock.ExclusiveLock([&]() InlineLambda {
 						This->root = Insert(This->root, pair, nullptr);
 						++This->count;
 						});
@@ -731,9 +731,9 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline void Insert(const TKey& key, const TValue& value)
+				ForceInline void Insert(const TKey& key, const TValue& value)
 				{
-					This->lock.ExclusiveLock([&]() {
+					This->lock.ExclusiveLock([&]() InlineLambda {
 						This->root = Insert(This->root, key, value, nullptr);
 						++This->count;
 						});
@@ -743,9 +743,9 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline void Insert(TKey&& key, const TValue& value)
+				ForceInline void Insert(TKey&& key, const TValue& value)
 				{
-					This->lock.ExclusiveLock([&, key = MoveRValue(key)]() mutable {
+					This->lock.ExclusiveLock([&, key = MoveRValue(key)]() mutable InlineLambda {
 						This->root = Insert(This->root, MoveRValue(key), value, nullptr);
 						++This->count;
 					});
@@ -755,9 +755,9 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline void Insert(const TKey& key, TValue&& value)
+				ForceInline void Insert(const TKey& key, TValue&& value)
 				{
-					This->lock.ExclusiveLock([&, value = MoveRValue(value)]() mutable {
+					This->lock.ExclusiveLock([&, value = MoveRValue(value)]() mutable InlineLambda {
 						This->root = Insert(This->root, key, MoveRValue(value), nullptr);
 						++This->count;
 					});
@@ -767,9 +767,9 @@ namespace Seed {
 				///<param name = "key">Ключ нового елемента</param>
 				///<param name = "value">Значення нового елемента</param>
 				///<exception cref = "Seed::KeyAllredyExistException">Ключ існує в асоціативному масиві</exception>
-				forceinline void Insert(TKey&& key, TValue&& value)
+				ForceInline void Insert(TKey&& key, TValue&& value)
 				{
-					This->lock.ExclusiveLock([&, key = MoveRValue(key), value = MoveRValue(value)]() mutable {
+					This->lock.ExclusiveLock([&, key = MoveRValue(key), value = MoveRValue(value)]() mutable InlineLambda {
 						This->root = Insert(This->root, MoveRValue(key), MoveRValue(value), nullptr);
 						++This->count;
 					});
@@ -778,9 +778,9 @@ namespace Seed {
 				///<summary>Видалення елемента по значенню</summary>
 				///<param name = "key">Ключ по якому відбуватиметься видалення</param>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				forceinline void Delete(const UKey& key)
+				ForceInline void Delete(const UKey& key)
 				{
-					This->lock.ExclusiveLock([&]() {
+					This->lock.ExclusiveLock([&]() InlineLambda {
 						--This->count;
 						This->root = Remove(This->root, key);
 						});
@@ -791,8 +791,8 @@ namespace Seed {
 				///<returns>Силка на значення</returns>
 				///<exception cref = "Seed::NullPointException">За заданим ключом немає значення в масиві</exception>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				forceinline TValue& operator[](const UKey& key) {
-					Node* node = This->lock.ShareLock([&]() {
+				ForceInline TValue& operator[](const UKey& key) {
+					Node* node = This->lock.ShareLock([&]() InlineLambda {
 						return Find(This->root, key); });
 
 					if (node == nullptr)
@@ -804,8 +804,8 @@ namespace Seed {
 				///<returns>Константна силка на значення</returns>
 				///<exception cref = "Seed::NullPointException">За заданим ключом немає значення в масиві</exception>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				forceinline const TValue& operator[](const UKey& key) const { //-V659
-					Node* node = This->lock.ShareLock([&]() {
+				ForceInline const TValue& operator[](const UKey& key) const { //-V659
+					Node* node = This->lock.ShareLock([&]() InlineLambda {
 						return Find(This->root, key); });
 
 					if (node == nullptr)
@@ -819,8 +819,8 @@ namespace Seed {
 				/// <param name="key">Ключ</param>
 				/// <returns>true якщо елемент існує</returns>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				forceinline bool IsExist(const UKey& key) const {
-					return This->lock.ShareLock([&]() {
+				ForceInline bool IsExist(const UKey& key) const {
+					return This->lock.ShareLock([&]() InlineLambda {
 						return Find(This->root, key); }) != nullptr;
 				}
 
@@ -830,7 +830,7 @@ namespace Seed {
 				/// <param name="key">Ключ</param>
 				/// <returns>true якщо елемент існує</returns>
 				template<typename UKey, typename V = TypeTraits::EnableIfV<TypeTraits::IsComparableV<TKey, UKey>, void>>
-				forceinline bool IsExist(UKey&& key) const {
+				ForceInline bool IsExist(UKey&& key) const {
 					return This->lock.ShareLock([&]() {
 						return Find(This->root, key); }) != nullptr;
 				}
@@ -840,7 +840,7 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Вертає новий об'єкт з копією всіх елементів</returns>
 				virtual BaseConcurencyMap Clone() const override final {
-					return This->lock.ShareLock([&]() {
+					return This->lock.ShareLock([&]() InlineLambda {
 						BaseConcurencyMap result;
 						result.This->count = This->count;
 						result.This->root = copyTree(This->root, nullptr, result.This);
@@ -856,7 +856,7 @@ namespace Seed {
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 #pragma region ForEach Pair
 				template<typename Lambda>
-				forceinline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				ForceInline static void ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachImplWithIndex(node->left, Index, lambda);
 					lambda(node->data, Index); Index++;
@@ -865,7 +865,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
+				ForceInline static void ForEachImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachImplWithoutIndex(node->left, lambda);
 					lambda(node->data);
@@ -874,9 +874,9 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline const BaseConcurencyMap& ForEachImpl(TLambda&& lambda) const {
+				ForceInline const BaseConcurencyMap& ForEachImpl(TLambda&& lambda) const {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&>) { 
-						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -886,7 +886,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>) { 
-						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -902,10 +902,10 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseConcurencyMap& ForEachImpl(TLambda&& lambda) {
+				ForceInline BaseConcurencyMap& ForEachImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, BasePair<THeap, TKey, TValue>&> || 
 						TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&>) { 
-						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -916,7 +916,7 @@ namespace Seed {
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, BasePair<THeap, TKey, TValue>&, SizeT> ||
 						TypeTraits::IsInvockable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>) { 
-						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -933,7 +933,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Key
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				ForceInline static void ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachKeyImplWithIndex(node->left, Index, lambda);
 					lambda(node->data.Key, Index); Index++;
@@ -942,7 +942,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
+				ForceInline static void ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachKeyImplWithoutIndex(node->left, lambda);
 					lambda(node->data.Key);
@@ -951,9 +951,9 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseConcurencyMap& ForEachKeyImpl(TLambda&& lambda) {
+				ForceInline BaseConcurencyMap& ForEachKeyImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -963,7 +963,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -979,9 +979,9 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline const BaseConcurencyMap& ForEachKeyImpl(TLambda&& lambda) const {
+				ForceInline const BaseConcurencyMap& ForEachKeyImpl(TLambda&& lambda) const {
 					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&>) {
-						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -991,7 +991,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&, SizeT>) {
-						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -1008,7 +1008,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Value
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
+				ForceInline static void ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachValueImplWithIndex(node->left, Index, lambda);
 					lambda(node->data.Value, Index); Index++;
@@ -1017,7 +1017,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda) {
+				ForceInline static void ForEachValueImplWithoutIndex(Node* node, Lambda& lambda) {
 					if (node->left != nullptr)
 						ForEachValueImplWithoutIndex(node->left, lambda);
 					lambda(node->data.Value);
@@ -1026,9 +1026,9 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline const BaseConcurencyMap& ForEachValueImpl(TLambda&& lambda) const {
+				ForceInline const BaseConcurencyMap& ForEachValueImpl(TLambda&& lambda) const {
 					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&> ) {
-						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -1038,7 +1038,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&, SizeT>) {
-						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> const BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -1054,10 +1054,10 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseConcurencyMap& ForEachValueImpl(TLambda&& lambda) {
+				ForceInline BaseConcurencyMap& ForEachValueImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, TValue&> ||
 						TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -1068,7 +1068,7 @@ namespace Seed {
 					}
 					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, TValue&, SizeT> ||
 						TypeTraits::IsInvockableWithResult<TLambda, void, const TValue&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
+						return This->lock.ShareLock([&]() -> BaseConcurencyMap& InlineLambda {
 							auto node = this->This->root;
 							if (node != nullptr)
 							{
@@ -1110,8 +1110,8 @@ namespace Seed {
 					return nullptr;
 				}
 
-				forceinline BaseConcurencyMap& RemoveAllImpl() {
-					return This->lock.ExclusiveLock([&]() -> BaseConcurencyMap& {
+				ForceInline BaseConcurencyMap& RemoveAllImpl() {
+					return This->lock.ExclusiveLock([&]() -> BaseConcurencyMap& InlineLambda {
 						This->root = DestroyTree(This->root);
 						This->count = 0;
 						return *this;
@@ -1119,19 +1119,19 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline BaseConcurencyMap& RemoveAllWithImpl(Lambda&& lambda) {
-					return This->lock.ShareLock([&]() -> BaseConcurencyMap& {
+				ForceInline BaseConcurencyMap& RemoveAllWithImpl(Lambda&& lambda) {
+					return This->lock.ShareLock([&]() -> BaseConcurencyMap& InlineLambda {
 						This->root = DestroyTreeWithLambdaPairValues(This->root, lambda);
 						This->count = 0;
 						return *this;
 						});
 				}
 
-				forceinline void UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair){
+				ForceInline void UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair){
 					Insert(MoveRValue(pair));
 				}
 
-				forceinline void UnsafeAdd(const BasePair<THeap, TKey, TValue>& pair){
+				ForceInline void UnsafeAdd(const BasePair<THeap, TKey, TValue>& pair){
 					Insert(pair);
 				}
 			};
@@ -1174,13 +1174,13 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename TKey, typename TVal>
-		forceinline void Swap(Containers::BaseConcurencyMap<THeap, TKey, TVal>& A, Containers::BaseConcurencyMap<THeap, TKey, TVal>& B) {
+		ForceInline void Swap(Containers::BaseConcurencyMap<THeap, TKey, TVal>& A, Containers::BaseConcurencyMap<THeap, TKey, TVal>& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename TKey, typename TVal>
-		forceinline void Swap(typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& A, typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& B) {
+		ForceInline void Swap(typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& A, typename Containers::BaseConcurencyMap<THeap, TKey, TVal>::Iterators& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}

@@ -31,7 +31,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						forceinline ThisCollection& ForEach(Lambda&& lambda) {
+						ForceInline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -50,7 +50,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
+						ForceInline const ThisCollection& ForEach(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -68,7 +68,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						forceinline ThisCollection& ForEach(Lambda&& lambda, SizeT Count) {
+						ForceInline ThisCollection& ForEach(Lambda&& lambda, SizeT Count) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
 					}
 
@@ -87,7 +87,7 @@ namespace Seed {
 						>,
 						bool
 					> = true>
-						forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT Count) const {
+						ForceInline const ThisCollection& ForEach(Lambda&& lambda, SizeT Count) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
 					}
 				public:
@@ -95,7 +95,7 @@ namespace Seed {
 					/// Вертає true якщо в контейнері хоч щось є
 					/// </summary>
 					/// <returns>Вертає true якщо в контейнері хоч щось є</returns>
-					forceinline bool Any() const {
+					ForceInline bool Any() const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl();
 					}
 
@@ -105,7 +105,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const TChar&>::State>, bool> = true>
-					forceinline bool Any(Lambda&& lambda) {
+					ForceInline bool Any(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
@@ -115,7 +115,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
 					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const TChar&>::State>, bool> = true>
-					forceinline bool All(Lambda&& lambda) {
+					ForceInline bool All(Lambda&& lambda) {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 
@@ -123,11 +123,11 @@ namespace Seed {
 					/// Реверсує порядок елементів в колекції
 					/// </summary>
 					/// <returns>Силку на поточну колекцію</returns>
-					forceinline ThisCollection& Reverse() {
+					ForceInline ThisCollection& Reverse() {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
 				public:
-					forceinline virtual ~IString() = 0 {}
+					ForceInline virtual ~IString() = 0 {}
 				};
 			}
 		}

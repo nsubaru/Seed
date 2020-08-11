@@ -22,7 +22,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="IsDescending">Якщо true то сортування спадаючому порядку відбувається</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					forceinline ThisCollection& SortBy(bool IsDescending = true) {
+					ForceInline ThisCollection& SortBy(bool IsDescending = true) {
 						return static_cast<ThisCollection&>(*this).SortByImpl(IsDescending);
 					}
 
@@ -38,7 +38,7 @@ namespace Seed {
 							TypeTraits::IsLambdaConvertibleT<Lambda, T, SizeT>::State
 						>
 						, bool> = true>
-					static forceinline ThisCollection Generate(Lambda generator) {
+					static ForceInline ThisCollection Generate(Lambda generator) {
 						if constexpr (TypeTraits::IsLambdaConvertibleT<Lambda, T>::State)
 						{
 							if constexpr (!ThisCollection::IsDynamic)
@@ -83,7 +83,7 @@ namespace Seed {
 						}
 					}
 				public:
-					forceinline virtual ~IFixedArray() = 0 {}
+					ForceInline virtual ~IFixedArray() = 0 {}
 				};
 			}
 		}

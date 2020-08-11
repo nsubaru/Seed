@@ -106,20 +106,20 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'Name'>Ім'я помилки</param>
 				///<returns>Екземпляр класу Exeption</returns>
-				forceinline Exception(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& ExeptionName) noexcept
+				ForceInline Exception(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& ExeptionName) noexcept
 					:location({ File, FunctName, Line, GetTargetThreadID() }), exceptionName(ExeptionName), stackTrace({ 0 }) 
 				{
 					GetStackBackTrace((Seed::Exceptions::Exception::StackTraceRecord&)this->stackTrace);
 				}
 
 				///<summary>Вертає користувальницьку назву помилки</summary>
-				forceinline const ConstString& GetExceptioName() const
+				ForceInline const ConstString& GetExceptioName() const
 				{
 					return exceptionName;
 				}
 
 				///<summary>Вертає місце генерації помилки</summary>
-				forceinline const ExeptionLocation& GetLocation() const
+				ForceInline const ExeptionLocation& GetLocation() const
 				{
 					return location;
 				}
@@ -128,7 +128,7 @@ namespace Seed {
 				/// Вертає стек викликів на момент генерації помилки
 				/// </summary>
 				/// <returns></returns>
-				forceinline const StackTraceRecord& GetStackTrace() const {
+				ForceInline const StackTraceRecord& GetStackTrace() const {
 					return stackTrace;
 				}
 
@@ -564,15 +564,15 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'RequiredIndex'>Індекс елемента який пробували отримати</param>
 				///<param name = 'MaxAllowedIndex'>Максимальний допустимий індекс</param>
-				forceinline IndexOutOfRange(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT RequiredIndex, SizeT MaxAllowedIndex)
+				ForceInline IndexOutOfRange(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT RequiredIndex, SizeT MaxAllowedIndex)
 					noexcept : Exception(File, FunctName, Line, L"Вихід за межі"),
 					Index(RequiredIndex), MaxIndex(MaxAllowedIndex)
 				{}
 
 				///<summary>Запрошуваний індекс</summary>
-				forceinline SizeT GetRequiredIndex() const { return Index; }
+				ForceInline SizeT GetRequiredIndex() const { return Index; }
 				///<summary>Максимальний достуаний індекс</summary>
-				forceinline SizeT GetMaxAllowedIndex() const { return MaxIndex; }
+				ForceInline SizeT GetMaxAllowedIndex() const { return MaxIndex; }
 
 				///<summary>Запрошуваний індекс</summary>
 				SizeT Property(GetRequiredIndex) RequiredIndex;
@@ -606,7 +606,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'RequireType'>Інформація про очікуваний тип</param>
 				///<param name = 'ActuallyType'>Інформація про фактичний тип</param>
-				forceinline InvalidTypeException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const TypeInfo& RequiredType, const TypeInfo& ActuallyType)
+				ForceInline InvalidTypeException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const TypeInfo& RequiredType, const TypeInfo& ActuallyType)
 					noexcept : Exception(File, FunctName, Line, L"Не вірний тип"),
 					requiredType(RequiredType), actuallyType(ActuallyType)
 				{
@@ -687,12 +687,12 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				forceinline InteruptException(const ConstAString & File, const ConstAString & FunctName, SizeT Line)
+				ForceInline InteruptException(const ConstAString & File, const ConstAString & FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Операція перервана")
 				{};
 
 				///<summary>Вертає місце генерації помилки</summary>
-				forceinline const ExeptionLocation& GetLocation() const
+				ForceInline const ExeptionLocation& GetLocation() const
 				{
 					return location;
 				}
@@ -764,7 +764,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				forceinline EndNodeNotDeferencable(const ConstAString& File, const ConstAString& FunctName, SizeT Line) noexcept
+				ForceInline EndNodeNotDeferencable(const ConstAString& File, const ConstAString& FunctName, SizeT Line) noexcept
 					: Exception(File, FunctName, Line, L"Ітератор на кінець не є визначеним")
 				{};
 
@@ -974,10 +974,10 @@ struct IsThrowable :
 
 ///<summary>Внутрішня функція генерації помилки</summary>
 ///<param name = 'ex'>Об'єкт помилки</param>
-template<typename E> InternalApiCall forceinline void __declspec(noreturn) ___cxxthrow(E&& ex) { throw static_cast<E&>(ex); }
+template<typename E> InternalApiCall ForceInline void __declspec(noreturn) ___cxxthrow(E&& ex) { throw static_cast<E&>(ex); }
 
 ///<summary>Внутрішня функція пркидування поточної помилки</summary>
-InternalApiCall forceinline void __declspec(noreturn) __cxxrethrow() { throw; } //-V667
+InternalApiCall ForceInline void __declspec(noreturn) __cxxrethrow() { throw; } //-V667
 
 #ifndef CXXTHROWAPI
 	///<summary>Генерація помилки з провіркою типу</summary>

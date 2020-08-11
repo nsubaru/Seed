@@ -29,7 +29,7 @@ struct ExceptionsHeapT
 	volatile Seed::SizeT CurrentHeapSize;
 };
 
-static forceinline ExceptionsHeapT& GetExceptionsHeap() {
+static ForceInline ExceptionsHeapT& GetExceptionsHeap() {
 	static ExceptionsHeapT ExceptionsHeap;
 	return ExceptionsHeap;
 }

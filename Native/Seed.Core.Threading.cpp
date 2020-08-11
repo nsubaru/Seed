@@ -33,20 +33,20 @@ using namespace Seed::Threading;
 
 static Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>* AllActiveThreadable;
 
-forceinline IThreadable* GetThisThreadable() {
+ForceInline IThreadable* GetThisThreadable() {
 	return Seed::Core::Threading::GetTLS()->Threadable;
 }
 
-forceinline volatile EThreadabledStates* GetThisThreadableState() {
+ForceInline volatile EThreadabledStates* GetThisThreadableState() {
 	return Seed::Core::Threading::GetTLS()->State;
 }
 
 SizeT Seed::Core::Threading::GetThreadableCount(Boolean WithPseudoThreadable)
 {
 	if (!WithPseudoThreadable)
-		return AllActiveThreadable->GetCountIf([](const SmartPtr<IThreadable>& item) -> bool {
-		return item->GetThreadableType() == EThreadableTypes::Thread;
-			});
+		return AllActiveThreadable->GetCountIf([](const SmartPtr<IThreadable>& item) -> bool InlineLambda {
+			return item->GetThreadableType() == EThreadableTypes::Thread;
+		});
 	else
 		return AllActiveThreadable->Count;
 }
@@ -293,14 +293,14 @@ namespace Seed
 				MainThread->RefreshName();
 				EntryPoint(MainThread->This->delegate, MainThread);
 				//Interupt and wait for interupting each exist theradable
-				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread)
+				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread) InlineLambda
 				{
 					toCoreLog(L"Попередження: Потік з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
 					thread->Interupt()
 						.Join(CurrentSettings().Threading.Thread.StopKernelThreadsTimeout);
 				});
 				//Kill each exist thread
-				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread)
+				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread) InlineLambda
 				{
 					if (thread->GetThreadableType() == EThreadableTypes::Thread)
 					{
@@ -313,7 +313,7 @@ namespace Seed
 					}
 				});
 
-				AllActiveThreadable->RemoveAll([] (SmartPtr<IThreadable>&& thread)
+				AllActiveThreadable->RemoveAll([] (SmartPtr<IThreadable>&& thread) InlineLambda
 				{
 					thread->Join();
 				});

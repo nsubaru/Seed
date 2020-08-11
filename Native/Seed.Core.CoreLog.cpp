@@ -150,7 +150,7 @@ SeedKernelCall InternalApiCall Seed::Boolean Seed::Core::toCoreLog(const Seed::C
 	NTSTATUS status = STATUS_SUCCESS;
 	Seed::Core::SendLogMsgToEvent(raw, size);
 	size += 2; size *= sizeof(wchar_t);
-	LogFile.lock.ExclusiveLock([&] ()
+	LogFile.lock.ExclusiveLock([&] () InlineLambda
 	{
 		status = NtWriteFile( //-V107
 			LogFile.handle,
@@ -240,7 +240,7 @@ Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
 	{
 		NTSTATUS status = STATUS_SUCCESS;
 
-		LogFile.lock.ShareLock([&] ()
+		LogFile.lock.ShareLock([&] () InlineLambda
 		{
 			FILE_STANDARD_INFORMATION logFileInfo;
 			status = NtQueryInformationFile(

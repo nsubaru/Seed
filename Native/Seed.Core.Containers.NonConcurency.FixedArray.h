@@ -23,12 +23,12 @@ namespace Seed {
 					Seed::RefCountT RefCount;
 					T array[TSize] = {};
 
-					forceinline Data() : RefCount(1) {}
+					ForceInline Data() : RefCount(1) {}
 				};
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() override {}
+				ForceInline virtual void Dispose() override {}
 			private:
 				template<typename Lambda>
 				void QuickSort(T* A, SizeT p, SizeT r, Lambda& lambda) {
@@ -61,7 +61,7 @@ namespace Seed {
 					}
 				}
 			public:
-				forceinline SizeT GetCount() const { return TSize; }
+				ForceInline SizeT GetCount() const { return TSize; }
 				SizeT Property(GetCount) Count;
 			protected:
 				template<template<typename, typename> typename TCollection, typename THeap, typename T, Boolean TIsDynamic, Boolean TIsConcurencySuport>
@@ -149,7 +149,7 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				forceinline bool AnyImpl() const { return TSize > 0; }
+				ForceInline bool AnyImpl() const { return TSize > 0; }
 
 				template<typename Lambda>
 				bool AnyImpl(Lambda&& lambda) const {
@@ -184,7 +184,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline BaseFixedArray& SortByLambdaImpl(Lambda&& lambda) {
+				ForceInline BaseFixedArray& SortByLambdaImpl(Lambda&& lambda) {
 					if constexpr (TSize == 0)
 					{
 						return *this;
@@ -240,22 +240,22 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				forceinline BaseFixedArray& ReverseImpl() {
+				ForceInline BaseFixedArray& ReverseImpl() {
 					for (SizeT i = 0; i < TSize / 2; i++) {
 						Swap(This->array[i], This->array[(TSize - 1) - i]);
 					}
 					return *this;
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->array[Index] = Value;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->array[Index] = MoveRValue(Value);
 				}
 
-				forceinline BaseFixedArray& RemoveAllImpl() {
+				ForceInline BaseFixedArray& RemoveAllImpl() {
 					for (SizeT i = 0; i < TSize; i++) {
 						This->array[i].~T();
 					}
@@ -263,7 +263,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline BaseFixedArray& RemoveAllImpl(Lambda&& lambda) {
+				ForceInline BaseFixedArray& RemoveAllImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < TSize; i++) {
 						lambda(MoveRValue(This->array[i]));
 					}
@@ -276,7 +276,7 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор ініціалізовує масив стандартним значенням
 				/// </summary>
-				forceinline constexpr BaseFixedArray() : This(new Data()) {}
+				ForceInline constexpr BaseFixedArray() : This(new Data()) {}
 
 				/// <summary>
 				/// Конструктор з списку ініціалізації, копіює всі елементи з списку, 
@@ -302,7 +302,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Index"></param>
 				/// <returns>Силка на елементи</returns>
-				forceinline constexpr T& operator[](SizeT Index) {
+				ForceInline constexpr T& operator[](SizeT Index) {
 					if (Index < TSize)
 					{
 						return This->array[Index];
@@ -318,7 +318,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Index"></param>
 				/// <returns>Константна силка на елементи</returns>
-				forceinline constexpr const T& operator[](SizeT Index) const {
+				ForceInline constexpr const T& operator[](SizeT Index) const {
 					if (Index < TSize)
 					{
 						return This->array[Index];
@@ -381,7 +381,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		forceinline void Swap(Containers::BaseFixedArray<THeap, TSize, T>& A, Containers::BaseFixedArray<THeap, TSize, T>& B) {
+		ForceInline void Swap(Containers::BaseFixedArray<THeap, TSize, T>& A, Containers::BaseFixedArray<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

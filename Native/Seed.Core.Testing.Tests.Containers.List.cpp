@@ -74,7 +74,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::CloneListW
 	auto list = Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10);
 	auto clone = list.Clone();
 	Asserts::AssertEqual(list.Count, clone.Count);
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		auto listIt = list.FirstIt;
 		auto cloneIt = list.FirstIt;
@@ -122,7 +122,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::LastCondit
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::ListIteratorsLoop::Excecute() {
 	auto list = Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10);
 	
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		auto i = 0;
 		for (auto& j : list)
@@ -204,7 +204,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::CloneListWith
 	auto list = Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10);
 	auto clone = list.Clone();
 	Asserts::AssertEqual(list.Count, clone.Count);
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		auto listIt = list.FirstIt;
 		auto cloneIt = list.FirstIt;
@@ -252,7 +252,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::LastCondition
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::ListIteratorsLoop::Excecute() {
 	auto list = Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10);
 	
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		auto i = 0;
 		for (auto& j : list)

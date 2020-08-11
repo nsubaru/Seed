@@ -24,17 +24,17 @@ namespace Seed {
 					RefCountT RefCount;
 					T stack[TSize];
 
-					forceinline Data() : count(0), RefCount(1), stack() {}
+					ForceInline Data() : count(0), RefCount(1), stack() {}
 				};
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() final override {}
+				ForceInline virtual void Dispose() final override {}
 			public:
 				/// <summary>
                 /// Пустий конструктор
                 /// </summary>
-				forceinline BaseFixedStack() : This(new Data()) {}
+				ForceInline BaseFixedStack() : This(new Data()) {}
 
 				/// <summary>
                 /// Конструктор з списку ініціалізаці, 
@@ -57,7 +57,7 @@ namespace Seed {
                 /// Додає елемент в стек, якщо стек заповнений то генерує помилку
                 /// </summary>
                 /// <param name="item">Силка на елемент</param>
-				forceinline void Push(const T& item) {
+				ForceInline void Push(const T& item) {
 					if (This->count == TSize)
 						Throw(FullStackException(ExceptionPosition, TSize));
 					This->stack[This->count] = item;
@@ -68,7 +68,7 @@ namespace Seed {
                 /// Додає елемент в стек, якщо стек заповнений то генерує помилку
                 /// </summary>
                 /// <param name="item">RValue силка на елемент</param>
-				forceinline void Push(T&& item) {
+				ForceInline void Push(T&& item) {
 					if (This->count == TSize)
 						Throw(FullStackException(ExceptionPosition, TSize));
 					This->stack[This->count] = MoveRValue(item);
@@ -79,7 +79,7 @@ namespace Seed {
                 /// Виймання з стеку елемента, якщо стек пустий то генерується помилка
                 /// </summary>
                 /// <returns></returns>
-				forceinline T Pop() {
+				ForceInline T Pop() {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
 					--This->count;
@@ -90,7 +90,7 @@ namespace Seed {
                 /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
                 /// </summary>
                 /// <returns>Силка на вехній елемент</returns>
-				forceinline const T& Top() {
+				ForceInline const T& Top() {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
 					--This->count;
@@ -101,7 +101,7 @@ namespace Seed {
                 /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
                 /// </summary>
                 /// <returns>Силка на вехній елемент</returns>
-				forceinline const T& Top() const {
+				ForceInline const T& Top() const {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
 					--This->count;
@@ -115,7 +115,7 @@ namespace Seed {
                 /// Кількість елементів в стеку
                 /// </summary>
                 /// <returns>Поточна кількість елементів в стеку</returns>
-				forceinline SizeT GetCount() { return This->count; }
+				ForceInline SizeT GetCount() { return This->count; }
 
 				/// <summary>
                 /// оточна кількість елементів в стеку
@@ -211,7 +211,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename Lambda>
-				forceinline U AggregateImpl(Lambda&& lambda) const {
+				ForceInline U AggregateImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return U();
 					U result = U();
@@ -224,7 +224,7 @@ namespace Seed {
 				}
 
 				template<typename U, typename Lambda>
-				forceinline U AggregateImpl(Lambda&& lambda, const U& Value) const {
+				ForceInline U AggregateImpl(Lambda&& lambda, const U& Value) const {
 					U result = Value;
 					if (This->count == 0)
 						return result;
@@ -237,7 +237,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline T AggregateImpl(Lambda&& lambda, T&& Value) const {
+				ForceInline T AggregateImpl(Lambda&& lambda, T&& Value) const {
 					if (This->count == 0)
 						return Value;
 					SizeT i = This->count;
@@ -248,10 +248,10 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				forceinline bool AnyImpl(Lambda&& lambda) const {
+				ForceInline bool AnyImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -264,7 +264,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline bool AllImpl(Lambda&& lambda) const {
+				ForceInline bool AllImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 					SizeT i = This->count;
@@ -347,17 +347,17 @@ namespace Seed {
 					return *this;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = Value;
 					This->count = Index + 1;
 				}
 
-				forceinline BaseFixedStack& RemoveAllImpl() {
+				ForceInline BaseFixedStack& RemoveAllImpl() {
 					for (SizeT i = 0; i < This->count; i++) {
 						This->stack[i].~T();
 					}
@@ -365,7 +365,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline BaseFixedStack& RemoveAllImpl(Lambda&& lambda) {
+				ForceInline BaseFixedStack& RemoveAllImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->stack[i]));
 					}
@@ -398,7 +398,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		forceinline void Swap(Containers::BaseFixedStack<THeap, TSize, T>& A, Containers::BaseFixedStack<THeap, TSize, T>& B) {
+		ForceInline void Swap(Containers::BaseFixedStack<THeap, TSize, T>& A, Containers::BaseFixedStack<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

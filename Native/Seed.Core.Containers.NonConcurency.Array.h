@@ -25,13 +25,13 @@ namespace Seed {
 					SizeT count;
 					T* restrict array;
 
-					forceinline Data() : RefCount(1), count(0), array(nullptr) {}
-					forceinline Data(T*&& array, SizeT count) : RefCount(1), count(count), array(array) {}
+					ForceInline Data() : RefCount(1), count(0), array(nullptr) {}
+					ForceInline Data(T*&& array, SizeT count) : RefCount(1), count(count), array(array) {}
 				};
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() override {
+				ForceInline virtual void Dispose() override {
 					delete[] This->array;
 					This->array = nullptr;
 				}
@@ -263,7 +263,7 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename TLambda>
 				bool AnyImpl(TLambda&& lambda) const {
@@ -285,7 +285,7 @@ namespace Seed {
 					return true;
 				}
 
-				forceinline BaseArray& SortByImpl(bool IsDescending = true) {
+				ForceInline BaseArray& SortByImpl(bool IsDescending = true) {
 					if (IsDescending) {
 						auto l = [](const T& V1, const T& V2) { return V1 < V2; };
 						QuickSort(This->array, 0, This->count - 1, l);
@@ -298,7 +298,7 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseArray& SortByLambdaImpl(TLambda&& lambda) {
+				ForceInline BaseArray& SortByLambdaImpl(TLambda&& lambda) {
 					if (This->count == 0)
 						return;
 
@@ -350,22 +350,22 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				forceinline BaseArray& ReverseImpl() {
+				ForceInline BaseArray& ReverseImpl() {
 					for (SizeT i = 0; i < This->count / 2; i++) {
 						Swap(This->array[i], This->array[(This->count - 1) - i]);
 					}
 					return *this;
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->array[Index] = Value;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->array[Index] = MoveRValue(Value);
 				}
 
-				forceinline BaseArray& RemoveAllImpl() {
+				ForceInline BaseArray& RemoveAllImpl() {
 					delete[] this->This->array;
 					this->This->array = nullptr;
 					this->This->count = 0;
@@ -373,7 +373,7 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseArray& RemoveAllImpl(TLambda&& lambda) {
+				ForceInline BaseArray& RemoveAllImpl(TLambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->array[i]));
 					}
@@ -389,7 +389,7 @@ namespace Seed {
 				/// <summary>
                 /// Конструктор масиву з нульвою довжиною
                 /// </summary>
-				forceinline BaseArray() : This(new Data()) {}
+				ForceInline BaseArray() : This(new Data()) {}
 
 				/// <summary>
                 /// Конструктор з списку елементів
@@ -411,7 +411,7 @@ namespace Seed {
                 /// Конструктор з кількістю елементів
                 /// </summary>
                 /// <param name="StartCount"></param>
-				forceinline BaseArray(SizeT StartCount) : This(new Data()) {
+				ForceInline BaseArray(SizeT StartCount) : This(new Data()) {
 					if (StartCount != 0) {
 						This->array = new T[StartCount];
 						This->count = StartCount;
@@ -451,7 +451,7 @@ namespace Seed {
                 /// Оператор отримання голого покажкика на елементи масиву
                 /// </summary>
                 /// <returns></returns>
-				forceinline InternalApiCall operator const T* const() const { return This->array; }
+				ForceInline InternalApiCall operator const T* const() const { return This->array; }
 #pragma warning(pop)
 			public:
 				/// <summary>
@@ -459,7 +459,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="Index">Номер елемента</param>
                 /// <returns>Силка на елемент</returns>
-				forceinline T& operator[](SizeT Index) {
+				ForceInline T& operator[](SizeT Index) {
 					if (Index < This->count)
                     {
                         return This->array[Index];
@@ -475,7 +475,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="Index">Номер елемента</param>
                 /// <returns>Константна силка на елемент</returns>
-				forceinline const T& operator[](SizeT Index) const {
+				ForceInline const T& operator[](SizeT Index) const {
 					if (Index < This->count)
                     {
                         return This->array[Index];
@@ -492,7 +492,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="NewSize">Новий розмір масиву</param>
                 /// <returns>Силка на поточний об'єкт</returns>
-				forceinline BaseArray& Resize(SizeT NewSize) {
+				ForceInline BaseArray& Resize(SizeT NewSize) {
 					if (this->This->array == nullptr || this->This->count == 0)
 					{
 						this->This->array = new T[NewSize];
@@ -578,7 +578,7 @@ namespace Seed {
                 /// Вертає поточну кількість елементів
                 /// </summary>
                 /// <returns></returns>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 
 				/// <summary>
                 /// Кількість елементів
@@ -589,7 +589,7 @@ namespace Seed {
                 /// Вертає сирий покажчик на елементи масиву
                 /// </summary>
                 /// <returns></returns>
-				forceinline const T* const GetRaw() const { return This->array; }
+				ForceInline const T* const GetRaw() const { return This->array; }
 			public:
 				RefCountClass(BaseArray, This);
 			};
@@ -638,10 +638,10 @@ namespace Seed {
 					SizeT size;
 					Node* next;
 
-					forceinline Node(SizeT size) : size(size), arr(new T[size]), next(nullptr) {}
-					forceinline Node(SizeT size, T*&& arr) : size(size), arr(arr), next(nullptr) {}
+					ForceInline Node(SizeT size) : size(size), arr(new T[size]), next(nullptr) {}
+					ForceInline Node(SizeT size, T*&& arr) : size(size), arr(arr), next(nullptr) {}
 					template<typename> requires (Concepts::IsClonable<T>)
-					forceinline Node(SizeT size, const T*& arr) : size(size), arr(new T[size]), next(nullptr) {
+					ForceInline Node(SizeT size, const T*& arr) : size(size), arr(new T[size]), next(nullptr) {
 						if constexpr (TypeTraits::IsPodV<T>) {
 							Memory::Copy(arr, this->arr, sizeof(T) * size);
 						}
@@ -653,7 +653,7 @@ namespace Seed {
 						}
 					}
 					template<typename> requires (Concepts::IsClonable<T>)
-					forceinline Node(SizeT size, T*& arr) : size(size), arr(new T[size]), next(nullptr) {
+					ForceInline Node(SizeT size, T*& arr) : size(size), arr(new T[size]), next(nullptr) {
 						if constexpr (TypeTraits::IsPodV<T>) {
 							Memory::Copy(arr, this->arr, sizeof(T) * size);
 						}
@@ -672,10 +672,10 @@ namespace Seed {
 					Node* root;
 					Node* last;
 
-					forceinline Data() : RefCount(1), count(0), root(nullptr), last(nullptr) {}
-					forceinline Data(SizeT count) : RefCount(1), count(count), root(new Node(count)), last(root) {}
-					forceinline Data(SizeT count, T*&& arr) : RefCount(1), count(count), root(new Node(count, MoveRValue(arr))), last(root) {}
-					forceinline Data(SizeT count, T*& arr) : RefCount(1), count(count), root(new Node(count, arr)), last(root) {}
+					ForceInline Data() : RefCount(1), count(0), root(nullptr), last(nullptr) {}
+					ForceInline Data(SizeT count) : RefCount(1), count(count), root(new Node(count)), last(root) {}
+					ForceInline Data(SizeT count, T*&& arr) : RefCount(1), count(count), root(new Node(count, MoveRValue(arr))), last(root) {}
+					ForceInline Data(SizeT count, T*& arr) : RefCount(1), count(count), root(new Node(count, arr)), last(root) {}
 				};
 			private:
 				Data* This;
@@ -683,7 +683,7 @@ namespace Seed {
 				/// <summary>
                 /// Пустий конструктор створює пустий екземпляр об'єкта
                 /// </summary>
-				forceinline BaseVList() : This(new Data()) {}
+				ForceInline BaseVList() : This(new Data()) {}
 
 				/// <summary>
                 /// Конструктор з списку ініціалізації, переміщає елементи в поточний об'єкт
@@ -701,7 +701,7 @@ namespace Seed {
                 /// Конструктор з масиву елементів
                 /// </summary>
                 /// <param name="array">Масив елементів</param>
-				forceinline BaseVList(const BaseArray<THeap, T>& array) : This(nullptr) {
+				ForceInline BaseVList(const BaseArray<THeap, T>& array) : This(nullptr) {
 					this->This = new Data(array.This->count, static_cast<T*&>(array.This->array));
 				}
 
@@ -710,7 +710,7 @@ namespace Seed {
                 /// то даний об'єкт оптимізовано стане власником елементів 
                 /// </summary>
                 /// <param name="array">RValue силка на масив</param>
-				forceinline BaseVList(BaseArray<THeap, T>&& array) : This(nullptr) {
+				ForceInline BaseVList(BaseArray<THeap, T>&& array) : This(nullptr) {
 					if (--array.This->RefCount == 0) {
 						This = new Data(array.This->count, MoveRValue(array.This->array));
 						delete array.This;
@@ -885,7 +885,7 @@ namespace Seed {
                 /// Кількість елементів в об'єкті
                 /// </summary>
                 /// <returns>Поточна кількість елементів в об'єктів</returns>
-                forceinline SizeT GetCount() const { return This->count; }
+                ForceInline SizeT GetCount() const { return This->count; }
 
                 /// <summary>
                 /// Поточна кількість елементів в об'єктів
@@ -1105,7 +1105,7 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename TLambda>
 				bool AnyImpl(TLambda&& lambda) const {
@@ -1217,15 +1217,15 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->root->arr[Index] = Value;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->root->arr[Index] = MoveRValue(Value);
 				}
 
-				forceinline BaseVList& RemoveAllImpl() {
+				ForceInline BaseVList& RemoveAllImpl() {
 					Node* node = This->root;
 					Node* tmp;
 					SizeT nodeStartIndex = 0;
@@ -1287,12 +1287,12 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseArray<THeap, T>& A, Containers::BaseArray<THeap, T> B) {
+		ForceInline void Swap(Containers::BaseArray<THeap, T>& A, Containers::BaseArray<THeap, T> B) {
 			Swap(A.This, B.This);
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseVList<THeap, T>& A, Containers::BaseVList<THeap, T> B) {
+		ForceInline void Swap(Containers::BaseVList<THeap, T>& A, Containers::BaseVList<THeap, T> B) {
 			Swap(A.This, B.This);
 		}
 	}

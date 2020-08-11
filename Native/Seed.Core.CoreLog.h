@@ -9,7 +9,7 @@ namespace Seed {
 		/// Запис в логи статичного повідомлення
 		/// </summary>
 		template<SizeT Lenght>
-		forceinline Boolean toCoreLog(StaticTextRef<Lenght> Msg) {
+		ForceInline Boolean toCoreLog(StaticTextRef<Lenght> Msg) {
 #pragma warning(push)
 #pragma warning(disable: 4996)
 			return toCoreLog(Msg, Lenght);

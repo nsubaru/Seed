@@ -25,11 +25,11 @@ namespace Seed {
 					RefCountT RefCount;
 					T queue[TSize];
 
-					forceinline T& operator[](SizeT Index) {
+					ForceInline T& operator[](SizeT Index) {
 						return queue[(front + Index) % TSize];
 					}
 
-					forceinline Data() :
+					ForceInline Data() :
 						front(0),
 						rear(0),
 						count(0),
@@ -40,12 +40,12 @@ namespace Seed {
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() final override {}
+				ForceInline virtual void Dispose() final override {}
 			public:
 				/// <summary>
 				/// Пустий конструктор ініціалізовує пусту чергу
 				/// </summary>
-				forceinline BaseFixedQueue() : This(new Data()) {}
+				ForceInline BaseFixedQueue() : This(new Data()) {}
 
 				/// <summary>
 				/// Конструктор з списку елементів, якщо елементів забагато то решта ігнорується
@@ -69,7 +69,7 @@ namespace Seed {
 				/// якщо в черзі немає місця то генерується помилка
 				/// </summary>
 				/// <param name="Value">Значення елемента</param>
-				forceinline void Enqueue(const T& Value) {
+				ForceInline void Enqueue(const T& Value) {
 					if (++This->count > TSize)
 						Throw(FullQueueException(ExceptionPosition, TSize));
 					SizeT newRear = (This->rear + 1) % TSize;
@@ -82,7 +82,7 @@ namespace Seed {
 				/// якщо в черзі немає місця то генерується помилка
 				/// </summary>
 				/// <param name="Value">Значення елемента</param>
-				forceinline void Enqueue(T&& Value) {
+				ForceInline void Enqueue(T&& Value) {
 					if (++This->count > TSize)
 						Throw(FullQueueException(ExceptionPosition, TSize));
 					SizeT newRear = (This->rear + 1) % TSize;
@@ -94,7 +94,7 @@ namespace Seed {
 				/// Виймає елемент з черги, якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns>Вийнятий елемент</returns>
-				forceinline T Dequeue() {
+				ForceInline T Dequeue() {
 					if (This->count == 0)
 						Throw(EmptyQueueException(ExceptionPosition));
 					T res = MoveRValue(This->queue[This->front]);
@@ -107,7 +107,7 @@ namespace Seed {
 				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
 				/// </summary>
 				/// <returns>Значення елемента</returns>
-				forceinline const T& Top() {
+				ForceInline const T& Top() {
 					if (This->front == This->rear)
 						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
@@ -117,7 +117,7 @@ namespace Seed {
 				/// Вертає перший елемент з черги без виймання з неї, якщо елемента немає то генерує помилку
 				/// </summary>
 				/// <returns>Значення елемента</returns>
-				forceinline const T& Top() const {
+				ForceInline const T& Top() const {
 					if (This->front == This->rear)
 						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
@@ -130,7 +130,7 @@ namespace Seed {
 				/// Вертає кількість елементів в черзі
 				/// </summary>
 				/// <returns>Поточна кількість елементів в черзі</returns>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 
 				/// <summary>
 				/// Поточна кількість елементів в черзі
@@ -268,7 +268,7 @@ namespace Seed {
 				bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
-				forceinline bool AnyImpl(Lambda&& lambda) const {
+				ForceInline bool AnyImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						return false;
 
@@ -377,7 +377,7 @@ namespace Seed {
 					}
 				}
 
-				forceinline BaseFixedQueue& ReverseImpl() {
+				ForceInline BaseFixedQueue& ReverseImpl() {
 					for (SizeT i = 0; i < This->count / 2; i++)
 					{
 						Seed::Swap((*This)[i], (*This)[(This->count - 1) - i]);
@@ -385,19 +385,19 @@ namespace Seed {
 					return *this;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->queue[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 					This->rear = Index + 1;
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->queue[Index] = Value;
 					This->count = Index + 1;
 					This->rear = Index + 1;
 				}
 
-				forceinline BaseFixedQueue& RemoveAllImpl() {
+				ForceInline BaseFixedQueue& RemoveAllImpl() {
 					if (This->count == 0)
 						return *this;
 					for (SizeT i = 0; i < This->count; i++)
@@ -408,7 +408,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline BaseFixedQueue& RemoveAllImpl(Lambda&& lambda) {
+				ForceInline BaseFixedQueue& RemoveAllImpl(Lambda&& lambda) {
 					if (This->count == 0)
 						return *this;
 					for (SizeT i = 0; i < This->count; i++)
@@ -444,7 +444,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, SizeT TSize, typename T>
-		forceinline void Swap(Containers::BaseFixedQueue<THeap, TSize, T>& A, Containers::BaseFixedQueue<THeap, TSize, T>& B) {
+		ForceInline void Swap(Containers::BaseFixedQueue<THeap, TSize, T>& A, Containers::BaseFixedQueue<THeap, TSize, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

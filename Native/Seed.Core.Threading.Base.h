@@ -76,7 +76,7 @@ namespace Seed {
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'TID'>Id не існуючого потоку</param>
-				forceinline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID) //-V730
+				ForceInline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID) //-V730
 					noexcept : Exception(File, FunctName, Line, L"Не можна працювати з незареєстрованим в рантаймі потоком"), tid(TID)
 				{};
 
@@ -95,7 +95,7 @@ namespace Seed {
 					});
 				}
 
-				forceinline virtual ~InvalidThread() override final {};
+				ForceInline virtual ~InvalidThread() override final {};
 			};
 
 			///<summary>Не валідний об'єкт потоку</summary>
@@ -106,7 +106,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				forceinline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				ForceInline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Не валідний об'єкт потоку")
 				{};
 
@@ -118,7 +118,7 @@ namespace Seed {
                     });
 				}
 
-				forceinline virtual ~InvalidThreadObj() override final {}
+				ForceInline virtual ~InvalidThreadObj() override final {}
 			};
 			///<summary>Запуск запущеного об'єкта</summary>
 			class ThreadableAlredyStarted final : public Exception //-V1052
@@ -128,7 +128,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				forceinline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				ForceInline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Запуск запущеного об'єкта")
 				{};
 
@@ -140,7 +140,7 @@ namespace Seed {
                     });
 				}
 
-				forceinline virtual ~ThreadableAlredyStarted() override final {}
+				ForceInline virtual ~ThreadableAlredyStarted() override final {}
 			};
 
 			///<summary>Взаємне блокування</summary>
@@ -151,7 +151,7 @@ namespace Seed {
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				forceinline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				ForceInline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Взаємне блокування")
 				{};
 
@@ -163,7 +163,7 @@ namespace Seed {
                     });
 				}
 
-				forceinline virtual ~DedlockExpected() override final {}
+				ForceInline virtual ~DedlockExpected() override final {}
 			};
 		}
 	}

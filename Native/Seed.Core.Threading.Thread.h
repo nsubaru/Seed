@@ -24,7 +24,7 @@ namespace Seed {
 					SynchronizeEvent* AbortEvent;
 					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;
 
-					forceinline Data(const String& Name, Delegate&& delegate) :
+					ForceInline Data(const String& Name, Delegate&& delegate) :
 						name(Name),
 						delegate(MoveRValue(delegate)),
 						State(EThreadabledStates::NotStarted),
@@ -35,7 +35,7 @@ namespace Seed {
 						RefCount(1)
 					{}
 
-					forceinline Data(String&& Name, Delegate&& delegate) :
+					ForceInline Data(String&& Name, Delegate&& delegate) :
 						name(Name),
 						delegate(MoveRValue(delegate)),
 						State(EThreadabledStates::NotStarted),
@@ -60,9 +60,9 @@ namespace Seed {
 			protected:
 				virtual void Dispose() override final;
 			public:
-				forceinline Thread(Delegate&& delegate) : This(new Data(L"Unnamed Thread", MoveRValue(delegate))) {}
-				forceinline Thread(String&& Name, Delegate&& delegate) : This(new Data(MoveRValue(Name), MoveRValue(delegate))) {}
-				forceinline Thread(const String& Name, Delegate&& delegate) : This(new Data(Name, MoveRValue(delegate))) {}
+				ForceInline Thread(Delegate&& delegate) : This(new Data(L"Unnamed Thread", MoveRValue(delegate))) {}
+				ForceInline Thread(String&& Name, Delegate&& delegate) : This(new Data(MoveRValue(Name), MoveRValue(delegate))) {}
+				ForceInline Thread(const String& Name, Delegate&& delegate) : This(new Data(Name, MoveRValue(delegate))) {}
 			public:
 				SeedKernelCall Thread& Start();
 				SeedKernelCall Thread& Join();
@@ -71,22 +71,22 @@ namespace Seed {
 				SeedKernelCall Thread& Suspend();
 			public:
 				template<typename T>
-				forceinline T GetThreadResult() {
+				ForceInline T GetThreadResult() {
 					return This->delegate.GetResult<T>();
 				}
 			public:
-				forceinline operator volatile IThreadable& () { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
-				forceinline operator const volatile IThreadable& () const { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
-				forceinline operator ID () const { return This->TID; }
-				forceinline operator Boolean () const { return This->TID != 0; }
+				ForceInline operator volatile IThreadable& () { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
+				ForceInline operator const volatile IThreadable& () const { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
+				ForceInline operator ID () const { return This->TID; }
+				ForceInline operator Boolean () const { return This->TID != 0; }
 			public:
-				forceinline void SetName(const String& name) { const_cast<String&>(This->name) = name; RefreshName(); }
-				forceinline void SetName(String&& name) { const_cast<String&>(This->name) = MoveRValue(name); RefreshName(); }
-				forceinline const String& GetName() { return const_cast<String&>(This->name); }
+				ForceInline void SetName(const String& name) { const_cast<String&>(This->name) = name; RefreshName(); }
+				ForceInline void SetName(String&& name) { const_cast<String&>(This->name) = MoveRValue(name); RefreshName(); }
+				ForceInline const String& GetName() { return const_cast<String&>(This->name); }
 
-				forceinline EThreadabledStates GetThreadState() { return this->This->State; }
+				ForceInline EThreadabledStates GetThreadState() { return this->This->State; }
 
-				forceinline ID GetTID() { return this->This->TID; }
+				ForceInline ID GetTID() { return this->This->TID; }
 
 				String Property(GetName, SetName) Name;
 				EThreadabledStates Property(GetThreadState) ThreadState;

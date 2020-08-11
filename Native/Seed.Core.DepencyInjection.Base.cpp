@@ -1,9 +1,10 @@
 #include "Seed.Core.DepencyInjection.Base.h"
 
 void Seed::Core::DI::DepencyInjector::RegisterServiceTypes(const SmartPtr<ServiceRecord>& service) {
-	service->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
+	service->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord) InlineLambda
 	{
-		methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
+		methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) InlineLambda 
+		{
 			if (this->data->objectTypeTableForNativeLevel.IsExist(typeRecord.GetTypeInfo()))
 			{
 				this->data->objectTypeRecordRefs[typeRecord.GetTypeInfo()]++;
@@ -29,16 +30,16 @@ void Seed::Core::DI::DepencyInjector::UnRegisterServiceByTypeRecord(const RTTI::
 
 		auto dependents = Containers::List<RTTI::RTTITypeRecord>();
 							
-		data->serviceStore.ForEach([&] (const SmartPtr<ServiceRecord>& record)
+		data->serviceStore.ForEach([&] (const SmartPtr<ServiceRecord>& record) InlineLambda
 		{
-			record->depencies.ForEach([&] (const RTTI::RTTITypeRecord & info)
+			record->depencies.ForEach([&] (const RTTI::RTTITypeRecord & info) InlineLambda
 			{
 				if (info == service->rttiRecord.GetRTTITypeInfo())
 					dependents += service->rttiRecord.GetRTTITypeInfo();
 			});
 		});
 
-		dependents.RemoveAll([&] (RTTI::RTTITypeRecord&& item)
+		dependents.RemoveAll([&] (RTTI::RTTITypeRecord&& item) InlineLambda
 		{
 			UnRegisterServiceByTypeRecord(item);
 		});
@@ -52,9 +53,9 @@ void Seed::Core::DI::DepencyInjector::UnRegisterServiceByTypeRecord(const RTTI::
 }
 
 void Seed::Core::DI::DepencyInjector::UnregisterServiceTypes(const SmartPtr<ServiceRecord>& service) {
-	service->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
+	service->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord) InlineLambda
 	{
-		methodRecord.TypeInformationGetterFunction().ForEach([&] (const Reflection::DataTypeRecord& typeRecord)
+		methodRecord.TypeInformationGetterFunction().ForEach([&] (const Reflection::DataTypeRecord& typeRecord) InlineLambda
 		{
 			if (--data->dataTypeRecordRefs[typeRecord.GetTypeInfo()] == 0)
 			{

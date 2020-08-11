@@ -178,7 +178,7 @@ namespace Seed {
 					LoadCachesData();
 				}
 
-				forceinline void LoadCachesData() {
+				ForceInline void LoadCachesData() {
 					for (SizeT i = 0; i < Delims.Count; i++)
 					{
 						DelimsRaw[i] = const_cast<CharStr>(static_cast<ConstCharStr>(Delims[i]));

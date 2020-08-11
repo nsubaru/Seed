@@ -43,8 +43,8 @@ bool Seed::Core::Testing::Test::Serilization::ArraySerilization::Excecute() {
 bool Seed::Core::Testing::Test::Serilization::ListSerilization::Excecute() {
 	auto registry = Core::Serilization::TypesRegistry();
 
-	auto list = Containers::List<Containers::List<SizeT>>::Generate([](){
-		return Containers::List<SizeT>::Generate([](SizeT Index){
+	auto list = Containers::List<Containers::List<SizeT>>::Generate([]() InlineLambda{
+		return Containers::List<SizeT>::Generate([](SizeT Index) InlineLambda {
 			return Index * 10;
 		}, 100);
 	}, 100);
@@ -59,7 +59,7 @@ bool Seed::Core::Testing::Test::Serilization::ListSerilization::Excecute() {
 	auto it = list.FirstIt;
 	auto itDeserilized = deserelizedList.FirstIt;
 
-	while(it!=nullptr){
+	while(it!=nullptr) {
 		if(it->Count != itDeserilized->Count)
 			return false;
 
@@ -84,8 +84,8 @@ bool Seed::Testing::Test::Serilization::DynamicQueue::Excecute()
 {
 	auto registry = Core::Serilization::TypesRegistry();
 
-	auto queue = Containers::DynamicQueue<Containers::DynamicQueue<SizeT>>::Generate([](){
-		return Containers::DynamicQueue<SizeT>::Generate([](SizeT index){
+	auto queue = Containers::DynamicQueue<Containers::DynamicQueue<SizeT>>::Generate([]() InlineLambda{
+		return Containers::DynamicQueue<SizeT>::Generate([](SizeT index) InlineLambda {
 			return index * 10;
 		}, 100);
 	}, 100);
@@ -119,13 +119,13 @@ bool Seed::Testing::Test::Serilization::FixedArray::Excecute()
 {
 	auto registry = Core::Serilization::TypesRegistry();
 
-	auto array = Core::Containers::FixedArray<10, Core::Containers::FixedArray<10, SizeT>>::Generate([](SizeT i)
-		{
-			return Core::Containers::FixedArray<10, SizeT>::Generate([&](SizeT j)
-				{
-					return i * 10 + j;
-				});
-		});
+	auto array = Core::Containers::FixedArray<10, Core::Containers::FixedArray<10, SizeT>>::Generate([](SizeT i) InlineLambda
+	{
+		return Core::Containers::FixedArray<10, SizeT>::Generate([&](SizeT j) InlineLambda
+			{
+				return i * 10 + j;
+			});
+	});
 
 	const auto stream = Core::Serilization::Serilize(array, registry);
 
@@ -210,20 +210,20 @@ bool Seed::Testing::Test::Serilization::Dictionary::Excecute()
 
 	auto IsAllFound = true;
 	
-	dictionary.ForEach([&](const Containers::Pair<String, Int32> & dictionaryPair)
-		{
-			auto flag = false;
-			deserelizedDictionary.ForEach([&](const Containers::Pair<String, Int32> &deserelizedDictionaryPair)
-				{
-					if(!flag){
-						if(dictionaryPair == deserelizedDictionaryPair)
-						{
-							flag = true;
-						}
+	dictionary.ForEach([&](const Containers::Pair<String, Int32> & dictionaryPair) InlineLambda
+	{
+		auto flag = false;
+		deserelizedDictionary.ForEach([&](const Containers::Pair<String, Int32> &deserelizedDictionaryPair) InlineLambda
+			{
+				if(!flag){
+					if(dictionaryPair == deserelizedDictionaryPair)
+					{
+						flag = true;
 					}
-				});
-			IsAllFound = (IsAllFound) ? flag : false;  
-		});
+				}
+			});
+		IsAllFound = (IsAllFound) ? flag : false;  
+	});
 
 	return IsAllFound;
 }
@@ -294,20 +294,20 @@ bool Seed::Testing::Test::Serilization::PriorityQueue::Excecute()
 
 	auto IsAllFound = true;
 	
-	priortyQueue.ForEach([&](const Containers::Pair<Int32, String> & dictionaryPair)
-		{
-			auto flag = false;
-			deserelizedPriortyQueue.ForEach([&](const Containers::Pair<Int32, String> &deserelizedDictionaryPair)
-				{
-					if(!flag){
-						if(dictionaryPair == deserelizedDictionaryPair)
-						{
-							flag = true;
-						}
+	priortyQueue.ForEach([&](const Containers::Pair<Int32, String> & dictionaryPair) InlineLambda
+	{
+		auto flag = false;
+		deserelizedPriortyQueue.ForEach([&](const Containers::Pair<Int32, String> &deserelizedDictionaryPair) InlineLambda
+			{
+				if(!flag){
+					if(dictionaryPair == deserelizedDictionaryPair)
+					{
+						flag = true;
 					}
-				});
-			IsAllFound = (IsAllFound) ? flag : false;  
-		});
+				}
+			});
+		IsAllFound = (IsAllFound) ? flag : false;  
+	});
 
 	return IsAllFound;
 }

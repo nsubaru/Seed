@@ -19,7 +19,7 @@ namespace Seed {
 
 				ImplT lock;
 			public:
-				forceinline SRWLock()
+				ForceInline SRWLock()
 				{
 					Internals::InitSRWLock(&lock);
 				}
@@ -27,7 +27,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T> requires Concepts::IsInvockable<T>
-				forceinline decltype(auto) ExclusiveLock(T& Funct)
+				ForceInline decltype(auto) ExclusiveLock(T& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
@@ -68,7 +68,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T> requires Concepts::IsInvockable<T>
-				forceinline decltype(auto) ShareLock(T&& Funct)
+				ForceInline decltype(auto) ShareLock(T&& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
@@ -107,7 +107,7 @@ namespace Seed {
 				}
 
 				template<typename T> requires Concepts::IsInvockableWithResult<T, void>
-				forceinline Boolean TryInShareLock(T&& Funct) {
+				ForceInline Boolean TryInShareLock(T&& Funct) {
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
 						if (!Internals::TryAcquireLockSharedSRWLock(&lock))

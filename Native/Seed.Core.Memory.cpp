@@ -36,17 +36,17 @@ struct HeapDataT
 	volatile SizeT CurrentHeapSize;
 };
 
-forceinline static HeapDataT& GetInternalHeapData() {
+ForceInline static HeapDataT& GetInternalHeapData() {
 	static HeapDataT InternalHeapData;
 	return InternalHeapData;
 }
 
-forceinline static HeapDataT& GetHeapData() {
+ForceInline static HeapDataT& GetHeapData() {
 	static HeapDataT HeapData;
 	return HeapData;
 }
 
-forceinline static HeapDataT& GetSecureHeapData() {
+ForceInline static HeapDataT& GetSecureHeapData() {
 	static HeapDataT SecureHeapData;
 	return SecureHeapData;
 }

@@ -56,7 +56,7 @@ namespace Seed
 }
 
 #define StructCttiDef(StructName, ...)\
-		forceinline constexpr static auto FieldMetaDataGetter()\
+		ForceInline constexpr static auto FieldMetaDataGetter()\
 		{\
 			DefStructMetaData(StructName,__VA_ARGS__);\
 			return FieldMetaData{};\

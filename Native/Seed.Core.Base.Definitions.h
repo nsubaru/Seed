@@ -13,7 +13,7 @@
 /// </summary>
 #ifdef SeedKernel
 ///<summary>Системний виклик який експортується з ядра Рем</summary>
-#define SeedKernelCall __declspec(dllexport)
+#define SeedKernelCall //__declspec(dllexport)
 
 ///<summary>Сигнатура статичного конструктор змінної</summary>
 // ReSharper disable once CppUnnamedNamespaceInHeaderFile
@@ -86,14 +86,14 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
     ((Seed::SizeT)((char *)&((s *)0)->memb - (char *)0))
 
 /// <summary>
-/// Примусовий вставка коду лямбди #define inlinelambda [[msvs::forceinline]]
+/// Примусовий вставка коду лямбди #define InlineLambda [[msvs::forceinline]]
 /// </summary>
-#define inlinelambda
+#define InlineLambda //[[msvs::forceinline]]
 
 /// <summary>
 /// Примусовий вставка коду функцій
 /// </summary>
-#define forceinline __forceinline
+#define ForceInline __forceinline
 
 /// <summary>
 /// Гарантія компілятору унікальності адресу змінної
@@ -104,57 +104,57 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 /// Стрілочна функція без аргументів
 /// </summary>
 #define __ArrowFunct1(ret) \
-    []() inlinelambda { return ret; }
+    []() InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з одним аргументом
 /// </summary>
 #define __ArrowFunct2(x1, ret) \
-    [](auto x1) inlinelambda { return ret; }
+    [](auto x1) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з двома аргументами
 /// </summary>
 #define __ArrowFunct3(x1, x2, ret) \
-    [](auto x1, auto x2) inlinelambda { return ret; }
+    [](auto x1, auto x2) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з трьома аргументами
 /// </summary>
 #define __ArrowFunct4(x1, x2, x3, ret) \
-    [](auto x1, auto x2, auto x3) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з чотирьма аргументами
 /// </summary>
 #define __ArrowFunct5(x1, x2, x3, x4, ret) \
-    [](auto x1, auto x2, auto x3, auto x4) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3, auto x4) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з п'ятьма аргументами
 /// </summary>
 #define __ArrowFunct6(x1, x2 ,x3, x4, x5, ret) \
-    [](auto x1, auto x2, auto x3, auto x4, auto x5) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3, auto x4, auto x5) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з шістьма аргументами
 /// </summary>
 #define __ArrowFunct7(x1, x2, x3, x4, x5, x6, ret) \
-    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з сімньма аргументами
 /// </summary>
 #define __ArrowFunct8(x1, x2, x3, x4, x5, x6, x7, ret) \
-    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з вісьма аргументами
 /// </summary>
 #define __ArrowFunct9(x1, x2, x3, x4 ,x5, x6, x7, x8, ret) \
-    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з девятьма аргументами
 /// </summary>
 #define __ArrowFunct10(x1, x2, x3, x4, x5, x6, x7, x8, x9, ret) \
-    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з десятьма аргументами
 /// </summary>
 #define __ArrowFunct11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, ret) \
-    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9, auto x10) inlinelambda { return ret; }
+    [](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9, auto x10) InlineLambda { return ret; }
 
 /// <summary>
 /// Вираз для визначення перегрузки макроса
@@ -185,57 +185,57 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 /// Стрілочна функція без аргументів
 /// </summary>
 #define __ArrowFunctWithClosure1(ret) \
-    [&]() inlinelambda { return ret; }
+    [&]() InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з одним аргументом
 /// </summary>
 #define __ArrowFunctWithClosure2(x1, ret) \
-    [&](auto x1) inlinelambda { return ret; }
+    [&](auto x1) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з двома аргументами
 /// </summary>
 #define __ArrowFunctWithClosure3(x1, x2, ret) \
-    [&](auto x1, auto x2) inlinelambda { return ret; }
+    [&](auto x1, auto x2) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з трьома аргументами
 /// </summary>
 #define __ArrowFunctWithClosure4(x1, x2, x3, ret) \
-    [&](auto x1, auto x2, auto x3) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з чотирьма аргументами
 /// </summary>
 #define __ArrowFunctWithClosure5(x1, x2, x3, x4, ret) \
-    [&](auto x1, auto x2, auto x3, auto x4) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3, auto x4) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з п'ятьма аргументами
 /// </summary>
 #define __ArrowFunctWithClosure6(x1, x2 ,x3, x4, x5, ret) \
-    [&](auto x1, auto x2, auto x3, auto x4, auto x5) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з шістьма аргументами
 /// </summary>
 #define __ArrowFunctWithClosure7(x1, x2, x3, x4, x5, x6, ret) \
-    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з сімньма аргументами
 /// </summary>
 #define __ArrowFunctWithClosure8(x1, x2, x3, x4, x5, x6, x7, ret) \
-    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з вісьма аргументами
 /// </summary>
 #define __ArrowFunctWithClosure9(x1, x2, x3, x4 ,x5, x6, x7, x8, ret) \
-    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з девятьма аргументами
 /// </summary>
 #define __ArrowFunctWithClosure10(x1, x2, x3, x4, x5, x6, x7, x8, x9, ret) \
-    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9) InlineLambda { return ret; }
 /// <summary>
 /// Стрілочна функція з десятьма аргументами
 /// </summary>
 #define __ArrowFunctWithClosure11(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, ret) \
-    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9, auto x10) inlinelambda { return ret; }
+    [&](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8, auto x9, auto x10) InlineLambda { return ret; }
 
 /// <summary>
 /// Вираз для визначення перегрузки макроса

@@ -36,7 +36,7 @@ bool Seed::Core::Testing::Test::Serilization::ComplexTypeTupleSerilization::Exce
 
 	return 
 		tuple.GetByIdx<0>() == deserelizedTuple.GetByIdx<0>() &&
-		[&](){
+		[&]() InlineLambda {
 		auto array = tuple.GetByIdx<1>();
 		auto deserelizedArray = deserelizedTuple.GetByIdx<1>();
 		if(array.Count != deserelizedArray.Count)
@@ -47,7 +47,7 @@ bool Seed::Core::Testing::Test::Serilization::ComplexTypeTupleSerilization::Exce
 				return false;
 		}
 		return true;}
-		() && [&](){
+		() && [&]() InlineLambda {
 			auto list = tuple.GetByIdx<2>();
 			auto deserelizedList = deserelizedTuple.GetByIdx<2>();
 			if(list.Count != deserelizedList.Count)
@@ -82,7 +82,7 @@ bool Seed::Core::Testing::Test::Serilization::TupleTypeTupleSerilization::Excecu
 	Core::Serilization::Deserilize(stream, deserelizedTuple, registry);
 
 	return 
-		[&](){
+		[&]() InlineLambda {
 		auto item1 = tuple.GetByIdx<0>();
 		auto deserelizedItem1 = deserelizedTuple.GetByIdx<0>();
 		return 
@@ -91,11 +91,11 @@ bool Seed::Core::Testing::Test::Serilization::TupleTypeTupleSerilization::Excecu
 			item1.GetByIdx<2>() == deserelizedItem1.GetByIdx<2>();
 	}()
 		&&
-	[&](){
+	[&]() InlineLambda {
 		auto item1 = tuple.GetByIdx<1>();
 		auto deserelizedItem1 = deserelizedTuple.GetByIdx<1>();
 		return 
-			[&](){ //-V1047
+			[&]() InlineLambda { //-V1047
 		auto array = item1.GetByIdx<0>();
 		auto deserelizedArray = deserelizedItem1.GetByIdx<0>();
 		if(array.Count != deserelizedArray.Count)
@@ -125,16 +125,16 @@ bool Seed::Core::Testing::Test::Serilization::CustomStructSerilization::Excecute
 	Core::Serilization::Deserilize(stream, deserelizedData, registry);
 
 	return data.Name() == deserelizedData.Name() &&
-		[&](){
+		[&]() InlineLambda {
 	
 		if(data.Storage().Count != deserelizedData.Storage().Count)
 			return false;
 
 		bool result = true;
 
-		data.Storage().ForEach([&](const Core::Containers::Pair<String, String> & dataItem){
+		data.Storage().ForEach([&](const Core::Containers::Pair<String, String> & dataItem)InlineLambda {
 			bool found = false;
-			deserelizedData.Storage().ForEach([&](const Core::Containers::Pair<String, String> & deserelizedDataItem){
+			deserelizedData.Storage().ForEach([&](const Core::Containers::Pair<String, String> & deserelizedDataItem) InlineLambda {
 				if(dataItem == deserelizedDataItem)
 					if(!found)
 						found = true;

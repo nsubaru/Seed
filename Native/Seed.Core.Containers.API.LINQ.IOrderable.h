@@ -24,7 +24,7 @@ namespace Seed {
 					/// </summary>
 					/// <param name="IsDescending">Якщо true то сортування спадаючому порядку відбувається</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					forceinline ThisCollection& Sort(bool IsDescending = true) {
+					ForceInline ThisCollection& Sort(bool IsDescending = true) {
 						return static_cast<ThisCollection&>(*this).SortByImpl(IsDescending);
 					}
 
@@ -36,7 +36,7 @@ namespace Seed {
 					template<typename Lambda, TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&, const T&>::State>
 						, bool> = true>
-					forceinline ThisCollection& SortBy(Lambda&& lambda) {
+					ForceInline ThisCollection& SortBy(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).SortByLambdaImpl(lambda);
 					}
 
@@ -44,11 +44,11 @@ namespace Seed {
 					/// Реверсує порядок елементів в колекції
 					/// </summary>
 					/// <returns>Силку на поточну колекцію</returns>
-					forceinline ThisCollection& Reverse() {
+					ForceInline ThisCollection& Reverse() {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
 				public:
-					forceinline virtual ~IOrderable() = 0 {}
+					ForceInline virtual ~IOrderable() = 0 {}
 				};
 			}
 		}

@@ -22,7 +22,7 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 	auto data = Data{ 1,
 		{{1, {L"text", {1,2,3}, {{"Rec1", 1}, {"Rec2", 2}}}} } };
 
-	Asserts::AssertTrue([&]
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		return Core::String(Core::Serilization::CTTIMetaDataGen<Data>()).Lenght > 0;
 	});
@@ -32,7 +32,7 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 	auto deserilizedData = Data{};
 	Core::Serilization::Deserilize<Data>(blob, deserilizedData, registry);
 
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		if (data.CountNonCopyRecord != deserilizedData.CountNonCopyRecord)
 			return false;

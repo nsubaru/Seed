@@ -31,7 +31,7 @@ namespace Seed {
 					NodeSym* node_root;
 					BasePair<THeap, TString, TData>* data;
 
-					forceinline NodeLex(SizeT count = 0) :node_root(nullptr), count(count), data(nullptr) {};
+					ForceInline NodeLex(SizeT count = 0) :node_root(nullptr), count(count), data(nullptr) {};
 				};
 
 				//Структура букви в складі AVL-дерева
@@ -42,28 +42,28 @@ namespace Seed {
 					NodeSym* left;
 					NodeSym* right;
 
-					forceinline NodeSym(Char key) :key(key), height(1), left(nullptr), right(nullptr), data(nullptr) {}
+					ForceInline NodeSym(Char key) :key(key), height(1), left(nullptr), right(nullptr), data(nullptr) {}
 				};
 
 				//Висота дерева
-				forceinline UInt8 height(NodeSym* node) {
+				ForceInline UInt8 height(NodeSym* node) {
 					return node ? node->height : 0;
 				}
 
 				//Різниця висот лівої і правої підгілки
-				forceinline Int8 bfactor(NodeSym* node) {
+				ForceInline Int8 bfactor(NodeSym* node) {
 					return height(node->right) - height(node->left);
 				}
 
 				//Переобчислення висоти
-				forceinline void fixheight(NodeSym* node) {
+				ForceInline void fixheight(NodeSym* node) {
 					auto h_left = height(node->left);
 					auto h_right = height(node->right);
 					node->height = ((h_left < h_right) ? h_right : h_left) + 1;
 				}
 
 				//Правий поворо піддерева
-				forceinline NodeSym* rotateright(NodeSym* p) {
+				ForceInline NodeSym* rotateright(NodeSym* p) {
 					NodeSym* q = p->left;
 					p->left = q->right;
 					q->right = p;
@@ -73,7 +73,7 @@ namespace Seed {
 				}
 
 				//Лівий поворот піддерева
-				forceinline NodeSym* rotateleft(NodeSym* q) {
+				ForceInline NodeSym* rotateleft(NodeSym* q) {
 					NodeSym* p = q->right;
 					q->right = p->left;
 					p->left = q;
@@ -101,7 +101,7 @@ namespace Seed {
 				}
 
 				//Вставка елемента в дерево
-				forceinline NodeSym* insert(NodeSym* p, wchar_t key) {
+				ForceInline NodeSym* insert(NodeSym* p, wchar_t key) {
 					if (!p) return new NodeSym(key);
 					if (key == p->key) return p;
 					if (key < p->key)
@@ -112,12 +112,12 @@ namespace Seed {
 				}
 
 				//Пошук мінімального елемента в дереві
-				forceinline NodeSym* findmin(NodeSym* p) {
+				ForceInline NodeSym* findmin(NodeSym* p) {
 					return p->left ? findmin(p->left) : p;
 				}
 
 				//Видалення мінімального елемента в дереві
-				forceinline NodeSym* removemin(NodeSym* p) {
+				ForceInline NodeSym* removemin(NodeSym* p) {
 					if (p->left == 0)
 						return p->right;
 					p->left = removemin(p->left);
@@ -146,7 +146,7 @@ namespace Seed {
 				}
 
 				//Пошук елемента в дереві
-				forceinline NodeSym* find(NodeSym* root, Char key) const { //-V688
+				ForceInline NodeSym* find(NodeSym* root, Char key) const { //-V688
 					if (!root) return nullptr;
 					while (root->key != key) {
 						if (root->key > key)
@@ -274,7 +274,7 @@ namespace Seed {
 					RefCountT count;
 					RefCountT RefCount;
 
-					forceinline RootNode() noexcept :node(nullptr), count(0), RefCount(1) {};
+					ForceInline RootNode() noexcept :node(nullptr), count(0), RefCount(1) {};
 				};
 			private:
 				//Кореневий елемент
@@ -335,7 +335,7 @@ namespace Seed {
 							ToMap(This->node, list);
 				}
 			protected:
-				forceinline virtual void Dispose() final {
+				ForceInline virtual void Dispose() final {
 					This->node = destroy_node(This->node);
 					This->count = 0;
 				}
@@ -343,7 +343,7 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор який ініціалізовує пустий словник
 				/// </summary>
-				forceinline BaseDictionary() :This(new RootNode()) {};
+				ForceInline BaseDictionary() :This(new RootNode()) {};
 
 				/// <summary>
 				/// Конструктор з списку пар і ключів
@@ -363,7 +363,7 @@ namespace Seed {
 				/// <param name="key">Ключ</param>
 				/// <param name="value">Значення</param>
 				/// <returns>Силка на поточний об'єкт</returns>
-				forceinline BaseDictionary& Insert(const TString& key, const TData& value) {
+				ForceInline BaseDictionary& Insert(const TString& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ key, value };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
@@ -377,7 +377,7 @@ namespace Seed {
 				/// <param name="key">Ключ</param>
 				/// <param name="value">Значення</param>
 				/// <returns>Силка на поточний об'єкт</returns>
-				forceinline BaseDictionary& Insert(TString&& key, const TData& value) {
+				ForceInline BaseDictionary& Insert(TString&& key, const TData& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), value };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
@@ -390,7 +390,7 @@ namespace Seed {
 				/// <param name="key">Ключ</param>
 				/// <param name="value">Значення</param>
 				/// <returns>Силка на поточний об'єкт</returns>
-				forceinline BaseDictionary& Insert(const TString& key, TData&& value) {
+				ForceInline BaseDictionary& Insert(const TString& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ key, MoveRValue(value) };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
@@ -403,7 +403,7 @@ namespace Seed {
 				/// <param name="key">Ключ</param>
 				/// <param name="value">Значення</param>
 				/// <returns>Силка на поточний об'єкт</returns>
-				forceinline BaseDictionary& Insert(TString&& key, TData&& value) {
+				ForceInline BaseDictionary& Insert(TString&& key, TData&& value) {
 					BasePair<THeap, TString, TData> data{ MoveRValue(key), MoveRValue(value) };
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
@@ -415,7 +415,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="data">Пара ключ і значення</param>
 				/// <returns>Силка на поточний об'єкт</returns>
-				forceinline BaseDictionary& Insert(Pair&& data) {
+				ForceInline BaseDictionary& Insert(Pair&& data) {
 					This->node = insert(This->node, MoveRValue(data));
 					++This->count;
 					return *this;
@@ -426,7 +426,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="data">Пара ключ і значення</param>
 				/// <returns>Силка на поточний об'єкт</returns>
-				forceinline BaseDictionary& Insert(const Pair& data) {
+				ForceInline BaseDictionary& Insert(const Pair& data) {
 					This->node = insert(This->node, MoveRValue(Pair(data)));
 					++This->count;
 					return *this;
@@ -437,7 +437,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Key">Ключ</param>
 				/// <returns>Константна силка на значення</returns>
-				forceinline const TData& Find(const TString& Key) const {
+				ForceInline const TData& Find(const TString& Key) const {
 					if (Key.Lenght == 0)
 						Throw(NullPointException(ExceptionPosition));
 					if (This == nullptr)
@@ -453,7 +453,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Key">Ключ</param>
 				/// <returns>Силка на значення</returns>
-				forceinline TData& Find(const TString& Key) {
+				ForceInline TData& Find(const TString& Key) {
 					if (Key.Lenght == 0)
 						Throw(NullPointException(ExceptionPosition));
 					if (This == nullptr)
@@ -469,7 +469,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="key">Ключ</param>
 				/// <returns>Силка на значення</returns>
-				forceinline TData& operator[](const TString& key) {
+				ForceInline TData& operator[](const TString& key) {
 					return Find(key);
 				}
 
@@ -478,7 +478,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="key">Ключ</param>
 				/// <returns>Силка на значення</returns>
-				forceinline TData& operator[](TString&& key) {
+				ForceInline TData& operator[](TString&& key) {
 					return Find(key);
 				}
 
@@ -487,7 +487,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="key">Ключ</param>
 				/// <returns>Константна силка на значення</returns>
-				forceinline const TData& operator[](const TString& key) const {
+				ForceInline const TData& operator[](const TString& key) const {
 					return Find(key);
 				}
 
@@ -496,7 +496,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="key">Ключ</param>
 				/// <returns>Константна силка на значення</returns>
-				forceinline const TData& operator[](TString&& key) const {
+				ForceInline const TData& operator[](TString&& key) const {
 					return Find(key);
 				}
 
@@ -504,14 +504,14 @@ namespace Seed {
 				/// Провірка чи словник пустий
 				/// </summary>
 				/// <returns>true якщо словник пустий</returns>
-				forceinline Boolean IsEmpty() const { return This->RefCount == 0 ? false : true; }
+				ForceInline Boolean IsEmpty() const { return This->RefCount == 0 ? false : true; }
 
 				/// <summary>
 				/// Перевірка чи є елемент з заданим ключом в словнику
 				/// </summary>
 				/// <param name="Key">Ключ по якому шукають елемент</param>
 				/// <returns>true якщо елемент існує</returns>
-				forceinline Boolean IsExist(const TString& Key) const {
+				ForceInline Boolean IsExist(const TString& Key) const {
 					if (This == nullptr) return false;
 					NodeLex* node = find(This->node, Key);
 					return (node == nullptr || node->data == nullptr) ? false : true;
@@ -522,7 +522,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Key">Ключ по якому шукають елемент</param>
 				/// <returns>true якщо елемент існує</returns>
-				forceinline Boolean IsExist(TString&& Key) const {
+				ForceInline Boolean IsExist(TString&& Key) const {
 					if (This == nullptr) return false;
 					NodeLex* node = find(This->node, Key);
 					return (node == nullptr || node->data == nullptr) ? false : true;
@@ -544,7 +544,7 @@ namespace Seed {
 				/// Кількість елементів в словнику
 				/// </summary>
 				/// <returns>Поточна кількість елементів в словнику</returns>
-				forceinline SizeT GetCount() const {
+				ForceInline SizeT GetCount() const {
 					return This->count;
 				}
 
@@ -557,7 +557,7 @@ namespace Seed {
 				/// Копіювання елементів в ассоціативний масив
 				/// </summary>
 				/// <returns>Асоціативний масив з елементами з словника</returns>
-				forceinline BaseMap<THeap, TString, TData> ToMap() {
+				ForceInline BaseMap<THeap, TString, TData> ToMap() {
 					BaseMap<THeap, TString, TData> ret_val;
 					ToMap(This, ret_val);
 					return ret_val;
@@ -567,7 +567,7 @@ namespace Seed {
 				/// Клонування об'єкта
 				/// </summary>
 				/// <returns>Вертає новий словник з копією елементів</returns>
-				forceinline virtual BaseDictionary Clone() const override {
+				ForceInline virtual BaseDictionary Clone() const override {
 					BaseDictionary result;
 					result.This->node = create_lex_copy(This->node);
 					result.This->count = This->count;
@@ -588,7 +588,7 @@ namespace Seed {
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 #pragma region For Each
 				template<typename Lambda>
-				forceinline static void ForEachImplWithoutIndex(
+				ForceInline static void ForEachImplWithoutIndex(
 					NodeSym* node,
 					Lambda& lambda)
 				{
@@ -609,7 +609,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithoutIndex(
+				ForceInline static void ForEachImplWithoutIndex(
 					RootNode* This, //-V688
 					Lambda& lambda)
 				{
@@ -619,7 +619,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithIndex(
+				ForceInline static void ForEachImplWithIndex(
 					NodeSym* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -644,7 +644,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachImplWithIndex(
+				ForceInline static void ForEachImplWithIndex(
 					RootNode* This, //-V688
 					Lambda& lambda,
 					SizeT& Index)
@@ -655,7 +655,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				forceinline const BaseDictionary& ForEachImpl(LambdaT&& lambda) const {
+				ForceInline const BaseDictionary& ForEachImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TString, TData>&>) {
 						ForEachImplWithoutIndex(This, lambda);
 						return *this;
@@ -671,7 +671,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				forceinline BaseDictionary& ForEachImpl(LambdaT&& lambda) {
+				ForceInline BaseDictionary& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, BasePair<THeap, TString, TData>&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const BasePair<THeap, TString, TData>&>) {
 						ForEachImplWithoutIndex(This, lambda);
@@ -690,7 +690,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Key
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithoutIndex(
+				ForceInline static void ForEachKeyImplWithoutIndex(
 					NodeSym* node,
 					Lambda& lambda)
 				{
@@ -711,7 +711,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithoutIndex(
+				ForceInline static void ForEachKeyImplWithoutIndex(
 					RootNode* This, //-V688
 					Lambda& lambda)
 				{
@@ -721,7 +721,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithIndex(
+				ForceInline static void ForEachKeyImplWithIndex(
 					NodeSym* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -746,7 +746,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachKeyImplWithIndex(
+				ForceInline static void ForEachKeyImplWithIndex(
 					RootNode* This, //-V688
 					Lambda& lambda,
 					SizeT& Index)
@@ -757,7 +757,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				forceinline const BaseDictionary& ForEachKeyImpl(LambdaT&& lambda) const {
+				ForceInline const BaseDictionary& ForEachKeyImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TString&>) {
 						ForEachKeyImplWithoutIndex(This, lambda);
 						return *this;
@@ -773,7 +773,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				forceinline BaseDictionary& ForEachKeyImpl(LambdaT&& lambda) {
+				ForceInline BaseDictionary& ForEachKeyImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TString&>) {
 						ForEachKeyImplWithoutIndex(This, lambda);
 						return *this;
@@ -790,7 +790,7 @@ namespace Seed {
 #pragma endregion
 #pragma region For Each Value
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithoutIndex(
+				ForceInline static void ForEachValueImplWithoutIndex(
 					NodeSym* node,
 					Lambda& lambda)
 				{
@@ -811,7 +811,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithoutIndex(
+				ForceInline static void ForEachValueImplWithoutIndex(
 					RootNode* This, //-V688
 					Lambda& lambda)
 				{
@@ -821,7 +821,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithIndex(
+				ForceInline static void ForEachValueImplWithIndex(
 					NodeSym* node,
 					Lambda& lambda,
 					SizeT& Index)
@@ -846,7 +846,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline static void ForEachValueImplWithIndex(
+				ForceInline static void ForEachValueImplWithIndex(
 					RootNode* This, //-V688
 					Lambda& lambda,
 					SizeT& Index)
@@ -857,7 +857,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				forceinline const BaseDictionary& ForEachValueImpl(LambdaT&& lambda) const {
+				ForceInline const BaseDictionary& ForEachValueImpl(LambdaT&& lambda) const {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TData&>) {
 						ForEachValueImplWithoutIndex(This, lambda);
 						return *this;
@@ -873,7 +873,7 @@ namespace Seed {
 				}
 
 				template<typename LambdaT>
-				forceinline BaseDictionary& ForEachValueImpl(LambdaT&& lambda) {
+				ForceInline BaseDictionary& ForEachValueImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, TData&> ||
 						TypeTraits::IsLambdaConvertibleV<LambdaT, void, const TData&>) {
 						ForEachValueImplWithoutIndex(This, lambda);
@@ -916,7 +916,7 @@ namespace Seed {
 					return nullptr;
 				}
 
-				forceinline BaseDictionary& RemoveAllImpl() {
+				ForceInline BaseDictionary& RemoveAllImpl() {
 					This->node = destroy_node(This->node);
 					This->count = 0;
 					return *this;
@@ -931,11 +931,11 @@ namespace Seed {
 						});
 				}
 
-				forceinline void UnsafeAdd(Pair&& pair){
+				ForceInline void UnsafeAdd(Pair&& pair){
 					Insert(MoveRValue(pair));
 				}
 
-				forceinline void UnsafeAdd(const Pair& pair){
+				ForceInline void UnsafeAdd(const Pair& pair){
 					Insert(pair);
 				}
 #pragma endregion
@@ -968,7 +968,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename TString, typename T>
-		forceinline void Swap(Containers::BaseDictionary<THeap, TString, T>& A, Containers::BaseDictionary<THeap, TString, T>& B) {
+		ForceInline void Swap(Containers::BaseDictionary<THeap, TString, T>& A, Containers::BaseDictionary<THeap, TString, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

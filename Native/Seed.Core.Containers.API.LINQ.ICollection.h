@@ -36,14 +36,14 @@ namespace Seed {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<T>::IsDynamic == false) {
 							NewCollection<T> Instance = NewCollection<T>(ThisCollectionRef.Count);
-							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) {
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
 								Instance.UnsafeSet(Item, Index);
 								});
 							return Instance;
 						}
 						else {
 							NewCollection<T> Instance = NewCollection<T>();
-							ThisCollectionRef.ForEach([&](const T& Item) {
+							ThisCollectionRef.ForEach([&](const T& Item) InlineLambda {
 								Instance.UnsafeAdd(Item);
 								});
 							return Instance;
@@ -66,14 +66,14 @@ namespace Seed {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<T>::IsDynamic == false) {
 							NewCollection<T> Instance = NewCollection<T>(ThisCollectionRef.Count);
-							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) {
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
 								Instance.UnsafeSet(Item, Index);
 								});
 							return Instance;
 						}
 						else {
 							NewCollection<T> Instance = NewCollection<T>();
-							ThisCollectionRef.ForEach([&](const T& Item) {
+							ThisCollectionRef.ForEach([&](const T& Item) InlineLambda {
 								Instance.UnsafeAdd(Item);
 								});
 							return Instance;
@@ -97,7 +97,7 @@ namespace Seed {
 						if constexpr (NewCollection<T>::IsDynamic == false) {
 							NewCollection<T> Instance = NewCollection<T>(ThisCollectionRef.Count);
 							SizeT Index = 0;
-							ThisCollectionRef.RemoveAll([&](T&& Item) {
+							ThisCollectionRef.RemoveAll([&](T&& Item) InlineLambda {
 								Instance.UnsafeSet(MoveRValue(Item), Index);
 								Index++;
 								});
@@ -105,7 +105,7 @@ namespace Seed {
 						}
 						else {
 							NewCollection<T> Instance = NewCollection<T>();
-							ThisCollectionRef.RemoveAll([&](T&& Item) {
+							ThisCollectionRef.RemoveAll([&](T&& Item) InlineLambda {
 								Instance.UnsafeAdd(MoveRValue(Item));
 								});
 							return Instance;
@@ -135,7 +135,7 @@ namespace Seed {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
-							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) {
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
 								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
 								{
 									Instance.UnsafeSet(lambda(Item, Index), Index);
@@ -151,14 +151,14 @@ namespace Seed {
 							NewCollection<U> Instance = NewCollection<U>();
 							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
 							{
-								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
 									Instance.UnsafeAdd(lambda(Item, Index));
 								});
 							}
 							else
 							{
-								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
 									Instance.UnsafeAdd(lambda(Item));
 								});
@@ -190,7 +190,7 @@ namespace Seed {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
-							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) {
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
 								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
 								{
 									Instance.UnsafeSet(lambda(Item, Index), Index);
@@ -206,14 +206,14 @@ namespace Seed {
 							NewCollection<U> Instance = NewCollection<U>();
 							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
 							{
-								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
 									Instance.UnsafeAdd(lambda(Item, Index));
 								});
 							}
 							else
 							{
-								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index)
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
 									Instance.UnsafeAdd(lambda(Item));
 								});
@@ -245,7 +245,7 @@ namespace Seed {
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							SizeT Index = 0;
-							ThisCollectionRef.RemoveAll([&](T&& Item) {
+							ThisCollectionRef.RemoveAll([&](T&& Item) InlineLambda {
 								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>)
 								{
 									Instance.UnsafeSet(MoveRValue(lambda(MoveRValue(Item), Index)), Index);
@@ -262,7 +262,7 @@ namespace Seed {
 							NewCollection<U> Instance = NewCollection<U>();
 							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>){ 
 								SizeT Index = 0;
-								ThisCollectionRef.RemoveAll([&] (T&& Item)
+								ThisCollectionRef.RemoveAll([&] (T&& Item) InlineLambda
 								{
 									Instance.UnsafeAdd(MoveRValue(lambda(MoveRValue(Item), Index)));
 									Index++;
@@ -270,7 +270,7 @@ namespace Seed {
 							}
 							else
 							{
-								ThisCollectionRef.RemoveAll([&] (T&& Item)
+								ThisCollectionRef.RemoveAll([&] (T&& Item) InlineLambda
 								{
 									Instance.UnsafeAdd(MoveRValue(lambda(MoveRValue(Item))));
 								});
@@ -288,7 +288,7 @@ namespace Seed {
 					template<typename Lambda> 
 					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
 							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					forceinline ThisCollection& ForEach(Lambda&& lambda) {
+					ForceInline ThisCollection& ForEach(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -300,7 +300,7 @@ namespace Seed {
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
 					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					forceinline const ThisCollection& ForEach(Lambda&& lambda) const {
+					ForceInline const ThisCollection& ForEach(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -314,7 +314,7 @@ namespace Seed {
 					template<typename Lambda> 
 					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
 							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					forceinline ThisCollection& ForEach(Lambda&& lambda, SizeT сount) {
+					ForceInline ThisCollection& ForEach(Lambda&& lambda, SizeT сount) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), сount);
 					}
 
@@ -327,7 +327,7 @@ namespace Seed {
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
 					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT count) const {
+					ForceInline const ThisCollection& ForEach(Lambda&& lambda, SizeT count) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), count);
 					}
 				public:
@@ -339,7 +339,7 @@ namespace Seed {
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					template<typename U = T, typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&>
-					forceinline U Aggregate(Lambda&& lambda) const {
+					ForceInline U Aggregate(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), U());
 					}
 
@@ -353,7 +353,7 @@ namespace Seed {
 					/// <returns>Результат обчислення</returns>
 					template<typename U, typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&> 
-					forceinline U Aggregate(Lambda&& lambda, const U& startValue) const {
+					ForceInline U Aggregate(Lambda&& lambda, const U& startValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), startValue);
 					}
 
@@ -367,7 +367,7 @@ namespace Seed {
 					/// <returns>Результат обчислення</returns>
 					template<typename U, typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&>
-					forceinline U Aggregate(Lambda&& lambda, U&& startValue) const {
+					ForceInline U Aggregate(Lambda&& lambda, U&& startValue) const {
 						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(startValue));
 					}
 
@@ -375,7 +375,7 @@ namespace Seed {
 					/// Вертає true якщо в контейнері хоч щось є
 					/// </summary>
 					/// <returns>Вертає true якщо в контейнері хоч щось є</returns>
-					forceinline bool Any() const {
+					ForceInline bool Any() const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl();
 					}
 
@@ -386,7 +386,7 @@ namespace Seed {
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					forceinline bool Any(Lambda&& lambda) const {
+					ForceInline bool Any(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
@@ -397,7 +397,7 @@ namespace Seed {
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					forceinline bool All(Lambda&& lambda) const  {
+					ForceInline bool All(Lambda&& lambda) const  {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 
@@ -408,7 +408,7 @@ namespace Seed {
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					forceinline T& First(Lambda&& lambda) {
+					ForceInline T& First(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
@@ -419,7 +419,7 @@ namespace Seed {
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					forceinline T& Last(Lambda&& lambda) {
+					ForceInline T& Last(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
@@ -430,7 +430,7 @@ namespace Seed {
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					forceinline const T& First(Lambda&& lambda) const {
+					ForceInline const T& First(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
@@ -441,7 +441,7 @@ namespace Seed {
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					forceinline const T& Last(Lambda&& lambda) const {
+					ForceInline const T& Last(Lambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
@@ -449,7 +449,7 @@ namespace Seed {
 					/// Видаляє всі елементи з колекції
 					/// </summary>
 					/// <returns>Силку на поточний об'єкт колекції</returns>
-					forceinline ThisCollection& RemoveAll() {
+					ForceInline ThisCollection& RemoveAll() {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl();
 					}
 
@@ -460,7 +460,7 @@ namespace Seed {
 					/// <returns>Силку на поточний об'єкт колекції</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockable<Lambda, T&&>
-					forceinline ThisCollection& RemoveAll(Lambda&& lambda) {
+					ForceInline ThisCollection& RemoveAll(Lambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl(MoveRValue(lambda));
 					}
 
@@ -471,7 +471,7 @@ namespace Seed {
 					/// <returns>Кількість елементів які підпадають під умову</returns>
 					template<typename Lambda>
 					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					forceinline SizeT GetCountIf(Lambda && lambda) {
+					ForceInline SizeT GetCountIf(Lambda && lambda) {
 						return static_cast<ThisCollection&>(*this).GetCountIfImpl(MoveRValue(lambda));
 					}
 
@@ -482,7 +482,7 @@ namespace Seed {
 					/// <typeparam name="Lambda">Тип лямбди</typeparam>
 					template<typename TLambda> 
 					requires Concepts::IsInvockableWithResult<TLambda, T> || Concepts::IsInvockableWithResult<TLambda, T, SizeT>
-					forceinline static ThisCollection Generate(TLambda&& generator, SizeT count) {
+					ForceInline static ThisCollection Generate(TLambda&& generator, SizeT count) {
 						if constexpr (TypeTraits::IsInvockableWithResult<TLambda, T>)
 						{
 							if constexpr (!ThisCollection::IsDynamic)
@@ -527,7 +527,7 @@ namespace Seed {
 						}
 					}
 				public:
-					forceinline virtual ~ICollection() = 0 {}
+					ForceInline virtual ~ICollection() = 0 {}
 				};
 			}
 		}

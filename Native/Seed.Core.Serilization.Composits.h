@@ -18,7 +18,7 @@ namespace Seed
 					using Tuple = TTuple<TTypes...>;
 
 					template<SizeT Index = 0>
-					forceinline static void SerilizeTupleItem(const Tuple& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
+					ForceInline static void SerilizeTupleItem(const Tuple& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
 						if constexpr(Index == sizeof...(TTypes))
 							return;
 						else{
@@ -29,7 +29,7 @@ namespace Seed
 					}
 
 					template<SizeT Index = 0>
-					forceinline static void DeserelizeTupleItem(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
+					ForceInline static void DeserelizeTupleItem(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
 						if constexpr(Index == sizeof...(TTypes))
 							return;
 						else{
@@ -40,7 +40,7 @@ namespace Seed
 					}
 
 					template<SizeT Index = 0>
-					forceinline static SizeT DataSizeTuppleItem(const Tuple& data, UnusedData const TypesRegistry& registry){
+					ForceInline static SizeT DataSizeTuppleItem(const Tuple& data, UnusedData const TypesRegistry& registry){
 						if constexpr(Index == sizeof...(TTypes))
 							return 0;
 						else{
@@ -52,7 +52,7 @@ namespace Seed
 					}
 
 					template<SizeT Index = 0>
-					constexpr forceinline static auto TypeMetaDataTuppleItem(){
+					constexpr ForceInline static auto TypeMetaDataTuppleItem(){
 						if constexpr(Index == sizeof...(TTypes))
 							return CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
 						else{
@@ -63,29 +63,29 @@ namespace Seed
 						}
 					}
 
-					forceinline static void SerilizeImpl(const Tuple& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void SerilizeImpl(const Tuple& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						SerilizeTupleItem(data, rawStream, offset, registry);
 					}
 
-					forceinline static constexpr Boolean IsMemCopy() {
+					ForceInline static constexpr Boolean IsMemCopy() {
 						return false;
 					}
 
-					forceinline static constexpr SizeT DataSize(const Tuple& data, UnusedData const TypesRegistry& registry) {
+					ForceInline static constexpr SizeT DataSize(const Tuple& data, UnusedData const TypesRegistry& registry) {
 						return DataSizeTuppleItem(data, registry);
 					}
 
-					forceinline static constexpr auto TypeHint() {
+					ForceInline static constexpr auto TypeHint() {
 						return
 							CTTI::Details::ToCharStr<sizeof...(TTypes)>();
 					}
 
-					forceinline static constexpr auto ConstexprSize() {
+					ForceInline static constexpr auto ConstexprSize() {
 						return
 							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
 					}
 
-					forceinline static constexpr auto TypeMetaData() {
+					ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<Tuple>().Resize<CTTI::TypeName<Tuple>().Count - 1>() +
@@ -102,7 +102,7 @@ namespace Seed
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
                     }
 
-					forceinline static void DeserelizeImpl(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void DeserelizeImpl(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						DeserelizeTupleItem(data, rawStream, offset, registry);
 					}
 				};
@@ -117,7 +117,7 @@ namespace Seed
 					using ISerilizable = CTTI::TypeTraits::ISerilizable<TObject>;
 
 					template<SizeT I = 0>
-					forceinline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						if constexpr (I < StructFieldsMetaData::Count)
 						
 						{
@@ -147,7 +147,7 @@ namespace Seed
 
 					
 					template<SizeT I = 0>
-					forceinline static void DeserelizeFieldsImp(Byte * fiedsPtr, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
+					ForceInline static void DeserelizeFieldsImp(Byte * fiedsPtr, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -174,7 +174,7 @@ namespace Seed
 					}
 
 					template<SizeT I = 0>
-					forceinline static SizeT DataSizeFieldsImp(Byte * fiedsPtr, UnusedData const TypesRegistry& registry){
+					ForceInline static SizeT DataSizeFieldsImp(Byte * fiedsPtr, UnusedData const TypesRegistry& registry){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -198,7 +198,7 @@ namespace Seed
 					}
 
 					template<SizeT I = 0>
-					constexpr forceinline static auto TypeHintFieldsImp(){
+					constexpr ForceInline static auto TypeHintFieldsImp(){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
@@ -236,7 +236,7 @@ namespace Seed
 					}
 
 					template<SizeT I = 0>
-					constexpr forceinline static auto TypeMetaDataFieldsImp(){
+					constexpr ForceInline static auto TypeMetaDataFieldsImp(){
 						if constexpr (I < StructFieldsMetaData::Count)
 						{
 							using FieldMetaData = StructFieldsMetaData::ItemType<I>;
@@ -255,36 +255,36 @@ namespace Seed
 						}
 					}
 
-					forceinline static void SerilizeImpl(const TObject& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void SerilizeImpl(const TObject& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						const auto& iSerelizeable = static_cast<const ISerilizable&>(data);
 						SerelizeFieldsImpl(iSerelizeable.GetDataPtr(), rawStream, offset, registry);
 					}
 
-					forceinline static void DeserelizeImpl(TObject& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+					ForceInline static void DeserelizeImpl(TObject& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
 						auto& iSerelizeable = static_cast<ISerilizable&>(data);
 						DeserelizeFieldsImp(iSerelizeable.GetDataPtr(), rawStream, offset, registry);
 					}
 
-					forceinline static constexpr Boolean IsMemCopy() {
+					ForceInline static constexpr Boolean IsMemCopy() {
 						return false;
 					}
 
-					forceinline static constexpr SizeT DataSize(const TObject& data, UnusedData const TypesRegistry& registry) {
+					ForceInline static constexpr SizeT DataSize(const TObject& data, UnusedData const TypesRegistry& registry) {
 						const auto& iSerelizeable = static_cast<const ISerilizable&>(data);
 						return DataSizeFieldsImp(iSerelizeable.GetDataPtr(), registry);
 					}
 
-					forceinline static constexpr auto TypeHint() {
+					ForceInline static constexpr auto TypeHint() {
 						return
 							TypeHintFieldsImp();
 					}
 
-					forceinline static constexpr auto ConstexprSize() {
+					ForceInline static constexpr auto ConstexprSize() {
 						return
 							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
 					}
 
-					forceinline static constexpr auto TypeMetaData() {
+					ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<TObject>().Resize<CTTI::TypeName<TObject>().Count - 1>() +

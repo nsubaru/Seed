@@ -6,49 +6,49 @@ namespace Seed {
 		namespace Math {
 			namespace Internal {
 #pragma region Const
-				forceinline constexpr Double E()
+				ForceInline constexpr Double E()
 				{
 					return 2.71828182845904523536l; //-V2517
 				}
-				forceinline constexpr Double Pi()
+				ForceInline constexpr Double Pi()
 				{
 					return 3.141592653589793238462643383279502884197169399;
 				}
 #pragma endregion
 #pragma region Abs
 
-				forceinline constexpr Seed::Int8 ConstexprAbs(Seed::Int8 Number)
+				ForceInline constexpr Seed::Int8 ConstexprAbs(Seed::Int8 Number)
 				{
 					return Number * ((Number < 0) * (-1i8) + (Number > 0)); //-V2517
 				}
 				static_assert((Int8)100 == ConstexprAbs((Int8)-100) && (Int8)100 == ConstexprAbs((Int8)100), "Модуль числа Int32 не коректно працює"); //-V2533
 
-				forceinline constexpr Seed::Int16 ConstexprAbs(Seed::Int16 Number)
+				ForceInline constexpr Seed::Int16 ConstexprAbs(Seed::Int16 Number)
 				{
 					return Number * ((Number < 0) * (-1i16) + (Number > 0)); //-V2517
 				}
 				static_assert((Int16)100 == ConstexprAbs((Int16)-100) && (Int16)100 == ConstexprAbs((Int16)100), "Модуль числа Int32 не коректно працює"); //-V2533
 
-				forceinline constexpr Seed::Int32 ConstexprAbs(Seed::Int32 Number)
+				ForceInline constexpr Seed::Int32 ConstexprAbs(Seed::Int32 Number)
 				{
 					return Number * ((Number < 0) * (-1) + (Number > 0));
 				}
 				static_assert(100 == ConstexprAbs(-100) && 100 == ConstexprAbs(100), "Модуль числа Int32 не коректно працює");
 
-				forceinline constexpr Seed::Int64 ConstexprAbs(Seed::Int64 Number)
+				ForceInline constexpr Seed::Int64 ConstexprAbs(Seed::Int64 Number)
 				{
 					return Number * ((Number < 0) * (-1i64) + (Number > 0)); //-V2517
 				}
 				static_assert(100L == ConstexprAbs(-100L) && 100L == ConstexprAbs(100L), "Модуль числа Int64 не коректно працює");
 
-				forceinline constexpr Seed::Float ConstexprAbs(Seed::Float Number)
+				ForceInline constexpr Seed::Float ConstexprAbs(Seed::Float Number)
 				{
 					if (Number < 0)
 						return -Number;
 					return Number;
 				}
 
-				forceinline constexpr Seed::Double ConstexprAbs(Seed::Double Number)
+				ForceInline constexpr Seed::Double ConstexprAbs(Seed::Double Number)
 				{
 					if (Number < 0)
 						return -Number;
@@ -56,18 +56,18 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Sign
-				forceinline constexpr Boolean ConstexprSign(Seed::Float Number)
+				ForceInline constexpr Boolean ConstexprSign(Seed::Float Number)
 				{
 					return Number < 0;
 				}
 
-				forceinline constexpr Boolean ConstexprSign(Seed::Double Number)
+				ForceInline constexpr Boolean ConstexprSign(Seed::Double Number)
 				{
 					return Number < 0;
 				}
 #pragma endregion
 #pragma region Factorial
-				forceinline constexpr UInt64 ConstexprFactorial(UInt64 N)
+				ForceInline constexpr UInt64 ConstexprFactorial(UInt64 N)
 				{
 					if (N == 1 || N == 0)
 						return 1;
@@ -81,7 +81,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Exp
-				forceinline constexpr Double ConstexprExp(Double X, Double Res, Double N, Int64 i, Double t)
+				ForceInline constexpr Double ConstexprExp(Double X, Double Res, Double N, Int64 i, Double t)
 				{
 					return FEqual(Res, Res + t / N) ?
 						Res :
@@ -89,7 +89,7 @@ namespace Seed {
 					return Res;
 				}
 
-				forceinline constexpr Double ConstexprExp(Double X)
+				ForceInline constexpr Double ConstexprExp(Double X)
 				{
 					return ConstexprExp(X, 1, 1, 2, X);
 				}
@@ -136,7 +136,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Pow
-				forceinline constexpr UInt64 ConstexprPow(UInt64 X, UInt8 Y, UInt64 Res = 1)
+				ForceInline constexpr UInt64 ConstexprPow(UInt64 X, UInt8 Y, UInt64 Res = 1)
 				{
 					for (UInt8 i = 0; i < Y; i++)
 					{
@@ -144,12 +144,12 @@ namespace Seed {
 					}
 					return Res;
 				}
-				forceinline constexpr Double ConstexprPow(Double X, Double Y)
+				ForceInline constexpr Double ConstexprPow(Double X, Double Y)
 				{
 					return ConstexprExp(ConstexprLog(X, 0) * Y);
 				}
 
-				forceinline constexpr Double ConstexprPow(Double X, Int32 Y)
+				ForceInline constexpr Double ConstexprPow(Double X, Int32 Y)
 				{
 					return (Y == 0) ? 1 :
 						Y == 1 ? X :
@@ -158,7 +158,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Sqrt
-				forceinline constexpr Double ConstexprSqrt(Double X, Double Res = 0)
+				ForceInline constexpr Double ConstexprSqrt(Double X, Double Res = 0)
 				{
 					Res = X; //-V763
 					for (int N = 1; N < 20; N++)
@@ -169,7 +169,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Sin
-				forceinline constexpr Double ConstexprSin(Double X, Double Res = 0)
+				ForceInline constexpr Double ConstexprSin(Double X, Double Res = 0)
 				{
 					for (int N = 0; N < 20; N++)
 					{
@@ -179,7 +179,7 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region Cos
-				forceinline constexpr Double ConstexprCos(Double X, Double Res = 0)
+				ForceInline constexpr Double ConstexprCos(Double X, Double Res = 0)
 				{
 					for (int N = 0; N < 15; N++)
 					{
@@ -190,19 +190,19 @@ namespace Seed {
 				constexpr Double res = ConstexprSqrt(10);
 #pragma endregion
 #pragma region Tan
-				forceinline constexpr Double ConstexprTan(Double X)
+				ForceInline constexpr Double ConstexprTan(Double X)
 				{
 					return ConstexprSin(X) / ConstexprCos(X);
 				}
 #pragma endregion
 #pragma region CTan
-				forceinline constexpr Double ConstexprCtan(Double X)
+				ForceInline constexpr Double ConstexprCtan(Double X)
 				{
 					return ConstexprCos(X) / ConstexprSin(X);
 				}
 #pragma endregion
 #pragma region ASin
-				forceinline constexpr Double ConstexprASin(Double X, Double Res = 0)
+				ForceInline constexpr Double ConstexprASin(Double X, Double Res = 0)
 				{
 					for (int N = 0; N <= 20; N++)
 					{
@@ -212,38 +212,38 @@ namespace Seed {
 				}
 #pragma endregion
 #pragma region ACos
-				forceinline constexpr Double ConstexprACos(Double X)
+				ForceInline constexpr Double ConstexprACos(Double X)
 				{
 					return (Pi() / 2.0) - ConstexprASin(X);
 				}
 #pragma endregion
 #pragma region ATan
-				forceinline constexpr Double ConstexprATan(Double X, Double Res = 0) //-V2537
+				ForceInline constexpr Double ConstexprATan(Double X, Double Res = 0) //-V2537
 				{
 					return ConstexprASin(1.0 / ConstexprSqrt(1 + X * X));
 				}
 #pragma endregion
 #pragma region ACTan
-				forceinline constexpr Double ConstexprACtan(Double X)
+				ForceInline constexpr Double ConstexprACtan(Double X)
 				{
 					return (Pi() / 2) - ConstexprATan(X);
 				}
 #pragma endregion
 
 #pragma region Runtime
-				forceinline Float RuntimeAbs(Float Val)
+				ForceInline Float RuntimeAbs(Float Val)
 				{
 					*(((int*) &Val)) &= 0x7fffffff;
 					return Val;
 				}
 
-				forceinline Double RuntimeAbs(Double Val)
+				ForceInline Double RuntimeAbs(Double Val)
 				{
 					*(((int*) &Val) + 1) &= 0x7fffffff;
 					return Val;
 				}
 
-				forceinline Seed::Boolean RuntimeSign(Seed::Float val)
+				ForceInline Seed::Boolean RuntimeSign(Seed::Float val)
 				{
 					static_assert(sizeof(Float) == sizeof(Int32), "Розміри Float і Int32 різні");
 					union
@@ -255,7 +255,7 @@ namespace Seed {
 					return ((*D.I) & ((Seed::Int32)1 << 31)); //-V2533
 				}
 
-				forceinline Seed::Boolean RuntimeSign(Seed::Double val)
+				ForceInline Seed::Boolean RuntimeSign(Seed::Double val)
 				{
 					static_assert(sizeof(Double) == sizeof(Int64), "Розміри Float і Int32 різні");
 					union

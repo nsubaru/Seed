@@ -174,7 +174,7 @@ namespace Seed
                     /// </summary>
                     /// <param name="pack">Покажчик на інтерфейс контейнера пакету</param>
                     /// <returns></returns>
-                    forceinline Data(IDynamicImpl* pack) : pack(pack), RefCount(1) {}
+                    ForceInline Data(IDynamicImpl* pack) : pack(pack), RefCount(1) {}
                 };
             private:
                 /// <summary>

@@ -44,7 +44,7 @@ namespace Seed
 				RefCountClass(RTTITypeRecord, data);
 
 				template<typename T>
-				forceinline RTTITypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
+				ForceInline RTTITypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
 					Lazy<String>(ArrowFunct(String(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeName))),
 					Lazy<String>(ArrowFunct(String(CTTI::TypeTraits::CTTITypeMetaData<T>::CXXTypeName))),
 					CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
@@ -53,27 +53,27 @@ namespace Seed
 				))
 				{}
 
-				forceinline const String& GetTypeName() const {
+				ForceInline const String& GetTypeName() const {
 					return *data->TypeName;
 				}
 
-				forceinline const String& GetCxxTypeName() const {
+				ForceInline const String& GetCxxTypeName() const {
 					return *data->CxxTypeName;
 				}
 
-				forceinline CTTI::TypeTraits::EType GetCxxTypeClass() const {
+				ForceInline CTTI::TypeTraits::EType GetCxxTypeClass() const {
 					return data->TypeClass;
 				}
 
-				forceinline Boolean GetIsSerilizeable() const {
+				ForceInline Boolean GetIsSerilizeable() const {
 					return data->IsSerilizeable;
 				}
 
-				forceinline const auto& TypeId() const {
+				ForceInline const auto& TypeId() const {
 					return *data->rttiTypeInfo;
 				}
 
-				forceinline ID GetHashCode() const {
+				ForceInline ID GetHashCode() const {
 					return data->rttiTypeInfo->GetHashCode();
 				}
 			public:
@@ -83,35 +83,35 @@ namespace Seed
 				Boolean					Property(GetIsSerilizeable) IsSerilizeable;
 				ID						Property(GetHashCode)		HashCode;
 			public:
-				forceinline auto operator==(const RTTITypeRecord& other) const {
+				ForceInline auto operator==(const RTTITypeRecord& other) const {
 					return *this->data->rttiTypeInfo == *other.data->rttiTypeInfo;
 				}
 
-				forceinline auto operator!=(const RTTITypeRecord& other) const {
+				ForceInline auto operator!=(const RTTITypeRecord& other) const {
 					return *this->data->rttiTypeInfo != *other.data->rttiTypeInfo;
 				}
 
-				forceinline auto operator<=>(const RTTITypeRecord& other) const {
+				ForceInline auto operator<=>(const RTTITypeRecord& other) const {
 					return this->data->rttiTypeInfo->HashCode <=> other.data->rttiTypeInfo->HashCode;
 				}
 
-				forceinline auto operator==(const TypeInfo& other) const {
+				ForceInline auto operator==(const TypeInfo& other) const {
 					return *this->data->rttiTypeInfo == other;
 				}
 
-				forceinline auto operator!=(const TypeInfo& other) const {
+				ForceInline auto operator!=(const TypeInfo& other) const {
 					return *this->data->rttiTypeInfo != other;
 				}
 
-				forceinline friend auto operator==(const TypeInfo& other, const RTTITypeRecord& item) {
+				ForceInline friend auto operator==(const TypeInfo& other, const RTTITypeRecord& item) {
 					return other == *item.data->rttiTypeInfo;
 				}
 
-				forceinline friend auto operator!=(const TypeInfo& other, const RTTITypeRecord& item) {
+				ForceInline friend auto operator!=(const TypeInfo& other, const RTTITypeRecord& item) {
 					return other != *item.data->rttiTypeInfo;
 				}
 
-				forceinline friend auto operator<=>(const TypeInfo& other, const RTTITypeRecord& item) {
+				ForceInline friend auto operator<=>(const TypeInfo& other, const RTTITypeRecord& item) {
 					return other.HashCode <=> item.data->rttiTypeInfo->HashCode;
 				}
 			};
@@ -252,6 +252,6 @@ namespace Seed
 }
 
 template<typename T>
-forceinline Seed::Core::RTTI::RTTITypeRecord TypeRecord() {
+ForceInline Seed::Core::RTTI::RTTITypeRecord TypeRecord() {
 	return Seed::Core::RTTI::RTTITypeRecord(Seed::Core::TypeTraits::TypeTag<T>{});
 }

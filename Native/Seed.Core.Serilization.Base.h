@@ -65,34 +65,34 @@ namespace Seed
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsNotSerlizable<T>, void>> {
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
                         __assume(false);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
+                    ForceInline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(data);
                     }
 
-                    forceinline static constexpr Boolean IsMemCopy() {
+                    ForceInline static constexpr Boolean IsMemCopy() {
                         return false;
                     }
 
-                    forceinline static constexpr auto TypeHint() {
+                    ForceInline static constexpr auto TypeHint() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
                     }
 
-                    forceinline static constexpr auto ConstexprSize() {
+                    ForceInline static constexpr auto ConstexprSize() {
                         return
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                          Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
                     }
 
-                    forceinline static constexpr auto TypeMetaData() {
+                    ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
@@ -123,33 +123,33 @@ namespace Seed
 
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T,typename TypeTraits::EnableIfV<IsSerilizablePrimitive<T>, void>> {
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         Memory::Copy(reinterpret_cast<const Byte*>(&data), rawStream + offset, sizeof(T)); offset += sizeof(T);
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
+                    ForceInline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         return sizeof(data);
                     }
 
-                    forceinline static constexpr Boolean IsMemCopy() {
+                    ForceInline static constexpr Boolean IsMemCopy() {
                         return true;
                     }
 
-                    forceinline static constexpr auto TypeHint() {
+                    ForceInline static constexpr auto TypeHint() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
                     }
 
-                    forceinline static constexpr auto ConstexprSize() {
+                    ForceInline static constexpr auto ConstexprSize() {
                         return
                             CTTI::Details::ToCharStr<sizeof(T)>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         data = *(reinterpret_cast<const T*>(rawStream + offset)); offset += sizeof(T);
                     }
 
-                    forceinline static constexpr auto TypeMetaData() {
+                    ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
@@ -176,7 +176,7 @@ namespace Seed
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsCFixedArraySerlizable<T>, void>> {
                     using ItemType = typename CTTI::TypeTraits::CTTITypeMetaData<T>::ItemType::Type;
 
-                    forceinline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         if constexpr (IsMemCopy())
                         {
                             SizeT dataSize = DataSize(data, registry);
@@ -193,7 +193,7 @@ namespace Seed
                         
                     }
 
-                    forceinline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
+                    ForceInline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
                         if constexpr (IsMemCopy())
                         {
                             return sizeof(ItemType) * CTTI::TypeTraits::CTTITypeMetaData<T>::Count;
@@ -209,21 +209,21 @@ namespace Seed
                         }
                     }
 
-                    forceinline static constexpr Boolean IsMemCopy() {
+                    ForceInline static constexpr Boolean IsMemCopy() {
                         return BaseSerlizationHandler<THeap, ItemType>::IsMemCopy();
                     }
 
-                    forceinline static constexpr auto TypeHint() {
+                    ForceInline static constexpr auto TypeHint() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
                     }
 
-                    forceinline static constexpr auto ConstexprSize() {
+                    ForceInline static constexpr auto ConstexprSize() {
                         return
                             CTTI::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<T>::Count>();
                     }
 
-                    forceinline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
+                    ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
                         if constexpr (IsMemCopy())
                         {
                             SizeT dataSize = sizeof(T);
@@ -239,7 +239,7 @@ namespace Seed
                         }
                     }
 
-                    forceinline static constexpr auto TypeMetaData() {
+                    ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
@@ -259,7 +259,7 @@ namespace Seed
             }
 
             template<typename THeap, typename T>
-            forceinline Containers::BaseArray<THeap, Byte> BaseSerilize(const T& Object, UnusedData const TypesRegistry& registry) {
+            ForceInline Containers::BaseArray<THeap, Byte> BaseSerilize(const T& Object, UnusedData const TypesRegistry& registry) {
                 SizeT rawStreamSize = Details::BaseSerlizationHandler<THeap, T>::DataSize(Object, registry);
                 Byte* rawStream = nullptr;
                 try
@@ -277,49 +277,49 @@ namespace Seed
             }
 
             template<typename THeap, typename T>
-            forceinline void BaseDeserilize(const Containers::BaseArray<THeap, Byte>& stream, T& Object, UnusedData const TypesRegistry& registry) {
+            ForceInline void BaseDeserilize(const Containers::BaseArray<THeap, Byte>& stream, T& Object, UnusedData const TypesRegistry& registry) {
                 const Byte* rawStream = (const Byte*) stream;
                 SizeT offset = 0;
                 Details::BaseSerlizationHandler<THeap, T>::DeserelizeImpl(Object, rawStream, offset, registry);
             }
 
             template<typename T>
-            forceinline Containers::Array<Byte> Serilize(const T& Object, UnusedData const TypesRegistry& registry) {
+            ForceInline Containers::Array<Byte> Serilize(const T& Object, UnusedData const TypesRegistry& registry) {
                 return BaseSerilize<Memory::Heap, T>(Object, registry);
             }
 
             template<typename T>
-            forceinline Containers::SensitiveArray<Byte> SensitiveSerilize(const T& Object, UnusedData const TypesRegistry& registry) {
+            ForceInline Containers::SensitiveArray<Byte> SensitiveSerilize(const T& Object, UnusedData const TypesRegistry& registry) {
                 return BaseSerilize<Memory::SensitiveDataHeap, T>(Object, registry);
             }
 
             template<typename T>
-            forceinline void Deserilize(const Containers::Array<Byte> & stream, T& Object, UnusedData const TypesRegistry& registry) {
+            ForceInline void Deserilize(const Containers::Array<Byte> & stream, T& Object, UnusedData const TypesRegistry& registry) {
                 BaseDeserilize<Memory::Heap, T>(stream, Object, registry);
             }
 
             template<typename T>
-            forceinline T SensitiveDeserilize(const Containers::Array<Byte>& stream, T& Object, UnusedData const TypesRegistry& registry) {
+            ForceInline T SensitiveDeserilize(const Containers::Array<Byte>& stream, T& Object, UnusedData const TypesRegistry& registry) {
                 BaseDeserilize<Memory::SensitiveDataHeap, T>(stream, Object, registry);
             }
 
             template<typename THeap, typename T>
-            forceinline BaseString<THeap> BaseMetaDataGen() {
+            ForceInline BaseString<THeap> BaseMetaDataGen() {
                 return BaseString<THeap>(Details::BaseSerlizationHandler<THeap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
             }
 
             template<typename T>
-            forceinline String MetaDataGen() {
+            ForceInline String MetaDataGen() {
                 return String(Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
             }
 
             template<typename T>
-            forceinline SensitiveString SensitiveMetaDataGen() {
+            ForceInline SensitiveString SensitiveMetaDataGen() {
                 return SensitiveString(Details::BaseSerlizationHandler<Memory::SensitiveDataHeap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
             }
 
             template<typename T>
-            forceinline constexpr auto CTTIMetaDataGen() {
+            ForceInline constexpr auto CTTIMetaDataGen() {
                 return Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")());
             }
         }

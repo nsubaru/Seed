@@ -53,7 +53,7 @@ namespace Seed
 			/// Оператор розіменування
 			/// </summary>
 			/// <returns>Силка на об'єкт</returns>
-			forceinline T& operator*() &
+			ForceInline T& operator*() &
 			{
 				CheckIsExistOrGetNew();
                 return *This->value;
@@ -63,7 +63,7 @@ namespace Seed
 			/// Оператор розіменування
 			/// </summary>
 			/// <returns>Силка на об'єкт</returns>
-			forceinline const T& operator*() const &
+			ForceInline const T& operator*() const &
 			{
 				CheckIsExistOrGetNew();
 				return *This->value;
@@ -73,7 +73,7 @@ namespace Seed
 			/// Оператор доступу до полів\методів
 			/// </summary>
 			/// <returns>Покажчик на об'єкт</returns>
-			forceinline T* operator->() &
+			ForceInline T* operator->() &
 			{
 				CheckIsExistOrGetNew();
 				return This->value;
@@ -83,7 +83,7 @@ namespace Seed
 			/// Оператор доступу до полів\методів
 			/// </summary>
 			/// <returns>Покажчик на об'єкт</returns>
-			forceinline const T* operator->() const &
+			ForceInline const T* operator->() const &
 			{
 				CheckIsExistOrGetNew();
 				return This->value;
@@ -93,7 +93,7 @@ namespace Seed
 			/// Оператор розіменування
 			/// </summary>
 			/// <returns>Силка на об'єкт</returns>
-			forceinline T&& operator*() &&
+			ForceInline T&& operator*() &&
 			{
 				CheckIsExistOrGetNew();
 				T value = MoveRValue(*This->value);
@@ -106,7 +106,7 @@ namespace Seed
 			/// Оператор доступу до полів\методів
 			/// </summary>
 			/// <returns>Покажчик на об'єкт</returns>
-			forceinline T*&& operator->() && //-V659
+			ForceInline T*&& operator->() && //-V659
 			{
 				CheckIsExistOrGetNew();
 				T* value = MoveRValue(This->value);
