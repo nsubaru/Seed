@@ -2,6 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Testing.Tests.Serilization.Struct.h"
+#include "Seed.Core.Serilization.h"
+#include "Seed.Core.RTTI.h"
+#include "Seed.Core.Reflection.h"
 
 bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 	struct Data {
@@ -14,20 +17,22 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
         );
 	};
 
+	auto registry = Core::Serilization::TypesRegistry();
+
 	auto data = Data{ 1,
 		{{1, {L"text", {1,2,3}, {{"Rec1", 1}, {"Rec2", 2}}}} } };
 
-	Asserts::AssertTrue([&]
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		return Core::String(Core::Serilization::CTTIMetaDataGen<Data>()).Lenght > 0;
 	});
 
 	auto schema = Core::Serilization::MetaDataGen<Data>();
-	auto blob = Core::Serilization::Serilize(data);
+	auto blob = Core::Serilization::Serilize(data, registry);
 	auto deserilizedData = Data{};
-	Core::Serilization::Deserilize<Data>(blob, deserilizedData);
+	Core::Serilization::Deserilize<Data>(blob, deserilizedData, registry);
 
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		if (data.CountNonCopyRecord != deserilizedData.CountNonCopyRecord)
 			return false;

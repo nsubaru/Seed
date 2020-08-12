@@ -10,7 +10,7 @@ namespace Seed {
 			constexpr Char SettingsFileName[16] = L"CoreSettings";
 			///<summary>Стандартні налаштування рантайму Seed</summary>
 			namespace Default {
-				forceinline CurrentSettings::SettingsData InitDefaultSettings() {
+				ForceInline CurrentSettings::SettingsData InitDefaultSettings() {
 					CurrentSettings::SettingsData DefaultSettings;
 					//Менеджер пам'яті
 					{

@@ -19,54 +19,54 @@ namespace Seed {
                 /// <summary>
                 /// Пустий конструктор
                 /// </summary>
-                forceinline BasePair() : key(), value() {}
+                ForceInline BasePair() : key(), value() {}
                 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                forceinline BasePair(const TKey& key, const TValue& value) : key(key), value(value) {}
+                ForceInline BasePair(const TKey& key, const TValue& value) : key(key), value(value) {}
 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                forceinline BasePair(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
+                ForceInline BasePair(TKey&& key, const TValue& value) : key(MoveRValue(key)), value(value) {}
 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                forceinline BasePair(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
+                ForceInline BasePair(const TKey& key, TValue&& value) : key(key), value(MoveRValue(value)) {}
 
                 /// <summary>
                 /// Конструктор з ключа і значення
                 /// </summary>
                 /// <param name="key">Ключ</param>
                 /// <param name="value">Значення</param>
-                forceinline BasePair(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
+                ForceInline BasePair(TKey&& key, TValue&& value) : key(MoveRValue(key)), value(MoveRValue(value)) {}
 
                 /// <summary>
                 /// Конструктор копіювання
                 /// </summary>
                 /// <param name="other">Оригинал</param>
-                forceinline BasePair(const BasePair& other) : key(other.key), value(other.value) {}
+                ForceInline BasePair(const BasePair& other) : key(other.key), value(other.value) {}
 
                 /// <summary>
                 /// Конструктор переміщення
                 /// </summary>
                 /// <param name="other">Оригинал</param>
-                forceinline BasePair(BasePair&& other) : key(MoveRValue(other.key)), value(MoveRValue(other.value)) {}
+                ForceInline BasePair(BasePair&& other) : key(MoveRValue(other.key)), value(MoveRValue(other.value)) {}
 
                 /// <summary>
                 /// Оператор копіювання
                 /// </summary>
                 /// <param name="other">Оригинал</param>
                 /// <returns>Силку на даний об'єкт</returns>
-                forceinline BasePair& operator=(const BasePair& other) {
+                ForceInline BasePair& operator=(const BasePair& other) {
                     this->~BasePair();
                     this->BasePair::BasePair(other);
                     return  *this;
@@ -77,7 +77,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="other">Оригинал</param>
                 /// <returns>Силку на даний об'єкт</returns>
-                forceinline BasePair& operator=(BasePair&& other) {
+                ForceInline BasePair& operator=(BasePair&& other) {
                     this->~BasePair();
                     this->BasePair::BasePair(MoveRValue(other));
                     return *this;
@@ -88,7 +88,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="other">Лівий операнд</param>
                 /// <returns>Вертає true якщо і ключ і значення рівні</returns>
-            	forceinline bool operator==(const BasePair & other) const
+            	ForceInline bool operator==(const BasePair & other) const
                 {
 	                return this->key == other.key && this->value == other.value;
                 }
@@ -98,7 +98,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="other">Лівий операнд</param>
                 /// <returns>Вертає true якщо або ключ або значення не рівні</returns>
-            	forceinline bool operator!=(const BasePair & other) const
+            	ForceInline bool operator!=(const BasePair & other) const
                 {
 	                return this->key != other.key || this->value != other.value;
                 }
@@ -107,31 +107,31 @@ namespace Seed {
                 /// Вертає ключ
                 /// </summary>
                 /// <returns>Ключ</returns>
-                forceinline const TKey& GetKey() const { return key; }
+                ForceInline const TKey& GetKey() const { return key; }
 
                 /// <summary>
                 /// Вертає значення
                 /// </summary>
                 /// <returns>Значення</returns>
-                forceinline TValue& GetValue() { return value; }
+                ForceInline TValue& GetValue() { return value; }
 
                 /// <summary>
                 /// Вертає значення
                 /// </summary>
                 /// <returns>Значення</returns>
-                forceinline const TValue& GetValue() const { return value; }
+                ForceInline const TValue& GetValue() const { return value; }
 
                 /// <summary>
                 /// Встановлює нове значення
                 /// </summary>
                 /// <param name="newValue">Нове значення</param>
-                forceinline void SetValue(const TValue& newValue) { value = newValue; }
+                ForceInline void SetValue(const TValue& newValue) { value = newValue; }
 
                 /// <summary>
                 /// Встановлює нове значення
                 /// </summary>
                 /// <param name="newValue">Нове значення</param>
-                forceinline void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
+                ForceInline void SetValue(TValue&& newValue) { value = MoveRValue(newValue); }
 
                 template<typename T>
                 friend void Seed::Core::Swap(T& a, T& b);
@@ -151,7 +151,7 @@ namespace Seed {
                 /// </summary>
                 /// <returns>Клонований об'єкт</returns>
                 template<typename = void> requires Concepts::IsClonable<TKey> && Concepts::IsClonable<TValue>
-                forceinline BasePair Clone() const {
+                ForceInline BasePair Clone() const {
                     if constexpr (TypeTraits::IsPodV<TKey> && TypeTraits::IsPodV<TValue>)
                     {
                         return BasePair(this->key, this->value);
@@ -176,7 +176,7 @@ namespace Seed {
                 /// <param name="lambda">Функція, лямбда або функтор який створює інстанс об'єкта на основі існуючого</param>
                 /// <returns>Клонований об'єкт</returns>
                 template<typename TLambda> requires Concepts::IsInvockableWithResult<TLambda, BasePair, const BasePair&> 
-                forceinline BasePair Clone(TLambda&& lambda) const {
+                ForceInline BasePair Clone(TLambda&& lambda) const {
                     return BasePair(lambda(*this));
                 }
             private:

@@ -16,7 +16,7 @@ namespace Seed {
 				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
 				class IFixedQueue : public IFixedCollection<TCollection, THeap, T, TSize, TIsConcurencySuport> {
 				public:
-					forceinline virtual ~IFixedQueue() = 0 {}
+					ForceInline virtual ~IFixedQueue() = 0 {}
 				};
 			}
 		}

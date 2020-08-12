@@ -28,9 +28,9 @@ bool Seed::Testing::Test::Containers::SimpleTypeFixedQueueTest::Excecute()
         queue.Enqueue(i);
         Sum += i;
     }
-	const auto IsAnyWork = !queue.Any([](const Int32& item) {return item > 19; });
-	const auto IsAllWork = queue.All([](const Int32& item) {return item > 10; });
-	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const Int32& item) {result += item; }) == Sum;
+	const auto IsAnyWork = !queue.Any([](const Int32& item) InlineLambda {return item > 19; });
+	const auto IsAllWork = queue.All([](const Int32& item) InlineLambda {return item > 10; });
+	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const Int32& item) InlineLambda {result += item; }) == Sum;
     return IsAnyWork && IsAllWork && IsAggregateWork;
 }
 
@@ -57,9 +57,9 @@ bool Seed::Testing::Test::Containers::SimpleTypeConcurencyFixedQueueTest::Excecu
         queue.Enqueue(i);
         Sum += i;
     }
-	const auto IsAnyWork = !queue.Any([](const Int32& item) {return item > 19; });
-	const auto IsAllWork = queue.All([](const Int32& item) {return item > 10; });
-	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const Int32& item) {result += item; }) == Sum;
+	const auto IsAnyWork = !queue.Any([](const Int32& item) InlineLambda {return item > 19; });
+	const auto IsAllWork = queue.All([](const Int32& item) InlineLambda {return item > 10; });
+	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const Int32& item) InlineLambda {result += item; }) == Sum;
     return IsAnyWork && IsAllWork && IsAggregateWork;
 }
 
@@ -86,9 +86,9 @@ bool Seed::Testing::Test::Containers::ComplexTypeFixedQueueTest::Excecute()
         queue.Enqueue(String::toString(i));
         Sum += i;
     }
-	const auto IsAnyWork = !queue.Any([](const String& item) {return item.toInt() > 19; });
-	const auto IsAllWork = queue.All([](const String& item) {return item.toInt() > 10; });
-	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const String& item) {result += item.toInt(); }, 0) == Sum;
+	const auto IsAnyWork = !queue.Any([](const String& item) InlineLambda {return item.toInt() > 19; });
+	const auto IsAllWork = queue.All([](const String& item) InlineLambda {return item.toInt() > 10; });
+	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const String& item) InlineLambda {result += item.toInt(); }, 0) == Sum;
     return IsAnyWork && IsAllWork && IsAggregateWork;
 }
 
@@ -115,8 +115,8 @@ bool Seed::Testing::Test::Containers::ComplexTypeConcurencyFixedQueueTest::Excec
         queue.Enqueue(String::toString(i));
         Sum += i;
     }
-	const auto IsAnyWork = !queue.Any([](const String& item) {return item.toInt() > 19; });
-	const auto IsAllWork = queue.All([](const String& item) {return item.toInt() > 10; });
-	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const String& item) {result += item.toInt(); }, 0) == Sum;
+	const auto IsAnyWork = !queue.Any([](const String& item) InlineLambda {return item.toInt() > 19; });
+	const auto IsAllWork = queue.All([](const String& item) InlineLambda {return item.toInt() > 10; });
+	const auto IsAggregateWork = queue.Aggregate([](Int32& result, const String& item) InlineLambda {result += item.toInt(); }, 0) == Sum;
     return IsAnyWork && IsAllWork && IsAggregateWork;
 }

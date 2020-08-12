@@ -45,7 +45,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr forceinline SafeInt operator+(SafeInt second) {
+				constexpr ForceInline SafeInt operator+(SafeInt second) {
 					if (static_cast<Int>(this->value + second.value) >= this->value)
 						return static_cast<Int>(this->value + second.value);
 					else
@@ -56,7 +56,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr forceinline SafeInt operator-(SafeInt second) {
+				constexpr ForceInline SafeInt operator-(SafeInt second) {
 					if (this->value >= second.value)
 						return static_cast<Int>(this->value - second.value);
 					else
@@ -70,7 +70,7 @@ namespace Seed {
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
 #pragma intrinsic(_umul128)
-				constexpr forceinline SafeInt operator*(SafeInt second) {
+				constexpr ForceInline SafeInt operator*(SafeInt second) {
 					if constexpr (TypeTraits::IsSameV<Int, UInt8>)
 					{
 						UInt16 res = static_cast<UInt16>(this->value) * second.value;
@@ -114,7 +114,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr forceinline SafeInt operator/(SafeInt second) {
+				constexpr ForceInline SafeInt operator/(SafeInt second) {
 					if (second.value == 0)
 						Seed::Core::Internals::Exceptions::ThrowDivideByZero(__FILE__, __FUNCSIG__, __LINE__);
 					else
@@ -125,7 +125,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr forceinline SafeInt operator+=(SafeInt second) {
+				constexpr ForceInline SafeInt operator+=(SafeInt second) {
 					if (static_cast<Int>(this->value + second.value) >= this->value)
 						return this->value = static_cast<Int>(this->value + second.value);
 					else
@@ -136,7 +136,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr forceinline SafeInt operator-=(SafeInt second) {
+				constexpr ForceInline SafeInt operator-=(SafeInt second) {
 					if (this->value >= second.value)
 						return this->value = static_cast<Int>(this->value - second.value);
 					else
@@ -151,7 +151,7 @@ namespace Seed {
 				///<param name = "second">Лівий операнд</param>
 				///<exception cref="IntegerOverflowException">Якщо відбулось переповнення</exception>
 				///<returns>Результат операції</returns>
-				constexpr forceinline SafeInt operator*=(SafeInt second) {
+				constexpr ForceInline SafeInt operator*=(SafeInt second) {
 					if constexpr (TypeTraits::IsSameV<Int, UInt8>)
 					{
 						UInt16 res = this->value * second.value;
@@ -194,14 +194,14 @@ namespace Seed {
 				/// </summary>
 				/// <param name="second">Друге число</param>
 				/// <returns>Результат порівняння</returns>
-				constexpr forceinline auto operator<=>(SafeInt second) {
+				constexpr ForceInline auto operator<=>(SafeInt second) {
 					return this->value <=> second.value;
 				}
 				/// <summary>
 				/// Вертає значення числа
 				/// </summary>
 				/// <returns>Значення числа</returns>
-				constexpr forceinline Int GetValue() { return value; }
+				constexpr ForceInline Int GetValue() { return value; }
 				/// <summary>
 				/// Значення числа
 				/// </summary>

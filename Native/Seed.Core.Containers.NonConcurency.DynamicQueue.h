@@ -27,11 +27,11 @@ namespace Seed {
 					RefCountT RefCount;
 					
 
-					forceinline T& operator[](SizeT Index) {
+					ForceInline T& operator[](SizeT Index) {
 						return queue[(front + Index) % bufferSize];
 					}
 
-					forceinline Data()
+					ForceInline Data()
 						: front(0),
 						  rear(0),
 						  count(0),
@@ -39,7 +39,7 @@ namespace Seed {
 						  bufferSize(0),
 						  RefCount(1) {}
 
-					forceinline Data(SizeT startCount)
+					ForceInline Data(SizeT startCount)
 						: front(0),
 						  rear(0),
 						  count(0),
@@ -50,7 +50,7 @@ namespace Seed {
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() final override
+				ForceInline virtual void Dispose() final override
 				{
 					if (This->bufferSize != 0)
 					{
@@ -63,13 +63,13 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор конкуретної черги
 				/// </summary>
-				forceinline BaseDynamicQueue() : This(new Data()) {}
+				ForceInline BaseDynamicQueue() : This(new Data()) {}
 
 				/// <summary>
 				/// Конструктор черги з певною максимальною кількістю елементів
 				/// </summary>
 				/// <param name="startCount">Максимальна кількість елементів в черзі</param>
-				forceinline BaseDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
+				ForceInline BaseDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
 
 				/// <summary>
 				/// Конструктор черги з елементами з списку ініціалізації
@@ -96,7 +96,7 @@ namespace Seed {
 				/// <param name="isResizeIfFull">Якщо true то чергу розширить автоматично при потребі, 
 				/// якщо false і черга немає місця то вона згенерує помилку
 				/// </param>
-				forceinline void Enqueue(const T& value, bool isResizeIfFull = false) {
+				ForceInline void Enqueue(const T& value, bool isResizeIfFull = false) {
 					if (This->count >= This->bufferSize) {
 						if (isResizeIfFull)
 							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
@@ -117,7 +117,7 @@ namespace Seed {
 				/// <param name="isResizeIfFull">Якщо true то чергу розширить автоматично при потребі, 
 				/// якщо false і черга немає місця то вона згенерує помилку
 				/// </param>
-				forceinline void Enqueue(T&& value, bool isResizeIfFull = false) {
+				ForceInline void Enqueue(T&& value, bool isResizeIfFull = false) {
 					if (This->count >= This->bufferSize) {
 						if (isResizeIfFull)
 							this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
@@ -136,7 +136,7 @@ namespace Seed {
 				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns>Значення елементу</returns>
-				forceinline T Dequeue() {
+				ForceInline T Dequeue() {
 					if (This->count == 0)
 						Throw(EmptyQueueException(ExceptionPosition));
 
@@ -152,7 +152,7 @@ namespace Seed {
 				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
-				forceinline const T& Top() {
+				ForceInline const T& Top() {
 					if (This->front == This->rear)
 						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
@@ -163,7 +163,7 @@ namespace Seed {
 				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
-				forceinline const T& Top() const {
+				ForceInline const T& Top() const {
 					if (This->front == This->rear)
 						Throw(EmptyQueueException(ExceptionPosition));
 					return This->queue[This->front];
@@ -173,7 +173,7 @@ namespace Seed {
 				/// Розширення черги на задану кількість елемент
 				/// </summary>
 				/// <param name="AdditionalSize">Кількість на яку збільшити треба</param>
-				forceinline void Extend(SizeT additionalSize) {
+				ForceInline void Extend(SizeT additionalSize) {
 					ExtendImpl(additionalSize);
 				}
 
@@ -199,7 +199,7 @@ namespace Seed {
 				/// Кількість елементів в черзі
 				/// </summary>
 				/// <returns>Поточна кількість елементів</returns>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 
 				/// <summary>
 				/// Поточна кількість елементів
@@ -210,7 +210,7 @@ namespace Seed {
 				/// Максимальна елементів в черзі
 				/// </summary>
 				/// <returns>Максимальна кількість елементів</returns>
-				forceinline SizeT GetMaxCount() const { return This->bufferSize; }
+				ForceInline SizeT GetMaxCount() const { return This->bufferSize; }
 
 				/// <summary>
 				/// Максимальна кількість елементів
@@ -501,7 +501,7 @@ namespace Seed {
 					return MoveRValue(result);
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename TLambda>
 				bool AnyImpl(TLambda&& lambda) const {
@@ -532,7 +532,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline T& FirstImpl(Lambda&& lambda) {
+				ForceInline T& FirstImpl(Lambda&& lambda) {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -542,7 +542,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline T& LastImpl(Lambda&& lambda) {
+				ForceInline T& LastImpl(Lambda&& lambda) {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -552,7 +552,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline const T& FirstImpl(Lambda&& lambda) const {
+				ForceInline const T& FirstImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -562,7 +562,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline const T& LastImpl(Lambda&& lambda) const {
+				ForceInline const T& LastImpl(Lambda&& lambda) const {
 					if (This->count == 0)
 						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -579,19 +579,19 @@ namespace Seed {
 					return *this;
 				}
 
-				forceinline void UnsafeSet(const T& value, SizeT index) {
+				ForceInline void UnsafeSet(const T& value, SizeT index) {
 					This->queue[index] = value;
 					This->rear = index;
 					This->count = This->bufferSize;
 				}
 
-				forceinline void UnsafeSet(T&& value, SizeT index) {
+				ForceInline void UnsafeSet(T&& value, SizeT index) {
 					This->queue[index] = MoveRValue(value);
 					This->rear = index;
 					This->count = This->bufferSize;
 				}
 
-				forceinline BaseDynamicQueue& RemoveAllImpl() {
+				ForceInline BaseDynamicQueue& RemoveAllImpl() {
 					if (This->count == 0)
 						return *this;
 					delete[] This->queue;
@@ -601,7 +601,7 @@ namespace Seed {
 				}
 
 				template<typename TLambda>
-				forceinline BaseDynamicQueue& RemoveAllImpl(TLambda&& lambda) {
+				ForceInline BaseDynamicQueue& RemoveAllImpl(TLambda&& lambda) {
 					if (This->count == 0)
 						return *this;
 					for (SizeT i = 0; i < This->count; i++)
@@ -640,7 +640,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseDynamicQueue<THeap, T>& A, Containers::BaseDynamicQueue<THeap, T>& B) {
+		ForceInline void Swap(Containers::BaseDynamicQueue<THeap, T>& A, Containers::BaseDynamicQueue<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

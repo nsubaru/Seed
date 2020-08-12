@@ -28,7 +28,7 @@ namespace Seed {
 					requires(Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&> ||
 							 Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&, SizeT>) &&
 							(Concepts::IsInvockable<TLambda, T&&> || Concepts::IsInvockable<TLambda, T&&, SizeT>)
-						forceinline ListType& RemoveIf(TFilteringLambda&& filter, TLambda&& lambda) {
+						ForceInline ListType& RemoveIf(TFilteringLambda&& filter, TLambda&& lambda) {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(filter), MoveRValue(lambda));
 					}
 
@@ -41,11 +41,11 @@ namespace Seed {
 					template<typename TFilteringLambda>
 					requires Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&> ||
 							 Concepts::IsInvockableWithResult<TFilteringLambda, Boolean, const T&, SizeT>
-					forceinline ListType& RemoveIf(TFilteringLambda&& filter) {
+					ForceInline ListType& RemoveIf(TFilteringLambda&& filter) {
 						return static_cast<ListType&>(*this).RemoveIfImpl(MoveRValue(filter), [] (T&&){});
 					}
 				public:
-					forceinline virtual ~IList() = 0 {}
+					ForceInline virtual ~IList() = 0 {}
 				};
 			}
 		}

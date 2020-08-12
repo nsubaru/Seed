@@ -24,7 +24,7 @@ namespace Seed {
 					SizeT bufferSize;
 					T* stack;
 
-					forceinline Data(SizeT bufferSize) : count(0), RefCount(1), stack(new T[bufferSize]), bufferSize(bufferSize) {}
+					ForceInline Data(SizeT bufferSize) : count(0), RefCount(1), stack(new T[bufferSize]), bufferSize(bufferSize) {}
 				};
 			private:
 				Data* This;
@@ -37,7 +37,7 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор ініціалізовує стек з стандартною максимальною кількістю елементів
 				/// </summary>
-				forceinline BaseDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
+				ForceInline BaseDynamicStack() : This(new Data(CurrentSettings().MemoryManager.StackReserveSize)) {}
 
 				/// <summary>
 				/// Конструктор з списку ініціалізації, 
@@ -65,7 +65,7 @@ namespace Seed {
 				/// то він розширюється на кількість задану в налаштуваннях
 				/// </summary>
 				/// <param name="item">Силка на елемент</param>
-				forceinline void Push(const T& item) {
+				ForceInline void Push(const T& item) {
 					if (This->count == This->bufferSize) {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 					}
@@ -78,7 +78,7 @@ namespace Seed {
 				/// то він розширюється на кількість задану в налаштуваннях
 				/// </summary>
 				/// <param name="item">RValue силка на елемент</param>
-				forceinline void Push(T&& item) {
+				ForceInline void Push(T&& item) {
 					if (This->count == This->bufferSize) {
 						ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
 					}
@@ -90,7 +90,7 @@ namespace Seed {
 				/// Виймає елемент з стеку, якщо стек пустий то генерує помилку
 				/// </summary>
 				/// <returns>Вийннятий елемент з стеку</returns>
-				forceinline T Pop() {
+				ForceInline T Pop() {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
 					--This->count;
@@ -102,7 +102,7 @@ namespace Seed {
 				/// якщо стек пустий то генерує помилку
 				/// </summary>
 				/// <returns>Константна силка на елемент</returns>
-				forceinline const T& Top() const {
+				ForceInline const T& Top() const {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
 					--This->count;
@@ -114,7 +114,7 @@ namespace Seed {
 				/// якщо стек пустий то генерує помилку
 				/// </summary>
 				/// <returns>Константна силка на елемент</returns>
-				forceinline const T& Top() {
+				ForceInline const T& Top() {
 					if (This->count == 0)
 						Throw(EmptyStackException(ExceptionPosition));
 					--This->count;
@@ -125,7 +125,7 @@ namespace Seed {
 				/// Розширення стеку на задану кількість елементів
 				/// </summary>
 				/// <param name="AdditionalSize">Кількість на яку необхідно розширити стек</param>
-				forceinline void ExtendBuffer(SizeT AdditionalSize) {
+				ForceInline void ExtendBuffer(SizeT AdditionalSize) {
 					ExtendBufferImpl(AdditionalSize);
 				}
 
@@ -169,7 +169,7 @@ namespace Seed {
 				/// Кількість елементів в стеку
 				/// </summary>
 				/// <returns>Поточна кількість елементів в стеку</returns>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 
 				/// <summary>
 				/// Поточна кількість елементів в стеку
@@ -294,7 +294,7 @@ namespace Seed {
 					return MoveRValue(Value);
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
 				bool AnyImpl(Lambda&& lambda) const {
@@ -386,31 +386,31 @@ namespace Seed {
 					Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 				}
 
-				forceinline BaseDynamicStack& ReverseImpl() {
+				ForceInline BaseDynamicStack& ReverseImpl() {
 					for (SizeT i = 0; i < This->count / 2; i++) {
 						Swap(This->stack[i], This->stack[(This->count - 1) - i]);
 					}
 					return *this;
 				}
 
-				forceinline void UnsafeSet(T&& Value, SizeT Index) {
+				ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
 				}
 
-				forceinline void UnsafeSet(const T& Value, SizeT Index) {
+				ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = Value;
 					This->count = Index + 1;
 				}
 
-				forceinline BaseDynamicStack& RemoveAllImpl() {
+				ForceInline BaseDynamicStack& RemoveAllImpl() {
 					delete[] This->stack;
 					This->count = This->bufferSize = 0;
 					return *this;
 				}
 
 				template<typename Lambda>
-				forceinline BaseDynamicStack& RemoveAllImpl(Lambda&& lambda) {
+				ForceInline BaseDynamicStack& RemoveAllImpl(Lambda&& lambda) {
 					for (SizeT i = 0; i < This->count; i++) {
 						lambda(MoveRValue(This->stack[i]));
 					}
@@ -445,7 +445,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseDynamicStack<THeap, T>& A, Containers::BaseDynamicStack<THeap, T>& B) {
+		ForceInline void Swap(Containers::BaseDynamicStack<THeap, T>& A, Containers::BaseDynamicStack<THeap, T>& B) {
 			Swap(A.This, B.This);
 		}
 	}

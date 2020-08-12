@@ -22,9 +22,9 @@ namespace Seed {
 				TlsExceptionData ExceptionInfo;
 			} TLSData = { 0 };
 
-			InternalApiCall forceinline TLS* GetTLS() { return &TLSData; }
+			InternalApiCall ForceInline TLS* GetTLS() { return &TLSData; }
 
-			InternalApiCall forceinline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates* State) {
+			InternalApiCall ForceInline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates* State) {
 				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
 				thisTLS->State = State;
@@ -32,7 +32,7 @@ namespace Seed {
 				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 
-			InternalApiCall forceinline void DestroyTls() {
+			InternalApiCall ForceInline void DestroyTls() {
 				TLS* thisTLS = GetTLS();
 				delete thisTLS->Threadable;
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);

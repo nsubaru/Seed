@@ -27,17 +27,17 @@ namespace Seed {
                     Threading::SRWLock lock;
                     T stack[TSize];
 
-                    forceinline Data() : count(0), RefCount(1), lock(), stack() {}
+                    ForceInline Data() : count(0), RefCount(1), lock(), stack() {}
                 };
             private:
                 Data* This;
             protected:
-                forceinline virtual void Dispose() final override {}
+                ForceInline virtual void Dispose() final override {}
             public:
                 /// <summary>
                 /// Пустий конструктор
                 /// </summary>
-                forceinline BaseConcurencyFixedStack() : This(new Data()) {}
+                ForceInline BaseConcurencyFixedStack() : This(new Data()) {}
 
                 /// <summary>
                 /// Конструктор з списку ініціалізаці, 
@@ -60,8 +60,8 @@ namespace Seed {
                 /// Додає елемент в стек, якщо стек заповнений то генерує помилку
                 /// </summary>
                 /// <param name="item">Силка на елемент</param>
-                forceinline void Push(const T& item) {
-                    This->lock.ExclusiveLock([&]() mutable {
+                ForceInline void Push(const T& item) {
+                    This->lock.ExclusiveLock([&]() mutable InlineLambda {
                         if (This->count == TSize)
                             Throw(FullStackException(ExceptionPosition, TSize));
                         This->stack[This->count] = item;
@@ -73,8 +73,8 @@ namespace Seed {
                 /// Додає елемент в стек, якщо стек заповнений то генерує помилку
                 /// </summary>
                 /// <param name="item">RValue силка на елемент</param>
-                forceinline void Push(T&& item) {
-                    This->lock.ExclusiveLock([&]() mutable {
+                ForceInline void Push(T&& item) {
+                    This->lock.ExclusiveLock([&]() mutable InlineLambda {
                         if (This->count == TSize)
                             Throw(FullStackException(ExceptionPosition, TSize));
                         This->stack[This->count] = MoveRValue(item);
@@ -86,8 +86,8 @@ namespace Seed {
                 /// Виймання з стеку елемента, якщо стек пустий то генерується помилка
                 /// </summary>
                 /// <returns></returns>
-                forceinline T Pop() {
-                    return MoveRValue(This->lock.ExclusiveLock([&]() mutable {
+                ForceInline T Pop() {
+                    return MoveRValue(This->lock.ExclusiveLock([&]() mutable InlineLambda {
                         if (This->count == 0)
                             Throw(EmptyStackException(ExceptionPosition));
                         --This->count;
@@ -99,8 +99,8 @@ namespace Seed {
                 /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
                 /// </summary>
                 /// <returns>Силка на вехній елемент</returns>
-                forceinline const T& Top() {
-                    return This->lock.ExclusiveLock([&]() mutable -> const T& {
+                ForceInline const T& Top() {
+                    return This->lock.ExclusiveLock([&]() mutable -> const T& InlineLambda {
                         if (This->count == 0)
                             Throw(EmptyStackException(ExceptionPosition));
                         --This->count;
@@ -112,8 +112,8 @@ namespace Seed {
                 /// Отримання верхнього елементу в стеку, якщо стек пустий то генерується помилка 
                 /// </summary>
                 /// <returns>Силка на вехній елемент</returns>
-                forceinline const T& Top() const {
-                    return This->lock.ExclusiveLock([&]() mutable -> const T& {
+                ForceInline const T& Top() const {
+                    return This->lock.ExclusiveLock([&]() mutable -> const T& InlineLambda {
                         if (This->count == 0)
                             Throw(EmptyStackException(ExceptionPosition));
                         --This->count;
@@ -128,7 +128,7 @@ namespace Seed {
                 /// Кількість елементів в стеку
                 /// </summary>
                 /// <returns>Поточна кількість елементів в стеку</returns>
-                forceinline  SizeT GetCount() { return This->count; }
+                ForceInline  SizeT GetCount() { return This->count; }
 
                 /// <summary>
                 /// оточна кількість елементів в стеку
@@ -140,7 +140,7 @@ namespace Seed {
                 /// </summary>
                 /// <returns>Стек з копією елементів</returns>
                 virtual BaseConcurencyFixedStack Clone() const override final {
-                    return This->lock.ShareLock([&]() {
+                    return This->lock.ShareLock([&]() InlineLambda {
                         BaseConcurencyFixedStack result;
                         result.This->count = This->count;
                         if constexpr (TypeTraits::IsPodV<T>) {
@@ -174,7 +174,7 @@ namespace Seed {
                 template<typename Lambda>
                 BaseConcurencyFixedStack& ForEachImpl(Lambda&& lambda) {
                     if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
-                        return This->lock.ShareLock([&]() -> BaseConcurencyFixedStack& {
+                        return This->lock.ShareLock([&]() -> BaseConcurencyFixedStack& InlineLambda {
                             if (This->count == 0)
                                 return *this;
                             for (SizeT i = This->count; i--> 0;)
@@ -185,7 +185,7 @@ namespace Seed {
                             });
                     }
                     else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&, SizeT>) {
-                        return This->lock.ShareLock([&]() -> BaseConcurencyFixedStack& {
+                        return This->lock.ShareLock([&]() -> BaseConcurencyFixedStack& InlineLambda {
                             if (This->count == 0)
                                 return *this;
                             SizeT i = This->count;
@@ -204,7 +204,7 @@ namespace Seed {
                 template<typename Lambda>
                 const BaseConcurencyFixedStack& ForEachImpl(Lambda&& lambda) const {
                     if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&>) {
-                        return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedStack& {
+                        return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedStack& InlineLambda {
                             if (This->count == 0)
                                 return *this;
                             SizeT i = This->count;
@@ -216,7 +216,7 @@ namespace Seed {
                             });
                     }
                     else if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, const T&, SizeT>) {
-                        return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedStack& {
+                        return this->This->lock.ShareLock([&]() -> const BaseConcurencyFixedStack& InlineLambda {
                             if (This->count == 0)
                                 return *this;
                             SizeT i = This->count;
@@ -234,7 +234,7 @@ namespace Seed {
 
                 template<typename U, typename Lambda>
                 U AggregateImpl(Lambda&& lambda) const {
-                    return MoveRValue(this->This->lock.ShareLock([&]() {
+                    return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 
                         if (This->count == 0)
                             return U();
@@ -250,7 +250,7 @@ namespace Seed {
 
                 template<typename U, typename Lambda>
                 U AggregateImpl(Lambda&& lambda, const U& Value) const {
-                    return MoveRValue(this->This->lock.ShareLock([&]() {
+                    return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
                         U result = Value;
                         if (This->count == 0)
                             return result;
@@ -265,7 +265,7 @@ namespace Seed {
 
                 template<typename U, typename Lambda>
                 U AggregateImpl(Lambda&& lambda, U&& Value) const {
-                    return MoveRValue(this->This->lock.ShareLock([&]() {
+                    return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
                         if (This->count == 0)
                             return Value;
                         SizeT i = This->count;
@@ -277,11 +277,11 @@ namespace Seed {
                         }));
                 }
 
-                forceinline bool AnyImpl() const { return This->count > 0; }
+                ForceInline bool AnyImpl() const { return This->count > 0; }
 
                 template<typename Lambda>
                 bool AnyImpl(Lambda&& lambda) const {
-                    return MoveRValue(this->This->lock.ShareLock([&]() {
+                    return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
                         if (This->count == 0)
                             return false;
                         SizeT i = This->count;
@@ -296,7 +296,7 @@ namespace Seed {
 
                 template<typename Lambda>
                 bool AllImpl(Lambda&& lambda) const {
-                    return MoveRValue(this->This->lock.ShareLock([&]() {
+                    return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
                         if (This->count == 0)
                             return false;
                         SizeT i = This->count;
@@ -311,7 +311,7 @@ namespace Seed {
 
                 template<typename Lambda>
                 T& FirstImpl(Lambda&& lambda) {
-                    return This->lock.ShareLock([&]() -> T& {
+                    return This->lock.ShareLock([&]() -> T& InlineLambda {
                         if (This->count == 0)
                             Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
                         SizeT i = This->count;
@@ -327,7 +327,7 @@ namespace Seed {
 
                 template<typename Lambda>
                 T& LastImpl(Lambda&& lambda) {
-                    return This->lock.ShareLock([&]() -> T& {
+                    return This->lock.ShareLock([&]() -> T& InlineLambda {
                         if (This->count == 0)
                             Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
                         SizeT i = This->count;
@@ -347,7 +347,7 @@ namespace Seed {
 
                 template<typename Lambda>
                 const T& FirstImpl(Lambda&& lambda) const {
-                    return This->lock.ShareLock([&]() -> const T& {
+                    return This->lock.ShareLock([&]() -> const T& InlineLambda {
                         if (This->count == 0)
                             Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
                         SizeT i = This->count;
@@ -363,7 +363,7 @@ namespace Seed {
 
                 template<typename Lambda>
                 const T& LastImpl(Lambda&& lambda) const {
-                    return This->lock.ShareLock([&]() -> const T& {
+                    return This->lock.ShareLock([&]() -> const T& InlineLambda {
                         if (This->count == 0)
                             Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
                         SizeT i = This->count;
@@ -382,7 +382,7 @@ namespace Seed {
                 }
 
                 BaseConcurencyFixedStack& ReverseImpl() {
-                    return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& {
+                    return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& InlineLambda {
                         for (SizeT i = 0; i < This->count / 2; i++) {
                             Seed::Swap(This->stack[i], This->stack[(This->count - 1) - i]);
                         }
@@ -390,18 +390,18 @@ namespace Seed {
                         });
                 }
 
-                forceinline void UnsafeSet(T&& Value, SizeT Index) {
+                ForceInline void UnsafeSet(T&& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
                 }
 
-                forceinline void UnsafeSet(const T& Value, SizeT Index) {
+                ForceInline void UnsafeSet(const T& Value, SizeT Index) {
 					This->stack[Index] = MoveRValue(Value);
 					This->count = Index + 1;
                 }
 
                 BaseConcurencyFixedStack& RemoveAllImpl() {
-                    return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& {
+                    return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& InlineLambda {
                         for (SizeT i = 0; i < This->count; i++) {
                             This->stack[i].~T();
                         }
@@ -411,7 +411,7 @@ namespace Seed {
 
                 template<typename Lambda>
                 BaseConcurencyFixedStack& RemoveAllImpl(Lambda&& lambda) {
-                    return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& {
+                    return This->lock.ExclusiveLock([&]() -> BaseConcurencyFixedStack& InlineLambda {
                         for (SizeT i = 0; i < This->count; i++) {
                             lambda(MoveRValue(This->stack[i]));
                         }
@@ -445,7 +445,7 @@ namespace Seed {
         }
 
         template<typename THeap, SizeT TSize, typename T>
-        forceinline void Swap(Containers::BaseConcurencyFixedStack<THeap, TSize, T>& A, Containers::BaseConcurencyFixedStack<THeap, TSize, T>& B) {
+        ForceInline void Swap(Containers::BaseConcurencyFixedStack<THeap, TSize, T>& A, Containers::BaseConcurencyFixedStack<THeap, TSize, T>& B) {
             Swap(A.This, B.This);
         }
     }

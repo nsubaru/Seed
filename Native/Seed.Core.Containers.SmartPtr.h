@@ -33,7 +33,7 @@ namespace Seed {
 			/// Оператор розіменування
 			/// </summary>
 			/// <returns>Силка на об'єкт</returns>
-			forceinline T& operator*()
+			ForceInline T& operator*()
 			{
 				return *This->ptr;
 			}
@@ -42,7 +42,7 @@ namespace Seed {
 			/// Оператор розіменування
 			/// </summary>
 			/// <returns>Силка на об'єкт</returns>
-			forceinline const T& operator*() const
+			ForceInline const T& operator*() const
 			{
 				return *This->ptr;
 			}
@@ -51,7 +51,7 @@ namespace Seed {
 			/// Оператор доступу до полів\методів
 			/// </summary>
 			/// <returns>Покажчик на об'єкт</returns>
-			forceinline T* operator->()
+			ForceInline T* operator->()
 			{
 				return This->ptr;
 			}
@@ -60,7 +60,7 @@ namespace Seed {
 			/// Оператор доступу до полів\методів
 			/// </summary>
 			/// <returns>Покажчик на об'єкт</returns>
-			forceinline const T* operator->() const
+			ForceInline const T* operator->() const
 			{
 				return This->ptr;
 			}
@@ -69,7 +69,7 @@ namespace Seed {
 			/// Кількість силок на даний об'єкт
 			/// </summary>
 			/// <returns>Кількість силок</returns>
-			forceinline SizeT GetRefCount() const {
+			ForceInline SizeT GetRefCount() const {
 				return This->RefCount;
 			}
 
@@ -77,7 +77,7 @@ namespace Seed {
 			/// Тип значення
 			/// </summary>
 			/// <returns>Cxx RTTI об'єкт типу</returns>
-			forceinline decltype(auto) GetTypeInfo() const {
+			ForceInline decltype(auto) GetTypeInfo() const {
 				return typeid(This->ptr);
 			}
 

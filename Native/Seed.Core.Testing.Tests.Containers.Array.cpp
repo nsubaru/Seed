@@ -30,7 +30,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::ForEachFr
 
 bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::AgregateSimpleItemsTypeTestArray::Excecute() {
 	auto arr = Core::Containers::Array<SizeT>::Generate(ArrowFunct(i, i), 10);
-	return arr.Aggregate(ArrowFunct(x, y, x + y)) == [] ()
+	return arr.Aggregate(ArrowFunct(x, y, x + y)) == [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -39,7 +39,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::AgregateS
 
 bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::AgregateConvertionsItemsTypeTestArray::Excecute() {
 	auto arr = Core::Containers::Array<String>::Generate(ArrowFunct(i, String::toString(i)), 10);
-	return arr.Aggregate(ArrowFunct(x, y, x + y.toInt<SizeT>()), 0Sz) == [] ()
+	return arr.Aggregate(ArrowFunct(x, y, x + y.toInt<SizeT>()), 0Sz) == [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -66,7 +66,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::CloneArra
 	auto orig = Core::Containers::Array<SizeT>::Generate(ArrowFunct(i, i), 10);
 	auto copy = orig.Clone();
 
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < orig.Count; i++)
 		{
@@ -84,7 +84,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::CloneArra
 	auto orig = Core::Containers::Array<String>::Generate(ArrowFunct(i, String::toString(i)), 10);
 	auto copy = orig.Clone();
 
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < orig.Count; i++)
 		{
@@ -142,7 +142,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::AgregateSimp
 
 bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::AgregateConvertionsItemsTypeTestArray::Excecute() {
 	auto arr = Core::Containers::ConcurencyArray<String>::Generate(ArrowFunct(i, String::toString(i)), 10);
-	return arr.Aggregate(ArrowFunct(x, y, x + y.toInt<SizeT>()), 0Sz) == [] ()
+	return arr.Aggregate(ArrowFunct(x, y, x + y.toInt<SizeT>()), 0Sz) == [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -169,7 +169,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::CloneArrayWi
 	auto orig = Core::Containers::ConcurencyArray<SizeT>::Generate(ArrowFunct(i, i), 10);
 	auto copy = orig.Clone();
 
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < orig.Count; i++)
 		{
@@ -187,7 +187,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::CloneArrayWi
 	auto orig = Core::Containers::ConcurencyArray<String>::Generate(ArrowFunct(i, String::toString(i)), 10);
 	auto copy = orig.Clone();
 
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < orig.Count; i++)
 		{

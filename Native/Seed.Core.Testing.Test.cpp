@@ -42,7 +42,7 @@ namespace Seed
 				toCoreLog(L"Запуск тестів...");
 				DateTime startTime = DateTime::GetCurrentSystemTimeData();
 
-				GetAllTests().ForEach([&](TestRecord& record) {
+				GetAllTests().ForEach([&](TestRecord& record) InlineLambda {
 					DateTime testDurration = DateTime::GetCurrentSystemTimeData();
 					try
 					{

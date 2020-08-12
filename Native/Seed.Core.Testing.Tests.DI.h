@@ -27,6 +27,10 @@ namespace Seed
                     class ResolveServiceByDI : public TestClass<ResolveServiceByDI> {
                         virtual bool Excecute() override;
                     };
+
+                    class TestSerilizationService : public TestClass<TestSerilizationService> {
+                        virtual bool Excecute() override;
+                    };
 				}
 			}
 		}

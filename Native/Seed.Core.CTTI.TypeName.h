@@ -122,14 +122,14 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::Int32> {
 					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Int16")());
+						return Details::TypeStringToArray(GenNGTypeString("Seed::Int32")());
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Int64> {
 					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Int16")());
+						return Details::TypeStringToArray(GenNGTypeString("Seed::Int64")());
 					}
 				};
 #pragma endregion
@@ -151,7 +151,7 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::UInt32> {
 					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt16")());
+						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt32")());
 					}
 				};
 

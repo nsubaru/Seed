@@ -71,13 +71,13 @@ namespace Seed {
             static constexpr const auto HexNumbers = L"0123456789abcdef";
         public:
             ///<summary>Пустий конструктор</summary>
-            constexpr forceinline BaseString() noexcept : str(nullptr), CurrentSize(0), ReservedSize(0) {};
+            constexpr ForceInline BaseString() noexcept : str(nullptr), CurrentSize(0), ReservedSize(0) {};
 
             ///<summary>Конструктор з готової літерала рядка</summary>
             ///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>
             ///<param name = "Text">Літерал рядка</param>
             template<SizeT Size>
-            forceinline BaseString(StaticTextRef<Size> Text) : BaseString() {
+            ForceInline BaseString(StaticTextRef<Size> Text) : BaseString() {
                 if constexpr (Size < 2)
                 {
                     this->str = nullptr;
@@ -112,7 +112,7 @@ namespace Seed {
 
             ///<summary>Конструктор з готової константного рядка</summary>
             ///<param name = "Text">Літерал рядка</param>
-            forceinline BaseString(const ConstString& Text) {
+            ForceInline BaseString(const ConstString& Text) {
                 if (Text.Size < 2)
                 {
                     this->str = nullptr;
@@ -279,7 +279,7 @@ namespace Seed {
             }
             ///<summary>Оптимізований конструктор</summary>
             ///<param name = "from">RValue силка на оригинал</param>
-            forceinline BaseString(BaseString&& from) noexcept {
+            ForceInline BaseString(BaseString&& from) noexcept {
                 this->str = from.str; from.str = nullptr;
                 this->CurrentSize = from.CurrentSize; from.CurrentSize = 0;
                 this->ReservedSize = from.ReservedSize; from.ReservedSize = 0;
@@ -289,14 +289,14 @@ namespace Seed {
             ///<summary>Оператор рівності</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            forceinline Boolean operator==(const BaseString& second) const {
+            ForceInline Boolean operator==(const BaseString& second) const {
                 return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            forceinline Boolean operator!=(const BaseString& second) const {
+            ForceInline Boolean operator!=(const BaseString& second) const {
                 return !this->operator==(second);
             }
 #pragma endregion
@@ -306,7 +306,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
             template<SizeT Size>
-            forceinline Boolean operator==(StaticTextRef<Size> second) const noexcept {
+            ForceInline Boolean operator==(StaticTextRef<Size> second) const noexcept {
                 return (*this <=> second) == 0;
             }
 
@@ -315,7 +315,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
             template<SizeT Size>
-            forceinline Boolean operator!=(StaticTextRef<Size> second) const noexcept {
+            ForceInline Boolean operator!=(StaticTextRef<Size> second) const noexcept {
                 return !this->operator==<Size>(second);
             }
 
@@ -325,7 +325,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
             template<SizeT Size>
-            forceinline friend Boolean operator==(StaticTextRef<Size> second, const BaseString& first) {
+            ForceInline friend Boolean operator==(StaticTextRef<Size> second, const BaseString& first) {
                 return first.operator==<Size>(second);
             }
 
@@ -335,7 +335,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
             template<SizeT Size>
-            forceinline friend Boolean operator!=(StaticTextRef<Size> second, const BaseString& first) {
+            ForceInline friend Boolean operator!=(StaticTextRef<Size> second, const BaseString& first) {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
@@ -345,7 +345,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
             template<SizeT Size>
-            forceinline Boolean operator==(StaticATextRef<Size> second) const {
+            ForceInline Boolean operator==(StaticATextRef<Size> second) const {
                 return (*this <=> second) == 0;
             }
 
@@ -354,7 +354,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
             template<SizeT Size>
-            forceinline Boolean operator!=(StaticATextRef<Size> second) const {
+            ForceInline Boolean operator!=(StaticATextRef<Size> second) const {
                 return !this->operator==<Size>(second);
             }
 
@@ -364,7 +364,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
             template<SizeT Size>
-            forceinline friend Boolean operator==(StaticATextRef<Size> second, const BaseString& first) {
+            ForceInline friend Boolean operator==(StaticATextRef<Size> second, const BaseString& first) {
                 return first.operator==<Size>(second);
             }
 
@@ -374,7 +374,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
             template<SizeT Size>
-            forceinline friend Boolean operator!=(StaticATextRef<Size> second, const BaseString& first) {
+            ForceInline friend Boolean operator!=(StaticATextRef<Size> second, const BaseString& first) {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
@@ -382,14 +382,14 @@ namespace Seed {
             ///<summary>Оператор рівності з константним рядком</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            forceinline Boolean operator==(const ConstString& second) const {
+            ForceInline Boolean operator==(const ConstString& second) const {
                 return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності з константним рядком</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            forceinline Boolean operator!=(const ConstString& second) const {
+            ForceInline Boolean operator!=(const ConstString& second) const {
                 return !this->operator==(second);
             }
 
@@ -397,7 +397,7 @@ namespace Seed {
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константий рядок</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            forceinline friend Boolean operator==(const ConstString& second, const BaseString& first) {
+            ForceInline friend Boolean operator==(const ConstString& second, const BaseString& first) {
                 return first.operator==(second);
             }
 
@@ -405,7 +405,7 @@ namespace Seed {
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константий рядок</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            forceinline friend Boolean operator!=(const ConstString& second, const BaseString& first) {
+            ForceInline friend Boolean operator!=(const ConstString& second, const BaseString& first) {
                 return first.operator!=(second);
             }
 #pragma endregion
@@ -414,14 +414,14 @@ namespace Seed {
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
             template<SizeT Size>
-            forceinline Boolean operator==(const ConstAString& second) const {
+            ForceInline Boolean operator==(const ConstAString& second) const {
                 return (*this <=> second) == 0;
             }
 
             ///<summary>Оператор нерівності з константним рядком ASCII символів</summary>
             ///<param name = "second">Правий аргумент оператора</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            forceinline Boolean operator!=(const ConstAString& second) const {
+            ForceInline Boolean operator!=(const ConstAString& second) const {
                 return !this->operator==(second);
             }
 
@@ -429,7 +429,7 @@ namespace Seed {
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константний рядок</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
-            forceinline friend Boolean operator==(const ConstAString& second, const BaseString& first) {
+            ForceInline friend Boolean operator==(const ConstAString& second, const BaseString& first) {
                 return first.operator==(second);
             }
 
@@ -437,7 +437,7 @@ namespace Seed {
             ///<param name = "first">Правий аргумент оператора</param>
             ///<param name = "second">Лівий аргумент оператора. Константний рядок</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
-            forceinline friend Boolean operator!=(const ConstAString& second, const BaseString& first) {
+            ForceInline friend Boolean operator!=(const ConstAString& second, const BaseString& first) {
                 return first.operator!=(second);
             }
 #pragma endregion
@@ -446,12 +446,12 @@ namespace Seed {
             ///<param name = "OtherString">Константне посилання на рядкову зміну</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
             template<typename OtherBase>
-            forceinline Boolean operator==(const BaseString<OtherBase>& OtherString) const {
+            ForceInline Boolean operator==(const BaseString<OtherBase>& OtherString) const {
                 return (*this <=> OtherString) == 0;
             }
 
             template<typename OtherBase>
-            forceinline Boolean operator!=(const BaseString<OtherBase>& OtherString) const {
+            ForceInline Boolean operator!=(const BaseString<OtherBase>& OtherString) const {
                 return (*this <=> OtherString) != 0;
             }
 #pragma endregion
@@ -484,7 +484,7 @@ namespace Seed {
             ///<returns>Посилання на поточну зміну</returns>
             ///<remarks>Викликається деструктор для поточного рядка.
             ///Копіються поля з оригинала. І накінець поля в оригинала обнулюються</remarks>
-            forceinline BaseString& operator=(BaseString&& orig) noexcept {
+            ForceInline BaseString& operator=(BaseString&& orig) noexcept {
                 if (orig.str == this->str) return *this;
                 this->~BaseString();
                 this->str = orig.str; orig.str = nullptr;
@@ -610,7 +610,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             template<SizeT Size>
-            forceinline BaseString operator+(StaticTextRef<Size> Text) const {
+            ForceInline BaseString operator+(StaticTextRef<Size> Text) const {
                 if constexpr (Size < 2)
                     return *this;
                 BaseString retData;
@@ -636,7 +636,7 @@ namespace Seed {
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             template<SizeT Size>
-            forceinline friend BaseString operator+(StaticTextRef<Size> Text, const BaseString& Right) {
+            ForceInline friend BaseString operator+(StaticTextRef<Size> Text, const BaseString& Right) {
                 if constexpr (Size < 2)
                     return Right;
                 BaseString retData(Text);
@@ -678,7 +678,7 @@ namespace Seed {
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             template<SizeT Size>
-            forceinline friend BaseString operator+(StaticATextRef<Size> Text, const BaseString& Right) {
+            ForceInline friend BaseString operator+(StaticATextRef<Size> Text, const BaseString& Right) {
                 if constexpr (Size < 2)
                     return Right;
                 BaseString retData(Text);
@@ -690,7 +690,7 @@ namespace Seed {
             ///<summary>Оператор додавання рядкового літералу</summary>
             ///<param name = "Text">Рядковий літерал</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-            forceinline BaseString operator+(const ConstString& Text) const {
+            ForceInline BaseString operator+(const ConstString& Text) const {
                 if (Text.Size < 2)
                     return *this;
 
@@ -717,7 +717,7 @@ namespace Seed {
             ///<param name = "Text">Рядковий літерал</param>
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-            forceinline friend BaseString operator+(const ConstString& Text, const BaseString& Right) {
+            ForceInline friend BaseString operator+(const ConstString& Text, const BaseString& Right) {
                 if (Text.Size < 2)
                     return Right;
                 BaseString retData(Text);
@@ -751,7 +751,7 @@ namespace Seed {
             ///<param name = "Text">Рядковий літерал ASCII символів</param>
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-            forceinline friend BaseString operator+(const ConstAString& Text, const BaseString& Right) {
+            ForceInline friend BaseString operator+(const ConstAString& Text, const BaseString& Right) {
                 if (Text.Size < 2)
                     return Right;
                 BaseString retData(Text);
@@ -960,7 +960,7 @@ namespace Seed {
             ///<summary>Оператор доступу до символів рядка</summary>
             ///<param name = "Index">Індекс елемента з нуля до нуль-термінатора не включно</param>
             ///<returns>Силка на елемент рядка</returns>
-            forceinline Char& operator[](SizeT index) {
+            ForceInline Char& operator[](SizeT index) {
                 if (index < CurrentSize)
                     return str[index];
                 else
@@ -969,7 +969,7 @@ namespace Seed {
             ///<summary>Констатний оператор доступу до символів рядка
             ///<param name = "Index">Індекс елемента з нуля до нуль-термінатора не включно</param>
             ///<returns>Константна силка на елемент рядка</returns>
-            forceinline const Char& operator[](SizeT index) const {
+            ForceInline const Char& operator[](SizeT index) const {
                 if (index < CurrentSize)
                     return str[index];
                 else
@@ -979,7 +979,7 @@ namespace Seed {
             ///<summary>Вертає чи строка починається з строки ExpectedString</summary>
             ///<param name = "ExpectedString">Рядок з якого має починатись поточний рядок</param>
             ///<results><c>True</c> якщо рядок поточний рядок починається ExpectedString</results>
-            forceinline bool IsStartWith(const BaseString& ExpectedString) const {
+            ForceInline bool IsStartWith(const BaseString& ExpectedString) const {
                 if (this->CurrentSize < ExpectedString.CurrentSize) return false;
                 for (SizeT i = 0; i < ExpectedString.CurrentSize; i++)
                     if (this->str[i] != ExpectedString.str[i]) return false;
@@ -990,7 +990,7 @@ namespace Seed {
             ///<param name = "ExpectedString">Рядок з якого має починатись поточний рядок</param>
             ///<results><c>True</c> якщо рядок поточний рядок починається ExpectedString</results>
             template<SizeT ExpectedStringSize>
-            forceinline bool IsStartWith(StaticTextRef<ExpectedStringSize> ExpectedString) const {
+            ForceInline bool IsStartWith(StaticTextRef<ExpectedStringSize> ExpectedString) const {
                 if (this->CurrentSize < ExpectedStringSize) return false;
                 for (SizeT i = 0; i < ExpectedStringSize - 1; i++) {
                     if (this->str[i] != ExpectedString[i]) return false;
@@ -1000,7 +1000,7 @@ namespace Seed {
 
             ///<summary>Оператор конвертації до символьного масиву</summary>
             ///<returns>Константний рядок</returns>
-            forceinline explicit operator const ConstCharStr() const noexcept { return str; }
+            ForceInline explicit operator const ConstCharStr() const noexcept { return str; }
 #pragma region Converting to string
 #pragma region Converting int types to string
 #pragma region Convertinh signed int types to string
@@ -1208,7 +1208,7 @@ namespace Seed {
             ///<summary>Конвертація логічного значення до рядка вертає <c>"True"</c> або <c>"False"</c></summary>
             ///<params name = "val">Логічне значення</params>
             ///<returns><c>"True"</c> якщо <c>val == true</c> інакше <c>"False"</c></returns>
-            forceinline static BaseString toString(Boolean val) {
+            ForceInline static BaseString toString(Boolean val) {
                 if (val) return BaseString(L"true"); else return BaseString(L"false");
             }
             ///<summary>Конвертація логічного значення до рядка вертає вміст рядка <c>IfTrue</c> або <c>IfFalse</c></summary>
@@ -1216,7 +1216,7 @@ namespace Seed {
             ///<params name = "IfTrue">Рядок який верне якщо <c>val == true</c></params>
             ///<params name = "IfFalse">Рядок який верне якщо <c>val == false</c></params>
             ///<returns><c>IfTrue</c> або <c>IfFalse</c> залежно від значення <c>val</c></returns>
-            forceinline static BaseString toString(Boolean val, const BaseString& IfTrue, const BaseString& IfFalse) {
+            ForceInline static BaseString toString(Boolean val, const BaseString& IfTrue, const BaseString& IfFalse) {
                 if (val) return IfTrue; else return IfFalse;
             }
 #pragma endregion
@@ -2104,7 +2104,7 @@ namespace Seed {
             /// </summary>
             /// <param name="strings">Масив рядків</param>
             /// <returns>Рядоку який є сумою масиву вхідних рядків</returns>
-            forceinline static BaseString Combine(Containers::Array<BaseString>&& strings) {
+            ForceInline static BaseString Combine(Containers::Array<BaseString>&& strings) {
                 return strings.Aggregate(
                     ArrowFunct(x, y, x + y),
                     BaseString(
@@ -2177,7 +2177,7 @@ namespace Seed {
             }
 
             ///<summary>Деструктор</summary>
-            forceinline virtual ~BaseString() override {
+            ForceInline virtual ~BaseString() override {
                 if (str == nullptr) return;
                 BaseString::operator delete[](str);
                 str = nullptr;
@@ -2190,7 +2190,7 @@ namespace Seed {
             friend class Containers::LINQ::IString;
         protected:
             template<typename LambdaT>
-            forceinline BaseString& ForEachImpl(LambdaT&& lambda) {
+            ForceInline BaseString& ForEachImpl(LambdaT&& lambda) {
                 if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&>) {
                     for (SizeT i = 0; i < this->Lenght; i++)
                     {
@@ -2211,7 +2211,7 @@ namespace Seed {
             }
 
             template<typename LambdaT>
-            forceinline const BaseString& ForEachImpl(LambdaT&& lambda) const {
+            ForceInline const BaseString& ForEachImpl(LambdaT&& lambda) const {
                 if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
                     for (SizeT i = 0; i < this->Lenght; i++)
                     {
@@ -2232,7 +2232,7 @@ namespace Seed {
             }
 
             template<typename LambdaT>
-            forceinline BaseString& ForEachImpl(LambdaT&& lambda, SizeT count) {
+            ForceInline BaseString& ForEachImpl(LambdaT&& lambda, SizeT count) {
                 if (count > this->Count)
                     count = this->Count;
                 if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&>) {
@@ -2255,7 +2255,7 @@ namespace Seed {
             }
 
             template<typename LambdaT>
-            forceinline const BaseString& ForEachImpl(LambdaT&& lambda, SizeT count) const {
+            ForceInline const BaseString& ForEachImpl(LambdaT&& lambda, SizeT count) const {
                 if (count > this->Lenght)
                     count = this->Lenght;
                 if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
@@ -2280,7 +2280,7 @@ namespace Seed {
             bool AnyImpl() const { return this->Lenght > 0; }
 
             template<typename Lambda>
-            forceinline bool AnyImpl(Lambda&& lambda) const {
+            ForceInline bool AnyImpl(Lambda&& lambda) const {
                 for (SizeT i = 0; i < this->Lenght; i++)
                 {
                     if (lambda(this->str[i]))
@@ -2290,7 +2290,7 @@ namespace Seed {
             }
 
             template<typename Lambda>
-            forceinline bool AllImpl(Lambda&& lambda) const {
+            ForceInline bool AllImpl(Lambda&& lambda) const {
                 for (SizeT i = 0; i < this->Lenght; i++)
                 {
                     if (!lambda(this->str[i]))
@@ -2306,17 +2306,17 @@ namespace Seed {
                 return *this;
             }
 
-            forceinline void UnsafeSet(const UChar& Value, SizeT Index) {
+            ForceInline void UnsafeSet(const UChar& Value, SizeT Index) {
                 this->str[Index] = Value;
             }
 
-            forceinline BaseString& RemoveAllImpl() {
+            ForceInline BaseString& RemoveAllImpl() {
                 this->~BaseString();
                 return *this;
             }
 
             template<typename Lambda>
-            forceinline BaseString& RemoveAllImpl(Lambda&& lambda) {
+            ForceInline BaseString& RemoveAllImpl(Lambda&& lambda) {
                 for (SizeT i = 0; i < CurrentSize; i++) {
                     lambda(MoveRValue(this->str[i]));
                 }
@@ -2331,7 +2331,7 @@ namespace Seed {
         ///<summary>Тип кінця рядка</summary>
         namespace { typedef const Char(&EndLineT)[3]; }
         ///<summary>Позначка переходу на новий рядок, використовується CRLF режим</summary>
-        constexpr forceinline EndLineT NextLine() {
+        constexpr ForceInline EndLineT NextLine() {
             return L"\r\n";
         }
 
@@ -2351,7 +2351,7 @@ namespace Seed {
 
 #pragma warning(disable: 4455)
 
-forceinline Seed::Core::String operator "" S(const wchar_t* const text, const Seed::SizeT size)
+ForceInline Seed::Core::String operator "" S(const wchar_t* const text, const Seed::SizeT size)
 { //-V2537
 	using namespace Seed;
 	return String((Char*)text); //-V2533

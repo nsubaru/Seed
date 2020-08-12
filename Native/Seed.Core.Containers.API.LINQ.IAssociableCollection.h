@@ -34,7 +34,7 @@ namespace Seed {
 						requires 
 							(Concepts::IsInvockable<TLambda, TPair&> || Concepts::IsInvockable<TLambda, TPair&, SizeT> ||
 							Concepts::IsInvockable<TLambda, const TPair&> || Concepts::IsInvockable<TLambda, const TPair&, SizeT>)
-						forceinline ThisCollection& ForEach(TLambda&& lambda) {
+						ForceInline ThisCollection& ForEach(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -46,7 +46,7 @@ namespace Seed {
 					/// <returns>Константну силку на колекцію</returns>
 					template<typename TLambda>
 						requires Concepts::IsInvockable<TLambda, const TPair&> || Concepts::IsInvockable<TLambda, const TPair&, SizeT>
-						forceinline const ThisCollection& ForEach(TLambda&& lambda) const {
+						ForceInline const ThisCollection& ForEach(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 				public:
@@ -58,7 +58,7 @@ namespace Seed {
 					/// <returns>Силку на колекцію</returns>
 					template<typename TLambda>
 					requires Concepts::IsInvockable<TLambda, const TKey&> || Concepts::IsInvockable<TLambda, const TKey&, SizeT>
-						forceinline ThisCollection& ForEachKey(TLambda&& lambda) {
+						ForceInline ThisCollection& ForEachKey(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
 
@@ -70,7 +70,7 @@ namespace Seed {
 					/// <returns>Константну силку на колекцію</returns>
 					template<typename TLambda>
 					requires Concepts::IsInvockable<TLambda, const TKey&> || Concepts::IsInvockable<TLambda, const TKey&, SizeT>
-						forceinline const ThisCollection& ForEachKey(TLambda&& lambda) const {
+						ForceInline const ThisCollection& ForEachKey(TLambda&& lambda) const {
 						return static_cast<ThisCollection&>(*this).ForEachKeyImpl(MoveRValue(lambda));
 					}
 				public:
@@ -82,7 +82,7 @@ namespace Seed {
 					/// <returns>Силку на колекцію</returns>
 					template<typename TLambda>
 					requires Concepts::IsInvockable<TLambda, TValue&> || Concepts::IsInvockable<TLambda, TValue&, SizeT>
-						forceinline ThisCollection& ForEachValue(TLambda&& lambda) {
+						ForceInline ThisCollection& ForEachValue(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
 
@@ -94,7 +94,7 @@ namespace Seed {
 					/// <returns>Константну силку на колекцію</returns>
 					template<typename TLambda>
 					requires Concepts::IsInvockable<TLambda, const TValue&> || Concepts::IsInvockable<TLambda, const TValue&, SizeT>
-						forceinline const ThisCollection& ForEachValue(TLambda&& lambda) const {
+						ForceInline const ThisCollection& ForEachValue(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachValueImpl(MoveRValue(lambda));
 					}
 				public:
@@ -102,7 +102,7 @@ namespace Seed {
 					/// Видаляє всі елементи з колекції
 					/// </summary>
 					/// <returns>Силку на колекцію</returns>
-					forceinline ThisCollection& RemoveAll() {
+					ForceInline ThisCollection& RemoveAll() {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl();
 					}
 
@@ -114,7 +114,7 @@ namespace Seed {
 					/// <returns>Силку на колекцію</returns>
 					template<typename TLambda>
 					requires Concepts::IsInvockable<TLambda, TPair&&>
-						forceinline ThisCollection& RemoveAllWith(TLambda && lambda) {
+						ForceInline ThisCollection& RemoveAllWith(TLambda && lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllWithImpl(MoveRValue(lambda));
 					}
 				public:
@@ -146,7 +146,7 @@ namespace Seed {
 								.GetCountIf(MoveRValue(filterCopy)));
 
 							SizeT Index = 0;
-							this->ForEach([&] (const TPair& pair)
+							this->ForEach([&] (const TPair& pair) InlineLambda
 							{
 								if (filterLambda(pair))
 								{
@@ -159,7 +159,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<UHeap, U> result;
-							this->ForEach([&] (const TPair& pair)
+							this->ForEach([&] (const TPair& pair) InlineLambda
 							{
 								if (filterLambda(pair))
 								{
@@ -197,7 +197,7 @@ namespace Seed {
 								.GetCountIf(MoveRValue(filterCopy)));
 
 							SizeT Index = 0;
-							this->ForEach([&] (const TPair& pair)
+							this->ForEach([&] (const TPair& pair) InlineLambda
 							{
 								if (filterLambda(pair))
 								{
@@ -210,7 +210,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<U> result;
-							this->ForEach([&] (const TPair& pair)
+							this->ForEach([&] (const TPair& pair) InlineLambda
 							{
 								if (filterLambda(pair))
 								{
@@ -246,7 +246,7 @@ namespace Seed {
 						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
 						{
 							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this).GetCount());
-							this->ForEach([&] (const TPair& pair, SizeT Index)
+							this->ForEach([&] (const TPair& pair, SizeT Index) InlineLambda
 							{
 								result.UnsafeSet(lambda(pair), Index);
 							});
@@ -255,7 +255,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<UHeap, U> result;
-							this->ForEach([&] (const TPair& pair)
+							this->ForEach([&] (const TPair& pair) InlineLambda
 							{
 								result.UnsafeAdd(lambda(pair));
 							});
@@ -287,7 +287,7 @@ namespace Seed {
 						if constexpr (NewCollection<U>::IsDynamic == false)
 						{
 							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this).GetCount());
-							this->ForEach([&] (const TPair& pair, SizeT Index)
+							this->ForEach([&] (const TPair& pair, SizeT Index) InlineLambda
 							{
 								result.UnsafeSet(lambda(pair), Index);
 							});
@@ -296,7 +296,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<U> result;
-							this->ForEach([&] (const TPair& pair)
+							this->ForEach([&] (const TPair& pair) InlineLambda
 							{
 								result.UnsafeAdd(lambda(pair));
 							});
@@ -322,8 +322,8 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					forceinline NewCollection<UHeap, TPair> CopyToCollection() const {
-						return this->CopyToCollection<NewCollection, UHeap>([] (const TPair& pair) -> TPair
+					ForceInline NewCollection<UHeap, TPair> CopyToCollection() const {
+						return this->CopyToCollection<NewCollection, UHeap>([] (const TPair& pair) -> TPair InlineLambda
 						{
 							return pair;
 						});
@@ -344,8 +344,8 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					forceinline NewCollection<TPair> CopyToCollection() const {
-						return this->CopyToCollection<NewCollection>([] (const TPair& pair) -> TPair
+					ForceInline NewCollection<TPair> CopyToCollection() const {
+						return this->CopyToCollection<NewCollection>([] (const TPair& pair) -> TPair InlineLambda
 						{
 							return pair;
 						});
@@ -369,8 +369,8 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					forceinline NewCollection<TPair> CopyIfToCollection(FilterLambda && filter) const {
-						return this->CopyToCollection<NewCollection>(MoveRValue(filter), [] (const TPair& pair) -> TPair
+					ForceInline NewCollection<TPair> CopyIfToCollection(FilterLambda && filter) const {
+						return this->CopyToCollection<NewCollection>(MoveRValue(filter), [] (const TPair& pair) -> TPair InlineLambda
 						{
 							return pair;
 						});
@@ -404,13 +404,13 @@ namespace Seed {
 						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
 						{
 							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this)
-								.GetCountIf([&] (const TPair& pair)
+								.GetCountIf([&] (const TPair& pair) InlineLambda
 							{
 								return filterLambda(pair.Key);
 							}));
 
 							SizeT Index = 0;
-							this->ForEachKey([&] (const TKey& key)
+							this->ForEachKey([&] (const TKey& key) InlineLambda
 							{
 								if (filterLambda(key))
 								{
@@ -422,7 +422,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<UHeap, U> result;
-							this->ForEachKey([&] (const TKey& key)
+							this->ForEachKey([&] (const TKey& key) InlineLambda
 							{
 								if (filterLambda(key))
 								{
@@ -459,13 +459,13 @@ namespace Seed {
 					NewCollection<U> CopyKeyToCollection(FilterLambda&& filterLambda, Lambda&& lambda) const {
 						if constexpr (NewCollection<U>::IsDynamic == false)
 						{
-							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this)
-								.GetCountIf([&] (const TPair& pair)
+							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this) 
+								.GetCountIf([&] (const TPair& pair) InlineLambda
 							{
 								return filterLambda(pair.Key);
 							}));
 
-							this->ForEachKey([&] (const TKey& key, SizeT Index)
+							this->ForEachKey([&] (const TKey& key, SizeT Index) InlineLambda
 							{
 								if (filterLambda(key))
 								{
@@ -477,7 +477,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<U> result;
-							this->ForEachKey([&] (const TKey& key)
+							this->ForEachKey([&] (const TKey& key) InlineLambda
 							{
 								if (filterLambda(key))
 								{
@@ -513,7 +513,7 @@ namespace Seed {
 						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
 						{
 							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this).GetCount());
-							this->ForEachKey([&] (const TKey& pair, SizeT Index)
+							this->ForEachKey([&] (const TKey& pair, SizeT Index) InlineLambda
 							{
 								result.UnsafeSet(lambda(pair), Index);
 							});
@@ -522,7 +522,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<UHeap, U> result;
-							this->ForEachKey([&] (const TKey& pair)
+							this->ForEachKey([&] (const TKey& pair) InlineLambda
 							{
 								result.UnsafeAdd(lambda(pair));
 							});
@@ -553,7 +553,7 @@ namespace Seed {
 						if constexpr (NewCollection<U>::IsDynamic == false)
 						{
 							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this).GetCount());
-							this->ForEachKey([&] (const TKey& pair, SizeT Index)
+							this->ForEachKey([&] (const TKey& pair, SizeT Index) InlineLambda
 							{
 								result.UnsafeSet(lambda(pair), Index);
 							});
@@ -562,7 +562,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<U> result;
-							this->ForEachKey([&] (const TKey& pair)
+							this->ForEachKey([&] (const TKey& pair) InlineLambda
 							{
 								result.UnsafeAdd(lambda(pair));
 							});
@@ -585,8 +585,8 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					forceinline NewCollection<TKey> CopyKeyToCollection() const {
-						return this->CopyKeyToCollection<NewCollection>([] (const TKey& pair) -> TKey
+					ForceInline NewCollection<TKey> CopyKeyToCollection() const {
+						return this->CopyKeyToCollection<NewCollection>([] (const TKey& pair) -> TKey InlineLambda
 						{
 							return pair;
 						});
@@ -610,8 +610,8 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					forceinline NewCollection<TKey> CopyKeyIfToCollection(FilterLambda&& filter) const {
-						return this->CopyKeyToCollection<NewCollection>(MoveRValue(filter), [] (const TKey& pair) -> TKey
+					ForceInline NewCollection<TKey> CopyKeyIfToCollection(FilterLambda&& filter) const {
+						return this->CopyKeyToCollection<NewCollection>(MoveRValue(filter), [] (const TKey& pair) -> TKey InlineLambda
 						{
 							return pair;
 						});
@@ -645,13 +645,13 @@ namespace Seed {
 						if constexpr (NewCollection<UHeap, U>::IsDynamic == false)
 						{
 							NewCollection<UHeap, U> result = NewCollection<UHeap, U>(static_cast<ThisCollection&>(*this)
-								.GetCountIf([&] (const TPair& pair)
+								.GetCountIf([&] (const TPair& pair) InlineLambda
 							{
 								return filterLambda(pair.Value);
 							}));
 
 							SizeT Index = 0;
-							this->ForEachValue([&] (const TValue& value)
+							this->ForEachValue([&] (const TValue& value) InlineLambda
 							{
 								if (filterLambda(value))
 								{
@@ -664,7 +664,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<UHeap, U> result;
-							this->ForEachValue([&] (const TValue& value)
+							this->ForEachValue([&] (const TValue& value) InlineLambda
 							{
 								if (filterLambda(value))
 								{
@@ -702,13 +702,13 @@ namespace Seed {
 						if constexpr (NewCollection<U>::IsDynamic == false)
 						{
 							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this)
-								.GetCountIf([&] (const TPair& pair)
+								.GetCountIf([&] (const TPair& pair) InlineLambda
 							{
 								return filterLambda(pair.Value);
 							}));
 
 							SizeT Index = 0;
-							this->ForEachValue([&] (const TValue& value)
+							this->ForEachValue([&] (const TValue& value) InlineLambda
 							{
 								if (filterLambda(value))
 								{
@@ -721,7 +721,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<U> result;
-							this->ForEachValue([&] (const TValue& value)
+							this->ForEachValue([&] (const TValue& value) InlineLambda
 							{
 								if (filterLambda(value))
 								{
@@ -757,7 +757,7 @@ namespace Seed {
 						if constexpr (NewCollection<THeap, U>::IsDynamic == false)
 						{
 							NewCollection<THeap, U> result = NewCollection<THeap, U>(static_cast<ThisCollection&>(*this).GetCount());
-							this->ForEachValue([&] (const TValue& pair, SizeT Index)
+							this->ForEachValue([&] (const TValue& pair, SizeT Index) InlineLambda
 							{
 								result.UnsafeSet(lambda(pair), Index);
 							});
@@ -766,7 +766,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<THeap, U> result;
-							this->ForEachValue([&] (const TValue& pair)
+							this->ForEachValue([&] (const TValue& pair) InlineLambda
 							{
 								result.UnsafeAdd(lambda(pair));
 							});
@@ -797,7 +797,7 @@ namespace Seed {
 						if constexpr (NewCollection<U>::IsDynamic == false)
 						{
 							NewCollection<U> result = NewCollection<U>(static_cast<ThisCollection&>(*this).GetCount());
-							this->ForEach([&] (const TValue& pair, SizeT Index)
+							this->ForEach([&] (const TValue& pair, SizeT Index) InlineLambda
 							{
 								result.UnsafeSet(lambda(pair), Index);
 							});
@@ -806,7 +806,7 @@ namespace Seed {
 						else
 						{
 							NewCollection<U> result;
-							this->ForEach([&] (const TValue& pair)
+							this->ForEach([&] (const TValue& pair) InlineLambda
 							{
 								result.UnsafeAdd(lambda(pair));
 							});
@@ -853,8 +853,8 @@ namespace Seed {
 							bool> 
 						= true
 					>
-					forceinline NewCollection<TValue> CopyValueIfToCollection(FilterLambda&& filter) const {
-						return this->CopyValueToCollection<NewCollection>(MoveRValue(filter), [] (const TValue& pair) -> TValue
+					ForceInline NewCollection<TValue> CopyValueIfToCollection(FilterLambda&& filter) const {
+						return this->CopyValueToCollection<NewCollection>(MoveRValue(filter), [] (const TValue& pair) -> TValue InlineLambda
 						{
 							return pair;
 						});
@@ -863,7 +863,7 @@ namespace Seed {
 					/// <summary>
 					/// Деструктор чисто віртуальний бо це лиш розширення асоціативних колекцій
 					/// </summary>
-					forceinline virtual ~IAssociableCollection() = 0 {};
+					ForceInline virtual ~IAssociableCollection() = 0 {};
 				};
 			}
 		}

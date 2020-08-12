@@ -160,14 +160,14 @@ namespace Seed {
 				///<summary>Оператор виділення пам'яті</summary>
 				///<param name = "Size">Розмір ділянки пам'яті</param>
 				///<returns>Вертає ділянку пам'яті</returns>
-				static forceinline void* operator new(SizeT Size) {
+				static ForceInline void* operator new(SizeT Size) {
 					return heap.Allocate(Size);
 				}
 
 				///<summary>Оператор виділення масиву об'єктів</summary>
 				///<param name = "Size">Розмір масиву об'єктів</param>
 				///<returns>Вертає ділянку пам'яті</returns>
-				static forceinline void* operator new[](SizeT Size) {
+				static ForceInline void* operator new[](SizeT Size) {
 					return heap.Allocate(Size);
 				}
 
@@ -175,7 +175,7 @@ namespace Seed {
 				///<param name = "Size">Розмір ділянки пам'яті</param>
 				///<param name = "Allign">Границя вирівнювання</param>
 				///<returns>Вертає ділянку пам'яті</returns>
-				static forceinline void* operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
+				static ForceInline void* operator new(Seed::SizeT Size, Seed::AllignRequirements Allign) {
 					return heap.AllignedAllocate(Size, (Seed::SizeT)Allign);
 				}
 
@@ -183,31 +183,31 @@ namespace Seed {
 				///<param name = "Size">Розмір ділянки пам'яті</param>
 				///<param name = "Allign">Границя вирівнювання</param>
 				///<returns>Вертає ділянку пам'яті</returns>
-				static forceinline void* operator new[](Seed::SizeT Size, Seed::AllignRequirements Allign) {
+				static ForceInline void* operator new[](Seed::SizeT Size, Seed::AllignRequirements Allign) {
 					return heap.AllignedAllocate(Size, (Seed::SizeT)Allign);
 				}
 
 				///<summary>Оператор видалення одиночного об'єкту</summary>
 				///<param name = "MemBlk">Ділянка пам'яті</param>
-				static forceinline void operator delete(void* MemBlk) {
+				static ForceInline void operator delete(void* MemBlk) {
 					heap.Free(MemBlk);
 				}
 				///<summary>Оператор видалення масиву об'єктів</summary>
 				///<param name = "MemBlk">Ділянка пам'яті</param>
-				static forceinline void operator delete[](void* MemBlk) {
+				static ForceInline void operator delete[](void* MemBlk) {
 					heap.Free(MemBlk);
 				}
 
 				///<summary>Оператор видалення одиночного об'єкту з специфічним вирівннюванням</summary>
 				///<param name = "MemBlk">Ділянка пам'яті</param>
 				///<param name = "Allign">Границя вирівнювання</param>
-				static forceinline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirements Allign) {
+				static ForceInline void __cdecl operator delete(void* MemBlk, Seed::AllignRequirements Allign) {
 					heap.AllignedFree(MemBlk, (SizeT)Allign);
 				}
 				///<summary>Оператор видалення масиву об'єктів з специфічним вирівннюванням</summary>
 				///<param name = "MemBlk">Ділянка пам'яті</param>
 				///<param name = "Allign">Границя вирівнювання</param>
-				static forceinline void __cdecl operator delete[](void* MemBlk, Seed::AllignRequirements Allign) {
+				static ForceInline void __cdecl operator delete[](void* MemBlk, Seed::AllignRequirements Allign) {
 					heap.AllignedFree(MemBlk, (SizeT)Allign);
 				}
 			};

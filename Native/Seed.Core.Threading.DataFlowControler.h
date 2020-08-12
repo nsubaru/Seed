@@ -25,7 +25,7 @@ namespace Seed {
 				DataFlowControler();
 				
 				template<typename Lambda>
-				forceinline decltype(auto) Concume(Lambda && lambda) {
+				ForceInline decltype(auto) Concume(Lambda && lambda) {
 					if constexpr (TypeTraits::IsSameV<decltype(lambda()), void>) {
 						try {
 							Internals::AcquireLockExclusiveSRWLock(&lock);
@@ -78,7 +78,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline decltype(auto) Produce(Lambda && lambda) {
+				ForceInline decltype(auto) Produce(Lambda && lambda) {
 					if constexpr (TypeTraits::IsSameV<decltype(lambda()), void>) {
 						try {
 							Internals::AcquireLockExclusiveSRWLock(&lock);
@@ -131,7 +131,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline auto SharedLock(Lambda&& lambda) -> decltype(lambda()) {
+				ForceInline auto SharedLock(Lambda&& lambda) -> decltype(lambda()) {
 					if constexpr (TypeTraits::IsSameV<decltype(lambda()), void>) {
 						try {
 							Internals::AcquireLockSharedSRWLock(&lock);
@@ -175,7 +175,7 @@ namespace Seed {
 				}
 
 				template<typename Lambda>
-				forceinline auto ExclusiveLock(Lambda&& lambda) -> decltype(lambda()) {
+				ForceInline auto ExclusiveLock(Lambda&& lambda) -> decltype(lambda()) {
 					if constexpr (TypeTraits::IsSameV<decltype(lambda()), void>) {
 						try {
 							Internals::AcquireLockExclusiveSRWLock(&lock);
@@ -217,14 +217,14 @@ namespace Seed {
 					}
 				}
 
-				forceinline void WaitForProducer() {
+				ForceInline void WaitForProducer() {
 					if (true)
 						Internals::WaitCondVal(&producer, &lock);
 					else
 						Core::Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCTION__, __LINE__);
 				}
 
-				forceinline void WaitForConcumer() {
+				ForceInline void WaitForConcumer() {
 					if (true)
 						Internals::WaitCondVal(&concumer, &lock);
 					else

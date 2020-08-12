@@ -117,7 +117,7 @@ bool Seed::Core::Testing::Test::DI::RegisterService::Excecute() {
 
 bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
 	auto serviceRecord = Reflection::ObjectRTTIRecord(TypeTraits::TypeTag<TestObject1Definition>{});
-	auto methodRecord = serviceRecord.Methods.First([] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& record)
+	auto methodRecord = serviceRecord.Methods.First([] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& record) InlineLambda
 	{
 		return record.Name == L"Method4";
 	});
@@ -183,4 +183,37 @@ bool Seed::Core::Testing::Test::DI::ResolveServiceByDI::Excecute() {
 	auto serviceB = injector.Resolve<ServiceB>();
 
 	return serviceB.MethodC(true, true);
+}
+
+#include "Seed.Core.Services.h"
+
+bool Seed::Core::Testing::Test::DI::TestSerilizationService::Excecute() {
+	using SerilizationServiceDefinition = ObjectDefinition(
+		Core::Services::SerilizationService,
+		NullCtorDescription(Core::Services::SerilizationService),
+		ObjectMethodsDefs(
+			MethodDescription(Core::Services::SerilizationService, SerelizeDynObj),
+			MethodDescription(Core::Services::SerilizationService, DeserelizeDynObj),
+			MethodDescription(Core::Services::SerilizationService, GetTypeMetaDataDynObj)
+		),
+		ObjectPropsDefs()
+	);
+
+	auto injector = Core::DI::DepencyInjector();
+	injector.Register<Core::Services::SerilizationService, Core::DI::IDI>
+			(TypeTraits::TypeTag<SerilizationServiceDefinition>{});
+
+	auto serilizationService = injector.Resolve<Core::Services::SerilizationService>();
+
+	auto dynamic = Dynamic(10);
+
+	auto serilizedDynamic = serilizationService.Serelize(dynamic);
+
+	auto dynamicDeserilized = serilizationService.Deserelize<Dynamic>(serilizedDynamic);
+
+	Asserts::AssertEqual(
+		dynamic.GetVariables<int>().GetByIdx<0>(), 
+		dynamicDeserilized.GetVariables<int>().GetByIdx<0>());
+
+	return true;
 }

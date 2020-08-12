@@ -24,7 +24,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::Fo
 
 bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::AgregateSimpleItemsTypeTestDynamicQueue::Excecute() {
 	auto items = Core::Containers::DynamicQueue<SizeT>::Generate(ArrowFunct(x, x), 10);
-	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -34,7 +34,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::Ag
 
 bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::AgregateConvertionsItemsTypeTestDynamicQueue::Excecute() {
 	auto items = Core::Containers::DynamicQueue<String>::Generate(ArrowFunct(x, String::toString(x)), 10);
-	Asserts::AssertEqual(items.Aggregate<Int32>(ArrowFunct(x, y, x + y.toInt())), [] ()
+	Asserts::AssertEqual(items.Aggregate<Int32>(ArrowFunct(x, y, x + y.toInt())), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -72,7 +72,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::Cl
 	auto items = Core::Containers::DynamicQueue<SizeT>::Generate(ArrowFunct(x, x), 10);
 	auto clone = items.Clone();
 	Asserts::AssertEqual(items.Count, clone.Count);
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < items.Count; i++)
 		{
@@ -88,7 +88,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::Cl
 	auto items = Core::Containers::DynamicQueue<String>::Generate(ArrowFunct(x, String::toString(x)), 10);
 	auto clone = items.Clone();
 	Asserts::AssertEqual(items.Count, clone.Count);
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < items.Count; i++)
 		{
@@ -106,7 +106,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::Sh
 	{
 		[[maybe_unused]] auto _ = items.Dequeue();
 	}
-	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 5; i++) x += 5 + i;
 		return x;
@@ -117,18 +117,18 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::Sh
 bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::ExtendDynamicQueue::Excecute() {
 	auto items = Core::Containers::DynamicQueue<SizeT>::Generate(ArrowFunct(x, x), 10);
 	Asserts::AssertTrue(items.IsFull);
-	Asserts::AssertThrowException<FullQueueException>([&] ()
+	Asserts::AssertThrowException<FullQueueException>([&] () InlineLambda
 	{
 		items.Enqueue(1);
 	});
 	items.Extend(1);
 	Asserts::AssertFalse(items.IsFull);
-	Asserts::AssertNoThrowException<FullQueueException>([&] ()
+	Asserts::AssertNoThrowException<FullQueueException>([&] () InlineLambda
 	{
 		items.Enqueue(1);
 	});
 	Asserts::AssertTrue(items.IsFull);
-	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x + 1;
@@ -152,7 +152,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::Eq
 		queue.Enqueue(i);
 	}
 
-	Asserts::AssertEqual(queue.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(queue.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -204,7 +204,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::ForEa
 
 bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::AgregateSimpleItemsTypeTestDynamicQueue::Excecute() {
 	auto items = Core::Containers::DynamicQueue<SizeT>::Generate(ArrowFunct(x, x), 10);
-	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -214,7 +214,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::Agreg
 
 bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::AgregateConvertionsItemsTypeTestDynamicQueue::Excecute() {
 	auto items = Core::Containers::ConcurencyDynamicQueue<String>::Generate(ArrowFunct(x, String::toString(x)), 10);
-	Asserts::AssertEqual(items.Aggregate<Int32>(ArrowFunct(x, y, x + y.toInt())), [] ()
+	Asserts::AssertEqual(items.Aggregate<Int32>(ArrowFunct(x, y, x + y.toInt())), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;
@@ -252,7 +252,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::Clone
 	auto items = Core::Containers::ConcurencyDynamicQueue<SizeT>::Generate(ArrowFunct(x, x), 10);
 	auto clone = items.Clone();
 	Asserts::AssertEqual(items.Count, clone.Count);
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < items.Count; i++)
 		{
@@ -268,7 +268,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::Clone
 	auto items = Core::Containers::ConcurencyDynamicQueue<String>::Generate(ArrowFunct(x, String::toString(x)), 10);
 	auto clone = items.Clone();
 	Asserts::AssertEqual(items.Count, clone.Count);
-	Asserts::AssertTrue([&] ()
+	Asserts::AssertTrue([&] () InlineLambda
 	{
 		for (SizeT i = 0; i < items.Count; i++)
 		{
@@ -286,7 +286,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::Shrin
 	{
 		[[maybe_unused]] auto _ = items.Dequeue();
 	}
-	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 5; i++) x += 5 + i;
 		return x;
@@ -299,12 +299,12 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::Exten
 	Asserts::AssertTrue(items.IsFull);
 	items.Extend(1);
 	Asserts::AssertFalse(items.IsFull);
-	Asserts::AssertNoThrowException<FullQueueException>([&] ()
+	Asserts::AssertNoThrowException<FullQueueException>([&] () InlineLambda
 	{
 		items.Enqueue(1);
 	});
 	Asserts::AssertTrue(items.IsFull);
-	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(items.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x + 1;
@@ -328,7 +328,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::Equeu
 		queue.Enqueue(i);
 	}
 
-	Asserts::AssertEqual(queue.Aggregate(ArrowFunct(x, y, x + y)), [] ()
+	Asserts::AssertEqual(queue.Aggregate(ArrowFunct(x, y, x + y)), [] () InlineLambda
 	{
 		SizeT x = 0; for (SizeT i = 0; i < 10; i++) x += i;
 		return x;

@@ -29,7 +29,7 @@ namespace Seed {
                 friend SizeT LoadTest(RTTI::RTTITypeRecord&& typeRecord, ITest&(*testObjGenerator)());
             private:
                 static volatile void* volatile GenTestRecord() {
-                    return (volatile void*) LoadTest(TypeRecord<TTest>(), [] () -> ITest&
+                    return (volatile void*) LoadTest(TypeRecord<TTest>(), [] () -> ITest& InlineLambda
                     {
                         static auto test = TTest();
                         return test;

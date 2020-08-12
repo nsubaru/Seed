@@ -29,11 +29,11 @@ namespace Seed {
 					
 					Threading::DataFlowControler flowControler;
 
-					forceinline T& operator[](SizeT index) {
+					ForceInline T& operator[](SizeT index) {
 						return queue[(front + index) % bufferSize];
 					}
 
-					forceinline Data()
+					ForceInline Data()
 						: front(0),
 						  rear(0),
 						  count(0),
@@ -41,7 +41,7 @@ namespace Seed {
 						  bufferSize{0},
 						  RefCount(1) {}
 
-					forceinline Data(SizeT startCount)
+					ForceInline Data(SizeT startCount)
 						: front(0),
 						  rear(0),
 						  count(0),
@@ -52,7 +52,7 @@ namespace Seed {
 			private:
 				Data* This;
 			protected:
-				forceinline virtual void Dispose() final override
+				ForceInline virtual void Dispose() final override
 				{
 					if (This->bufferSize != 0)
 					{
@@ -65,13 +65,13 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор конкуретної черги
 				/// </summary>
-				forceinline BaseConcurencyDynamicQueue() : This(new Data()) {}
+				ForceInline BaseConcurencyDynamicQueue() : This(new Data()) {}
 
 				/// <summary>
 				/// Конструктор черги з певною максимальною кількістю елементів
 				/// </summary>
 				/// <param name="startCount">Максимальна кількість елементів в черзі</param>
-				forceinline BaseConcurencyDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
+				ForceInline BaseConcurencyDynamicQueue(SizeT startCount) : This(new Data(startCount)) {}
 
 				/// <summary>
 				/// Конструктор черги з елементами з списку ініціалізації
@@ -99,7 +99,7 @@ namespace Seed {
 				/// якщо false і черга немає місця то вона зупинить виконання команди
 				/// до моменту коли зявиться місце в черзі</param>
 				void Enqueue(const T& value, bool isResizeIfFull = false) {
-					This->flowControler.Produce([&]() {
+					This->flowControler.Produce([&]() InlineLambda {
 						if (This->count >= This->bufferSize) {
 							if (!isResizeIfFull)
 								This->flowControler.WaitForConcumer();
@@ -122,7 +122,7 @@ namespace Seed {
 				/// якщо false і черга немає місця то вона зупинить виконання команди 
 				/// до моменту коли зявиться місце в черзі</param>
 				void Enqueue(T&& Value, bool IsResizeIfFull = false) {
-					This->flowControler.Produce([&, Value = MoveRValue(Value)]() mutable {
+					This->flowControler.Produce([&, Value = MoveRValue(Value)]() mutable InlineLambda {
 						if (This->count >= This->bufferSize) {
 							if (!IsResizeIfFull)
 								This->flowControler.WaitForConcumer();
@@ -144,7 +144,7 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Значення елементу</returns>
 				T Dequeue() {
-					return This->flowControler.Concume([&]() {
+					return This->flowControler.Concume([&]() InlineLambda {
 						while (This->count == 0) This->flowControler.WaitForProducer();
 
 						T res = This->queue[This->front];
@@ -160,8 +160,8 @@ namespace Seed {
 				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
-				forceinline const T& Top() {
-					return This->flowControler.SharedLock([&]() -> const T& {
+				ForceInline const T& Top() {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->front == This->rear)
 							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
@@ -173,8 +173,8 @@ namespace Seed {
 				/// якщо черга пуста то генерує помилку
 				/// </summary>
 				/// <returns></returns>
-				forceinline const T& Top() const {
-					return This->flowControler.SharedLock([&]() -> const T& {
+				ForceInline const T& Top() const {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->front == This->rear)
 							Throw(EmptyQueueException(ExceptionPosition));
 						return This->queue[This->front];
@@ -185,8 +185,8 @@ namespace Seed {
 				/// Розширення черги на задану кількість елемент
 				/// </summary>
 				/// <param name="AdditionalSize">Кількість на яку збільшити треба</param>
-				forceinline void Extend(SizeT AdditionalSize) {
-					This->flowControler.ExclusiveLock([&]() {
+				ForceInline void Extend(SizeT AdditionalSize) {
+					This->flowControler.ExclusiveLock([&]() InlineLambda {
 						ExtendImpl(AdditionalSize);
 						});
 				}
@@ -195,7 +195,7 @@ namespace Seed {
 				/// Зменшити розмір черги до поточної кількості елементів
 				/// </summary>
 				void Shrink() {
-					This->flowControler.ExclusiveLock([&]() {
+					This->flowControler.ExclusiveLock([&]() InlineLambda {
 						const SizeT newSize = This->count;
 						T* newBuffer = new T[newSize];
 						for (SizeT i = 0; i < This->count; i++)
@@ -209,13 +209,13 @@ namespace Seed {
 				}
 
 				template<typename TU>
-				forceinline friend void Seed::Core::Swap(TU& a, TU& b);
+				ForceInline friend void Seed::Core::Swap(TU& a, TU& b);
 
 				/// <summary>
 				/// Кількість елементів в черзі
 				/// </summary>
 				/// <returns>Поточна кількість елементів</returns>
-				forceinline SizeT GetCount() const { return This->count; }
+				ForceInline SizeT GetCount() const { return This->count; }
 
 				/// <summary>
 				/// Поточна кількість елементів
@@ -224,7 +224,7 @@ namespace Seed {
 				/// Максимальна елементів в черзі
 				/// </summary>
 				/// <returns>Максимальна кількість елементів</returns>
-				forceinline SizeT GetMaxCount() const { return This->bufferSize; }
+				ForceInline SizeT GetMaxCount() const { return This->bufferSize; }
 
 				/// <summary>
 				/// Максимальна кількість елементів
@@ -252,7 +252,7 @@ namespace Seed {
                 BaseConcurencyDynamicQueue Clone() const {
                     if constexpr (TypeTraits::IsPodV<T>)
                     {
-						return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue
+						return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue InlineLambda
 						{
 							auto item = BaseConcurencyDynamicQueue(this->This->count);
 							Memory::Copy(this->This->queue, item.This->queue, sizeof(T) * this->This->count);
@@ -264,7 +264,7 @@ namespace Seed {
                     }
                     else
                     {
-						return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue
+						return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue InlineLambda
 						{
 							auto item = BaseConcurencyDynamicQueue(this->This->count);
 							for (SizeT i = 0; i < This->count; i++)
@@ -286,7 +286,7 @@ namespace Seed {
                 /// <returns>Вертає новий масив з копією всіх елементів</returns>
                 template<typename TLambda> requires (Concepts::IsInvockableWithResult<TLambda, T, const T&>)
                 BaseConcurencyDynamicQueue Clone(TLambda&& lambda) const {
-					return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue
+					return This->flowControler.SharedLock([&] () -> BaseConcurencyDynamicQueue InlineLambda
 					{
 						auto item = BaseConcurencyDynamicQueue(this->This->count);
 						for (SizeT i = 0; i < This->count; i++)
@@ -364,7 +364,7 @@ namespace Seed {
 					if constexpr (TypeTraits::IsInvockable<TLambda, T&> ||
 						TypeTraits::IsInvockable<TLambda, const T&>) {
 
-						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& InlineLambda {
 							for (SizeT i = 0; i < This->count; i++)
 							{
 								lambda((*This)[i]);
@@ -375,7 +375,7 @@ namespace Seed {
 					else if constexpr (TypeTraits::IsInvockable<TLambda, T&, SizeT> ||
 						TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 
-						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& InlineLambda {
 							SizeT index = 0;
 
 							for (SizeT i = 0; i < This->count; i++, index++)
@@ -397,7 +397,7 @@ namespace Seed {
 				template<typename TLambda>
 				const BaseConcurencyDynamicQueue& ForEachImpl(TLambda&& lambda) const {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& InlineLambda {
 							for (SizeT i = 0; i < This->count; i++)
 							{
 								lambda((*This)[i]);
@@ -406,7 +406,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& InlineLambda {
 							SizeT Index = 0;
 
 							for (SizeT i = 0; i < This->count; i++, Index++)
@@ -433,7 +433,7 @@ namespace Seed {
 					if constexpr (TypeTraits::IsInvockable<TLambda, T&> ||
 						TypeTraits::IsInvockable<TLambda, const T&>) {
 
-						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& InlineLambda {
 							for (SizeT i = 0; i < requiredCount; i++)
 							{
 								lambda((*This)[i]);
@@ -444,7 +444,7 @@ namespace Seed {
 					else if constexpr (TypeTraits::IsInvockable<TLambda, T&, SizeT> ||
 						TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
 
-						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& InlineLambda {
 							SizeT index = 0;
 
 							for (SizeT i = 0; i < requiredCount; i++, index++)
@@ -469,7 +469,7 @@ namespace Seed {
                         requiredCount = this->Count;
 
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& InlineLambda {
 							for (SizeT i = 0; i < requiredCount; i++)
 							{
 								lambda((*This)[i]);
@@ -478,7 +478,7 @@ namespace Seed {
 							});
 					}
 					else if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>) {
-						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& {
+						return This->flowControler.SharedLock([&]() -> const BaseConcurencyDynamicQueue& InlineLambda {
 							SizeT Index = 0;
 
 							for (SizeT i = 0; i < requiredCount; i++, Index++)
@@ -517,7 +517,7 @@ namespace Seed {
 
 				template<typename T, typename Lambda>
 				T AggregateImpl(Lambda&& lambda, const T& value) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() InlineLambda {
 						T result = value;
 						if (This->count == 0) {
 							return MoveRValue(result);
@@ -533,8 +533,8 @@ namespace Seed {
 				}
 
 				template<typename T, typename Lambda>
-				forceinline T AggregateImpl(Lambda&& lambda, T&& value) const {
-					return This->flowControler.SharedLock([&, Value = MoveRValue(value)]() mutable {
+				ForceInline T AggregateImpl(Lambda&& lambda, T&& value) const {
+					return This->flowControler.SharedLock([&, Value = MoveRValue(value)]() mutable InlineLambda {
 						T result = MoveRValue(Value);
 
 						if (This->count == 0)
@@ -549,11 +549,11 @@ namespace Seed {
 					});
 				}
 
-				forceinline bool AnyImpl() const { return This->count > 0; }
+				ForceInline bool AnyImpl() const { return This->count > 0; }
 
 				template<typename Lambda>
 				bool AnyImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() InlineLambda {
 						if (This->count == 0)
 							return false;
 
@@ -569,7 +569,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				bool AllImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() {
+					return This->flowControler.SharedLock([&]() InlineLambda {
 						if (This->count == 0)
 							return false;
 
@@ -585,7 +585,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& FirstImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&]() -> T& {
+					return This->flowControler.SharedLock([&]() -> T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -597,7 +597,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				T& LastImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&]() -> T& {
+					return This->flowControler.SharedLock([&]() -> T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -609,7 +609,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& FirstImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() -> const T& {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -621,7 +621,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				const T& LastImpl(Lambda&& lambda) const {
-					return This->flowControler.SharedLock([&]() -> const T& {
+					return This->flowControler.SharedLock([&]() -> const T& InlineLambda {
 						if (This->count == 0)
 							Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__, 0, 0);
 
@@ -632,7 +632,7 @@ namespace Seed {
 				}
 
 				BaseConcurencyDynamicQueue& ReverseImpl() {
-					return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+					return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& InlineLambda {
 						for (SizeT i = 0; i < This->count / 2; i++)
 						{
 							Seed::Swap((*This)[i], (*This)[(This->count - 1) - i]);
@@ -641,20 +641,20 @@ namespace Seed {
 						});
 				}
 
-				forceinline void UnsafeSet(const T& value, SizeT index) {
+				ForceInline void UnsafeSet(const T& value, SizeT index) {
 					This->queue[index] = value;
 					This->rear = index;
 					This->count = This->bufferSize;
 				}
 
-				forceinline void UnsafeSet(T&& value, SizeT index) {
+				ForceInline void UnsafeSet(T&& value, SizeT index) {
 					This->queue[index] = MoveRValue(value);
 					This->rear = index;
 					This->count = This->bufferSize;
 				}
 
 				BaseConcurencyDynamicQueue& RemoveAllImpl() {
-					return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& {
+					return This->flowControler.SharedLock([&]() -> BaseConcurencyDynamicQueue& InlineLambda {
 						if (This->count == 0)
 							return *this;
 						delete[] This->queue;
@@ -666,7 +666,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				BaseConcurencyDynamicQueue& RemoveAllImpl(Lambda&& lambda) {
-					return This->flowControler.SharedLock([&, lambda = MoveRValue(lambda)]()->BaseConcurencyDynamicQueue& {
+					return This->flowControler.SharedLock([&, lambda = MoveRValue(lambda)]()->BaseConcurencyDynamicQueue& InlineLambda {
 						if (This->count == 0)
 							return *this;
 						for (SizeT i = 0; i < This->count; i++)
@@ -682,7 +682,7 @@ namespace Seed {
 
 				template<typename Lambda>
 				SizeT GetCountIfImpl(Lambda&& lambda) {
-					return This->lock.SharedLock([&]() {
+					return This->lock.SharedLock([&]() InlineLambda {
 						SizeT selectedCount = 0;
 
 						for (SizeT i = 0; i < This->count; i++)
@@ -721,7 +721,7 @@ namespace Seed {
 		}
 
 		template<typename THeap, typename T>
-		forceinline void Swap(Containers::BaseConcurencyDynamicQueue<THeap, T>& A, Containers::BaseConcurencyDynamicQueue<THeap, T>& B) {
+		ForceInline void Swap(Containers::BaseConcurencyDynamicQueue<THeap, T>& A, Containers::BaseConcurencyDynamicQueue<THeap, T>& B) {
 			//TODO: Interlocked Exchange
 			Swap(A.This, B.This);
 		}

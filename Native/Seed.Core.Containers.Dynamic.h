@@ -46,6 +46,20 @@ namespace Seed
                     }
 
                     /// <summary>
+                    /// Вертає пакет змінних якщо тип вірний, якщо ні генерує помилку InvalidTypeException
+                    /// </summary>
+                    /// <typeparam name="TTypes">Кортеж типів</typeparam>
+                    template<typename TTuple>
+                    TTuple& GetVariablesTuple() {
+                        using Pack = TTuple;
+                        if (typeid(Pack) == GetVariablesPackTypeInfo())
+                        {
+                            return *reinterpret_cast<Pack*>(GetVariablePackRaw());
+                        }
+                        Throw(InvalidTypeException(ExceptionPosition, typeid(Pack), GetVariablesPackTypeInfo()));
+                    }
+
+                    /// <summary>
                     /// Вертає тип кортежу який містить об'єкт
                     /// </summary>
                     /// <returns>RTTI TypeInfo</returns>
@@ -160,7 +174,7 @@ namespace Seed
                     /// </summary>
                     /// <param name="pack">Покажчик на інтерфейс контейнера пакету</param>
                     /// <returns></returns>
-                    forceinline Data(IDynamicImpl* pack) : pack(pack), RefCount(1) {}
+                    ForceInline Data(IDynamicImpl* pack) : pack(pack), RefCount(1) {}
                 };
             private:
                 /// <summary>
@@ -181,10 +195,14 @@ namespace Seed
                 Dynamic(IDynamicImpl* pack) : This(new Data(pack)) {}
             public:
                 /// <summary>
+                /// Пустий стандартний конструктор
+                /// </summary>
+                Dynamic() : This(new Data(new DynamicImpl<>())) {}
+                /// <summary>
                 /// Конструктор з пакета змінних
                 /// </summary>
                 /// <typeparam name="TTypes">Пакет типів</typeparam>
-                template<typename ... TTypes>
+                template<typename ... TTypes> requires (sizeof...(TTypes) == 0 || sizeof...(TTypes) > 1 || ((!Concepts::Tuple<TTypes>) || ...))
                 Dynamic(TTypes&& ... types) : This(new Data(new DynamicImpl<TTypes...>(ForwardReference<TTypes>(types)...))) {}
 
                 /// <summary>
@@ -202,6 +220,36 @@ namespace Seed
                 template<typename ... TTypes>
                 Tuple<TTypes...>& GetVariables() {
                     return This->pack->GetVariables<TTypes...>();
+                }
+
+                /// <summary>
+                /// Вертає силку на пакет змінних які містить об'єкт,
+                /// якщо типи вказані некоректно то генерується помилка
+                /// </summary>
+                /// <typeparam name="TTypes">Типи пакету</typeparam>
+                template<typename ... TTypes>
+                const Tuple<TTypes...>& GetVariables() const {
+                    return This->pack->GetVariables<TTypes...>();
+                }
+
+                /// <summary>
+                /// Вертає силку на пакет змінних які містить об'єкт,
+                /// якщо типи вказані некоректно то генерується помилка
+                /// </summary>
+                /// <typeparam name="TTypes">Типи пакету</typeparam>
+                template<typename TTuple>
+                TTuple& GetVariablesTuple() {
+                    return This->pack->GetVariablesTuple<TTuple>();
+                }
+
+                /// <summary>
+                /// Вертає силку на пакет змінних які містить об'єкт,
+                /// якщо типи вказані некоректно то генерується помилка
+                /// </summary>
+                /// <typeparam name="TTypes">Типи пакету</typeparam>
+                template<typename TTuple>
+                const TTuple& GetVariablesTuple() const {
+                    return This->pack->GetVariablesTuple<TTuple>();
                 }
 
                 /// <summary>

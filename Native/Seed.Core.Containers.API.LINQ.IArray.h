@@ -29,7 +29,7 @@ namespace Seed {
 					template<typename Lambda> 
 					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
 							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					forceinline ThisCollection& ForEach(Lambda&& lambda, SizeT startIndex = Math::Min<SizeT>(), SizeT сount = Math::Max<SizeT>()) {
+					ForceInline ThisCollection& ForEach(Lambda&& lambda, SizeT startIndex = Math::Min<SizeT>(), SizeT сount = Math::Max<SizeT>()) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), startIndex, сount);
 					}
 
@@ -43,11 +43,11 @@ namespace Seed {
 					/// <returns>Силку на поточну колекцію</returns>
 					template<typename Lambda> 
 					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					forceinline const ThisCollection& ForEach(Lambda&& lambda, SizeT startIndex = Math::Min<SizeT>(), SizeT count = Math::Max<SizeT>()) const {
+					ForceInline const ThisCollection& ForEach(Lambda&& lambda, SizeT startIndex = Math::Min<SizeT>(), SizeT count = Math::Max<SizeT>()) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), startIndex, count);
 					}
 
-					forceinline virtual ~IArray() = 0 {}
+					ForceInline virtual ~IArray() = 0 {}
 				};
 			}
 		}

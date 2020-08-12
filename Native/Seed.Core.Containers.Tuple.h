@@ -31,32 +31,32 @@ namespace Seed
                     static constexpr UInt64 N = TI;
                     TData data;
 
-                    forceinline constexpr const TData& GetData() const {
+                    ForceInline constexpr const TData& GetData() const {
                         return data;
                     }
 
-                    forceinline constexpr TData& GetData() {
+                    ForceInline constexpr TData& GetData() {
                         return data;
                     }
 
-                    forceinline constexpr TData&& MoveData()
+                    ForceInline constexpr TData&& MoveData()
                     {
                         return Seed::MoveRValue(data);
                     }
 
-                    forceinline constexpr Leaf() = default;
-                    forceinline constexpr Leaf(const TData & data) : data(data) {}
-                    forceinline constexpr Leaf(TData && data) : data(ForwardReference<TData>(data)) {}
+                    ForceInline constexpr Leaf() = default;
+                    ForceInline constexpr Leaf(const TData & data) : data(data) {}
+                    ForceInline constexpr Leaf(TData && data) : data(ForwardReference<TData>(data)) {}
 
-                    forceinline constexpr Leaf(const Leaf& leaf) : Leaf(leaf.data) {}
-                    forceinline constexpr Leaf(Leaf&& leaf) : Leaf(ForwardReference<TData>(leaf.data)) {}
+                    ForceInline constexpr Leaf(const Leaf& leaf) : Leaf(leaf.data) {}
+                    ForceInline constexpr Leaf(Leaf&& leaf) : Leaf(ForwardReference<TData>(leaf.data)) {}
 
-					forceinline constexpr Leaf& operator=(const Leaf& leaf) {
+					ForceInline constexpr Leaf& operator=(const Leaf& leaf) {
 						this->Leaf::~Leaf();
 						this->Leaf::Leaf(leaf);
 					}
 
-					forceinline constexpr Leaf& operator=(Leaf&& leaf) {
+					ForceInline constexpr Leaf& operator=(Leaf&& leaf) {
 						this->Leaf::~Leaf();
 						this->Leaf::Leaf(MoveRValue(leaf));
 					}
@@ -67,32 +67,32 @@ namespace Seed
                     static constexpr UInt64 N = TI;
                     TData data;
 
-                    forceinline constexpr const TData& GetData() const {
+                    ForceInline constexpr const TData& GetData() const {
                         return data;
                     }
 
-                    forceinline constexpr TData& GetData() {
+                    ForceInline constexpr TData& GetData() {
                         return data;
                     }
 
-                    forceinline constexpr TData&& MoveData()
+                    ForceInline constexpr TData&& MoveData()
                     {
                         return Seed::MoveRValue(data);
                     }
 
-                    forceinline constexpr Leaf() = default;
-                    forceinline constexpr Leaf(const TData & data) : data(data) {}
-                    forceinline constexpr Leaf(TData && data) : data(ForwardReference<TData>(data)) {}
+                    ForceInline constexpr Leaf() = default;
+                    ForceInline constexpr Leaf(const TData & data) : data(data) {}
+                    ForceInline constexpr Leaf(TData && data) : data(ForwardReference<TData>(data)) {}
 
-                    forceinline constexpr Leaf(const Leaf& leaf) : Leaf(leaf.data) {}
-                    forceinline constexpr Leaf(Leaf&& leaf) : Leaf(ForwardReference<TData>(leaf.data)) {}
+                    ForceInline constexpr Leaf(const Leaf& leaf) : Leaf(leaf.data) {}
+                    ForceInline constexpr Leaf(Leaf&& leaf) : Leaf(ForwardReference<TData>(leaf.data)) {}
 
-					forceinline constexpr Leaf& operator=(const Leaf& leaf) {
+					ForceInline constexpr Leaf& operator=(const Leaf& leaf) {
 						this->Leaf::~Leaf();
 						this->Leaf::Leaf(leaf);
 					}
 
-					forceinline constexpr Leaf& operator=(Leaf&& leaf) {
+					ForceInline constexpr Leaf& operator=(Leaf&& leaf) {
 						this->Leaf::~Leaf();
 						this->Leaf::Leaf(MoveRValue(leaf));
 					}
@@ -111,15 +111,15 @@ namespace Seed
                     template<UInt64 TId>
                     using RetType = typename GetByN<TId, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>...>::Type;
 
-                    forceinline constexpr Leafes() = default;
-                    forceinline constexpr Leafes(const Leafes&) = default;
-                    forceinline constexpr Leafes(Leafes&&) = default;
+                    ForceInline constexpr Leafes() = default;
+                    ForceInline constexpr Leafes(const Leafes&) = default;
+                    ForceInline constexpr Leafes(Leafes&&) = default;
 
-                    forceinline constexpr Leafes(const TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>&... datas) : Leaf<TIdxN, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>>(datas)... {}
-                    forceinline constexpr Leafes(TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>&&... datas) : Leaf<TIdxN, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>>(ForwardReference<TTypes>(datas))... {}
+                    ForceInline constexpr Leafes(const TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>&... datas) : Leaf<TIdxN, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>>(datas)... {}
+                    ForceInline constexpr Leafes(TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>&&... datas) : Leaf<TIdxN, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>>(ForwardReference<TTypes>(datas))... {}
 
                     template<UInt64 TId>
-                    forceinline constexpr decltype(auto) GetById() const {
+                    ForceInline constexpr decltype(auto) GetById() const {
                         using LeafType = Leaf<(Count - 1) - TId, RetType<TId>>;
                         decltype(auto) leaf = static_cast<const LeafType&>(*this);
                         decltype(auto) i = leaf.GetData();
@@ -127,7 +127,7 @@ namespace Seed
                     }
 
                     template<UInt64 TId>
-                    forceinline constexpr decltype(auto)  GetById() {
+                    ForceInline constexpr decltype(auto)  GetById() {
                         using LeafType = Leaf<(Count - 1) - TId, RetType<TId>>;
                         decltype(auto) leaf = static_cast<LeafType&>(*this);
                         decltype(auto) i = leaf.GetData();
@@ -135,7 +135,7 @@ namespace Seed
                     }
 
                     template<UInt64 TId>
-                    forceinline constexpr decltype(auto)  MoveByIdx() {
+                    ForceInline constexpr decltype(auto)  MoveByIdx() {
                         using LeafType = Leaf<(Count - 1) - TId, RetType<TId>>;
                         decltype(auto) leaf = static_cast<LeafType&>(*this);
                         decltype(auto) i = Seed::MoveRValue(leaf.MoveData());
@@ -148,7 +148,7 @@ namespace Seed
                 Leafes<typename TypeTraits::Indexer<sizeof...(TDatas)>::Type, TDatas...> ls;
             private:
                 template<typename F, SizeT ... TIdxN>
-                forceinline decltype(auto) CallWithArgsFromTupleImpl(F f, TypeTraits::TypeTag<TypeTraits::Indexator<TIdxN...>>) {
+                ForceInline decltype(auto) CallWithArgsFromTupleImpl(F f, TypeTraits::TypeTag<TypeTraits::Indexator<TIdxN...>>) {
                     if constexpr (TypeTraits::IsSameV<decltype(f(MoveRValue(this->GetByIdx<(Count - 1) -TIdxN>())...)), void>)
                     {
                         f(MoveRValue<decltype(this->GetByIdx<(Count - 1) - TIdxN>())>(this->GetByIdx<(Count - 1) - TIdxN>())...);
@@ -159,25 +159,25 @@ namespace Seed
                     }
                 }
             public:
-                forceinline constexpr Tuple() : ls() {}
-                forceinline constexpr Tuple(const Tuple&) = default;
-                forceinline constexpr Tuple(Tuple&&) = default;
+                ForceInline constexpr Tuple() : ls() {}
+                ForceInline constexpr Tuple(const Tuple&) = default;
+                ForceInline constexpr Tuple(Tuple&&) = default;
 
-                forceinline constexpr Tuple(TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TDatas>>&&... data) : ls(ForwardReference<TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TDatas>>>(data)...) {}
-                forceinline constexpr Tuple(const TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TDatas>>&... data) : ls(data...) {}
+                ForceInline constexpr Tuple(TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TDatas>>&&... data) : ls(ForwardReference<TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TDatas>>>(data)...) {}
+                ForceInline constexpr Tuple(const TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TDatas>>&... data) : ls(data...) {}
 
                 template<UInt64 TId>
-                forceinline constexpr decltype(auto) GetByIdx() const {
+                ForceInline constexpr decltype(auto) GetByIdx() const {
                     return ForwardReference<decltype(ls.template GetById<TId>())>(ls.template GetById<TId>());
                 }
 
                 template<UInt64 TId>
-                forceinline constexpr decltype(auto)  GetByIdx() {
+                ForceInline constexpr decltype(auto)  GetByIdx() {
                     return ForwardReference<decltype(ls.template GetById<TId>())>(ls.template GetById<TId>());
                 }
 
                 template<typename F>
-                forceinline decltype(auto) CallWithArgsFromTuple(F f)
+                ForceInline decltype(auto) CallWithArgsFromTuple(F f)
                 {
                     if constexpr (TypeTraits::IsSameV<decltype(CallWithArgsFromTupleImpl(f, TypeTraits::TypeTag<typename TypeTraits::Indexer<sizeof...(TDatas)>::Type>{})), void>)
                     {
@@ -199,14 +199,14 @@ namespace Seed
             template<>
             class Tuple<> final {
             public:
-                forceinline constexpr Tuple() {}
-                forceinline constexpr Tuple(const Tuple&) = default;
-                forceinline constexpr Tuple(Tuple&&) = default;
+                ForceInline constexpr Tuple() {}
+                ForceInline constexpr Tuple(const Tuple&) = default;
+                ForceInline constexpr Tuple(Tuple&&) = default;
 
                 static constexpr SizeT Count = 0;
 
                 template<typename F>
-                forceinline decltype(auto) CallWithArgsFromTuple(F f) {
+                ForceInline decltype(auto) CallWithArgsFromTuple(F f) {
                     if constexpr (TypeTraits::IsSameV<decltype(f()), void>){
                         f();
                     }
@@ -216,6 +216,24 @@ namespace Seed
                     }
                 }
             };
+        }
+
+        namespace TypeTraits
+        {
+            template<typename T>
+            struct IsTupleT : LogicFalse {};
+
+            template<typename ... Types>
+            struct IsTupleT<Containers::Tuple<Types...>> : LogicTrue {};
+
+            template<typename T>
+            constexpr bool IsTupleV = IsTupleT<T>::State;
+        }
+
+        namespace Concepts
+        {
+            template<typename T>
+            concept Tuple = TypeTraits::IsTupleV<T>;
         }
     }
 }
@@ -227,25 +245,25 @@ namespace std
 #pragma region std::get
     template <SizeT TI, class... TType>
     // ReSharper disable once CppInconsistentNaming
-    forceinline constexpr decltype(auto) get(Seed::Core::Containers::Tuple<TType...>& tuple) {
+    ForceInline constexpr decltype(auto) get(Seed::Core::Containers::Tuple<TType...>& tuple) {
         return Seed::ForwardReference<decltype(tuple.template GetByIdx<TI>())>(tuple.template GetByIdx<TI>());
     }
 
     template <SizeT TI, class... TType>
     // ReSharper disable once CppInconsistentNaming
-    forceinline constexpr decltype(auto) get(const Seed::Core::Containers::Tuple<TType...>& tuple) {
+    ForceInline constexpr decltype(auto) get(const Seed::Core::Containers::Tuple<TType...>& tuple) {
         return Seed::ForwardReference<decltype(tuple.template GetByIdx<TI>())>(tuple.template GetByIdx<TI>());
     }
 
     template <SizeT TI, class... TType>
     // ReSharper disable once CppInconsistentNaming
-    forceinline constexpr decltype(auto) get(Seed::Core::Containers::Tuple<TType...>&& tuple) {
+    ForceInline constexpr decltype(auto) get(Seed::Core::Containers::Tuple<TType...>&& tuple) {
         return Seed::ForwardReference<decltype(tuple.template GetByIdx<TI>())>(tuple.template GetByIdx<TI>());
     }
 
     template <SizeT TI, class... TType>
     // ReSharper disable CppInconsistentNaming
-    forceinline constexpr decltype(auto) get(const Seed::Core::Containers::Tuple<TType...>&& tuple) {
+    ForceInline constexpr decltype(auto) get(const Seed::Core::Containers::Tuple<TType...>&& tuple) {
         // ReSharper restore CppInconsistentNaming
         return Seed::ForwardReference<decltype(tuple.template GetByIdx<TI>())>(tuple.template GetByIdx<TI>());
     }
@@ -302,11 +320,11 @@ namespace std
         static constexpr SizeT value = sizeof...(TTypes);
 
         // ReSharper disable once CppNonExplicitConversionOperator
-        forceinline constexpr operator SizeT() const {
+        ForceInline constexpr operator SizeT() const {
             return value;
         }
 
-        forceinline constexpr size_t operator()() const {
+        ForceInline constexpr size_t operator()() const {
             return value;
         }
 

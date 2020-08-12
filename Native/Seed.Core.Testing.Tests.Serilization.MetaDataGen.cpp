@@ -2,6 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Testing.Tests.Serilization.MetaDataGen.h"
+#include "Seed.Core.Serilization.h"
+#include "Seed.Core.RTTI.h"
+#include "Seed.Core.Reflection.h"
 
 bool Seed::Core::Testing::Test::Serilization::ComplexMetaDataGen::Excecute() {
 	auto metaData = Core::Serilization::MetaDataGen<

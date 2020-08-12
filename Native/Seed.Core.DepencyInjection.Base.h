@@ -125,15 +125,20 @@ namespace Seed
 				};
 			private:
 				struct Data {
-					Containers::ConcurencyMap<RTTI::RTTITypeRecord, SmartPtr<ServiceRecord>> serviceTableForNativeLevel;
-					Containers::ConcurencyDictionary<SmartPtr<ServiceRecord>> serviceTableForManagedLevel;
-					Containers::ConcurencyList<SmartPtr<ServiceRecord>> serviceStore;
-					Containers::ConcurencyMap<RTTI::RTTITypeRecord, Reflection::DataTypeRecord> dataTypeTableForNativeLevel;
-					Containers::ConcurencyDictionary<Reflection::DataTypeRecord> dataTypeTableForManagedLevel;
-					Containers::ConcurencyMap<RTTI::RTTITypeRecord, Reflection::ObjectRTTIRecord> objectTypeTableForNativeLevel;
-					Containers::ConcurencyDictionary<Reflection::ObjectRTTIRecord> objectTypeTableForManagedLevel;
+					Containers::ConcurencyMap<RTTI::RTTITypeRecord, SmartPtr<ServiceRecord>>		serviceTableForNativeLevel;
+					Containers::ConcurencyDictionary<SmartPtr<ServiceRecord>>						serviceTableForManagedLevel;
+					Containers::ConcurencyList<SmartPtr<ServiceRecord>>								serviceStore;
+					Containers::ConcurencyMap<RTTI::RTTITypeRecord, Reflection::DataTypeRecord>		dataTypeTableForNativeLevel;
+					Containers::ConcurencyDictionary<Reflection::DataTypeRecord>					dataTypeTableForManagedLevel;
+					Containers::ConcurencyMap<RTTI::RTTITypeRecord, Reflection::ObjectRTTIRecord>	objectTypeTableForNativeLevel;
+					Containers::ConcurencyDictionary<Reflection::ObjectRTTIRecord>					objectTypeTableForManagedLevel;
 
-					RefCountT RefCount;
+					Serilization::TypesRegistry														dataTypesListForSerilization;
+
+					Containers::ConcurencyMap<RTTI::RTTITypeRecord, SizeT>							dataTypeRecordRefs;
+					Containers::ConcurencyMap<RTTI::RTTITypeRecord, SizeT>							objectTypeRecordRefs;
+
+					RefCountT																		RefCount;
 
 					Data() :
 						RefCount(1),
@@ -142,25 +147,32 @@ namespace Seed
 						dataTypeTableForNativeLevel(),
 						dataTypeTableForManagedLevel(),
 						objectTypeTableForNativeLevel(),
-						objectTypeTableForManagedLevel()
+						objectTypeTableForManagedLevel(),
+						dataTypesListForSerilization(),
+						dataTypeRecordRefs(),
+						objectTypeRecordRefs()
 					{}
 				};
 			private:
 				Data* data;
+			private:
+				template<typename T>
+				ForceInline void RegisterType() {
+					auto typeRecord = Reflection::DataTypeRecord(Seed::Core::TypeTraits::TypeTag<T>{});
+
+					data->dataTypeTableForNativeLevel.Insert(TypeRecord<T>(), typeRecord);
+					data->dataTypeTableForManagedLevel.Insert(CTTI::TypeName<T>(), typeRecord);
+					data->dataTypesListForSerilization.AddLast({ TypeRecord<T>(), typeRecord});
+					data->dataTypeRecordRefs.Insert(TypeRecord<T>(), 1);
+				}
+
+				void RegisterServiceTypes(const SmartPtr<ServiceRecord>& service);
+
+				void UnRegisterServiceByTypeRecord(const RTTI::RTTITypeRecord& serviceRecord);
+
+				void UnregisterServiceTypes(const SmartPtr<ServiceRecord>& service);
 			protected:
-				virtual void Dispose() override {
-					//Видалення сервісів з реєстрів
-					data->serviceTableForManagedLevel.RemoveAll();
-					data->serviceTableForNativeLevel.RemoveAll();
-					//Видалення сервісів
-					data->serviceStore.RemoveAll();
-					//Видалення записів про типи даних
-					data->dataTypeTableForManagedLevel.RemoveAll();
-					data->dataTypeTableForNativeLevel.RemoveAll();
-					//Видалення записів про типи об'єктів
-					data->objectTypeTableForManagedLevel.RemoveAll();
-					data->objectTypeTableForNativeLevel.RemoveAll();
-				};
+				virtual void Dispose() override;
 			public:
 				/// <summary>
 				/// Клас сервісу постачальника залежностей
@@ -185,64 +197,68 @@ namespace Seed
 					}
 					~IDI() {}
 				public:
-					forceinline Containers::List<String> GetAllServicesNames() const {
+					ForceInline Containers::List<String> GetAllServicesNames() const {
 						return di.GetAllServicesNames();
 					}
 
-					forceinline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) const {
+					ForceInline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) const {
 						return di.GetServiceRecordByName(name);
 					}
 
-					forceinline Containers::List<String> GetAllRegisteredObjects() const {
+					ForceInline Containers::List<String> GetAllRegisteredObjects() const {
 						return di.GetAllRegisteredObjects();
 					}
 
-					forceinline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) const {
+					ForceInline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) const {
 						return di.GetObjectRecordByName(name);
 					}
 
-					forceinline Reflection::ObjectRTTIRecord GetObjectRecordByType(const RTTI::RTTITypeRecord& id) const {
+					ForceInline Reflection::ObjectRTTIRecord GetObjectRecordByType(const RTTI::RTTITypeRecord& id) const {
 						return di.GetObjectRecordByType(id);
 					}
 
-					forceinline Boolean IsExistObjectRecordByName(const String& name) const {
+					ForceInline Boolean IsExistObjectRecordByName(const String& name) const {
 						return di.IsExistObjectRecordByName(name);
 					}
 
-					forceinline Boolean IsExistObjectRecordByType(const RTTI::RTTITypeRecord& id) const {
+					ForceInline Boolean IsExistObjectRecordByType(const RTTI::RTTITypeRecord& id) const {
 						return di.IsExistObjectRecordByType(id);
 					}
 
-					forceinline Containers::List<String> GetAllRegisteredDataTypes() const {
+					ForceInline Containers::List<String> GetAllRegisteredDataTypes() const {
 						return di.GetAllRegisteredDataTypes();
 					}
 
-					forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) const {
+					ForceInline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) const {
 						return di.GetDataTypesRecordByName(name);
 					}
 
-					forceinline Reflection::DataTypeRecord GetDataTypesRecordByType(const RTTI::RTTITypeRecord& id) const {
+					ForceInline Reflection::DataTypeRecord GetDataTypesRecordByType(const RTTI::RTTITypeRecord& id) const {
 						return di.GetDataTypesRecordByType(id);
 					}
 
-					forceinline Boolean IsExistDataTypesRecordByName(const String& name) const {
+					ForceInline Boolean IsExistDataTypesRecordByName(const String& name) const {
 						return di.IsExistDataTypesRecordByName(name);
 					}
 
-					forceinline Boolean IsExistDataTypesRecordByType(const RTTI::RTTITypeRecord& type) const {
+					ForceInline Boolean IsExistDataTypesRecordByType(const RTTI::RTTITypeRecord& type) const {
 						return di.IsExistDataTypesRecordByType(type);
 					}
 
-					forceinline void RegisterObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) const {
+					ForceInline void RegisterObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) const {
 						di.RegisterObjectType(objectRTTIRecord);
 					}
 
-					forceinline void RegisterObjectRTTIRecord(Reflection::ObjectRTTIRecord&& objectRTTIRecord) const {
+					ForceInline void RegisterObjectRTTIRecord(Reflection::ObjectRTTIRecord&& objectRTTIRecord) const {
 						di.RegisterObjectType(MoveRValue(objectRTTIRecord));
 					}
 
-					forceinline void RemoveObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) const {
+					ForceInline void RemoveObjectRTTIRecord(const Reflection::ObjectRTTIRecord& objectRTTIRecord) const {
 						di.RemoveObjectType(objectRTTIRecord);
+					}
+
+					ForceInline const Serilization::TypesRegistry& GetTypesRegistry() {
+						return di.data->dataTypesListForSerilization;
 					}
 				private:
 					friend class DepencyInjector;
@@ -251,7 +267,7 @@ namespace Seed
 				/// <summary>
 				/// Конструктор
 				/// </summary>
-				DepencyInjector() : data(new Data()) {}
+				DepencyInjector();
 
 				/// <summary>
 				/// Вертає сервіс за типом
@@ -306,10 +322,10 @@ namespace Seed
 						else
 						{
 							return Containers::Tuple<TCtorArgs...>{injector.Resolve<TCtorArgs>() ... }
-							.CallWithArgsFromTuple([] (TCtorArgs&& ... args)
-							{
-								return new TService(args...);
-							});
+								.CallWithArgsFromTuple([] (TCtorArgs&& ... args) InlineLambda
+								{
+									return new TService(args...);
+								});
 						}
 					};
 
@@ -334,18 +350,7 @@ namespace Seed
 					this->data->serviceTableForNativeLevel.Insert(TypeRecord<TService>(), serviceRecord);
 					this->data->serviceTableForManagedLevel.Insert(serviceRecord->rttiRecord.ClassName, serviceRecord);
 
-					serviceRecord->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
-					{
-						methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
-							if (this->data->dataTypeTableForNativeLevel.IsExist(typeRecord.GetTypeInfo()))
-								return;
-							if (this->data->objectTypeTableForNativeLevel.IsExist(typeRecord.GetTypeInfo()))
-								return;
-
-							this->data->dataTypeTableForNativeLevel.Insert(typeRecord.GetTypeInfo(), typeRecord);
-							this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
-						});
-					});
+					RegisterServiceTypes(serviceRecord);
 
 					return *this;
 				}
@@ -368,7 +373,7 @@ namespace Seed
 						else
 						{
 							return Containers::Tuple<TCtorArgs...>{injector.Resolve<TCtorArgs>() ... }
-								.CallWithArgsFromTuple([] (TCtorArgs&& ... args)
+								.CallWithArgsFromTuple([] (TCtorArgs&& ... args) InlineLambda
 								{
 									return new TService(args...);
 								});
@@ -390,21 +395,7 @@ namespace Seed
 						{ RTTI::RTTITypeRecord(TypeTraits::TypeTag<TCtorArgs>{}) ... }
 					) };
 
-					this->data->serviceTableForNativeLevel.Insert(TypeRecord<TServiceInterface>(), serviceRecord);
-					this->data->serviceTableForManagedLevel.Insert(CTTI::TypeName<TServiceInterface>(), serviceRecord);
-
-					serviceRecord->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord)
-					{
-						methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) {
-							if (this->data->dataTypeTableForNativeLevel.IsExist(typeRecord.GetTypeInfo()))
-								return;
-							if (this->data->objectTypeTableForNativeLevel.IsExist(typeRecord.GetTypeInfo()))
-								return;
-
-							this->data->dataTypeTableForNativeLevel.Insert(typeRecord.GetTypeInfo(), typeRecord);
-							this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
-						});
-					});
+					RegisterServiceTypes(serviceRecord);
 
 					return *this;
 				}
@@ -414,54 +405,7 @@ namespace Seed
 				/// </summary>
 				template<typename TService>
 				DepencyInjector& UnRegisterService() {
-					if (data->serviceTableForNativeLevel.IsExist(TypeRecord<TService>()))
-					{
-						auto service = data->serviceTableForNativeLevel[TypeRecord<TService>()];
-
-						auto dependents = Containers::List<decltype(service)>();
-						
-						dependents += service;
-						auto currentDependentsCount = 0Sz;
-						do
-						{
-							currentDependentsCount = dependents.Count;
-
-							auto newDependents = Containers::List<decltype(service)>();
-							
-							for (auto& service : dependents)
-							{
-								data->serviceStore.ForEach([&] (const SmartPtr<ServiceRecord>& record)
-								{
-									record->depencies.ForEach([&] (const RTTI::RTTITypeRecord & info)
-									{
-										if (info == service->rttiRecord.GetRTTITypeInfo())
-											newDependents += record;
-									});
-								});
-							}
-
-							dependents += MoveRValue(newDependents);
-
-						} while (currentDependentsCount != dependents.Count);
-
-						dependents.RemoveAll([&] (SmartPtr<ServiceRecord>&& serviceRecord)
-						{
-							//Видалення сервісів з реєстрів
-							data->serviceTableForManagedLevel.Remove(serviceRecord->rttiRecord.ClassName);
-							data->serviceTableForNativeLevel.Delete(serviceRecord->rttiRecord.GetRTTITypeInfo());
-							//Видалення сервісів
-							data->serviceStore.RemoveIf([&] (const SmartPtr<ServiceRecord>& item)
-							{
-								return item->rttiRecord.GetRTTITypeInfo() == serviceRecord->rttiRecord.GetRTTITypeInfo();
-							});
-							//TODO: Remove method type on unregister services
-						});
-					}
-					else
-					{
-						Throw(DIResolveException(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
-					}
-
+					UnRegisterServiceByTypeRecord(TypeRecord<TService>());
 					return *this;
 				}
 
@@ -472,10 +416,15 @@ namespace Seed
 				/// <returns>Посилання на поточний об'єкт</returns>
 				DepencyInjector& RegisterObjectType(Reflection::ObjectRTTIRecord&& rttiRecord) {
 					
-					if (!this->data->objectTypeTableForNativeLevel.IsExist(rttiRecord.GetRTTITypeInfo()))
+					if (this->data->objectTypeRecordRefs.IsExist(rttiRecord.GetRTTITypeInfo()))
+					{
+						++this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()];
+					}
+					else
 					{
 						this->data->objectTypeTableForNativeLevel.Insert(rttiRecord.GetRTTITypeInfo(), rttiRecord);
-						this->data->objectTypeTableForManagedLevel.Insert(rttiRecord.ClassName, MoveRValue(rttiRecord));
+						this->data->objectTypeTableForManagedLevel.Insert(rttiRecord.ClassName, rttiRecord);
+						this->data->objectTypeRecordRefs.Insert({ rttiRecord.GetRTTITypeInfo(), 1 });
 					}
 
 					return *this;
@@ -488,10 +437,15 @@ namespace Seed
 				/// <returns>Посилання на поточний об'єкт</returns>
 				DepencyInjector& RegisterObjectType(const Reflection::ObjectRTTIRecord& rttiRecord) {
 					
-					if (!this->data->objectTypeTableForNativeLevel.IsExist(rttiRecord.GetRTTITypeInfo()))
+					if (this->data->objectTypeRecordRefs.IsExist(rttiRecord.GetRTTITypeInfo()))
+					{
+						++this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()];
+					}
+					else
 					{
 						this->data->objectTypeTableForNativeLevel.Insert(rttiRecord.GetRTTITypeInfo(), rttiRecord);
 						this->data->objectTypeTableForManagedLevel.Insert(rttiRecord.ClassName, rttiRecord);
+						this->data->objectTypeRecordRefs.Insert({ rttiRecord.GetRTTITypeInfo(), 1 });
 					}
 
 					return *this;
@@ -503,9 +457,14 @@ namespace Seed
 				/// <param name="rttiRecord">Мета інформація про об'єкт</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
 				DepencyInjector& RemoveObjectType(const Reflection::ObjectRTTIRecord& rttiRecord) {
-					if (this->data->objectTypeTableForNativeLevel.IsExist(rttiRecord.GetRTTITypeInfo())) {
-						this->data->objectTypeTableForNativeLevel.Delete(rttiRecord.GetRTTITypeInfo());
-						this->data->objectTypeTableForManagedLevel.Remove(rttiRecord.ClassName);
+					if (this->data->objectTypeRecordRefs.IsExist(rttiRecord.GetRTTITypeInfo()))
+					{
+						if (--this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()] == 0)
+						{
+							this->data->objectTypeTableForNativeLevel.Delete(rttiRecord.GetRTTITypeInfo());
+							this->data->objectTypeTableForManagedLevel.Remove(rttiRecord.ClassName);
+							this->data->objectTypeRecordRefs.Delete(rttiRecord.GetRTTITypeInfo());
+						}
 					}
 
 					return *this;
@@ -515,9 +474,9 @@ namespace Seed
 				/// Вертає список імен всіх сервісів
 				/// </summary>
 				/// <returns></returns>
-				forceinline Containers::List<String> GetAllServicesNames() {
+				ForceInline Containers::List<String> GetAllServicesNames() {
 					Containers::List<String> servicesNames;
-					data->serviceTableForManagedLevel.ForEachKey([&] (const String& str) mutable
+					data->serviceTableForManagedLevel.ForEachKey([&] (const String& str)  mutable InlineLambda
 					{
 						servicesNames += str;
 					});
@@ -529,7 +488,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name"></param>
 				/// <returns></returns>
-				forceinline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) {
+				ForceInline Reflection::ObjectRTTIRecord GetServiceRecordByName(const String& name) {
 					return data->serviceTableForManagedLevel[name]->rttiRecord;
 				}
 
@@ -537,9 +496,9 @@ namespace Seed
 				/// Вертає список всіх зареєстрованих об'єктів
 				/// </summary>
 				/// <returns>Список зареєстрованих об'єкті</returns>
-				forceinline Containers::List<String> GetAllRegisteredObjects() {
+				ForceInline Containers::List<String> GetAllRegisteredObjects() {
 					Containers::List<String> objectNames;
-					data->objectTypeTableForManagedLevel.ForEachKey([&] (const String& str) mutable
+					data->objectTypeTableForManagedLevel.ForEachKey([&] (const String& str) mutable InlineLambda
 					{
 						objectNames += str;
 					});
@@ -550,7 +509,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name">Ім'я типу</param>
 				/// <returns>Мета інформація про об'єкт</returns>
-				forceinline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) {
+				ForceInline Reflection::ObjectRTTIRecord GetObjectRecordByName(const String& name) {
 					return data->objectTypeTableForManagedLevel[name];
 				}
 				/// <summary>
@@ -558,7 +517,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="id">Запис про тип</param>
 				/// <returns>Мета інформація про об'єкт</returns>
-				forceinline Reflection::ObjectRTTIRecord GetObjectRecordByType(const RTTI::RTTITypeRecord& id) {
+				ForceInline Reflection::ObjectRTTIRecord GetObjectRecordByType(const RTTI::RTTITypeRecord& id) {
 					return data->objectTypeTableForNativeLevel[id];
 				}
 
@@ -567,7 +526,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name">Ім'я типу</param>
 				/// <returns>true якщо об'єкт типу зареєтрований</returns>
-				forceinline Boolean IsExistObjectRecordByName(const String& name) {
+				ForceInline Boolean IsExistObjectRecordByName(const String& name) {
 					return data->objectTypeTableForManagedLevel.IsExist(name);
 				}
 
@@ -576,7 +535,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name">Запис про тип</param>
 				/// <returns>true якщо об'єкт типу зареєтрований</returns>
-				forceinline Boolean IsExistObjectRecordByType(const RTTI::RTTITypeRecord& id) {
+				ForceInline Boolean IsExistObjectRecordByType(const RTTI::RTTITypeRecord& id) {
 					return data->objectTypeTableForNativeLevel.IsExist(id);
 				}
 
@@ -584,9 +543,9 @@ namespace Seed
 				/// Вертає список зареєстрованих типів даних
 				/// </summary>
 				/// <returns>Список імен зареєстрованиї типів даних</returns>
-				forceinline Containers::List<String> GetAllRegisteredDataTypes() {
+				ForceInline Containers::List<String> GetAllRegisteredDataTypes() {
 					Containers::List<String> dataTypeNames;
-					data->dataTypeTableForManagedLevel.ForEachKey([&] (const String& str) mutable
+					data->dataTypeTableForManagedLevel.ForEachKey([&] (const String& str) mutable InlineLambda
 					{
 						dataTypeNames += str;
 					});
@@ -598,7 +557,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name">Ім'я типу даних</param>
 				/// <returns>Мета інформація про тип даних</returns>
-				forceinline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) {
+				ForceInline Reflection::DataTypeRecord GetDataTypesRecordByName(const String& name) {
 					return data->dataTypeTableForManagedLevel[name];
 				}
 
@@ -607,7 +566,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name">Запис про типх</param>
 				/// <returns>Мета інформація про тип даних</returns>
-				forceinline Reflection::DataTypeRecord GetDataTypesRecordByType(const RTTI::RTTITypeRecord& id) {
+				ForceInline Reflection::DataTypeRecord GetDataTypesRecordByType(const RTTI::RTTITypeRecord& id) {
 					return data->dataTypeTableForNativeLevel[id];
 				}
 
@@ -616,7 +575,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name">Ім'я типу</param>
 				/// <returns>true якщо тип даних зареєтрований</returns>
-				forceinline Boolean IsExistDataTypesRecordByName(const String& name) {
+				ForceInline Boolean IsExistDataTypesRecordByName(const String& name) {
 					return data->dataTypeTableForManagedLevel.IsExist(name);
 				}
 
@@ -625,7 +584,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="name">Запис про тип</param>
 				/// <returns>true якщо тип даних зареєтрований</returns>
-				forceinline Boolean IsExistDataTypesRecordByType(const RTTI::RTTITypeRecord& id) {
+				ForceInline Boolean IsExistDataTypesRecordByType(const RTTI::RTTITypeRecord& id) {
 					return data->dataTypeTableForNativeLevel.IsExist(id);
 				}
 			public:
