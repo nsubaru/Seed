@@ -34,6 +34,18 @@ namespace Seed
                     class StringIntConvert final : public TestClass<StringIntConvert> {
                         virtual bool Excecute() override;
                     };
+
+                    class StringSplitChar final : public TestClass<StringSplitChar> {
+                        virtual bool Excecute() override;
+                    };
+
+                    class StringSplitCharLiteral final : public TestClass<StringSplitCharLiteral> {
+                        virtual bool Excecute() override;
+                    };
+
+                    class StringSplitString final : public TestClass<StringSplitString> {
+                        virtual bool Excecute() override;
+                    };
 				}
 			}
 		}

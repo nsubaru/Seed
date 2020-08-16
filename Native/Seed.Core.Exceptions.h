@@ -783,7 +783,7 @@ namespace Seed {
 			class NtException : public Exception {
 			private:
 				///<summary>NtStatus code операції</summary>
-				Int64 statusCode;
+				Int32 statusCode;
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -799,7 +799,7 @@ namespace Seed {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName),
 						ExceptionString(L". Системний виклик вернув код "),
-						BaseString<Memory::ExceptionHeap>::UInt64asHex(statusCode), ExceptionString(L". "),
+						BaseString<Memory::ExceptionHeap>::Int32asHex(statusCode), ExceptionString(L". "),
 						location.toString(),
 						ExceptionString(L". ")
 					});
