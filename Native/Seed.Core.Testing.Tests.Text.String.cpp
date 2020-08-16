@@ -202,17 +202,17 @@ bool Seed::Core::Testing::Test::Text::StringDoubleFloatConvert::Excecute() {
 	double Pattern4 = 1.018;
 	double Pattern5 = 0.016;
 
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern1, 1) == L"1.0"; });
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern2, 2) == L"2.12"; });
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern3, 2) == L"0.14"; });
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern4, 3) == L"1.018"; });
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern5, 3) == L"0.016"; });
+	Asserts::AssertTrue(String::toString(Pattern1, 1) == L"1.0");
+	Asserts::AssertTrue(String::toString(Pattern2, 2) == L"2.12");
+	Asserts::AssertTrue(String::toString(Pattern3, 2) == L"0.14");
+	Asserts::AssertTrue(String::toString(Pattern4, 3) == L"1.018");
+	Asserts::AssertTrue(String::toString(Pattern5, 3) == L"0.016");
 
-	Asserts::AssertTrue([&] () InlineLambda { return Math::Equals(L"1.0"S.toDouble(),	Pattern1); });
-	Asserts::AssertTrue([&] () InlineLambda { return Math::Equals(L"2.12"S.toDouble(),	Pattern2); });
-	Asserts::AssertTrue([&] () InlineLambda { return Math::Equals(L"0.14"S.toDouble(),	Pattern3); });
-	Asserts::AssertTrue([&] () InlineLambda { return Math::Equals(L"1.018"S.toDouble(), Pattern4); });
-	Asserts::AssertTrue([&] () InlineLambda { return Math::Equals(L"0.016"S.toDouble(), Pattern5); });
+	Asserts::AssertTrue(Math::Equals(L"1.0"S.toDouble(),	Pattern1));
+	Asserts::AssertTrue(Math::Equals(L"2.12"S.toDouble(),	Pattern2));
+	Asserts::AssertTrue(Math::Equals(L"0.14"S.toDouble(),	Pattern3));
+	Asserts::AssertTrue(Math::Equals(L"1.018"S.toDouble(), Pattern4));
+	Asserts::AssertTrue(Math::Equals(L"0.016"S.toDouble(), Pattern5));
 
 	return true;
 }
@@ -224,17 +224,83 @@ bool Seed::Core::Testing::Test::Text::StringIntConvert::Excecute() {
 	int Pattern4 = 105;
 	int Pattern5 = 1050;
 
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern1) == L"1"; });
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern2) == L"25"; });
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern3) == L"0"; });
-	Asserts::AssertTrue([&] () InlineLambda{ return String::toString(Pattern4) == L"105"; });
-	Asserts::AssertTrue([&] () InlineLambda { return String::toString(Pattern5) == L"1050"; });
+	Asserts::AssertTrue(String::toString(Pattern1) == L"1");
+	Asserts::AssertTrue(String::toString(Pattern2) == L"25");
+	Asserts::AssertTrue(String::toString(Pattern3) == L"0");
+	Asserts::AssertTrue(String::toString(Pattern4) == L"105");
+	Asserts::AssertTrue(String::toString(Pattern5) == L"1050");
 
-	Asserts::AssertTrue([&] () InlineLambda { return L"1"S.toInt()	== Pattern1; });
-	Asserts::AssertTrue([&] () InlineLambda { return L"25"S.toInt()	== Pattern2; });
-	Asserts::AssertTrue([&] () InlineLambda { return L"0"S.toInt()	== Pattern3; });
-	Asserts::AssertTrue([&] () InlineLambda { return L"105"S.toInt()	== Pattern4; });
-	Asserts::AssertTrue([&] () InlineLambda { return L"1050"S.toInt()	== Pattern5; });
+	Asserts::AssertTrue(L"1"S.toInt()	== Pattern1);
+	Asserts::AssertTrue(L"25"S.toInt()	== Pattern2);
+	Asserts::AssertTrue(L"0"S.toInt()	== Pattern3);
+	Asserts::AssertTrue(L"105"S.toInt()	== Pattern4);
+	Asserts::AssertTrue(L"1050"S.toInt()	== Pattern5);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Text::StringSplitChar::Excecute() {
+	auto text1 = L"123.123.123"S;
+
+	auto items1 = text1.Split(L'.');
+
+	Asserts::AssertTrue(items1.All(ArrowFunct(x, x == L"123")));
+
+	auto text2 = L"123.123.123."S;
+
+	auto items2 = text2.Split(L'.');
+
+	Asserts::AssertTrue(items2.All(ArrowFunct(x, x == L"123")));
+
+	auto text3 = L"1.1.1.1"S;
+
+	auto items3 = text3.Split(L'.');
+
+	Asserts::AssertTrue(items3.All(ArrowFunct(x, x == L"1")));
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Text::StringSplitCharLiteral::Excecute() {
+	auto text1 = L"123::123::123"S;
+
+	auto items1 = text1.Split(L"::");
+
+	Asserts::AssertTrue(items1.All(ArrowFunct(x, x == L"123")));
+
+	auto text2 = L"123::123::123::"S;
+
+	auto items2 = text2.Split(L"::");
+
+	Asserts::AssertTrue(items2.All(ArrowFunct(x, x == L"123")));
+
+	auto text3 = L"1::1::1::1"S;
+
+	auto items3 = text3.Split(L"::");
+
+	Asserts::AssertTrue(items3.All(ArrowFunct(x, x == L"1")));
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Text::StringSplitString::Excecute() {
+	auto text1 = L"123::123::123"S;
+
+	auto items1 = text1.Split(L"::"S);
+
+	Asserts::AssertTrue(items1.All(ArrowFunct(x, x == L"123")));
+
+	auto text2 = L"123::123::123::"S;
+
+	auto items2 = text2.Split(L"::"S);
+
+	Asserts::AssertTrue(items2.All(ArrowFunct(x, x == L"123")));
+
+	auto text3 = L"1::1::1::1"S;
+
+	auto items3 = text3.Split(L"::"S);
+
+	Asserts::AssertTrue(items3.All(ArrowFunct(x, x == L"1")));
 
 	return true;
 }

@@ -194,8 +194,6 @@ Seed::Boolean Seed::Core::Init::Protection() noexcept
 			return false;
 		if (!DisableRemoteImage())
 			return false;
-		if (!DisableDynamicCode())
-			return false;
 	}
 
 	if (!InitModuleFilter())
