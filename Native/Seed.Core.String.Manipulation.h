@@ -61,6 +61,8 @@ namespace Seed
                 ///<returns>Силку на поточний рядок</returns>
                 TBaseString& Resize(SizeT newSize) {
                     TBaseString* This = static_cast<TBaseString*>(this);
+                    newSize++;
+
                     if (This->str == nullptr)
                     {
                         This->str = static_cast<CharStr>(This->operator new[](sizeof(Char)* newSize));
@@ -68,21 +70,21 @@ namespace Seed
                         This->CurrentSize = 1;
                         This->ReservedSize = newSize;
                         return *This;
+                    }     
+
+                    if(This->CurrentSize > newSize) {
+                        This->str[newSize - 1] = L'\0';
+                        This->CurrentSize = newSize;
                     }
-                    if (This->CurrentSize < newSize)
-                        This->str[newSize] = L'\0';
-                    newSize++;
-                    CharStr buf = static_cast<CharStr>(This->operator new[](sizeof(Char)* newSize));
-                    if (This->CurrentSize > newSize) {
-                        Memory::Copy(This->str, buf, newSize * sizeof(Char));
-                        This->ReservedSize = This->CurrentSize = newSize;
-                    }
-                    else {
+
+                    if(This->ReservedSize < newSize) {
+                        CharStr buf = static_cast<CharStr>(This->operator new[](sizeof(Char)* newSize));
                         Memory::Copy(This->str, buf, This->CurrentSize * sizeof(Char));
                         This->ReservedSize = newSize;
+                        This->operator delete[](This->str);
+                        This->str = buf;
                     }
-                    This->operator delete[](This->str);
-                    This->str = buf;
+                    
                     return *This;
                 }
 
@@ -471,6 +473,29 @@ namespace Seed
                         }
                     }
                     return Math::Max<SizeT>();
+                }
+                
+                /// <summary>
+                /// Розширення рядка якщо він менший ніж вказаний розмір
+                /// і заповнення вільного простору певним символом
+                /// </summary>
+                /// <param name="requiredSize">Розмір до якого треба розширити рядок</param>
+                /// <param name="fillerCharacter">Символ заповнювач</param>
+                /// <returns>Посилання на </returns>
+                TBaseString& ResizeToFixed(SizeT requiredSize, Char fillerCharacter = L' ') {
+                    TBaseString* This = static_cast<TBaseString*>(this);
+                    if (This->Lenght >= requiredSize)
+                        return *This;
+
+                    This->Reserve(requiredSize + CurrentSettings().MemoryManager.StringReserveSize);
+                    for (SizeT i = This->Lenght; i < requiredSize; i++)
+                    {
+                        This->str[i] = fillerCharacter;
+                    }
+                    This->str[requiredSize] = L'\0';
+                    This->CurrentSize = requiredSize;
+
+                    return *This;
                 }
 			protected:
                 virtual ~TManipulationStringPart() = 0 {}

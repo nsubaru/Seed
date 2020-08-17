@@ -231,7 +231,7 @@ namespace Seed {
                 template<typename TLambda>
                 const BaseConcurencyArray& ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT count) const {
                     if (startIndex > this->Count)
-                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __LINE__, __FUNCSIG__);
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, startIndex, this->Count);
                     if (startIndex + count > this->Count)
                         count = this->Count - startIndex;
 

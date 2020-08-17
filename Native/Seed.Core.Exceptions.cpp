@@ -36,6 +36,9 @@ static ForceInline ExceptionsHeapT& GetExceptionsHeap() {
 
 #define ExceptionsHeap GetExceptionsHeap()
 
+LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo);
+PVOID vehHandleId;
+
 Boolean Seed::Core::Init::Exceptions() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
@@ -64,11 +67,14 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 
 	ExceptionsHeap.AllocatedMemBlksCount = ExceptionsHeap.AllocatedMemory = 0;
 
+	vehHandleId = RtlAddVectoredExceptionHandler(TRUE, FirstVehHandler);
+
 	return true;
 }
 
 void Seed::Core::Stop::Exceptions() noexcept
 {
+	RtlRemoveVectoredExceptionHandler(vehHandleId);
 	RtlDestroyHeap(ExceptionsHeap.HeapHandle);
 }
 
@@ -426,19 +432,59 @@ void Seed::Core::Exceptions::Exception::RawException::Dispose() {
 
 #pragma region VEH handler
 
-//LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
-//	switch (ExceptionInfo->ExceptionRecord->ExceptionCode)
-//	{
-//	case STATUS_INTEGER_OVERFLOW:
-//		Throw(Seed::Exceptions::IntegerOverflowException(ExceptionPosition));
-//	case STATUS_INTEGER_DIVIDE_BY_ZERO:
-//		Throw(Seed::Exceptions::DivideByZero(ExceptionPosition));
-//	default:
-//		break;
-//	}
-//
-//	return EXCEPTION_CONTINUE_SEARCH;
-//}
+LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
+	switch (ExceptionInfo->ExceptionRecord->ExceptionCode)
+	{
+	case EH_EXCEPTION_NUMBER:
+		return EXCEPTION_CONTINUE_SEARCH;
+	case STATUS_INTEGER_OVERFLOW:
+		Throw(Seed::Exceptions::IntegerOverflowException(ExceptionPosition));
+	case STATUS_INTEGER_DIVIDE_BY_ZERO:
+		Throw(Seed::Exceptions::DivideByZero(ExceptionPosition));
+#if !(PreReleaseMode || DebugMode)
+	case STATUS_BREAKPOINT:
+		Seed::toCoreLog(L"Критична помилка: Відбувається відлагодження");
+		break;
+#endif
+	case STATUS_HEAP_CORRUPTION:
+		Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
+#if (PreReleaseMode || DebugMode)
+		__debugbreak();
+#endif
+		NtTerminateProcess(NtCurrentProcess(), STATUS_HEAP_CORRUPTION);
+		break;
+	case STATUS_ACCESS_VIOLATION:
+	{
+		Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+#if (PreReleaseMode || DebugMode)
+		__debugbreak();
+#endif
+		EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)ExceptionInfo->ExceptionRecord; //-V1027
+		NullPointException::Types type;
+		switch (sehException->ExceptionInformation[0])
+		{
+		case 0:
+			type = NullPointException::Types::Read;
+			break;
+		case 1:
+			type = NullPointException::Types::Write;
+			break;
+		case 8:
+			type = NullPointException::Types::Execute;
+			break;
+		default:
+			type = NullPointException::Types::Read;
+			break;
+		}
+		Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
+	}
+	break;
+	default:
+		break;
+	}
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
 
 #pragma endregion
 

@@ -110,6 +110,30 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::LastCondi
 	return Core::Containers::Array<SizeT>::Generate(ArrowFunct(i, i), 10).Last(ArrowFunct(x, true)) == 9;
 }
 
+bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::MaxItem::Excecute() {
+	return Core::Containers::Array<SizeT>::Generate(ArrowFunct(i, i), 10).Max() == 9;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::MaxItemField::Excecute() {
+	return Core::Containers::Array<String>({ L"1"S, L"12"S, L"123"S }).Max(ArrowFunct(x, x.Lenght)) == 3;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::MaxByItemField::Excecute() {
+	return Core::Containers::Array<String>({ L"1"S, L"12"S, L"123"S }).MaxBy(ArrowFunct(x, x.Lenght)) == L"123";
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::MinItem::Excecute() {
+	return Core::Containers::Array<SizeT>::Generate(ArrowFunct(i, i), 10).Min() == 0;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::MinItemField::Excecute() {
+	return Core::Containers::Array<String>({ L"1"S, L"12"S, L"123"S }).Min(ArrowFunct(x, x.Lenght)) == 1;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::MinByItemField::Excecute() {
+	return Core::Containers::Array<String>({ L"1"S, L"12"S, L"123"S }).MinBy(ArrowFunct(x, x.Lenght)) == L"1";
+}
+
 #pragma endregion
 
 #pragma region Concurency Array
@@ -213,6 +237,30 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::FirstConditi
 
 bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::LastConditionArray::Excecute() {
 	return Core::Containers::ConcurencyArray<SizeT>::Generate(ArrowFunct(i, i), 10).Last(ArrowFunct(x, true)) == 9;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::MaxItem::Excecute() {
+	return Core::Containers::ConcurencyArray<SizeT>::Generate(ArrowFunct(i, i), 10).Max() == 9;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::MaxItemField::Excecute() {
+	return Core::Containers::ConcurencyArray<String>({ L"1"S, L"12"S, L"123"S }).Max(ArrowFunct(x, x.Lenght)) == 3;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::MaxByItemField::Excecute() {
+	return Core::Containers::ConcurencyArray<String>({ L"1"S, L"12"S, L"123"S }).MaxBy(ArrowFunct(x, x.Lenght)) == L"123";
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::MinItem::Excecute() {
+	return Core::Containers::ConcurencyArray<SizeT>::Generate(ArrowFunct(i, i), 10).Min() == 0;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::MinItemField::Excecute() {
+	return Core::Containers::ConcurencyArray<String>({ L"1"S, L"12"S, L"123"S }).Min(ArrowFunct(x, x.Lenght)) == 1;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::MinByItemField::Excecute() {
+	return Core::Containers::ConcurencyArray<String>({ L"1"S, L"12"S, L"123"S }).MinBy(ArrowFunct(x, x.Lenght)) == L"1";
 }
 
 #pragma endregion

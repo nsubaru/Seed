@@ -24,17 +24,20 @@
 //so we must use stack as storage for msg
 #pragma warning(disable: 6262)
 
+
 struct TLogFile {
 	HANDLE handle = nullptr;
 	IO_STATUS_BLOCK ioBlock = { 0 };
 	Seed::Threading::SRWLock lock = Seed::Threading::SRWLock();
 };
 
+TLogFile* LogFileStructData;
+
 //Статична функція отримання керуючої структури логування
-static TLogFile& GetLogFile() {
-	static TLogFile LogFileStructData;
-	return LogFileStructData;
+inline static TLogFile& GetLogFile() {
+	return *LogFileStructData;
 }
+
 namespace Seed
 {
 	inline namespace Core
@@ -81,8 +84,9 @@ void FormatCurrentTime(Seed::Char* buffer) {
 	buffer[20] = '0' + timeFields.Milliseconds;
 }
 
-Seed::Boolean Seed::Core::Init::Loging() noexcept
+Seed::Boolean Seed::Core::Init::Loging(void* logFileStructData) noexcept
 {
+	LogFileStructData = (TLogFile*)logFileStructData;
 	BOOLEAN state;
 	RtlAdjustPrivilege(SE_TIME_ZONE_PRIVILEGE, TRUE, FALSE, &state);
 	Char raw[sizeof(size_t) + 1024];

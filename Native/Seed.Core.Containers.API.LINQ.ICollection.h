@@ -116,27 +116,27 @@ namespace Seed {
 					/// Копіює елементи колекції в нову колекцію
 					/// </summary>
 					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди перетворення елементів</typeparam>
 					/// <returns>Нова колекція з копіями елементів</returns>
 					template<template <typename> typename NewCollection,
-						typename Lambda,
-						typename U = typename TypeTraits::LambdaType<Lambda>::ReturnType,
+						typename TLambda,
+						typename U = typename TypeTraits::LambdaType<TLambda>::ReturnType,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
 						(
-							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&> ||  
-							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>
+							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&> ||  
+							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>
 						)&&
 						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
 						>,
 						bool
 					> = true>
-						NewCollection<U> CopyTo(Lambda&& lambda) {
+						NewCollection<U> CopyTo(TLambda&& lambda) {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
-								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+								if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
 								{
 									Instance.UnsafeSet(lambda(Item, Index), Index);
 								}
@@ -149,7 +149,7 @@ namespace Seed {
 						}
 						else {
 							NewCollection<U> Instance = NewCollection<U>();
-							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+							if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
 							{
 								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
@@ -171,27 +171,27 @@ namespace Seed {
 					/// Копіює елементи колекції в нову колекцію
 					/// </summary>
 					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
-					/// <typeparam name="Lambda">Тип лямбди перетворення елементів</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди перетворення елементів</typeparam>
 					/// <returns>Нова колекція з копіями елементів</returns>
 					template<template <typename> typename NewCollection,
-						typename Lambda,
-						typename U = typename TypeTraits::LambdaType<Lambda>::ReturnType,
+						typename TLambda,
+						typename U = typename TypeTraits::LambdaType<TLambda>::ReturnType,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
 						(
-							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&> ||  
-							TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>
+							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&> ||  
+							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>
 						)&&
 						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
 						>,
 						bool
 					> = true>
-						NewCollection<U> CopyTo(Lambda&& lambda) const {
+						NewCollection<U> CopyTo(TLambda&& lambda) const {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
-								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+								if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
 								{
 									Instance.UnsafeSet(lambda(Item, Index), Index);
 								}
@@ -204,7 +204,7 @@ namespace Seed {
 						}
 						else {
 							NewCollection<U> Instance = NewCollection<U>();
-							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, const T&, SizeT>)
+							if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
 							{
 								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
@@ -228,25 +228,25 @@ namespace Seed {
 					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
 					/// <returns>Нова колекція з елементами</returns>
 					template<template <typename> typename NewCollection,
-						typename Lambda,
-						typename U = typename TypeTraits::LambdaType<Lambda>::ReturnType,
+						typename TLambda,
+						typename U = typename TypeTraits::LambdaType<TLambda>::ReturnType,
 						TypeTraits::EnableIfTV<
 						TypeTraits::LogicConst<
 						(
-							TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&> ||  
-							TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>
+							TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&> ||  
+							TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&, SizeT>
 						)&&
 						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
 						>,
 						bool
 					> = true>
-						NewCollection<U> MoveTo(Lambda&& lambda) {
+						NewCollection<U> MoveTo(TLambda&& lambda) {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							SizeT Index = 0;
 							ThisCollectionRef.RemoveAll([&](T&& Item) InlineLambda {
-								if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>)
+								if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&, SizeT>)
 								{
 									Instance.UnsafeSet(MoveRValue(lambda(MoveRValue(Item), Index)), Index);
 								}
@@ -260,7 +260,7 @@ namespace Seed {
 						}
 						else {
 							NewCollection<U> Instance = NewCollection<U>();
-							if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, U, T&&, SizeT>){ 
+							if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&, SizeT>){ 
 								SizeT Index = 0;
 								ThisCollectionRef.RemoveAll([&] (T&& Item) InlineLambda
 								{
@@ -282,52 +282,52 @@ namespace Seed {
 					/// <summary>
 					/// Обхід усіх елементів в колекції
 					/// </summary>
-					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&amp;) або void(*)(T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda> 
-					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
-							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					ForceInline ThisCollection& ForEach(Lambda&& lambda) {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, T&> || Concepts::IsInvockable<TLambda, T&, SizeT> ||
+							  Concepts::IsInvockable<TLambda, const T&> || Concepts::IsInvockable<TLambda, const T&, SizeT>)
+					ForceInline ThisCollection& ForEach(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
 					/// <summary>
 					/// Обхід усіх елементів в колекції
 					/// </summary>
-					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&amp;) або void(*)(const T&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda> 
-					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					ForceInline const ThisCollection& ForEach(Lambda&& lambda) const {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, const T&> || Concepts::IsInvockable<TLambda, const T&, SizeT>)
+					ForceInline const ThisCollection& ForEach(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
 					/// <summary>
 					/// Обхід усіх елементів в колекції
 					/// </summary>
-					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(T&amp;) або void(*)(T&amp;, SizeT)</param>
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda> 
-					requires (Concepts::IsInvockable<Lambda, T&> || Concepts::IsInvockable<Lambda, T&, SizeT> ||
-							  Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					ForceInline ThisCollection& ForEach(Lambda&& lambda, SizeT сount) {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, T&> || Concepts::IsInvockable<TLambda, T&, SizeT> ||
+							  Concepts::IsInvockable<TLambda, const T&> || Concepts::IsInvockable<TLambda, const T&, SizeT>)
+					ForceInline ThisCollection& ForEach(TLambda&& lambda, SizeT сount) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), сount);
 					}
 
 					/// <summary>
 					/// Обхід усіх елементів в колекції
 					/// </summary>
-					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
 					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(const T&amp;) або void(*)(const T&amp;, SizeT)</param>
 					/// <param name="сount">Кількість елементів які треба пройти</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda> 
-					requires (Concepts::IsInvockable<Lambda, const T&> || Concepts::IsInvockable<Lambda, const T&, SizeT>)
-					ForceInline const ThisCollection& ForEach(Lambda&& lambda, SizeT count) const {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, const T&> || Concepts::IsInvockable<TLambda, const T&, SizeT>)
+					ForceInline const ThisCollection& ForEach(TLambda&& lambda, SizeT count) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), count);
 					}
 				public:
@@ -335,40 +335,40 @@ namespace Seed {
 					/// Агрегація елементів колекції
 					/// </summary>
 					/// <typeparam name="U">Вихідний тип</typeparam>
-					/// <typeparam name="Lambda">Тип лямбди</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
-					template<typename U = T, typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&>
-					ForceInline U Aggregate(Lambda&& lambda) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), U());
+					template<typename U = T, typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, U, const U&, const T&>
+					ForceInline U Aggregate(TLambda&& lambda) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, TLambda>(MoveRValue(lambda), U());
 					}
 
 					/// <summary>
 					/// Агрегація елементів колекції
 					/// </summary>
 					/// <typeparam name="U">Вихідний тип</typeparam>
-					/// <typeparam name="Lambda">Тип лямбди</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
-					template<typename U, typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&> 
-					ForceInline U Aggregate(Lambda&& lambda, const U& startValue) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), startValue);
+					template<typename U, typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, U, const U&, const T&> 
+					ForceInline U Aggregate(TLambda&& lambda, const U& startValue) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, TLambda>(MoveRValue(lambda), startValue);
 					}
 
 					/// <summary>
 					/// Агрегація елементів колекції
 					/// </summary>
 					/// <typeparam name="U">Вихідний тип</typeparam>
-					/// <typeparam name="Lambda">Тип лямбди</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди</typeparam>
 					/// <param name="lambda">Лямбда типу void(*)(U&amp;, const T&amp;)</param>
 					/// <param name="startValue">Стартове значенняя</param>
 					/// <returns>Результат обчислення</returns>
-					template<typename U, typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, U, const U&, const T&>
-					ForceInline U Aggregate(Lambda&& lambda, U&& startValue) const {
-						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, Lambda>(MoveRValue(lambda), MoveRValue(startValue));
+					template<typename U, typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, U, const U&, const T&>
+					ForceInline U Aggregate(TLambda&& lambda, U&& startValue) const {
+						return static_cast<const ThisCollection&>(*this).AggregateImpl<U, TLambda>(MoveRValue(lambda), MoveRValue(startValue));
 					}
 
 					/// <summary>
@@ -384,9 +384,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					ForceInline bool Any(Lambda&& lambda) const {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&>
+					ForceInline bool Any(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
@@ -395,9 +395,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					ForceInline bool All(Lambda&& lambda) const  {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&>
+					ForceInline bool All(TLambda&& lambda) const  {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 
@@ -406,9 +406,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					ForceInline T& First(Lambda&& lambda) {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&>
+					ForceInline T& First(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
@@ -417,9 +417,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					ForceInline T& Last(Lambda&& lambda) {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&>
+					ForceInline T& Last(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
@@ -428,9 +428,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає перший елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					ForceInline const T& First(Lambda&& lambda) const {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&>
+					ForceInline const T& First(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).FirstImpl(MoveRValue(lambda));
 					}
 
@@ -439,9 +439,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає останій елемент який підпадає під умову лямбди в колекції якщо він існує</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					ForceInline const T& Last(Lambda&& lambda) const {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&>
+					ForceInline const T& Last(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).LastImpl(MoveRValue(lambda));
 					}
 
@@ -456,11 +456,11 @@ namespace Seed {
 					/// <summary>
 					/// Видаляє всі елементи з колекції викликаючи для кожного елементу лямбду
 					/// </summary>
-					/// <param name="Lambda">Лямбда формату void(*)(T&amp;&amp;)</param>
+					/// <param name="TLambda">Лямбда формату void(*)(T&amp;&amp;)</param>
 					/// <returns>Силку на поточний об'єкт колекції</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockable<Lambda, T&&>
-					ForceInline ThisCollection& RemoveAll(Lambda&& lambda) {
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, T&&>
+					ForceInline ThisCollection& RemoveAll(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).RemoveAllImpl(MoveRValue(lambda));
 					}
 
@@ -469,17 +469,138 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Кількість елементів які підпадають під умову</returns>
-					template<typename Lambda>
-					requires Concepts::IsInvockableWithResult<Lambda, bool, const T&>
-					ForceInline SizeT GetCountIf(Lambda && lambda) {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&>
+					ForceInline SizeT GetCountIf(TLambda && lambda) {
 						return static_cast<ThisCollection&>(*this).GetCountIfImpl(MoveRValue(lambda));
 					}
+				public:
+					/// <summary>
+					/// Пошук максимального елемента в колекції
+					/// </summary>
+					/// <returns>Максимальне значення</returns>
+					ForceInline T Max() const
+					requires Concepts::IsComparableWith<T, T>
+					{
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
 
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem](const T& item){
+							if (maxItem < item)
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук максимального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук максимального</param>
+					/// <returns>Максимальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline decltype(auto) Max(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+						auto maxItem = lambda(This.First(ArrowFunct(x, true)));
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)](const T& item){
+							auto itemValue = lambda(item);
+							if (maxItem < itemValue)
+								maxItem = itemValue;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук максимального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук максимального</param>
+					/// <returns>Максимальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline T MaxBy(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)](const T& item){
+							if (lambda(maxItem) < lambda(item))
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
+
+					/// <summary>
+					/// Пошук мінімального елемента в колекції
+					/// </summary>
+					/// <returns>Максимальне значення</returns>
+					ForceInline T Min()
+					requires Concepts::IsComparableWith<T, T>
+					{
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem] (const T& item){
+							if (maxItem > item)
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук мінімального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук мінімального</param>
+					/// <returns>Мінімальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline decltype(auto) Min(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+						auto maxItem = lambda(This.First([] ([[maybe_unused]] const auto&) { return true; }));
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const T& item){
+							auto itemValue = lambda(item);
+							if (maxItem > itemValue)
+								maxItem = itemValue;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук мінімального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук мінімального</param>
+					/// <returns>Мінімальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline T MinBy(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const T& item) {
+							if (lambda(maxItem) > lambda(item))
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
+				public:
 					/// <summary>
 					/// Генерація колекції з елементами які генерує лямбда
 					/// </summary>
 					/// <param name="generator">Функція генератор формату T(*)() або T(*)(SizeT)</param>
-					/// <typeparam name="Lambda">Тип лямбди</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди</typeparam>
 					template<typename TLambda> 
 					requires Concepts::IsInvockableWithResult<TLambda, T> || Concepts::IsInvockableWithResult<TLambda, T, SizeT>
 					ForceInline static ThisCollection Generate(TLambda&& generator, SizeT count) {

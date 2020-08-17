@@ -226,6 +226,128 @@ namespace Seed {
 					ForceInline ThisCollection& Reverse() {
 						return static_cast<ThisCollection&>(*this).ReverseImpl();
 					}
+
+				public:
+					/// <summary>
+					/// Пошук максимального елемента в колекції
+					/// </summary>
+					/// <returns>Максимальне значення</returns>
+					ForceInline T Max() const
+					requires Concepts::IsComparableWith<T, T>
+					{
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem](const T& item){
+							if (maxItem < item)
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук максимального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук максимального</param>
+					/// <returns>Максимальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline decltype(auto) Max(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+						auto maxItem = lambda(This.First(ArrowFunct(x, true)));
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)](const T& item){
+							auto itemValue = lambda(item);
+							if (maxItem < itemValue)
+								maxItem = itemValue;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук максимального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук максимального</param>
+					/// <returns>Максимальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline T MaxBy(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)](const T& item){
+							if (lambda(maxItem) < lambda(item))
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
+
+					/// <summary>
+					/// Пошук мінімального елемента в колекції
+					/// </summary>
+					/// <returns>Максимальне значення</returns>
+					ForceInline T Min()
+					requires Concepts::IsComparableWith<T, T>
+					{
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem] (const T& item){
+							if (maxItem > item)
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук мінімального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук мінімального</param>
+					/// <returns>Мінімальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline decltype(auto) Min(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+						auto maxItem = lambda(This.First([] ([[maybe_unused]] const auto&) { return true; }));
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const T& item){
+							auto itemValue = lambda(item);
+							if (maxItem > itemValue)
+								maxItem = itemValue;
+						});
+
+						return maxItem;
+					}
+					/// <summary>
+					/// Пошук мінімального елемента в колекції з використанням лямбди яка вертає значення поля чи елемента
+					/// </summary>
+					/// <param name="lambda">Лямбда яка вертає значення серед якого буде відбуватись пошук мінімального</param>
+					/// <returns>Мінімальне значення</returns>
+					template<typename TLambda>
+					requires Concepts::IsInvockable<TLambda, const T&> && 
+							 (!Concepts::IsInvockableReturnVoid<TLambda, const T&>) && 
+							 Concepts::IsComparableWith<TypeTraits::InvockableResult<TLambda, const T&>, TypeTraits::InvockableResult<TLambda, const T&>>
+					ForceInline T MinBy(TLambda&& lambda) const {
+						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
+						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
+
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const T& item) {
+							if (lambda(maxItem) > lambda(item))
+								maxItem = item;
+						});
+
+						return maxItem;
+					}
 				public:
 					ForceInline virtual ~IFixedCollection() = 0 {}
 				};

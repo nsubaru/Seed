@@ -181,6 +181,30 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::To
 	return true;
 }
 
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::MaxItem::Excecute() {
+	return Core::Containers::DynamicQueue<SizeT>::Generate(ArrowFunct(i, i), 10).Max() == 9;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::MaxItemField::Excecute() {
+	return Core::Containers::DynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).Max(ArrowFunct(x, x.Lenght)) == 3;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::MaxByItemField::Excecute() {
+	return Core::Containers::DynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).MaxBy(ArrowFunct(x, x.Lenght)) == L"123";
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::MinItem::Excecute() {
+	return Core::Containers::DynamicQueue<SizeT>::Generate(ArrowFunct(i, i), 10).Min() == 0;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::MinItemField::Excecute() {
+	return Core::Containers::DynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).Min(ArrowFunct(x, x.Lenght)) == 1;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::NonConcurency::MinByItemField::Excecute() {
+	return Core::Containers::DynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).MinBy(ArrowFunct(x, x.Lenght)) == L"1";
+}
+
 #pragma endregion
 
 #pragma region Concurency
@@ -355,6 +379,30 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::TopDy
 	}
 
 	return true;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MaxItem::Excecute() {
+	return Core::Containers::ConcurencyDynamicQueue<SizeT>::Generate(ArrowFunct(i, i), 10).Max() == 9;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MaxItemField::Excecute() {
+	return Core::Containers::ConcurencyDynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).Max(ArrowFunct(x, x.Lenght)) == 3;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MaxByItemField::Excecute() {
+	return Core::Containers::ConcurencyDynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).MaxBy(ArrowFunct(x, x.Lenght)) == L"123";
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MinItem::Excecute() {
+	return Core::Containers::ConcurencyDynamicQueue<SizeT>::Generate(ArrowFunct(i, i), 10).Min() == 0;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MinItemField::Excecute() {
+	return Core::Containers::ConcurencyDynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).Min(ArrowFunct(x, x.Lenght)) == 1;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MinByItemField::Excecute() {
+	return Core::Containers::ConcurencyDynamicQueue<String>({ L"1"S, L"12"S, L"123"S }).MinBy(ArrowFunct(x, x.Lenght)) == L"1";
 }
 
 bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MultiThreadQueueProcessingDynamicQueue::Excecute() {
