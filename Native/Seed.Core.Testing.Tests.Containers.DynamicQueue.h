@@ -84,6 +84,30 @@ namespace Seed
 								class TopDynamicQueue : public TestClass<TopDynamicQueue> {
 									virtual bool Excecute() override;
 								};
+
+								class MaxItem : public TestClass<MaxItem> {
+									virtual bool Excecute() override;
+								};
+
+								class MaxItemField : public TestClass<MaxItemField> {
+									virtual bool Excecute() override;
+								};
+
+								class MaxByItemField : public TestClass<MaxByItemField> {
+									virtual bool Excecute() override;
+								};
+
+								class MinItem : public TestClass<MinItem> {
+									virtual bool Excecute() override;
+								};
+
+								class MinItemField : public TestClass<MinItemField> {
+									virtual bool Excecute() override;
+								};
+
+								class MinByItemField : public TestClass<MinByItemField> {
+									virtual bool Excecute() override;
+								};
 							}
 
 							namespace Concurency
@@ -157,6 +181,30 @@ namespace Seed
 								};
 
 								class MultiThreadQueueProcessingDynamicQueue : public TestClass<MultiThreadQueueProcessingDynamicQueue> {
+									virtual bool Excecute() override;
+								};
+
+								class MaxItem : public TestClass<MaxItem> {
+									virtual bool Excecute() override;
+								};
+
+								class MaxItemField : public TestClass<MaxItemField> {
+									virtual bool Excecute() override;
+								};
+
+								class MaxByItemField : public TestClass<MaxByItemField> {
+									virtual bool Excecute() override;
+								};
+
+								class MinItem : public TestClass<MinItem> {
+									virtual bool Excecute() override;
+								};
+
+								class MinItemField : public TestClass<MinItemField> {
+									virtual bool Excecute() override;
+								};
+
+								class MinByItemField : public TestClass<MinByItemField> {
 									virtual bool Excecute() override;
 								};
 							}

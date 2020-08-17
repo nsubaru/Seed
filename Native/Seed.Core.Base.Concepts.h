@@ -18,6 +18,12 @@ namespace Seed {
 			template<typename TCallable, typename TRet, typename ... TArgs>
 			concept IsInvockableWithResult = TypeTraits::IsInvockableWithResult<TCallable, TRet, TArgs...>;
 
+			template<typename TCallable, typename TRet, typename ... TArgs>
+			concept IsInvockableReturnSameAs = TypeTraits::IsSameV<typename TypeTraits::InvockableResult<TCallable, TArgs...>, TRet>;
+
+			template<typename TCallable, typename ... TArgs>
+			concept IsInvockableReturnVoid = TypeTraits::IsVoidV<typename TypeTraits::InvockableResult<TCallable, TArgs...>>;
+
 			/// <summary>
 			/// Перевірка чи тип U наслідується від типу T
 			/// </summary>

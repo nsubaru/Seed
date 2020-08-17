@@ -144,7 +144,7 @@ namespace Seed {
 				{
 					UInt16 HLeft = Height(node->left);
 					UInt16 HRight = Height(node->right);
-					node->height = Max(HLeft, HRight) + 1;
+					node->height = Core::Max(HLeft, HRight) + 1;
 				}
 
 				///<summary>Правий малий поворот дерева</summary>

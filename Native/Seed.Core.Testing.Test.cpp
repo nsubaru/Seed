@@ -42,10 +42,7 @@ namespace Seed
 				toCoreLog(L"Запуск тестів...");
 				DateTime startTime = DateTime::GetCurrentSystemTimeData();
 
-				SizeT maxTestNameSz = 0;
-				GetAllTests().ForEach([&](const TestRecord& record) InlineLambda{
-					if (record.Key.TypeName.Size > maxTestNameSz) maxTestNameSz = record.Key.TypeName.Lenght;
-				});
+				auto maxTestNameSz = GetAllTests().Max(ArrowFunct(record, record.Key.TypeName.Lenght));
 
 				maxTestNameSz += 10;
 

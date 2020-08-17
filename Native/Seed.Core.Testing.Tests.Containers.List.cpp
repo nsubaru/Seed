@@ -138,6 +138,30 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::ListIterat
 	return true;
 }
 
+bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::MaxItem::Excecute() {
+	return Core::Containers::List<SizeT>::Generate(ArrowFunct(i, i), 10).Max() == 9;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::MaxItemField::Excecute() {
+	return Core::Containers::List<String>({ L"1"S, L"12"S, L"123"S }).Max(ArrowFunct(x, x.Lenght)) == 3;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::MaxByItemField::Excecute() {
+	return Core::Containers::List<String>({ L"1"S, L"12"S, L"123"S }).MaxBy(ArrowFunct(x, x.Lenght)) == L"123";
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::MinItem::Excecute() {
+	return Core::Containers::List<SizeT>::Generate(ArrowFunct(i, i), 10).Min() == 0;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::MinItemField::Excecute() {
+	return Core::Containers::List<String>({ L"1"S, L"12"S, L"123"S }).Min(ArrowFunct(x, x.Lenght)) == 1;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::MinByItemField::Excecute() {
+	return Core::Containers::List<String>({ L"1"S, L"12"S, L"123"S }).MinBy(ArrowFunct(x, x.Lenght)) == L"1";
+}
+
 #pragma endregion
 
 #pragma region Concurency ConcurencyList
@@ -266,6 +290,30 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::ListIterators
 	});
 
 	return true;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::Concurency::MaxItem::Excecute() {
+	return Core::Containers::ConcurencyList<SizeT>::Generate(ArrowFunct(i, i), 10).Max() == 9;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::Concurency::MaxItemField::Excecute() {
+	return Core::Containers::ConcurencyList<String>({ L"1"S, L"12"S, L"123"S }).Max(ArrowFunct(x, x.Lenght)) == 3;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::Concurency::MaxByItemField::Excecute() {
+	return Core::Containers::ConcurencyList<String>({ L"1"S, L"12"S, L"123"S }).MaxBy(ArrowFunct(x, x.Lenght)) == L"123";
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::Concurency::MinItem::Excecute() {
+	return Core::Containers::ConcurencyList<SizeT>::Generate(ArrowFunct(i, i), 10).Min() == 0;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::Concurency::MinItemField::Excecute() {
+	return Core::Containers::ConcurencyList<String>({ L"1"S, L"12"S, L"123"S }).Min(ArrowFunct(x, x.Lenght)) == 1;
+}
+
+bool Seed::Core::Testing::Test::API::Containers::List::Concurency::MinByItemField::Excecute() {
+	return Core::Containers::ConcurencyList<String>({ L"1"S, L"12"S, L"123"S }).MinBy(ArrowFunct(x, x.Lenght)) == L"1";
 }
 
 #pragma endregion
