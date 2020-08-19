@@ -256,12 +256,16 @@ namespace Seed
                             Byte HighPart : 4;
                         }
                         Code[sizeof(SizeT)];
-                    } Converter;
+                    } Converter {};
+
+                    constexpr Char mask[] = L"0x0000000000000000";
+                    constexpr auto CurrentSize = (sizeof(mask) / 2);
+
                     Converter.Variable = Value;
-                    constexpr auto CurrentSize = (sizeof(SizeT) * 2) + 1;
+                    
                     auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     CharStr ret = (CharStr)TBaseString::operator new[](ReservedSize * sizeof(Char));
-                    ret[CurrentSize] = L'\0';
+                    Memory::Copy(mask, ret, sizeof(mask));
                 
                     Int32 len = CurrentSize - 1;
                     for (--len; len >= 0; Value >>= 4, --len) {
@@ -283,12 +287,16 @@ namespace Seed
                             Byte HighPart : 4;
                         }
                         Code[sizeof(Int32)];
-                    } Converter;
+                    } Converter {};
+
+                    constexpr Char mask[] = L"0x00000000";
+                    constexpr auto CurrentSize = (sizeof(mask) / 2);
+
                     Converter.Variable = Value;
-                    constexpr auto CurrentSize = (sizeof(Int32) * 2) + 1;
+                    
                     auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     CharStr ret = (CharStr)TBaseString::operator new[](ReservedSize * sizeof(Char));
-                    ret[CurrentSize] = L'\0';
+                    Memory::Copy(mask, ret, sizeof(mask));
 
                     Int32 len = CurrentSize - 1;
                     for (--len; len >= 0; Value >>= 4, --len) {

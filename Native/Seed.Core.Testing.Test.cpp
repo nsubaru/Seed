@@ -105,6 +105,8 @@ namespace Seed
 						toCoreLog(msg);
 
 						results += {record.Key.TypeName, TestResult::EStatus::Failure, ex.toString(), testDurration};
+
+						msg.Resize(0);
 					}
 					catch (Exception & ex) {
 						testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
@@ -121,6 +123,8 @@ namespace Seed
 
 						toCoreLog(msg);
 						results += {record.Key.TypeName, TestResult::EStatus::Exception, ex.toString(), testDurration};
+
+						msg.Resize(0);
 					}
 					catch (...) {
 						testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
@@ -136,6 +140,8 @@ namespace Seed
 
 						toCoreLog(msg);
 						results += {record.Key.TypeName, TestResult::EStatus::Exception, L"Uknown", testDurration};
+
+						msg.Resize(0);
 					}
 					});
 

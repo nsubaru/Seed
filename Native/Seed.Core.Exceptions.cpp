@@ -242,7 +242,8 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 		case STATUS_HEAP_CORRUPTION:
 			Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
 	#if (PreReleaseMode || DebugMode)
-			__debugbreak();
+			if(NtCurrentPeb()->BeingDebugged == TRUE)
+				__debugbreak();
 	#endif
 			NtTerminateProcess(NtCurrentProcess(), STATUS_HEAP_CORRUPTION);
 			break;
@@ -250,7 +251,8 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 		{
 			Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
 	#if (PreReleaseMode || DebugMode)
-			__debugbreak();
+			if(NtCurrentPeb()->BeingDebugged == TRUE)
+				__debugbreak();
 	#endif
 			EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)exData->ExceptionRecord; //-V1027
 			NullPointException::Types type;
@@ -278,7 +280,8 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 				Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
 			Seed::toCoreLog(str);
 	#if (PreReleaseMode || DebugMode)
-			__debugbreak();
+			if(NtCurrentPeb()->BeingDebugged == TRUE)
+				__debugbreak();
 	#endif
 			NtTerminateProcess(NtCurrentProcess(), exCode);
 			break;
@@ -449,7 +452,8 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 	case STATUS_HEAP_CORRUPTION:
 		Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
 #if (PreReleaseMode || DebugMode)
-		__debugbreak();
+		if(NtCurrentPeb()->BeingDebugged == TRUE)
+			__debugbreak();
 #endif
 		NtTerminateProcess(NtCurrentProcess(), STATUS_HEAP_CORRUPTION);
 		break;
@@ -457,7 +461,8 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 	{
 		Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
 #if (PreReleaseMode || DebugMode)
-		__debugbreak();
+		if(NtCurrentPeb()->BeingDebugged == TRUE)
+			__debugbreak();
 #endif
 		EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)ExceptionInfo->ExceptionRecord; //-V1027
 		NullPointException::Types type;
