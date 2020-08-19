@@ -250,7 +250,7 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName),
-						ExceptionString(L" за адресом "), ExceptionString::toString(GetMemoryAddress()),
+						ExceptionString(L" за адресом "), ExceptionString::UInt64asHex(GetMemoryAddress()),
 						ExceptionString(L" при спробі "),
 						((GetAccessType() == Types::Read) ?		ExceptionString(L"читання. ") :
 						(GetAccessType() == Types::Write) ?		ExceptionString(L"запису. ")
