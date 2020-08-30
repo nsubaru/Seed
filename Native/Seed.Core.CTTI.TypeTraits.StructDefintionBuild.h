@@ -31,17 +31,19 @@ namespace Seed
                         > {};
 
                     template<typename T>
+                    concept _IsSerelizableStruct = requires { T::FieldMetaDataGetter(); };
+
+                    template<typename T> requires _IsSerelizableStruct<T>
                     struct CTTITypeDataSpecialization<
                         T,
-                        typename Seed::Core::TypeTraits::EnableIfV<Seed::Core::TypeTraits::LogicConst<T::FieldMetaDataGetter != nullptr>::State, void>
-                    >
-                        : CTTIStructTypeDataImpl<
+                        void
+                    > : CTTIStructTypeDataImpl<
                         typename Seed::TypeTraits::RemoveCV<T>,
                         Seed::TypeTraits::IsConstV<T>,
                         Seed::TypeTraits::IsVolatileV<T>,
-                        T::FieldMetaDataGetter().IsSerilizable,
+                        true,
                         true
-                        > {
+                        >  {
                         using FieldMetaData = decltype(T::FieldMetaDataGetter());
                         using Fields = typename FieldMetaData::Fields;
                         

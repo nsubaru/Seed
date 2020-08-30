@@ -11,6 +11,9 @@ namespace Seed
 		{
 			using NonSerelizableType = Serilization::NonSerelizableType;
 
+			/// <summary>
+			/// Запис про тип даних(який підтримує серелізацію)
+			/// </summary>
 			class DataTypeRecord : IDisposable, Serilization::ISerilizable<DataTypeRecord> {
 			private:
 				template<typename T>
@@ -291,7 +294,10 @@ namespace Seed
 					DefStructFieldData(Data, isSereilizable)
 				);
 			public:
-				template<typename T>
+				/// <summary>
+				/// Конструктор з тегу типу, тип мусить підтримувати серелізацію
+				/// </summary>
+				template<typename T> //requires CTTI::Concepts::IsCttiSerelizable<T>
 				DataTypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
 					CTTI::TypeName<TypeTraits::RemoveCVRefV<T>>(),
 					CTTI::CXXTypeName<TypeTraits::RemoveCVRefV<T>>(),
@@ -313,81 +319,194 @@ namespace Seed
 				))
 				{}
 
+				/// <summary>
+				/// Ім'я типу
+				/// </summary>
+				/// <returns>Вертає текстове представлення імені типу</returns>
 				const String& GetTypeName() const {
 					return data->typeName;
 				}
 
+				/// <summary>
+				/// Cxx ім'я типу
+				/// </summary>
+				/// <returns>Вертає текстове представлення декорованого імені типу</returns>
 				const String& GetCxxTypeName() const {
 					return data->cxxTypeName;
 				}
 
+				/// <summary>
+				/// Схема типу
+				/// </summary>
+				/// <returns>Вертає текстове представлення схеми типу</returns>
 				const String& GetTypeMetaData() const {
 					return data->typeMetaData;
 				}
 
+				/// <summary>
+				/// Вказує чи тип серелізується
+				/// </summary>
+				/// <returns>Логічне значення</returns>
 				bool GetIsSerelizableType() const {
 					return data->isSereilizable;
 				}
 
+				/// <summary>
+				/// Функція серелізації з Seed.Reflection.DynamicObject
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				SerelizeFunctionType GetSerelizeFunction() const {
 					return data->serelizeFunction;
 				}
 
+				/// <summary>
+				/// Функція десерелізації з Seed::Core::Reflection::DynamicObject
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				DeSerelizeFunctionType GetDeSerelizeFunction() const {
 					return data->deSerelizeFunction;
 				}
 
+				/// <summary>
+				/// Функція створення об'єкта як Seed::Core::Reflection::DynamicObject
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				BuilderFunctionType GetBuilderFunction() const {
 					return data->builderFunction;
 				}
 
+				/// <summary>
+				/// Функція серелізації з Seed::Core::Containers::Dynamic
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				SerelizeToDynamicFunctionType GetSerelizeToDynamicFunction() const {
 					return data->serelizeToDynamicFunction;
 				}
 
+				/// <summary>
+				/// Функція десерелізації з Seed::Core::Containers::Dynamic
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				DeSerelizeToDynamicFunctionType GetDeSerelizeToDynamicFunction() const {
 					return data->deSerelizeToDynamicFunction;
 				}
 
+				/// <summary>
+				/// Функція створення об'єкта як Seed::Core::Containers::Dynamic
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				BuilderToDynamicFunctionType GetBuilderToDynamicFunction() const {
 					return data->builderToDynamicFunction;
 				}
 
+				/// <summary>
+				/// Функція яка вказує розмір даних після серелізації з об'єкта Seed::Core::Reflection::DynamicObject
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				DataSizeFunctionType GetDataSizeFunction() const {
 					return data->dataSizeFunctionType;
 				}
 
+				/// <summary>
+				/// Функція яка вказує розмір даних після серелізації з об'єкта Seed::Core::Containers::Dynamic
+				/// </summary>
+				/// <returns>Покажчик на фунцію</returns>
 				DataSizeDynamicFunctionType GetDataSizeDynamicFunction() const {
 					return data->dataSizeDynamicFunctionType;
 				}
-					
+				
+				/// <summary>
+				/// Інформація про тип
+				/// </summary>
+				/// <returns>RTTITypeRecord</returns>
 				const RTTI::RTTITypeRecord& GetTypeInfo() const {
 					return data->typeInfo;
 				}
 
+			public:
+				/// <summary>
+				/// Ім'я типу
+				/// </summary>
 				String Property(GetTypeName) TypeName;
-				String Property(GetCxxTypeName) CxxTypeName;
-				String Property(GetTypeMetaData) TypeMetaData;
-				bool Property(GetIsSerelizableType) IsSerelizableType;
 
+				/// <summary>
+				/// Cxx ім'я типу
+				/// </summary>
+				String Property(GetCxxTypeName) CxxTypeName;
+
+				/// <summary>
+				/// Схема типу
+				/// </summary>
+				String Property(GetTypeMetaData) TypeMetaData;
+
+				/// <summary>
+				/// Вказує чи тип серелізується
+				/// </summary>
+				Boolean Property(GetIsSerelizableType) IsSerelizableType;
+
+				/// <summary>
+				/// Інформація про тип
+				/// </summary>
+				RTTI::RTTITypeRecord Property(GetTypeInfo) TypeRecord;
+
+				/// <summary>
+				/// Функція серелізації з Seed::Core::Reflection::DynamicObject
+				/// </summary>
 				SerelizeFunctionType Property(GetSerelizeFunction) SerelizeFunction;
+
+				/// <summary>
+				/// Функція десерелізації з Seed::Core::Reflection::DynamicObject
+				/// </summary>
 				DeSerelizeFunctionType Property(GetDeSerelizeFunction) DeSerelizeFunction;
+
+				/// <summary>
+				/// Функція створення об'єкта як Seed::Core::Reflection::DynamicObject
+				/// </summary>
 				BuilderFunctionType Property(GetBuilderFunction) BuilderFunction;
 
+
+				/// <summary>
+				/// Функція серелізації з Seed::Core::Containers::Dynamic
+				/// </summary>
 				SerelizeToDynamicFunctionType Property(GetSerelizeToDynamicFunction) SerelizeToDynamicFunction;
+
+				/// <summary>
+				/// Функція десерелізації з Seed::Core::Reflection::DynamicObject
+				/// </summary>
 				DeSerelizeToDynamicFunctionType Property(GetDeSerelizeToDynamicFunction) DeSerelizeToDynamicFunction;
+
+				/// <summary>
+				/// Функція створення об'єкта як Seed::Core::Containers::Dynamic
+				/// </summary>
 				BuilderToDynamicFunctionType Property(GetBuilderToDynamicFunction) BuilderToDynamicFunction;
 
+				/// <summary>
+				/// Функція яка вказує розмір даних після серелізації з об'єкта Seed::Core::Reflection::DynamicObject
+				/// </summary>
 				DataSizeFunctionType Property(GetDataSizeFunction) DataSizeFunction;
+
+				/// <summary>
+				/// Функція яка вказує розмір даних після серелізації з об'єкта Seed::Core::Containers::Dynamic
+				/// </summary>
 				DataSizeDynamicFunctionType Property(GetDataSizeDynamicFunction) DataSizeDynamicFunction;
 
 				RefCountClass(DataTypeRecord, data);
 			public:
+				/// <summary>
+				/// Оператор рівності з іншим об'єктом <see cref="DataTypeRecord"/>
+				/// </summary>
+				/// <param name="other">Лівий операнд</param>
+				/// <returns>Результат порівняння</returns>
 				bool operator==(const DataTypeRecord& other) const {
 					return this->data->typeInfo == other.data->typeInfo ||
 						this->data->cxxTypeName == other.data->cxxTypeName;
 				}
 
+				/// <summary>
+				/// Оператор рівності з іншим об'єктом <see cref="DataTypeRecord"/>
+				/// </summary>
+				/// <param name="other">Лівий операнд</param>
+				/// <returns>Результат порівняння</returns>
 				bool operator!=(const DataTypeRecord& other) const {
 					return this->data->typeInfo != other.data->typeInfo &&
 						this->data->cxxTypeName != other.data->cxxTypeName;

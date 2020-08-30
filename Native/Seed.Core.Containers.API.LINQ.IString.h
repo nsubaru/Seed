@@ -21,17 +21,12 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&) або void(*)(TChar&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&amp;) або void(*)(TChar&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&, SizeT>::State
-						>,
-						bool
-					> = true>
-						ForceInline ThisCollection& ForEach(Lambda&& lambda) {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, TChar&> || Concepts::IsInvockable<TLambda, TChar&, SizeT> ||
+							  Concepts::IsInvockable<TLambda, const TChar&> || Concepts::IsInvockable<TLambda, const TChar&, SizeT>)
+					ForceInline ThisCollection& ForEach(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -39,18 +34,11 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&) або void(*)(TChar&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&amp;) або void(*)(TChar&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<
-						typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&, SizeT>::State
-						>,
-						bool
-					> = true>
-						ForceInline const ThisCollection& ForEach(Lambda&& lambda) const {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, const TChar&> || Concepts::IsInvockable<TLambda, const TChar&, SizeT>)
+						ForceInline const ThisCollection& ForEach(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda));
 					}
 
@@ -58,17 +46,12 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&) або void(*)(TChar&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&amp;) або void(*)(TChar&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, TChar&, SizeT>::State
-						>,
-						bool
-					> = true>
-						ForceInline ThisCollection& ForEach(Lambda&& lambda, SizeT Count) {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, TChar&> || Concepts::IsInvockable<TLambda, TChar&, SizeT> ||
+							  Concepts::IsInvockable<TLambda, const TChar&> || Concepts::IsInvockable<TLambda, const TChar&, SizeT>)
+						ForceInline ThisCollection& ForEach(TLambda&& lambda, SizeT Count) {
 						return static_cast<ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
 					}
 
@@ -76,18 +59,11 @@ namespace Seed {
 					/// Обхід усіх елементів в колекції
 					/// </summary>
 					/// <typeparam name="Lambda">Тип лямбди яка викликатиметься для кожного елементу колекції</typeparam>
-					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&) або void(*)(TChar&, SizeT)</param>
+					/// <param name="lambda">Лямбди яка викликатиметься для кожного елементу колекції. ЇЇ вигляд void(*)(TChar&amp;) або void(*)(TChar&amp;, SizeT)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<
-						typename Lambda,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&>::State ||
-						TypeTraits::IsLambdaConvertibleT<Lambda, void, const TChar&, SizeT>::State
-						>,
-						bool
-					> = true>
-						ForceInline const ThisCollection& ForEach(Lambda&& lambda, SizeT Count) const {
+					template<typename TLambda> 
+					requires (Concepts::IsInvockable<TLambda, const TChar&> || Concepts::IsInvockable<TLambda, const TChar&, SizeT>)
+						ForceInline const ThisCollection& ForEach(TLambda&& lambda, SizeT Count) const {
 						return static_cast<const ThisCollection&>(*this).ForEachImpl(MoveRValue(lambda), Count);
 					}
 				public:
@@ -102,20 +78,22 @@ namespace Seed {
 					/// <summary>
 					/// Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо в контейнері хоч щось є що підпадає під умову лямбди</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const TChar&>::State>, bool> = true>
-					ForceInline bool Any(Lambda&& lambda) {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const TChar&>
+					ForceInline bool Any(TLambda&& lambda) const {
 						return static_cast<const ThisCollection&>(*this).AnyImpl(MoveRValue(lambda));
 					}
 
 					/// <summary>
 					/// Вертає true якщо всі елементи в контейнері підпадають під умову лямбди
 					/// </summary>
-					/// <param name="lambda">Лямбда формату bool(*)(const T&)</param>
+					/// <param name="lambda">Лямбда формату bool(*)(const T&amp;)</param>
 					/// <returns>Вертає true якщо всі елементи в контейнері підпадають під умову лямбди</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const TChar&>::State>, bool> = true>
-					ForceInline bool All(Lambda&& lambda) {
+					template<typename TLambda>
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const TChar&>
+					ForceInline bool All(TLambda&& lambda) const  {
 						return static_cast<const ThisCollection&>(*this).AllImpl(MoveRValue(lambda));
 					}
 

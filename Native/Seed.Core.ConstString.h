@@ -71,6 +71,13 @@ namespace Seed {
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
+
+				InternalApiCall __declspec(noreturn) void ThrowInvalidArgumentException(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					Seed::SizeT Line,
+					const Seed::ConstString& ArgName,
+					const Seed::ConstString& Description);
 			}
 		}
 

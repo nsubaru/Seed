@@ -248,32 +248,32 @@ namespace Seed
 			public:
 				SerilizationService(const DI::IDI& idi) : This(new Data(idi)) {}
 			public:
-				template<typename T>
-				Containers::Blob Serelize(const T& data) {
+				template<typename T>// requires CTTI::Concepts::IsCttiSerelizable<T>
+				Containers::Blob Serelize(const T& data) const {
 					return Serilization::Serilize(data, This->idi.GetTypesRegistry());
 				}
 
-				template<typename T> requires Concepts::IsConstructibleWith<T>
-				T Deserelize(const Containers::Blob& data) {
+				template<typename T> requires Concepts::IsConstructibleWith<T>// && CTTI::Concepts::IsCttiSerelizable<T>
+				T Deserelize(const Containers::Blob& data) const {
 					T val = T();
 					Serilization::Deserilize(data, val, This->idi.GetTypesRegistry());
 					return val;
 				}
 
-				template<typename T>
-				String GetTypeMetaData() {
+				template<typename T>// requires CTTI::Concepts::IsCttiSerelizable<T>
+				String GetTypeMetaData() const {
 					return Serilization::MetaDataGen<T>();
 				}
 
-				Containers::Blob SerelizeDynObj(const Reflection::DynamicObject& data) {
+				Containers::Blob SerelizeDynObj(const Reflection::DynamicObject& data) const {
 					return Serelize(data);
 				}
 
-				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data) {
+				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data) const {
 					return Deserelize<Reflection::DynamicObject>(data);
 				}
 
-				String GetTypeMetaDataDynObj(const Reflection::DynamicObject& data);
+				String GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) const;
 			public:
 				RefCountClass(SerilizationService, This);
 			};

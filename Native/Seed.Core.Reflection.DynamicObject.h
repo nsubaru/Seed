@@ -7,6 +7,9 @@ namespace Seed
 	{
 		namespace Reflection
 		{
+			/// <summary>
+			/// Динамічний об'єкт, містить у собі кортеж з типів, доступ отримати можна якщо відомий тип
+			/// </summary>
 			class DynamicObject final : IDisposable{
 			private:
 				class IDynamicImpl {
@@ -89,17 +92,46 @@ namespace Seed
 					delete this->data->impl;
 				}
 			public:
+				/// <summary>
+				/// Пустий конструктор ініціалізовує пустий кортеж 
+				/// </summary>
 				DynamicObject() : data(new Data(new DynamicImpl(Containers::Tuple<>()))) {}
+				/// <summary>
+				/// Конструктор з кортежу
+				/// </summary>
+				/// <param name="tuple">Кортеж значень</param>
 				template<typename ... TTypes>
 				DynamicObject(const Containers::Tuple<TTypes...>& tuple) : data(new Data(new DynamicImpl(tuple))) {}
+				/// <summary>
+				/// Конструктор переміщення з кортежу
+				/// </summary>
+				/// <param name="tuple">Кортеж значень</param>
 				template<typename ... TTypes>
 				DynamicObject(Containers::Tuple<TTypes...>&& tuple) : data(new Data(new DynamicImpl(MoveRValue(tuple)))) {}
 
-				const RTTI::RTTITypeRecord& GetValueType() const { return data->impl->GetValueType(); }
+				/// <summary>
+				/// Вертає тип кортежу який містить на даний тип об'єкт
+				/// </summary>
+				/// <returns>Опис типу</returns>
+				RTTI::RTTITypeRecord GetValueType() const { return data->impl->GetValueType(); }
+
+				/// <summary>
+				/// Вертає схему типу для серелізатора
+				/// </summary>
+				/// <returns>Рядкове представлення схеми типів</returns>
 				const String& GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }
 
+				/// <summary>
+				/// Вертає cxx rtti опис типу
+				/// </summary>
+				/// <returns></returns>
 				const TypeInfo& GetImplementationTypeInfo() const { return data->impl->GetImplementationTypeInfo(); }
 
+				/// <summary>
+				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// </summary>
+				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
+				/// <returns>Посилання на кортеж</returns>
 				template<typename ... TTypes>
 				Containers::Tuple<TTypes...>& GetValue() {
 					if(typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo()){
@@ -111,6 +143,11 @@ namespace Seed
 					}
 				}
 
+				/// <summary>
+				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// </summary>
+				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
+				/// <returns>Незмінне посилання на кортеж</returns>
 				template<typename ... TTypes>
 				const Containers::Tuple<TTypes...>& GetValue() const {
 					if(typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo()){
@@ -122,6 +159,11 @@ namespace Seed
 					}
 				}
 
+				/// <summary>
+				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// </summary>
+				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
+				/// <returns>Посилання на кортеж</returns>
 				template<typename TTuple> requires Concepts::Tuple<TTuple>
 				TTuple GetTuple() {
 					
@@ -134,6 +176,11 @@ namespace Seed
 					}
 				}
 
+				/// <summary>
+				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// </summary>
+				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
+				/// <returns>Незмінне посилання на кортеж</returns>
 				template<typename TTuple> requires Concepts::Tuple<TTuple>
 				const TTuple GetTuple() const {
 					
@@ -145,8 +192,15 @@ namespace Seed
 						Throw(NullPointException(ExceptionPosition));
 					}
 				}
-
+			public:
+				/// <summary>
+				/// Опис типу який містить кортеж
+				/// </summary>
 				RTTI::RTTITypeRecord Property(GetValueType) ValueType;
+
+				/// <summary>
+				/// Схема серелізації
+				/// </summary>
 				String Property(GetSerilizationMetadata) SerilizationMetadata;
 
 				RefCountClass(DynamicObject, data);

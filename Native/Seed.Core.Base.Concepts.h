@@ -27,8 +27,10 @@ namespace Seed {
 			/// <summary>
 			/// Перевірка чи тип U наслідується від типу T
 			/// </summary>
-			template<typename T, typename U>
-			concept IsBasedOn = TypeTraits::IsBasedOnV<T, U>;
+			/// <typeparam name="TBase">Базовий класс(інтерфейс)</typeparam>
+			/// <typeparam name="TDerived">Дочірній класс(реалізація)</typeparam>
+			template<typename TBase, typename TDerived>
+			concept IsBasedOn = TypeTraits::IsBasedOnV<TBase, TDerived>;
 
 			/// <summary>
 			/// Перевірка чи тип T і U є одним і тим самим типом

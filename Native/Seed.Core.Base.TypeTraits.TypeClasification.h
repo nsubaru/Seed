@@ -96,6 +96,12 @@ namespace Seed
             /// </summary>
             template <class TTy>
             constexpr bool IsFinalV = __is_final(TTy);   
+
+            /// <summary>
+            /// Вертає true якщо це клас або структура
+            /// </summary>
+            template<typename T>
+            constexpr bool IsClassOrStructV = __is_class(T);
 		}
 	}
 }

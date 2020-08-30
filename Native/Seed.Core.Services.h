@@ -1,6 +1,7 @@
 #pragma once
 #include "Seed.Core.Services.Base.h"
 #include "Seed.Core.Services.CoreLogger.h"
+#include "Seed.Core.Services.SystemTaskPoolService.h"
 #include "Seed.Core.Services.InternalSensors.h"
 #include "Seed.Core.Services.EventService.h"
 #include "Seed.Core.Services.ExcecutableStatusManagment.h"

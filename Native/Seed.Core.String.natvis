@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::BaseString&lt;*&gt;">
-    <DisplayString>{{ Lenght={CurrentSize} Text = {str == nullptr ? "nullptr" : str, su} }}</DisplayString>
-    <StringView>str, su</StringView>
+    <DisplayString>{{ Lenght={CurrentSize} Text = {str == nullptr ? L"nullptr" : str, su} }}</DisplayString>
+    <StringView>{str == nullptr ? L"nullptr" : str, su}</StringView>
     <Expand>
       <Item Name="Lenght">CurrentSize</Item>
       <Item Name="Capacity">ReservedSize</Item>

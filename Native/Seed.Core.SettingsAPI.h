@@ -882,6 +882,16 @@ namespace Seed {
 			/// Налаштування менеджера розділіва хоста
 			/// </summary>
 			PartitionManagerConfigurationT Property(GetPartitionManagerConfiguration, SetPartitionManagerConfiguration) PartitionManagerConfiguration;
+		
+			/// <summary>
+			/// Версія ядра
+			/// </summary>
+			KernelVersionT Property(GetCurrentKernelVersion) CurrentKernelVersion;
+
+			/// <summary>
+			/// Версія налаштувань ядра
+			/// </summary>
+			KernelVersionT Property(GetSettingsKernelVersion) SettingsKernelVersion;
 		public:
 			void SaveCurrentSettings();
 		};

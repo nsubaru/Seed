@@ -257,6 +257,22 @@ namespace Seed
 						di.RemoveObjectType(objectRTTIRecord);
 					}
 
+					ForceInline void RegisterDataTypeRecord(const Reflection::DataTypeRecord& objectRTTIRecord) const {
+						di.RegisterDataType(objectRTTIRecord);
+					}
+
+					ForceInline void RegisterDataTypeRecord(Reflection::DataTypeRecord&& objectRTTIRecord) const {
+						di.RegisterDataType(MoveRValue(objectRTTIRecord));
+					}
+
+					ForceInline void RemoveDataTypeRecord(const Reflection::DataTypeRecord& objectRTTIRecord) const {
+						di.RemoveDataType(objectRTTIRecord);
+					}
+
+					ForceInline void RemoveDataTypeRecord(Reflection::DataTypeRecord&& objectRTTIRecord) const {
+						di.RemoveDataType(objectRTTIRecord);
+					}
+
 					ForceInline const Serilization::TypesRegistry& GetTypesRegistry() {
 						return di.data->dataTypesListForSerilization;
 					}
@@ -310,6 +326,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="rttiRecord">Мета інформація про сервіс</param>
 				template<typename TService, typename ... TCtorArgs>
+				requires Concepts::IsConstructibleWith<TService, TCtorArgs...>
 				DepencyInjector& Register(Reflection::ObjectRTTIRecord&& rttiRecord) {
 					static_assert(TypeTraits::IsConstructible<TService, TCtorArgs...>, "Cannot construct service with that types");
 
@@ -360,6 +377,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="rttiRecord">Мета інформація про сервіс</param>
 				template<typename TServiceInterface, typename TService, typename ... TCtorArgs>
+				requires Concepts::IsConstructibleWith<TService, TCtorArgs...>
 				DepencyInjector& RegisterInterface(Reflection::ObjectRTTIRecord&& rttiRecord) {
 					static_assert(TypeTraits::IsConstructible<TService, TCtorArgs...>, "Cannot construct service with that types");
 					static_assert(TypeTraits::IsBasedOnV<TServiceInterface, TService>, "Cannot register service with invalid interface");
@@ -586,6 +604,70 @@ namespace Seed
 				/// <returns>true якщо тип даних зареєтрований</returns>
 				ForceInline Boolean IsExistDataTypesRecordByType(const RTTI::RTTITypeRecord& id) {
 					return data->dataTypeTableForNativeLevel.IsExist(id);
+				}
+
+				/// <summary>
+				/// Реєстрація об'єкта
+				/// </summary>
+				/// <param name="rttiRecord">Мета інформація про об'єкт</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				DepencyInjector& RegisterDataType(Reflection::DataTypeRecord&& rttiRecord) {
+					
+					if (this->data->dataTypeRecordRefs.IsExist(rttiRecord.TypeRecord))
+					{
+						++this->data->dataTypeRecordRefs[rttiRecord.TypeRecord];
+					}
+					else
+					{
+						this->data->dataTypeTableForNativeLevel.Insert(rttiRecord.TypeRecord, rttiRecord);
+						this->data->dataTypeTableForManagedLevel.Insert(rttiRecord.TypeName, rttiRecord);
+						this->data->dataTypeRecordRefs.Insert({ rttiRecord.TypeRecord, 1 });
+						this->data->dataTypesListForSerilization.AddLast({ rttiRecord.TypeRecord, rttiRecord });
+					}
+
+					return *this;
+				}
+
+				/// <summary>
+				/// Реєстрація об'єкта
+				/// </summary>
+				/// <param name="rttiRecord">Мета інформація про об'єкт</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				DepencyInjector& RegisterDataType(const Reflection::DataTypeRecord& rttiRecord) {
+					
+					if (this->data->dataTypeRecordRefs.IsExist(rttiRecord.TypeRecord))
+					{
+						++this->data->dataTypeRecordRefs[rttiRecord.TypeRecord];
+					}
+					else
+					{
+						this->data->dataTypeTableForNativeLevel.Insert(rttiRecord.TypeRecord, rttiRecord);
+						this->data->dataTypeTableForManagedLevel.Insert(rttiRecord.TypeName, rttiRecord);
+						this->data->dataTypeRecordRefs.Insert({ rttiRecord.TypeRecord, 1 });
+						this->data->dataTypesListForSerilization.AddLast({ rttiRecord.TypeRecord, rttiRecord });
+					}
+
+					return *this;
+				}
+
+				/// <summary>
+				/// Дереєстрація об'єкта
+				/// </summary>
+				/// <param name="rttiRecord">Мета інформація про об'єкт</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				DepencyInjector& RemoveDataType(const Reflection::DataTypeRecord& rttiRecord) {
+					if (this->data->dataTypeRecordRefs.IsExist(rttiRecord.TypeRecord))
+					{
+						if (--this->data->dataTypeRecordRefs[rttiRecord.TypeRecord] == 0)
+						{
+							this->data->dataTypeTableForNativeLevel.Delete(rttiRecord.TypeRecord);
+							this->data->dataTypeTableForManagedLevel.Remove(rttiRecord.TypeName);
+							this->data->dataTypeRecordRefs.Delete(rttiRecord.TypeRecord);
+							this->data->dataTypesListForSerilization.RemoveIf([&](const auto& item){ return item.Key == rttiRecord.TypeRecord; });
+						}
+					}
+
+					return *this;
 				}
 			public:
 				RefCountClass(DepencyInjector, data);

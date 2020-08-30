@@ -46,3 +46,8 @@ __declspec(noreturn) void Seed::Core::Internals::Exceptions::ThrowInternalError(
 __declspec(noreturn) void Seed::Core::Internals::Exceptions::ThrowDivideByZero(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(DivideByZero(File, Function, Line));
 }
+
+__declspec(noreturn) void Seed::Core::Internals::Exceptions::ThrowInvalidArgumentException(const Seed::ConstAString& File, const Seed::ConstAString& Function, Seed::SizeT Line, const Seed::ConstString& ArgName, const Seed::ConstString& Description) {
+	Throw(InvalidArgumentException(File, Function, Line, ArgName, Description));
+}
+

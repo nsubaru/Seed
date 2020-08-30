@@ -25,14 +25,9 @@ namespace Seed {
 					/// </summary>
 					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
 					/// <returns>Нова колекція з копіями елементів</returns>
-					template<template <typename> typename NewCollection,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
-						>,
-						bool
-					> = true>
-						NewCollection<T> CopyTo() {
+					template<template <typename> typename NewCollection>
+					requires Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<T> CopyTo() {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<T>::IsDynamic == false) {
 							NewCollection<T> Instance = NewCollection<T>(ThisCollectionRef.Count);
@@ -55,14 +50,9 @@ namespace Seed {
 					/// </summary>
 					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
 					/// <returns>Нова колекція з копіями елементів</returns>
-					template<template <typename> typename NewCollection,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
-						>,
-						bool
-					> = true>
-						NewCollection<T> CopyTo() const {
+					template<template <typename> typename NewCollection> 
+					requires Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<T> CopyTo() const {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<T>::IsDynamic == false) {
 							NewCollection<T> Instance = NewCollection<T>(ThisCollectionRef.Count);
@@ -85,14 +75,9 @@ namespace Seed {
 					/// </summary>
 					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
 					/// <returns>Нова колекція з елементами</returns>
-					template<template <typename> typename NewCollection,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
-						>,
-						bool
-					> = true>
-						NewCollection<T> MoveTo() {
+					template<template <typename> typename NewCollection>
+					requires Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<T> MoveTo() {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<T>::IsDynamic == false) {
 							NewCollection<T> Instance = NewCollection<T>(ThisCollectionRef.Count);
@@ -120,23 +105,16 @@ namespace Seed {
 					/// <returns>Нова колекція з копіями елементів</returns>
 					template<template <typename> typename NewCollection,
 						typename TLambda,
-						typename U = typename TypeTraits::LambdaType<TLambda>::ReturnType,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						(
-							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&> ||  
-							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>
-						)&&
-						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
-						>,
-						bool
-					> = true>
-						NewCollection<U> CopyTo(TLambda&& lambda) {
+						typename U = typename TypeTraits::InvockableResult<TLambda, const T&>> 
+					requires 
+							Concepts::IsInvockable<TLambda, const T&> && 
+							Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<U> CopyTo(TLambda&& lambda) {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
-								if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
+								if constexpr (TypeTraits::IsInvockable<TLambda, const T&>)
 								{
 									Instance.UnsafeSet(lambda(Item, Index), Index);
 								}
@@ -149,7 +127,7 @@ namespace Seed {
 						}
 						else {
 							NewCollection<U> Instance = NewCollection<U>();
-							if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
+							if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
 							{
 								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
@@ -175,23 +153,16 @@ namespace Seed {
 					/// <returns>Нова колекція з копіями елементів</returns>
 					template<template <typename> typename NewCollection,
 						typename TLambda,
-						typename U = typename TypeTraits::LambdaType<TLambda>::ReturnType,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						(
-							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&> ||  
-							TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>
-						)&&
-						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
-						>,
-						bool
-					> = true>
-						NewCollection<U> CopyTo(TLambda&& lambda) const {
+						typename U = typename TypeTraits::InvockableResult<TLambda, const T&, SizeT>> 
+					requires 
+						Concepts::IsInvockable<TLambda, const T&, SizeT> && 
+						Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<U> CopyTo(TLambda&& lambda) {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
-								if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
+								if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
 								{
 									Instance.UnsafeSet(lambda(Item, Index), Index);
 								}
@@ -204,7 +175,103 @@ namespace Seed {
 						}
 						else {
 							NewCollection<U> Instance = NewCollection<U>();
-							if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, const T&, SizeT>)
+							if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
+								{
+									Instance.UnsafeAdd(lambda(Item, Index));
+								});
+							}
+							else
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
+								{
+									Instance.UnsafeAdd(lambda(Item));
+								});
+							}
+							return Instance;
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи колекції в нову колекцію
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди перетворення елементів</typeparam>
+					/// <returns>Нова колекція з копіями елементів</returns>
+					template<template <typename> typename NewCollection,
+						typename TLambda,
+						typename U = typename TypeTraits::InvockableResult<TLambda, const T&>> 
+					requires 
+							Concepts::IsInvockable<TLambda, const T&> && 
+							Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<U> CopyTo(TLambda&& lambda) const {
+						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+						if constexpr (NewCollection<U>::IsDynamic == false) {
+							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
+								if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
+								{
+									Instance.UnsafeSet(lambda(Item, Index), Index);
+								}
+								else
+								{
+									Instance.UnsafeSet(lambda(Item), Index);
+								}
+								});
+							return Instance;
+						}
+						else {
+							NewCollection<U> Instance = NewCollection<U>();
+							if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
+								{
+									Instance.UnsafeAdd(lambda(Item, Index));
+								});
+							}
+							else
+							{
+								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
+								{
+									Instance.UnsafeAdd(lambda(Item));
+								});
+							}
+							return Instance;
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи колекції в нову колекцію
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <typeparam name="TLambda">Тип лямбди перетворення елементів</typeparam>
+					/// <returns>Нова колекція з копіями елементів</returns>
+					template<template <typename> typename NewCollection,
+						typename TLambda,
+						typename U = typename TypeTraits::InvockableResult<TLambda, const T&, SizeT>> 
+					requires 
+							Concepts::IsInvockable<TLambda, const T&, SizeT> && 
+							Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<U> CopyTo(TLambda&& lambda) const {
+						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+						if constexpr (NewCollection<U>::IsDynamic == false) {
+							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
+							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
+								if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
+								{
+									Instance.UnsafeSet(lambda(Item, Index), Index);
+								}
+								else
+								{
+									Instance.UnsafeSet(lambda(Item), Index);
+								}
+								});
+							return Instance;
+						}
+						else {
+							NewCollection<U> Instance = NewCollection<U>();
+							if constexpr (TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
 							{
 								ThisCollectionRef.ForEach([&] (const T& Item, SizeT Index) InlineLambda
 								{
@@ -229,24 +296,17 @@ namespace Seed {
 					/// <returns>Нова колекція з елементами</returns>
 					template<template <typename> typename NewCollection,
 						typename TLambda,
-						typename U = typename TypeTraits::LambdaType<TLambda>::ReturnType,
-						TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<
-						(
-							TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&> ||  
-							TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&, SizeT>
-						)&&
-						TypeTraits::IsBasedOnV<ICollectionGenericBase, NewCollection<T>>
-						>,
-						bool
-					> = true>
-						NewCollection<U> MoveTo(TLambda&& lambda) {
+						typename U = typename TypeTraits::InvockableResult<TLambda, T&&>> 
+					requires 
+							Concepts::IsInvockable<TLambda, T&&> && 
+							Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<U> MoveTo(TLambda&& lambda) {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							SizeT Index = 0;
 							ThisCollectionRef.RemoveAll([&](T&& Item) InlineLambda {
-								if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&, SizeT>)
+								if constexpr (TypeTraits::IsInvockable<TLambda, T&&, SizeT>)
 								{
 									Instance.UnsafeSet(MoveRValue(lambda(MoveRValue(Item), Index)), Index);
 								}
@@ -260,7 +320,57 @@ namespace Seed {
 						}
 						else {
 							NewCollection<U> Instance = NewCollection<U>();
-							if constexpr (TypeTraits::IsLambdaConvertibleV<TLambda, U, T&&, SizeT>){ 
+							if constexpr (TypeTraits::IsInvockable<TLambda, T&&, SizeT>){ 
+								SizeT Index = 0;
+								ThisCollectionRef.RemoveAll([&] (T&& Item) InlineLambda
+								{
+									Instance.UnsafeAdd(MoveRValue(lambda(MoveRValue(Item), Index)));
+									Index++;
+								});
+							}
+							else
+							{
+								ThisCollectionRef.RemoveAll([&] (T&& Item) InlineLambda
+								{
+									Instance.UnsafeAdd(MoveRValue(lambda(MoveRValue(Item))));
+								});
+							}
+							return Instance;
+						}
+					}
+
+					/// <summary>
+					/// Переміщення елементів в нову колекцію, з старої колекції елементи зникають
+					/// </summary>
+					/// <typeparam name="NewCollection">Тип нової колекції</typeparam>
+					/// <returns>Нова колекція з елементами</returns>
+					template<template <typename> typename NewCollection,
+						typename TLambda,
+						typename U = typename TypeTraits::InvockableResult<TLambda, T&&, SizeT>> 
+					requires 
+							Concepts::IsInvockable<TLambda, T&&, SizeT> && 
+							Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
+					NewCollection<U> MoveTo(TLambda&& lambda) {
+						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+						if constexpr (NewCollection<U>::IsDynamic == false) {
+							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
+							SizeT Index = 0;
+							ThisCollectionRef.RemoveAll([&](T&& Item) InlineLambda {
+								if constexpr (TypeTraits::IsInvockable<TLambda, T&&, SizeT>)
+								{
+									Instance.UnsafeSet(MoveRValue(lambda(MoveRValue(Item), Index)), Index);
+								}
+								else
+								{
+									Instance.UnsafeSet(MoveRValue(lambda(MoveRValue(Item))), Index);
+								}
+								Index++;
+								});
+							return Instance;
+						}
+						else {
+							NewCollection<U> Instance = NewCollection<U>();
+							if constexpr (TypeTraits::IsInvockable<TLambda, T&&, SizeT>){ 
 								SizeT Index = 0;
 								ThisCollectionRef.RemoveAll([&] (T&& Item) InlineLambda
 								{

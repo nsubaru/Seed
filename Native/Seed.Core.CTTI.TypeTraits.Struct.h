@@ -35,7 +35,7 @@ namespace Seed
                     struct CustomStruct {
                         using Type = T;
 
-                        static constexpr SizeT FieldsSize = [&] ()
+                        static constexpr SizeT FieldsSize = [] ()
                         {
                             SizeT result = 0; for (auto s : { TFields::FieldSize... }) result += s; return result;
                         }();
@@ -44,13 +44,15 @@ namespace Seed
                        
                         using Fields = typename Containers::Tuple<TFields...>;
 
-                        static constexpr Boolean IsSerilizable = Seed::TypeTraits::OrV(CTTITypeData<typename TFields::Type>::IsSerilizable...);
+                        static constexpr Boolean IsSerilizable = [] () constexpr
+                        {
+                            return (CTTITypeData<typename TFields::Type>::IsSerilizable && ...);
+                        }();
                     
                         constexpr static Containers::Tuple<typename TFields::Type...> ToTuple(const Type& data) {
                             return Containers::Tuple<typename TFields::Type...>{TFields::Selector(data)...};
                         };
                     };
-
 
                     template<
                         typename T, 
