@@ -33,7 +33,7 @@ namespace Seed
                 /// <param name="startPos">Позиція першого символа який потрібно скопіювати</param>
                 /// <param name="count">Кількість символів</param>
                 /// <returns>Новий рядок який містить частину поточного рядка</returns>
-				TBaseString SubString(SizeT startPos, SizeT count) const {
+				TBaseString SubString(SizeT startPos, SizeT count = Math::Max<SizeT>()) const {
 					if (count == 0)
 						return TBaseString();
 
@@ -47,7 +47,7 @@ namespace Seed
 						Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, startPos, size);
 					}
 
-					if (startPos + count > size)
+					if (count == Math::Max<SizeT>() || startPos + count > size)
 					{
 						count = size - startPos;
 					}

@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.BaseTypes.h"
 #include "Seed.Core.CTTI.TypeTraits.Primitives.h"
 #include "Seed.Core.CTTI.TypeTraits.HeapMetaData.h"
 #include "Seed.Core.CTTI.TypeTraits.String.h"

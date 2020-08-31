@@ -909,25 +909,21 @@ namespace Seed {
 				template<typename TLambda>
 				ForceInline BaseMap& ForEachKeyImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&>) {
-						return This->lock.ShareLock([&]() -> BaseMap& {
-							auto node = this->This->root;
-							if (node != nullptr)
-							{
-								ForEachKeyImplWithoutIndex(node, lambda);
-							}
-							return *this;
-							});
+						auto node = this->This->root;
+						if (node != nullptr)
+						{
+							ForEachKeyImplWithoutIndex(node, lambda);
+						}
+						return *this;
 					}
 					else if constexpr (TypeTraits::IsInvockableWithResult<TLambda, void, const TKey&, SizeT>) {
-						return This->lock.ShareLock([&]() -> BaseMap& {
-							auto node = this->This->root;
-							if (node != nullptr)
-							{
-								SizeT index = 0;
-								ForEachKeyImplWithIndex(node, index, lambda);
-							}
-							return *this;
-							});
+						auto node = this->This->root;
+						if (node != nullptr)
+						{
+							SizeT index = 0;
+							ForEachKeyImplWithIndex(node, index, lambda);
+						}
+						return *this;
 					}
 					else {
 						static_assert(false);

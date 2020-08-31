@@ -1094,7 +1094,7 @@ namespace Seed
 				NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 			}
 
-			void WaitForMany(const Containers::Array<SynchronizeEvent>& events, Boolean isWaitAll, SizeT TimeOutMs) {
+			UInt64 WaitForMany(const Containers::Array<SynchronizeEvent>& events, Boolean isWaitAll, SizeT TimeOutMs) {
 				if (events.Count > static_cast<SizeT>(Math::Max<UInt32>()))
 					Throw(InvalidArgumentException(ExceptionPosition, L"events.Count", L"events count must be less than ULONG max"));
 
@@ -1106,14 +1106,14 @@ namespace Seed
 				try
 				{
 					if (events.Count == 0)
-						return;
+						return 0;
 					if (events.Count == 1)
 					{
 						events.First([] (const SynchronizeEvent&)
 						{
 							return true;
 						}).Wait();
-						return;
+						return 1;
 					}
 					hEvents = new HANDLE[events.Count];
 					events.ForEach([&] (const SynchronizeEvent& event, SizeT Index)
@@ -1121,7 +1121,7 @@ namespace Seed
 						hEvents[Index] = event.data->handle;
 					});
 
-					NtWaitForMultipleObjects(
+					NTSTATUS status = NtWaitForMultipleObjects(
 						static_cast<ULONG>(events.Count),
 						hEvents,
 						(isWaitAll) ? WaitAll : WaitAny,
@@ -1130,10 +1130,13 @@ namespace Seed
 					);
 
 					delete[] hEvents;
+
+					return status - STATUS_WAIT_0;
 				}
 				catch (...)
 				{
 					delete[] hEvents;
+					ReThrow;
 				}
 			}
 		}

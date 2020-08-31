@@ -66,16 +66,18 @@ namespace Seed
                 template<typename THeap, typename T>
                 struct BaseSerlizationHandler<THeap, T, typename TypeTraits::EnableIfV<IsNotSerlizable<T>, void>> {
                     ForceInline static void SerilizeImpl(const T& data, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-                        Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+                        Throw(NonSerelizableType(ExceptionPosition, CTTI::TypeName<T>()));
                         __assume(false);
                     }
 
                     ForceInline static constexpr SizeT DataSize(const T& data, UnusedData const TypesRegistry& registry) {
-                        return sizeof(data);
+                        Throw(NonSerelizableType(ExceptionPosition, CTTI::TypeName<T>()));
+                        __assume(false);
                     }
 
                     ForceInline static constexpr Boolean IsMemCopy() {
-                        return false;
+                        Throw(NonSerelizableType(ExceptionPosition, CTTI::TypeName<T>()));
+                        __assume(false);
                     }
 
                     ForceInline static constexpr auto TypeHint() {
@@ -89,7 +91,8 @@ namespace Seed
                     }
 
                     ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-                         Throw(InvalidArgumentException(ExceptionPosition, L"Data", L"Invalid data type"));
+                         Throw(NonSerelizableType(ExceptionPosition, CTTI::TypeName<T>()));
+                         __assume(false);
                     }
 
                     ForceInline static constexpr auto TypeMetaData() {
@@ -116,7 +119,7 @@ namespace Seed
                     CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Character ||
                     CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::FloatNumeric ||
                     CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Logic ||
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::POD
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Pod
                     )
                     &&
                     CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
@@ -301,6 +304,11 @@ namespace Seed
             template<typename T>
             ForceInline T SensitiveDeserilize(const Containers::Array<Byte>& stream, T& Object, UnusedData const TypesRegistry& registry) {
                 BaseDeserilize<Memory::SensitiveDataHeap, T>(stream, Object, registry);
+            }
+
+            template<typename T>
+            ForceInline SizeT SerilizedDataSize(const T& object, UnusedData const TypesRegistry& registry) {
+                return Details::BaseSerlizationHandler<THeap, T>::DataSize(Object, registry);
             }
 
             template<typename THeap, typename T>

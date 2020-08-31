@@ -178,12 +178,13 @@ namespace Seed {
 					}
 					else if constexpr (TypeTraits::IsSameV<Int, UInt64>)
 					{
-						UInt64 res[2];
-						_umul128Impl(this->value, second.value, res);
-						if (res[1] > 0)
+						UInt64 res;
+						UInt64 highPart = 0;
+						res = _umul128Impl(this->value, second.value, &highPart);
+						if (highPart > 0)
 							Seed::Core::Internals::Exceptions::ThrowIntegerOverflowException(__FILE__, __FUNCSIG__, __LINE__);
 						else
-							return this->value = res[0];
+							return this->value = res;
 					}
 					//Unreacheable code
 					Seed::Core::Internals::Exceptions::ThrowInternalError(__FILE__, __FUNCSIG__, __LINE__);

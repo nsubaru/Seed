@@ -3,11 +3,21 @@
 
 namespace Seed {
 	inline namespace Core {
+		namespace Containers
+		{
+			namespace LINQ
+			{
+				class ISmartPtrGenericBase {
+				protected:
+					virtual ~ISmartPtrGenericBase() = 0 {}
+				};
+			}
+		}
 		/// <summary>
 		/// Розумний покажчик, сам автоматично видаляє покажчик при зникненні посилань на об'єкт
 		/// </summary>
 		template<typename T>
-		class SmartPtr : IDisposable {
+		class SmartPtr : protected IDisposable, public Containers::LINQ::ISmartPtrGenericBase {
 			struct Data {
 				T* ptr;
 				RefCountT RefCount;

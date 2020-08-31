@@ -441,7 +441,7 @@ namespace Seed
                         int_part += double_part;
                     }
 
-                    return int_part * ((sign) ? -1.0 : 1.0);
+                    return int_part * ((sign) ? -1.0f : 1.0f);
                 }
 
                 ///<summary>Перетворення тексту в дійсне число Double. На початку може стояти символ '+' або '-'</summary>
@@ -483,6 +483,25 @@ namespace Seed
                         int_part += double_part;
                     }
                     return int_part * ((sign) ? -1.0 : 1.0);
+                }
+
+                /// <summary>
+                /// Перетворення рядка в логічне значення, 
+                /// якщо 'true' або 'True' то вертає true, 
+                /// якщо 'false' або 'False' то вертає false,
+                /// інакше генерує помилку InvalidArgumentException
+                /// </summary>
+                /// <exception cref="Seed::Exceptions::InvalidArgumentException">Якщо рядок неможливо перетворити в логічне значення</exception>
+                /// <returns>Логічне значення</returns>
+                Boolean toBoolean() const {
+                    const TBaseString& This = static_cast<const TBaseString&>(*this);
+
+                    if (This == L"true" || This == L"True")
+                        return true;
+                    else if (This == L"false" || This == L"False")
+                        return false;
+                    else
+                        Internals::Exceptions::ThrowInvalidArgumentException(__FILE__, __FUNCSIG__, __LINE__, L"this", L"не вірне значення рядка");
                 }
 #pragma endregion
                 ///<summary>Вертає рядкове представлення UUID</summary>

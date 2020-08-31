@@ -4,6 +4,7 @@
 #include "Seed.Core.Serilization.IntegratedTypes.h"
 #include "Seed.Core.Serilization.Collection.h"
 #include "Seed.Core.Serilization.Composits.h"
+#include "Seed.Core.Serilization.Box.h"
 
 namespace Seed
 {

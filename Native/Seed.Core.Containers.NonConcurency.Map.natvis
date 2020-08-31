@@ -4,7 +4,7 @@
     <DisplayString>{{ Lenght={This->count} RefCount={This->RefCount.count} }}</DisplayString>
     <Expand>
       <Item Name="[Reference count]">This->RefCount.count</Item>
-      <Item Name="[Lenght]">This->count</Item>
+      <Item Name="[Lenght]">This->count.count</Item>
       <TreeItems>
         <Size>This->count</Size>
         <HeadPointer>This->root</HeadPointer>

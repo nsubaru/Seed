@@ -36,7 +36,7 @@ namespace Seed
             protected:
                 template<typename LambdaT>
                 ForceInline TBaseString& ForEachImpl(LambdaT&& lambda) {
-                    if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&>) {
+                    if constexpr (TypeTraits::IsInvockable<LambdaT, UChar&>) {
                         TBaseString* This = static_cast<TBaseString*>(this);
                         for (SizeT i = 0; i < This->Lenght; i++)
                         {
@@ -44,7 +44,7 @@ namespace Seed
                         }
                         return *This;
                     }
-                    else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&, SizeT>) {
+                    else if constexpr (TypeTraits::IsInvockable<LambdaT, UChar&, SizeT>) {
                         TBaseString* This = static_cast<TBaseString*>(this);
                         for (SizeT i = 0; i < This->Lenght; i++)
                         {
@@ -59,7 +59,7 @@ namespace Seed
 
                 template<typename LambdaT>
                 ForceInline const TBaseString& ForEachImpl(LambdaT&& lambda) const {
-                    if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
+                    if constexpr (TypeTraits::IsInvockable<LambdaT, const UChar&>) {
                         const TBaseString* This = static_cast<const TBaseString*>(this);
                         for (SizeT i = 0; i < This->Lenght; i++)
                         {
@@ -67,7 +67,7 @@ namespace Seed
                         }
                         return *This;
                     }
-                    else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&, SizeT>) {
+                    else if constexpr (TypeTraits::IsInvockable<LambdaT, const UChar&, SizeT>) {
                         const TBaseString* This = static_cast<const TBaseString*>(this);
                         for (SizeT i = 0; i < This->Lenght; i++)
                         {
@@ -85,14 +85,14 @@ namespace Seed
                     TBaseString* This = static_cast<TBaseString*>(this);
                     if (count > This->Count)
                         count = This->Count;
-                    if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&>) {
+                    if constexpr (TypeTraits::IsInvockable<LambdaT, UChar&>) {
                         for (SizeT i = 0; i < count; i++)
                         {
                             lambda(This->str[i]);
                         }
                         return *This;
                     }
-                    else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, UChar&, SizeT>) {
+                    else if constexpr (TypeTraits::IsInvockable<LambdaT, UChar&, SizeT>) {
                         for (SizeT i = 0; i < count; i++)
                         {
                             lambda(This->str[i], i);
@@ -109,14 +109,14 @@ namespace Seed
                     const TBaseString* This = static_cast<const TBaseString*>(this);
                     if (count > This->Lenght)
                         count = This->Lenght;
-                    if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&>) {
+                    if constexpr (TypeTraits::IsInvockable<LambdaT, const UChar&>) {
                         for (SizeT i = 0; i < count; i++)
                         {
                             lambda(This->str[i]);
                         }
                         return *This;
                     }
-                    else if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, const UChar&, SizeT>) {
+                    else if constexpr (TypeTraits::IsInvockable<LambdaT, const UChar&, SizeT>) {
                         for (SizeT i = 0; i < count; i++)
                         {
                             lambda(This->str[i], i);

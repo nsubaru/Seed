@@ -98,14 +98,14 @@ namespace Seed {
 				/// </summary>
 				String Property(GetName) Name;
 			public:
-				friend void WaitForAll(Containers::Array<SynchronizeEvent>&& events);
-				friend void WaitForAny(Containers::Array<SynchronizeEvent>&& events);
-				friend void WaitForAll(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs);
-				friend void WaitForAny(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs);
-				friend void WaitForAll(const Containers::Array<SynchronizeEvent>& events);
-				friend void WaitForAny(const Containers::Array<SynchronizeEvent>& events);
-				friend void WaitForAll(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs);
-				friend void WaitForAny(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs);
+				friend UInt64 WaitForAll(Containers::Array<SynchronizeEvent>&& events);
+				friend UInt64 WaitForAny(Containers::Array<SynchronizeEvent>&& events);
+				friend UInt64 WaitForAll(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs);
+				friend UInt64 WaitForAny(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs);
+				friend UInt64 WaitForAll(const Containers::Array<SynchronizeEvent>& events);
+				friend UInt64 WaitForAny(const Containers::Array<SynchronizeEvent>& events);
+				friend UInt64 WaitForAll(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs);
+				friend UInt64 WaitForAny(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs);
 			private:
 				/// <summary>
 				/// Реалізація очікування на декілька подій
@@ -113,69 +113,69 @@ namespace Seed {
 				/// <param name="events">Масив подій</param>
 				/// <param name="isWaitAll">Чи очікувати на всі, якщо false то очікування відбувається на будь-яку з</param>
 				/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-				friend void WaitForMany(const Containers::Array<SynchronizeEvent>& events, Boolean isWaitAll, SizeT timeOutMs = Math::Max<SizeT>());
+				friend UInt64 WaitForMany(const Containers::Array<SynchronizeEvent>& events, Boolean isWaitAll, SizeT timeOutMs = Math::Max<SizeT>());
 			};
 
 			/// <summary>
 			/// Очікування на всі події в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			ForceInline void WaitForAll(Containers::Array<SynchronizeEvent>&& events) {
-				WaitForMany(events, true);
+			ForceInline UInt64 WaitForAll(Containers::Array<SynchronizeEvent>&& events) {
+				return WaitForMany(events, true);
 			}
 			/// <summary>
 			/// Очікування на любу з подій в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			ForceInline void WaitForAny(Containers::Array<SynchronizeEvent>&& events) {
-				WaitForMany(events, false);
+			ForceInline UInt64 WaitForAny(Containers::Array<SynchronizeEvent>&& events) {
+				return WaitForMany(events, false);
 			}
 			/// <summary>
 			/// Очікування на всі події в масиві подій з максимальним часом очікування
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			ForceInline void WaitForAll(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs) {
-				WaitForMany(events, true, timeOutMs);
+			ForceInline UInt64 WaitForAll(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs) {
+				return WaitForMany(events, true, timeOutMs);
 			}
 			/// <summary>
 			/// Очікування на любу з подій в масиві подій з максимальним часом очікування
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			ForceInline void WaitForAny(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs) {
-				WaitForMany(events, false, timeOutMs);
+			ForceInline UInt64 WaitForAny(Containers::Array<SynchronizeEvent>&& events, SizeT timeOutMs) {
+				return WaitForMany(events, false, timeOutMs);
 			}
 
 			/// <summary>
 			/// Очікування на всі події в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			ForceInline void WaitForAll(const Containers::Array<SynchronizeEvent>& events) {
-				WaitForMany(events, true);
+			ForceInline UInt64 WaitForAll(const Containers::Array<SynchronizeEvent>& events) {
+				return WaitForMany(events, true);
 			}
 			/// <summary>
 			/// Очікування на любу з подій в масиві подій
 			/// </summary>
 			/// <param name="events">Масив подій</param>
-			ForceInline void WaitForAny(const Containers::Array<SynchronizeEvent>& events) {
-				WaitForMany(events, false);
+			ForceInline UInt64 WaitForAny(const Containers::Array<SynchronizeEvent>& events) {
+				return WaitForMany(events, false);
 			}
 			/// <summary>
 			/// Очікування на всі події в масиві подій з максимальним часом очікування
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			ForceInline void WaitForAll(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs) {
-				WaitForMany(events, true, timeOutMs);
+			ForceInline UInt64 WaitForAll(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs) {
+				return WaitForMany(events, true, timeOutMs);
 			}
 			/// <summary>
 			/// Очікування на любу з подій в масиві подій з максимальним часом очікування
 			/// </summary>
 			/// <param name="events">Масив подій</param>
 			/// <param name="timeOutMs">Час очікування або SizeT max якщо потрібно очікувати без таймауту</param>
-			ForceInline void WaitForAny(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs) {
-				WaitForMany(events, false, timeOutMs);
+			ForceInline UInt64 WaitForAny(const Containers::Array<SynchronizeEvent>& events, SizeT timeOutMs) {
+				return WaitForMany(events, false, timeOutMs);
 			}
 		}
 	}

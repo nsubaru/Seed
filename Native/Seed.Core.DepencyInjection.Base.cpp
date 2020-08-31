@@ -45,6 +45,14 @@ void Seed::Core::DI::DepencyInjector::UnRegisterServiceByTypeRecord(const RTTI::
 		});
 
 		UnregisterServiceTypes(service);
+
+		data->serviceStore.RemoveIf([&] (const auto& item)
+		{
+			return item->rttiRecord.GetRTTITypeInfo() == service->rttiRecord.GetRTTITypeInfo();
+		});
+
+		data->serviceTableForManagedLevel.Remove(service->rttiRecord.ClassName);
+		data->serviceTableForNativeLevel.Delete(service->rttiRecord.GetRTTITypeInfo());
 	}
 	else
 	{

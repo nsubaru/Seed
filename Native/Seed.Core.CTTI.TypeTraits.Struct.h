@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.BaseTypes.h"
 #include "Seed.Core.CTTI.TypeTraits.Collections.h"
 
 namespace Seed
@@ -10,8 +10,6 @@ namespace Seed
         {
             namespace TypeTraits
             {
-                
-
                 template<typename Serilizable >
                 struct ISerilizable;
 
@@ -35,7 +33,7 @@ namespace Seed
                     struct CustomStruct {
                         using Type = T;
 
-                        static constexpr SizeT FieldsSize = [&] ()
+                        static constexpr SizeT FieldsSize = [] ()
                         {
                             SizeT result = 0; for (auto s : { TFields::FieldSize... }) result += s; return result;
                         }();
@@ -44,13 +42,15 @@ namespace Seed
                        
                         using Fields = typename Containers::Tuple<TFields...>;
 
-                        static constexpr Boolean IsSerilizable = Seed::TypeTraits::OrV(CTTITypeData<typename TFields::Type>::IsSerilizable...);
+                        static constexpr Boolean IsSerilizable = [] () constexpr
+                        {
+                            return (CTTITypeData<typename TFields::Type>::IsSerilizable && ...);
+                        }();
                     
                         constexpr static Containers::Tuple<typename TFields::Type...> ToTuple(const Type& data) {
                             return Containers::Tuple<typename TFields::Type...>{TFields::Selector(data)...};
                         };
                     };
-
 
                     template<
                         typename T, 
@@ -69,17 +69,14 @@ namespace Seed
                         TIsConvertibleToTuple
                         > {};
 
-                    template<typename T>
-                    struct CTTITypeDataSpecialization<
-                        T, 
-                        typename Seed::Core::TypeTraits::EnableIfV<Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
-                    >
-                        : CTTIObjectTypeDataImpl<
-                        typename Seed::TypeTraits::RemoveCV<T>, 
-                        Seed::TypeTraits::IsConstV<T>, 
-                        Seed::TypeTraits::IsVolatileV<T>,
-                        T::FieldMetaData::IsSerilizable,
-                        false
+                    template<typename T> requires Concepts::IsObjectCttiType<T>
+                    struct CTTITypeDataSpecialization<T, void> : 
+                        CTTIObjectTypeDataImpl<
+                            typename Seed::TypeTraits::RemoveCV<T>, 
+                            Seed::TypeTraits::IsConstV<T>, 
+                            Seed::TypeTraits::IsVolatileV<T>,
+                            T::FieldMetaData::IsSerilizable,
+                            false
                         > 
                     {
                         static constexpr bool IsConvertibleToTuple = false;
@@ -88,7 +85,7 @@ namespace Seed
                 }
 
                 template<typename Serilizable >
-                struct ISerilizable: public ISerilizableBase {
+                struct ISerilizable: public Details::ISerilizableGenericBase {
                 protected:
                     virtual Byte* GetDataPtr() const = 0;
                 private:

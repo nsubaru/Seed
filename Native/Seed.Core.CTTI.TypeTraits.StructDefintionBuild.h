@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.BaseTypes.h"
 #include "Seed.Core.CTTI.TypeTraits.Collections.h"
 #include "Seed.Core.CTTI.TypeTraits.Struct.h"
 
@@ -30,18 +30,17 @@ namespace Seed
                         TIsConvertibleToTuple
                         > {};
 
-                    template<typename T>
+                    template<typename T> requires Concepts::IsStructCttiType<T>
                     struct CTTITypeDataSpecialization<
                         T,
-                        typename Seed::Core::TypeTraits::EnableIfV<Seed::Core::TypeTraits::LogicConst<T::FieldMetaDataGetter != nullptr>::State, void>
-                    >
-                        : CTTIStructTypeDataImpl<
+                        void
+                    > : CTTIStructTypeDataImpl<
                         typename Seed::TypeTraits::RemoveCV<T>,
                         Seed::TypeTraits::IsConstV<T>,
                         Seed::TypeTraits::IsVolatileV<T>,
-                        T::FieldMetaDataGetter().IsSerilizable,
+                        true,
                         true
-                        > {
+                        >  {
                         using FieldMetaData = decltype(T::FieldMetaDataGetter());
                         using Fields = typename FieldMetaData::Fields;
                         

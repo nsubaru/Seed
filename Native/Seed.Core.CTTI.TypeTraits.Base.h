@@ -9,6 +9,13 @@ namespace Seed
 		{
 			namespace TypeTraits
 			{
+				namespace Details
+				{
+					struct ISerilizableGenericBase {};
+
+					template<typename T>
+					struct IsDynamicT : Core::TypeTraits::LogicFalse {};
+				}
 				///<summary>Перелік категорій типів</summary>
 				enum class EType : UInt8
 				{
@@ -28,99 +35,79 @@ namespace Seed
 					Pointer,
 					Reference,
 					FixedArray,
-					POD,
 					Struct,
-					Dynamic,
 					Object,
+					Dynamic,
 					Interface,
+					Pod,
 					Undefine = Math::Max<UInt8>()
 				};
+			}
 
-                struct ISerilizableBase {};
-
-				namespace Details
-				{
-#pragma region Base implementation
-					template<typename T, EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile, bool TIsConvertibleToTuple = false>
-					struct BaseCTTITypeDataImpl
-					{
-						using Type = T;
-						static constexpr EType TypeClass = TTypeClass;
-						static constexpr SizeT Size = sizeof(T);
-						static constexpr Boolean IsSerilizable = TIsSerilizable;
-						static constexpr Boolean IsConst = TIsConst;
-						static constexpr Boolean IsVolatile = TIsVolatile;
-						static constexpr auto TypeName = CTTI::TypeName<T>();
-						static constexpr auto CXXTypeName = CTTI::CXXTypeName<T>();
-						static constexpr Boolean IsConvertibleToTuple = TIsConvertibleToTuple;
-
-                        static constexpr Boolean IsContaineSubTypes =
-                            !(
-                            TypeClass == EType::Logic ||
-                            TypeClass == EType::Numeric ||
-                            TypeClass == EType::FloatNumeric ||
-                            TypeClass == EType::Character ||
-                            TypeClass == EType::POD);
-					};
-
-					template<EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile>
-					struct BaseCTTITypeDataImpl<void, TTypeClass, TIsSerilizable, TIsConst, TIsVolatile, false>
-					{
-						using Type = void;
-						static constexpr EType TypeClass = EType::Undefine;
-						static constexpr SizeT Size = 0;
-						static constexpr Boolean IsSerilizable = false;
-						static constexpr Boolean IsConst = TIsConst;
-						static constexpr Boolean IsVolatile = TIsVolatile;
-						static constexpr auto TypeName = CTTI::TypeName<void>();
-						static constexpr auto CXXTypeName = CTTI::CXXTypeName<void>();
-						static constexpr Boolean IsConvertibleToTuple = false;
-
-                        static constexpr Boolean IsContaineSubTypes = false;
-					};
-#pragma endregion
-#pragma region Default Implementation
-					template<typename T, bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl : BaseCTTITypeDataImpl<T, EType::Undefine, false, TIsConst, TIsVolatile>
-					{};
-
-                    template<typename T, typename Enable = void>
-                    struct CTTITypeDataSpecialization
-						: CTTITypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>>
-					{};
-
-					template<typename T>
-					struct CTTITypeData : CTTITypeDataSpecialization<T>
-					{
-					};
-#pragma endregion
-#pragma region Pointer, Reference and CArray implementations
-					
-					template<typename T, bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl<T*, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<T*, EType::Pointer, false, TIsConst, TIsVolatile>
-					{
-						using PointerType = CTTITypeData<T>;
-					};
-
-					template<typename T, bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl<T&, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<T&, EType::Reference, false, TIsConst, TIsVolatile>
-					{
-						using ReferenceType = CTTITypeData<T>;
-					};
-
-					template<typename T, SizeT TSize, bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl<T[TSize], TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<T[TSize], EType::FixedArray, CTTITypeData<T>::IsSerilizable, TIsConst, TIsVolatile>
-					{
-                        static constexpr SizeT Count = TSize;
-						using ItemType = CTTITypeData<T>;
-					};
-#pragma endregion
-
-				}
-#pragma region Public using
+			namespace Concepts
+			{
 				template<typename T>
-				using CTTITypeMetaData = Details::CTTITypeData<T>;
-#pragma endregion
+				concept IsLogicCttiType = Core::Concepts::IsSame<T, Boolean>;
+
+				template<typename T>
+				concept IsNumericCttiType = Core::TypeTraits::IsIntegerNumber<T>;
+
+				template<typename T>
+				concept IsEnumertationCttiType = Core::TypeTraits::IsEnumV<T>;
+
+				template<typename T>
+				concept IsCharacterCttiType = Core::TypeTraits::IsCharacter<T>;
+
+				template<typename T>
+				concept IsNtTimeCttiType = 
+					Core::TypeTraits::IsSameV<T, Date> ||
+					Core::TypeTraits::IsSameV<T, DateTime> ||
+					Core::TypeTraits::IsSameV<T, DateSpan>;
+
+				template<typename T>
+				concept IsCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ICollectionGenericBase, T>;
+
+				template<typename T>
+				concept IsStringCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::IStringCollectionGenericBase, T>;
+
+				template<typename T>
+				concept IsFixedCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::IFixedCollectionGenericBase, T>;
+
+				template<typename T>
+				concept IsAssociableCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::IAssociableCollectionGenericBase, T>;
+
+				template<typename T>
+				concept IsBoxCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ISmartPtrGenericBase, T> || 
+										Core::TypeTraits::IsBasedOnV<Containers::LINQ::ILazyGenericBase, T>;
+
+				template<typename T>
+				concept IsTupleCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ITupleGenericBase, T>;
+
+				template<typename T>
+				concept IsPairCttiType = Core::TypeTraits::Collection::IsPair<T>;
+
+				template<typename T>
+				concept IsPointerCttiType = Core::TypeTraits::IsPointerT<T>::State;
+
+				template<typename T>
+				concept IsReferenceCttiType = Core::TypeTraits::IsReferenceV<T>;
+				
+				template<typename T>
+				concept IsFixedArrayCttiType = Core::TypeTraits::IsCArray<T>::State;
+
+				template<typename T>
+				concept IsStructCttiType = requires { T::FieldMetaDataGetter(); };
+
+				template<typename T>
+				concept IsObjectCttiType = Core::TypeTraits::IsBasedOnV<TypeTraits::Details::ISerilizableGenericBase, T>;
+
+				template<typename T>
+				concept IsDynamicCttiType = TypeTraits::Details::IsDynamicT<T>::State;
+
+				template<typename T>
+				concept IsPodCttiType = Core::TypeTraits::IsClassOrStructV<T> && 
+										Core::TypeTraits::IsPodV<T> && 
+										!(IsStructCttiType<T> || IsObjectCttiType<T>);
 			}
 		}
 	}
