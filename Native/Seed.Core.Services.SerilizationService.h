@@ -21,6 +21,12 @@ namespace Seed
 					struct CTTITypeDataImpl<Reflection::DynamicObject, TIsConst, TIsVolatile> 
 						: BaseCTTITypeDataImpl<Reflection::DynamicObject, EType::Dynamic, true, TIsConst, TIsVolatile>
 					{};
+
+					template<>
+					struct IsDynamicT<Containers::Dynamic> : Core::TypeTraits::LogicTrue {};
+
+					template<>
+					struct IsDynamicT<Reflection::DynamicObject> : Core::TypeTraits::LogicTrue {};
 				}
 			}
 		}

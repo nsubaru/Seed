@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.BaseTypes.h"
 #include "Seed.Core.CTTI.TypeTraits.Collections.h"
 
 namespace Seed
@@ -10,8 +10,6 @@ namespace Seed
         {
             namespace TypeTraits
             {
-                
-
                 template<typename Serilizable >
                 struct ISerilizable;
 
@@ -71,17 +69,14 @@ namespace Seed
                         TIsConvertibleToTuple
                         > {};
 
-                    template<typename T>
-                    struct CTTITypeDataSpecialization<
-                        T, 
-                        typename Seed::Core::TypeTraits::EnableIfV<Seed::Core::TypeTraits::IsBasedOnV<ISerilizableBase, T>, void>
-                    >
-                        : CTTIObjectTypeDataImpl<
-                        typename Seed::TypeTraits::RemoveCV<T>, 
-                        Seed::TypeTraits::IsConstV<T>, 
-                        Seed::TypeTraits::IsVolatileV<T>,
-                        T::FieldMetaData::IsSerilizable,
-                        false
+                    template<typename T> requires Concepts::IsObjectCttiType<T>
+                    struct CTTITypeDataSpecialization<T, void> : 
+                        CTTIObjectTypeDataImpl<
+                            typename Seed::TypeTraits::RemoveCV<T>, 
+                            Seed::TypeTraits::IsConstV<T>, 
+                            Seed::TypeTraits::IsVolatileV<T>,
+                            T::FieldMetaData::IsSerilizable,
+                            false
                         > 
                     {
                         static constexpr bool IsConvertibleToTuple = false;
@@ -90,7 +85,7 @@ namespace Seed
                 }
 
                 template<typename Serilizable >
-                struct ISerilizable: public ISerilizableBase {
+                struct ISerilizable: public Details::ISerilizableGenericBase {
                 protected:
                     virtual Byte* GetDataPtr() const = 0;
                 private:

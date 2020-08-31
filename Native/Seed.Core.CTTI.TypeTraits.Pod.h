@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.BaseTypes.h"
 
 namespace Seed
 {
@@ -20,30 +20,17 @@ namespace Seed
                     struct CTTIPodTypeDataImpl
                         : BaseCTTITypeDataImpl<
                         T,
-                        EType::POD,
+                        EType::Pod,
                         TIsSerilizable,
                         TIsConst,
                         TIsVolatile,
                         false
                         > {};
 
-                    template<typename T>
-                    concept IsSerelizableObject = Core::Concepts::IsBasedOn<ISerilizableBase, T>;
-
-                    template<typename T>
-                    concept IsSerelizableStruct = requires { T::FieldMetaDataGetter(); };
-
-                    template<typename T>
-                    constexpr bool IsCttiPod =
-                        !IsSerelizableObject<T> &&
-                        !IsSerelizableStruct<T> &&
-                        Core::TypeTraits::IsClassOrStructV<T> &&
-                        Core::TypeTraits::IsPodV<T>;
-
-                    template<typename T>
+                    template<typename T> requires Concepts::IsPodCttiType<T>
                     struct CTTITypeDataSpecialization<
                         T,
-                        typename Seed::Core::TypeTraits::EnableIfV<IsCttiPod<T>, void>
+                        void
                     >
                         : CTTIPodTypeDataImpl<
                         typename Seed::TypeTraits::RemoveCV<T>,

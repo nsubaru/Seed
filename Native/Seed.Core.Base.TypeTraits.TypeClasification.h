@@ -22,14 +22,28 @@ namespace Seed
             constexpr bool IsPodV = IsPodT<T>::State;
 
             /// <summary>
+            /// Вертає true якщо тип цілочиселльний
+            /// </summary>
+            template<typename T>
+            constexpr bool IsIntegerNumber =
+                TypeTraits::IsSigned<T> ||
+                TypeTraits::IsUnsigned<T>;
+
+            /// <summary>
+            /// Вертає true якщо тип дійсних чисел
+            /// </summary>
+            template<typename T>
+            constexpr bool IsFloatPointNumber = 
+                TypeTraits::IsSameT<T, Float>::State ||
+                TypeTraits::IsSameT<T, Double>::State;
+
+            /// <summary>
             /// Вертає true якщо тип числовий
             /// </summary>
             template<typename T>
             constexpr bool IsNumeric =
-                TypeTraits::IsSigned<T> ||
-                TypeTraits::IsUnsigned<T> ||
-                TypeTraits::IsSameT<T, Float>::State ||
-                TypeTraits::IsSameT<T, Double>::State;
+                IsIntegerNumber<T> ||
+                IsFloatPointNumber<T>;
 
 #pragma warning(push)
             //VS bug char and wchar_t trait as equal
@@ -38,7 +52,12 @@ namespace Seed
             /// Вертає чи тип символьний
             /// </summary>
             template<typename T>
-            constexpr bool IsCharacter = TypeTraits::IsSameT<T, AChar>() || TypeTraits::IsSameT<T, UChar>();
+            constexpr bool IsCharacter =
+                TypeTraits::IsSameT<T, AChar>() ||
+                TypeTraits::IsSameT<T, UChar>() ||
+                TypeTraits::IsSameT<T, U8Char>() ||
+                TypeTraits::IsSameT<T, U16Char>() ||
+                TypeTraits::IsSameT<T, U32Char>();
 #pragma warning(pop)
 
             /// <summary>

@@ -9,6 +9,17 @@ namespace Seed
 	{
 		namespace TypeTraits
 		{
+            /// <summary>
+            /// Вертає true якщо тип є покажчиком
+            /// </summary>
+            template<typename T>
+            struct IsPointerT : LogicFalse {};
+
+            /// <summary>
+            /// Вертає true якщо тип є покажчиком
+            /// </summary>
+            template<typename T>
+            struct IsPointerT<T*> : LogicTrue {};
 #pragma region C Array
 			/// <summary>
             /// Вертає true якщо тип є статичним масивом

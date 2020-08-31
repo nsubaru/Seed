@@ -8,11 +8,22 @@ namespace Seed
 {
     inline namespace Core
     {
+		namespace Containers
+		{
+			namespace LINQ
+			{
+				class ILazyGenericBase {
+				protected:
+					ForceInline virtual ~ILazyGenericBase() = 0 {}
+				};
+			}
+		}
+
 		/// <summary>
 		/// Лінивий об'єкт
 		/// </summary>
         template<typename THeap, typename T>
-        class BaseLazy final : Memory::Allocator<THeap>, IDisposable { //-V1052
+        class BaseLazy final : Memory::Allocator<THeap>, IDisposable, public Containers::LINQ::ILazyGenericBase { //-V1052
         public:
             using LazyGetter = T(*)();
         private:
@@ -23,11 +34,14 @@ namespace Seed
 
                 Data(LazyGetter getter) :
                     getter(getter), value(nullptr), RefCount(1) {}
+
+				Data(T*&& value) :
+                    getter(nullptr), value(value), RefCount(1) {}
             };
         private:
             Data* This;
 		private:
-			void CheckIsExistOrGetNew() {
+			void CheckIsExistOrGetNew() const {
 				if (This->value == nullptr)
 				{
 					This->value = new T(This->getter());
@@ -48,6 +62,24 @@ namespace Seed
                     Throw(NullPointException(ExceptionPosition));
                 }
             }
+
+			/// <summary>
+			/// Конструктор лінивого об'єкта
+			/// </summary>
+			/// <param name="val">Значення об'єкта</param>
+            BaseLazy(const T& val) : This(new Data(new T(val))) {}
+
+			/// <summary>
+			/// Конструктор лінивого об'єкта
+			/// </summary>
+			/// <param name="val">Значення об'єкта</param>
+            BaseLazy(T&& val) : This(new Data(new T(MoveRValue(val)))) {}
+
+			/// <summary>
+			/// Пустий конструктор лінивого об'єкта, якщо об'єкт можна створити конструктором без аргументів
+			/// </summary>
+            BaseLazy() requires Concepts::IsDefaultConstructible<T>
+				: BaseLazy(ArrowFunct(T())) {}
         public:
             /// <summary>
 			/// Оператор розіменування
@@ -117,7 +149,7 @@ namespace Seed
 			template<typename T>
             friend void Seed::Core::Swap(T& a, T& b);
 		public:
-			RefCountClass(BaseLazy, This)
+			RefCountClass(BaseLazy, This);
         };
 
 		/// <summary>

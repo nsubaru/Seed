@@ -39,10 +39,7 @@ namespace Seed {
 					Boolean TIsResizeableT,
 					Boolean TIsConcurencySupportT
 				>
-                // ReSharper disable CppInconsistentNaming
                 struct TLinq {
-                    // ReSharper restore CppInconsistentNaming
-
                     /// <summary>
                     /// Тип колекції
                     /// </summary>
@@ -68,7 +65,7 @@ namespace Seed {
                 /// <summary>
                 /// Базовий клас для LINQ контейнерів
                 /// </summary>
-				class ILinqBase { public: virtual ~ILinqBase() = 0 {}; };
+				class ILinqBase { public: ForceInline virtual ~ILinqBase() = 0 {}; };
                 /// <summary>
                 /// Базовий клас для загальних колекцій
                 /// </summary>
@@ -81,6 +78,10 @@ namespace Seed {
                 /// Базовий клас для асоціативних колекцій
                 /// </summary>
 				class IAssociableCollectionGenericBase { public: ForceInline virtual ~IAssociableCollectionGenericBase() = 0 {}; };
+                /// <summary>
+                /// Базовий клас для рядкових колекцій
+                /// </summary>
+				class IStringCollectionGenericBase { public: ForceInline virtual ~IStringCollectionGenericBase() = 0 {}; };
 #pragma region LINQ for one typearg Collection
 
                 /// <summary>
@@ -511,7 +512,9 @@ namespace Seed {
                 /// <typeparam name="THeap">Тип кучі</typeparam>
                 /// <typeparam name="TChar">Тип символа</typeparam>
 				template<template<typename THeap> typename TString, typename THeap, typename TChar, Boolean TIsConcurencySuport>
-				class IStringCollectionBaseLinq : public TStringLinq<TString<THeap>, THeap, TChar, TIsConcurencySuport> {
+				class IStringCollectionBaseLinq : 
+                    public TStringLinq<TString<THeap>, THeap, TChar, TIsConcurencySuport>, 
+                    public IStringCollectionGenericBase {
 				public:
 					ForceInline virtual ~IStringCollectionBaseLinq() = 0 {};
 				};

@@ -55,6 +55,12 @@ namespace Seed {
 		namespace { using Char = wchar_t; using UChar = wchar_t; }
 		///<summary>Символ в кодуванні ASCII</summary>
 		namespace { using AChar = char; }
+		/// <summary> Символ в кодуванні UTF-8 </summary>
+		namespace { using U8Char = char8_t; }
+		/// <summary> Символ в кодуванні UTF-16 </summary>
+		namespace { using U16Char = char16_t; }
+		/// <summary> Символ в кодуванні UTF-32 </summary>
+		namespace { using U32Char = char32_t; }
 
 		///<summary>Покажчик на масив символів в кодуванні UTF-16LE</summary>
 		namespace { using CharStr = Char*; using UCharStr = UChar*; }

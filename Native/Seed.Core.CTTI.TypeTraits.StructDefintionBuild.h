@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.CTTI.TypeTraits.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.BaseTypes.h"
 #include "Seed.Core.CTTI.TypeTraits.Collections.h"
 #include "Seed.Core.CTTI.TypeTraits.Struct.h"
 
@@ -30,10 +30,7 @@ namespace Seed
                         TIsConvertibleToTuple
                         > {};
 
-                    template<typename T>
-                    concept _IsSerelizableStruct = requires { T::FieldMetaDataGetter(); };
-
-                    template<typename T> requires _IsSerelizableStruct<T>
+                    template<typename T> requires Concepts::IsStructCttiType<T>
                     struct CTTITypeDataSpecialization<
                         T,
                         void

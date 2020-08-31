@@ -11,8 +11,16 @@ namespace Seed
     {
         namespace Containers
         {
+            namespace LINQ
+            {
+                class ITupleGenericBase {
+                protected:
+                    ForceInline virtual ~ITupleGenericBase() = 0 {}
+                };
+            }
+
             template<typename... TDatas>
-            class Tuple final {
+            class Tuple final : public LINQ::ITupleGenericBase {
             protected:
                 template<UInt64 TN, typename THead, typename... TTypes>
                 struct GetByN {
