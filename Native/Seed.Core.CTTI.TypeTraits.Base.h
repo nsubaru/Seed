@@ -65,23 +65,23 @@ namespace Seed
 					Core::TypeTraits::IsSameV<T, DateSpan>;
 
 				template<typename T>
-				concept IsCollectionCttiType = Core::TypeTraits::IsBasedOnV<T, Containers::LINQ::ICollectionGenericBase>;
+				concept IsCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ICollectionGenericBase, T>;
 
 				template<typename T>
-				concept IsStringCttiType = Core::TypeTraits::IsBasedOnV<T, Containers::LINQ::IStringCollectionGenericBase>;
+				concept IsStringCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::IStringCollectionGenericBase, T>;
 
 				template<typename T>
-				concept IsFixedCollectionCttiType = Core::TypeTraits::IsBasedOnV<T, Containers::LINQ::IFixedCollectionGenericBase>;
+				concept IsFixedCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::IFixedCollectionGenericBase, T>;
 
 				template<typename T>
-				concept IsAssociableCollectionCttiType = Core::TypeTraits::IsBasedOnV<T, Containers::LINQ::IAssociableCollectionGenericBase>;
+				concept IsAssociableCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::IAssociableCollectionGenericBase, T>;
 
 				template<typename T>
-				concept IsBoxCttiType = Core::TypeTraits::IsBasedOnV<T, Containers::LINQ::ISmartPtrGenericBase> || 
-										Core::TypeTraits::IsBasedOnV<T, Containers::LINQ::ILazyGenericBase>;
+				concept IsBoxCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ISmartPtrGenericBase, T> || 
+										Core::TypeTraits::IsBasedOnV<Containers::LINQ::ILazyGenericBase, T>;
 
 				template<typename T>
-				concept IsTupleCttiType = Core::TypeTraits::IsBasedOnV<T, Containers::LINQ::ITupleGenericBase>;
+				concept IsTupleCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ITupleGenericBase, T>;
 
 				template<typename T>
 				concept IsPairCttiType = Core::TypeTraits::Collection::IsPair<T>;
@@ -99,7 +99,7 @@ namespace Seed
 				concept IsStructCttiType = requires { T::FieldMetaDataGetter(); };
 
 				template<typename T>
-				concept IsObjectCttiType = Core::TypeTraits::IsBasedOnV<T, TypeTraits::Details::ISerilizableGenericBase>;
+				concept IsObjectCttiType = Core::TypeTraits::IsBasedOnV<TypeTraits::Details::ISerilizableGenericBase, T>;
 
 				template<typename T>
 				concept IsDynamicCttiType = TypeTraits::Details::IsDynamicT<T>::State;
