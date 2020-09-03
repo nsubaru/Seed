@@ -70,7 +70,7 @@ inline void __stdcall _CallMemberFunction0(
     void* const pmfn
     ) noexcept(false)
 {
-    auto const OneArgFn = reinterpret_cast<void (__thiscall*)(void*)>(pmfn);
+    auto const OneArgFn = reinterpret_cast<void (__vectorcall*)(void*)>(pmfn);
     OneArgFn(pthis);
 }
 
@@ -81,7 +81,7 @@ inline void __stdcall _CallMemberFunction1(
     void* const pthat
     ) noexcept(false)
 {
-    auto const TwoArgFn = reinterpret_cast<void (__thiscall*)(void*, void*)>(pmfn);
+    auto const TwoArgFn = reinterpret_cast<void (__vectorcall*)(void*, void*)>(pmfn);
     TwoArgFn(pthis, pthat);
 }
 
@@ -93,7 +93,7 @@ inline void __stdcall _CallMemberFunction2(
     int   const val2
     ) noexcept(false)
 {
-    auto const ThreeArgFn = reinterpret_cast<void (__thiscall*)(void*, void*, int)>(pmfn);
+    auto const ThreeArgFn = reinterpret_cast<void (__vectorcall*)(void*, void*, int)>(pmfn);
     ThreeArgFn(pthis, pthat, val2);
 }
 
@@ -1853,7 +1853,7 @@ inline TlsExceptionData * GetThreadExceptionData()
 //
 void _CallCopyCtor(_Out_writes_bytes_(size) void* dst, _In_reads_bytes_(size) void* src, size_t size, _In_ const CatchableType* const pType, void* ThrowImageBase)
 {
-    if (pType->properties & CT_IsSimpleType || // this is a simple type
+    if (pType->properties & CT_IsSimpleType && // this is a simple type
         pType->copyFunction == NULL    // this is a user defined type without copy ctor
         )
     {
@@ -1944,19 +1944,22 @@ void _CopyException(RawExceptionInfo* orig, RawExceptionInfo* copy, void*(*alloc
         }
 
         // we finally got the type info we want
+        auto catchableTypeArray = reinterpret_cast<CatchableTypeArray*>(
+            reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
+            orig->CxxExceptionInfo.params.pThrowInfo->pCatchableTypeArray
+            );
+
         auto ppCatchable =
             reinterpret_cast<int*>(
                 reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
-                *reinterpret_cast<CatchableTypeArray*>(
-                    reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
-                    orig->CxxExceptionInfo.params.pThrowInfo->pCatchableTypeArray
-                    )->arrayOfCatchableTypes
+                catchableTypeArray->arrayOfCatchableTypes[0]
                 );
+
         void* pExceptionBuffer = NULL;
-        auto typeInfo = (CatchableType *)(reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) + *ppCatchable);
+        auto typeInfo = (CatchableType *)(ppCatchable);
         
-        //TODO: Analyze memory leak
-        pExceptionBuffer = allocator(typeInfo->sizeOrOffset);
+        //HACK: hardcoded max buffer size for exception
+        pExceptionBuffer = allocator((typeInfo->sizeOrOffset == 0) ? 4Kb - 1 : typeInfo->sizeOrOffset);
 
         _CallCopyCtor(pExceptionBuffer, orig->CxxExceptionInfo.params.pExceptionObject, typeInfo->sizeOrOffset, typeInfo, orig->CxxExceptionInfo.params.pThrowImageBase);
 
@@ -2037,22 +2040,25 @@ void ThrowStoredException(void* exception)
         // we finally got the type info we want
         //auto typeInfo = GetByOffset<CatchableType>((SizeT)orig->CxxExceptionInfo.params.pThrowImageBase, pThrow->pCatchableTypeArray);
         // we finally got the type info we want
+        // we finally got the type info we want
+        auto catchableTypeArray = reinterpret_cast<CatchableTypeArray*>(
+            reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
+            orig->CxxExceptionInfo.params.pThrowInfo->pCatchableTypeArray
+            );
+
         auto ppCatchable =
             reinterpret_cast<int*>(
                 reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
-                *reinterpret_cast<CatchableTypeArray*>(
-                    reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) +
-                    orig->CxxExceptionInfo.params.pThrowInfo->pCatchableTypeArray
-                    )->arrayOfCatchableTypes
+                catchableTypeArray->arrayOfCatchableTypes[0]
                 );
-        auto typeInfo = (CatchableType *)(reinterpret_cast<Seed::SizeT>(orig->CxxExceptionInfo.params.pThrowImageBase) + *ppCatchable);
 
         void* pExceptionBuffer = NULL;
+        auto typeInfo = (CatchableType *)(ppCatchable);
 
         __assume(typeInfo->sizeOrOffset < 4Kb);
 #pragma warning(push)
 #pragma warning(disable: 6255)
-        GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca(typeInfo->sizeOrOffset);
+        GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca((typeInfo->sizeOrOffset == 0) ? 4Kb - 1 : typeInfo->sizeOrOffset);
 #pragma warning(pop)
         pExceptionBuffer = GetThreadExceptionData()->_throwObjStorageForStoredException;
 

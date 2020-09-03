@@ -13,19 +13,19 @@ namespace Seed
 				concept IsCttiType = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == TType;
 
 				template<typename T>
-				concept IsLogic = IsCttiType<T, CTTI::TypeTraits::EType::Logic>;
+				concept IsCttiLogic = IsCttiType<T, CTTI::TypeTraits::EType::Logic>;
 
 				template<typename T>
-				concept IsNumeric = IsCttiType<T, CTTI::TypeTraits::EType::Numeric>;
+				concept IsCttiNumeric = IsCttiType<T, CTTI::TypeTraits::EType::Numeric>;
 
 				template<typename T>
-				concept IsFloatNumeric = IsCttiType<T, CTTI::TypeTraits::EType::FloatNumeric>;
+				concept IsCttiFloatNumeric = IsCttiType<T, CTTI::TypeTraits::EType::FloatNumeric>;
 
 				template<typename T>
-				concept IsString = IsCttiType<T, CTTI::TypeTraits::EType::String>;
+				concept IsCttiString = IsCttiType<T, CTTI::TypeTraits::EType::String>;
 
 				template<typename T>
-				concept IsStruct = IsCttiType<T, CTTI::TypeTraits::EType::Struct>;
+				concept IsCttiStruct = IsCttiType<T, CTTI::TypeTraits::EType::Struct>;
 
 				template<typename T>
 				concept IsCttiSerelizable = CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;

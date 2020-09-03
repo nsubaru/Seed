@@ -29,6 +29,11 @@ namespace Seed
 				/// Ім'я типу який не знайдено
 				/// </summary>
 				ExceptionString typeName;
+            public:
+                NonSerelizableType(const NonSerelizableType& orig) : Exception(orig) {}
+                NonSerelizableType(NonSerelizableType&& from) : Exception(MoveRValue(from)) {}
+				NonSerelizableType& operator=(const NonSerelizableType& from) { this->~NonSerelizableType(); this->NonSerelizableType::NonSerelizableType(from); return *this; }
+				NonSerelizableType& operator=(NonSerelizableType&& from) { this->~NonSerelizableType(); this->NonSerelizableType::NonSerelizableType(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -43,8 +48,17 @@ namespace Seed
                     return ExceptionString::Combine({
                         ExceptionString(exceptionName),
                         ExceptionString(L". Ім'я типу: "), typeName, ExceptionString(L". "),
-                        location.toString(), ExceptionString(L". ")
+                        location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
                     });
+				}
+
+                /// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new NonSerelizableType(*this));
 				}
 
 				virtual ~NonSerelizableType() {}

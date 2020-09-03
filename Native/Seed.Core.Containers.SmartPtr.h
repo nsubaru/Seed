@@ -16,9 +16,9 @@ namespace Seed {
 		/// <summary>
 		/// Розумний покажчик, сам автоматично видаляє покажчик при зникненні посилань на об'єкт
 		/// </summary>
-		template<typename T>
-		class SmartPtr : protected IDisposable, public Containers::LINQ::ISmartPtrGenericBase {
-			struct Data {
+		template<typename THeap, typename T>
+		class BaseSmartPtr : protected IDisposable, public Containers::LINQ::ISmartPtrGenericBase, public Memory::Allocator<THeap> {
+			struct Data : Memory::Allocator<THeap> {
 				T* ptr;
 				RefCountT RefCount;
 				Data(T*&& ptr) : ptr(MoveRValue(ptr)), RefCount(1) {}
@@ -32,12 +32,12 @@ namespace Seed {
 			/// Пустий конструктор ініціалізує покажчик невірним значення, 
 			/// при використані такого об'єкт буде виникати NPE
 			/// </summary>
-			SmartPtr() : This(nullptr) {}
+			BaseSmartPtr() : This(nullptr) {}
 			/// <summary>
 			/// Конструктор з rvalue силки на покажчик
 			/// </summary>
 			/// <param name="ptr">Rvalue силки на покажчик</param>
-			SmartPtr(T*&& ptr) : This(new Data(MoveRValue(ptr))) {}
+			BaseSmartPtr(T*&& ptr) : This(new Data(MoveRValue(ptr))) {}
 			
 			/// <summary>
 			/// Оператор розіменування
@@ -95,15 +95,48 @@ namespace Seed {
 			/// Кількість силок
 			/// </summary>
 			SizeT Property(GetRefCount) RefCount;
+
+		public:
+			/// <summary>
+			/// Порівняння з нульовим покажчиком
+			/// </summary>
+			/// <returns>Результат порівняння</returns>
+			bool operator==(const std::nullptr_t&) const {
+				return This->ptr == nullptr;
+			}
+
+			/// <summary>
+			/// Порівняння з нульовим покажчиком
+			/// </summary>
+			/// <returns>Результат порівняння</returns>
+			bool operator==(std::nullptr_t&&) const {
+				return This->ptr == nullptr;
+			}
 		public:
 			template<typename T>
             friend void Seed::Core::Swap(T& a, T& b);
 		public:
-			RefCountClass(SmartPtr, This);
+			RefCountClass(BaseSmartPtr, This);
 		};
 
-		template<typename T>
-        void Swap(SmartPtr<T>& a, SmartPtr<T>& b) {
+		/// <summary>
+        /// Розумний покажчик в простій кучі
+        /// </summary>
+        namespace {
+            template<typename T>
+            using SmartPtr = BaseSmartPtr<Memory::Heap, T>;
+        }
+
+        /// <summary>
+        /// Розумний покажчик в захищеній кучі
+        /// </summary>
+        namespace {
+            template<typename T>
+            using SensitiveSmartPtr = BaseSmartPtr<Memory::SensitiveDataHeap, T>;
+        }
+
+		template<typename THeap, typename T>
+        void Swap(BaseSmartPtr<THeap, T>& a, BaseSmartPtr<THeap, T>& b) {
             Swap(a.This, b.This);
         }
 	}

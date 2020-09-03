@@ -23,6 +23,11 @@ namespace Seed
 				/// </summary>
 				ExceptionString typeName;
 			public:
+				DIResolveException(const DIResolveException& orig) : Exception(orig), type(orig.type), typeName(orig.typeName) {}
+				DIResolveException(DIResolveException&& from) : Exception(MoveRValue(from)), type(from.type), typeName(MoveRValue(from.typeName)) {}
+				DIResolveException& operator=(const DIResolveException& from) { this->~DIResolveException(); this->DIResolveException::DIResolveException(from); return *this; }
+				DIResolveException& operator=(DIResolveException&& from) { this->~DIResolveException(); this->DIResolveException::DIResolveException(MoveRValue(from)); return *this; }
+			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
 				///<param name = 'FunctName'>Ім'я функції</param>
@@ -36,8 +41,17 @@ namespace Seed
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName),
 						ExceptionString(L". Ім'я типу: "), typeName, ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new DIResolveException(*this));
 				}
 
 				virtual ~DIResolveException() {}
