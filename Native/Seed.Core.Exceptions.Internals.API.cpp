@@ -39,6 +39,10 @@ __declspec(noreturn) void Seed::Core::Internals::Exceptions::ThrowKeyAlredyExist
 	Throw(KeyAllredyExistException(File, Function, Line));
 }
 
+__declspec(noreturn) void Seed::Core::Internals::Exceptions::ThrowNotFound(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
+	Throw(NotFoundException(File, Function, Line));
+}
+
 __declspec(noreturn) void Seed::Core::Internals::Exceptions::ThrowInternalError(const Seed::ConstAString& File, const Seed::ConstAString& Function, const Seed::SizeT Line) {
 	Throw(InternalError(File, Function, Line));
 }

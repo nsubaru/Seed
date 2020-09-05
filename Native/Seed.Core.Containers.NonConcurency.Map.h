@@ -765,7 +765,7 @@ namespace Seed {
 					Node* node = Find(This->root, key);
 
 					if (node == nullptr)
-						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
+						Internals::Exceptions::ThrowNotFound(__FILE__, __FUNCSIG__, __LINE__);
 					return node->value;
 				}
 				///<summary>Отриання значення по ключу</summary>
@@ -777,7 +777,7 @@ namespace Seed {
 					Node* node = Find(This->root, key);
 
 					if (node == nullptr)
-						Internals::Exceptions::ThrowNullPointException(__FILE__, __FUNCSIG__, __LINE__);
+						Internals::Exceptions::ThrowNotFound(__FILE__, __FUNCSIG__, __LINE__);
 					return node->value;
 				}
 
