@@ -3,6 +3,7 @@
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.ConstString.h"
 #include "Seed.Core.String.h"
+#include "Seed.Core.Containers.SmartPtr.h"
 #include "typeinfo"
 
 #pragma warning(push)
@@ -42,13 +43,22 @@ namespace Seed {
 			};
 		}
 
+		///<summary>Підсистема помилок в рантаймі</summary>
+		inline namespace Exceptions
+		{
+			///<summary>Класс базової помилки</summary>
+			class Exception;
+		}
+
 		///<summary>Рядок для збереження тексту помилок</summary>
 		namespace { using ExceptionString = BaseString<Memory::ExceptionHeap>; }
+		/// <summary> Об'єкт для збереження помилки  </summary>
+		namespace { using ExceptionHolderType = BaseSmartPtr<Memory::ExceptionHeap, Exception>; }
 
 		///<summary>Підсистема помилок в рантаймі</summary>
 		inline namespace Exceptions {
 			///<summary>Класс базової помилки</summary>
-			class Exception : virtual public Memory::Allocator<Memory::ExceptionHeap> {
+			class Exception : public Memory::Allocator<Memory::ExceptionHeap>, public IClonable<ExceptionHolderType> {
 			public:
 				/// <summary>
 				/// Сховище стеку викликів
@@ -94,11 +104,55 @@ namespace Seed {
 				ExeptionLocation location;
 				///<summary>Ім'я помилки</summary>
 				ConstString exceptionName;
-
+				///<summary>Стек помилки</summary>
 				StackTraceRecord stackTrace;
+				///<summary>Внутрішня помилка</summary>
+				ExceptionHolderType innerException;
 			private:
 				static SeedKernelCall ID GetTargetThreadID();
 				friend SeedKernelCall void GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace);
+			public:
+				/// <summary>
+				/// Копіювальний конструктор 
+				/// </summary>
+				/// <param name="from"></param>
+				Exception(const Exception& from) : 
+					location(from.location), 
+					exceptionName(from.exceptionName), 
+					stackTrace(from.stackTrace), 
+					innerException(from.innerException) {}
+
+				/// <summary>
+				/// Конструктор переміщення конструктор 
+				/// </summary>
+				/// <param name="from"></param>
+				Exception(Exception&& from) : 
+					location(from.location), 
+					exceptionName(MoveRValue(from.exceptionName)), 
+					stackTrace(stackTrace), 
+					innerException(MoveRValue(from.innerException)) {}
+
+				/// <summary>
+				/// Оператор копіювання
+				/// </summary>
+				/// <param name="ex">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				Exception& operator=(const Exception& ex) {
+					this->~Exception();
+					this->Exception::Exception(ex);
+					return *this;
+				}
+
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="ex">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				Exception& operator=(Exception&& ex) {
+					this->~Exception();
+					this->Exception::Exception(MoveRValue(ex));
+					return *this;
+				}
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -107,7 +161,7 @@ namespace Seed {
 				///<param name = 'Name'>Ім'я помилки</param>
 				///<returns>Екземпляр класу Exeption</returns>
 				ForceInline Exception(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const ConstString& ExeptionName) noexcept
-					:location({ File, FunctName, Line, GetTargetThreadID() }), exceptionName(ExeptionName), stackTrace({ 0 }) 
+					:location({ File, FunctName, Line, GetTargetThreadID() }), exceptionName(ExeptionName), stackTrace({ 0 }), innerException(nullptr)
 				{
 					GetStackBackTrace((Seed::Exceptions::Exception::StackTraceRecord&)this->stackTrace);
 				}
@@ -132,20 +186,53 @@ namespace Seed {
 					return stackTrace;
 				}
 
+				/// <summary>
+				/// Вертає об'єкт який містить внутрішню помилку(об'єкт може бути пустий)
+				/// </summary>
+				/// <returns></returns>
+				ForceInline const ExceptionHolderType& GetInnerException() const {
+					return innerException;
+				}
+
+				/// <summary>
+				/// Встановлює об'єкт який містить внутрішню помилку(об'єкт може бути пустий)
+				/// </summary>
+				/// <param name="newInnerException">Об'єкт який містить нову помилку</param>
+				ForceInline void SetInnerException(const ExceptionHolderType& newInnerException) {
+					innerException = newInnerException;
+				}
+
+				/// <summary>
+				/// Встановлює об'єкт який містить внутрішню помилку(об'єкт може бути пустий)
+				/// </summary>
+				/// <param name="newInnerException">Об'єкт який містить нову помилку</param>
+				ForceInline void SetInnerException(ExceptionHolderType&& newInnerException) {
+					innerException = MoveRValue(newInnerException);
+				}
+
+				/// <summary>
+				/// Встановлює об'єкт який містить внутрішню помилку(об'єкт може бути пустий)
+				/// </summary>
+				/// <param name="newInnerException">Покажчик на внутрішню помилку</param>
+				ForceInline void SetInnerException(Exception*&& newInnerException) {
+					innerException = ExceptionHolderType(MoveRValue(newInnerException));
+				}
+
 				///<summary>Користувальницька назва помилки</summary>
 				ConstString Property(GetExceptioName) Name;
 				///<summary>Місце генерації помилки</summary>
 				ExeptionLocation Property(GetLocation) Location;
-				/// <summary>
-				/// Стек викликів на момент генерації помилки
-				/// </summary>
+				///<summary> Стек викликів на момент генерації помилки </summary>
 				StackTraceRecord Property(GetStackTrace) StackTrace;
+				/// <summary> Внутрішня помилка якщо вона є </summary>
+				ExceptionHolderType Property(GetInnerException, SetInnerException) InnerException;
 
 				///<summary>Текстове представлення інформації про помилки помилки</summary>
-				virtual ExceptionString toString() const = 0 {
+				virtual ExceptionString toString() const {
 					return ExceptionString::Combine({
 						ExceptionString(L"Невідома помилка з повідомлення "), ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString()
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 						});
 				}
 
@@ -180,10 +267,19 @@ namespace Seed {
 			public:
 				static SeedKernelCall RawException StoreCurrentException();
 				static SeedKernelCall void ThrowRawException(RawException& exception);
+			public:
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new Exception(*this));
+				}
 			};
 
 			///<summary>Ділення на ноль</summary>
 			class DivideByZero final : public Exception {
+			public:
+				DivideByZero(const DivideByZero& from) :Exception(from) {}
+				DivideByZero(DivideByZero&& from) :Exception(MoveRValue(from)) {}
+				DivideByZero& operator=(const DivideByZero& from) { this->~DivideByZero(); this->DivideByZero::DivideByZero(from); return *this; }
+				DivideByZero& operator=(DivideByZero&& from) { this->~DivideByZero(); this->DivideByZero::DivideByZero(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -197,11 +293,16 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
-					});
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
+						});
 				}
 
 				virtual ~DivideByZero() {};
+			public:
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new DivideByZero(*this));
+				}
 			};
 
 			///<summary>Помилка доступу до комірки пам'яті
@@ -220,6 +321,11 @@ namespace Seed {
 				SizeT Addr;
 				///<summary>Тип доступу який згенерував помилку</summary>
 				Types Type;
+			public:
+				NullPointException(const NullPointException& from) : Exception(from), Addr(from.Addr), Type(from.Type) {}
+				NullPointException(NullPointException&& from) :Exception(MoveRValue(from)), Addr(from.Addr), Type(from.Type) {}
+				NullPointException& operator=(const NullPointException& from) { this->~NullPointException(); this->NullPointException::NullPointException(from); return *this; }
+				NullPointException& operator=(NullPointException&& from) { this->~NullPointException(); this->NullPointException::NullPointException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -252,11 +358,20 @@ namespace Seed {
 						ExceptionString(exceptionName),
 						ExceptionString(L" за адресом "), ExceptionString::UInt64asHex(GetMemoryAddress()),
 						ExceptionString(L" при спробі "),
-						((GetAccessType() == Types::Read) ?		ExceptionString(L"читання. ") :
-						(GetAccessType() == Types::Write) ?		ExceptionString(L"запису. ")
-														  :		ExceptionString(L"виконання. ")),
-						location.toString(), ExceptionString(L". ")
-					});
+						((GetAccessType() == Types::Read) ? ExceptionString(L"читання. ") :
+						(GetAccessType() == Types::Write) ? ExceptionString(L"запису. ")
+															: ExceptionString(L"виконання. ")),
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L". ") : (L". Також є вкладена помилка: " + InnerException->toString())
+						});
+				}
+			public:
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new NullPointException(*this));
 				}
 
 				virtual ~NullPointException() {}
@@ -264,6 +379,11 @@ namespace Seed {
 
 			///<summary>Використання невалідного дескриптора</summary>
 			class InvalidHandleUsage final : public Exception {
+			public:
+				InvalidHandleUsage(const InvalidHandleUsage& orig) : Exception(orig) {}
+				InvalidHandleUsage(InvalidHandleUsage&& from) :Exception(MoveRValue(from)) {}
+				InvalidHandleUsage& operator=(const InvalidHandleUsage& from) { this->~InvalidHandleUsage(); this->InvalidHandleUsage::InvalidHandleUsage(from); return *this; }
+				InvalidHandleUsage& operator=(InvalidHandleUsage&& from) { this->~InvalidHandleUsage(); this->InvalidHandleUsage::InvalidHandleUsage(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -277,8 +397,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new InvalidHandleUsage(*this));
 				}
 
 				virtual ~InvalidHandleUsage() {}
@@ -288,6 +417,11 @@ namespace Seed {
 			/// Не знайдено 
 			/// </summary>
 			class NotFoundException : public Exception {
+			public:
+				NotFoundException(const NotFoundException& orig) : Exception(orig) {}
+				NotFoundException(NotFoundException&& from) :Exception(MoveRValue(from)) {}
+				NotFoundException& operator=(const NotFoundException& from) { this->~NotFoundException(); this->NotFoundException::NotFoundException(from); return *this; }
+				NotFoundException& operator=(NotFoundException&& from) { this->~NotFoundException(); this->NotFoundException::NotFoundException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -310,8 +444,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new NotFoundException(*this));
 				}
 
 				virtual ~NotFoundException() {}
@@ -319,6 +462,11 @@ namespace Seed {
 
 			///<summary>Неможливо перетворити тип</summary>
 			class BadCast final : public Exception {
+			public:
+				BadCast(const BadCast& orig) : Exception(orig) {}
+				BadCast(BadCast&& from) :Exception(MoveRValue(from)) {}
+				BadCast& operator=(const BadCast& from) { this->~BadCast(); this->BadCast::BadCast(from); return *this; }
+				BadCast& operator=(BadCast&& from) { this->~BadCast(); this->BadCast::BadCast(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -336,11 +484,24 @@ namespace Seed {
 					});
 				}
 
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new BadCast(*this));
+				}
+
 				virtual ~BadCast() {}
 			};
 
 			///<summary>Неможливо викликати віртуальну функцію</summary>
 			class BadPureCall final : public Exception {
+			public:
+				BadPureCall(const BadPureCall& orig) : Exception(orig) {}
+				BadPureCall(BadPureCall&& from) :Exception(MoveRValue(from)) {}
+				BadPureCall& operator=(const BadPureCall& from) { this->~BadPureCall(); this->BadPureCall::BadPureCall(from); return *this; }
+				BadPureCall& operator=(BadPureCall&& from) { this->~BadPureCall(); this->BadPureCall::BadPureCall(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -354,8 +515,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new BadPureCall(*this));
 				}
 
 				virtual ~BadPureCall() {}
@@ -363,6 +533,11 @@ namespace Seed {
 
 			///<summary>Вже існує</summary>
 			class AllredyExistException : public Exception {
+			public:
+				AllredyExistException(const AllredyExistException& orig) : Exception(orig) {}
+				AllredyExistException(AllredyExistException&& from) : Exception(MoveRValue(from)) {}
+				AllredyExistException& operator=(const AllredyExistException& from) { this->~AllredyExistException(); this->AllredyExistException::AllredyExistException(from); return *this; }
+				AllredyExistException& operator=(AllredyExistException&& from) { this->~AllredyExistException(); this->AllredyExistException::AllredyExistException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -384,8 +559,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new AllredyExistException(*this));
 				}
 
 				virtual ~AllredyExistException() {}
@@ -393,6 +577,11 @@ namespace Seed {
 
 			///<summary>Ключ вжк існує</summary>
 			class KeyAllredyExistException : public AllredyExistException {
+			public:
+				KeyAllredyExistException(const KeyAllredyExistException& orig) : AllredyExistException(orig) {}
+				KeyAllredyExistException(KeyAllredyExistException&& from) :AllredyExistException(MoveRValue(from)) {}
+				KeyAllredyExistException& operator=(const KeyAllredyExistException& from) { this->~KeyAllredyExistException(); this->KeyAllredyExistException::KeyAllredyExistException(from); return *this; }
+				KeyAllredyExistException& operator=(KeyAllredyExistException&& from) { this->~KeyAllredyExistException(); this->KeyAllredyExistException::KeyAllredyExistException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -402,11 +591,24 @@ namespace Seed {
 					:AllredyExistException(File, FunctName, Line, L"Ключ вже існує")
 				{}
 
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new KeyAllredyExistException(*this));
+				}
+
 				virtual ~KeyAllredyExistException() {}
 			};
 
 			///<summary>Некоректний тип помилки</summary>
 			class BadException final : public Exception {
+			public:
+				BadException(const BadException& orig) : Exception(orig) {}
+				BadException(BadException&& from) :Exception(MoveRValue(from)) {}
+				BadException& operator=(const BadException& from) { this->~BadException(); this->BadException::BadException(from); return *this; }
+				BadException& operator=(BadException&& from) { this->~BadException(); this->BadException::BadException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -420,8 +622,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new BadException(*this));
 				}
 
 				virtual ~BadException() {}
@@ -438,6 +649,23 @@ namespace Seed {
 				SizeT AllocatedBefore;
 				///<summary>Кількість елементів зайннятих до</summary>
 				SizeT MemBlkscountBefore;
+			public:
+				OutOfMemory(const OutOfMemory& orig) :
+					Exception(orig),
+					HeapName(orig.HeapName),
+					TryAllocate(orig.TryAllocate),
+					AllocatedBefore(orig.AllocatedBefore),
+					MemBlkscountBefore(orig.MemBlkscountBefore) {}
+
+				OutOfMemory(OutOfMemory&& orig) : 
+					Exception(MoveRValue(orig)),
+					HeapName(orig.HeapName),
+					TryAllocate(orig.TryAllocate),
+					AllocatedBefore(orig.AllocatedBefore),
+					MemBlkscountBefore(orig.MemBlkscountBefore) {}
+
+				OutOfMemory& operator=(const OutOfMemory& from) { this->~OutOfMemory(); this->OutOfMemory::OutOfMemory(from); return *this; }
+				OutOfMemory& operator=(OutOfMemory&& from) { this->~OutOfMemory(); this->OutOfMemory::OutOfMemory(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -479,8 +707,17 @@ namespace Seed {
 						ExceptionString::toString(AllocatedBefore), ExceptionString(L" байт в "),
 						ExceptionString::toString(MemBlkscountBefore),
 						ExceptionString((MemBlkscountBefore == 1) ? ExceptionString(L" блоку пам'яті. ") : (L"блоках пам'яті. ")),
-						location.toString()
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new OutOfMemory(*this));
 				}
 
 				virtual ~OutOfMemory() {}
@@ -488,6 +725,11 @@ namespace Seed {
 
 			///<summary>Внутрішня помилка ядра</summary>
 			class InternalError final : public Exception {
+			public:
+				InternalError(const InternalError& orig) : Exception(orig) {}
+				InternalError(InternalError&& from) :Exception(MoveRValue(from)) {}
+				InternalError& operator=(const InternalError& from) { this->~InternalError(); this->InternalError::InternalError(from); return *this; }
+				InternalError& operator=(InternalError&& from) { this->~InternalError(); this->InternalError::InternalError(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -505,11 +747,24 @@ namespace Seed {
 					});
 				}
 
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new InternalError(*this));
+				}
+
 				virtual ~InternalError() {}
 			};
 
 			///<summary>Невірний формат</summary>
 			class InvalidFormatException : public Exception {
+			public:
+				InvalidFormatException(const InvalidFormatException& orig) : Exception(orig) {}
+				InvalidFormatException(InvalidFormatException&& from) :Exception(MoveRValue(from)) {}
+				InvalidFormatException& operator=(const InvalidFormatException& from) { this->~InvalidFormatException(); this->InvalidFormatException::InvalidFormatException(from); return *this; }
+				InvalidFormatException& operator=(InvalidFormatException&& from) { this->~InvalidFormatException(); this->InvalidFormatException::InvalidFormatException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -523,8 +778,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new InvalidFormatException(*this));
 				}
 
 				virtual ~InvalidFormatException() {}
@@ -532,6 +796,11 @@ namespace Seed {
 
 			///<summary>Невірний формат</summary>
 			class NotImplementedException final : public Exception {
+			public:
+				NotImplementedException(const NotImplementedException& orig) : Exception(orig) {}
+				NotImplementedException(NotImplementedException&& from) :Exception(MoveRValue(from)) {}
+				NotImplementedException& operator=(const NotImplementedException& from) { this->~NotImplementedException(); this->NotImplementedException::NotImplementedException(from); return *this; }
+				NotImplementedException& operator=(NotImplementedException&& from) { this->~NotImplementedException(); this->NotImplementedException::NotImplementedException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -545,8 +814,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new NotImplementedException(*this));
 				}
 
 				virtual ~NotImplementedException() {}
@@ -557,6 +835,11 @@ namespace Seed {
 			private:
 				SizeT Index;
 				SizeT MaxIndex;
+			public:
+				IndexOutOfRange(const IndexOutOfRange& orig) : Exception(orig), Index(orig.Index), MaxIndex(orig.MaxIndex) {}
+				IndexOutOfRange(IndexOutOfRange&& from) :Exception(MoveRValue(from)), Index(from.Index), MaxIndex(from.MaxIndex) {}
+				IndexOutOfRange& operator=(const IndexOutOfRange& from) { this->~IndexOutOfRange(); this->IndexOutOfRange::IndexOutOfRange(from); return *this; }
+				IndexOutOfRange& operator=(IndexOutOfRange&& from) { this->~IndexOutOfRange(); this->IndexOutOfRange::IndexOutOfRange(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -586,9 +869,17 @@ namespace Seed {
 						ExceptionString(L". При спробі отримати доступ до елемента за індексом "), ExceptionString::toString(RequiredIndex),
 						ExceptionString(L" якщо максимальний дозволений індекс "), ExceptionString::toString(MaxAllowedIndex),
 						ExceptionString(L". "),
-						location.toString(),
-						ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new IndexOutOfRange(*this));
 				}
 
 				virtual ~IndexOutOfRange() {}
@@ -599,6 +890,11 @@ namespace Seed {
 			private:
 				const TypeInfo& requiredType;
 				const TypeInfo& actuallyType;
+			public:
+				InvalidTypeException(const InvalidTypeException& orig) : Exception(orig), requiredType(orig.requiredType), actuallyType(orig.actuallyType) {}
+				InvalidTypeException(InvalidTypeException&& from) :Exception(MoveRValue(from)), requiredType(from.requiredType), actuallyType(from.actuallyType) {}
+				InvalidTypeException& operator=(const InvalidTypeException& from) { this->~InvalidTypeException(); this->InvalidTypeException::InvalidTypeException(from); return *this; }
+				InvalidTypeException& operator=(InvalidTypeException&& from) { this->~InvalidTypeException(); this->InvalidTypeException::InvalidTypeException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -629,8 +925,17 @@ namespace Seed {
 						ExceptionString(L". Очікуваний тип: "), ExceptionString((Char*) RequiredType.GetCxxName()),
 						ExceptionString(L". Фактичний тип: "), ExceptionString((Char*) ActuallyType.GetCxxName()),
 						ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new InvalidTypeException(*this));
 				}
 
 				virtual ~InvalidTypeException() {}
@@ -643,6 +948,19 @@ namespace Seed {
 				ConstString ArgNameValue;
 				///<summary>Додаткова інформація</summary>
 				ConstString DescriptionValue;
+			public:
+				InvalidArgumentException(const InvalidArgumentException& orig) :
+					Exception(orig),
+					ArgNameValue(orig.ArgNameValue),
+					DescriptionValue(orig.DescriptionValue) {}
+
+				InvalidArgumentException(InvalidArgumentException&& from) :
+					Exception(from),
+					ArgNameValue(from.ArgNameValue),
+					DescriptionValue(from.DescriptionValue) {}
+
+				InvalidArgumentException& operator=(const InvalidArgumentException& from) { this->~InvalidArgumentException(); this->InvalidArgumentException::InvalidArgumentException(from); return *this; }
+				InvalidArgumentException& operator=(InvalidArgumentException&& from) { this->~InvalidArgumentException(); this->InvalidArgumentException::InvalidArgumentException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -671,17 +989,29 @@ namespace Seed {
 						ExceptionString(L". Невірний "), ArgNameValue,
 						ExceptionString(L" аргумент. Додатковий опис: "),
 						ExceptionString(DescriptionValue), ExceptionString(L". "),
-						location.toString(),
-						ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new InvalidArgumentException(*this));
 				}
 
 				virtual ~InvalidArgumentException() {}
 			};
 
 			///<summary>Операцію перервано</summary>
-			class InteruptException final : protected Exception
-			{
+			class InteruptException final : protected Exception {
+			public:
+				InteruptException(const InteruptException& orig) : Exception(orig) {}
+				InteruptException(InteruptException&& from) : Exception(MoveRValue(from)) {}
+				InteruptException& operator=(const InteruptException& from) { this->~InteruptException(); this->InteruptException::InteruptException(from); return *this; }
+				InteruptException& operator=(InteruptException&& from) { this->~InteruptException(); this->InteruptException::InteruptException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -701,8 +1031,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new InteruptException(*this));
 				}
 
 				virtual ~InteruptException() {}
@@ -713,6 +1052,11 @@ namespace Seed {
 			private:
 				///<summary>Запрошений розмір</summary>
 				SizeT requiredSize;
+			public:
+				StringToLong(const StringToLong& orig) : Exception(orig), requiredSize(orig.requiredSize) {}
+				StringToLong(StringToLong&& from) : Exception(MoveRValue(from)), requiredSize(from.requiredSize) {}
+				StringToLong& operator=(const StringToLong& from) { this->~StringToLong(); this->StringToLong::StringToLong(from); return *this; }
+				StringToLong& operator=(StringToLong&& from) { this->~StringToLong(); this->StringToLong::StringToLong(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -732,13 +1076,27 @@ namespace Seed {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName),
 						ExceptionString(L". Запрошений розмір "), ExceptionString::toString(requiredSize),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new StringToLong(*this));
 				}
 			};
 
 			///<summary>Цілочисельне переповнення</summary>
 			class IntegerOverflowException : public Exception {
+			public:
+				IntegerOverflowException(const IntegerOverflowException& orig) : Exception(orig) {}
+				IntegerOverflowException(IntegerOverflowException&& from) : Exception(MoveRValue(from)) {}
+				IntegerOverflowException& operator=(const IntegerOverflowException& from) { this->~IntegerOverflowException(); this->IntegerOverflowException::IntegerOverflowException(from); return *this; }
+				IntegerOverflowException& operator=(IntegerOverflowException&& from) { this->~IntegerOverflowException(); this->IntegerOverflowException::IntegerOverflowException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -751,14 +1109,29 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
 				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new IntegerOverflowException(*this));
+				}
+
+				virtual ~IntegerOverflowException() {}
 			};
 
 			///<summary>Ітератор на кінець не є визначеним</summary>
-			class EndNodeNotDeferencable final : public Exception
-			{
+			class EndNodeNotDeferencable final : public Exception {
+			public:
+				EndNodeNotDeferencable(const EndNodeNotDeferencable& orig) : Exception(orig) {}
+				EndNodeNotDeferencable(EndNodeNotDeferencable&& from) : Exception(MoveRValue(from)) {}
+				EndNodeNotDeferencable& operator=(const EndNodeNotDeferencable& from) { this->~EndNodeNotDeferencable(); this->EndNodeNotDeferencable::EndNodeNotDeferencable(from); return *this; }
+				EndNodeNotDeferencable& operator=(EndNodeNotDeferencable&& from) { this->~EndNodeNotDeferencable(); this->EndNodeNotDeferencable::EndNodeNotDeferencable(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -772,9 +1145,20 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
 				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new EndNodeNotDeferencable(*this));
+				}
+
+				virtual ~EndNodeNotDeferencable() {}
 			};
 
 			/// <summary>
@@ -784,6 +1168,11 @@ namespace Seed {
 			private:
 				///<summary>NtStatus code операції</summary>
 				Int32 statusCode;
+			public:
+				NtException(const NtException& orig) : Exception(orig), statusCode(orig.statusCode) {}
+				NtException(NtException&& from) : Exception(MoveRValue(from)), statusCode(from.statusCode) {}
+				NtException& operator=(const NtException& from) { this->~NtException(); this->NtException::NtException(from); return *this; }
+				NtException& operator=(NtException&& from) { this->~NtException(); this->NtException::NtException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -800,9 +1189,17 @@ namespace Seed {
 						ExceptionString(exceptionName),
 						ExceptionString(L". Системний виклик вернув код "),
 						BaseString<Memory::ExceptionHeap>::Int32asHex(statusCode), ExceptionString(L". "),
-						location.toString(),
-						ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new NtException(*this));
 				}
 
 				virtual ~NtException() {}
@@ -815,6 +1212,11 @@ namespace Seed {
 			private:
 				///<summary>Максимальний допустимий розмір стеку</summary>
 				SizeT maxSize;
+			public:
+				FullStackException(const FullStackException& orig) : Exception(orig), maxSize(orig.maxSize) {}
+				FullStackException(FullStackException&& from) : Exception(MoveRValue(from)), maxSize(from.maxSize) {}
+				FullStackException& operator=(const FullStackException& from) { this->~FullStackException(); this->FullStackException::FullStackException(from); return *this; }
+				FullStackException& operator=(FullStackException&& from) { this->~FullStackException(); this->FullStackException::FullStackException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -842,9 +1244,17 @@ namespace Seed {
 						ExceptionString(L". Максимальний допустимий розмір - "),
 						ExceptionString::toString(maxSize),
 						ExceptionString(L". "),
-						location.toString(),
-						ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new FullStackException(*this));
 				}
 
 				virtual ~FullStackException() {}
@@ -854,6 +1264,11 @@ namespace Seed {
 			/// Порожній стек
 			/// </summary>
 			class EmptyStackException : public Exception {
+			public:
+				EmptyStackException(const EmptyStackException& orig) : Exception(orig) {}
+				EmptyStackException(EmptyStackException&& from) : Exception(MoveRValue(from)) {}
+				EmptyStackException& operator=(const EmptyStackException& from) { this->~EmptyStackException(); this->EmptyStackException::EmptyStackException(from); return *this; }
+				EmptyStackException& operator=(EmptyStackException&& from) { this->~EmptyStackException(); this->EmptyStackException::EmptyStackException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -867,9 +1282,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName),
-						location.toString(),
-						ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 						});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new EmptyStackException(*this));
 				}
 
 				virtual ~EmptyStackException() {}
@@ -882,6 +1305,11 @@ namespace Seed {
 			private:
 				///<summary>Максимальний допустимий розмір черги</summary>
 				SizeT maxSize;
+			public:
+				FullQueueException(const FullQueueException& orig) : Exception(orig), maxSize(orig.maxSize) {}
+				FullQueueException(FullQueueException&& from) : Exception(MoveRValue(from)), maxSize(from.maxSize) {}
+				FullQueueException& operator=(const FullQueueException& from) { this->~FullQueueException(); this->FullQueueException::FullQueueException(from); return *this; }
+				FullQueueException& operator=(FullQueueException&& from) { this->~FullQueueException(); this->FullQueueException::FullQueueException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -909,9 +1337,17 @@ namespace Seed {
 						ExceptionString(L". Максимальний допустимий розмір - "),
 						ExceptionString::toString(maxSize),
 						ExceptionString(L". "),
-						location.toString(),
-						ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 						});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new FullQueueException(*this));
 				}
 
 				virtual ~FullQueueException() {}
@@ -921,6 +1357,11 @@ namespace Seed {
 			/// Порожня черга
 			/// </summary>
 			class EmptyQueueException : public Exception {
+			public:
+				EmptyQueueException(const EmptyQueueException& orig) : Exception(orig) {}
+				EmptyQueueException(EmptyQueueException&& from) : Exception(MoveRValue(from)) {}
+				EmptyQueueException& operator=(const EmptyQueueException& from) { this->~EmptyQueueException(); this->EmptyQueueException::EmptyQueueException(from); return *this; }
+				EmptyQueueException& operator=(EmptyQueueException&& from) { this->~EmptyQueueException(); this->EmptyQueueException::EmptyQueueException(MoveRValue(from)); return *this; }
 			public:
 				///<summary>Конструктор помилки</summary>
 				///<param name = 'File'>Файл в якому згенерована помилка</param>
@@ -934,9 +1375,17 @@ namespace Seed {
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName),
-						location.toString(),
-						ExceptionString(L". ")
+						location.toString(), 
+						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 						});
+				}
+
+				/// <summary>
+				/// Вертає копію об'єкта помилки
+				/// </summary>
+				/// <returns>Розумний покажчик на об'єкт помилки</returns>
+				virtual ExceptionHolderType Clone() const override {
+					return ExceptionHolderType(new EmptyQueueException(*this));
 				}
 
 				virtual ~EmptyQueueException() {}
@@ -949,7 +1398,7 @@ namespace Seed {
 			/// Перевірка чи заданий тип є типом помилки(Seed::Core::Exception або похідний від нього клас)
 			/// </summary>
 			template<typename T>
-			concept IsException = IsSame<T, Exceptions::Exception> || IsBasedOn<Exceptions::Exception, T>;
+			concept IsException = IsSame<T, Exceptions::Exception> || IsBasedOn<Exceptions::Exception, T> || IsSame<T, InteruptException>;
 		}
 	}
 }

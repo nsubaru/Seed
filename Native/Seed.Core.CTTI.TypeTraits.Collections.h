@@ -55,9 +55,9 @@ namespace Seed
 
                     //SmartPtr
 
-                    template<typename T, bool TIsConst, bool TIsVolatile>
-                    struct CTTITypeDataImpl<SmartPtr<T>, TIsConst, TIsVolatile> :
-                        BaseCTTITypeDataImpl<SmartPtr<T>, EType::Box, CTTITypeData<T>::IsSerilizable, TIsConst, TIsVolatile>
+                    template<typename THeap, typename T, bool TIsConst, bool TIsVolatile>
+                    struct CTTITypeDataImpl<BaseSmartPtr<THeap, T>, TIsConst, TIsVolatile> :
+                        BaseHeapCTTITypeData<BaseSmartPtr<THeap, T>, THeap, EType::Box, CTTITypeData<T>::IsSerilizable, TIsConst, TIsVolatile>
                     {
                         using ValueType = T;
 

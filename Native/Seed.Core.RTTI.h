@@ -8,6 +8,9 @@ namespace Seed
 	{
 		namespace RTTI
 		{
+			/// <summary>
+			/// Запис про тип
+			/// </summary>
 			class RTTITypeRecord : IDisposable
 			{
 				using Getter = String(*)();
@@ -42,7 +45,10 @@ namespace Seed
 				Data * data;
 			public:
 				RefCountClass(RTTITypeRecord, data);
-
+			public:
+				/// <summary>
+				/// Конструктор запису типу
+				/// </summary>
 				template<typename T>
 				ForceInline RTTITypeRecord(TypeTraits::TypeTag<T>) : data(new Data(
 					Lazy<String>(ArrowFunct(String(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeName))),
@@ -53,34 +59,73 @@ namespace Seed
 				))
 				{}
 
+				/// <summary>
+				/// Вертає ім'я типу
+				/// </summary>
+				/// <returns>Рядкове представлення імені типу</returns>
 				ForceInline const String& GetTypeName() const {
 					return *data->TypeName;
 				}
 
+				/// <summary>
+				/// Вертає Cxx ім'я типу
+				/// </summary>
+				/// <returns>Рядкове представлення Cxx імені</returns>
 				ForceInline const String& GetCxxTypeName() const {
 					return *data->CxxTypeName;
 				}
 
+				/// <summary>
+				/// Вертає CTTI клас типу
+				/// </summary>
+				/// <returns></returns>
 				ForceInline CTTI::TypeTraits::EType GetCxxTypeClass() const {
 					return data->TypeClass;
 				}
 
+				/// <summary>
+				/// Вказує чи тип підтримує серелізацію
+				/// </summary>
+				/// <returns>true якщо тип серелізується</returns>
 				ForceInline Boolean GetIsSerilizeable() const {
 					return data->IsSerilizeable;
 				}
 
+				/// <summary>
+				/// Вертає Cxx опис типу
+				/// </summary>
+				/// <returns>Cxx опис типу</returns>
 				ForceInline const auto& TypeId() const {
 					return *data->rttiTypeInfo;
 				}
 
+				/// <summary>
+				/// Вертає хеш типу
+				/// </summary>
+				/// <returns>Хеш типу</returns>
 				ForceInline ID GetHashCode() const {
 					return data->rttiTypeInfo->GetHashCode();
 				}
 			public:
+				/// <summary>
+				/// Ім'я типу
+				/// </summary>
 				String					Property(GetTypeName)		TypeName;
+				/// <summary>
+				/// Cxx ім'я типу
+				/// </summary>
 				String					Property(GetCxxTypeName)	CxxTypeName;
+				/// <summary>
+				/// CTTI клас типу
+				/// </summary>
 				CTTI::TypeTraits::EType Property(GetCxxTypeClass)	CxxTypeClass;
+				/// <summary>
+				/// Вказує чи тип підтримує серелізацію
+				/// </summary>
 				Boolean					Property(GetIsSerilizeable) IsSerilizeable;
+				/// <summary>
+				/// Хеш типу
+				/// </summary>
 				ID						Property(GetHashCode)		HashCode;
 			public:
 				ForceInline auto operator==(const RTTITypeRecord& other) const {

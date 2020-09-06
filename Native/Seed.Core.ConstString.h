@@ -62,6 +62,11 @@ namespace Seed {
 					const Seed::ConstAString& Function,
 					const Seed::SizeT Line);
 
+				InternalApiCall __declspec(noreturn) void ThrowNotFound(
+					const Seed::ConstAString& File,
+					const Seed::ConstAString& Function,
+					const Seed::SizeT Line);
+
 				InternalApiCall __declspec(noreturn) void ThrowInternalError(
 					const Seed::ConstAString& File,
 					const Seed::ConstAString& Function,

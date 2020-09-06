@@ -5,20 +5,33 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			interface ITask;
+			class ITask;
 			class SheduledJob;
 			class SheduledJobBuilder;
 			class TaskSheduler;
 
-			interface ITask
+			/// <summary>
+			/// Інтерфейс задачі
+			/// </summary>
+			class ITask
 			{
-				void Execute(DateTime startTimeUtc) volatile;
+			public:
+				/// <summary>
+				/// Тіло задачі
+				/// </summary>
+				/// <param name="startTimeUtc">Час виклику в UTC форматі</param>
+				virtual void Execute(DateTime startTimeUtc) volatile = 0;
+			public:
+				virtual ~ITask() = 0 {}
 			};
 
 			/// <summary>
 			/// Планувальник задач на базі пулу потоків(виконує задачі в задану дату і час)
 			/// </summary>
 			class TaskSheduler final : protected IDisposable {
+				/// <summary>
+				/// Дані планувальника задач
+				/// </summary>
 				struct Data {
 					///<summary>Керуюча структура пула потоків</summary>
 					ImplSpecificT pool;
@@ -89,7 +102,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="thread">Поінтер на задачу</param>
 				/// <returns>Об'єкт блокировки</returns>
-				friend SRWLock GetPoolLock(SheduledJob* thread);
+				friend SRWLock& GetPoolLock(SheduledJob* thread);
 				/// <summary>
 				/// Вертає true якщо пул впроцесі знищення
 				/// </summary>
@@ -174,6 +187,11 @@ namespace Seed {
 					volatile Handle hTask;
 
 					/// <summary>
+					/// Ідентифікатор задачі
+					/// </summary>
+					volatile Handle hId;
+
+					/// <summary>
 					/// Останій час запуску
 					/// </summary>
 					volatile DateTime LastStartTime;
@@ -187,6 +205,11 @@ namespace Seed {
 					/// Стан потоку задачі
 					/// </summary>
 					volatile EThreadabledStates State;
+
+					/// <summary>
+					/// Активний стан потоку задачі
+					/// </summary>
+					volatile EThreadabledStates ActiveState;
 
 					/// <summary>
 					/// ID потоку в якому задача виконується
@@ -214,6 +237,11 @@ namespace Seed {
 					String Name;
 
 					/// <summary>
+					/// Блокування задачі від запуску кількості екземплярів
+					/// </summary>
+					Threading::SRWLock lock;
+
+					/// <summary>
 					/// Кількість виконаннь
 					/// </summary>
 					RefCountT ExucutedCount;
@@ -237,13 +265,16 @@ namespace Seed {
 						TimerProximity(0),
 						PeriodsCount(1),
 						hTask(nullptr),
+						hId(nullptr),
 						LastStartTime(0),
 						StartTime(0),
 						State(EThreadabledStates::NotStarted),
+						ActiveState(EThreadabledStates::NotStarted),
 						TID(0),
 						sheduler(sheduler),
 						hThread(nullptr),
 						Name(L"Unnamed Task"),
+						lock(),
 						ExucutedCount(0),
 						RemainingPeriodsCount(0),
 						RefCount(1),
@@ -262,8 +293,10 @@ namespace Seed {
 				friend void RegisterThread(SheduledJob* thread);
 				friend void UnRegisterThread(SheduledJob* thread);
 				friend volatile ITask& GetJobEntryPoint(SheduledJob* thread);
-				friend SRWLock GetPoolLock(SheduledJob* thread);
+				friend SRWLock& GetPoolLock(SheduledJob* thread);
 				friend Boolean IsPoolTerminating(SheduledJob* thread);
+				friend void SetCallbackInstanceObj(SheduledJob* thread, void* callbackObj);
+				friend SRWLock& GetTaskLock(SheduledJob* thread);
 			protected:
 				/// <summary>
 				/// Знищення об'єкта задачі
@@ -295,6 +328,11 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Силку на поточний об'єкт</returns>
 				SeedKernelCall SheduledJob& Suspend();
+				/// <summary>
+				/// Продовження виконання задачі
+				/// </summary>
+				/// <returns></returns>
+				SeedKernelCall SheduledJob& Resume();
 				/// <summary>
 				/// Очікування на завершення задачі
 				/// </summary>
