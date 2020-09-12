@@ -81,32 +81,32 @@ namespace Seed {
                     T arr[Size];
                 public:
                     template<typename C1, typename ...C>
-                    friend constexpr auto Fill(ConstexprArray This, C1 c1, C ... c) {
+                    ForceInline friend constexpr auto Fill(ConstexprArray This, C1 c1, C ... c) {
                         This.arr[sizeof...(C)] = c1;
                         return Fill(This, c...);
                     }
                     template<typename C1>
-                    friend constexpr auto Fill(ConstexprArray This, C1 c1) {
+                    ForceInline friend constexpr auto Fill(ConstexprArray This, C1 c1) {
                         This.arr[0] = c1;
                         return This;
                     }
                 public:
-                    constexpr ConstexprArray() : arr() {}
+                    ForceInline constexpr ConstexprArray() : arr() {}
 
                     template<typename ... T>
-                    constexpr ConstexprArray(T ... t) : arr{ t... } {
+                    ForceInline constexpr ConstexprArray(T ... t) : arr{ t... } {
                     }
 
-                    constexpr T& operator[](SizeT Index) {
+                    ForceInline constexpr T& operator[](SizeT Index) {
                         return arr[Index];
                     }
 
-					constexpr const T& operator[](SizeT Index) const {
+					ForceInline constexpr const T& operator[](SizeT Index) const {
                         return arr[Index];
                     }
 
                     template<SizeT N>
-                    constexpr ConstexprArray<T, Size + N> operator+(ConstexprArray<T, N> second) const {
+                    ForceInline constexpr ConstexprArray<T, Size + N> operator+(ConstexprArray<T, N> second) const {
                         if constexpr (N == 0)
                         {
                             return *this;
@@ -123,7 +123,7 @@ namespace Seed {
                     }
 
                     template<SizeT NewSize>
-                    constexpr ConstexprArray<T, NewSize> Resize() const {
+                    ForceInline constexpr ConstexprArray<T, NewSize> Resize() const {
                         ConstexprArray<T, NewSize> ret;
                         constexpr SizeT CopySize = Min(Size, NewSize);
                         for (SizeT i = 0; i < CopySize; i++)
@@ -132,7 +132,7 @@ namespace Seed {
                     }
 
                     template<SizeT NewSize>
-                    constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
+                    ForceInline constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
                         if constexpr (NewSize >= Size)
                             static_assert(false);
                         ConstexprArray<T, NewSize> ret;
@@ -142,11 +142,11 @@ namespace Seed {
                         return ret;
                     }
 
-                    constexpr const T* Raw() const { return arr; }
+                    ForceInline constexpr const T* Raw() const { return arr; }
 
                     static constexpr SizeT Count = Size;
 
-                    constexpr ConstexprArray Reverse() {
+                    ForceInline constexpr ConstexprArray Reverse() {
 						if constexpr (Size < 2)
 							return *this;
 						else
@@ -162,7 +162,7 @@ namespace Seed {
                     }
 
                     template<SizeT Size2>
-                    constexpr bool IsStartWith(ConstexprArray<T, Size2> mask) {
+                    ForceInline constexpr bool IsStartWith(ConstexprArray<T, Size2> mask) {
                         if (Size < Size2)
                             return false;
 
@@ -182,22 +182,22 @@ namespace Seed {
                 template<typename T>
                 class ConstexprArray<T, 0> {
                 public:
-                    constexpr ConstexprArray() {};
-                    constexpr ConstexprArray(const ConstexprArray&) = default;
+                    ForceInline constexpr ConstexprArray() {};
+                    ForceInline constexpr ConstexprArray(const ConstexprArray&) = default;
 
                     template<SizeT N>
-                    constexpr ConstexprArray<T, N> operator+(ConstexprArray<T, N> second) const {
+                    ForceInline constexpr ConstexprArray<T, N> operator+(ConstexprArray<T, N> second) const {
                         return second;
                     }
 
                     template<SizeT NewSize>
-                    constexpr ConstexprArray<T, NewSize> Resize() const {
+                    ForceInline constexpr ConstexprArray<T, NewSize> Resize() const {
                         ConstexprArray<T, NewSize> ret;
                         return ret;
                     }
 
                     template<SizeT NewSize>
-                    constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
+                    ForceInline constexpr ConstexprArray<T, NewSize> ResizeLeft() const {
                         if constexpr (NewSize >= 0)
                             static_assert(false);
                         ConstexprArray<T, NewSize> ret;
@@ -207,7 +207,7 @@ namespace Seed {
 
                     static constexpr SizeT Count = 0;
 
-                    constexpr ConstexprArray Reverse() {
+                    ForceInline constexpr ConstexprArray Reverse() {
                         return *this;
                     }       
 
@@ -216,18 +216,18 @@ namespace Seed {
                 };
 
                 template<char ... Chars>
-                constexpr auto TypeStringToArray(TypeString<Chars...>) {
+                ForceInline constexpr auto TypeStringToArray(TypeString<Chars...>) {
                     return CompileStringView(TypeString<Chars...>()).AsArray<TypeString<Chars...>::Size()>();
                 }
 
                 template<char ... Chars>
-                constexpr auto TypeStringToArrayWithoutTrailZero(TypeString<Chars...>) {
+                ForceInline constexpr auto TypeStringToArrayWithoutTrailZero(TypeString<Chars...>) {
                     return CompileStringView(TypeString<Chars...>()).AsArray<TypeString<Chars...>::Size() - 1>();
                 }
 
                 namespace Details {
                     template <typename U>
-                    static constexpr auto type_name()
+                    ForceInline static constexpr auto type_name()
                     {
                         SizeT prefix = 0;
                         while (true) {
@@ -247,7 +247,7 @@ namespace Seed {
                     }
 
 					template <typename U>
-                    static constexpr auto type_name_size()
+                    ForceInline static constexpr auto type_name_size()
                     {
                         SizeT prefix = 0;
                         while (true) {
@@ -268,12 +268,12 @@ namespace Seed {
                 }
 
                 template<typename T>
-                constexpr auto TypeName() {
+                ForceInline constexpr auto TypeName() {
                     return (Details::type_name<T>().AsArray<Details::type_name_size<T>()>()).Resize<Details::type_name_size<T>() + 1>();
                 }
 
                 template<SizeT I>
-                constexpr auto ToCharStr() {
+                ForceInline constexpr auto ToCharStr() {
                     constexpr SizeT N = []() {
 						if(I < 9)
 							return 1ui64;
@@ -301,9 +301,23 @@ namespace Seed {
 						return ret.Reverse();
 					}
                 }
+
+                template <Seed::SizeT N>
+                using fakeStr = Seed::Core::CTTI::Details::ConstexprArray<char, N>;
+
+
+                template <Seed::SizeT N, Seed::SizeT ... Is>
+                ForceInline constexpr fakeStr<sizeof...(Is)> mFSh (char const (& str)[N],
+                                                       Seed::TypeTraits::Indexator<Is...> const &)
+                 { return { str[Is]... }; }
+
+                template <Seed::SizeT N>
+                ForceInline constexpr auto CreateTypeStr (char const (& str)[N])
+                 { return mFSh(str, Seed::TypeTraits::Indexer<N-1>::Type{}).Reverse(); }
             }
         }
     }
 }
+
 
 #pragma warning(pop)

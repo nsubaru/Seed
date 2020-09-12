@@ -335,7 +335,7 @@ static void* FindCompleteObject(void* inptr)           // Pointer to polymorphic
 //
 
 static _RTTIBaseClassDescriptor* FindSITargetTypeInstance(
-	_RTTICompleteObjectLocator* const pCOLocator, // pointer to Locator of complete object
+	_RTTICompleteObjectLocator* const pCOLocator, // pointer to Locator of complete object //-V2558
 	_RTTITypeDescriptor* const pSrcTypeID,        // pointer to TypeDescriptor of source object
 	_RTTITypeDescriptor* const pTargetTypeID      // pointer to TypeDescriptor of result of cast
 	IMAGEBASE_PARAMETER
@@ -470,7 +470,7 @@ static _RTTIBaseClassDescriptor* FindSITargetTypeInstance(
 
 static _RTTIBaseClassDescriptor* FindMITargetTypeInstance(
 	void* pCompleteObject,                 // pointer to complete object
-	_RTTICompleteObjectLocator* pCOLocator, // pointer to Locator of complete object
+	_RTTICompleteObjectLocator* pCOLocator, // pointer to Locator of complete object //-V2558
 	_RTTITypeDescriptor* pSrcTypeID,        // pointer to TypeDescriptor of source object
 	ptrdiff_t SrcOffset,                    // offset of source object in complete object
 	_RTTITypeDescriptor* pTargetTypeID      // pointer to TypeDescriptor of result of cast
@@ -664,7 +664,7 @@ static _RTTIBaseClassDescriptor* FindMITargetTypeInstance(
 
 static _RTTIBaseClassDescriptor* FindVITargetTypeInstance(
 	void* pCompleteObject,                 // pointer to complete object
-	_RTTICompleteObjectLocator* pCOLocator, // pointer to Locator of complete object
+	_RTTICompleteObjectLocator* pCOLocator, // pointer to Locator of complete object //-V2558
 	_RTTITypeDescriptor* pSrcTypeID,        // pointer to TypeDescriptor of source object
 	ptrdiff_t SrcOffset,                    // offset of source object in complete object
 	_RTTITypeDescriptor* pTargetTypeID      // pointer to TypeDescriptor of result of cast

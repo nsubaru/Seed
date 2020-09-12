@@ -2,8 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Security.h"
-#include "Seed.Core.Security.Manage.h"
-#include "Seed.Core.Security.Internal.h"
 
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"

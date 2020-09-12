@@ -69,7 +69,7 @@ public:
 		return a;
 	}
 	int Method4(int a, double b) {
-		return static_cast<int>(a + b);
+		return static_cast<int>(a + b); //-V2564
 	}
 };
 
@@ -82,7 +82,7 @@ public:
 		return a;
 	}
 	int Method4(int a, double b) {
-		return static_cast<int>(a + b);
+		return static_cast<int>(a + b); //-V2564
 	}
 };
 

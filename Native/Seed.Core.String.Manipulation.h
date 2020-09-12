@@ -93,7 +93,7 @@ namespace Seed
                 /// </summary>
                 /// <param name="newReservedSize">Новий розмір буфера рядка</param>
                 /// <returns>Силка на поточнй об'єкт</returns>
-                TBaseString& Reserve(SizeT newReservedSize) {
+                ForceInline TBaseString& Reserve(SizeT newReservedSize) {
                     TBaseString* This = static_cast<TBaseString*>(this);
                     if (newReservedSize < This->ReservedSize)
                         return *This;
@@ -105,7 +105,7 @@ namespace Seed
                 /// <param name = "newSize">Новий фактичний розмір, якшо він більший ніж поточний то генерується помилка ThrowIndexOutOfRange</param>
                 /// <exception cref="Exceptions::ThrowIndexOutOfRange">Новий фактичний розмір більший ніж поточний</exception>
                 /// <returns>Силка на поточний рядок</returns>
-                TBaseString& Shrink(SizeT newSize) {
+                ForceInline TBaseString& Shrink(SizeT newSize) {
                     TBaseString* This = static_cast<TBaseString*>(this);
                     if (newSize > This->CurrentSize)
                     {
@@ -197,7 +197,7 @@ namespace Seed
 
                 ///<summary>Приведення всіх букв в заглавні</summary>
                 ///<returns>Силку на поточний рядок</retutns>
-                TBaseString& toUpcase() {
+                ForceInline TBaseString& toUpcase() {
                     TBaseString* This = static_cast<TBaseString*>(this);
                     for (SizeT i = 0; i < This->CurrentSize; i++)
                         This->str[i] = CStr::ToUpcase(This->str[i]);
@@ -206,7 +206,7 @@ namespace Seed
 
                 ///<summary>Приведення всіх букв в нижній регістр</summary>
                 ///<returns>Силку на поточний рядок</retutns>
-                TBaseString& toDowncase() {
+                ForceInline TBaseString& toDowncase() {
                     TBaseString* This = static_cast<TBaseString*>(this);
                     for (SizeT i = 0; i < This->CurrentSize; i++)
                         This->str[i] = CStr::ToDowncase(This->str[i]);
@@ -498,7 +498,7 @@ namespace Seed
                     return *This;
                 }
 			protected:
-                virtual ~TManipulationStringPart() = 0 {}
+                ForceInline virtual ~TManipulationStringPart() = 0 {}
 			};
 		}
 	}

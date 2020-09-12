@@ -109,7 +109,7 @@ namespace Seed {
         	/// <param name="str1">Перша рядкова змінна</param>
         	/// <param name="str2">Друга рядкова змінна</param>
         	/// <returns>True якщо всі символи ідентичні</returns>
-            __forceinline constexpr Boolean Compare(const ACharStr str1, const ACharStr str2) {
+            __forceinline constexpr Boolean Compare(const ACharStr str1, const ACharStr str2) { //-V2558
                 const auto str1Size = Size(str1);
                 const auto str2Size = Size(str2);
                 if (str1Size != str2Size) return false;

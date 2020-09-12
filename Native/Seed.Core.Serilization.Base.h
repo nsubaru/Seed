@@ -96,7 +96,7 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("N/A")());
+                            CTTI::Details::CreateTypeStr("N/A");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
@@ -111,19 +111,19 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(T)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+							CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr("") +
+                            CTTI::Details::CreateTypeStr("}");
                     }
                 };
 
@@ -154,7 +154,7 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+                            CTTI::Details::CreateTypeStr("");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
@@ -168,19 +168,19 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(T)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")()) +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+							CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr("") +
+                            CTTI::Details::CreateTypeStr("}");
                     }
                 };
 
@@ -232,7 +232,7 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+                            CTTI::Details::CreateTypeStr("");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
@@ -258,19 +258,19 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(T)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             BaseSerlizationHandler<THeap, ItemType>::TypeMetaData() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
                 };
             }
@@ -327,22 +327,22 @@ namespace Seed
 
             template<typename THeap, typename T>
             ForceInline BaseString<THeap> BaseMetaDataGen() {
-                return BaseString<THeap>(Details::BaseSerlizationHandler<THeap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
+                return BaseString<THeap>(Details::BaseSerlizationHandler<THeap, T>::TypeMetaData() + CTTI::Details::CreateTypeStr("\0"));
             }
 
             template<typename T>
             ForceInline String MetaDataGen() {
-                return String(Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
+                return String(Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::CreateTypeStr("\0"));
             }
 
             template<typename T>
             ForceInline SensitiveString SensitiveMetaDataGen() {
-                return SensitiveString(Details::BaseSerlizationHandler<Memory::SensitiveDataHeap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")()));
+                return SensitiveString(Details::BaseSerlizationHandler<Memory::SensitiveDataHeap, T>::TypeMetaData() + CTTI::Details::CreateTypeStr("\0"));
             }
 
             template<typename T>
             ForceInline constexpr auto CTTIMetaDataGen() {
-                return Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::TypeStringToArray(GenNGTypeString("")());
+                return Details::BaseSerlizationHandler<Memory::Heap, T>::TypeMetaData() + CTTI::Details::CreateTypeStr("\0");
             }
         }
     }

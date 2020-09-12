@@ -33,7 +33,7 @@ bool Seed::Core::Testing::Test::Serilization::FloatPointSerilization::Excecute()
     auto stream = Core::Serilization::Serilize(Value, registry);
     decltype(Value) deserelizedValue;
     Core::Serilization::Deserilize(stream, deserelizedValue, registry);
-    return Value == deserelizedValue; //-V550
+    return Value == deserelizedValue; //-V550 //-V2550
 }
 
 bool Seed::Core::Testing::Test::Serilization::CharacterSerilization::Excecute() {

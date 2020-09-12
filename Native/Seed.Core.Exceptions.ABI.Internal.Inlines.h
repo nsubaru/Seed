@@ -141,7 +141,7 @@ inline ptrdiff_t DecompFuncInfo(Seed::UInt8 * buffer, FuncInfo4 & FuncInfoDe, ui
 }
 
 inline uintptr_t __FuncRelToRealOffset(
-    DispatcherContext   *pDC,
+    DispatcherContext   *pDC, //-V2558
     unsigned int        funcRelOffset
 )
 {
@@ -149,7 +149,7 @@ inline uintptr_t __FuncRelToRealOffset(
 }
 
 inline uintptr_t __RVAtoRealOffset(
-    DispatcherContext   *pDC,
+    DispatcherContext   *pDC, //-V2558
     int                 RVA
 )
 {

@@ -69,7 +69,7 @@ namespace Seed {
                                                                         TSize,
                                                                         TNewSize);
 						}
-					}
+					} //-V591
 				public:
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<

@@ -258,17 +258,21 @@ namespace Seed
                 ///<returns>Рядкове представлення числа</returns>
                 static TBaseString toString(Float val, UInt8 precision = 3) {
                     using namespace Math;
-                    if (val == 0.0) return L"0"; //-V550
+                    
                     if (val != val) return L"NaN";
-                    if (val == Infinity) return L"Infinity"; //-V550
-                    if (val == -Infinity) return L"-Infinity"; //-V550
+
+                    if (Math::Equals(val, Infinity)) return L"Infinity"; //-V550
+                    if (Math::Equals(val, -Infinity)) return L"-Infinity"; //-V550
+                    if (Math::Equals(val, 0.0)) return L"0"; //-V550
+
                     if (precision > 10) precision = 10;
+
                     Boolean sign = Math::Sign(val);
                     if (sign) val *= -1.0;
-                    Float IntPart;
+                    Float IntPart = 0;
                     Float DoublePart = Math::ModD(val, IntPart);
                     DoublePart *= Math::Pow(10, precision);
-                    Char buf[50];
+                    Char buf[50] = { 0 };
                     SizeT size = 0;
                     while (DoublePart >= 1) {
                         buf[size] = L'0' + (Int32)(DoublePart) % 10; //-V2005 //-V2003
@@ -309,17 +313,20 @@ namespace Seed
                 ///<returns>Рядкове представлення числа</returns>
                 static TBaseString toString(Double val, UInt8 precision = 5) {
                     using namespace Math;
-                    if (val == 0.0) return L"0"; //-V550
+                    
                     if (val != val) return L"NaN";
-                    if (val == Infinity) return L"Infinity"; //-V550
-                    if (val == -Infinity) return L"-Infinity"; //-V550
+
+                    if (Math::Equals(val, Infinity)) return L"Infinity"; //-V550
+                    if (Math::Equals(val, -Infinity)) return L"-Infinity"; //-V550
+                    if (Math::Equals(val, 0.0)) return L"0"; //-V550
+
                     if (precision > 10) precision = 10;
                     Boolean sign = Math::Sign(val);
                     if (sign) val *= -1.0;
-                    Double IntPart;
+                    Double IntPart = 0;
                     Double DoublePart = Math::ModD(val, IntPart);
                     DoublePart *= Math::Pow(10, precision);
-                    Char buf[50];
+                    Char buf[50] = { 0 };
                     SizeT size = 0;
                     while (DoublePart >= 1) {
                         buf[size] = L'0' + (Int32)(DoublePart) % 10; //-V2005 //-V2003
@@ -493,7 +500,7 @@ namespace Seed
                 /// </summary>
                 /// <exception cref="Seed::Exceptions::InvalidArgumentException">Якщо рядок неможливо перетворити в логічне значення</exception>
                 /// <returns>Логічне значення</returns>
-                Boolean toBoolean() const {
+                ForceInline Boolean toBoolean() const {
                     const TBaseString& This = static_cast<const TBaseString&>(*this);
 
                     if (This == L"true" || This == L"True")
@@ -506,7 +513,7 @@ namespace Seed
 #pragma endregion
                 ///<summary>Вертає рядкове представлення UUID</summary>
                 ///<returns>Рядкове представлення UUID в вигляді {????????-????-????-????????????????}</returns>
-                static TBaseString toString(const UUID& id) {
+                ForceInline static TBaseString toString(const UUID& id) {
                     auto ReservedSize = sizeof(UUID::UUIDStringWildCard) + CurrentSettings().MemoryManager.StringReserveSize;
                     CharStr buffer = reinterpret_cast<CharStr>(TBaseString::operator new[](sizeof(UUID::UUIDStringWildCard)));
                     Internals::ConvertUUIDtoCharStr(id, buffer);
@@ -514,14 +521,14 @@ namespace Seed
                 }
 
                 ///<summary>Перетворення дати і часу в строкове представлення</summary>
-                static TBaseString toString(Seed::Core::Date date) {
+                ForceInline static TBaseString toString(Seed::Core::Date date) {
                     Char buffer[22];
                     Internals::ConvertDateToStringImpl(date, buffer);
                     return buffer;
                 }
 
                 ///<summary>Перетворення часу і дати в строкове представлення</summary>
-                static TBaseString toString(Seed::Core::DateTime time) {
+                ForceInline static TBaseString toString(Seed::Core::DateTime time) {
                     Char buffer[22];
                     Internals::ConvertDateTimeToStringImpl(time, buffer);
                     return buffer;
@@ -532,7 +539,7 @@ namespace Seed
                 /// </summary>
                 /// <param name="typeInfo">CxxRtti опис типу</param>
                 /// <returns>Кодована назва типу</returns>
-                static TBaseString toString(const TypeInfo& typeInfo) {
+                ForceInline static TBaseString toString(const TypeInfo& typeInfo) {
                     return TBaseString<THeap>(const_cast<AChar*>(typeInfo.GetCxxName()));
                 }
 
@@ -551,7 +558,7 @@ namespace Seed
 
                 ///<summary>Конвертація з рядкового в бінарне представлення UUID </summary>
                 ///<returns>UUID</returns>
-                UUID toUUID() const {
+                ForceInline UUID toUUID() const {
                     const TBaseString* This = static_cast<const TBaseString*>(this);
 
                     if (This->str == nullptr || This->CurrentSize == 0)
@@ -564,7 +571,7 @@ namespace Seed
                 }
 #pragma endregion
 			protected:
-                virtual ~TConvertorsStringPart() = 0 {}
+                ForceInline virtual ~TConvertorsStringPart() = 0 {}
 			};
 		}
 	}

@@ -14,8 +14,6 @@ namespace Seed
             namespace LINQ
             {
                 class ITupleGenericBase {
-                protected:
-                    ForceInline virtual ~ITupleGenericBase() = 0 {}
                 };
             }
 
@@ -156,7 +154,7 @@ namespace Seed
                 Leafes<typename TypeTraits::Indexer<sizeof...(TDatas)>::Type, TDatas...> ls;
             private:
                 template<typename F, SizeT ... TIdxN>
-                ForceInline decltype(auto) CallWithArgsFromTupleImpl(F f, TypeTraits::TypeTag<TypeTraits::Indexator<TIdxN...>>) {
+                ForceInline decltype(auto) CallWithArgsFromTupleImpl(F f, UnusedData TypeTraits::TypeTag<TypeTraits::Indexator<TIdxN...>>) {
                     if constexpr (TypeTraits::IsSameV<decltype(f(MoveRValue(this->GetByIdx<(Count - 1) -TIdxN>())...)), void>)
                     {
                         f(MoveRValue<decltype(this->GetByIdx<(Count - 1) - TIdxN>())>(this->GetByIdx<(Count - 1) - TIdxN>())...);
@@ -165,6 +163,11 @@ namespace Seed
                     {
                         return f(MoveRValue<decltype(this->GetByIdx<(Count - 1) - TIdxN>())>(this->GetByIdx<(Count - 1) - TIdxN>())...);
                     }
+                }
+
+                template<typename TLambda, SizeT... TIdx>
+                ForceInline constexpr decltype(auto) ConvertToImpl(TLambda&& lambda, UnusedData TypeTraits::TypeTag<TypeTraits::Indexator<TIdx...>>) const {
+                    return Tuple<decltype(lambda(GetByIdx<TIdx>()))...>(lambda(GetByIdx<TIdx>())...);
                 }
             public:
                 ForceInline constexpr Tuple() : ls() {}
@@ -195,6 +198,11 @@ namespace Seed
                     {
                         return CallWithArgsFromTupleImpl(f, TypeTraits::TypeTag<typename TypeTraits::Indexer<sizeof...(TDatas)>::Type>{});
                     }
+                }
+
+                template<typename TLambda>
+                ForceInline constexpr decltype(auto) ConvertTo(TLambda&& lambda) const {
+                    return ConvertToImpl(lambda, TypeTraits::TypeTag<typename TypeTraits::Indexer<sizeof...(TDatas)>::Type>{});
                 }
 
                 template<UInt64 TI>

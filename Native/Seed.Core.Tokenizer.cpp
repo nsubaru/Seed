@@ -5,7 +5,7 @@
 
 using namespace Seed;
 
-Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr* Delims, SizeT* DelimSizes, SizeT DelimsCount, SizeT StartSize)
+Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(const CharStr Text, SizeT Size, CharStr* Delims, SizeT* DelimSizes, SizeT DelimsCount, SizeT StartSize)
 {
 	for (SizeT i = StartSize + 1; i < Size; i++)
 	{

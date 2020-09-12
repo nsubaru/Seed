@@ -80,7 +80,6 @@ namespace Seed
 							msg += String::toString(testDurration.GetMsFrom1600());
 							msg += L" tiks";
 							msg += L", тест не пройдено";
-							msg += 
 							toCoreLog(msg);
 
 							results += {record.Key.TypeName, TestResult::EStatus::Failure, L"Вернув false", testDurration};

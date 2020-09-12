@@ -650,17 +650,17 @@ namespace Seed
 				struct ObjectNullCtorAndDtor {
 					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> DynamicObject
 					{
-						Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
+						Throw(InvlaidDynamicFunctionArgs(__FILE__, "ObjectNullCtorAndDtor", __LINE__));
 					};
 
 					static constexpr auto UnifiedDtor = [] (DynamicObject&& object)
 					{
 					};
 
-					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::TypeStringToArray(GenNGTypeString("`invalid`")());
+					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::CreateTypeStr("`invalid`");
 
 					static String ArgsMetaData() {
-						return Seed::Core::CTTI::Details::TypeStringToArray(GenNGTypeString("`Can not construct`")());
+						return Seed::Core::CTTI::Details::CreateTypeStr("`Can not construct`");
 					}
 				};
 

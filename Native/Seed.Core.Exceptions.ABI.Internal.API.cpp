@@ -12,7 +12,7 @@
 
 __ehstate_t GetMaxState(
         DispatcherContext  *pDC,
-        FuncInfo4           *pFuncInfo
+        FuncInfo4           *pFuncInfo //-V2558
     )
     {
         if (pFuncInfo->dispUnwindMap)
@@ -262,7 +262,7 @@ void FrameUnwindToState(
 }
 
 __ehstate_t StateFromIp(
-    FuncInfo4           *pFuncInfo,
+    FuncInfo4           *pFuncInfo, //-V2558
     DispatcherContext   *pDC,
     uintptr_t           Ip
 )
@@ -307,7 +307,7 @@ __ehstate_t StateFromIp(
 //
 bool ExecutionInCatch(
     DispatcherContext*  /*pDC*/,
-    FuncInfo4            *pFuncInfo
+    FuncInfo4            *pFuncInfo //-V2558
     )
 {
     return pFuncInfo->header.isCatch;
@@ -318,7 +318,7 @@ bool ExecutionInCatch(
 //
 EHRegistrationNode * GetEstablisherFrame
 (
-    EHRegistrationNode  *pRN,
+    EHRegistrationNode  *pRN, //-V2558
     DispatcherContext   *pDC,
     FuncInfo4            *pFuncInfo,
     EHRegistrationNode  *pEstablisher
@@ -495,7 +495,7 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler(
 }
 
 int TypeMatchHelper(
-    typename HandlerType4 *pCatch,   // Type of the 'catch' clause
+    HandlerType4 *pCatch,   // Type of the 'catch' clause //-V2558
     CatchableType *pCatchable,       // Type conversion under consideration
     ThrowInfo *pThrow                // General information about the thrown
                                      //   type.
@@ -543,7 +543,7 @@ int TypeMatchHelper(
         (!(pCatchable->properties & CT_ByReferenceOnly) || pCatch->adjectives & HT_IsReference) &&
         (!(pThrow->attributes & TI_IsConst) || pCatch->adjectives & HT_IsConst) &&
         (!(pThrow->attributes & TI_IsUnaligned) || pCatch->adjectives & HT_IsUnaligned) &&
-        (!(pThrow->attributes & TI_IsVolatile) || pCatch->adjectives & HT_IsVolatile);
+        (!(pThrow->attributes & TI_IsVolatile) || pCatch->adjectives & HT_IsVolatile); //-V2570
 }
 
 
@@ -568,7 +568,7 @@ int TypeMatch(
 //
 BOOLEAN IsInExceptionSpec(
     EHExceptionRecord *pExcept,         // Information for this (logical) exception
-    ESTypeList *pESTypeList             // Static information for subject frame
+    ESTypeList *pESTypeList             // Static information for subject frame //-V2558
 )
 {
     //TODO: _VCRT_VERIFY(pESTypeList);
@@ -601,7 +601,7 @@ BOOLEAN IsInExceptionSpec(
                 pESTypeList->dispTypeArray
                 );
 
-        for (catchables = n; catchables > 0; catchables--, ppCatchable++) {
+        for (catchables = n; catchables > 0; catchables--, ppCatchable++) { //-V2528
             pCatchable = (CatchableType *)(reinterpret_cast<Seed::SizeT>(pExcept->params.pThrowImageBase) + *ppCatchable);
 
             if (TypeMatch(&handlerTypes[i], pCatchable, pExcept->params.pThrowInfo))
@@ -618,7 +618,7 @@ BOOLEAN IsInExceptionSpec(
 //////////////////////////////////////////////////////////////////////////////////
 // Is_bad_exception_allowed - checks if std::bad_exception belongs to the list
 //
-BOOLEAN Is_bad_exception_allowed(ESTypeList *pESTypeList)
+BOOLEAN Is_bad_exception_allowed(ESTypeList *pESTypeList) //-V2558
 {
     HandlerType* typesList =
         reinterpret_cast<HandlerType*>(
@@ -772,7 +772,7 @@ int SehTransFilter(
 
 BOOL _CallSETranslator(
     EHExceptionRecord    *pExcept,    // The exception to be translated
-    EHRegistrationNode   *pRN,        // Dynamic info of function with catch
+    EHRegistrationNode   *pRN,        // Dynamic info of function with catch //-V2558
     CONTEXT              *pContext,   // Context info
     DispatcherContext    *pDC,        // More dynamic info of function with catch (ignored)
     FuncInfo4            *pFuncInfo,  // Static info of function with catch
@@ -1123,11 +1123,11 @@ void FindHandler(
                             GetThreadExceptionData()->_ThrowImageBase +
                         pExcept->params.pThrowInfo->pCatchableTypeArray)->nCatchableTypes;
                     // Scan all types that thrown object can be converted to:
-                    for (int catchables = catchableCount; catchables > 0; catchables--, ppCatchable++)
+                    for (int catchables = catchableCount; catchables > 0; catchables--, ppCatchable++) //-V2528
                     {
                         pCatchable = (CatchableType *)(GetThreadExceptionData()->_ThrowImageBase + *ppCatchable);
 
-                        if (!TypeMatch(&handler, pCatchable, pExcept->params.pThrowInfo))
+                        if (!TypeMatch(&handler, pCatchable, pExcept->params.pThrowInfo)) //-V2570
                         {
                             continue;   
                         }
@@ -1239,7 +1239,7 @@ int BuildCatchObjectHelperInternal(
                                      // COM+ eh. If we are in our own eh,
                                      // then this is a Registration node of
                                      // catching function
-    HandlerType4 *pCatch,            // The catch clause that got it
+    HandlerType4 *pCatch,            // The catch clause that got it //-V2558
     CatchableType *pConv             // The conversion to use
     )
 {
@@ -1352,7 +1352,7 @@ void BuildCatchObjectInternal(
                                         // COM+ eh. If we are in our own eh,
                                         // then this is a Registration node of
                                         // catching function
-    HandlerType4 *pCatch,    // The catch clause that got it
+    HandlerType4 *pCatch,    // The catch clause that got it //-V2558
     CatchableType *pConv                // The conversion to use
     )
 {
@@ -1446,7 +1446,7 @@ FRAMEINFO * __cdecl _CreateFrameInfo(
 //__declspec(guard(ignore)) 
 int ExFilterRethrow(
     EXCEPTION_POINTERS *pExPtrs,
-    EHExceptionRecord *pOldExcept,
+    EHExceptionRecord *pOldExcept, //-V2558
     int *rethrow
 ) {
     // Get the exception record thrown (don't care about other info)
@@ -1524,7 +1524,7 @@ void __RethrowException(EHExceptionRecord* pThisException)
 //  case.
 //
 extern "C" void __cdecl _FindAndUnlinkFrame(
-    FRAMEINFO * pFrameInfo
+    FRAMEINFO * pFrameInfo //-V2558
 ) {
     //TODO: _VCRT_VERIFY(pFrameInfo == pFrameInfoChain);
     
@@ -1552,7 +1552,7 @@ extern "C" void __cdecl _FindAndUnlinkFrame(
 //      TRUE if exception object not found and should be destroyed.
 //
 extern "C" BOOL __cdecl _IsExceptionObjectToBeDestroyed(
-    PVOID pExceptionObject
+    PVOID pExceptionObject //-V2558
 ) {
     FRAMEINFO * pFrameInfo;
 
@@ -1704,7 +1704,7 @@ void UnwindNestedFrames(
     FuncInfo4*          /*pFuncInfo*/,
     __ehstate_t         TargetUnwindState,
     __ehstate_t         CatchState,        // State outside of current try but inside of any enclosing trys
-    HandlerType4        *pCatch,
+    HandlerType4        *pCatch, //-V2558
     DispatcherContext   *pDC,
     BOOLEAN             recursive
     )
@@ -1789,7 +1789,7 @@ void CatchIt(
     FuncInfo4 *pFuncInfo,                 // Static info of function with catch
     HandlerType4 *pCatch,                 // The catch clause selected
     CatchableType *pConv,                 // The rules for making the conversion
-    TryBlockMapEntry4 *pEntry,            // Description of the try block
+    TryBlockMapEntry4 *pEntry,            // Description of the try block //-V2558
     int CatchDepth,                       // How many catches are we nested in?
     EHRegistrationNode *pMarkerRN,        // Special node if nested in catch
     BOOLEAN IsRethrow,                    // Is this a rethrow ?

@@ -129,7 +129,7 @@ namespace Seed {
 				Exception(Exception&& from) : 
 					location(from.location), 
 					exceptionName(MoveRValue(from.exceptionName)), 
-					stackTrace(stackTrace), 
+					stackTrace(from.stackTrace), 
 					innerException(MoveRValue(from.innerException)) {}
 
 				/// <summary>

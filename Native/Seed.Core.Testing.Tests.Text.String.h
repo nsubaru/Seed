@@ -46,6 +46,10 @@ namespace Seed
                     class StringSplitString final : public TestClass<StringSplitString> {
                         virtual bool Excecute() override;
                     };
+
+                    class StringCtorFromConstArray final : public TestClass<StringCtorFromConstArray> {
+                        virtual bool Excecute() override;
+                    };
 				}
 			}
 		}

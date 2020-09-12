@@ -43,24 +43,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
+							CTTI::Details::CreateTypeStr("0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<TString<TStringHeap>>().Resize<CTTI::TypeName<TString<TStringHeap>>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TString<TStringHeap>>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(TString<TStringHeap>)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             BaseSerlizationHandler<THeap, CharacterType>::TypeMetaData() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
 
 					ForceInline static void DeserelizeImpl(TString<TStringHeap>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -92,30 +92,30 @@ namespace Seed
 					}
 
 					ForceInline static constexpr auto TypeHint() {
-						return CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+						return CTTI::Details::CreateTypeStr("");
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
+							CTTI::Details::CreateTypeStr("0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<TPair<TPairHeap, TKey, TValue>>().Resize<CTTI::TypeName<TPair<TPairHeap, TKey, TValue>>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TPair<TPairHeap, TKey, TValue>>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(TPair<TPairHeap, TKey, TValue>)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             BaseSerlizationHandler<THeap, TKey>::TypeMetaData() +
 							BaseSerlizationHandler<THeap, TValue>::TypeMetaData() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
 
 					ForceInline static void DeserelizeImpl(TPair<TPairHeap, TKey, TValue>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -165,29 +165,29 @@ namespace Seed
 
 					ForceInline static constexpr auto TypeHint() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+							CTTI::Details::CreateTypeStr("");
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
+							CTTI::Details::CreateTypeStr("0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<TCollectionClass>().Resize<CTTI::TypeName<TCollectionClass>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(TCollectionClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -267,24 +267,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
+							CTTI::Details::CreateTypeStr("0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<TCollectionClass>().Resize<CTTI::TypeName<TCollectionClass>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(TCollectionClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -348,29 +348,29 @@ namespace Seed
 
 					ForceInline static constexpr auto TypeHint() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+							CTTI::Details::CreateTypeStr("");
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
+							CTTI::Details::CreateTypeStr("0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<TCollectionClass>().Resize<CTTI::TypeName<TCollectionClass>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(TCollectionClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {

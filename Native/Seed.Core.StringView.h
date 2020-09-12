@@ -31,21 +31,21 @@ namespace Seed
 			/// <param name="refStr">Референс рядка</param>
 			/// <param name="offset">Відступ</param>
 			/// <param name="len">Довжина частини</param>
-			BaseStringView(const BaseString<Heap>& refStr, SizeT offset = 0, SizeT len = Math::Max<SizeT>()) 
+			ForceInline BaseStringView(const BaseString<Heap>& refStr, SizeT offset = 0, SizeT len = Math::Max<SizeT>()) 
 				: refStr(refStr), offset(offset), len(len) {}
-			BaseStringView(BaseStringView&) = delete;
-			BaseStringView& operator=(BaseStringView&) = delete;
+			ForceInline BaseStringView(BaseStringView&) = delete;
+			ForceInline BaseStringView& operator=(BaseStringView&) = delete;
 			/// <summary>
 			/// Переміщення даних референса в новий об'єкт
 			/// </summary>
 			/// <param name="from"></param>
-			BaseStringView(BaseStringView&& from) : refStr(from.refStr), offset(from.offset), len(from.len) {}
+			ForceInline BaseStringView(BaseStringView&& from) : refStr(from.refStr), offset(from.offset), len(from.len) {}
 			/// <summary>
 			/// Оператор переміщення референса в новий об'єкт
 			/// </summary>
 			/// <param name="from">Оригинал</param>
 			/// <returns>Силку на поточний об'єкт</returns>
-			BaseStringView& operator=(BaseStringView&& from) {
+			ForceInline BaseStringView& operator=(BaseStringView&& from) {
 				this->~BaseStringView();
 				this->BaseStringView::BaseStringView(MoveRValue(from));
 			}
@@ -55,7 +55,7 @@ namespace Seed
 			/// </summary>
 			/// <param name="other">Рядок</param>
 			/// <returns>true якщо рівні</returns>
-			bool operator==(const BaseString<Heap>& other) const {
+			ForceInline bool operator==(const BaseString<Heap>& other) const {
 				return (*this <=> other) == 0;
 			}
 			/// <summary>
@@ -63,7 +63,7 @@ namespace Seed
 			/// </summary>
 			/// <param name="other">Рядок</param>
 			/// <returns>false якщо рівні</returns>
-			bool operator!=(const BaseString<Heap>& other) const {
+			ForceInline bool operator!=(const BaseString<Heap>& other) const {
 				return !(*this == other);
 			}
 			/// <summary>
@@ -72,7 +72,7 @@ namespace Seed
 			/// <param name="first">Відображення рядка</param>
 			/// <param name="second">Рядок</param>
 			/// <returns>true якщо рівні</returns>
-			friend bool operator==(const BaseString<Heap>& first, const BaseStringView& second) {
+			ForceInline friend bool operator==(const BaseString<Heap>& first, const BaseStringView& second) {
 				return second == first;
 			}
 			/// <summary>
@@ -81,7 +81,7 @@ namespace Seed
 			/// <param name="first">Відображення рядка</param>
 			/// <param name="second"><Рядок/param>
 			/// <returns>true якщо не рівні</returns>
-			friend bool operator!=(const BaseString<Heap>& first, const BaseStringView& second) {
+			ForceInline friend bool operator!=(const BaseString<Heap>& first, const BaseStringView& second) {
 				return second != first;
 			}
 		public:
@@ -92,7 +92,7 @@ namespace Seed
 			/// <param name="second">Рядок</param>
 			/// <returns>true якщо рівні</returns>
 			template<typename TOtherHeap>
-			friend bool operator==(const BaseString<Heap>& first, const BaseStringView<TOtherHeap>& second) {
+			ForceInline friend bool operator==(const BaseString<Heap>& first, const BaseStringView<TOtherHeap>& second) {
 				return (second <=> first) == 0;
 			}
 			/// <summary>
@@ -102,7 +102,7 @@ namespace Seed
 			/// <param name="second"><Рядок/param>
 			/// <returns>true якщо не рівні</returns>
 			template<typename TOtherHeap>
-			friend bool operator!=(const BaseString<Heap>& first, const BaseStringView<TOtherHeap>& second) {
+			ForceInline friend bool operator!=(const BaseString<Heap>& first, const BaseStringView<TOtherHeap>& second) {
 				return (second != first) == 0;
 			}
 
@@ -112,7 +112,7 @@ namespace Seed
 			/// <param name="first">Перший елемент</param>
 			/// <param name="second">Другий елемент</param>
 			/// <returns>Результат порівняння</returns>
-			friend StrongOrdering operator<=>(const BaseString<Heap>& first, const BaseStringView& second) {
+			ForceInline friend StrongOrdering operator<=>(const BaseString<Heap>& first, const BaseStringView& second) {
 				auto comparableLen = Min(first.Lenght, second.ActualViewLen);
 				for (SizeT i = 0; i < comparableLen; i++)
 				{
@@ -128,7 +128,7 @@ namespace Seed
 			/// <param name="first">Перший елемент</param>
 			/// <param name="second">Другий елемент</param>
 			/// <returns>Результат порівняння</returns>
-			friend StrongOrdering operator<=>(const BaseStringView& first, const BaseString<Heap>& second) {
+			ForceInline friend StrongOrdering operator<=>(const BaseStringView& first, const BaseString<Heap>& second) {
 				auto comparableLen = Min(first.ActualViewLen, second.Lenght);
 				for (SizeT i = 0; i < comparableLen; i++)
 				{
@@ -145,7 +145,7 @@ namespace Seed
 			/// <param name="second">Другий елемент</param>
 			/// <returns>Результат порівняння</returns>
 			template<typename TOtherHeap>
-			friend StrongOrdering operator<=>(const BaseStringView& first, const BaseStringView<TOtherHeap>& second) {
+			ForceInline friend StrongOrdering operator<=>(const BaseStringView& first, const BaseStringView<TOtherHeap>& second) {
 				auto comparableLen = Min(first.ActualViewLen, second.ActualViewLen);
 				for (SizeT i = 0; i < comparableLen; i++)
 				{
@@ -160,7 +160,7 @@ namespace Seed
 			/// </summary>
 			/// <param name="Index">Індекс символу</param>
 			/// <returns>Літеру яка знаходиться за позицією</returns>
-			Char operator[](SizeT Index) const {
+			ForceInline Char operator[](SizeT Index) const {
 				if (offset + Index > offset + len && offset + Index > refStr.Lenght)
 				{
 					Seed::Core::Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, offset + Index, refStr.Lenght - len);
@@ -177,7 +177,7 @@ namespace Seed
 			/// Вертає силку на рядок на якому базуєтсья референс
 			/// </summary>
 			/// <returns></returns>
-			const BaseString<Heap>& GetFullText() const {
+			ForceInline const BaseString<Heap>& GetFullText() const {
 				return refStr;
 			}
 
@@ -185,7 +185,7 @@ namespace Seed
 			/// Вертає оффсет
 			/// </summary>
 			/// <returns></returns>
-			SizeT GetOffset() const {
+			ForceInline SizeT GetOffset() const {
 				return offset;
 			}
 
@@ -193,7 +193,7 @@ namespace Seed
 			/// Встановлює новий оффсет
 			/// </summary>
 			/// <param name="newOffset">Новий оффсет</param>
-			void SetOffset(SizeT newOffset) {
+			ForceInline void SetOffset(SizeT newOffset) {
 				offset = newOffset;
 			}
 
@@ -201,7 +201,7 @@ namespace Seed
 			/// Вертає межу референса
 			/// </summary>
 			/// <returns></returns>
-			SizeT GetViewLen() const {
+			ForceInline SizeT GetViewLen() const {
 				return len;
 			}
 
@@ -209,7 +209,7 @@ namespace Seed
 			/// Встановлює нову межу референса
 			/// </summary>
 			/// <param name="newViewLen">Нова межа референса</param>
-			void SetViewLen(SizeT newViewLen) {
+			ForceInline void SetViewLen(SizeT newViewLen) {
 				len = newViewLen;
 			}
 
@@ -218,7 +218,7 @@ namespace Seed
 			/// </summary>
 			/// <returns></returns>
 			template<typename UHeap = Heap> 
-			BaseString<UHeap> ToString() const {
+			ForceInline BaseString<UHeap> ToString() const {
 #pragma warning(push)
 //Use internal string ctor
 #pragma warning(disable: 4996)
@@ -230,7 +230,7 @@ namespace Seed
 			/// Отримання рядка з відображення
 			/// </summary>
 			/// <returns></returns>
-			BaseString<Heap> GetText() const {
+			ForceInline BaseString<Heap> GetText() const {
 				return this->ToString();
 			}
 
@@ -238,7 +238,7 @@ namespace Seed
 			/// Фактичний текст
 			/// </summary>
 			/// <returns></returns>
-			SizeT GetActualViewLen() const {
+			ForceInline SizeT GetActualViewLen() const {
 				return (len == Math::Max<SizeT>() || len + offset > refStr.Lenght) ? refStr.Lenght - offset : len;
 			}
 

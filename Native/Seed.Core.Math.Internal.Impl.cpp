@@ -132,7 +132,7 @@ qS4 = 7.70381505559019352791e-02; /* 0x3FB3B8C5, 0xB12E9282 */
 double fabs(double x)
 {
 	union { double f; UINT64 i; } u = { x };
-	u.i &= -1ULL / 2;
+	u.i &= -1ULL / 2; //-V2553
 	return u.f;
 }
 #pragma warning(pop)
@@ -159,7 +159,7 @@ double asin(double x)
 		if ((ix - 0x3ff00000 | lx) == 0)
 			/* asin(1) = +-pi/2 with inexact */
 			return x * pio2_hi + 0x1p-120f;
-		return 0 / (x - x);
+		return 0.0 / (x - x);
 	}
 	/* |x| < 0.5 */
 	if (ix < 0x3fe00000) {
@@ -169,11 +169,11 @@ double asin(double x)
 		return x + x * R(x * x);
 	}
 	/* 1 > |x| >= 0.5 */
-	z = (1 - fabs(x)) * 0.5;
+	z = (1.0 - fabs(x)) * 0.5;
 	s = sqrt(z);
 	r = R(z);
 	if (ix >= 0x3fef3333) {  /* if |x| > 0.975 */
-		x = pio2_hi - (2 * (s + s * r) - pio2_lo);
+		x = pio2_hi - (2.0 * (s + s * r) - pio2_lo);
 	}
 	else {
 		double f, c;
@@ -181,7 +181,7 @@ double asin(double x)
 		f = s;
 		SET_LOW_WORD(f, 0);
 		c = (z - f * f) / (s + f);
-		x = 0.5 * pio2_hi - (2 * s * r - (pio2_lo - 2 * c) - (0.5 * pio2_hi - 2 * f));
+		x = 0.5 * pio2_hi - (2.0 * s * r - (pio2_lo - 2.0 * c) - (0.5 * pio2_hi - 2.0 * f));
 	}
 	if (hx >> 31)
 		return -x;

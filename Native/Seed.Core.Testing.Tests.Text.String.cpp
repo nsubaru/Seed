@@ -304,3 +304,13 @@ bool Seed::Core::Testing::Test::Text::StringSplitString::Excecute() {
 
 	return true;
 }
+
+bool Seed::Core::Testing::Test::Text::StringCtorFromConstArray::Excecute() {
+	Asserts::AssertEqual(String(Core::CTTI::Details::CreateTypeStr("123")), String(L"123"));
+	Asserts::AssertEqual(String(Core::CTTI::Details::CreateTypeStr("123")) + L"4", String(L"1234"));
+	Asserts::AssertEqual(String(Core::CTTI::Details::CreateTypeStr("123")) + L"4"S, String(L"1234"));
+	Asserts::AssertEqual(L"1" + String(Core::CTTI::Details::CreateTypeStr("234")), String(L"1234"));
+	Asserts::AssertEqual(L"1"S + String(Core::CTTI::Details::CreateTypeStr("234")), String(L"1234"));
+
+	return true;
+}
