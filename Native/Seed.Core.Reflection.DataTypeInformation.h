@@ -508,16 +508,19 @@ namespace Seed
 				/// <param name="other">Лівий операнд</param>
 				/// <returns>Результат порівняння</returns>
 				bool operator!=(const DataTypeRecord& other) const {
-					return this->data->typeInfo != other.data->typeInfo &&
-						this->data->cxxTypeName != other.data->cxxTypeName;
+					return this->data->typeInfo != other.data->typeInfo;
 				}
 
 				bool operator==(const TypeInfo& other) const {
-					return this->data->typeInfo.TypeId() == other;
+					return this->data->typeInfo == other;
 				}
 
 				bool operator!=(const TypeInfo& other) const {
-					return this->data->typeInfo.TypeId() != other;
+					return this->data->typeInfo != other;
+				}
+
+				auto operator<=>(const TypeInfo& other) const {
+					return this->data->typeInfo <=> other;
 				}
 
 				bool operator==(const RTTI::RTTITypeRecord & other) const {
@@ -537,7 +540,7 @@ namespace Seed
 				}
 
 				friend auto operator<=>(const TypeInfo& other, const DataTypeRecord& item) {
-					return other.HashCode <=> item.data->typeInfo.TypeId().HashCode;
+					return other <=> item.data->typeInfo;
 				}
 			};
 		}

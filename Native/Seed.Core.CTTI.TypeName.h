@@ -27,7 +27,7 @@ namespace Seed {
 				{
 					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() + 
+						return TTypeName<T>::TypeName() + 
 							Details::CreateTypeStr("*");
 					}
 				};
@@ -37,7 +37,7 @@ namespace Seed {
 				{
 					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>();;
+						return TTypeName<T>::TypeName();
 					}
 				};
 
@@ -46,7 +46,7 @@ namespace Seed {
 				{
 					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>();;
+						return TTypeName<T>::TypeName();
 					}
 				};
 
@@ -55,7 +55,7 @@ namespace Seed {
 				{
 					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>();;
+						return TTypeName<T>::TypeName();
 					}
 				};
 
@@ -64,7 +64,7 @@ namespace Seed {
 				{
 					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() + 
+						return TTypeName<T>::TypeName() + 
 							Details::CreateTypeStr("&");
 					}
 				};
@@ -74,7 +74,7 @@ namespace Seed {
 				{
 					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() + 
+						return TTypeName<T>::TypeName() + 
 							Details::CreateTypeStr("&&");
 					}
 				};
@@ -84,7 +84,7 @@ namespace Seed {
 				{
 					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+						return TTypeName<T>::TypeName() +
 							Details::CreateTypeStr("[") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr("]");
@@ -191,7 +191,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							CTTI::Details::CreateTypeStr("Seed::Containers::Array<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							CTTI::Details::CreateTypeStr(">");
 					}
 				};
@@ -201,7 +201,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							CTTI::Details::CreateTypeStr("Seed::Containers::SensitiveArray<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							CTTI::Details::CreateTypeStr(">");
 					}
 				};
@@ -211,7 +211,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencyArray<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -221,7 +221,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveArray<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -232,7 +232,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::List<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -242,7 +242,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::SensitiveList<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -252,7 +252,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencyList<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -262,7 +262,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveList<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -273,7 +273,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::DynamicQueue<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -283,7 +283,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::SensitiveDynamicQueue<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -293,7 +293,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencyDynamicQueue<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -303,7 +303,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveDynamicQueue<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -314,7 +314,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::DynamicStack<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -324,7 +324,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::SensitiveDynamicStack<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -334,7 +334,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencyDynamicStack<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -344,7 +344,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveDynamicStack<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -359,7 +359,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::FixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -371,7 +371,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::ConcurencyFixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -383,7 +383,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::SensitiveFixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -395,7 +395,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveFixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -408,7 +408,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::FixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -420,7 +420,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::ConcurencyFixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -432,7 +432,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::SensitiveFixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -444,7 +444,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveFixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -457,7 +457,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::FixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -469,7 +469,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::ConcurencyFixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -481,7 +481,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::SensitiveFixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -493,7 +493,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveFixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -508,7 +508,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::BitMapT<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -522,7 +522,7 @@ namespace Seed {
 							Details::CreateTypeStr("Seed::Containers::SensitiveBitMapT<") +
 							CTTI::Details::ToCharStr<TSize>() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -535,7 +535,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::Dictionary<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -545,7 +545,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::ConcurencyContainers::ConcurencyDictionary<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -555,7 +555,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::SensitiveDictionary<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -565,7 +565,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::ConcurencyContainers::ConcurencySensitiveDictionary<") +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
+							TTypeName<T>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -576,9 +576,9 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::Map<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -590,9 +590,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencyMap<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -604,9 +604,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::SensitiveMap<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -618,9 +618,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveMap<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -633,9 +633,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::PriorityQueue<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -647,9 +647,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencyPriorityQueue<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -661,9 +661,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::SensitivePriorityQueue<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -675,9 +675,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::ConcurencySensitivePriorityQueue<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -689,9 +689,9 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Details::CreateTypeStr("Seed::Containers::Pair<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -703,9 +703,9 @@ namespace Seed {
 					{
 						return
 							Details::CreateTypeStr("Seed::Containers::SensitivePair<") +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
+							TTypeName<TKey>::TypeName() +
 							Details::CreateTypeStr(", ") +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
+							TTypeName<TValue>::TypeName() +
 							Details::CreateTypeStr(">");
 					}
 				};
@@ -739,7 +739,7 @@ namespace Seed {
                     template<typename Head, typename ... Tail>
                     struct TFieldTypeName {
                         constexpr static auto Name() {
-                            return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>() +
+                            return TTypeName<Head>::TypeName() +
                                 Details::CreateTypeStr(", ") +
                                 TFieldTypeName<Tail...>::Name();
                         }
@@ -748,7 +748,7 @@ namespace Seed {
                     template<typename Head>
                     struct TFieldTypeName<Head> {
                         constexpr static auto Name() {
-                            return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>();
+                            return TTypeName<Head>::TypeName();
                         }
                     };
 					

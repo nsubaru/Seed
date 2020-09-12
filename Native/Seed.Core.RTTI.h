@@ -136,8 +136,35 @@ namespace Seed
 					return *this->data->rttiTypeInfo != *other.data->rttiTypeInfo;
 				}
 
+				ForceInline auto operator<(const RTTITypeRecord& other) const {
+					return this->data->rttiTypeInfo < other.data->rttiTypeInfo;
+				}
+
+				ForceInline auto operator>(const RTTITypeRecord& other) const {
+					return this->data->rttiTypeInfo > other.data->rttiTypeInfo;
+				}
+
+				ForceInline auto operator<=(const RTTITypeRecord& other) const {
+					return *this == other || *this < other;
+				}
+
+				ForceInline auto operator>=(const RTTITypeRecord& other) const {
+					return *this == other || *this > other;
+				}
+
 				ForceInline auto operator<=>(const RTTITypeRecord& other) const {
-					return this->data->rttiTypeInfo->HashCode <=> other.data->rttiTypeInfo->HashCode;
+					if (*this == other)
+					{
+						return Comparing::StrongOrdering::equal;
+					}
+					else if (*this > other)
+					{
+						return Comparing::StrongOrdering::greater;
+					}
+					else
+					{
+						return Comparing::StrongOrdering::less;
+					}
 				}
 
 				ForceInline auto operator==(const TypeInfo& other) const {
@@ -156,8 +183,35 @@ namespace Seed
 					return other != *item.data->rttiTypeInfo;
 				}
 
+				ForceInline friend auto operator<(const TypeInfo& other, const RTTITypeRecord& item) {
+					return &other < item.data->rttiTypeInfo;
+				}
+
+				ForceInline friend auto operator>(const TypeInfo& other, const RTTITypeRecord& item) {
+					return &other > item.data->rttiTypeInfo;
+				}
+
+				ForceInline friend auto operator<=(const TypeInfo& other, const RTTITypeRecord& item) {
+					return (other == item) || (other < item);
+				}
+
+				ForceInline friend auto operator>=(const TypeInfo& other, const RTTITypeRecord& item) {
+					return (other == item) || (other > item);
+				}
+
 				ForceInline friend auto operator<=>(const TypeInfo& other, const RTTITypeRecord& item) {
-					return other.HashCode <=> item.data->rttiTypeInfo->HashCode;
+					if (other == item)
+					{
+						return Comparing::StrongOrdering::equal;
+					}
+					else if (other > item)
+					{
+						return Comparing::StrongOrdering::greater;
+					}
+					else
+					{
+						return Comparing::StrongOrdering::less;
+					}
 				}
 			};
 
