@@ -46,28 +46,11 @@ namespace Seed
 
 			namespace Details
 			{
-#pragma region V1 MeatDataImplementaion
 				template<typename ... TArgs>
-				constexpr bool IsFunctionWithoutArgs =
-					sizeof...(TArgs) == 0
-					;//||
-					//(sizeof...(TArgs) == 1 && TypeTraits::IsSameV<TypeTraits::Pack<void>, TypeTraits::Pack<TArgs...>>);
-
-				template<typename T>
-				struct IsCTTIStringT : TypeTraits::LogicFalse {};
-
-				template<char ... TChars>
-				struct IsCTTIStringT<CTTI::Details::TypeString<TChars...>> : TypeTraits::LogicTrue {};
-
-				template<typename T>
-				constexpr bool IsCTTIStringV = IsCTTIStringT<T>::State;
-
-				template<char ... TChars>
-				using CTTIString = CTTI::Details::TypeString<TChars...>;
+				constexpr bool IsFunctionWithoutArgs = sizeof...(TArgs) == 0;
 
 				template<typename, typename>
 				struct MethodCallDescriptor {
-					//static_assert(false, "Invalid method type passed");
 				};
 
 				template<typename TTargetClass, typename TRet, typename TClass, typename ...TArgs>
@@ -566,43 +549,6 @@ namespace Seed
 					using Args = ArgsType;
 				};
 
-				template<typename TTargetClass, typename T, T pMethodType, typename TName>
-				struct MethodDescriptor {
-					static_assert(IsCTTIStringV<TName>, "TName must be CTTIString");
-
-					static constexpr auto Name = Seed::Core::CTTI::Details::TypeStringToArray(TName());
-					using MethodCallType = typename MethodCallDescriptor<TTargetClass, T>::MethodType;
-
-					using MethodClass = typename MethodCallDescriptor<TTargetClass, T>::Class;
-
-					static constexpr Boolean IsConst = MethodCallDescriptor<TTargetClass, T>::IsConst;
-					static constexpr Boolean IsVolatile = MethodCallDescriptor<TTargetClass, T>::IsVolatile;
-
-					static constexpr auto ArgsTypeName = MethodCallDescriptor<TTargetClass, T>::ArgsTypeName;
-					static constexpr auto RetTypeName = MethodCallDescriptor<TTargetClass, T>::RetTypeName;
-
-					static constexpr auto pMethod = pMethodType;
-
-					static String ArgsMetaData() {
-						return MethodCallDescriptor<TTargetClass, T>::ArgsMetaData();
-					}
-
-					static String RetMetaData() {
-						return MethodCallDescriptor<TTargetClass, T>::RetMetaData();
-					}
-
-					static constexpr auto MethodCaller = MethodCallDescriptor<TTargetClass, T>::MethodCaller;
-
-					static constexpr auto TypeInformationGetter = MethodCallDescriptor<TTargetClass, T>::TypeInformationGetter;
-
-					static constexpr bool IsArgsSerilizable = MethodCallDescriptor<TTargetClass, T>::IsArgsSerilizable;
-
-					static constexpr bool IsRetSerilizable = MethodCallDescriptor<TTargetClass, T>::IsRetSerilizable;
-
-					using Ret = typename MethodCallDescriptor<TTargetClass, T>::Ret;
-					using Args = typename MethodCallDescriptor<TTargetClass, T>::Args;
-				};
-
 				template<typename T, typename ... TArgs>
 				struct ObjectCtorAndDtor {
 					static_assert(Core::TypeTraits::IsConstructible<T, TArgs...>, "Can not construct class with this args");
@@ -666,129 +612,8 @@ namespace Seed
 					}
 				};
 
-				template<typename TTargetClass, typename TName, typename TGet, TGet GetT, typename TSetterMethods>
-				struct PropertyDescriptor {
-				private:
-					template<SizeT I = 0>
-					static constexpr bool CheckSetterMethods() {
-						if constexpr (TSetterMethods::Count == I)
-						{
-							return true;
-						}
-						else
-						{
-							return (
-								TypeTraits::IsSameT<typename TSetterMethods::ItemType<I>::Ret, void>::State &&
-									TSetterMethods::ItemType<0>::Args::Count == 1 &&
-									TypeTraits::IsSameV<
-										typename TypeTraits::RemoveCV<
-											TypeTraits::RemoveRefV<
-												typename TSetterMethods::ItemType<0>::Args::ItemType<0>
-											>
-										>, 
-										typename MethodCallDescriptor<TGet>::Ret
-									>
-								) &&
-								CheckSetterMethods<I + 1>();
-						}
-					}
-				public:
-					using PropType = typename MethodCallDescriptor<TGet, TTargetClass>::Ret;
-					using PropClass = TTargetClass;
-					static constexpr auto Name = Seed::Core::CTTI::Details::TypeStringToArray(TName());
-					static constexpr auto PropTypeName = CTTI::TypeName<PropType>();
-					static constexpr auto GetCaller = MethodCallDescriptor<TGet>::MethodCaller;
-					static constexpr auto pGet = GetT;
-					static constexpr auto PropTypeInformationGetter = MethodCallDescriptor<TTargetClass, TGet>::TypeInformationGetter;
-					static constexpr bool IsRw = (TSetterMethods::Count != 0);
-					static constexpr bool IsValueSerilizable = MethodCallDescriptor<TTargetClass, TGet>::IsRetSerilizable;
-					static constexpr auto SerilizeFunction = [] (const DynamicObject& data) -> Containers::Blob
-					{
-						if constexpr (IsValueSerilizable)
-						{
-							//TODO: temp solution for compiling. Think how pass TypeRegistry
-							auto registry = Core::Serilization::TypesRegistry();
-
-							auto pObjGet = pGet;
-							auto emptyArgs = DynamicObject(Containers::Tuple<>());
-							//HACK: we know that getter use const object but for unification method caller lambda use object without 
-							//HACK: const modificator and we should remove it to get property value
-							auto propValue = GetCaller(reinterpret_cast<void*&>(pObjGet), const_cast<DynamicObject&>(data), emptyArgs)
-								.GetValue<PropType>()
-								.GetByIdx<0>();
-							return Serilization::Serilize(propValue, registry);
-						}
-						else
-						{
-							Throw(NonSerelizableType(__FILE__, "", __LINE__, PropTypeName));
-						}
-					};
-					static constexpr auto SerilizeTypeMetaData = [] () -> String
-					{
-						if constexpr (IsValueSerilizable)
-						{
-							return Serilization::MetaDataGen<PropType>();
-						}
-						else
-						{
-							return String();
-						}
-					};
-
-					using SetterMethods = TSetterMethods;
-
-					static_assert(MethodCallDescriptor<TTargetClass, TGet>::IsConst, "Property getter should be const method");
-					static_assert(CheckSetterMethods(), "Invalid setters for property");
-				};
-
-				template<typename TObj, typename TObjectCtorAndDtor, typename TMethodsTuple, typename TPropertiesTuple>
-				struct ObjectDescriptor {
-					static constexpr auto Name = CTTI::TypeName<TObj>();
-
-					static constexpr auto RttiTypeInfo = [] () 
-					{
-						return TypeRecord<TObj>();
-					};
-						
-					static constexpr auto UnifiedCtor = TObjectCtorAndDtor::UnifiedCtor;
-					static constexpr auto UnifiedDtor = TObjectCtorAndDtor::UnifiedDtor;
-
-					using Methods = TMethodsTuple;
-					using Properties = TPropertiesTuple;
-
-					static constexpr auto CtorArgsTypeName = TObjectCtorAndDtor::CtorArgsTypeName;
-
-					static String ArgsMetaData() {
-						return TObjectCtorAndDtor::ArgsMetaData();
-					}
-
-				private:
-					template<SizeT TId = 0>
-					static constexpr bool IsAllMethodsHaveCorrectClassImpl() {
-						if constexpr (TId == TMethodsTuple::Count)
-						{
-							return true;
-						}
-						else
-						{
-							return
-								TypeTraits::IsSameT<
-								typename Methods::ItemType<TId>::MethodClass,
-								TObj>::State
-								&&
-								IsAllMethodsHaveCorrectClassImpl<TId + 1>();
-						}
-					}
-				public:
-					static_assert(IsAllMethodsHaveCorrectClassImpl(), "Invalid method passed");
-				};
-			}
-#pragma endregion
-#pragma region V2 MeatDataImplementaion
-			namespace Details
-			{
 				template<typename TClass, typename T, T pMethodType, typename TName>
-				struct V2MethodDescriptor {
+				struct MethodDescriptor {
 					TName Name;
 
 					using MethodCallType = typename MethodCallDescriptor<TClass, T>::MethodType;
@@ -822,7 +647,7 @@ namespace Seed
 					using Ret = typename MethodCallDescriptor<TClass, T>::Ret;
 					using Args = typename MethodCallDescriptor<TClass, T>::Args;
 
-					ForceInline constexpr V2MethodDescriptor(TName Name) : Name(Name) {}
+					ForceInline constexpr MethodDescriptor(TName Name) : Name(Name) {}
 				};
 
 				template<typename ... TMethods>
@@ -831,7 +656,7 @@ namespace Seed
 				}
 
 				template<typename TTargetClass, typename TName, typename TGet, TGet GetT, typename TSetterMethods>
-				struct V2PropertyDescriptor {
+				struct PropertyDescriptor {
 				private:
 					template<SizeT I = 0>
 					static constexpr bool CheckSetterMethods() {
@@ -904,7 +729,7 @@ namespace Seed
 					static_assert(MethodCallDescriptor<TTargetClass, TGet>::IsConst, "Property getter should be const method");
 					static_assert(CheckSetterMethods(), "Invalid setters for property");
 
-					ForceInline constexpr V2PropertyDescriptor(TName Name, TSetterMethods SetterMethods) : Name(Name), SetterMethods(SetterMethods) {}
+					ForceInline constexpr PropertyDescriptor(TName Name, TSetterMethods SetterMethods) : Name(Name), SetterMethods(SetterMethods) {}
 				};
 
 				template<typename ... TProperty>
@@ -913,7 +738,7 @@ namespace Seed
 				}
 
 				template<typename TObj, typename TObjectCtorAndDtor, typename TMethodsTuple, typename TPropertiesTuple>
-				struct V2ObjectDescriptor {
+				struct ObjectDescriptor {
 					static constexpr auto Name = CTTI::TypeName<TObj>();
 
 					static constexpr auto RttiTypeInfo = [] () 
@@ -933,16 +758,16 @@ namespace Seed
 						return TObjectCtorAndDtor::ArgsMetaData();
 					}
 
-					ForceInline constexpr V2ObjectDescriptor(const TMethodsTuple& Methods, const TPropertiesTuple& Properties) : 
+					ForceInline constexpr ObjectDescriptor(const TMethodsTuple& Methods, const TPropertiesTuple& Properties) : 
 						Methods(Methods), Properties(Properties) {}
 
-					ForceInline constexpr V2ObjectDescriptor(TMethodsTuple&& Methods, const TPropertiesTuple& Properties) : 
+					ForceInline constexpr ObjectDescriptor(TMethodsTuple&& Methods, const TPropertiesTuple& Properties) : 
 						Methods(MoveRValue(Methods)), Properties(Properties) {}
 
-					ForceInline constexpr V2ObjectDescriptor(const TMethodsTuple& Methods, TPropertiesTuple&& Properties) : 
+					ForceInline constexpr ObjectDescriptor(const TMethodsTuple& Methods, TPropertiesTuple&& Properties) : 
 						Methods(Methods), Properties(MoveRValue(Properties)) {}
 
-					ForceInline constexpr V2ObjectDescriptor(TMethodsTuple&& Methods, TPropertiesTuple&& Properties) : 
+					ForceInline constexpr ObjectDescriptor(TMethodsTuple&& Methods, TPropertiesTuple&& Properties) : 
 						Methods(MoveRValue(Methods)), Properties(MoveRValue(Properties)) {}
 
 				private:
@@ -966,476 +791,8 @@ namespace Seed
 					static_assert(IsAllMethodsHaveCorrectClassImpl(), "Invalid method passed");
 				};
 			}
-#pragma endregion
-		/*	class ObjectRTTIRecord final : IDisposable, public Serilization::ISerilizable<ObjectRTTIRecord> {
-			public:
-				using CtorCaller = DynamicObject (*)(DynamicObject&&);
-				using DtorCaller = void (*)(DynamicObject&&);
-				using MethodCaller = DynamicObject(*)(const void* const&, DynamicObject&, DynamicObject&);
-				using TypeInformationGetterType = Containers::List<DataTypeRecord>(*)();
-			public:
-				class MethodRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
-				private:
-					struct Data {
-						String MethodName;
-						MethodCaller methodCaller;
-						const void* const& pMethod;
-						String MethodArgs;
-						String MethodRet;
-						String MethodArgsMetaData;
-						String MethodRetMetaData;
 
-						TypeInformationGetterType typeInformationGetter;
-						Boolean IsRetSerilizable;
-						Boolean IsArgsSerilizable;
-
-						Boolean IsConstMethod;
-						Boolean IsVolatileMethod;
-
-						RefCountT RefCount;
-
-						ForceInline Data(
-							String&& methodName,
-							MethodCaller methodCaller,
-							const void* const& pMethod,
-							String&& methodArgs,
-							String&& methodRet,
-							String&& methodArgsMetaData,
-							String&& methodRetMetaData,
-							TypeInformationGetterType typeInformationGetter,
-							Boolean IsRetSerilizable,
-							Boolean IsArgsSerilizable,
-							Boolean isConstMethod,
-							Boolean isVolatileMethod
-						)
-							:
-							MethodName(MoveRValue(methodName)),
-							methodCaller(methodCaller),
-							pMethod(pMethod),
-							MethodArgs(MoveRValue(methodArgs)),
-							MethodRet(MoveRValue(methodRet)),
-							MethodArgsMetaData(MoveRValue(methodArgsMetaData)),
-							MethodRetMetaData(MoveRValue(methodRetMetaData)),
-							typeInformationGetter(typeInformationGetter),
-							IsRetSerilizable(IsRetSerilizable),
-							IsArgsSerilizable(IsArgsSerilizable),
-							IsConstMethod(isConstMethod),
-							IsVolatileMethod(isVolatileMethod),
-							RefCount(1) {}
-					};
-				private:
-					Data* data;
-				protected:
-					ForceInline virtual void Dispose() override {}
-					ForceInline virtual Byte* GetDataPtr() const override {
-						return reinterpret_cast<Byte*>(data);
-					}
-				public:
-					DefStructMetaData(Data,
-						DefStructFieldData(Data, MethodName),
-						DefStructFieldData(Data, MethodArgs),
-						DefStructFieldData(Data, MethodRet),
-						DefStructFieldData(Data, MethodArgsMetaData),
-						DefStructFieldData(Data, MethodRetMetaData),
-						DefStructFieldData(Data, IsRetSerilizable),
-						DefStructFieldData(Data, IsArgsSerilizable),
-						DefStructFieldData(Data, IsConstMethod),
-						DefStructFieldData(Data, IsVolatileMethod)
-					);
-				public:
-					template<typename TMethodDescriptor>
-					ForceInline MethodRTTIRecord(TypeTraits::TypeTag<TMethodDescriptor>)
-						: data(new Data(
-							TMethodDescriptor::Name,
-							TMethodDescriptor::MethodCaller,
-							reinterpret_cast<const void* const&>(TMethodDescriptor::pMethod),
-							TMethodDescriptor::ArgsTypeName,
-							TMethodDescriptor::RetTypeName,
-							TMethodDescriptor::ArgsMetaData(),
-							TMethodDescriptor::RetMetaData(),
-							TMethodDescriptor::TypeInformationGetter,
-							TMethodDescriptor::IsRetSerilizable,
-							TMethodDescriptor::IsArgsSerilizable,
-							TMethodDescriptor::IsConst,
-							TMethodDescriptor::IsVolatile
-						)) {}
-
-					ForceInline const String& GetName() const {
-						return this->data->MethodName;
-					}
-
-					ForceInline MethodCaller GetMethodCaller() const {
-						return this->data->methodCaller;
-					}
-
-					ForceInline const String& GetArgsTypeName() const {
-						return this->data->MethodArgs;
-					}
-
-					ForceInline const String& GetRetTypeName() const {
-						return this->data->MethodRet;
-					}
-
-					ForceInline const String& GetArgsMetaData() const {
-						return this->data->MethodArgsMetaData;
-					}
-
-					ForceInline const String& GetRetMetaData() const {
-						return this->data->MethodRetMetaData;
-					}
-
-					ForceInline TypeInformationGetterType GetTypeInformationGetter() const {
-						return this->data->typeInformationGetter;
-					}
-
-					ForceInline bool GetIsRetSerilizable() const {
-						return this->data->IsRetSerilizable;
-					}
-
-					ForceInline bool GetIsArgsSerilizable() const {
-						return this->data->IsArgsSerilizable;
-					}
-
-					ForceInline bool GetIsConst() const {
-						return this->data->IsConstMethod;
-					}
-
-					ForceInline bool GetIsVolatile() const {
-						return this->data->IsVolatileMethod;
-					}
-
-					ForceInline const void* const& GetMethodPointer() const {
-						return this->data->pMethod;
-					}
-
-					String Property(GetName) Name;
-					MethodCaller Property(GetMethodCaller) MethodCallerFunction;
-					String Property(GetArgsTypeName) ArgsTypeName;
-					String Property(GetRetTypeName) RetTypeName;
-					String Property(GetArgsMetaData) ArgsMetaData;
-					String Property(GetRetMetaData) RetMetaData;
-					TypeInformationGetterType Property(GetTypeInformationGetter) TypeInformationGetterFunction;
-					bool Property(GetIsRetSerilizable) IsRetSerilizable;
-					bool Property(GetIsArgsSerilizable) IsArgsSerilizable;
-					bool Property(GetIsConst) IsConst;
-					bool Property(GetIsVolatile) IsVolatile;
-
-
-					RefCountClass(MethodRTTIRecord, data);
-				};
-
-				class PropertyRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
-				public:
-					using TSerilizationFunction = Containers::Blob(*)(const DynamicObject&);
-					using TSerilizationMetaDataGetter = String(*)();
-
-					struct CallerData {
-						MethodCaller Setter;
-						const void* const& pSetter;
-
-						ForceInline CallerData(MethodCaller Setter, const void* const& pSetter) : Setter(Setter), pSetter(pSetter) {}
-						ForceInline CallerData(const CallerData& callerData) : Setter(callerData.Setter), pSetter(callerData.pSetter) {}
-						ForceInline CallerData(CallerData&& callerData) : Setter(callerData.Setter), pSetter(callerData.pSetter) {}
-						ForceInline CallerData& operator=(const CallerData& callerData) {
-							this->~CallerData();
-							this->CallerData::CallerData(callerData);
-							return *this;
-						}
-						ForceInline CallerData& operator=(CallerData&& callerData) {
-							this->~CallerData();
-							this->CallerData::CallerData(MoveRValue(callerData));
-							return *this;
-						}
-						ForceInline ~CallerData() {}
-					};
-				private:
-					struct Data {
-						String Name;
-						String PropTypeName;
-						MethodCaller Getter;
-						Containers::List<CallerData> Setters;
-						Boolean IsRW;
-						const void* const& pGetter;
-						TypeInformationGetterType typeInformationGetter;
-						Boolean IsValueSerilizable;
-						TSerilizationFunction serilizationFunction;
-						TSerilizationMetaDataGetter serilizationMetaDataGetter;
-
-						RefCountT RefCount;
-
-						ForceInline Data(
-							String Name,
-							String PropTypeName,
-							MethodCaller Getter,
-							Containers::List<CallerData> Setters,
-							Boolean IsRW,
-							const void* const& pGetter,
-							TypeInformationGetterType typeInformationGetter,
-							Boolean IsValueSerilizable,
-							TSerilizationFunction serilizationFunction,
-							TSerilizationMetaDataGetter serilizationMetaDataGetter
-						) :
-							Name(Name),
-							PropTypeName(PropTypeName),
-							Getter(Getter),
-							Setters(Setters),
-							IsRW(IsRW),
-							pGetter(pGetter),
-							typeInformationGetter(typeInformationGetter),
-							IsValueSerilizable(IsValueSerilizable),
-							serilizationFunction(serilizationFunction),
-							serilizationMetaDataGetter(serilizationMetaDataGetter),
-							RefCount(1) {}
-					};
-				private:
-					template<typename TMethods, SizeT I = 0>
-					ForceInline static Containers::List<CallerData> GenSettersData(TypeTraits::TypeTag<TMethods> tag) {
-						if constexpr (TMethods::Count == I)
-						{
-							return {};
-						}
-						else
-						{
-							return MoveRValue(
-								Containers::List<CallerData>{
-									CallerData{
-										TMethods::ItemType<I>::MethodCaller, reinterpret_cast<const void* const&>(TMethods::ItemType<I>::pMethod)
-									}
-								} 
-								+= GenSettersData<TMethods, I + 1>(tag)
-							);
-						}
-					}
-				private:
-					Data* data;
-				protected:
-					ForceInline virtual void Dispose() override {}
-					ForceInline virtual Byte* GetDataPtr() const override {
-						return reinterpret_cast<Byte*>(data);
-					}
-				public:
-					DefStructMetaData(Data,
-						DefStructFieldData(Data, Name),
-						DefStructFieldData(Data, IsRW),
-						DefStructFieldData(Data, PropTypeName),
-						DefStructFieldData(Data, IsValueSerilizable)
-					);
-				public:
-					template<typename TPropertyDescriptor>
-					ForceInline PropertyRTTIRecord(TypeTraits::TypeTag<TPropertyDescriptor>) :
-						data(new Data(
-							TPropertyDescriptor::Name,
-							TPropertyDescriptor::PropTypeName,
-							TPropertyDescriptor::GetCaller,
-							GenSettersData<TPropertyDescriptor::SetterMethods, 0>(TypeTraits::TypeTag<TPropertyDescriptor::SetterMethods>{}),
-							TPropertyDescriptor::IsRw,
-							reinterpret_cast<const void* const&>(TPropertyDescriptor::pGet),
-							TPropertyDescriptor::PropTypeInformationGetter,
-							TPropertyDescriptor::IsValueSerilizable,
-							TPropertyDescriptor::SerilizeFunction,
-							TPropertyDescriptor::SerilizeTypeMetaData
-						)) {}
-				public:
-					ForceInline String GetName() const {
-						return data->Name;
-					}
-
-					ForceInline String GetPropTypeName() const {
-						return data->PropTypeName;
-					}
-
-					ForceInline MethodCaller GetGetter() const {
-						return data->Getter;
-					}
-
-					ForceInline const Containers::List<CallerData>& GetSetters() const {
-						return data->Setters;
-					}
-
-					ForceInline Boolean GetIsRW() const {
-						return data->IsRW;
-					}
-
-					ForceInline const void* const& GetGetterAddr() const {
-						return data->pGetter;
-					}
-
-					ForceInline TypeInformationGetterType GetTypeInformationGetter() const {
-						return data->typeInformationGetter;
-					}
-
-					ForceInline DynamicObject CallGetterForObject(DynamicObject& obj) const {
-						auto args = DynamicObject(Containers::Tuple<>());
-						return data->Getter(data->pGetter, obj, args);
-					}
-
-					ForceInline Boolean GetIsSerilizable() const {
-						return data->IsValueSerilizable;
-					}
-
-					ForceInline TSerilizationFunction GetSerilizableFunction() const {
-						return data->serilizationFunction;
-					}
-
-					ForceInline TSerilizationMetaDataGetter GetSerilizableMetaDataGetter() const {
-						return data->serilizationMetaDataGetter;
-					}
-
-					String Property(GetName) Name;
-					String Property(GetPropTypeName) PropertieTypeName;
-					MethodCaller Property(GetGetter) Getter;
-					Containers::List<CallerData> Property(GetSetters) Setters;
-					Boolean Property(GetIsRW) IsRW;
-					TypeInformationGetterType Property(GetTypeInformationGetter) TypeInformationGetter;
-					Boolean Property(GetIsSerilizable) IsSerilizable;
-					TSerilizationFunction Property(GetSerilizableFunction) SerilizationFunction;
-					TSerilizationMetaDataGetter Property(GetSerilizableMetaDataGetter) SerilizableMetaDataGetter;
-				public:
-					RefCountClass(PropertyRTTIRecord, data);
-				};
-			private:
-				struct Data {
-					String ClassName;
-					String CtorArgs;
-					String CtorMetaDate;
-					CtorCaller ctorCaller;
-					DtorCaller dtorCaller;
-					RTTI::RTTITypeRecord RttiTypeInfo;
-					Containers::List<MethodRTTIRecord> Methods;
-					Containers::List<PropertyRTTIRecord> Properties;
-					RefCountT RefCount;
-
-					ForceInline Data(
-						String&& className,
-						String&& ctorArgs,
-						String&& ctorMetaDate,
-						CtorCaller ctorCaller,
-						DtorCaller dtorCaller,
-						RTTI::RTTITypeRecord RttiTypeInfo,
-						Containers::List<MethodRTTIRecord>&& methods,
-						Containers::List<PropertyRTTIRecord>&& properties
-					) :
-						ClassName(MoveRValue(className)),
-						CtorArgs(MoveRValue(ctorArgs)),
-						CtorMetaDate(MoveRValue(ctorMetaDate)),
-						ctorCaller(ctorCaller),
-						dtorCaller(dtorCaller),
-						RttiTypeInfo(RttiTypeInfo),
-						Methods(MoveRValue(methods)),
-						Properties(MoveRValue(properties)),
-						RefCount(1) {}
-
-				};
-			private:
-				Data* data;
-			private:
-				template<SizeT TId, typename ... TMethod>
-				ForceInline static Containers::List<MethodRTTIRecord> GenerateRTTIMethodInfo(TypeTraits::TypeTag<Containers::Tuple<TMethod...>>) {
-					if constexpr (TId == sizeof...(TMethod))
-					{
-						return Containers::List<MethodRTTIRecord>();
-					}
-					else
-					{
-						return Containers::List<MethodRTTIRecord>(MoveRValue(
-							(Containers::List<MethodRTTIRecord>({
-							MethodRTTIRecord(TypeTraits::TypeTag<typename Containers::Tuple<TMethod...>::ItemType<TId>>{})
-								})
-								+=
-								MoveRValue(GenerateRTTIMethodInfo<TId + 1>(TypeTraits::TypeTag<Containers::Tuple<TMethod...>>{})))
-						));
-					}
-				}
-
-				template<SizeT TId, typename ... TProperties>
-				ForceInline static Containers::List<PropertyRTTIRecord> GenerateRTTIPropertieInfo(TypeTraits::TypeTag<Containers::Tuple<TProperties...>>) {
-					if constexpr (TId == sizeof...(TProperties))
-					{
-						return Containers::List<PropertyRTTIRecord>();
-					}
-					else
-					{
-						return Containers::List<PropertyRTTIRecord>(MoveRValue(
-							(
-								Containers::List<PropertyRTTIRecord>({
-									PropertyRTTIRecord(TypeTraits::TypeTag<typename Containers::Tuple<TProperties...>::ItemType<TId>>{})
-								}) += 
-									MoveRValue(GenerateRTTIPropertieInfo<TId + 1>(TypeTraits::TypeTag<Containers::Tuple<TProperties...>>{})
-								)
-							)
-						));
-					}
-				}
-			protected:
-				ForceInline virtual void Dispose() override {}
-				ForceInline virtual Byte* GetDataPtr() const override {
-					return reinterpret_cast<Byte*>(data);
-				}
-			public:
-				DefStructMetaData(Data,
-					DefStructFieldData(Data, ClassName),
-					DefStructFieldData(Data, CtorArgs),
-					DefStructFieldData(Data, CtorMetaDate),
-					DefStructFieldData(Data, Methods)
-				);
-			public:
-				template<typename TObjectDescriptor>
-				ForceInline ObjectRTTIRecord(TypeTraits::TypeTag<TObjectDescriptor>) :
-					data(new Data(
-						TObjectDescriptor::Name,
-						TObjectDescriptor::CtorArgsTypeName,
-						TObjectDescriptor::ArgsMetaData(),
-						TObjectDescriptor::UnifiedCtor,
-						TObjectDescriptor::UnifiedDtor,
-						TObjectDescriptor::RttiTypeInfo(),
-						GenerateRTTIMethodInfo<0>(TypeTraits::TypeTag<TObjectDescriptor::Methods>{}),
-						GenerateRTTIPropertieInfo<0>(TypeTraits::TypeTag<TObjectDescriptor::Properties>{})
-					)) {};
-
-				ForceInline const String& GetName() const {
-					return this->data->ClassName;
-				}
-
-				ForceInline const String& GetCtorArgs() const {
-					return this->data->CtorArgs;
-				}
-
-				ForceInline const String& GetArgsMetaData() const {
-					return this->data->CtorMetaDate;
-				}
-
-				ForceInline CtorCaller GetCtorCaller() const {
-					return this->data->ctorCaller;
-				}
-
-				ForceInline DtorCaller GetDtorCaller() const {
-					return this->data->dtorCaller;
-				}
-
-				ForceInline const Containers::List<MethodRTTIRecord>& GetAllMethods() const {
-					return this->data->Methods;
-				}
-
-				ForceInline const Containers::List<PropertyRTTIRecord>& GetAllProperties() const {
-					return this->data->Properties;
-				}
-
-				ForceInline RTTI::RTTITypeRecord GetRTTITypeInfo() const {
-					return this->data->RttiTypeInfo;
-				}
-
-				String Property(GetName) ClassName;
-				String Property(GetCtorArgs) CtorArgs;
-				String Property(GetArgsMetaData) ArgsMetaData;
-				CtorCaller Property(GetCtorCaller) CtorCallerFunction;
-				DtorCaller Property(GetDtorCaller) DtorCallerFunction;
-				Containers::List<MethodRTTIRecord> Property(GetAllMethods) Methods;
-				Containers::List<PropertyRTTIRecord> Property(GetAllProperties) Properties;
-
-				RefCountClass(ObjectRTTIRecord, data);
-			};*/
-
-			class ObjectRTTIRecordV2 final : IDisposable, public Serilization::ISerilizable<ObjectRTTIRecordV2> {
+			class ObjectRTTIRecord final : IDisposable, public Serilization::ISerilizable<ObjectRTTIRecord> {
 			public:
 				using CtorCaller = DynamicObject (*)(DynamicObject&&);
 				using DtorCaller = void (*)(DynamicObject&&);
@@ -1848,7 +1205,7 @@ namespace Seed
 				);
 			public:
 				template<typename TObjectDescriptor>
-				ForceInline ObjectRTTIRecordV2(TObjectDescriptor ObjectDescriptor) :
+				ForceInline ObjectRTTIRecord(TObjectDescriptor ObjectDescriptor) :
 					data(new Data(
 						TObjectDescriptor::Name,
 						TObjectDescriptor::CtorArgsTypeName,
@@ -1900,60 +1257,101 @@ namespace Seed
 				Containers::List<MethodRTTIRecord> Property(GetAllMethods) Methods;
 				Containers::List<PropertyRTTIRecord> Property(GetAllProperties) Properties;
 
-				RefCountClass(ObjectRTTIRecordV2, data);
+				RefCountClass(ObjectRTTIRecord, data);
 			};
-
-			using ObjectRTTIRecord = ObjectRTTIRecordV2;
 		}
 	}
 }
-//#define ObjectMethodsDefs(...) Seed::Core::Containers::Tuple<__VA_ARGS__>
-//#define ObjectPropsDefs(...) Seed::Core::Containers::Tuple<__VA_ARGS__>
-//#define MethodDescription(Class, Method) Seed::Core::Reflection::Details::MethodDescriptor<decltype(&Class::Method), &Class::Method, GenNGTypeString(#Method)>
-//#define MethodDescriptionWithArgs(Class, Method, RetType, ...) Seed::Core::Reflection::Details::MethodDescriptor<RetType(Class::*)(__VA_ARGS__), &Class::Method, GenNGTypeString(#Method)>
-//#define	ObjectProperty(Name, Getter, ...) Seed::Core::Reflection::Details::PropertyDescriptor<GenNGTypeString(#Name), decltype(&Getter), &Getter, Seed::Core::Containers::Tuple<__VA_ARGS__>>
-//#define CtorDescription(Class, ...) Seed::Core::Reflection::Details::ObjectCtorAndDtor<Class, __VA_ARGS__>
-//#define NullCtorDescription(Class) Seed::Core::Reflection::Details::ObjectNullCtorAndDtor<Class>
-//#define ObjectDefinition(Class, CtorDesc, Methods, Props) Seed::Core::Reflection::Details::ObjectDescriptor<Class, CtorDesc, Methods, Props>
-//#define GenObjectRTTIRecord(ObjectTypeRecord) Seed::Core::Reflection::ObjectRTTIRecord(Seed::Core::TypeTraits::TypeTag<ObjectTypeRecord>{})
 
+/// <summary>
+/// Збирає описів колекцію методів(MethodDescription або MethodDescriptionWithArgs) в один кортеж
+/// </summary>
 #define ObjectMethodsDefs(...)                                              					\
 	Seed::Core::Reflection::Details::MakeMethodsTuple(__VA_ARGS__)								
-																								
+
+/// <summary>
+/// Збирає описів колекцію властивостей(ObjectProperty) в один кортеж
+/// </summary>
 #define ObjectPropsDefs(...) 																	\
 	Seed::Core::Reflection::Details::MakePropertiesTuple(__VA_ARGS__)							
-																								
+
+/// <summary>
+/// Опис метода
+/// </summary>
+/// <param name="Class">Класс метод якого описується</param>
+/// <param name="Method">Ім'я метода</param>
+/// <returns>Об'єкт MethodDescriptor який містить опис метода</returns>
 #define MethodDescription(Class, Method) 														\
-	Seed::Core::Reflection::Details::V2MethodDescriptor<											\
+	Seed::Core::Reflection::Details::MethodDescriptor<											\
 		Class, 																					\
 		decltype(&Class::Method), 																\
 		&Class::Method, 																		\
 		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Method))								\
 	>(Seed::Core::CTTI::Details::CreateTypeStr(#Method))											\
-																								
+
+
+/// <summary>
+/// Опис метода з вказуванням типів аргументів для вибору певної перегрузки 
+/// </summary>
+/// <param name="Class">Класс метод якого описується</param>
+/// <param name="Method">Ім'я метода</param>
+/// <param name="RetType">Тип повернення з CV Ref модифікаторами</param>
+/// <param name="...">Типи аргментів з CV Ref модифікаторами</param>
+/// <returns>Об'єкт MethodDescriptor який містить опис метода</returns> 
 #define MethodDescriptionWithArgs(Class, Method, RetType, ...) 									\
-	Seed::Core::Reflection::Details::V2MethodDescriptor< 										\
+	Seed::Core::Reflection::Details::MethodDescriptor< 										\
 		Class, 																					\
 		RetType(Class::*)(__VA_ARGS__), 														\
 		&Class::Method, 																		\
 		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Method))								\
 	>(Seed::Core::CTTI::Details::CreateTypeStr(#Method))											
-																								
-#define	ObjectProperty(Type, Name, Getter, ...) 												\
-	Seed::Core::Reflection::Details::V2PropertyDescriptor< 										\
-		Type, 																					\
+
+/// <summary>
+/// Опис властивості
+/// </summary>
+/// <param name="Class">Класс властивість якого описується</param>
+/// <param name="Name">Назва властивості</param>
+/// <param name="Getter">Метод який надає значення властивості</param>
+/// <param name="...">Нуль або більше об'єктів MethodDescriptor або MethodDescriptionWithArgs 
+/// які описують методи встановлення значення властивості якщо такі є</param>
+/// <returns>Об'єкт PropertyDescriptor який містить опис властивості</returns>
+#define	ObjectProperty(Class, Name, Getter, ...) 												\
+	Seed::Core::Reflection::Details::PropertyDescriptor< 										\
+		Class, 																					\
 		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Name)), 								\
-		decltype(&Type::Getter), 																\
-		&Type::Getter, 																			\
+		decltype(&Class::Getter), 																\
+		&Class::Getter, 																			\
 		decltype(ObjectMethodsDefs(__VA_ARGS__))												\
 	>(Seed::Core::CTTI::Details::CreateTypeStr(#Name), ObjectMethodsDefs(__VA_ARGS__))			
-																								
+						
+/// <summary>
+/// Опис констора та деструктора
+/// </summary>
+/// <param name="Class">Класс конструктор та деструктор якого описується</param>
+/// <param name="...">Нуль або більше типів з CV Ref модифікаторами 
+/// які є аргументами конструктора</param>
+/// <returns>Об'єкт ObjectCtorAndDtor 
+/// який містить опис конструктора та деструктора типу</returns>
 #define CtorDescription(Class, ...) 															\
 	Seed::Core::Reflection::Details::ObjectCtorAndDtor<Class, __VA_ARGS__>						
-																								
+
+/// <summary>
+/// Опис деструктора і вказування що конструктор(и) недоступний
+/// </summary>
+/// <param name="Class">Класс деструктор якого описується</param>
+/// <returns>Об'єкт ObjectCtorAndDtor 
+/// який містить опис деструктора типу</returns> 
 #define NullCtorDescription(Class) 																\
 	Seed::Core::Reflection::Details::ObjectNullCtorAndDtor<Class>								
-																								
+
+/// <summary>
+/// Опис схеми класу(створення об'єкта ObjectDescriptor)
+/// </summary>
+/// <param name="Class">Класс схема якого описується</param>
+/// <param name="CtorDesc">Опис деструктора(CtorDescription або NullCtorDescription)</param>
+/// <param name="Methods">Список методів классу(ObjectMethodsDefs)</param>
+/// <param name="Props">Опис властивостей класу(ObjectPropsDefs)</param>
+/// <returns>ОБ'єкт ObjectDescriptor який містить компіл тайм схему типу</returns>
 #define ObjectDefinition(Class, CtorDesc, Methods, Props)                                       \
 	[]() constexpr {																		    \
 		constexpr auto methods = Methods;													    \
@@ -1962,12 +1360,18 @@ namespace Seed
 		using methodsTupleType = Seed::Core::TypeTraits::DecayV<decltype(methods)>;			    \
 		using propertiesTupleType = Seed::Core::TypeTraits::DecayV<decltype(properties)>;	    \
 																							    \
-		constexpr auto descriptor = Seed::Core::Reflection::Details::V2ObjectDescriptor<		    \
+		constexpr auto descriptor = Seed::Core::Reflection::Details::ObjectDescriptor<		    \
 			Class, CtorDesc, methodsTupleType, propertiesTupleType>(methods, properties);	    \
 																							    \
 		return descriptor;																	    \
 	}()
 	
 
-#define GenObjectRTTIRecord(ObjectTypeRecord) \
+/// <summary>
+/// Генерація об'єкта ObjectRTTIRecord який містить рантайм опис схеми типу
+/// </summary>
+/// <param name="ObjectTypeRecord">Об'єкт ObjectTypeRecord 
+/// який містить компіл тайм опис схеми типуу</param>
+/// <returns>Об'єкт ObjectRTTIRecord який містить опис схеми типу</returns>
+#define GenObjectRTTIRecord(ObjectTypeRecord)													\
 	Seed::Core::Reflection::ObjectRTTIRecord(ObjectTypeRecord)
