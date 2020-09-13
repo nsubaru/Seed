@@ -152,7 +152,7 @@ namespace Seed
                     return true;
                 }
 
-                TBaseString& ReverseImpl() {
+                ForceInline TBaseString& ReverseImpl() {
                     TBaseString* This = static_cast<TBaseString*>(this);
                     for (SizeT i = 0; i < This->Lenght / 2; i++) {
                         Swap(This->str[i], This->str[(This->Lenght - 1) - i]);
@@ -180,7 +180,7 @@ namespace Seed
             	    return *This;
                 }
             protected:
-                virtual ~TLinqApi() = 0 {}
+                ForceInline virtual ~TLinqApi() = 0 {}
 			};
 		}
 	}

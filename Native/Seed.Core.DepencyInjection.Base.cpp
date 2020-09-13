@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.DepencyInjection.Base.h"
 
 void Seed::Core::DI::DepencyInjector::RegisterServiceTypes(const SmartPtr<ServiceRecord>& service) {
@@ -5,18 +8,19 @@ void Seed::Core::DI::DepencyInjector::RegisterServiceTypes(const SmartPtr<Servic
 	{
 		methodRecord.TypeInformationGetterFunction().ForEach([&](const Reflection::DataTypeRecord & typeRecord) InlineLambda 
 		{
-			if (this->data->objectTypeTableForNativeLevel.IsExist(typeRecord.GetTypeInfo()))
+			if (this->data->objectTypeRecordRefs.IsExist(typeRecord.GetTypeInfo()))
 			{
-				this->data->objectTypeRecordRefs[typeRecord.GetTypeInfo()]++;
+				this->data->objectTypeRecordRefs[typeRecord.GetTypeInfo()] += 1;
 				return;
 			}
 
-			if (this->data->dataTypeTableForNativeLevel.IsExist(typeRecord.GetTypeInfo()))
+			if (this->data->dataTypeRecordRefs.IsExist(typeRecord.GetTypeInfo()))
 			{
-				this->data->dataTypeRecordRefs[typeRecord.GetTypeInfo()]++;
+				this->data->dataTypeRecordRefs[typeRecord.GetTypeInfo()] += 1;
 				return;
 			}
 
+			this->data->dataTypeRecordRefs.Insert({ typeRecord.GetTypeInfo(), 1 });
 			this->data->dataTypeTableForNativeLevel.Insert(typeRecord.GetTypeInfo(), typeRecord);
 			this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
 		});
@@ -65,23 +69,27 @@ void Seed::Core::DI::DepencyInjector::UnregisterServiceTypes(const SmartPtr<Serv
 	{
 		methodRecord.TypeInformationGetterFunction().ForEach([&] (const Reflection::DataTypeRecord& typeRecord) InlineLambda
 		{
-			if (--data->dataTypeRecordRefs[typeRecord.GetTypeInfo()] == 0)
-			{
-				data->dataTypeTableForNativeLevel.Delete(typeRecord.GetTypeInfo());
-				data->dataTypeTableForManagedLevel.Remove(typeRecord.TypeName);
+			if (data->dataTypeRecordRefs.IsExist(typeRecord.GetTypeInfo())) {
+				if ((--data->dataTypeRecordRefs[typeRecord.GetTypeInfo()]) == 0)
+				{
+					data->dataTypeTableForNativeLevel.Delete(typeRecord.GetTypeInfo());
+					data->dataTypeTableForManagedLevel.Remove(typeRecord.TypeName);
 
-				data->dataTypeRecordRefs.Delete(typeRecord.GetTypeInfo());
+					data->dataTypeRecordRefs.Delete(typeRecord.GetTypeInfo());
 
-				return;
+					return;
+				}
 			}
-			else if (--data->objectTypeRecordRefs[typeRecord.GetTypeInfo()] == 0)
-			{
-				data->objectTypeTableForNativeLevel.Delete(typeRecord.GetTypeInfo());
-				data->objectTypeTableForManagedLevel.Remove(typeRecord.TypeName);
+			else if (data->objectTypeRecordRefs.IsExist(typeRecord.GetTypeInfo())) {
+				if ((--data->objectTypeRecordRefs[typeRecord.GetTypeInfo()]) == 0)
+				{
+					data->objectTypeTableForNativeLevel.Delete(typeRecord.GetTypeInfo());
+						data->objectTypeTableForManagedLevel.Remove(typeRecord.TypeName);
 
-				data->objectTypeRecordRefs.Delete(typeRecord.GetTypeInfo());
+						data->objectTypeRecordRefs.Delete(typeRecord.GetTypeInfo());
 
-				return;
+						return;
+				}
 			}
 		});
 	});

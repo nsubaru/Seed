@@ -606,21 +606,21 @@ namespace Seed
 					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(This->pool), NullPointException::Types::Write));
 
 				TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG) CurrentSettings().VirtualSetting.CpuCoresCount / 2);
-				TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG) CurrentSettings().VirtualSetting.CpuCoresCount);
+				TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG) CurrentSettings().VirtualSetting.CpuCoresCount); //-V2571
 				TP_POOL_STACK_INFORMATION info;
 				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
 				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
-				TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info);
+				TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info); //-V2571
 				status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
 
 				if (!NT_SUCCESS(status))
 					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(This->cleanupData), NullPointException::Types::Write));
 
 				This->env = new TP_CALLBACK_ENVIRON;
-				auto threadPoolEnviroment = reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->env);
+				auto threadPoolEnviroment = reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->env); //-V2571
 				threadPoolEnviroment->Version = 3;
-				threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(This->pool);
-				threadPoolEnviroment->CleanupGroup = reinterpret_cast<PTP_CLEANUP_GROUP>(This->cleanupData);
+				threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(This->pool); //-V2571
+				threadPoolEnviroment->CleanupGroup = reinterpret_cast<PTP_CLEANUP_GROUP>(This->cleanupData); //-V2571
 				threadPoolEnviroment->CleanupGroupCancelCallback = CleanupCallback;
 				threadPoolEnviroment->RaceDll = NULL;
 				threadPoolEnviroment->ActivationContext = NULL;
@@ -665,7 +665,7 @@ namespace Seed
 					if (!NT_SUCCESS(status))
 						Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(event), NullPointException::Types::Write));
 
-					status = TpAllocWork(&work, PoolWorkCallbak, new JobPool(*this), reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->Parrent->env));
+					status = TpAllocWork(&work, PoolWorkCallbak, new JobPool(*this), reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->Parrent->env)); //-V2571
 
 					if (!NT_SUCCESS(status))
 						Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(work), NullPointException::Types::Write));

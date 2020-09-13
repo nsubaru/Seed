@@ -450,7 +450,7 @@ namespace Seed
 					
 					if (this->data->objectTypeRecordRefs.IsExist(rttiRecord.GetRTTITypeInfo()))
 					{
-						++this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()];
+						this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()] += 1;
 					}
 					else
 					{
@@ -471,7 +471,7 @@ namespace Seed
 					
 					if (this->data->objectTypeRecordRefs.IsExist(rttiRecord.GetRTTITypeInfo()))
 					{
-						++this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()];
+						this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()] += 1;
 					}
 					else
 					{
@@ -491,7 +491,7 @@ namespace Seed
 				DepencyInjector& RemoveObjectType(const Reflection::ObjectRTTIRecord& rttiRecord) {
 					if (this->data->objectTypeRecordRefs.IsExist(rttiRecord.GetRTTITypeInfo()))
 					{
-						if (--this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()] == 0)
+						if ((--this->data->objectTypeRecordRefs[rttiRecord.GetRTTITypeInfo()]) == 0)
 						{
 							this->data->objectTypeTableForNativeLevel.Delete(rttiRecord.GetRTTITypeInfo());
 							this->data->objectTypeTableForManagedLevel.Remove(rttiRecord.ClassName);
@@ -629,7 +629,7 @@ namespace Seed
 					
 					if (this->data->dataTypeRecordRefs.IsExist(rttiRecord.TypeRecord))
 					{
-						++this->data->dataTypeRecordRefs[rttiRecord.TypeRecord];
+						this->data->dataTypeRecordRefs[rttiRecord.TypeRecord] += 1;
 					}
 					else
 					{
@@ -651,7 +651,7 @@ namespace Seed
 					
 					if (this->data->dataTypeRecordRefs.IsExist(rttiRecord.TypeRecord))
 					{
-						++this->data->dataTypeRecordRefs[rttiRecord.TypeRecord];
+						this->data->dataTypeRecordRefs[rttiRecord.TypeRecord] += 1;
 					}
 					else
 					{
@@ -672,7 +672,7 @@ namespace Seed
 				DepencyInjector& RemoveDataType(const Reflection::DataTypeRecord& rttiRecord) {
 					if (this->data->dataTypeRecordRefs.IsExist(rttiRecord.TypeRecord))
 					{
-						if (--this->data->dataTypeRecordRefs[rttiRecord.TypeRecord] == 0)
+						if ((--this->data->dataTypeRecordRefs[rttiRecord.TypeRecord]) == 0)
 						{
 							this->data->dataTypeTableForNativeLevel.Delete(rttiRecord.TypeRecord);
 							this->data->dataTypeTableForManagedLevel.Remove(rttiRecord.TypeName);

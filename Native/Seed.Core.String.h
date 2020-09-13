@@ -33,7 +33,7 @@ namespace Seed {
             ///<params name = "rawPtr">Покажчик який буде використано як масив символів в нового рядка</params>
             ///<params name = "CurrentSize">Кількість символів з нуль-термінатором</params>
             ///<params name = "ReservedSize">Фактичний розмір масиву символів</params>
-            BaseString(CharStr&& rawPtr, SizeT CurrentSize, SizeT ReservedSize)
+            ForceInline BaseString(CharStr&& rawPtr, SizeT CurrentSize, SizeT ReservedSize)
                 :str(rawPtr), CurrentSize(CurrentSize), ReservedSize(ReservedSize) {
                 rawPtr = nullptr;
             }
@@ -164,7 +164,7 @@ namespace Seed {
             ///<param name = "Text">Масив букв</param>
             ///<param name = "Size">Кількість символів разом з нуль-термінатором</summary>
             ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-            InternalApiCall BaseString(const AChar* text, SizeT textSize) {
+            ForceInline InternalApiCall BaseString(const AChar* text, SizeT textSize) {
                 if (textSize == 0) {
                     this->str = nullptr;
                     this->CurrentSize = this->ReservedSize = 0;
@@ -184,7 +184,7 @@ namespace Seed {
             ///<summary>Конструктор з масиву символів і його розміру. Копіює вміст і дописую нуль-термінатор</summary>
             ///<params name = "rawText">Масив символів</params>
             ///<params name = "Size">Кількість символів</params>
-            InternalApiCall BaseString(const CharStr rawText, SizeT Size) :
+            ForceInline InternalApiCall BaseString(const CharStr rawText, SizeT Size) :
                 CurrentSize(Size + 1),
                 ReservedSize(Size + 1 + CurrentSettings().MemoryManager.StringReserveSize),
                 str((CharStr)BaseString::operator new[]((Size + 1 + CurrentSettings().MemoryManager.StringReserveSize) * sizeof(Char)))
@@ -196,7 +196,7 @@ namespace Seed {
             ///<summary>Конструктор з стартовим резервованим розміром</summary>
             ///<param name = "StartSize">Стартовий розмір в кількості символів без нуль-термінатора</param>
             ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-            explicit BaseString(SizeT StartSize) {
+            ForceInline explicit BaseString(SizeT StartSize) {
                 if (StartSize > Math::Max<SizeT>())
                     Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize);
                 if (StartSize == 0 || StartSize < CurrentSettings().MemoryManager.StringReserveSize)
@@ -213,27 +213,37 @@ namespace Seed {
             /// <param name="item">Compile time рядок</param>
             /// <typeparam name="N">Кільість символів</typeparam>
             template<SizeT N>
-            BaseString(const CTTI::Details::ConstexprArray<char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
+            ForceInline BaseString(const CTTI::Details::ConstexprArray<char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (N == 0)
                 {
 	                static_assert(false, "ConstexprArray must have '\\0' in end");
                 }
                 else
                 {
-                    this->CurrentSize = N;
+                    this->CurrentSize = N + 1;
+                    for (SizeT i = 0; i < N; i++)
+                    {
+                        if (item[i] == '\0')
+                        {
+                            this->CurrentSize = i + 1; break;
+                        }
+                    }
+                    
                     this->ReservedSize = this->CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     this->str = (CharStr) BaseString::operator new[](ReservedSize * sizeof(Char));
-                    for (SizeT i = 0; i < N; i++)
+                    for (SizeT i = 0; i < this->CurrentSize; i++)
                     {
                         str[i] = item[i];
                     }
+
+                    this->str[this->CurrentSize - 1] = L'\0';
                 }
             }
 
             ///<summary>Копіювальний конструктор</summary>
             ///<remarks>Виділить пам'ять лише при потребі</remarks>
             ///<param name = "from">Оригинал рядка</param>
-            BaseString(const BaseString& from) {
+            ForceInline BaseString(const BaseString& from) {
                 if (from.str != nullptr) {
                     this->CurrentSize = from.CurrentSize;
                     this->ReservedSize = from.ReservedSize;
@@ -469,7 +479,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<typename TOtherHeap>
-            StrongOrdering operator<=>(const BaseString<TOtherHeap>& right) const {
+            ForceInline StrongOrdering operator<=>(const BaseString<TOtherHeap>& right) const {
                 auto res = Internals::CompareString(this->str, right.str, this->Lenght, right.Lenght);
                 if (res == 0)
                     return StrongOrdering::equal;
@@ -485,7 +495,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<> 
-            StrongOrdering operator<=>(const BaseString<THeap>& right) const {
+            ForceInline StrongOrdering operator<=>(const BaseString<THeap>& right) const {
                 auto res = Internals::CompareString(this->str, right.str, this->Lenght, right.Lenght);
                 if (res == 0)
                     return StrongOrdering::equal;
@@ -501,7 +511,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<SizeT TextLenght>
-            StrongOrdering operator<=>(StaticTextRef<TextLenght> right) const {
+            ForceInline StrongOrdering operator<=>(StaticTextRef<TextLenght> right) const {
                 auto res = Internals::CompareString(this->str, (Char*)right, this->Lenght, TextLenght - 1);
                 if (res == 0)
                     return StrongOrdering::equal;
@@ -516,7 +526,7 @@ namespace Seed {
             /// </summary>
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
-            StrongOrdering operator<=>(const ConstString& right) const {
+            ForceInline StrongOrdering operator<=>(const ConstString& right) const {
                 auto res = Internals::CompareString(this->str, (Char*)right.Str, this->Lenght, right.GetSize() - 1);
                 if (res == 0)
                     return StrongOrdering::equal;
@@ -531,7 +541,7 @@ namespace Seed {
             /// </summary>
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
-            StrongOrdering operator<=>(const ConstAString& right) const {
+            ForceInline StrongOrdering operator<=>(const ConstAString& right) const {
                 auto countedSize = Min(this->Size, right.Size);
 
                 for (SizeT i = 0; i < countedSize; i++)
@@ -554,7 +564,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<SizeT TextLenght>
-            StrongOrdering operator<=>(StaticATextRef<TextLenght> right) const {
+            ForceInline StrongOrdering operator<=>(StaticATextRef<TextLenght> right) const {
                 auto countedSize = Min(this->Size, TextLenght);
 
                 for (SizeT i = 0; i < countedSize; i++)
@@ -658,7 +668,7 @@ namespace Seed {
             ///<summary>Оператор додавання рядкового літералу</summary>
             ///<param name = "Text">Рядковий літерал</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
-            ForceInline BaseString operator+(const ConstString& Text) const {
+            BaseString operator+(const ConstString& Text) const {
                 if (Text.Size < 2)
                     return *this;
 
@@ -1002,14 +1012,14 @@ namespace Seed {
             ForceInline explicit operator const ConstCharStr() const noexcept { return str; }
 
             ///<summary>Вертає поточну довжина рядку</summary>
-            SizeT GetLenght() const { return (CurrentSize > 0) ? CurrentSize - 1 : 0; }
+            ForceInline SizeT GetLenght() const { return (CurrentSize > 0) ? CurrentSize - 1 : 0; }
             ///<summary>Поточна довжина рядка</summary>
             SizeT Property(GetLenght) Lenght;
 
             /// <summary>
             /// Вертає поточну довжину рядка з нуль-термінатором
             /// </summary>
-            SizeT GetSize() const {
+            ForceInline SizeT GetSize() const {
                 return CurrentSize;
             }
 
@@ -1021,7 +1031,7 @@ namespace Seed {
             /// <summary>
             /// Вертає розмір буфера рядка
             /// </summary>
-            SizeT GetBufferSize() const {
+            ForceInline SizeT GetBufferSize() const {
                 return ReservedSize;
             }
 
@@ -1031,7 +1041,7 @@ namespace Seed {
             SizeT Property(GetBufferSize) BufferSize;
 
             ///<summary>Вертає істину якщо рядок пустий</summary>
-            Boolean GetIsEmpty() const { return GetSize() == 0; }
+            ForceInline Boolean GetIsEmpty() const { return GetSize() == 0; }
             ///<summary>Вертає істину якщо рядок пустий</summary>
             Boolean Property(GetIsEmpty) IsEmpty;
 
@@ -1089,11 +1099,11 @@ namespace Seed {
             ///<param name = "NewBase">Новий алокатор</summary>
             ///<returns>Копія рядка алокована алокатором NewBase</returns>
             template<typename NewBase>
-            operator BaseString<NewBase>() const {
+            ForceInline operator BaseString<NewBase>() const {
                 return BaseString<NewBase>((const CharStr)(ConstCharStr)*this);
             }
 
-            virtual BaseString Clone() const override {
+            ForceInline virtual BaseString Clone() const override {
                 return BaseString(*this);
             }
 

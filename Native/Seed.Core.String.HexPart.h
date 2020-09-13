@@ -205,8 +205,8 @@ namespace Seed
 
                 ///<summary>Перетворення числа, структури, класу чи покажчика в hex рядок</summary>
                 ///<param name = "Data">Дані які перетворить в шістнадцятиричне представлення</param>
-                template<typename T>
-                static TBaseString toHexString(const T& Data) {
+                template<typename T> requires Concepts::IsPod<T>
+                ForceInline static TBaseString toHexString(const T& Data) {
                     return binaryToHex(Containers::Array<Byte>(reinterpret_cast<const Byte*>(&Data), sizeof(T)));
                 }
 
@@ -307,7 +307,7 @@ namespace Seed
                     return str;
                 }
 			protected:
-                virtual ~THexStringPart() = 0 {}
+                ForceInline virtual ~THexStringPart() = 0 {}
 			};
 		}
 	}

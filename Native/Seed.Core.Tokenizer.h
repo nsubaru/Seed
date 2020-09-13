@@ -231,7 +231,7 @@ namespace Seed {
 			Tokenizer(const Token& ParentToken, const Containers::Array<String>& Delims) : data(new Data(ParentToken, Delims)) {}
 
 			Token begin() {
-				extern Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
+				extern Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(const CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
 
 				auto [OffSet, Size, DelimIndex] =
 					GetNextToken(

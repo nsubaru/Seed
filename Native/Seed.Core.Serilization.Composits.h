@@ -54,7 +54,7 @@ namespace Seed
 					template<SizeT Index = 0>
 					constexpr ForceInline static auto TypeMetaDataTuppleItem(){
 						if constexpr(Index == sizeof...(TTypes))
-							return CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+							return CTTI::Details::CreateTypeStr("");
 						else{
 							using Type = typename Tuple::ItemType<Index>;
 							return BaseSerlizationHandler<THeap, Type>::TypeMetaData()
@@ -82,24 +82,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
+							CTTI::Details::CreateTypeStr("0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<Tuple>().Resize<CTTI::TypeName<Tuple>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(Tuple)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeMetaDataTuppleItem() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
 
 					ForceInline static void DeserelizeImpl(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -113,20 +113,20 @@ namespace Seed
 
 				template<typename THeap, typename TObject>
 				struct BaseSerlizationHandler<THeap, TObject, typename TypeTraits::EnableIfV<IsSerilizableObject<TObject>, void>> {
-					using StructFieldsMetaData = typename CTTI::TypeTraits::CTTITypeMetaData<TObject>::Fields;
+					static constexpr auto StructFieldsMetaData = CTTI::TypeTraits::CTTITypeMetaData<TObject>::Fields;
 					using ISerilizable = CTTI::TypeTraits::ISerilizable<TObject>;
 
 					template<SizeT I = 0>
 					ForceInline static void SerelizeFieldsImpl(Byte * fiedsPtr, Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if constexpr (I < StructFieldsMetaData::Count)
+						if constexpr (I < StructFieldsMetaData.Count)
 						
 						{
-							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
-							using Type = typename FieldMetaData::Type;
+							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
+							using Type = decltype(FieldMetaData)::Type;
 
-							if constexpr (I + 1 < StructFieldsMetaData::Count){
+							if constexpr (I + 1 < StructFieldsMetaData.Count){
 								BaseSerlizationHandler<THeap, Type>::SerilizeImpl(
-									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
+									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData.FieldOffset), 
 									rawStream, 
 									offset, registry);
 								SerelizeFieldsImpl<I + 1>(fiedsPtr, rawStream, offset, registry);
@@ -134,7 +134,7 @@ namespace Seed
 							else
 							{
 								BaseSerlizationHandler<THeap, Type>::SerilizeImpl(
-									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
+									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData.FieldOffset), 
 									rawStream, 
 									offset, registry);
 							}
@@ -148,21 +148,21 @@ namespace Seed
 					
 					template<SizeT I = 0>
 					ForceInline static void DeserelizeFieldsImp(Byte * fiedsPtr, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry){
-						if constexpr (I < StructFieldsMetaData::Count)
+						if constexpr (I < StructFieldsMetaData.Count)
 						{
-							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
-							using Type = typename FieldMetaData::Type;
+							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
+							using Type = decltype(FieldMetaData)::Type;
 
-							if constexpr (I + 1 < StructFieldsMetaData::Count){
+							if constexpr (I + 1 < StructFieldsMetaData.Count){
 								BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(
-									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
+									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData.FieldOffset), 
 									rawStream, 
 									offset, registry);
 								DeserelizeFieldsImp<I + 1>(fiedsPtr, rawStream, offset, registry);
 							}
 							else{
 								BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(
-									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), 
+									*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData.FieldOffset), 
 									rawStream, 
 									offset, registry);
 							}
@@ -175,21 +175,21 @@ namespace Seed
 
 					template<SizeT I = 0>
 					ForceInline static SizeT DataSizeFieldsImp(Byte * fiedsPtr, UnusedData const TypesRegistry& registry){
-						if constexpr (I < StructFieldsMetaData::Count)
+						if constexpr (I < StructFieldsMetaData.Count)
 						{
-							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
-							using Type = typename FieldMetaData::Type;
+							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
+							using Type = decltype(FieldMetaData)::Type;
 
-							if constexpr (I + 1 < StructFieldsMetaData::Count)
+							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return 
 									BaseSerlizationHandler<THeap, Type>::DataSize(
-										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), registry)
+										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData.FieldOffset), registry)
 									+
 									DataSizeFieldsImp<I + 1>(fiedsPtr, registry);
 							else
 								return
 									BaseSerlizationHandler<THeap, Type>::DataSize(
-										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData::FieldOffset), registry);
+										*reinterpret_cast<Type*>(fiedsPtr + FieldMetaData.FieldOffset), registry);
 						}
 						else
 						{
@@ -199,50 +199,50 @@ namespace Seed
 
 					template<SizeT I = 0>
 					constexpr ForceInline static auto TypeHintFieldsImp(){
-						if constexpr (I < StructFieldsMetaData::Count)
+						if constexpr (I < StructFieldsMetaData.Count)
 						{
-							using FieldMetaData = typename StructFieldsMetaData::ItemType<I>;
-							using Type = typename FieldMetaData::Type;
+							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
+							using Type = decltype(FieldMetaData)::Type;
 
-							if constexpr (I + 1 < StructFieldsMetaData::Count)
+							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("[")()) +
-									FieldMetaData::FieldName.Resize<FieldMetaData::FieldName.Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
-									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldOffset)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
-									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldSize)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
+									CTTI::Details::CreateTypeStr("[") +
+									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
+									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
+									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
+									CTTI::Details::CreateTypeStr("-") +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("]")())
+									CTTI::Details::CreateTypeStr("]")
 									+
 									TypeHintFieldsImp<I + 1>();
 							else
 								return
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("[")()) +
-									FieldMetaData::FieldName.Resize<FieldMetaData::FieldName.Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
-									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldOffset)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
-									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData::FieldSize)>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("-")()) +
+									CTTI::Details::CreateTypeStr("[") +
+									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
+									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
+									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
+									CTTI::Details::CreateTypeStr("-") +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("]")());
+									CTTI::Details::CreateTypeStr("]");
 						}
 						else
 						{
-							return CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+							return CTTI::Details::CreateTypeStr("");
 						}
 					}
 
 					template<SizeT I = 0>
 					constexpr ForceInline static auto TypeMetaDataFieldsImp(){
-						if constexpr (I < StructFieldsMetaData::Count)
+						if constexpr (I < StructFieldsMetaData.Count)
 						{
-							using FieldMetaData = StructFieldsMetaData::ItemType<I>;
-							using Type = typename FieldMetaData::Type;
+							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
+							using Type = decltype(FieldMetaData)::Type;
 
-							if constexpr (I + 1 < StructFieldsMetaData::Count)
+							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return BaseSerlizationHandler<THeap, Type>::TypeMetaData()
 									+
 								TypeMetaDataFieldsImp<I + 1>();
@@ -251,7 +251,7 @@ namespace Seed
 						}
 						else
 						{
-							return CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("")());
+							return CTTI::Details::CreateTypeStr("");
 						}
 					}
 
@@ -281,24 +281,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("0")());
+							CTTI::Details::CreateTypeStr("0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("{")()) +
+                            CTTI::Details::CreateTypeStr("{") +
                             CTTI::TypeName<TObject>().Resize<CTTI::TypeName<TObject>().Count - 1>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TObject>::TypeClass)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             CTTI::Details::ToCharStr<sizeof(TObject)>() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             ConstexprSize() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeHint() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("|")()) +
+                            CTTI::Details::CreateTypeStr("|") +
                             TypeMetaDataFieldsImp() +
-                            CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("}")());
+                            CTTI::Details::CreateTypeStr("}");
                     }
 				};
 			}

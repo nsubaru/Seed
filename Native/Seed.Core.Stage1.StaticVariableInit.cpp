@@ -18,56 +18,65 @@ static int const epoch_start = INT_MIN;
 extern void* InternalHeapFree(void* MemBlk);
 extern void* InternalHeapAllocate(Seed::SizeT Size);
 
+extern __declspec(noreturn) void EmergencyShutdown(
+    Seed::Core::ConstAString File,
+    Seed::Core::ConstAString Function,
+    Seed::Core::UInt64 Line,
+    Seed::Core::ConstString Reason //-V813
+);
+
 class InternalHeap final: public Seed::Memory::BasicHeap {
 public:
-    ///<summary>Виділення пам'яті</summary>
-	///<param name='Size'>Розмір ділянки в байтах</param>
-	///<returns>Виділену ділянку</returns>
     virtual void* Allocate(Seed::SizeT Size) final {
         return InternalHeapAllocate(Size);
     }
-	///<summary>Вирівнняне виділення пам'яті</summary>
-	///<param name='Size'>Розмір ділянки в байтах</param>
-	///<param name='AllocationReq'>Границя вирівнювання</param>
-	///<returns>Виділену ділянку</returns>
+
     virtual void* AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq) final {
         Throw(Seed::NotImplementedException(ExceptionPosition));
     }
 
-	///<summary>Звільнення пам'яті</summary>
-	///<param name='MemBlk'>Блок пам'яті який звільняється</param>
     virtual void* Free(void* MemBlk) final {
         return InternalHeapFree(MemBlk);
     }
-	///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
-	///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-	///<param name='AllocationReq'>Границя вирівнювання</param>
+
     virtual void* AllignedFree(void* MemBlk, Seed::SizeT AllocationReq) final {
         Throw(Seed::NotImplementedException(ExceptionPosition));
     }
 
-	///<summary>Кількість виділених блоків даних</summary>
-    virtual Seed::SizeT CurrentMemBlkCount() noexcept final {
+
+    virtual Seed::SizeT CurrentMemBlkCount() final {
         return Seed::Core::Memory::CurrentInternalHeapAllocatedMemBlks();
     }
-	///<summary>Розмір виділеної пам'яті в байтах</summary>
-    virtual Seed::SizeT CurrentAllocatedMemory() noexcept final {
+
+    virtual Seed::SizeT CurrentAllocatedMemory() final {
         return Seed::Core::Memory::CurrentInternalHeapAllocatedMemory();
     }
-	///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-    virtual Seed::SizeT CurrentHeapUsage() noexcept final {
+
+    virtual Seed::SizeT CurrentHeapUsage() final {
         return Seed::Core::Memory::CurrentInternalHeapHeapsUsage();
     }
 };
 
 static Seed::Core::Containers::BaseList<InternalHeap, Seed::SizeT>* TSStorage = nullptr;
 
-void registerTSSVariable(int* const pOnce) {
-    if (TSStorage == nullptr)
+void registerTSSVariable(int* const pOnce) noexcept {
+    try
     {
-        TSStorage = new Seed::Core::Containers::BaseList<InternalHeap, Seed::SizeT>();
+        if (TSStorage == nullptr)
+        {
+            TSStorage = new Seed::Core::Containers::BaseList<InternalHeap, Seed::SizeT>();
+        }
+        (*TSStorage) += (Seed::SizeT) pOnce;
     }
-    (*TSStorage) += (Seed::SizeT) pOnce;
+    catch (Seed::Exception& ex)
+    {
+        Seed::toCoreLog(L"При реєстрації TSS виникла помилка: ", ex);
+        EmergencyShutdown(ExceptionPosition, L"При реєстрації TSS виникла помилка");
+    }
+    catch (...)
+    {
+        EmergencyShutdown(ExceptionPosition, L"При реєстрації TSS виникла невідома помилка");
+    }
 }
 
 void unRegisterTSSVariable() {
@@ -155,7 +164,7 @@ extern "C" extern void __cdecl _Init_thread_header(int* const pOnce) noexcept
             timeount.QuadPart = xp_timeout * 1000ULL * 10000ULL;
             _Init_thread_wait(timeount);
 
-            if (*pOnce == uninitialized)
+            if (*pOnce == uninitialized) //-V547
             {
                 *pOnce = being_initialized;
                 _Init_thread_unlock();

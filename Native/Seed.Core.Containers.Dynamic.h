@@ -36,7 +36,7 @@ namespace Seed
                     /// </summary>
                     /// <typeparam name="TTypes">Кортеж типів</typeparam>
                     template<typename ... TTypes>
-                    Tuple<TTypes...>& GetVariables() {
+                    ForceInline Tuple<TTypes...>& GetVariables() {
                         using Pack = Tuple<TTypes...>;
                         if (typeid(Pack) == GetVariablesPackTypeInfo())
                         {
@@ -50,7 +50,7 @@ namespace Seed
                     /// </summary>
                     /// <typeparam name="TTypes">Кортеж типів</typeparam>
                     template<typename TTuple>
-                    TTuple& GetVariablesTuple() {
+                    ForceInline TTuple& GetVariablesTuple() {
                         using Pack = TTuple;
                         if (typeid(Pack) == GetVariablesPackTypeInfo())
                         {
@@ -63,14 +63,14 @@ namespace Seed
                     /// Вертає тип кортежу який містить об'єкт
                     /// </summary>
                     /// <returns>RTTI TypeInfo</returns>
-                    const TypeInfo& GetType() const {
+                    ForceInline const TypeInfo& GetType() const {
                         return GetVariablesPackTypeInfo();
                     }
 
                     /// <summary>
                     /// Деструктор
                     /// </summary>
-                    virtual ~IDynamicImpl() = 0 {};
+                    ForceInline virtual ~IDynamicImpl() = 0 {};
                 };
 
                 /// <summary>
@@ -86,7 +86,7 @@ namespace Seed
                     /// Інформацію типу який містить об'єкт
                     /// </summary>
                     /// <returns>RTTI TypeInfo</returns>
-                    const TypeInfo& GetVariablesPackTypeInfo() const override {
+                    ForceInline const TypeInfo& GetVariablesPackTypeInfo() const override {
                         return typeid(Tuple<TTypes...>);
                     }
 
@@ -94,7 +94,7 @@ namespace Seed
                     /// Покажчик на пакет змінних
                     /// </summary>
                     /// <returns></returns>
-                    void* GetVariablePackRaw() override {
+                    ForceInline void* GetVariablePackRaw() override {
                         return reinterpret_cast<void*>(&data);
                     }
 
@@ -102,33 +102,32 @@ namespace Seed
                     /// Копіювальний конструктор
                     /// </summary>
                     /// <param name="other"></param>
-                    DynamicImpl(const DynamicImpl& other) : data(other.data) {}
+                    ForceInline DynamicImpl(const DynamicImpl& other) : data(other.data) {}
 
                     /// <summary>
                     /// Конструктор переміщення
                     /// </summary>
                     /// <param name="other"></param>
-                    DynamicImpl(DynamicImpl&& other) : data(MoveRValue(other.data)) {}
-
+                    ForceInline DynamicImpl(DynamicImpl&& other) : data(MoveRValue(other.data)) {}
                 public:
                     /// <summary>
                     /// Конструктор з пакету змінних
                     /// </summary>
                     /// <param name="types">Пакет змінних</param>
-                    DynamicImpl(TTypes&&... types) : data(ForwardReference<TTypes>(types)...) {}
+                    ForceInline DynamicImpl(TTypes&&... types) : data(ForwardReference<TTypes>(types)...) {}
 
                     /// <summary>
                     /// Конструктор з пакету змінних
                     /// </summary>
                     /// <param name="types">Пакет змінних</param>
-                    DynamicImpl(Tuple<TTypes...>&& types) : data(ForwardReference<Tuple<TTypes...>>(types)) {}
+                    ForceInline DynamicImpl(Tuple<TTypes...>&& types) : data(ForwardReference<Tuple<TTypes...>>(types)) {}
 
                     /// <summary>
                     /// Оператор присвоєння
                     /// </summary>
                     /// <param name="other">Лівий операнд</param>
                     /// <returns>Посилання на поточний об'єкт</returns>
-                    DynamicImpl& operator=(const DynamicImpl& other) {
+                    ForceInline DynamicImpl& operator=(const DynamicImpl& other) {
                         this->~DynamicImpl();
                         this->DynamicImpl::DynamicImpl(other);
                         return *this;
@@ -139,7 +138,7 @@ namespace Seed
                     /// </summary>
                     /// <param name="other">Лівий операнд</param>
                     /// <returns>Посилання на поточний об'єкт</returns>
-                    DynamicImpl& operator=(DynamicImpl&& other) {
+                    ForceInline DynamicImpl& operator=(DynamicImpl&& other) {
                         this->~DynamicImpl();
                         this->DynamicImpl::DynamicImpl(MoveRValue(other));
                         return *this;
@@ -149,14 +148,14 @@ namespace Seed
                     /// Клонування імплементації dynamic
                     /// </summary>
                     /// <returns>Інтерфейс імплементації</returns>
-                    virtual IDynamicImpl* Clone() const {
+                    ForceInline virtual IDynamicImpl* Clone() const {
                         return new DynamicImpl(*this);
                     }
 
                     /// <summary>
                     /// Деструктор
                     /// </summary>
-                    virtual ~DynamicImpl() override final {};
+                    ForceInline virtual ~DynamicImpl() override final {};
                 };
             private:
                 /// <summary>
@@ -185,32 +184,32 @@ namespace Seed
                 /// <summary>
                 /// Звільнення ресурсів
                 /// </summary>
-                virtual void Dispose() override final {
+                ForceInline virtual void Dispose() override final {
                     delete This->pack;
                 }
             private:
                 /// <summary>
                 /// Конструктор з імплементації
                 /// </summary>
-                Dynamic(IDynamicImpl* pack) : This(new Data(pack)) {}
+                ForceInline Dynamic(IDynamicImpl* pack) : This(new Data(pack)) {}
             public:
                 /// <summary>
                 /// Пустий стандартний конструктор
                 /// </summary>
-                Dynamic() : This(new Data(new DynamicImpl<>())) {}
+                ForceInline Dynamic() : This(new Data(new DynamicImpl<>())) {}
                 /// <summary>
                 /// Конструктор з пакета змінних
                 /// </summary>
                 /// <typeparam name="TTypes">Пакет типів</typeparam>
                 template<typename ... TTypes> requires (sizeof...(TTypes) == 0 || sizeof...(TTypes) > 1 || ((!Concepts::Tuple<TTypes>) || ...))
-                Dynamic(TTypes&& ... types) : This(new Data(new DynamicImpl<TTypes...>(ForwardReference<TTypes>(types)...))) {}
+                ForceInline Dynamic(TTypes&& ... types) : This(new Data(new DynamicImpl<TTypes...>(ForwardReference<TTypes>(types)...))) {}
 
                 /// <summary>
                 /// Конструктор з пакета змінних
                 /// </summary>
                 /// <typeparam name="TTypes">Пакет типів</typeparam>
                 template<typename ... TTypes>
-                Dynamic(Tuple<TTypes...>&& types) : This(new Data(new DynamicImpl<TTypes...>(ForwardReference<Tuple<TTypes...>>(types)))) {}
+                ForceInline Dynamic(Tuple<TTypes...>&& types) : This(new Data(new DynamicImpl<TTypes...>(ForwardReference<Tuple<TTypes...>>(types)))) {}
 
                 /// <summary>
                 /// Вертає силку на пакет змінних які містить об'єкт,
@@ -218,7 +217,7 @@ namespace Seed
                 /// </summary>
                 /// <typeparam name="TTypes">Типи пакету</typeparam>
                 template<typename ... TTypes>
-                Tuple<TTypes...>& GetVariables() {
+                ForceInline Tuple<TTypes...>& GetVariables() {
                     return This->pack->GetVariables<TTypes...>();
                 }
 
@@ -228,7 +227,7 @@ namespace Seed
                 /// </summary>
                 /// <typeparam name="TTypes">Типи пакету</typeparam>
                 template<typename ... TTypes>
-                const Tuple<TTypes...>& GetVariables() const {
+                ForceInline const Tuple<TTypes...>& GetVariables() const {
                     return This->pack->GetVariables<TTypes...>();
                 }
 
@@ -238,7 +237,7 @@ namespace Seed
                 /// </summary>
                 /// <typeparam name="TTypes">Типи пакету</typeparam>
                 template<typename TTuple>
-                TTuple& GetVariablesTuple() {
+                ForceInline TTuple& GetVariablesTuple() {
                     return This->pack->GetVariablesTuple<TTuple>();
                 }
 
@@ -248,7 +247,7 @@ namespace Seed
                 /// </summary>
                 /// <typeparam name="TTypes">Типи пакету</typeparam>
                 template<typename TTuple>
-                const TTuple& GetVariablesTuple() const {
+                ForceInline const TTuple& GetVariablesTuple() const {
                     return This->pack->GetVariablesTuple<TTuple>();
                 }
 
@@ -256,7 +255,7 @@ namespace Seed
                 /// Вертає тип кортежу пакета які на даний момент містить об'єкт
                 /// </summary>
                 /// <returns></returns>
-                const TypeInfo& GetVariableType() const {
+                ForceInline const TypeInfo& GetVariableType() const {
                     return This->pack->GetType();
                 }
 
@@ -269,7 +268,7 @@ namespace Seed
                 /// Конструктор копіювання
                 /// </summary>
                 /// <param name="other">Оригинал</param>
-                Dynamic(Dynamic& other) : This(other.This) {
+                ForceInline Dynamic(Dynamic& other) : This(other.This) {
                     ++other.This->RefCount;
                 }
 
@@ -278,7 +277,7 @@ namespace Seed
                 /// </summary>
                 /// <param name="other">Оригинал</param>
                 /// <returns>Силку на поточний елемент</returns>
-                Dynamic& operator=(Dynamic& other) {
+                ForceInline Dynamic& operator=(Dynamic& other) {
                     this->~Dynamic();
                     this->Dynamic::Dynamic(other);
                     return *this;
@@ -288,7 +287,7 @@ namespace Seed
                 /// Створює повну копію об'єкта
                 /// </summary>
                 /// <returns></returns>
-                virtual Dynamic Clone() const {
+                ForceInline virtual Dynamic Clone() const {
                     return Dynamic(This->pack->Clone());
                 }
 

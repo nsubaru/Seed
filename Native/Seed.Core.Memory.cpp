@@ -132,8 +132,12 @@ void * Seed::Core::Memory::Heap::Allocate(SizeT Size)
 {
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
 	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
-		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
 		LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Загальна");
+	}
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.DefaultHeap.HeapValidationChecks)
+	{
+		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
 	}
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
@@ -167,8 +171,12 @@ void * Seed::Core::Memory::Heap::AllignedAllocate(SizeT Size, SizeT AllocationRe
 		return Allocate(Size);
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
 	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
-		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
 		LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Загальна");
+	}
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.DefaultHeap.HeapValidationChecks)
+	{
+		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
 	}
 	//Пробуєм виділити пам'ять з кучі
 	//Виділяєм ділянку більшу для того щоб помістити розмір і реальний початок ділянки пам'яті
@@ -201,8 +209,9 @@ void * Seed::Core::Memory::Heap::Free(void * MemBlk)
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
-	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно перевіряєм цілісність кучі
-	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.DefaultHeap.HeapValidationChecks)
+	{
 		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
 	}
 	//Отримуєм покажчик на заголовок ділянки пам'яті
@@ -232,7 +241,12 @@ void * Seed::Core::Memory::Heap::AllignedFree(void * MemBlk, SizeT AllocationReq
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно перевіряєм цілісність кучі
-	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) {
+	if (CurrentSettings().MemoryManager.DefaultHeap.HeapAllocsLogging) { //-V807
+		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	}
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.DefaultHeap.HeapValidationChecks)
+	{
 		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
 	}
 	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне,
@@ -263,17 +277,17 @@ void * Seed::Core::Memory::Heap::AllignedFree(void * MemBlk, SizeT AllocationReq
 	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
-Seed::SizeT Seed::Core::Memory::Heap::CurrentMemBlkCount() noexcept
+Seed::SizeT Seed::Core::Memory::Heap::CurrentMemBlkCount()
 {
 	return HeapData.AllocatedMemBlksCount;
 }
 
-Seed::SizeT Seed::Core::Memory::Heap::CurrentAllocatedMemory() noexcept
+Seed::SizeT Seed::Core::Memory::Heap::CurrentAllocatedMemory()
 {
 	return HeapData.AllocatedMemory;
 }
 
-Seed::SizeT Seed::Core::Memory::Heap::CurrentHeapUsage() noexcept
+Seed::SizeT Seed::Core::Memory::Heap::CurrentHeapUsage()
 {
 	return HeapData.CurrentHeapSize;
 }
@@ -322,8 +336,12 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 {
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
 	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
-		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
-		LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+		LogAllocating(Size, SecureHeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+	}
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapValidationChecks)
+	{
+		RtlValidateHeap(SecureHeapData.HeapHandle, 0, nullptr);
 	}
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
 	if (Size == Math::Max<SizeT>())
@@ -357,8 +375,12 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 		return Allocate(Size);
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
 	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
-		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
-		LogAllocating(Size, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+		LogAllocating(Size, SecureHeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+	}
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapValidationChecks)
+	{
+		RtlValidateHeap(SecureHeapData.HeapHandle, 0, nullptr);
 	}
 	//Пробуєм виділити пам'ять з кучі
 	//Виділяєм ділянку більшу для того щоб помістити розмір і реальний початок ділянки пам'яті
@@ -392,9 +414,10 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
-	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно перевіряєм цілісність кучі
-	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
-		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapValidationChecks)
+	{
+		RtlValidateHeap(SecureHeapData.HeapHandle, 0, nullptr);
 	}
 	//Отримуєм покажчик на заголовок ділянки пам'яті
 	SizeT* RealPtr = ((SizeT*)MemBlk) - 1;
@@ -402,7 +425,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	SizeT DataSize = RealPtr[0];
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
 	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
-		LogFree(DataSize, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+		LogFree(DataSize, SecureHeapData.AllocatedMemBlksCount + 1, L"Безпечна");
 	}
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + DataSize;
@@ -424,9 +447,10 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 {
 	//Якщо покажчик nullptr то нічого не потрібно робити бо він і так вільний
 	if (MemBlk == nullptr) return nullptr;
-	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно перевіряєм цілісність кучі
-	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
-		RtlValidateHeap(HeapData.HeapHandle, 0, nullptr);
+	//Якщо валідація пам'яті включена то виконуєм додаткову перевірку
+	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapValidationChecks)
+	{
+		RtlValidateHeap(SecureHeapData.HeapHandle, 0, nullptr);
 	}
 	//Отримуєм покажчик на заголовок ділянки пам'яті
 	SizeT* Header = ((SizeT*)MemBlk) - 2;
@@ -436,7 +460,7 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	SizeT DataSize = Header[1];
 	//Якщо включено логування виділеннь\звільненнь пам'ять то відповідно логуєм дані
 	if (CurrentSettings().MemoryManager.SensitiveDataHeap.HeapAllocsLogging) {
-		LogFree(DataSize, HeapData.AllocatedMemBlksCount + 1, L"Безпечна");
+		LogFree(DataSize, SecureHeapData.AllocatedMemBlksCount + 1, L"Безпечна");
 	}
 	//Обчислюєм повний розмір ділянки пам'яті
 	SizeT FullSize = sizeof(SizeT) + sizeof(SizeT) + AllocationReq + DataSize;
@@ -454,17 +478,17 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* Seed::Core::Memory::Sensi
 	else Throw(NullPointException(__FILE__, __FUNCSIG__, __LINE__, (SizeT)MemBlk, NullPointException::Types::Read));
 }
 
-Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentMemBlkCount() noexcept
+Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentMemBlkCount()
 {
 	return SecureHeapData.AllocatedMemBlksCount;
 }
 
-Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentAllocatedMemory() noexcept
+Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentAllocatedMemory()
 {
 	return SecureHeapData.AllocatedMemory;
 }
 
-Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentHeapUsage() noexcept
+Seed::SizeT Seed::Core::Memory::SensitiveDataHeap::CurrentHeapUsage()
 {
 	return SecureHeapData.CurrentHeapSize;
 }
@@ -521,34 +545,34 @@ DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed
 	return obj + 1;
 }
 
-SizeT Seed::Core::Memory::CurrentInternalHeapAllocatedMemBlks() noexcept
+SizeT Seed::Core::Memory::CurrentInternalHeapAllocatedMemBlks()
 {
 	return InternalHeapData.AllocatedMemBlksCount;
 }
 
-SizeT Seed::Core::Memory::CurrentInternalHeapAllocatedMemory() noexcept
+SizeT Seed::Core::Memory::CurrentInternalHeapAllocatedMemory()
 {
 	return InternalHeapData.AllocatedMemory;
 }
 
-SizeT Seed::Core::Memory::CurrentInternalHeapHeapsUsage() noexcept
+SizeT Seed::Core::Memory::CurrentInternalHeapHeapsUsage()
 {
 	return InternalHeapData.CurrentHeapSize;
 }
 #pragma endregion
 
 #pragma region Statistic
-SizeT Seed::Core::Memory::CurrentTotalAllocatedMemBlks() noexcept
+SizeT Seed::Core::Memory::CurrentTotalAllocatedMemBlks()
 {
 	return InternalHeapData.AllocatedMemBlksCount + HeapData.AllocatedMemBlksCount + SecureHeapData.AllocatedMemBlksCount;
 }
 
-SizeT Seed::Core::Memory::CurrentTotalAllocatedMemory() noexcept
+SizeT Seed::Core::Memory::CurrentTotalAllocatedMemory()
 {
 	return InternalHeapData.AllocatedMemory + HeapData.AllocatedMemory + SecureHeapData.CurrentHeapSize;
 }
 
-SizeT Seed::Core::Memory::CurrentTotalHeapsUsage() noexcept
+SizeT Seed::Core::Memory::CurrentTotalHeapsUsage()
 {
 	return InternalHeapData.CurrentHeapSize + HeapData.CurrentHeapSize + SecureHeapData.CurrentHeapSize;
 }

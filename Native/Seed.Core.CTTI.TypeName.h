@@ -7,98 +7,87 @@ namespace Seed {
 	inline namespace Core {
 		namespace CTTI {
 			namespace TypeNameSpecializations {
-				static constexpr auto CLASS_TYPE_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("class ")());
-				static constexpr auto STRUCT_TYPE_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("struct ")());
-				static constexpr auto CONST_MODIFICATOR_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("const ")());
-				static constexpr auto VOLATILE_MODIFICATOR_NAME = Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("volatile ")());
+				static constexpr auto CLASS_TYPE_NAME = Details::CreateTypeStr("class ");
+				static constexpr auto STRUCT_TYPE_NAME = Details::CreateTypeStr("struct ");
 
 				template<typename T>
 				struct TTypeName {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						if constexpr (CTTI::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
 							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
 						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(STRUCT_TYPE_NAME))
 							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - STRUCT_TYPE_NAME.Count>();
-
-						else if constexpr (Core::TypeTraits::IsConstV<T>&& Core::TypeTraits::IsVolatileV<T>)
-						{
-							using U = Core::TypeTraits::RemoveCV<T>;
-							if constexpr (CTTI::Details::TypeName<U>().IsStartWith(CLASS_TYPE_NAME))
-							{
-								return CONST_MODIFICATOR_NAME + VOLATILE_MODIFICATOR_NAME +
-									CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
-							}
-
-							return CTTI::Details::TypeName<T>();
-						}
-						else if constexpr (Core::TypeTraits::IsConstV<T>)
-						{
-							using U = Core::TypeTraits::RemoveCV<T>;
-							if constexpr (CTTI::Details::TypeName<U>().IsStartWith(CLASS_TYPE_NAME))
-							{
-								return CONST_MODIFICATOR_NAME +
-									CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
-							}
-
-							return CTTI::Details::TypeName<T>();
-						}
-						else if constexpr (Core::TypeTraits::IsVolatileV<T>)
-						{
-							using U = Core::TypeTraits::RemoveCV<T>;
-							if constexpr (CTTI::Details::TypeName<U>().IsStartWith(CLASS_TYPE_NAME))
-							{
-								return VOLATILE_MODIFICATOR_NAME +
-									CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
-							}
-
-							return CTTI::Details::TypeName<T>();
-						}
 						else
-						{
 							return CTTI::Details::TypeName<T>();
-						}
 					}
 				};
 #pragma region Specializations for array and reference
 				template<typename T>
 				struct TTypeName<T*>
 				{
-					constexpr static auto TypeName()
+					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() + 
-							Details::TypeStringToArray(GenNGTypeString("*")());
+						return TTypeName<T>::TypeName() + 
+							Details::CreateTypeStr("*");
+					}
+				};
+
+				template<typename T>
+				struct TTypeName<const T>
+				{
+					ForceInline constexpr static auto TypeName()
+					{
+						return TTypeName<T>::TypeName();
+					}
+				};
+
+				template<typename T>
+				struct TTypeName<volatile T>
+				{
+					ForceInline constexpr static auto TypeName()
+					{
+						return TTypeName<T>::TypeName();
+					}
+				};
+
+				template<typename T>
+				struct TTypeName<const volatile T>
+				{
+					ForceInline constexpr static auto TypeName()
+					{
+						return TTypeName<T>::TypeName();
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<T&>
 				{
-					constexpr static auto TypeName()
+					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() + 
-							Details::TypeStringToArray(GenNGTypeString("&")());
+						return TTypeName<T>::TypeName() + 
+							Details::CreateTypeStr("&");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<T&&>
 				{
-					constexpr static auto TypeName()
+					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() + 
-							Details::TypeStringToArray(GenNGTypeString("&&")());
+						return TTypeName<T>::TypeName() + 
+							Details::CreateTypeStr("&&");
 					}
 				};
 
 				template<typename T, SizeT TSize>
 				struct TTypeName<T[TSize]>
 				{
-					constexpr static auto TypeName()
+					ForceInline constexpr static auto TypeName()
 					{
-						return TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("[")()) +
+						return TTypeName<T>::TypeName() +
+							Details::CreateTypeStr("[") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString("]")());
+							Details::CreateTypeStr("]");
 					}
 				};
 #pragma endregion
@@ -107,73 +96,73 @@ namespace Seed {
 #pragma region Signed Int
 				template<>
 				struct TTypeName<Seed::Int8> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Int8")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::Int8");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Int16> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Int16")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::Int16");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Int32> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Int32")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::Int32");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Int64> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Int64")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::Int64");
 					}
 				};
 #pragma endregion
 #pragma region Unsigned Int
 				template<>
 				struct TTypeName<Seed::UInt8> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt8")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::UInt8");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::UInt16> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt16")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::UInt16");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::UInt32> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt32")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::UInt32");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::UInt64> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::UInt64")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::UInt64");
 					}
 				};
 #pragma endregion
 #pragma region Float and Double
 				template<>
 				struct TTypeName<Seed::Float> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Float")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::Float");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Double> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Double")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::Double");
 					}
 				};
 #pragma endregion
@@ -181,16 +170,16 @@ namespace Seed {
 #pragma region Character
 				template<>
 				struct TTypeName<Seed::UChar> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::UChar")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::UChar");
 					}
 				};
 #pragma endregion
 #pragma region Boolean
 				template<>
 				struct TTypeName<Seed::Boolean> {
-					constexpr static auto TypeName() {
-						return Details::TypeStringToArray(GenNGTypeString("Seed::Boolean")());
+					ForceInline static constexpr auto TypeName() {
+						return Details::CreateTypeStr("Seed::Boolean");
 					}
 				};
 #pragma endregion
@@ -199,164 +188,164 @@ namespace Seed {
 #pragma region Array
 				template<typename T>
 				struct TTypeName<Seed::Containers::Array<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Array<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							CTTI::Details::CreateTypeStr("Seed::Containers::Array<") +
+							TTypeName<T>::TypeName() +
+							CTTI::Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::SensitiveArray<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveArray<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							CTTI::Details::CreateTypeStr("Seed::Containers::SensitiveArray<") +
+							TTypeName<T>::TypeName() +
+							CTTI::Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencyArray<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyArray<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencyArray<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveArray<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveArray<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveArray<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
 #pragma region List
 				template<typename T>
 				struct TTypeName<Seed::Containers::List<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::List<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::List<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::SensitiveList<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveList<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::SensitiveList<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencyList<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyList<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencyList<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveList<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveList<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveList<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
 #pragma region DynamicQueue
 				template<typename T>
 				struct TTypeName<Seed::Containers::DynamicQueue<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::DynamicQueue<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::DynamicQueue<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::SensitiveDynamicQueue<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveDynamicQueue<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::SensitiveDynamicQueue<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencyDynamicQueue<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyDynamicQueue<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencyDynamicQueue<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveDynamicQueue<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveDynamicQueue<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveDynamicQueue<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
 #pragma region DynamicStack
 				template<typename T>
 				struct TTypeName<Seed::Containers::DynamicStack<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::DynamicStack<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::DynamicStack<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::SensitiveDynamicStack<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveDynamicStack<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::SensitiveDynamicStack<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencyDynamicStack<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyDynamicStack<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencyDynamicStack<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveDynamicStack<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveDynamicStack<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveDynamicStack<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
@@ -365,147 +354,147 @@ namespace Seed {
 #pragma region FixedAray
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::FixedArray<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::FixedArray<")()) +
+							Details::CreateTypeStr("Seed::Containers::FixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::ConcurencyFixedArray<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyFixedArray<")()) +
+							Details::CreateTypeStr("Seed::Containers::ConcurencyFixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::SensitiveFixedArray<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveFixedArray<")()) +
+							Details::CreateTypeStr("Seed::Containers::SensitiveFixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveFixedArray<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveFixedArray<")()) +
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveFixedArray<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
 #pragma region FixedQueue
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::FixedQueue<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::FixedQueue<")()) +
+							Details::CreateTypeStr("Seed::Containers::FixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::ConcurencyFixedQueue<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyFixedQueue<")()) +
+							Details::CreateTypeStr("Seed::Containers::ConcurencyFixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::SensitiveFixedQueue<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveFixedQueue<")()) +
+							Details::CreateTypeStr("Seed::Containers::SensitiveFixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveFixedQueue<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveFixedQueue<")()) +
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveFixedQueue<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
 #pragma region FixedStack
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::FixedStack<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::FixedStack<")()) +
+							Details::CreateTypeStr("Seed::Containers::FixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::ConcurencyFixedStack<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyFixedStack<")()) +
+							Details::CreateTypeStr("Seed::Containers::ConcurencyFixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::SensitiveFixedStack<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveFixedStack<")()) +
+							Details::CreateTypeStr("Seed::Containers::SensitiveFixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<SizeT TSize, typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveFixedStack<TSize, T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveFixedStack<")()) +
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveFixedStack<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
@@ -516,11 +505,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::BitMapT<")()) +
+							Details::CreateTypeStr("Seed::Containers::BitMapT<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -530,11 +519,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveBitMapT<")()) +
+							Details::CreateTypeStr("Seed::Containers::SensitiveBitMapT<") +
 							CTTI::Details::ToCharStr<TSize>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr(", ") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
@@ -543,54 +532,54 @@ namespace Seed {
 #pragma region Dictionary
 				template<typename T>
 				struct TTypeName<Seed::Containers::Dictionary<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Dictionary<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::Dictionary<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencyDictionary<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::ConcurencyContainers::ConcurencyDictionary<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::ConcurencyContainers::ConcurencyDictionary<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::SensitiveDictionary<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveDictionary<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::SensitiveDictionary<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
 				template<typename T>
 				struct TTypeName<Seed::Containers::ConcurencySensitiveDictionary<T>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::ConcurencyContainers::ConcurencySensitiveDictionary<")()) +
-							TTypeName<T>::TypeName().Resize<TTypeName<T>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::ConcurencyContainers::ConcurencySensitiveDictionary<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
 #pragma region Map
 				template<typename TKey, typename TValue>
 				struct TTypeName<Seed::Containers::Map<TKey, TValue>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Map<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::Map<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -600,11 +589,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyMap<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencyMap<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -614,11 +603,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitiveMap<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::SensitiveMap<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -628,11 +617,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitiveMap<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitiveMap<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
@@ -643,11 +632,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::PriorityQueue<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::PriorityQueue<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -657,11 +646,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencyPriorityQueue<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencyPriorityQueue<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -671,11 +660,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitivePriorityQueue<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::SensitivePriorityQueue<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -685,11 +674,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::ConcurencySensitivePriorityQueue<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::ConcurencySensitivePriorityQueue<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
@@ -697,13 +686,13 @@ namespace Seed {
 #pragma region Pair
 				template<typename TKey, typename TValue>
 				struct TTypeName<Seed::Containers::Pair<TKey, TValue>> {
-					constexpr static auto TypeName() {
+					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Pair<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::Pair<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 
@@ -713,11 +702,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::SensitivePair<")()) +
-							TTypeName<TKey>::TypeName().Resize<TTypeName<TKey>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
-							TTypeName<TValue>::TypeName().Resize<TTypeName<TValue>::TypeName().Count - 1>() +
-							CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+							Details::CreateTypeStr("Seed::Containers::SensitivePair<") +
+							TTypeName<TKey>::TypeName() +
+							Details::CreateTypeStr(", ") +
+							TTypeName<TValue>::TypeName() +
+							Details::CreateTypeStr(">");
 					}
 				};
 #pragma endregion
@@ -728,7 +717,7 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArray(GenNGTypeString("Seed::String")());
+							Details::CreateTypeStr("Seed::String");
 					}
 				};
 
@@ -738,7 +727,7 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArray(GenNGTypeString("Seed::Containers::SensitiveString")());
+							Details::CreateTypeStr("Seed::Containers::SensitiveString");
 					}
 				};
 #pragma endregion
@@ -750,8 +739,8 @@ namespace Seed {
                     template<typename Head, typename ... Tail>
                     struct TFieldTypeName {
                         constexpr static auto Name() {
-                            return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>() +
-                                CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString(", ")()) +
+                            return TTypeName<Head>::TypeName() +
+                                Details::CreateTypeStr(", ") +
                                 TFieldTypeName<Tail...>::Name();
                         }
                     };
@@ -759,7 +748,7 @@ namespace Seed {
                     template<typename Head>
                     struct TFieldTypeName<Head> {
                         constexpr static auto Name() {
-                            return TTypeName<Head>::TypeName().Resize<TTypeName<Head>::TypeName().Count - 1>();
+                            return TTypeName<Head>::TypeName();
                         }
                     };
 					
@@ -768,13 +757,13 @@ namespace Seed {
 					{
 						if constexpr(sizeof...(Types) ==  0) {
 							return
-								CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Tuple<")()) +
-								CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+								Details::CreateTypeStr("Seed::Containers::Tuple<") +
+								Details::CreateTypeStr(">");
 						}else{
 							return
-								CTTI::Details::TypeStringToArrayWithoutTrailZero(GenNGTypeString("Seed::Containers::Tuple<")()) +
+								Details::CreateTypeStr("Seed::Containers::Tuple<") +
 								TFieldTypeName<Types...>::Name() +
-								CTTI::Details::TypeStringToArray(GenNGTypeString(">")());
+								Details::CreateTypeStr(">");
 						}
 					}
 				};
@@ -786,7 +775,7 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							CTTI::Details::TypeStringToArray(GenNGTypeString("void")());
+							Details::CreateTypeStr("void");
 					}
 				};
 #pragma endregion
@@ -795,13 +784,13 @@ namespace Seed {
 			//<summary>Декороване ім'я типу для серелізації</summary>
 			template<typename T>
 			constexpr auto TypeName() {
-				return TypeNameSpecializations::TTypeName<T>::TypeName();
+				return TypeNameSpecializations::TTypeName<T>::TypeName() + Details::CreateTypeStr("\0");
 			}
 
 			///<summary>Ім'я типу в С++ для компарингу</summary>
 			template<typename T>
 			constexpr auto CXXTypeName() {
-				return CTTI::Details::TypeName<T>();
+				return CTTI::Details::TypeName<T>() + Details::CreateTypeStr("\0");
 			}
 
 			static constexpr SizeT TypeStringSize = Details::TypeStringSize;

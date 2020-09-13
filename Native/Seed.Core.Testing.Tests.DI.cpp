@@ -69,7 +69,7 @@ public:
 		return a;
 	}
 	int Method4(int a, double b) {
-		return static_cast<int>(a + b);
+		return static_cast<int>(a + b); //-V2564
 	}
 };
 
@@ -82,11 +82,11 @@ public:
 		return a;
 	}
 	int Method4(int a, double b) {
-		return static_cast<int>(a + b);
+		return static_cast<int>(a + b); //-V2564
 	}
 };
 
-using TestObject1Definition = ObjectDefinition(
+constexpr auto TestObject1Definition = ObjectDefinition(
 	TestObject1,
 	CtorDescription(TestObject1),
 	ObjectMethodsDefs(
@@ -98,7 +98,7 @@ using TestObject1Definition = ObjectDefinition(
 	ObjectPropsDefs()
 );
 
-using TestObject2Definition = ObjectDefinition(
+constexpr auto TestObject2Definition = ObjectDefinition(
 	TestObject2,
 	CtorDescription(TestObject2, int, int),
 	ObjectMethodsDefs(
@@ -111,12 +111,12 @@ using TestObject2Definition = ObjectDefinition(
 );
 
 bool Seed::Core::Testing::Test::DI::RegisterService::Excecute() {
-	auto serviceRecord = Reflection::ObjectRTTIRecord(TypeTraits::TypeTag<TestObject1Definition>{});
+	auto serviceRecord = Reflection::ObjectRTTIRecord(TestObject1Definition);
 	return serviceRecord.ClassName.Lenght != 0;
 }
 
 bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
-	auto serviceRecord = Reflection::ObjectRTTIRecord(TypeTraits::TypeTag<TestObject1Definition>{});
+	auto serviceRecord = Reflection::ObjectRTTIRecord(TestObject1Definition);
 	auto methodRecord = serviceRecord.Methods.First([] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& record) InlineLambda
 	{
 		return record.Name == L"Method4";
@@ -140,45 +140,45 @@ bool Seed::Core::Testing::Test::DI::ResolveServiceByDI::Excecute() {
 	auto injector = Core::DI::DepencyInjector();
 
 	injector.Register<ServiceA>(
-		Reflection::ObjectRTTIRecord(TypeTraits::TypeTag<
-		ObjectDefinition(
-			ServiceA,
-			CtorDescription(ServiceA),
-			ObjectMethodsDefs(
-				MethodDescription(ServiceA, MethodA),
-				MethodDescription(ServiceA, MethodB),
-				MethodDescription(ServiceA, MethodC)
-			),
-			ObjectPropsDefs(
-				ObjectProperty(A, ServiceA::GetA, 
-					MethodDescription(ServiceA, SetA)
+		Reflection::ObjectRTTIRecord(
+			ObjectDefinition(
+				ServiceA,
+				CtorDescription(ServiceA),
+				ObjectMethodsDefs(
+					MethodDescription(ServiceA, MethodA),
+					MethodDescription(ServiceA, MethodB),
+					MethodDescription(ServiceA, MethodC)
+				),
+				ObjectPropsDefs(
+					ObjectProperty(ServiceA, A, GetA, 
+						MethodDescription(ServiceA, SetA)
+					)
 				)
 			)
-		)> {}
 		)
-		);
+	);
 
 	injector.Register<ServiceB, ServiceA>(
-		Reflection::ObjectRTTIRecord(TypeTraits::TypeTag<
-		ObjectDefinition(
-			ServiceB,
-			CtorDescription(ServiceB,ServiceA),
-			ObjectMethodsDefs(
-				MethodDescription(ServiceB, MethodA),
-				MethodDescription(ServiceB, MethodB),
-				MethodDescription(ServiceB, MethodC),
-				MethodDescription(ServiceB, MethodD)
-			),
-			ObjectPropsDefs(
-				ObjectProperty(TextSize, ServiceB::GetTextSize),
-				ObjectProperty(Text, ServiceB::GetText,
-					MethodDescriptionWithArgs(ServiceB, SetText, void, const String&),
-					MethodDescriptionWithArgs(ServiceB, SetText, void, String&&)
+		Reflection::ObjectRTTIRecord(
+			ObjectDefinition(
+				ServiceB,
+				CtorDescription(ServiceB, ServiceA),
+				ObjectMethodsDefs(
+					MethodDescription(ServiceB, MethodA),
+					MethodDescription(ServiceB, MethodB),
+					MethodDescription(ServiceB, MethodC),
+					MethodDescription(ServiceB, MethodD)
+				),
+				ObjectPropsDefs(
+					ObjectProperty(ServiceB, TextSize, GetTextSize),
+					ObjectProperty(ServiceB, Text, GetText,
+						MethodDescriptionWithArgs(ServiceB, SetText, void, const String&),
+						MethodDescriptionWithArgs(ServiceB, SetText, void, String&&)
+					)
 				)
 			)
-		)> {}
 		)
-		);
+	);
 
 	auto serviceB = injector.Resolve<ServiceB>();
 
@@ -188,7 +188,7 @@ bool Seed::Core::Testing::Test::DI::ResolveServiceByDI::Excecute() {
 #include "Seed.Core.Services.h"
 
 bool Seed::Core::Testing::Test::DI::TestSerilizationService::Excecute() {
-	using SerilizationServiceDefinition = ObjectDefinition(
+	constexpr auto SerilizationServiceDefinition = ObjectDefinition(
 		Core::Services::SerilizationService,
 		NullCtorDescription(Core::Services::SerilizationService),
 		ObjectMethodsDefs(
@@ -201,7 +201,7 @@ bool Seed::Core::Testing::Test::DI::TestSerilizationService::Excecute() {
 
 	auto injector = Core::DI::DepencyInjector();
 	injector.Register<Core::Services::SerilizationService, Core::DI::IDI>
-			(TypeTraits::TypeTag<SerilizationServiceDefinition>{});
+			(SerilizationServiceDefinition);
 
 	auto serilizationService = injector.Resolve<Core::Services::SerilizationService>();
 

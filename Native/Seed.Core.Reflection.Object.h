@@ -47,34 +47,18 @@ namespace Seed
 			namespace Details
 			{
 				template<typename ... TArgs>
-				constexpr bool IsFunctionWithoutArgs =
-					sizeof...(TArgs) == 0
-					;//||
-					//(sizeof...(TArgs) == 1 && TypeTraits::IsSameV<TypeTraits::Pack<void>, TypeTraits::Pack<TArgs...>>);
+				constexpr bool IsFunctionWithoutArgs = sizeof...(TArgs) == 0;
 
-				template<typename T>
-				struct IsCTTIStringT : TypeTraits::LogicFalse {};
-
-				template<char ... TChars>
-				struct IsCTTIStringT<CTTI::Details::TypeString<TChars...>> : TypeTraits::LogicTrue {};
-
-				template<typename T>
-				constexpr bool IsCTTIStringV = IsCTTIStringT<T>::State;
-
-				template<char ... TChars>
-				using CTTIString = CTTI::Details::TypeString<TChars...>;
-
-				template<typename>
+				template<typename, typename>
 				struct MethodCallDescriptor {
-					//static_assert(false, "Invalid method type passed");
 				};
 
-				template<typename TRet, typename TClass, typename ...TArgs>
-				struct MethodCallDescriptor<TRet(TClass::*)(TArgs...)> {
+				template<typename TTargetClass, typename TRet, typename TClass, typename ...TArgs>
+				struct MethodCallDescriptor<TTargetClass, TRet(TClass::*)(TArgs...)> {
 					using MethodType = TRet(TClass::*)(TArgs...);
 					using ArgsType = typename Containers::Tuple<typename TypeTraits::RemoveCVRefV<TArgs>...>;
 
-					using Class = TClass;
+					using Class = TTargetClass;
 
 					static constexpr Boolean IsConst = false;
 					static constexpr Boolean IsVolatile = false;
@@ -102,7 +86,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -132,7 +116,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -157,7 +141,7 @@ namespace Seed
 									return dynamic.GetValue<TypeTraits::RemoveCVRefV<TArgs>...>()
 										.CallWithArgsFromTuple([&] (TypeTraits::RemoveCVRefV<TArgs>&&... args)
 									{
-										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>(((&pThis)->*method)(args...)));
+										return DynamicObject(Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>(((&pThis)->*method)(ForwardReference<TArgs>(args)...)));
 									});
 								}
 								else
@@ -193,12 +177,12 @@ namespace Seed
 					using Args = ArgsType;
 				};
 
-				template<typename TRet, typename TClass, typename ...TArgs>
-				struct MethodCallDescriptor<TRet(TClass::*)(TArgs...) const> {
+				template<typename TTargetClass, typename TRet, typename TClass, typename ...TArgs>
+				struct MethodCallDescriptor<TTargetClass, TRet(TClass::*)(TArgs...) const> {
 					using MethodType = TRet(TClass::*)(TArgs...);
 					using ArgsType = typename Containers::Tuple<typename TypeTraits::RemoveCVRefV<TArgs>...>;
 
-					using Class = TClass;
+					using Class = TTargetClass;
 
 					static constexpr Boolean IsConst = true;
 					static constexpr Boolean IsVolatile = false;
@@ -226,7 +210,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -256,7 +240,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -317,12 +301,12 @@ namespace Seed
 					using Args = ArgsType;
 				};
 
-				template<typename TRet, typename TClass, typename ...TArgs>
-				struct MethodCallDescriptor<TRet(TClass::*)(TArgs...) volatile> {
+				template<typename TTargetClass, typename TRet, typename TClass, typename ...TArgs>
+				struct MethodCallDescriptor<TTargetClass, TRet(TClass::*)(TArgs...) volatile> {
 					using MethodType = TRet(TClass::*)(TArgs...);
 					using ArgsType = typename Containers::Tuple<typename TypeTraits::RemoveCVRefV<TArgs>...>;
 
-					using Class = TClass;
+					using Class = TTargetClass;
 
 					static constexpr Boolean IsConst = false;
 					static constexpr Boolean IsVolatile = true;
@@ -350,7 +334,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -380,7 +364,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -441,12 +425,12 @@ namespace Seed
 					using Args = ArgsType;
 				};
 
-				template<typename TRet, typename TClass, typename ...TArgs>
-				struct MethodCallDescriptor<TRet(TClass::*)(TArgs...) const volatile> {
+				template<typename TTargetClass, typename TRet, typename TClass, typename ...TArgs>
+				struct MethodCallDescriptor<TTargetClass, TRet(TClass::*)(TArgs...) const volatile> {
 					using MethodType = TRet(TClass::*)(TArgs...);
 					using ArgsType = typename Containers::Tuple<typename TypeTraits::RemoveCVRefV<TArgs>...>;
 
-					using Class = TClass;
+					using Class = TTargetClass;
 
 					static constexpr Boolean IsConst = true;
 					static constexpr Boolean IsVolatile = true;
@@ -474,7 +458,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -504,7 +488,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TClass& pThis = This.GetValue<TClass>().GetByIdx<0>();
+							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -563,43 +547,6 @@ namespace Seed
 
 					using Ret = TypeTraits::RemoveCVRefV<TRet>;
 					using Args = ArgsType;
-				};
-
-				template<typename T, T pMethodType, typename TName>
-				struct MethodDescriptor {
-					static_assert(IsCTTIStringV<TName>, "TName must be CTTIString");
-
-					static constexpr auto Name = Seed::Core::CTTI::Details::TypeStringToArray(TName());
-					using MethodCallType = typename MethodCallDescriptor<T>::MethodType;
-
-					using MethodClass = typename MethodCallDescriptor<T>::Class;
-
-					static constexpr Boolean IsConst = MethodCallDescriptor<T>::IsConst;
-					static constexpr Boolean IsVolatile = MethodCallDescriptor<T>::IsVolatile;
-
-					static constexpr auto ArgsTypeName = MethodCallDescriptor<T>::ArgsTypeName;
-					static constexpr auto RetTypeName = MethodCallDescriptor<T>::RetTypeName;
-
-					static constexpr auto pMethod = pMethodType;
-
-					static String ArgsMetaData() {
-						return MethodCallDescriptor<T>::ArgsMetaData();
-					}
-
-					static String RetMetaData() {
-						return MethodCallDescriptor<T>::RetMetaData();
-					}
-
-					static constexpr auto MethodCaller = MethodCallDescriptor<T>::MethodCaller;
-
-					static constexpr auto TypeInformationGetter = MethodCallDescriptor<T>::TypeInformationGetter;
-
-					static constexpr bool IsArgsSerilizable = MethodCallDescriptor<T>::IsArgsSerilizable;
-
-					static constexpr bool IsRetSerilizable = MethodCallDescriptor<T>::IsRetSerilizable;
-
-					using Ret = typename MethodCallDescriptor<T>::Ret;
-					using Args = typename MethodCallDescriptor<T>::Args;
 				};
 
 				template<typename T, typename ... TArgs>
@@ -637,6 +584,7 @@ namespace Seed
 
 					static constexpr auto UnifiedDtor = [] (DynamicObject&& object)
 					{
+						(void) object;
 					};
 
 					static constexpr auto CtorArgsTypeName = CTTI::TypeName<Containers::Tuple<TArgs...>>();
@@ -650,21 +598,64 @@ namespace Seed
 				struct ObjectNullCtorAndDtor {
 					static constexpr auto UnifiedCtor = [] (DynamicObject&& args) -> DynamicObject
 					{
-						Throw(InvlaidDynamicFunctionArgs(__FILE__, "", __LINE__));
+						Throw(InvlaidDynamicFunctionArgs(__FILE__, "ObjectNullCtorAndDtor", __LINE__));
 					};
 
 					static constexpr auto UnifiedDtor = [] (DynamicObject&& object)
 					{
 					};
 
-					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::TypeStringToArray(GenNGTypeString("`invalid`")());
+					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::CreateTypeStr("`invalid`");
 
 					static String ArgsMetaData() {
-						return Seed::Core::CTTI::Details::TypeStringToArray(GenNGTypeString("`Can not construct`")());
+						return Seed::Core::CTTI::Details::CreateTypeStr("`Can not construct`");
 					}
 				};
 
-				template<typename TName, typename TGet, TGet GetT, typename TSetterMethods>
+				template<typename TClass, typename T, T pMethodType, typename TName>
+				struct MethodDescriptor {
+					TName Name;
+
+					using MethodCallType = typename MethodCallDescriptor<TClass, T>::MethodType;
+
+					using MethodClass = TClass;
+
+					static constexpr Boolean IsConst = MethodCallDescriptor<TClass, T>::IsConst;
+					static constexpr Boolean IsVolatile = MethodCallDescriptor<TClass, T>::IsVolatile;
+
+					static constexpr auto ArgsTypeName = MethodCallDescriptor<TClass, T>::ArgsTypeName;
+					static constexpr auto RetTypeName = MethodCallDescriptor<TClass, T>::RetTypeName;
+
+					static constexpr auto pMethod = pMethodType;
+
+					static String ArgsMetaData() {
+						return MethodCallDescriptor<TClass, T>::ArgsMetaData();
+					}
+
+					static String RetMetaData() {
+						return MethodCallDescriptor<TClass, T>::RetMetaData();
+					}
+
+					static constexpr auto MethodCaller = MethodCallDescriptor<TClass, T>::MethodCaller;
+
+					static constexpr auto TypeInformationGetter = MethodCallDescriptor<TClass, T>::TypeInformationGetter;
+
+					static constexpr bool IsArgsSerilizable = MethodCallDescriptor<TClass, T>::IsArgsSerilizable;
+
+					static constexpr bool IsRetSerilizable = MethodCallDescriptor<TClass, T>::IsRetSerilizable;
+
+					using Ret = typename MethodCallDescriptor<TClass, T>::Ret;
+					using Args = typename MethodCallDescriptor<TClass, T>::Args;
+
+					ForceInline constexpr MethodDescriptor(TName Name) : Name(Name) {}
+				};
+
+				template<typename ... TMethods>
+				ForceInline constexpr Containers::Tuple<TMethods...> MakeMethodsTuple(TMethods... Methods) {
+					return Containers::Tuple<TMethods...>(Methods...);
+				}
+
+				template<typename TTargetClass, typename TName, typename TGet, TGet GetT, typename TSetterMethods>
 				struct PropertyDescriptor {
 				private:
 					template<SizeT I = 0>
@@ -677,29 +668,29 @@ namespace Seed
 						{
 							return (
 								TypeTraits::IsSameT<typename TSetterMethods::ItemType<I>::Ret, void>::State &&
-									TSetterMethods::ItemType<0>::Args::Count == 1 &&
-									TypeTraits::IsSameV<
-										typename TypeTraits::RemoveCV<
-											TypeTraits::RemoveRefV<
-												typename TSetterMethods::ItemType<0>::Args::ItemType<0>
-											>
-										>, 
-										typename MethodCallDescriptor<TGet>::Ret
-									>
+								TSetterMethods::ItemType<0>::Args::Count == 1 &&
+								TypeTraits::IsSameV<
+								typename TypeTraits::RemoveCV<
+								TypeTraits::RemoveRefV<
+								typename TSetterMethods::ItemType<0>::Args::ItemType<0>
+								>
+								>,
+								typename MethodCallDescriptor<TTargetClass, TGet>::Ret
+								>
 								) &&
 								CheckSetterMethods<I + 1>();
 						}
 					}
 				public:
-					using PropType = typename MethodCallDescriptor<TGet>::Ret;
-					using PropClass = typename MethodCallDescriptor<TGet>::Class;
-					static constexpr auto Name = Seed::Core::CTTI::Details::TypeStringToArray(TName());
+					using PropType = typename MethodCallDescriptor<TTargetClass, TGet>::Ret;
+					using PropClass = TTargetClass;
+					TName Name;
 					static constexpr auto PropTypeName = CTTI::TypeName<PropType>();
-					static constexpr auto GetCaller = MethodCallDescriptor<TGet>::MethodCaller;
+					static constexpr auto GetCaller = MethodCallDescriptor<TTargetClass, TGet>::MethodCaller;
 					static constexpr auto pGet = GetT;
-					static constexpr auto PropTypeInformationGetter = MethodCallDescriptor<TGet>::TypeInformationGetter;
+					static constexpr auto PropTypeInformationGetter = MethodCallDescriptor<TTargetClass, TGet>::TypeInformationGetter;
 					static constexpr bool IsRw = (TSetterMethods::Count != 0);
-					static constexpr bool IsValueSerilizable = MethodCallDescriptor<TGet>::IsRetSerilizable;
+					static constexpr bool IsValueSerilizable = MethodCallDescriptor<TTargetClass, TGet>::IsRetSerilizable;
 					static constexpr auto SerilizeFunction = [] (const DynamicObject& data) -> Containers::Blob
 					{
 						if constexpr (IsValueSerilizable)
@@ -733,11 +724,18 @@ namespace Seed
 						}
 					};
 
-					using SetterMethods = TSetterMethods;
+					TSetterMethods SetterMethods;
 
-					static_assert(MethodCallDescriptor<TGet>::IsConst, "Property getter should be const method");
+					static_assert(MethodCallDescriptor<TTargetClass, TGet>::IsConst, "Property getter should be const method");
 					static_assert(CheckSetterMethods(), "Invalid setters for property");
+
+					ForceInline constexpr PropertyDescriptor(TName Name, TSetterMethods SetterMethods) : Name(Name), SetterMethods(SetterMethods) {}
 				};
+
+				template<typename ... TProperty>
+				ForceInline constexpr Containers::Tuple<TProperty...> MakePropertiesTuple(TProperty... Methods) {
+					return Containers::Tuple<TProperty...>(Methods...);
+				}
 
 				template<typename TObj, typename TObjectCtorAndDtor, typename TMethodsTuple, typename TPropertiesTuple>
 				struct ObjectDescriptor {
@@ -751,14 +749,26 @@ namespace Seed
 					static constexpr auto UnifiedCtor = TObjectCtorAndDtor::UnifiedCtor;
 					static constexpr auto UnifiedDtor = TObjectCtorAndDtor::UnifiedDtor;
 
-					using Methods = TMethodsTuple;
-					using Properties = TPropertiesTuple;
+					TMethodsTuple Methods;
+					TPropertiesTuple Properties;
 
 					static constexpr auto CtorArgsTypeName = TObjectCtorAndDtor::CtorArgsTypeName;
 
 					static String ArgsMetaData() {
 						return TObjectCtorAndDtor::ArgsMetaData();
 					}
+
+					ForceInline constexpr ObjectDescriptor(const TMethodsTuple& Methods, const TPropertiesTuple& Properties) : 
+						Methods(Methods), Properties(Properties) {}
+
+					ForceInline constexpr ObjectDescriptor(TMethodsTuple&& Methods, const TPropertiesTuple& Properties) : 
+						Methods(MoveRValue(Methods)), Properties(Properties) {}
+
+					ForceInline constexpr ObjectDescriptor(const TMethodsTuple& Methods, TPropertiesTuple&& Properties) : 
+						Methods(Methods), Properties(MoveRValue(Properties)) {}
+
+					ForceInline constexpr ObjectDescriptor(TMethodsTuple&& Methods, TPropertiesTuple&& Properties) : 
+						Methods(MoveRValue(Methods)), Properties(MoveRValue(Properties)) {}
 
 				private:
 					template<SizeT TId = 0>
@@ -771,7 +781,7 @@ namespace Seed
 						{
 							return
 								TypeTraits::IsSameT<
-								typename Methods::ItemType<TId>::MethodClass,
+								typename TMethodsTuple::ItemType<TId>::MethodClass,
 								TObj>::State
 								&&
 								IsAllMethodsHaveCorrectClassImpl<TId + 1>();
@@ -859,9 +869,9 @@ namespace Seed
 					);
 				public:
 					template<typename TMethodDescriptor>
-					ForceInline MethodRTTIRecord(TypeTraits::TypeTag<TMethodDescriptor>)
+					ForceInline MethodRTTIRecord(TMethodDescriptor MethodDescriptor)
 						: data(new Data(
-							TMethodDescriptor::Name,
+							MethodDescriptor.Name,
 							TMethodDescriptor::MethodCaller,
 							reinterpret_cast<const void* const&>(TMethodDescriptor::pMethod),
 							TMethodDescriptor::ArgsTypeName,
@@ -1037,12 +1047,12 @@ namespace Seed
 					);
 				public:
 					template<typename TPropertyDescriptor>
-					ForceInline PropertyRTTIRecord(TypeTraits::TypeTag<TPropertyDescriptor>) :
+					ForceInline PropertyRTTIRecord(TPropertyDescriptor PropertyDescriptor) :
 						data(new Data(
-							TPropertyDescriptor::Name,
+							PropertyDescriptor.Name,
 							TPropertyDescriptor::PropTypeName,
 							TPropertyDescriptor::GetCaller,
-							GenSettersData<TPropertyDescriptor::SetterMethods, 0>(TypeTraits::TypeTag<TPropertyDescriptor::SetterMethods>{}),
+							GenSettersData<decltype(PropertyDescriptor.SetterMethods), 0>(TypeTraits::TypeTag<decltype(PropertyDescriptor.SetterMethods)>{}),
 							TPropertyDescriptor::IsRw,
 							reinterpret_cast<const void* const&>(TPropertyDescriptor::pGet),
 							TPropertyDescriptor::PropTypeInformationGetter,
@@ -1145,7 +1155,7 @@ namespace Seed
 				Data* data;
 			private:
 				template<SizeT TId, typename ... TMethod>
-				ForceInline static Containers::List<MethodRTTIRecord> GenerateRTTIMethodInfo(TypeTraits::TypeTag<Containers::Tuple<TMethod...>>) {
+				ForceInline static Containers::List<MethodRTTIRecord> GenerateRTTIMethodInfo(Containers::Tuple<TMethod...> Methods) {
 					if constexpr (TId == sizeof...(TMethod))
 					{
 						return Containers::List<MethodRTTIRecord>();
@@ -1154,16 +1164,16 @@ namespace Seed
 					{
 						return Containers::List<MethodRTTIRecord>(MoveRValue(
 							(Containers::List<MethodRTTIRecord>({
-							MethodRTTIRecord(TypeTraits::TypeTag<typename Containers::Tuple<TMethod...>::ItemType<TId>>{})
+							MethodRTTIRecord(Methods.GetByIdx<TId>())
 								})
 								+=
-								MoveRValue(GenerateRTTIMethodInfo<TId + 1>(TypeTraits::TypeTag<Containers::Tuple<TMethod...>>{})))
+								MoveRValue(GenerateRTTIMethodInfo<TId + 1>(Methods)))
 						));
 					}
 				}
 
 				template<SizeT TId, typename ... TProperties>
-				ForceInline static Containers::List<PropertyRTTIRecord> GenerateRTTIPropertieInfo(TypeTraits::TypeTag<Containers::Tuple<TProperties...>>) {
+				ForceInline static Containers::List<PropertyRTTIRecord> GenerateRTTIPropertieInfo(Containers::Tuple<TProperties...> Properties) {
 					if constexpr (TId == sizeof...(TProperties))
 					{
 						return Containers::List<PropertyRTTIRecord>();
@@ -1173,9 +1183,9 @@ namespace Seed
 						return Containers::List<PropertyRTTIRecord>(MoveRValue(
 							(
 								Containers::List<PropertyRTTIRecord>({
-									PropertyRTTIRecord(TypeTraits::TypeTag<typename Containers::Tuple<TProperties...>::ItemType<TId>>{})
+									PropertyRTTIRecord(Properties.GetByIdx<0>())
 								}) += 
-									MoveRValue(GenerateRTTIPropertieInfo<TId + 1>(TypeTraits::TypeTag<Containers::Tuple<TProperties...>>{})
+									MoveRValue(GenerateRTTIPropertieInfo<TId + 1>(Properties)
 								)
 							)
 						));
@@ -1195,7 +1205,7 @@ namespace Seed
 				);
 			public:
 				template<typename TObjectDescriptor>
-				ForceInline ObjectRTTIRecord(TypeTraits::TypeTag<TObjectDescriptor>) :
+				ForceInline ObjectRTTIRecord(TObjectDescriptor ObjectDescriptor) :
 					data(new Data(
 						TObjectDescriptor::Name,
 						TObjectDescriptor::CtorArgsTypeName,
@@ -1203,8 +1213,8 @@ namespace Seed
 						TObjectDescriptor::UnifiedCtor,
 						TObjectDescriptor::UnifiedDtor,
 						TObjectDescriptor::RttiTypeInfo(),
-						GenerateRTTIMethodInfo<0>(TypeTraits::TypeTag<TObjectDescriptor::Methods>{}),
-						GenerateRTTIPropertieInfo<0>(TypeTraits::TypeTag<TObjectDescriptor::Properties>{})
+						GenerateRTTIMethodInfo<0>(ObjectDescriptor.Methods),
+						GenerateRTTIPropertieInfo<0>(ObjectDescriptor.Properties)
 					)) {};
 
 				ForceInline const String& GetName() const {
@@ -1249,16 +1259,119 @@ namespace Seed
 
 				RefCountClass(ObjectRTTIRecord, data);
 			};
-
 		}
 	}
 }
-#define ObjectMethodsDefs(...) Seed::Core::Containers::Tuple<__VA_ARGS__>
-#define ObjectPropsDefs(...) Seed::Core::Containers::Tuple<__VA_ARGS__>
-#define MethodDescription(Class, Method) Seed::Core::Reflection::Details::MethodDescriptor<decltype(&Class::Method), &Class::Method, GenNGTypeString(#Method)>
-#define MethodDescriptionWithArgs(Class, Method, RetType, ...) Seed::Core::Reflection::Details::MethodDescriptor<RetType(Class::*)(__VA_ARGS__), &Class::Method, GenNGTypeString(#Method)>
-#define	ObjectProperty(Name, Getter, ...) Seed::Core::Reflection::Details::PropertyDescriptor<GenNGTypeString(#Name), decltype(&Getter), &Getter, Seed::Core::Containers::Tuple<__VA_ARGS__>>
-#define CtorDescription(Class, ...) Seed::Core::Reflection::Details::ObjectCtorAndDtor<Class, __VA_ARGS__>
-#define NullCtorDescription(Class) Seed::Core::Reflection::Details::ObjectNullCtorAndDtor<Class>
-#define ObjectDefinition(Class, CtorDesc, Methods, Props) Seed::Core::Reflection::Details::ObjectDescriptor<Class, CtorDesc, Methods, Props>
-#define GenObjectRTTIRecord(ObjectTypeRecord) Seed::Core::Reflection::ObjectRTTIRecord(Seed::Core::TypeTraits::TypeTag<ObjectTypeRecord>{})
+
+/// <summary>
+/// Збирає описів колекцію методів(MethodDescription або MethodDescriptionWithArgs) в один кортеж
+/// </summary>
+#define ObjectMethodsDefs(...)                                              					\
+	Seed::Core::Reflection::Details::MakeMethodsTuple(__VA_ARGS__)								
+
+/// <summary>
+/// Збирає описів колекцію властивостей(ObjectProperty) в один кортеж
+/// </summary>
+#define ObjectPropsDefs(...) 																	\
+	Seed::Core::Reflection::Details::MakePropertiesTuple(__VA_ARGS__)							
+
+/// <summary>
+/// Опис метода
+/// </summary>
+/// <param name="Class">Класс метод якого описується</param>
+/// <param name="Method">Ім'я метода</param>
+/// <returns>Об'єкт MethodDescriptor який містить опис метода</returns>
+#define MethodDescription(Class, Method) 														\
+	Seed::Core::Reflection::Details::MethodDescriptor<											\
+		Class, 																					\
+		decltype(&Class::Method), 																\
+		&Class::Method, 																		\
+		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Method))								\
+	>(Seed::Core::CTTI::Details::CreateTypeStr(#Method))											\
+
+
+/// <summary>
+/// Опис метода з вказуванням типів аргументів для вибору певної перегрузки 
+/// </summary>
+/// <param name="Class">Класс метод якого описується</param>
+/// <param name="Method">Ім'я метода</param>
+/// <param name="RetType">Тип повернення з CV Ref модифікаторами</param>
+/// <param name="...">Типи аргментів з CV Ref модифікаторами</param>
+/// <returns>Об'єкт MethodDescriptor який містить опис метода</returns> 
+#define MethodDescriptionWithArgs(Class, Method, RetType, ...) 									\
+	Seed::Core::Reflection::Details::MethodDescriptor< 										\
+		Class, 																					\
+		RetType(Class::*)(__VA_ARGS__), 														\
+		&Class::Method, 																		\
+		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Method))								\
+	>(Seed::Core::CTTI::Details::CreateTypeStr(#Method))											
+
+/// <summary>
+/// Опис властивості
+/// </summary>
+/// <param name="Class">Класс властивість якого описується</param>
+/// <param name="Name">Назва властивості</param>
+/// <param name="Getter">Метод який надає значення властивості</param>
+/// <param name="...">Нуль або більше об'єктів MethodDescriptor або MethodDescriptionWithArgs 
+/// які описують методи встановлення значення властивості якщо такі є</param>
+/// <returns>Об'єкт PropertyDescriptor який містить опис властивості</returns>
+#define	ObjectProperty(Class, Name, Getter, ...) 												\
+	Seed::Core::Reflection::Details::PropertyDescriptor< 										\
+		Class, 																					\
+		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Name)), 								\
+		decltype(&Class::Getter), 																\
+		&Class::Getter, 																			\
+		decltype(ObjectMethodsDefs(__VA_ARGS__))												\
+	>(Seed::Core::CTTI::Details::CreateTypeStr(#Name), ObjectMethodsDefs(__VA_ARGS__))			
+						
+/// <summary>
+/// Опис констора та деструктора
+/// </summary>
+/// <param name="Class">Класс конструктор та деструктор якого описується</param>
+/// <param name="...">Нуль або більше типів з CV Ref модифікаторами 
+/// які є аргументами конструктора</param>
+/// <returns>Об'єкт ObjectCtorAndDtor 
+/// який містить опис конструктора та деструктора типу</returns>
+#define CtorDescription(Class, ...) 															\
+	Seed::Core::Reflection::Details::ObjectCtorAndDtor<Class, __VA_ARGS__>						
+
+/// <summary>
+/// Опис деструктора і вказування що конструктор(и) недоступний
+/// </summary>
+/// <param name="Class">Класс деструктор якого описується</param>
+/// <returns>Об'єкт ObjectCtorAndDtor 
+/// який містить опис деструктора типу</returns> 
+#define NullCtorDescription(Class) 																\
+	Seed::Core::Reflection::Details::ObjectNullCtorAndDtor<Class>								
+
+/// <summary>
+/// Опис схеми класу(створення об'єкта ObjectDescriptor)
+/// </summary>
+/// <param name="Class">Класс схема якого описується</param>
+/// <param name="CtorDesc">Опис деструктора(CtorDescription або NullCtorDescription)</param>
+/// <param name="Methods">Список методів классу(ObjectMethodsDefs)</param>
+/// <param name="Props">Опис властивостей класу(ObjectPropsDefs)</param>
+/// <returns>ОБ'єкт ObjectDescriptor який містить компіл тайм схему типу</returns>
+#define ObjectDefinition(Class, CtorDesc, Methods, Props)                                       \
+	[]() constexpr {																		    \
+		constexpr auto methods = Methods;													    \
+		constexpr auto properties = Props;													    \
+																							    \
+		using methodsTupleType = Seed::Core::TypeTraits::DecayV<decltype(methods)>;			    \
+		using propertiesTupleType = Seed::Core::TypeTraits::DecayV<decltype(properties)>;	    \
+																							    \
+		constexpr auto descriptor = Seed::Core::Reflection::Details::ObjectDescriptor<		    \
+			Class, CtorDesc, methodsTupleType, propertiesTupleType>(methods, properties);	    \
+																							    \
+		return descriptor;																	    \
+	}()
+	
+
+/// <summary>
+/// Генерація об'єкта ObjectRTTIRecord який містить рантайм опис схеми типу
+/// </summary>
+/// <param name="ObjectTypeRecord">Об'єкт ObjectTypeRecord 
+/// який містить компіл тайм опис схеми типуу</param>
+/// <returns>Об'єкт ObjectRTTIRecord який містить опис схеми типу</returns>
+#define GenObjectRTTIRecord(ObjectTypeRecord)													\
+	Seed::Core::Reflection::ObjectRTTIRecord(ObjectTypeRecord)

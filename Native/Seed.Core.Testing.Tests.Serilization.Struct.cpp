@@ -40,7 +40,7 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 		auto dataIt = data.Records.FirstIt();
 		auto deserilizedIt = deserilizedData.Records.FirstIt();
 
-		for (; dataIt != nullptr && deserilizedIt != nullptr; ++dataIt, ++deserilizedIt)
+		for (; dataIt != nullptr && deserilizedIt != nullptr; ++dataIt, ++deserilizedIt) //-V2528
 		{
 			if (dataIt->Key != deserilizedIt->Key)
 				return false;

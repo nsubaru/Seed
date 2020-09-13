@@ -30,15 +30,30 @@ namespace Seed {
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) = 0;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept = 0;
+				virtual SeedKernelCall SizeT CurrentMemBlkCount() = 0;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept = 0;
+				virtual SeedKernelCall SizeT CurrentAllocatedMemory() = 0;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept = 0;
+				virtual SeedKernelCall SizeT CurrentHeapUsage() = 0;
 			};
 
 			///<summary>Загальна куча</summary>
-			class Heap final : public BasicHeap{
+			class Heap final : public BasicHeap {
+			public:
+				/// <summary>
+				/// Стандартний конструктор
+				/// </summary>
+				ForceInline Heap() = default;
+				/// <summary>
+				/// Стандартний оператор копіювання
+				/// </summary>
+				/// <param name="Лівий операнд"></param>
+				/// <returns></returns>
+				ForceInline Heap& operator=(Heap&&) = default;
+				/// <summary>
+				/// Стандартний деструктор
+				/// </summary>
+				ForceInline ~Heap() = default;
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -71,16 +86,31 @@ namespace Seed {
 				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) override final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentMemBlkCount() override final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentAllocatedMemory() override final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept;
+				virtual SeedKernelCall SizeT CurrentHeapUsage();
 			};
 
 			///<summary>Захищена куча</summary>
 			///<remarks>Перед виділенням і після звільнення відбувається обнулення пам'яті</remarks>
-			class SensitiveDataHeap final : public BasicHeap{
+			class SensitiveDataHeap final : public BasicHeap {
+			public:
+				/// <summary>
+				/// Стандартний конструктор
+				/// </summary>
+				ForceInline SensitiveDataHeap() = default;
+				/// <summary>
+				/// Стандартний оператор копіювання
+				/// </summary>
+				/// <param name="Лівий операнд"></param>
+				/// <returns></returns>
+				ForceInline SensitiveDataHeap& operator=(SensitiveDataHeap&&) = default;
+				/// <summary>
+				/// Стандартний деструктор
+				/// </summary>
+				ForceInline ~SensitiveDataHeap() = default;
 			private:
 				///<summary>Ініціалізація кучі</summary>
 				///<returns>True якщо ініціалізація вдало проведена</returns>
@@ -113,11 +143,11 @@ namespace Seed {
 				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) override final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentMemBlkCount() override final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentAllocatedMemory() override final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept override final;
+				virtual SeedKernelCall SizeT CurrentHeapUsage() override final;
 			};
 #pragma endregion
 
@@ -135,15 +165,15 @@ namespace Seed {
 				///<summary>Дані алокатора статичні тому конструктори,
 				///оператори копіювання і переміщення та деструктор не потрібен
 				///</summary>
-				Allocator() noexcept {};
+				ForceInline Allocator() {};
 				///<summary>Дані алокатора статичні тому конструктори,
 				///оператори копіювання і переміщення та деструктор не потрібен
 				///</summary>
-				Allocator(Allocator&) noexcept {};
+				ForceInline Allocator(Allocator&) {};
 				///<summary>Дані алокатора статичні тому конструктори,
 				///оператори копіювання і переміщення та деструктор не потрібен
 				///</summary>
-				Allocator(Allocator&&) noexcept {};
+				ForceInline Allocator(Allocator&&) {};
 				///<summary>Дані алокатора статичні тому конструктори,
 				///оператори копіювання і переміщення та деструктор не потрібен
 				///</summary>
@@ -155,7 +185,7 @@ namespace Seed {
 				///<summary>Дані алокатора статичні тому конструктори,
 				///оператори копіювання і переміщення та деструктор не потрібен
 				///</summary>
-				~Allocator() {};
+				ForceInline ~Allocator() {};
 
 				///<summary>Оператор виділення пам'яті</summary>
 				///<param name = "Size">Розмір ділянки пам'яті</param>
@@ -215,22 +245,22 @@ namespace Seed {
 
 #pragma region Memory statistic
 			///<summary>Загальне кількість виділених блоків пам'яті у внутрішній кучі рантайму</summary>
-			SizeT CurrentInternalHeapAllocatedMemBlks() noexcept;
+			SizeT CurrentInternalHeapAllocatedMemBlks();
 
 			///<summary>Загальний розмір виділеної пам'яті у внутрішній кучі рантайму</summary>
-			SizeT CurrentInternalHeapAllocatedMemory() noexcept;
+			SizeT CurrentInternalHeapAllocatedMemory();
 
 			///<summary>Загальне використання пам'яті у внутрішній кучі рантайму</summary>
-			SizeT CurrentInternalHeapHeapsUsage() noexcept;
+			SizeT CurrentInternalHeapHeapsUsage();
 
 			///<summary>Загальне кількість виділених блоків пам'яті у всіх керованих кучах кучах</summary>
-			SizeT CurrentTotalAllocatedMemBlks() noexcept;
+			SizeT CurrentTotalAllocatedMemBlks();
 
 			///<summary>Загальний розмір виділеної пам'яті у всіх керованих кучах кучах</summary>
-			SizeT CurrentTotalAllocatedMemory() noexcept;
+			SizeT CurrentTotalAllocatedMemory();
 
 			///<summary>Загальне використання пам'яті у всіх керованих кучах кучах</summary>
-			SizeT CurrentTotalHeapsUsage() noexcept;
+			SizeT CurrentTotalHeapsUsage();
 #pragma endregion
 
 #pragma region Miscenelious memory function

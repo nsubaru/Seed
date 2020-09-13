@@ -41,11 +41,11 @@ namespace Seed
                         true,
                         true
                         >  {
-                        using FieldMetaData = decltype(T::FieldMetaDataGetter());
-                        using Fields = typename FieldMetaData::Fields;
+                        static constexpr auto FieldMetaData = T::FieldMetaDataGetter();
+                        static constexpr auto Fields = typename FieldMetaData.DataFields;
                         
-                        static constexpr decltype(auto) ToTuple(const T& data) {
-                            return FieldMetaData::ToTuple(data);
+                        ForceInline static constexpr decltype(auto) ToTuple(const T& data) {
+                            return FieldMetaData.ToTuple(data);
                         }
                     };
                 }
@@ -57,6 +57,6 @@ namespace Seed
 #define StructCttiDef(StructName, ...)\
 		ForceInline constexpr static auto FieldMetaDataGetter()\
 		{\
-			DefStructMetaData(StructName,__VA_ARGS__);\
-			return FieldMetaData{};\
+			auto FieldMetaData = DefStructMetaDataObj(StructName,__VA_ARGS__);\
+			return FieldMetaData;\
 		}

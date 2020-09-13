@@ -69,13 +69,16 @@ namespace Seed
 				};
 			private:
 				template<typename T>
-				struct _ {};
+				struct TupleGetter {};
 
 				template<typename ... TTypes>
-				struct _<Containers::Tuple<TTypes...>> {
-					constexpr static auto __ = [] (IDynamicImpl* impl) -> Containers::Tuple<TTypes...>
+				struct TupleGetter<Containers::Tuple<TTypes...>> {
+					constexpr static auto Getter = [] (IDynamicImpl* impl) -> Containers::Tuple<TTypes...>
 					{
-						return dynamic_cast<DynamicImpl<TTypes...>*>(impl)->GetValue();
+						auto valueHolder = dynamic_cast<DynamicImpl<TTypes...>*>(impl);
+						if (valueHolder == nullptr)
+							Throw(NullPointException(__FILE__, "TupleGetter<Containers::Tuple<TTypes...>>::Getter", __LINE__));
+						return valueHolder->GetValue();
 					};
 				};
 			private:
@@ -168,7 +171,7 @@ namespace Seed
 				TTuple GetTuple() {
 					
 					if(typeid(TTuple) == GetImplementationTypeInfo()){
-						return _<TTuple>::__(data->impl);
+						return TupleGetter<TTuple>::Getter(data->impl);
 					}
 					else
 					{
@@ -185,7 +188,7 @@ namespace Seed
 				const TTuple GetTuple() const {
 					
 					if(typeid(TTuple) == GetImplementationTypeInfo()){
-						return _<TTuple>::__(data->impl);
+						return TupleGetter<TTuple>::Getter(data->impl);
 					}
 					else
 					{
