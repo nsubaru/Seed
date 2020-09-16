@@ -175,6 +175,20 @@ namespace Seed {
                         return true;
                     }
 
+                    constexpr SizeT Find(T item) {
+                        for (SizeT i = 0ui64; i < Size; i++)
+                            if (arr[i] == item)
+                                return i;
+                        return static_cast<SizeT>(-1);
+                    }
+
+                    constexpr SizeT Find(T item, SizeT StartPos) {
+                        for (SizeT i = StartPos; i < Size; i++)
+                            if (arr[i] == item)
+                                return i;
+                        return static_cast<SizeT>(-1);
+                    }
+
                     template<typename T2, SizeT N>
                     friend class ConstexprArray;
                 };
@@ -210,6 +224,14 @@ namespace Seed {
                     ForceInline constexpr ConstexprArray Reverse() {
                         return *this;
                     }       
+
+                    constexpr SizeT Find(T item) {
+                        return static_cast<SizeT>(-1);
+                    }
+
+                    constexpr SizeT Find(T item, SizeT StartPos) {
+                        return static_cast<SizeT>(-1);
+                    }
 
                     template<typename T2, SizeT N>
                     friend class ConstexprArray;

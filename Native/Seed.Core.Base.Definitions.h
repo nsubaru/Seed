@@ -88,7 +88,7 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
 /// <summary>
 /// Примусовий вставка коду лямбди #define InlineLambda [[msvs::forceinline]]
 /// </summary>
-#define InlineLambda //[[msvs::forceinline]]
+#define InlineLambda [[msvc::forceinline]]
 
 /// <summary>
 /// Примусовий вставка коду функцій
