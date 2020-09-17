@@ -768,6 +768,45 @@ namespace Seed {
 					}
 				};
 #pragma endregion
+#pragma region GenericTemplate implementation
+				template<template <typename ...> typename TTemplate, typename ... TTypes>
+				struct TTypeName<TTemplate<TTypes...>>
+				{
+					using T = TTemplate<TTypes...>;
+
+					constexpr static auto FullTypeName() {
+						if constexpr (CTTI::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
+							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
+						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(STRUCT_TYPE_NAME))
+							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - STRUCT_TYPE_NAME.Count>();
+						else
+							return CTTI::Details::TypeName<T>();
+					}
+
+					template<typename THead, typename ... TTypes>
+					struct TSubTypeName {
+						constexpr static auto Name() {
+							return TTypeName<THead>::TypeName() + Details::CreateTypeStr(", ") + TSubTypeName<TTypes...>::Name();
+						}
+					};
+
+					template<typename THead>
+					struct TSubTypeName<THead> {
+						constexpr static auto Name() {
+							return TTypeName<THead>::TypeName();
+						}
+					};
+
+					constexpr static auto TypeName()
+					{
+						if constexpr (sizeof...(TTypes) == 0)
+							return FullTypeName();
+						else
+							return
+								FullTypeName().Resize<FullTypeName().Find('<') + 1>() + TSubTypeName<TTypes...>::Name() + Details::CreateTypeStr(">");
+					}
+				};
+#pragma endregion
 #pragma region Void
 				template<>
 				struct TTypeName<void>

@@ -197,7 +197,7 @@ namespace Seed {
 
 				RefCountClass(BaseConcurencyDynamicStack, This)
 			private:
-				void ExtendBufferImpl(SizeT AdditionalSize) InlineLambda {
+				void ExtendBufferImpl(SizeT AdditionalSize) {
 					T* newBuffer = new T[This->bufferSize + AdditionalSize];
 					for (SizeT i = 0; i < This->count; i++)
 					{
