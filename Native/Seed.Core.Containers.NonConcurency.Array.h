@@ -423,7 +423,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="Array">Покажчик на масив елементів</param>
                 /// <param name="StartCount">Кількість елементів</param>
-				InternalApiCall BaseArray(const T* Array, SizeT StartCount) : This(new Data()) {
+				InternalApiCall BaseArray(const T*& Array, SizeT StartCount) : This(new Data()) {
 					if (StartCount != 0) {
 						This->array = new T[StartCount];
 						This->count = StartCount;
@@ -531,11 +531,11 @@ namespace Seed {
                 BaseArray Clone() const {
 					if constexpr (TypeTraits::IsPodV<T>)
                     {
-                        return BaseArray(This->array, This->count);
+                        return BaseArray((const T*&)This->array, This->count);
                     }
                     else
                     {
-                        auto array = BaseArray(This->array, This->count);
+                        auto array = BaseArray((const T*&)This->array, This->count);
                         for (SizeT i = 0; i < This->count; i++)
                         {
                             array.This->array[i] = This->array[i].Clone();
