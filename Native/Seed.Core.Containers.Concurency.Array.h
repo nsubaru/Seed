@@ -488,7 +488,7 @@ namespace Seed {
                 /// </summary>
                 /// <param name="Array">Покажчик на масив елементів</param>
                 /// <param name="StartCount">Кількість елементів</param>
-                InternalApiCall BaseConcurencyArray(const T* Array, SizeT StartCount) : This(new Data()) {
+                InternalApiCall BaseConcurencyArray(const T*& Array, SizeT StartCount) : This(new Data()) {
                     if (StartCount != 0) {
                         This->array = new T[StartCount];
                         This->count = StartCount;
@@ -603,11 +603,11 @@ namespace Seed {
                     {
                         if constexpr (TypeTraits::IsPodV<T>)
                         {
-                            return BaseConcurencyArray(This->array, This->count);
+                            return BaseConcurencyArray((const T*&)This->array, This->count);
                         }
                         else
                         {
-                            auto array = BaseConcurencyArray(This->array, This->count);
+                            auto array = BaseConcurencyArray((const T*&)This->array, This->count);
                             for (SizeT i = 0; i < This->count; i++)
                             {
                                 array.This->array[i] = This->array[i].Clone();
