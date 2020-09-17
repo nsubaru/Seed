@@ -142,8 +142,8 @@ namespace Seed {
 				}
 
 				template<typename U, typename Lambda>
-				U AggregateImpl(Lambda&& lambda, const U& Value) const InlineLambda {
-					return MoveRValue(this->This->lock.ShareLock([&]() {
+				U AggregateImpl(Lambda&& lambda, const U& Value) const {
+					return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
 						U result = Value;
 						for (SizeT i = 0; i < TSize; i++)
 						{

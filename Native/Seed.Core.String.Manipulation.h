@@ -488,14 +488,27 @@ namespace Seed
                         return *This;
 
                     This->Reserve(requiredSize + CurrentSettings().MemoryManager.StringReserveSize);
+
                     for (SizeT i = This->Lenght; i < requiredSize; i++)
                     {
                         This->str[i] = fillerCharacter;
                     }
                     This->str[requiredSize] = L'\0';
-                    This->CurrentSize = requiredSize;
+                    This->CurrentSize = requiredSize + 1;
 
                     return *This;
+                }
+
+                /// <summary>
+                /// Створює рядок заповнений вказаним символом вказану кількість раз
+                /// </summary>
+                /// <param name="requiredSize">Розмір який потрібно заповнити</param>
+                /// <param name="fillerCharacter">Символ заповнювач</param>
+                /// <returns>Заповнений рядок</returns>
+                static TBaseString CreateFilledString(SizeT requiredSize, Char fillerCharacter = L' ') {
+                    TBaseString str(requiredSize);
+                    str.ResizeToFixed(requiredSize, fillerCharacter);
+                    return str;
                 }
 			protected:
                 ForceInline virtual ~TManipulationStringPart() = 0 {}
