@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.h"
+#include "Seed.Core.Time.Base.h"
 #include "Seed.Core.Containers.TypeTraits.h"
 
 namespace Seed {

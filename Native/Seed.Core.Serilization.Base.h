@@ -128,14 +128,8 @@ namespace Seed
                 };
 
                 template<typename T>
-                constexpr bool IsSerilizablePrimitive = (
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Numeric ||
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Character ||
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::FloatNumeric ||
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Logic ||
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Pod
-                    )
-                    &&
+                constexpr bool IsSerilizablePrimitive =
+                    CTTI::IsSimpleTypes(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass) &&
                     CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
                 template<typename THeap, typename T>
@@ -186,7 +180,7 @@ namespace Seed
 
                 template<typename T>
                 constexpr bool IsCFixedArraySerlizable = 
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::FixedArray &&
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::FixedArray &&
                     CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
                 template<typename THeap, typename T>

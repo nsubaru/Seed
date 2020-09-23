@@ -13,7 +13,7 @@ String Seed::Core::Services::SerilizationService::GetTypeMetaDataDynObj(const Re
 		return item.Key == data.ValueType;
 	}))
 	{
-		auto typeRecord = typeRegistry.First([&] (const auto& item) InlineLambda
+		auto& typeRecord = typeRegistry.First([&] (const auto& item) InlineLambda
 		{
 			return item.Key == data.ValueType;
 		});

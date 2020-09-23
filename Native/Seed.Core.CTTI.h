@@ -3,3 +3,5 @@
 #include "Seed.Core.CTTI.TypeName.h"
 #include "Seed.Core.CTTI.TypeTraits.h"
 #include "Seed.Core.CTTI.Concepts.h"
+
+#include "Seed.Core.Time.CTTI.h"

@@ -1,6 +1,6 @@
 #pragma once
-#include "Seed.Core.Stage1.h"
-#include "Seed.Core.DepencyInjection.h"
+#include "Seed.Core.Services.Base.h"
+#include "Seed.Core.Services.BootupServicesManager.h"
 
 namespace Seed
 {
@@ -239,7 +239,29 @@ namespace Seed
 
 		namespace Services
 		{
-			class SerilizationService final : public IDisposable {
+			/// <summary>
+			/// Сервіс серелізації даних
+			/// </summary>
+			class SerilizationService final : public IDisposable, IBootUpService<SerilizationService, DI::IDI> {
+			public:
+				/// <summary>
+				/// Схема сервісу
+				/// </summary>
+				/// <returns>Рантайм опис типу сервіса</returns>
+				static auto GetRttiInformation() {
+					constexpr auto SerilizationServiceDefinition = ObjectDefinition(
+						Services::SerilizationService,
+						NullCtorDescription(Services::SerilizationService),
+						ObjectMethodsDefs(
+							MethodDescription(Services::SerilizationService, SerelizeDynObj),
+							MethodDescription(Services::SerilizationService, DeserelizeDynObj),
+							MethodDescription(Services::SerilizationService, GetTypeMetaDataDynObj)
+						),
+						ObjectPropsDefs()
+					);
+
+					return GenObjectRTTIRecord(SerilizationServiceDefinition);
+				}
 			private:
 				struct Data {
 					DI::IDI idi;
@@ -252,33 +274,69 @@ namespace Seed
 			protected:
 				virtual void Dispose() override {}
 			public:
+				/// <summary>
+				/// Конструктор завантажує інформацію про типи з сховища типів
+				/// </summary>
+				/// <param name="idi">Сховище типів</param>
 				SerilizationService(const DI::IDI& idi) : This(new Data(idi)) {}
 			public:
-				template<typename T>// requires CTTI::Concepts::IsCttiSerelizable<T>
+				/// <summary>
+				/// Серелізація типу
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <param name="data">Об'єкт даних</param>
+				/// <returns>Масив байтів</returns>
+				template<typename T> requires CTTI::Concepts::IsCttiSerelizable<T>
 				Containers::Blob Serelize(const T& data) const {
 					return Serilization::Serilize(data, This->idi.GetTypesRegistry());
 				}
 
-				template<typename T> requires Concepts::IsConstructibleWith<T>// && CTTI::Concepts::IsCttiSerelizable<T>
+				/// <summary>
+				/// Десерелізація
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <param name="data">Масив байтів який містить дані</param>
+				/// <returns>Об'єкт даних</returns>
+				template<typename T> requires Concepts::IsConstructibleWith<T> && CTTI::Concepts::IsCttiSerelizable<T>
 				T Deserelize(const Containers::Blob& data) const {
 					T val = T();
 					Serilization::Deserilize(data, val, This->idi.GetTypesRegistry());
 					return val;
 				}
 
-				template<typename T>// requires CTTI::Concepts::IsCttiSerelizable<T>
+				/// <summary>
+				/// Вертає схему типу
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <returns>Рядкове представлення схеми даних</returns>
+				template<typename T> requires CTTI::Concepts::IsCttiSerelizable<T>
 				String GetTypeMetaData() const {
 					return Serilization::MetaDataGen<T>();
 				}
-
+				
+				/// <summary>
+				/// Серелізація динамічного об'єкта
+				/// </summary>
+				/// <param name="data">Об'єкт даних</param>
+				/// <returns>Масив байтів</returns>
 				Containers::Blob SerelizeDynObj(const Reflection::DynamicObject& data) const {
 					return Serelize(data);
 				}
 
+				/// <summary>
+				/// Десерелізація в динамічний об'єкт
+				/// </summary>
+				/// <param name="data">Масив байтів</param>
+				/// <returns>Динамічний об'єкт</returns>
 				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data) const {
 					return Deserelize<Reflection::DynamicObject>(data);
 				}
 
+				/// <summary>
+				/// Вертає схему типу для динамічного об'єкта
+				/// </summary>
+				/// <param name="data">Динамічний об'єкт</param>
+				/// <returns>Рядкове представлення схеми даних</returns>
 				String GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) const;
 			public:
 				RefCountClass(SerilizationService, This);

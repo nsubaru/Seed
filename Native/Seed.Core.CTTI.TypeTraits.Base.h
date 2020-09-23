@@ -1,5 +1,7 @@
 #pragma once
+#include "Seed.Core.CTTI.Base.h"
 #include "Seed.Core.CTTI.TypeName.h"
+#include "Seed.Core.CTTI.EType.h"
 
 namespace Seed
 {
@@ -16,32 +18,9 @@ namespace Seed
 					template<typename T>
 					struct IsDynamicT : Core::TypeTraits::LogicFalse {};
 				}
-				///<summary>Перелік категорій типів</summary>
-				enum class EType : UInt8
-				{
-					Logic,
-					Numeric,
-					Enumeration,
-					FloatNumeric,
-					Character,
-					NtTime,
-					Collection,
-					String,
-					FixedCollection,
-					AssociableCollection,
-					Box,
-					Tuple,
-					Pair,
-					Pointer,
-					Reference,
-					FixedArray,
-					Struct,
-					Object,
-					Dynamic,
-					Interface,
-					Pod,
-					Undefine = Math::Max<UInt8>()
-				};
+
+				template<typename T>
+				struct StructCttiShema : Core::TypeTraits::LogicFalse {};
 			}
 
 			namespace Concepts
@@ -59,10 +38,11 @@ namespace Seed
 				concept IsCharacterCttiType = Core::TypeTraits::IsCharacter<T>;
 
 				template<typename T>
-				concept IsNtTimeCttiType = 
-					Core::TypeTraits::IsSameV<T, Date> ||
-					Core::TypeTraits::IsSameV<T, DateTime> ||
-					Core::TypeTraits::IsSameV<T, DateSpan>;
+				concept IsNtTimeCttiType =
+					Core::TypeTraits::IsSameV<T, Time::Date> ||
+					Core::TypeTraits::IsSameV<T, Time::DateTime> ||
+					Core::TypeTraits::IsSameV<T, Time::TimeSpan> ||
+					Core::TypeTraits::IsSameV<T, Time::DateSpan>;
 
 				template<typename T>
 				concept IsCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ICollectionGenericBase, T>;
@@ -96,7 +76,7 @@ namespace Seed
 				concept IsFixedArrayCttiType = Core::TypeTraits::IsCArray<T>::State;
 
 				template<typename T>
-				concept IsStructCttiType = requires { T::FieldMetaDataGetter(); };
+				concept IsStructCttiType = requires { T::FieldMetaDataGetter(); } || TypeTraits::StructCttiShema<T>::State;
 
 				template<typename T>
 				concept IsObjectCttiType = Core::TypeTraits::IsBasedOnV<TypeTraits::Details::ISerilizableGenericBase, T>;

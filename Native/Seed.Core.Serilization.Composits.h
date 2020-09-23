@@ -10,7 +10,7 @@ namespace Seed
 			namespace Details
 			{
 				template<typename T>
-				constexpr bool IsSerilizableTuple = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple
+				constexpr bool IsSerilizableTuple = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<typename ... TTypes> typename TTuple, typename ... TTypes>
@@ -108,7 +108,7 @@ namespace Seed
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableObject = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Object
+				constexpr bool IsSerilizableObject = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Object
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, typename TObject>

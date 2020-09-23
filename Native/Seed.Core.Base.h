@@ -122,7 +122,7 @@ namespace Seed {
     	/// <summary>
     	/// Інтерфейс звільнення ресурсів з класу з підрахунком силок
     	/// </summary>
-        class IDisposable // NOLINT
+        class IDisposable
         {
         protected:
         	/// <summary>

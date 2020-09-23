@@ -6,7 +6,7 @@
 #include "Seed.Core.Math.h"
 #include "Seed.Core.SettingsAPI.h"
 #include "Seed.Core.Memory.h"
-#include "Seed.Core.DateTime.h"
+#include "Seed.Core.Time.Base.h"
 #include "Seed.Core.Containers.NonConcurency.Array.h"
 #include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.Containers.NonConcurency.Map.h"
@@ -520,17 +520,60 @@ namespace Seed
                     return TBaseString(MoveRValue(buffer), sizeof(UUID::UUIDStringWildCard), ReservedSize);
                 }
 
-                ///<summary>Перетворення дати і часу в строкове представлення</summary>
-                ForceInline static TBaseString toString(Seed::Core::Date date) {
-                    Char buffer[22];
+                /// <summary>
+                /// Перетворення дати і часу в строкове представлення
+                /// </summary>
+                /// <typeparam name="date">Об'єкт дати</typeparam>
+                ForceInline static TBaseString toString(Seed::Core::Time::Date date) {
+                    Char buffer[22] = { 0 };
                     Internals::ConvertDateToStringImpl(date, buffer);
                     return buffer;
                 }
 
-                ///<summary>Перетворення часу і дати в строкове представлення</summary>
-                ForceInline static TBaseString toString(Seed::Core::DateTime time) {
-                    Char buffer[22];
+                /// <summary>
+                /// Перетворення дати і часу в строкове представлення
+                /// </summary>
+                /// <param name="time">Об'єкт часу і дати</param>
+                ForceInline static TBaseString toString(Seed::Core::Time::DateTime time) {
+                    Char buffer[22] = { 0 };
                     Internals::ConvertDateTimeToStringImpl(time, buffer);
+                    return buffer;
+                }
+
+                /// <summary>
+                /// Перетворення часу і дати в строкове представлення
+                /// </summary>
+                /// <param name="dateSpan">Об'єкт відрізку дат</param>
+                ForceInline static TBaseString toString(Seed::Core::Time::DateSpan dateSpan) {
+                    Char buffer[22] = { 0 };
+                    auto value = static_cast<Time::DateTime>(time);
+                    Internals::ConvertDateTimeToStringImpl(value, buffer);
+                    return buffer;
+                }
+
+                /// <summary>
+                /// Перетворення часу і дати в строкове представлення
+                /// </summary>
+                /// <param name="time">Об'єкт відрізку часу</param>
+                ForceInline static TBaseString toString(Seed::Core::Time::TimeSpan time) {
+                    Char buffer[22] = { 0 };
+                    auto value = static_cast<Time::DateTime>(static_cast<Time::DateSpan>(time));
+                    Internals::ConvertDateTimeToStringImpl(value, buffer);
+                    return buffer;
+                }
+
+                /// <summary>
+                /// Перетворення часу і дати в строкове представлення
+                /// </summary>
+                /// <param name="time">Об'єкт діапазону часу</param>
+                static TBaseString toString(Seed::Core::Time::TimeRange time) {
+                    Char buffer[47] = { 0 };
+                    Internals::ConvertDateTimeToStringImpl(time, buffer);
+                    buffer[22] = L' ';
+                    buffer[23] = L'-';
+                    buffer[24] = L' ';
+                    auto value = (Time::DateTime)time;
+                    Internals::ConvertDateTimeToStringImpl(value, buffer + 24);
                     return buffer;
                 }
 

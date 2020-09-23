@@ -10,7 +10,7 @@ namespace Seed
             namespace Details
             {
 				template<typename T>
-				constexpr bool IsSerilizableString = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::String
+				constexpr bool IsSerilizableString = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::String
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<class THeap> typename TString, typename TStringHeap>
@@ -72,7 +72,7 @@ namespace Seed
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizablePair = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Pair
+				constexpr bool IsSerilizablePair = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Pair
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<class THeap, typename TKey, typename TValue> typename TPair, typename TPairHeap, typename TKey, typename TValue>
@@ -128,7 +128,7 @@ namespace Seed
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Collection
+				constexpr bool IsSerilizableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Collection
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<typename TCollectionHeap, typename T> typename TCollection, typename TCollectionHeap, typename T>
@@ -225,7 +225,7 @@ namespace Seed
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableFixedCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::FixedCollection
+				constexpr bool IsSerilizableFixedCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::FixedCollection
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<typename TCollectionHeap, SizeT TSize, typename T> typename TFixedCollection, typename TCollectionHeap, SizeT TSize, typename T>
@@ -262,7 +262,7 @@ namespace Seed
 
 					ForceInline static constexpr auto TypeHint() {
 						return
-							CTTI::Details::ToCharStr<TSize>().Resize<CTTI::Details::ToCharStr<TSize>().Count - 1>();
+							CTTI::Details::ToCharStr<TSize>();
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
@@ -309,7 +309,7 @@ namespace Seed
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableAssociableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::AssociableCollection
+				constexpr bool IsSerilizableAssociableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::AssociableCollection
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				constexpr bool f = IsSerilizableAssociableCollection<Containers::Dictionary<Int32>>;

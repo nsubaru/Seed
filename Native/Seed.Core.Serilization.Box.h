@@ -11,7 +11,7 @@ namespace Seed
             {
                 template<typename T>
                 constexpr bool IsSerilizableBox = 
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Box
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Box
                     &&
                     CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 

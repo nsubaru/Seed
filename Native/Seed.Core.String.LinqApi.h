@@ -6,7 +6,6 @@
 #include "Seed.Core.Math.h"
 #include "Seed.Core.SettingsAPI.h"
 #include "Seed.Core.Memory.h"
-#include "Seed.Core.DateTime.h"
 #include "Seed.Core.Containers.NonConcurency.Array.h"
 #include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.Containers.NonConcurency.Map.h"

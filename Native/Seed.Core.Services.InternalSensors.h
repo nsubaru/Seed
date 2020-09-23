@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Services.Base.h"
+#include "Seed.Core.Services.BootupServicesManager.h"
 
 namespace Seed
 {
@@ -7,7 +8,30 @@ namespace Seed
 	{
 		namespace Services
 		{
-			class InternalSensorsService {
+			class InternalSensorsService final : IBootUpService<InternalSensorsService> {
+			public:
+				/// <summary>
+				/// Схема сервісу
+				/// </summary>
+				/// <returns>Рантайм опис типу сервіса</returns>
+				static auto GetRttiInformation() {
+					constexpr auto InternalSensorsServiceDefinition = ObjectDefinition(
+						Services::InternalSensorsService,
+						NullCtorDescription(Services::InternalSensorsService),
+						ObjectMethodsDefs(),
+						ObjectPropsDefs(
+							ObjectProperty(Services::InternalSensorsService, CurrentMemBlkCount, CurrentMemBlkCount),
+							ObjectProperty(Services::InternalSensorsService, CurrentTotalAllocatedMemory, CurrentTotalAllocatedMemory),
+							ObjectProperty(Services::InternalSensorsService, CurrentTotalHeapsUsage, CurrentTotalHeapsUsage),
+							ObjectProperty(Services::InternalSensorsService, ExcecutableNtPath, GetExcecutableNtPath),
+							ObjectProperty(Services::InternalSensorsService, CpuCount, CpuCount),
+							ObjectProperty(Services::InternalSensorsService, MemoryPageSize, MemoryPageSize),
+							ObjectProperty(Services::InternalSensorsService, PhysicalMemorySize, PhysicalMemorySize)
+						)
+					);
+
+					return GenObjectRTTIRecord(InternalSensorsServiceDefinition);
+				}
 			public:
 				InternalSensorsService() {}
 

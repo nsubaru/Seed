@@ -156,7 +156,7 @@ namespace Seed
 					{
 						if constexpr (TypeTraits::IsSameV<TRet, void>)
 						{
-							return Containers::List<DataTypeRecord>{DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TArgs>>{})...};
+							return Containers::List<DataTypeRecord>{ DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TArgs>>{}) ... };
 						}
 						else
 						{
@@ -286,7 +286,7 @@ namespace Seed
 						{
 							return Containers::List<DataTypeRecord>{
 								DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TRet>>{}), 
-								DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TArgs>>{})...
+								DataTypeRecord(TypeTraits::TypeTag<TypeTraits::RemoveCVRefV<TArgs>>{}) ...
 							};
 						}
 					};

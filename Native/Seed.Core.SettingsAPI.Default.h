@@ -1,6 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.h"
-#include "Seed.Core.DateTime.h"
+#include "Seed.Core.Time.Base.h"
 #include "Seed.Core.SettingsAPI.h"
 
 namespace Seed {
@@ -18,7 +18,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.DefaultHeap.StartSize = 40Mb;
 						DefaultSettings.MainMemoryManager.DefaultHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
-						DefaultSettings.MainMemoryManager.DefaultHeap.Additional—hecks = { 0x1, 0x1, 0x1, 0x1 };
+						DefaultSettings.MainMemoryManager.DefaultHeap.Additional—hecks = { 0x0, 0x0, 0x0, 0x0 };
 						DefaultSettings.MainMemoryManager.DefaultHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
 						DefaultSettings.MainMemoryManager.DefaultHeap.Additional—hecks = { 0x1, 0x1, 0x1, 0x1 };
@@ -31,7 +31,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.StartSize = 20Mb;
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
-						DefaultSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks = { 0x1, 0x1, 0x1, 0x1 };
+						DefaultSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks = { 0x0, 0x0, 0x0, 0x0 };
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
 						DefaultSettings.MainMemoryManager.SensitiveDataHeap.Additional—hecks = { 0x1, 0x1, 0x1 };
@@ -44,7 +44,7 @@ namespace Seed {
 						DefaultSettings.MainMemoryManager.ExceptionHeap.StartSize = 80Mb;
 						DefaultSettings.MainMemoryManager.ExceptionHeap.MaxSize = 0Mb;
 #ifdef PreReleaseMode
-						DefaultSettings.MainMemoryManager.ExceptionHeap.Additional—hecks = { 0x1, 0x1, 0x1, 0x1 };
+						DefaultSettings.MainMemoryManager.ExceptionHeap.Additional—hecks = { 0x0, 0x0, 0x0, 0x0 };
 						DefaultSettings.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree = false;
 #elif DebugMode
 						DefaultSettings.MainMemoryManager.ExceptionHeap.Additional—hecks = { 0x1, 0x1, 0x1, 0x1 };
@@ -70,8 +70,7 @@ namespace Seed {
 						{
 							DefaultSettings.Threading.Thread.StackStartSize = 5Mb;
 							DefaultSettings.Threading.Thread.StackMaxSize = 10Mb;
-							DefaultSettings.Threading.Thread.StopKernelThreadsTimeout = 
-								static_cast<DateTime>(DateSpan(0, 0, 0, 0, 0, 3, 0, 0)).GetAsRelativeTime();
+							DefaultSettings.Threading.Thread.StopKernelThreadsTimeout = Time::TimeSpan().AddMinutes(3);
 						}
 					}
 
@@ -80,7 +79,12 @@ namespace Seed {
 						//œÎ‡ÌÛ‚‡Î¸ÌËÍ Á‡‰‡˜
 						{
 							//—Ú‡Ì‰‡Ú ÓÁ‰≥Î¸Ì‡ Á‰‡ÚÌ≥ÒÚ¸ Ú‡ÈÏÂ‡ ‰Îˇ ÔÎ‡ÌÛ‚‡Î¸ÌËÍ‡ Á‡‰‡˜
-							DefaultSettings.KernelServicesConfig.TaskSheduler.DefaultTimerProximity = 1 * DateTime::SecondInNtTime;
+							DefaultSettings.KernelServicesConfig.TaskSheduler.DefaultTimerProximity = Time::TimeSpan(1 * Time::SecondInNtTime);
+						}
+
+						{
+							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount = 10;
+							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout = Time::TimeSpan(60 * Time::SecondInNtTime);
 						}
 					}
 

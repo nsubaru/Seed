@@ -3,6 +3,8 @@
 
 #include "Seed.Core.DepencyInjection.Base.h"
 
+#include "Seed.Core.Time.h"
+
 void Seed::Core::DI::DepencyInjector::RegisterServiceTypes(const SmartPtr<ServiceRecord>& service) {
 	service->rttiRecord.Methods.ForEach([&] (const Reflection::ObjectRTTIRecord::MethodRTTIRecord& methodRecord) InlineLambda
 	{
@@ -130,9 +132,11 @@ Seed::Core::DI::DepencyInjector::DepencyInjector() : data(new Data()) {
 	RegisterTypeDef(Boolean);
 	RegisterTypeDef(String);
 
-	RegisterTypeDef(Date);
-	RegisterTypeDef(DateSpan);
-	RegisterTypeDef(DateTime);
+	RegisterTypeDef(Time::Date);
+	RegisterTypeDef(Time::DateSpan);
+	RegisterTypeDef(Time::TimeSpan);
+	RegisterTypeDef(Time::DateTime);
+	RegisterTypeDef(Time::TimeRange);
 
 	RegisterTypeDef(Containers::Blob);
 	RegisterTypeDef(Containers::Dynamic);

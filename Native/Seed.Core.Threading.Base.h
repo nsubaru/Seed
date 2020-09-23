@@ -1,4 +1,5 @@
 #pragma once
+#include "Seed.Core.Time.Base.h"
 #include "Seed.Core.Containers.Concurency.Array.h"
 #include "Seed.Core.Containers.Concurency.List.h"
 #include "Seed.Core.Containers.SmartPtr.h"
@@ -106,7 +107,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
-				virtual IThreadable& Join(DateTime timeOut) = 0;
+				virtual IThreadable& Join(Time::DateTime timeOut) = 0;
 				/// <summary>
 				/// Очікувння завершення потокової сутності
 				/// </summary>
@@ -117,7 +118,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
-				virtual const IThreadable& Join(DateTime timeOut) const = 0;
+				virtual const IThreadable& Join(Time::DateTime timeOut) const = 0;
 				virtual ~IThreadable() = 0 {}
 			};
 
@@ -146,13 +147,13 @@ namespace Seed {
 			/// </summary>
 			/// <param name="time">Час</param>
 			/// <param name="IsRelative">якщо true то час береться як відносне значення відносно часу призупинення</param>
-			void Sleep(DateTime time, Boolean IsRelative);
+			void Sleep(Time::DateTime time, Boolean IsRelative);
 
 			/// <summary>
 			/// Призупиняє виконання потоку на задану кількість мілісекунд
 			/// </summary>
 			/// <param name="ms">Кількість мілісекунд</param>
-			inline void Sleep(UInt64 ms) { Sleep(DateTime((DateTime::SecondInNtTime / 1000) * ms), true); }
+			inline void Sleep(UInt64 ms) { Sleep(Time::DateTime((Time::SecondInNtTime / 1000) * ms), true); }
 
 			/// <summary>
 			/// Стани задач

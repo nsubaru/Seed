@@ -37,115 +37,128 @@ namespace Seed
 				return TestsStorage();
 			}
 
-			TestPackResult TestRegister::RunAllTest() {
+			TestPackResult TestRegister::RunAllTest(Boolean isLogging) {
 				Containers::List<TestResult> results;
-				toCoreLog(L"Запуск тестів...");
-				DateTime startTime = DateTime::GetCurrentSystemTimeData();
+
+				if(isLogging) toCoreLog(L"Запуск тестів...");
+
+				Time::DateTime startTime = Time::DateTime::GetCurrentSystemTimeData();
 
 				auto maxTestNameSz = GetAllTests().Max(ArrowFunct(record, record.Key.TypeName.Lenght));
 
 				maxTestNameSz += 10;
 
-				String msg = String(100Kb);
+				String msg = (isLogging) ? String(maxTestNameSz + 100Kb) : String();
 
 				GetAllTests().ForEach([&](TestRecord& record) InlineLambda {
-					DateTime testDurration = DateTime::GetCurrentSystemTimeData();
+					Time::TimeSpan testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks;
+					
 					try
 					{
 						if (record.Value().Excecute())
 						{
-							testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+							testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
-							msg += L"Тест \"";
-							msg += record.Key.TypeName;
-							msg += L"\"";
-							msg.ResizeToFixed(maxTestNameSz);
-							msg += L" тривалість: ";
-							msg += String::toString(testDurration.GetMsFrom1600());
-							msg += L" tiks";
-							msg += L", тест пройдено";
-							toCoreLog(msg);
+							if (isLogging) {
+								msg += L"Тест \"";
+								msg += record.Key.TypeName;
+								msg += L"\"";
+								msg.ResizeToFixed(maxTestNameSz);
+								msg += L" тривалість: ";
+								msg += String::toString(testDurration.Ticks);
+								msg += L" tiks";
+								msg += L", тест пройдено";
+								toCoreLog(msg);
+							}
 
 							results += {record.Key.TypeName, TestResult::EStatus::Success, "", testDurration};
 						}
 						else
 						{
-							testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+							testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
+							if (isLogging) {
+								msg += L"Тест \"";
+								msg += record.Key.TypeName;
+								msg += L"\"";
+								msg.ResizeToFixed(maxTestNameSz);
+								msg += L" тривалість: ";
+								msg += String::toString(testDurration.Ticks);
+								msg += L" tiks";
+								msg += L", тест не пройдено";
+								toCoreLog(msg);
+							}
+
+							results += {record.Key.TypeName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
+						}
+
+						if (isLogging) msg.Resize(0);
+					}
+					catch (Asserts::AssertException & ex)
+					{
+						testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
+
+						if (isLogging) {
 							msg += L"Тест \"";
 							msg += record.Key.TypeName;
 							msg += L"\"";
 							msg.ResizeToFixed(maxTestNameSz);
 							msg += L" тривалість: ";
-							msg += String::toString(testDurration.GetMsFrom1600());
+							msg += String::toString(testDurration);
 							msg += L" tiks";
-							msg += L", тест не пройдено";
-							toCoreLog(msg);
+							msg += L", тест не пройдено, спрацював ассерт: ";
+							msg += ex.AssertMessage;
 
-							results += {record.Key.TypeName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
+							toCoreLog(msg);
+							msg.Resize(0);
 						}
 
-						msg.Resize(0);
-					}
-					catch (Asserts::AssertException & ex)
-					{
-						testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
-
-						msg += L"Тест \"";
-						msg += record.Key.TypeName;
-						msg += L"\"";
-						msg.ResizeToFixed(maxTestNameSz);
-						msg += L" тривалість: ";
-						msg += String::toString(testDurration.GetMsFrom1600());
-						msg += L" tiks";
-						msg += L", тест не пройдено, спрацював ассерт: ";
-						msg += ex.AssertMessage;
-
-						toCoreLog(msg);
-
 						results += {record.Key.TypeName, TestResult::EStatus::Failure, ex.toString(), testDurration};
-
-						msg.Resize(0);
 					}
 					catch (Exception & ex) {
-						testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+						testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
-						msg += L"Тест \"";
-						msg += record.Key.TypeName;
-						msg += L"\"";
-						msg.ResizeToFixed(maxTestNameSz);
-						msg += L" тривалість: ";
-						msg += String::toString(testDurration.GetMsFrom1600());
-						msg += L" tiks";
-						msg += L", тест не пройдено, виникло виключення: ";
-						msg += ex.toString();
+						if (isLogging) {
+							msg += L"Тест \"";
+							msg += record.Key.TypeName;
+							msg += L"\"";
+							msg.ResizeToFixed(maxTestNameSz);
+							msg += L" тривалість: ";
+							msg += String::toString(testDurration);
+							msg += L" tiks";
+							msg += L", тест не пройдено, виникло виключення: ";
+							msg += ex.toString();
 
-						toCoreLog(msg);
+							toCoreLog(msg);
+							msg.Resize(0);
+						}
+
 						results += {record.Key.TypeName, TestResult::EStatus::Exception, ex.toString(), testDurration};
-
-						msg.Resize(0);
 					}
 					catch (...) {
-						testDurration = DateTime::GetCurrentSystemTimeData() - testDurration;
+						testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
-						msg += L"Тест \"";
-						msg += record.Key.TypeName;
-						msg += L"\"";
-						msg.ResizeToFixed(maxTestNameSz);
-						msg += L" тривалість: ";
-						msg += String::toString(testDurration.GetMsFrom1600());
-						msg += L" tiks";
-						msg += L", тест не пройдено, виникло невідоме виключення";
+						if (isLogging) {
+							msg += L"Тест \"";
+							msg += record.Key.TypeName;
+							msg += L"\"";
+							msg.ResizeToFixed(maxTestNameSz);
+							msg += L" тривалість: ";
+							msg += String::toString(testDurration);
+							msg += L" tiks";
+							msg += L", тест не пройдено, виникло невідоме виключення";
 
-						toCoreLog(msg);
+							toCoreLog(msg);
+							msg.Resize(0);
+						}
 						results += {record.Key.TypeName, TestResult::EStatus::Exception, L"Uknown", testDurration};
 
-						msg.Resize(0);
+						
 					}
 					});
 
-				DateTime endTime = DateTime::GetCurrentSystemTimeData();
-				return TestPackResult(String(L"Тести ядра"), results, startTime, endTime);
+				auto endTime = Time::DateTime::GetCurrentSystemTimeData();
+				return TestPackResult(String(L"Тести ядра"), results, { startTime, endTime });
 			}
 		}
 	}

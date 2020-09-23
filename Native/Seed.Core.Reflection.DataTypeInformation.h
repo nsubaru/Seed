@@ -26,7 +26,7 @@ namespace Seed
 						) -> void
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							if (data.GetImplementationTypeInfo() != typeid(T))
 							{
@@ -53,7 +53,7 @@ namespace Seed
 						) -> void
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							if (data.GetVariableType() != typeid(T))
 							{
@@ -80,7 +80,7 @@ namespace Seed
 						) -> void
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							T object = T();
 							Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DeserelizeImpl(object, rawStream, offset, registry);
@@ -100,7 +100,7 @@ namespace Seed
 						) -> void
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							T object = T();
 							Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DeserelizeImpl(object, rawStream, offset, registry);
@@ -117,7 +117,7 @@ namespace Seed
 						if constexpr (Core::TypeTraits::IsConstructible<T>)
 						{
 							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable &&
-								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 							{
 								return DynamicObject(T{});
 							}
@@ -138,7 +138,7 @@ namespace Seed
 						if constexpr (Core::TypeTraits::IsConstructible<T>)
 						{
 							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable &&
-								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 							{
 								return Containers::Dynamic(T{});
 							}
@@ -159,7 +159,7 @@ namespace Seed
 						) -> SizeT
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DataSize
 								(data.GetTuple<T>(), registry);
@@ -176,7 +176,7 @@ namespace Seed
 						) -> SizeT
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DataSize
 								(data.GetVariablesTuple<T>(), registry);

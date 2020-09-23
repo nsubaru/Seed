@@ -12,7 +12,7 @@ namespace Seed
 				struct Node {
 					Containers::Map<String, Node> Namespaces;
 					Containers::Map<String, Testing::TestResult> Tests;
-					DateTime durration;
+					Time::TimeSpan durration;
 					TestResult::EStatus State;
 					SizeT TestCount;
 
@@ -23,7 +23,7 @@ namespace Seed
 						State(TestResult::EStatus::Success), 
 						TestCount(1) {}
 
-					Node(DateTime durration) : 
+					Node(Time::TimeSpan durration) :
 						durration(durration), 
 						Namespaces(), 
 						Tests(), 

@@ -163,29 +163,6 @@ namespace Seed
 
                     };
 #pragma endregion
-#pragma region Date and DateTime
-					template<bool TIsConst, bool TIsVolatile> 
-					struct CTTITypeDataImpl<DateTime, TIsConst, TIsVolatile> : 
-						BaseCTTITypeDataImpl<DateTime, EType::NtTime, true, TIsConst, TIsVolatile>
-					{
-						using NumericType = UInt64;
-						using NumericTypeMetaData = CTTITypeMetaData<NumericType>;
-					};
-
-					template<bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl<Date, TIsConst, TIsVolatile> : 
-						BaseCTTITypeDataImpl<Date, EType::NtTime, true, TIsConst, TIsVolatile>
-					{
-						using PlainTime = DateTime;
-					};
-
-					template<bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl<DateSpan, TIsConst, TIsVolatile> : 
-						BaseCTTITypeDataImpl<DateSpan, EType::NtTime, true, TIsConst, TIsVolatile>
-					{
-						using PlainTime = DateTime;
-					};
-#pragma endregion
 				}
 			}
 		}

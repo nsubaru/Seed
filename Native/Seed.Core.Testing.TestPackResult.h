@@ -12,27 +12,25 @@ namespace Seed
 				struct Data {
 					String Name;
 					Containers::List<TestResult> Results;
-					DateTime StartTime;
-					DateTime EndTime;
+					Time::TimeRange TestTimeRange;
 					RefCountT RefCount;
 
-					Data(const String& name, const Containers::List<TestResult>& results, DateTime startTime, DateTime endTime)
-						: Name(name), Results(results), StartTime(startTime), EndTime(endTime), RefCount(1) {}
+					Data(const String& name, const Containers::List<TestResult>& results, Time::TimeRange testTimeRange)
+						: Name(name), Results(results), TestTimeRange(testTimeRange), RefCount(1) {}
 
-					Data(String&& name, const Containers::List<TestResult>& results, DateTime startTime, DateTime endTime)
-						: Name(MoveRValue(name)), Results(results), StartTime(startTime), EndTime(endTime), RefCount(1) {}
+					Data(String&& name, const Containers::List<TestResult>& results, Time::TimeRange testTimeRange)
+						: Name(MoveRValue(name)), Results(results), TestTimeRange(testTimeRange), RefCount(1) {}
 
-					Data(const String& name, Containers::List<TestResult>& results, DateTime startTime, DateTime endTime)
-						: Name(name), Results(MoveRValue(results)), StartTime(startTime), EndTime(endTime), RefCount(1) {}
+					Data(const String& name, Containers::List<TestResult>& results, Time::TimeRange testTimeRange)
+						: Name(name), Results(MoveRValue(results)), TestTimeRange(testTimeRange), RefCount(1) {}
 
-					Data(String&& name, Containers::List<TestResult>&& results, DateTime startTime, DateTime endTime)
-						: Name(MoveRValue(name)), Results(MoveRValue(results)), StartTime(startTime), EndTime(endTime), RefCount(1) {}
+					Data(String&& name, Containers::List<TestResult>&& results, Time::TimeRange testTimeRange)
+						: Name(MoveRValue(name)), Results(MoveRValue(results)), TestTimeRange(testTimeRange), RefCount(1) {}
 				};
 			public:
 				DefStructMetaData(Data,
 					DefStructFieldData(Data, Name),
-					DefStructFieldData(Data, StartTime),
-					DefStructFieldData(Data, EndTime),
+					DefStructFieldData(Data, TestTimeRange),
 					DefStructFieldData(Data, Results)
 				);
 			private:
@@ -44,17 +42,17 @@ namespace Seed
 			private:
 				virtual void Dispose() override {}
 			public:
-				TestPackResult(const String& name, const Containers::List<TestResult>& results, DateTime startTime, DateTime endTime)
-					: This(new Data(name, results, startTime, endTime)) {}
+				TestPackResult(const String& name, const Containers::List<TestResult>& results, Time::TimeRange testTimeRange)
+					: This(new Data(name, results, testTimeRange)) {}
 
-				TestPackResult(String&& name, const Containers::List<TestResult>& results, DateTime startTime, DateTime endTime)
-					: This(new Data(MoveRValue(name), results, startTime, endTime)) {}
+				TestPackResult(String&& name, const Containers::List<TestResult>& results, Time::TimeRange testTimeRange)
+					: This(new Data(MoveRValue(name), results, testTimeRange)) {}
 
-				TestPackResult(const String& name, Containers::List<TestResult>&& results, DateTime startTime, DateTime endTime)
-					: This(new Data(name, MoveRValue(results), startTime, endTime)) {}
+				TestPackResult(const String& name, Containers::List<TestResult>&& results, Time::TimeRange testTimeRange)
+					: This(new Data(name, MoveRValue(results), testTimeRange)) {}
 
-				TestPackResult(String&& name, Containers::List<TestResult>&& results, DateTime startTime, DateTime endTime)
-					: This(new Data(MoveRValue(name), MoveRValue(results), startTime, endTime)) {}
+				TestPackResult(String&& name, Containers::List<TestResult>&& results, Time::TimeRange testTimeRange)
+					: This(new Data(MoveRValue(name), MoveRValue(results), testTimeRange)) {}
 			public:
 				const String& GetName() const {
 					return This->Name;
@@ -64,16 +62,20 @@ namespace Seed
 					return This->Results;
 				}
 			public:
-				DateTime GetStartTime() const {
-					return This->StartTime;
+				Time::DateTime GetStartTime() const {
+					return This->TestTimeRange.StartTime;
 				}
 			public:
-				DateTime GetEndTime() const {
-					return This->EndTime;
+				Time::DateTime GetEndTime() const {
+					return This->TestTimeRange.StartTime.Ticks + This->TestTimeRange.Durration.Ticks;
 				}
 			public:
-				DateTime GetDuration() const {
-					return This->EndTime - This->StartTime;
+				Time::TimeSpan GetDuration() const {
+					return This->TestTimeRange.Durration;
+				}
+			public:
+				Time::TimeRange GetTestTimeRange() const {
+					return This->TestTimeRange;
 				}
 			public:
 				SizeT GetSucessCount() const {
@@ -102,9 +104,10 @@ namespace Seed
 				}
 			public:
 				String Property(GetName) Name;
-				DateTime Property(GetStartTime) StartTime;
-				DateTime Property(GetEndTime) EndTime;
-				DateTime Property(GetDuration) Duration;
+				Time::DateTime Property(GetStartTime) StartTime;
+				Time::DateTime Property(GetEndTime) EndTime;
+				Time::TimeSpan Property(GetDuration) Duration;
+				Time::TimeRange Property(GetTestTimeRange) TestTimeRange;
 				SizeT Property(GetSucessCount) SucessCount;
 				SizeT Property(GetFailCount) FailCount;
 				SizeT Property(GetExceptionCount) ExceptionCount;

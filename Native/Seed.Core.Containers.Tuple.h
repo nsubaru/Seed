@@ -50,7 +50,7 @@ namespace Seed
                         return Seed::MoveRValue(data);
                     }
 
-                    ForceInline constexpr Leaf() = default;
+                    ForceInline constexpr Leaf() requires Concepts::IsDefaultConstructible<TData> = default;
                     ForceInline constexpr Leaf(const TData & data) : data(data) {}
                     ForceInline constexpr Leaf(TData && data) : data(ForwardReference<TData>(data)) {}
 
@@ -86,7 +86,7 @@ namespace Seed
                         return Seed::MoveRValue(data);
                     }
 
-                    ForceInline constexpr Leaf() = default;
+                    ForceInline constexpr Leaf() requires Concepts::IsDefaultConstructible<TData> = default;
                     ForceInline constexpr Leaf(const TData & data) : data(data) {}
                     ForceInline constexpr Leaf(TData && data) : data(ForwardReference<TData>(data)) {}
 
@@ -104,6 +104,42 @@ namespace Seed
 					}
                 };
 
+                template<UInt64 TI, typename TData>
+                struct Leaf<TI, TData&&> {
+                    static constexpr UInt64 N = TI;
+                    TData data;
+
+                    ForceInline constexpr const TData& GetData() const {
+                        return data;
+                    }
+
+                    ForceInline constexpr TData& GetData() {
+                        return data;
+                    }
+
+                    ForceInline constexpr TData&& MoveData()
+                    {
+                        return Seed::MoveRValue(data);
+                    }
+
+                    ForceInline constexpr Leaf() requires Concepts::IsDefaultConstructible<TData> = default;
+                    ForceInline constexpr Leaf(const TData& data) : data(data) {}
+                    ForceInline constexpr Leaf(TData&& data) : data(ForwardReference<TData>(data)) {}
+
+                    ForceInline constexpr Leaf(const Leaf& leaf) : Leaf(leaf.data) {}
+                    ForceInline constexpr Leaf(Leaf&& leaf) : Leaf(ForwardReference<TData>(leaf.data)) {}
+
+                    ForceInline constexpr Leaf& operator=(const Leaf& leaf) {
+                        this->Leaf::~Leaf();
+                        this->Leaf::Leaf(leaf);
+                    }
+
+                    ForceInline constexpr Leaf& operator=(Leaf&& leaf) {
+                        this->Leaf::~Leaf();
+                        this->Leaf::Leaf(MoveRValue(leaf));
+                    }
+                };
+
                 template<UInt64 TI>
                 struct Leaf<TI, void> {
                     static constexpr UInt64 N = TI;
@@ -117,7 +153,7 @@ namespace Seed
                     template<UInt64 TId>
                     using RetType = typename GetByN<TId, TypeTraits::RemoveRefV<TypeTraits::RemoveCV<TTypes>>...>::Type;
 
-                    ForceInline constexpr Leafes() = default;
+                    ForceInline constexpr Leafes() requires (Concepts::IsDefaultConstructible<TTypes> && ...) = default;
                     ForceInline constexpr Leafes(const Leafes&) = default;
                     ForceInline constexpr Leafes(Leafes&&) = default;
 
@@ -170,7 +206,7 @@ namespace Seed
                     return Tuple<decltype(lambda(GetByIdx<TIdx>()))...>(lambda(GetByIdx<TIdx>())...);
                 }
             public:
-                ForceInline constexpr Tuple() : ls() {}
+                ForceInline constexpr Tuple() requires (Concepts::IsDefaultConstructible<TDatas> && ...) : ls() {}
                 ForceInline constexpr Tuple(const Tuple&) = default;
                 ForceInline constexpr Tuple(Tuple&&) = default;
 

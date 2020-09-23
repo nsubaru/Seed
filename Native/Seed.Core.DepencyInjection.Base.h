@@ -211,6 +211,7 @@ namespace Seed
 					}
 					~IDI() {}
 				public:
+#pragma region Getters
 					ForceInline Containers::List<String> GetAllServicesNames() const {
 						return di.GetAllServicesNames();
 					}
@@ -289,6 +290,37 @@ namespace Seed
 
 					ForceInline const Serilization::TypesRegistry& GetTypesRegistry() {
 						return di.data->dataTypesListForSerilization;
+					}
+#pragma endregion
+				public:
+					/// <summary>
+					/// Вертає сервіс за типом
+					/// </summary>
+					template<typename TService>
+					TService Resolve() {
+						return di.Resolve<TService>();
+					}
+
+					/// <summary>
+					/// Реєстрація сервісу
+					/// </summary>
+					/// <param name="rttiRecord">Мета інформація про сервіс</param>
+					template<typename TService, typename ... TCtorArgs>
+					requires Concepts::IsConstructibleWith<TService, TCtorArgs...>
+					IDI& Register(Reflection::ObjectRTTIRecord&& rttiRecord) {
+						di.Register<TService, TCtorArgs...>(MoveRValue(rttiRecord));
+						return *this;
+					}
+
+					/// <summary>
+					/// Реєстрація сервісу через інтферфейс
+					/// </summary>
+					/// <param name="rttiRecord">Мета інформація про сервіс</param>
+					template<typename TServiceInterface, typename TService, typename ... TCtorArgs>
+					requires Concepts::IsConstructibleWith<TService, TCtorArgs...>
+					IDI& RegisterInterface(Reflection::ObjectRTTIRecord&& rttiRecord) {
+						di.RegisterInterface<TServiceInterface, TService, TCtorArgs...>(MoveRValue(rttiRecord));
+						return *this;
 					}
 				private:
 					friend class DepencyInjector;

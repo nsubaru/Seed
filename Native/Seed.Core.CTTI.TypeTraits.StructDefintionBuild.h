@@ -30,7 +30,7 @@ namespace Seed
                         TIsConvertibleToTuple
                         > {};
 
-                    template<typename T> requires Concepts::IsStructCttiType<T>
+                    template<typename T> requires requires { T::FieldMetaDataGetter(); }
                     struct CTTITypeDataSpecialization<
                         T,
                         void
