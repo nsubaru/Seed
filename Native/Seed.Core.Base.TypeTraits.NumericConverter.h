@@ -8,79 +8,59 @@ namespace Seed
 		namespace TypeTraits
 		{
 #pragma region Signed type converter helpers
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<typename>
             struct MakeSigned : LogicFalse {};
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<unsigned __int8> : LogicFalse {
                 using Type = signed __int8;
             };
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<unsigned __int16> : LogicFalse {
                 using Type = signed __int16;
             };
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<unsigned __int32> : LogicFalse {
                 using Type = signed __int32;
             };
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<unsigned __int64> : LogicFalse {
                 using Type = signed __int64;
             };
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<signed __int8> : LogicTrue {
                 using Type = signed __int8;
             };
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<signed __int16> : LogicTrue {
                 using Type = signed __int16;
             };
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<signed __int32> : LogicTrue {
                 using Type = signed __int32;
             };
 
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<>
             struct MakeSigned<signed __int64> : LogicTrue {
                 using Type = signed __int64;
             };
 #pragma endregion
-            /// <summary>
-            /// Вертає знаковий аналог типу числа
-            /// </summary>
+            //Вертає знаковий аналог типу числа
             template<typename TInt>
             using Signed = typename MakeSigned<TInt>::Type;
 
@@ -91,71 +71,53 @@ namespace Seed
             constexpr auto IsSigned = MakeSigned<TInt>::State;
 
 #pragma region Unsigned type converter helpers
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<typename>
             struct MakeUnsigned : LogicFalse {};
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<signed __int8> : LogicFalse {
                 using Type = unsigned __int8;
             };
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<signed __int16> : LogicFalse {
                 using Type = unsigned __int16;
             };
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<signed __int32> : LogicFalse {
                 using Type = unsigned __int32;
             };
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<signed __int64> : LogicFalse {
                 using Type = unsigned __int64;
             };
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<unsigned __int8> : LogicTrue {
                 using Type = unsigned __int8;
             };
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<unsigned __int16> : LogicTrue {
                 using Type = unsigned __int16;
             };
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<unsigned __int32> : LogicTrue {
                 using Type = unsigned __int32;
             };
 
-            /// <summary>
-            /// Вертає беззнаковий аналог типу числа
-            /// </summary>
+            //Вертає беззнаковий аналог типу числа
             template<>
             struct MakeUnsigned<unsigned __int64> : LogicTrue {
                 using Type = unsigned __int64;

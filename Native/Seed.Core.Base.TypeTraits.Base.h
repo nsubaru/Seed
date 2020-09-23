@@ -81,54 +81,42 @@ namespace Seed {
                 constexpr void IsConstexprHelper(T&& t) {}
             }
 
-            /// <summary>
-            /// Вертає чи даний тип є void
-            /// </summary>
+            //Вертає чи даний тип є void
             template<class TTy>
             struct IsVoidT
                 : LogicFalse
             {	
             };
 
-            /// <summary>
-            /// Вертає чи даний тип є void
-            /// </summary>
+            //Вертає чи даний тип є void
             template<>
             struct IsVoidT<void>
                 : LogicTrue
             {	
             };
 
-            /// <summary>
-            /// Вертає чи даний тип є void
-            /// </summary>
+            //Вертає чи даний тип є void
             template<>
             struct IsVoidT<const void>
                 : LogicTrue
             {	
             };
 
-            /// <summary>
-            /// Вертає чи даний тип є void
-            /// </summary>
+            //Вертає чи даний тип є void
             template<>
             struct IsVoidT<volatile void>
                 : LogicTrue
             {	
             };
 
-            /// <summary>
-            /// Вертає чи даний тип є void
-            /// </summary>
+            //Вертає чи даний тип є void
             template<>
             struct IsVoidT<const volatile void>
                 : LogicTrue
             {	
             };
 
-            /// <summary>
-            /// Вертає чи даний тип є void
-            /// </summary>
+            //Вертає чи даний тип є void
             template<class TTy>
             inline constexpr bool IsVoidV = IsVoidT<TTy>::State;
 
