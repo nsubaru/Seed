@@ -105,32 +105,32 @@ namespace Seed
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return
-									CTTI::Details::CreateTypeStr("[") +
+									CTTI::Details::CreateTypeStr(L"[") +
 									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::CreateTypeStr("]")
+									CTTI::Details::CreateTypeStr(L"]")
 									+
 									TypeHintFieldsImp<I + 1>();
 							else
 								return
-									CTTI::Details::CreateTypeStr("[") +
+									CTTI::Details::CreateTypeStr(L"[") +
 									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::CreateTypeStr("]");
+									CTTI::Details::CreateTypeStr(L"]");
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr("");
+							return CTTI::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -150,7 +150,7 @@ namespace Seed
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr("");
+							return CTTI::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -177,24 +177,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
+                            CTTI::Details::CreateTypeStr(L"{") +
                             CTTI::TypeName<TStruct>().Resize<CTTI::TypeName<TStruct>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TStruct>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TStruct)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeMetaDataFieldsImp() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 				};
 			}

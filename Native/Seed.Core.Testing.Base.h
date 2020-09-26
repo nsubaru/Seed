@@ -38,7 +38,7 @@ namespace Seed {
             private:
 #pragma section(".TEST$a",read, write)
                 [[maybe_unused]] __declspec(allocate(".TEST$a")) inline static volatile void* volatile Result = GenTestRecord();
-#pragma comment(linker, "/MERGE:.data=.TEST") 
+#pragma comment(linker, "/MERGE:.TEST=.data") 
             public:
                 virtual ~TestClass() {}
             };

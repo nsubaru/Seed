@@ -605,10 +605,10 @@ namespace Seed
 					{
 					};
 
-					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::CreateTypeStr("`invalid`");
+					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::CreateTypeStr(L"`invalid`");
 
 					static String ArgsMetaData() {
-						return Seed::Core::CTTI::Details::CreateTypeStr("`Can not construct`");
+						return Seed::Core::CTTI::Details::CreateTypeStr(L"`Can not construct`");
 					}
 				};
 
@@ -1286,8 +1286,8 @@ namespace Seed
 		Class, 																					\
 		decltype(&Class::Method), 																\
 		&Class::Method, 																		\
-		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Method))								\
-	>(Seed::Core::CTTI::Details::CreateTypeStr(#Method))											\
+		decltype(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))							\
+	>(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))										
 
 
 /// <summary>
@@ -1299,12 +1299,12 @@ namespace Seed
 /// <param name="...">Типи аргментів з CV Ref модифікаторами</param>
 /// <returns>Об'єкт MethodDescriptor який містить опис метода</returns> 
 #define MethodDescriptionWithArgs(Class, Method, RetType, ...) 									\
-	Seed::Core::Reflection::Details::MethodDescriptor< 										\
+	Seed::Core::Reflection::Details::MethodDescriptor< 											\
 		Class, 																					\
 		RetType(Class::*)(__VA_ARGS__), 														\
 		&Class::Method, 																		\
-		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Method))								\
-	>(Seed::Core::CTTI::Details::CreateTypeStr(#Method))											
+		decltype(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))							\
+	>(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))											
 
 /// <summary>
 /// Опис властивості
@@ -1318,11 +1318,11 @@ namespace Seed
 #define	ObjectProperty(Class, Name, Getter, ...) 												\
 	Seed::Core::Reflection::Details::PropertyDescriptor< 										\
 		Class, 																					\
-		decltype(Seed::Core::CTTI::Details::CreateTypeStr(#Name)), 								\
+		decltype(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Name)), 							\
 		decltype(&Class::Getter), 																\
-		&Class::Getter, 																			\
+		&Class::Getter, 																		\
 		decltype(ObjectMethodsDefs(__VA_ARGS__))												\
-	>(Seed::Core::CTTI::Details::CreateTypeStr(#Name), ObjectMethodsDefs(__VA_ARGS__))			
+	>(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Name), ObjectMethodsDefs(__VA_ARGS__))			
 						
 /// <summary>
 /// Опис констора та деструктора

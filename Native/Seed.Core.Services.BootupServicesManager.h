@@ -32,10 +32,10 @@ namespace Seed {
 					(void)IoC.Resolve<TService>();
 				}
 			private:
-#pragma section(".DIBOOT$a",read, write)
-				[[maybe_unused]] __declspec(allocate(".DIBOOT$a")) inline static volatile void* volatile _ = 
+#pragma section(".DIBT$a",read, write)
+				[[maybe_unused]] __declspec(allocate(".DIBT$a")) inline static volatile void* volatile _ = 
 					RegisterBootUpServices(CTTI::TypeName<TService>() ,RegisterInDi, LoadToDi);
-#pragma comment(linker, "/MERGE:.data=.DIBOOT") 
+#pragma comment(linker, "/MERGE:.DIBT=.data") 
 			};
 
 			/// <summary>

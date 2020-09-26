@@ -213,10 +213,10 @@ namespace Seed {
             /// <param name="item">Compile time рядок</param>
             /// <typeparam name="N">Кільість символів</typeparam>
             template<SizeT N>
-            ForceInline BaseString(const CTTI::Details::ConstexprArray<char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
+            ForceInline BaseString(const CTTI::Details::ConstexprArray<Char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (N == 0)
                 {
-	                static_assert(false, "ConstexprArray must have '\\0' in end");
+                    return;
                 }
                 else
                 {
@@ -231,10 +231,11 @@ namespace Seed {
                     
                     this->ReservedSize = this->CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     this->str = (CharStr) BaseString::operator new[](ReservedSize * sizeof(Char));
-                    for (SizeT i = 0; i < this->CurrentSize; i++)
-                    {
-                        str[i] = item[i];
-                    }
+                    Memory::Copy(item.Raw(), this->str, this->CurrentSize * sizeof(Char));
+                    //for (SizeT i = 0; i < this->CurrentSize; i++)
+                    //{
+                    //    str[i] = item[i];
+                    //}
 
                     this->str[this->CurrentSize - 1] = L'\0';
                 }

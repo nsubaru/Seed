@@ -54,7 +54,7 @@ namespace Seed
 					template<SizeT Index = 0>
 					constexpr ForceInline static auto TypeMetaDataTuppleItem(){
 						if constexpr(Index == sizeof...(TTypes))
-							return CTTI::Details::CreateTypeStr("");
+							return CTTI::Details::CreateTypeStr(L"");
 						else{
 							using Type = typename Tuple::ItemType<Index>;
 							return BaseSerlizationHandler<THeap, Type>::TypeMetaData()
@@ -82,24 +82,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
+                            CTTI::Details::CreateTypeStr(L"{") +
                             CTTI::TypeName<Tuple>().Resize<CTTI::TypeName<Tuple>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(Tuple)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeMetaDataTuppleItem() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static void DeserelizeImpl(Tuple& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -206,32 +206,32 @@ namespace Seed
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return
-									CTTI::Details::CreateTypeStr("[") +
+									CTTI::Details::CreateTypeStr(L"[") +
 									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::CreateTypeStr("]")
+									CTTI::Details::CreateTypeStr(L"]")
 									+
 									TypeHintFieldsImp<I + 1>();
 							else
 								return
-									CTTI::Details::CreateTypeStr("[") +
+									CTTI::Details::CreateTypeStr(L"[") +
 									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::CreateTypeStr("]");
+									CTTI::Details::CreateTypeStr(L"]");
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr("");
+							return CTTI::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -251,7 +251,7 @@ namespace Seed
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr("");
+							return CTTI::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -281,24 +281,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
+                            CTTI::Details::CreateTypeStr(L"{") +
                             CTTI::TypeName<TObject>().Resize<CTTI::TypeName<TObject>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TObject>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TObject)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeMetaDataFieldsImp() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 				};
 			}
