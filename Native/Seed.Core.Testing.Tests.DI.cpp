@@ -121,11 +121,20 @@ bool Seed::Core::Testing::Test::DI::CallServiceMethodByNameAndArgs::Excecute() {
 	{
 		return record.Name == L"Method4";
 	});
-	auto args = Reflection::DynamicObject(Seed::Core::Containers::Tuple<int, double>(10, 1.0));
-	auto dynObj = serviceRecord.CtorCallerFunction(Reflection::DynamicObject(Seed::Core::Containers::Tuple<>()));
+	auto args = Seed::Core::Containers::Array<Seed::Core::Reflection::DynamicObject>(
+		{ 
+			Seed::Core::Containers::Tuple<int>(10),
+			Seed::Core::Containers::Tuple<double>(1.0)
+		});
+
+	auto dynObj = serviceRecord.CtorCallerFunction(Seed::Core::Containers::Array<Seed::Core::Reflection::DynamicObject>());
+
 	auto res = methodRecord.MethodCallerFunction(methodRecord.GetMethodPointer(), dynObj, args);
+
 	auto resValue = res.GetValue<int>().GetByIdx<0>();
+
 	serviceRecord.DtorCallerFunction(MoveRValue(dynObj));
+
 	return resValue == 11;
 }
 
@@ -193,8 +202,7 @@ bool Seed::Core::Testing::Test::DI::TestSerilizationService::Excecute() {
 		NullCtorDescription(Core::Services::SerilizationService),
 		ObjectMethodsDefs(
 			MethodDescription(Core::Services::SerilizationService, SerelizeDynObj),
-			MethodDescription(Core::Services::SerilizationService, DeserelizeDynObj),
-			MethodDescription(Core::Services::SerilizationService, GetTypeMetaDataDynObj)
+			MethodDescription(Core::Services::SerilizationService, DeserelizeDynObj)
 		),
 		ObjectPropsDefs()
 	);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.Serilization.Base.h"
+#include "Seed.Core.Serilization.Core.h"
 
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
@@ -47,7 +47,7 @@ namespace Seed
                     ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::CreateTypeStr(L"{") +
-                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::TypeName<T>() +
                             CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
                             CTTI::Details::CreateTypeStr(L"|") +
@@ -59,6 +59,17 @@ namespace Seed
                             CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, typename TypeTraits::EnumUnderlyingTypeV<T>>::TypeMetaData() +
                             CTTI::Details::CreateTypeStr(L"}");
+                    }
+
+                    ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+                        return BaseTypeMetaDataRecord<THeap>(
+                            CTTI::TypeName<T>(),
+                            CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+                            sizeof(T),
+                            sizeof(T),
+                            TypeHint(),
+                            { BaseSerlizationHandler<THeap, typename TypeTraits::EnumUnderlyingTypeV<T>>::GetTypeMetaDataRecord() }
+                        );
                     }
                 };
             }

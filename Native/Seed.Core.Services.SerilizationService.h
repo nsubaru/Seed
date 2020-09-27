@@ -120,7 +120,7 @@ namespace Seed
                     ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::CreateTypeStr(L"{") +
-                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::TypeName<T>() +
                             CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
                             CTTI::Details::CreateTypeStr(L"|") +
@@ -133,6 +133,16 @@ namespace Seed
                             CTTI::Details::CreateTypeStr(L"") +
                             CTTI::Details::CreateTypeStr(L"}");
                     }
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<T>(),
+							CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+							sizeof(T),
+							0,
+							TypeHint()
+						);
+					}
                 };
 
 				template<typename THeap, typename T>
@@ -220,7 +230,7 @@ namespace Seed
                     ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::CreateTypeStr(L"{") +
-                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
+                            CTTI::TypeName<T>() +
                             CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
                             CTTI::Details::CreateTypeStr(L"|") +
@@ -233,6 +243,16 @@ namespace Seed
                             CTTI::Details::CreateTypeStr(L"") +
                             CTTI::Details::CreateTypeStr(L"}");
                     }
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<T>(),
+							CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+							sizeof(T),
+							0,
+							TypeHint()
+							);
+					}
                 };
 			}
 		}
@@ -254,8 +274,7 @@ namespace Seed
 						NullCtorDescription(Services::SerilizationService),
 						ObjectMethodsDefs(
 							MethodDescription(Services::SerilizationService, SerelizeDynObj),
-							MethodDescription(Services::SerilizationService, DeserelizeDynObj),
-							MethodDescription(Services::SerilizationService, GetTypeMetaDataDynObj)
+							MethodDescription(Services::SerilizationService, DeserelizeDynObj)
 						),
 						ObjectPropsDefs()
 					);
@@ -305,13 +324,23 @@ namespace Seed
 				}
 
 				/// <summary>
-				/// Вертає схему типу
+				/// Вертає рядкове представлення схеми типу
 				/// </summary>
 				/// <typeparam name="T">Тип даних</typeparam>
 				/// <returns>Рядкове представлення схеми даних</returns>
 				template<typename T> requires CTTI::Concepts::IsCttiSerelizable<T>
 				String GetTypeMetaData() const {
 					return Serilization::MetaDataGen<T>();
+				}
+
+				/// <summary>
+				/// Вертає схему типу
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <returns>Схема типу</returns>
+				template<typename T> requires CTTI::Concepts::IsCttiSerelizable<T>
+				Serilization::TypeMetaDataRecord GetTypeShema() const {
+					return Serilization::GetTypeRecordForType<T>();
 				}
 				
 				/// <summary>
@@ -331,13 +360,6 @@ namespace Seed
 				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data) const {
 					return Deserelize<Reflection::DynamicObject>(data);
 				}
-
-				/// <summary>
-				/// Вертає схему типу для динамічного об'єкта
-				/// </summary>
-				/// <param name="data">Динамічний об'єкт</param>
-				/// <returns>Рядкове представлення схеми даних</returns>
-				String GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) const;
 			public:
 				RefCountClass(SerilizationService, This);
 			};

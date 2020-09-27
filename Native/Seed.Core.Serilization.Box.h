@@ -36,7 +36,7 @@ namespace Seed
 
                     ForceInline static constexpr auto ConstexprSize() {
                         return
-                            CTTI::Details::ToCharStr<sizeof(BaseLazy<TLazyHeap, T>)>();
+                            CTTI::Details::CreateTypeStr(L"0");
                     }
 
                     ForceInline static void DeserelizeImpl(BaseLazy<TLazyHeap, T>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -50,7 +50,7 @@ namespace Seed
                     ForceInline static constexpr auto TypeMetaData() {
                         return
                             CTTI::Details::CreateTypeStr(L"{") +
-                            CTTI::TypeName<BaseLazy<TLazyHeap, T>>().Resize<CTTI::TypeName<BaseLazy<TLazyHeap, T>>().Count - 1>() +
+                            CTTI::TypeName<BaseLazy<TLazyHeap, T>>() +
                             CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<BaseLazy<TLazyHeap, T>>::TypeClass)>() +
                             CTTI::Details::CreateTypeStr(L"|") +
@@ -62,6 +62,17 @@ namespace Seed
                             CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
                             CTTI::Details::CreateTypeStr(L"}");
+                    }
+
+                    ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+                        return BaseTypeMetaDataRecord<THeap>(
+                            CTTI::TypeName<T>(),
+                            CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+                            sizeof(T),
+                            0,
+                            TypeHint(),
+                            { BaseSerlizationHandler<THeap, ItemType>::GetTypeMetaDataRecord() }
+                        );
                     }
                 };
 
@@ -86,7 +97,7 @@ namespace Seed
 
                     ForceInline static constexpr auto ConstexprSize() {
                         return
-                            CTTI::Details::ToCharStr<sizeof(BaseSmartPtr<TSmartPtrHeap, T>)>();
+                            CTTI::Details::CreateTypeStr(L"0");
                     }
 
                     ForceInline static void DeserelizeImpl(BaseSmartPtr<TSmartPtrHeap, T>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -112,6 +123,17 @@ namespace Seed
                             CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
                             CTTI::Details::CreateTypeStr(L"}");
+                    }
+
+                    ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+                        return BaseTypeMetaDataRecord<THeap>(
+                            CTTI::TypeName<T>(),
+                            CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+                            sizeof(T),
+                            0,
+                            TypeHint(),
+                            { BaseSerlizationHandler<THeap, ItemType>::GetTypeMetaDataRecord() }
+                        );
                     }
                 };
             }

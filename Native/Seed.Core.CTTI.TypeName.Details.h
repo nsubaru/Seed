@@ -291,7 +291,7 @@ namespace Seed {
 
                 template<typename T>
                 ForceInline constexpr auto TypeName() {
-                    return (Details::type_name<T>().AsArray<Details::type_name_size<T>()>()).Resize<Details::type_name_size<T>() + 1>();
+                    return (Details::type_name<T>().AsArray<Details::type_name_size<T>()>());
                 }
 
                 template<SizeT I>

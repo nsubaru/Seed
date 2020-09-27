@@ -47,6 +47,13 @@ namespace Seed
 				RefCountClass(RTTITypeRecord, data);
 			public:
 				/// <summary>
+				/// Пустий конструктор, не валідний для даного типу
+				/// </summary>
+				ForceInline RTTITypeRecord() : data(nullptr) {
+					Throw(NotImplementedException(ExceptionPosition));
+				}
+
+				/// <summary>
 				/// Конструктор запису типу
 				/// </summary>
 				template<typename T>

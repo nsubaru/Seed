@@ -823,13 +823,13 @@ namespace Seed {
 			//<summary>Декороване ім'я типу для серелізації</summary>
 			template<typename T>
 			constexpr auto TypeName() {
-				return TypeNameSpecializations::TTypeName<T>::TypeName() + Details::CreateTypeStr(L"\0");
+				return TypeNameSpecializations::TTypeName<T>::TypeName();
 			}
 
 			///<summary>Ім'я типу в С++ для компарингу</summary>
 			template<typename T>
 			constexpr auto CXXTypeName() {
-				return CTTI::Details::TypeName<T>() + Details::CreateTypeStr(L"\0");
+				return CTTI::Details::TypeName<T>();
 			}
 
 			static constexpr SizeT TypeStringSize = Details::TypeStringSize;

@@ -242,7 +242,6 @@ namespace Seed
                 }
 
                 template<UInt64 TI>
-                // ReSharper disable once CppRedundantTypenameKeyword
                 using ItemType = typename decltype(ls)::template RetType<TI>;
 
                 static constexpr SizeT Count = sizeof...(TDatas);

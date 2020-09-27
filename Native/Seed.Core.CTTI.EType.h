@@ -12,6 +12,7 @@ namespace Seed
 			/// </summary>
 			enum class EType : UInt8
 			{
+				MetaData,
 				Logic,
 				Numeric,
 				Enumeration,
@@ -43,6 +44,8 @@ namespace Seed
 			constexpr Boolean IsSimpleTypes(EType type) {
 				switch (type)
 				{
+				case Seed::Core::CTTI::EType::MetaData:
+					return false;
 				case Seed::Core::CTTI::EType::Logic:
 					return true;
 				case Seed::Core::CTTI::EType::Numeric:

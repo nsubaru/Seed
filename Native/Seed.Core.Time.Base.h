@@ -676,13 +676,13 @@ namespace Seed {
 						this->Durration = TimeSpan(0);
 
 					}
-					else if (startTime.Ticks > endTime.Ticks) {
+					else if (startTime.Ticks < endTime.Ticks) {
 						this->StartTime = startTime;
 						this->Durration = TimeSpan(endTime.Ticks - startTime.Ticks);
 					}
 					else {
-						this->StartTime = startTime;
-						this->Durration = TimeSpan(endTime.Ticks - startTime.Ticks);
+						this->StartTime = endTime;
+						this->Durration = TimeSpan(startTime.Ticks - endTime.Ticks);
 					}
 				}
 

@@ -30,8 +30,8 @@ namespace Seed
 						ObjectPropsDefs(
 							ObjectProperty(Services::AutomatiSelfTestingService, LastTestResult, GetLastTestResult),
 							ObjectProperty(Services::AutomatiSelfTestingService, TestRunPeriod, GetTestRunPeriod),
-							ObjectProperty(Services::AutomatiSelfTestingService, LastTestsResults, GetLastTestsResults),
-							ObjectProperty(Services::AutomatiSelfTestingService, TestsStartAndDurationTime, GetTestsStartAndDurationTime)
+							ObjectProperty(Services::AutomatiSelfTestingService, SavedTestsResults, GetSavedTestsResults),
+							ObjectProperty(Services::AutomatiSelfTestingService, SavedTestsStartAndDurationTime, GetSavedTestsStartAndDurationTime)
 						)
 					);
 
@@ -96,7 +96,7 @@ namespace Seed
 				/// Вертає інформацію про збереженні результати тестування
 				/// </summary>
 				/// <returns></returns>
-				Containers::List<Testing::TestPackResult> GetLastTestsResults() const {
+				Containers::List<Testing::TestPackResult> GetSavedTestsResults() const {
 					return This->testsResults.CopyTo<Containers::List>();
 				}
 
@@ -104,7 +104,7 @@ namespace Seed
 				/// Вертає інформацію про збереженні тривалості тестування
 				/// </summary>
 				/// <returns></returns>
-				Containers::List<Time::TimeRange> GetTestsStartAndDurationTime() const {
+				Containers::List<Time::TimeRange> GetSavedTestsStartAndDurationTime() const {
 					return This->testsResults.CopyTo<Containers::List>(ArrowFunct(x, x.TestTimeRange));
 				}
 			public:

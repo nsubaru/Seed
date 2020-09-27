@@ -33,10 +33,9 @@ namespace Seed {
 					/// </summary>
 					/// <param name="lambda">Лямбда вигляду bool(const T&amp;, const T&amp;)</param>
 					/// <returns>Силку на поточну колекцію</returns>
-					template<typename Lambda, TypeTraits::EnableIfTV<
-						TypeTraits::LogicConst<TypeTraits::IsLambdaConvertibleT<Lambda, bool, const T&, const T&>::State>
-						, bool> = true>
-					ForceInline ThisCollection& SortBy(Lambda&& lambda) {
+					template<typename TLambda> 
+					requires Concepts::IsInvockableWithResult<TLambda, bool, const T&, const T&>
+					ForceInline ThisCollection& SortBy(TLambda&& lambda) {
 						return static_cast<ThisCollection&>(*this).SortByLambdaImpl(lambda);
 					}
 

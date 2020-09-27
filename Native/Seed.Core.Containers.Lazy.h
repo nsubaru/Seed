@@ -23,11 +23,11 @@ namespace Seed
 		/// Лінивий об'єкт
 		/// </summary>
         template<typename THeap, typename T>
-        class BaseLazy final : Memory::Allocator<THeap>, IDisposable, public Containers::LINQ::ILazyGenericBase { //-V1052
+        class BaseLazy final : public Memory::Allocator<THeap>, IDisposable, public Containers::LINQ::ILazyGenericBase { //-V1052
         public:
             using LazyGetter = T(*)();
         private:
-            struct Data : Memory::Allocator<THeap> {
+            struct Data : public Memory::Allocator<THeap> {
                 LazyGetter getter;
                 T* value;
                 RefCountT RefCount;
