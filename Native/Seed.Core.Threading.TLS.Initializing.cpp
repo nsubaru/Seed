@@ -10,13 +10,13 @@ typedef void (__cdecl* _PVFV)(void);
 
 extern "C" {
 
-#pragma section("INIT$XDA",    long, read) // First Dynamic TLS Initializer
-#pragma section("INIT$XDZ",    long, read) // Last Dynamic TLS Initializer
+#pragma section(".INIT$XDA",    long, read) // First Dynamic TLS Initializer
+#pragma section(".INIT$XDZ",    long, read) // Last Dynamic TLS Initializer
 
-#pragma section("INIT$XLA",    long, read) // First Loader TLS Callback
-#pragma section("INIT$XLC",    long, read) // CRT TLS Constructor
-#pragma section("INIT$XLD",    long, read) // CRT TLS Terminator
-#pragma section("INIT$XLZ",    long, read) // Last Loader TLS Callback
+#pragma section(".INIT$XLA",    long, read) // First Loader TLS Callback
+#pragma section(".INIT$XLC",    long, read) // CRT TLS Constructor
+#pragma section(".INIT$XLD",    long, read) // CRT TLS Terminator
+#pragma section(".INIT$XLZ",    long, read) // Last Loader TLS Callback
 
 /*
  * Start and end sections for array of TLS callBacks to initialize individual
@@ -29,9 +29,9 @@ extern "C" {
  * to force inclusion of this support object.
  */
 
-static __declspec(allocate("INIT$XDA")) _PVFV __xd_a = nullptr;
+static __declspec(allocate(".INIT$XDA")) _PVFV __xd_a = nullptr;
 
-static __declspec(allocate("INIT$XDZ")) _PVFV __xd_z = nullptr;
+static __declspec(allocate(".INIT$XDZ")) _PVFV __xd_z = nullptr;
 
 // TRANSITION, toolset update
 #pragma warning(push)
@@ -112,7 +112,7 @@ extern const PIMAGE_TLS_CALLBACK __dyn_tls_init_callback = __dyn_tls_init;
  * the OS knows we want to be notified on each thread startup/shutdown.
  */
 
-static __declspec(allocate("INIT$XLC")) PIMAGE_TLS_CALLBACK __xl_c = __dyn_tls_init;
+static __declspec(allocate(".INIT$XLC")) PIMAGE_TLS_CALLBACK __xl_c = __dyn_tls_init;
 
 /*
  * Helper function invoked by the compiler for on-demand initialization of
@@ -298,7 +298,7 @@ __declspec(allocate(".tls$ZZZ")) char _tls_end = 0;
  * to be walked.
  */
 
-__declspec(allocate("INIT$XLA")) PIMAGE_TLS_CALLBACK __xl_a = __dyn_tls_dtor;
+__declspec(allocate(".INIT$XLA")) PIMAGE_TLS_CALLBACK __xl_a = __dyn_tls_dtor;
 
 /* NULL terminator for TLS callback array.  This symbol, __xl_z, is never
  * actually referenced anywhere, but it must remain.  The OS loader code
@@ -306,7 +306,7 @@ __declspec(allocate("INIT$XLA")) PIMAGE_TLS_CALLBACK __xl_a = __dyn_tls_dtor;
  * sure the array is properly terminated.
  */
 
-__declspec(allocate("INIT$XLZ")) PIMAGE_TLS_CALLBACK __xl_z = 0;
+__declspec(allocate(".INIT$XLZ")) PIMAGE_TLS_CALLBACK __xl_z = 0;
 
 #pragma comment(linker, "/include:__xl_a")
 #pragma comment(linker, "/include:__xl_z")
@@ -319,7 +319,7 @@ extern const IMAGE_TLS_DIRECTORY64 _tls_used =
         (ULONGLONG) &_tls_start,        // start of tls data
         (ULONGLONG) &_tls_end,          // end of tls data
         (ULONGLONG) &_tls_index,        // address of tls_index
-        (ULONGLONG) &__xl_a,        // pointer to call back array
+        (ULONGLONG) &__xl_a,            // pointer to call back array
         (ULONG) 0,                      // size of tls zero fill
         (ULONG) 0                       // characteristics
 };

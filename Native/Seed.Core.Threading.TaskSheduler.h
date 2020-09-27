@@ -1,6 +1,5 @@
 #pragma once
 #include "Seed.Core.Threading.Base.h"
-#include "Seed.Core.DateTime.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -20,7 +19,7 @@ namespace Seed {
 				/// Тіло задачі
 				/// </summary>
 				/// <param name="startTimeUtc">Час виклику в UTC форматі</param>
-				virtual void Execute(DateTime startTimeUtc) volatile = 0;
+				virtual void Execute(Time::DateTime startTimeUtc) volatile = 0;
 			public:
 				virtual ~ITask() = 0 {}
 			};
@@ -88,9 +87,13 @@ namespace Seed {
 				Data* This;
 			private:
 				/// <summary>
-				/// Ініціалізація панувальник задач на базі пулу потоків
+				/// Ініціалізація планувальник задач на базі пулу потоків
 				/// </summary>
 				SeedKernelCall void InitTaskSheduler();
+				/// <summary>
+				/// Ініціалізація планувальник задач на базі пулу потоків
+				/// </summary>
+				SeedKernelCall void InitTaskSheduler(UInt32 minThreadCount, UInt32 maxThreadCount);
 				/// <summary>
 				/// Конструктор планувальник задач на базі пулу потоків
 				/// </summary>
@@ -113,7 +116,7 @@ namespace Seed {
 				/// <summary>
 				/// Знищення пулу
 				/// </summary>
-				ForceInline virtual void Dispose() override final;
+				virtual void Dispose() override final;
 			public:
 				/// <summary>
 				/// Створення безіменного планувальник задач на базі пулу потоків
@@ -129,6 +132,22 @@ namespace Seed {
 				/// </summary>
 				/// <param name="Name">Ім'я пулу</param>
 				ForceInline TaskSheduler(String&& Name) : This(new Data(MoveRValue(Name))) { InitTaskSheduler(); }
+
+				/// <summary>
+				/// Створення безіменного планувальник задач на базі пулу потоків
+				/// </summary>
+				ForceInline TaskSheduler(UInt32 minThreadCount, UInt32 maxThreadCount) : This(new Data("Unnamed Task Sheduler")) { InitTaskSheduler(minThreadCount, maxThreadCount); }
+				/// <summary>
+				/// Створення іменого планувальник задач на базі пулу потоків
+				/// </summary>
+				/// <param name="Name">Ім'я пулу</param>
+				ForceInline TaskSheduler(const String& Name, UInt32 minThreadCount, UInt32 maxThreadCount) : This(new Data(Name)) { InitTaskSheduler(minThreadCount, maxThreadCount); }
+				/// <summary>
+				/// Створення іменого планувальник задач на базі пулу потоків
+				/// </summary>
+				/// <param name="Name">Ім'я пулу</param>
+				ForceInline TaskSheduler(String&& Name, UInt32 minThreadCount, UInt32 maxThreadCount) : This(new Data(MoveRValue(Name))) { InitTaskSheduler(minThreadCount, maxThreadCount); }
+
 				/// <summary>
 				/// Передача задачі в планувальник задач на базі пулу потоків
 				/// </summary>
@@ -194,12 +213,12 @@ namespace Seed {
 					/// <summary>
 					/// Останій час запуску
 					/// </summary>
-					volatile DateTime LastStartTime;
+					volatile Time::DateTime LastStartTime;
 
 					/// <summary>
 					/// Час запуску
 					/// </summary>
-					volatile DateTime StartTime;
+					volatile Time::DateTime StartTime;
 
 					/// <summary>
 					/// Стан потоку задачі
@@ -297,6 +316,7 @@ namespace Seed {
 				friend Boolean IsPoolTerminating(SheduledJob* thread);
 				friend void SetCallbackInstanceObj(SheduledJob* thread, void* callbackObj);
 				friend SRWLock& GetTaskLock(SheduledJob* thread);
+				friend void ZeroingTaskHadle(SheduledJob* thread);
 			protected:
 				/// <summary>
 				/// Знищення об'єкта задачі
@@ -338,7 +358,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="timeOut">Таймаут очікування</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				SeedKernelCall SheduledJob& Join(DateTime timeOut);
+				SeedKernelCall SheduledJob& Join(Time::DateTime timeOut);
 			public:
 				/// <summary>
 				/// Ім'я задачі
@@ -435,7 +455,7 @@ namespace Seed {
 				/// <param name="time">Час виконання</param>
 				/// <param name="isExcecutionTimeRelative">Флаг відносності часу, якщо true то час відносний відносно моменту запуску</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				ForceInline SheduledJobBuilder& SetExecutionTime(DateTime time, Boolean isExcecutionTimeRelative = false) {
+				ForceInline SheduledJobBuilder& SetExecutionTime(Time::DateTime time, Boolean isExcecutionTimeRelative = false) {
 					This->StartTime = time; 
 					this->IsExcecutionTimeRelative = isExcecutionTimeRelative; 
 					return *this;
@@ -445,8 +465,12 @@ namespace Seed {
 				/// </summary>
 				/// <param name="time">Тривалість циклу</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				ForceInline SheduledJobBuilder& SetLoopDuration(DateTime time) {
-					This->PeriodLenght = (Int32) time.TimeFromStartEpoch;
+				ForceInline SheduledJobBuilder& SetLoopDuration(Time::TimeSpan time) {
+					if (time.Ticks > Math::Max<Int32>()) {
+						Throw(InvalidArgumentException(ExceptionPosition, L"time", L"Задовгий період часу вказано"));
+					}
+
+					This->PeriodLenght = static_cast<Int32>(time.Miliseconds);
 					return *this;
 				}
 				/// <summary>
@@ -464,7 +488,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="proximity">Точність таймера для задачі</param>
 				/// <returns>Силку на поточний об'єкт</returns>
-				ForceInline SheduledJobBuilder& SetTimerProximity(DateTime proximity) { This->TimerProximity = (Int32)proximity.TimeFromStartEpoch; return *this; }
+				ForceInline SheduledJobBuilder& SetTimerProximity(Time::DateTime proximity) { This->TimerProximity = (Int32)proximity.TimeFromStartEpoch; return *this; }
 				/// <summary>
 				/// Запуск задачі
 				/// </summary>

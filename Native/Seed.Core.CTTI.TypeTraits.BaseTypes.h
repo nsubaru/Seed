@@ -25,13 +25,7 @@ namespace Seed
 						static constexpr auto CXXTypeName = CTTI::CXXTypeName<T>();
 						static constexpr Boolean IsConvertibleToTuple = TIsConvertibleToTuple;
 
-                        static constexpr Boolean IsContaineSubTypes =
-                            !(
-                            TypeClass == EType::Logic ||
-                            TypeClass == EType::Numeric ||
-                            TypeClass == EType::FloatNumeric ||
-                            TypeClass == EType::Character ||
-                            TypeClass == EType::Pod);
+						static constexpr Boolean IsContaineSubTypes = IsComplexTypes(TypeClass);
 					};
 
 					template<EType TTypeClass, bool TIsSerilizable, bool TIsConst, bool TIsVolatile>

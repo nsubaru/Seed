@@ -296,7 +296,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="timeOut">Таймаут очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
-				SeedKernelCall JobPool& Join(DateTime timeOut);
+				SeedKernelCall JobPool& Join(Time::DateTime timeOut);
 				/// <summary>
 				/// Вказує чи задача існує
 				/// </summary>

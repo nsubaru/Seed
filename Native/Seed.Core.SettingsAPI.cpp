@@ -21,10 +21,23 @@
 using namespace Seed;
 using namespace Seed::Settings;
 
-CurrentSettings::SettingsData CurrentSettingsData;
-CurrentSettings::VirtualSettingData CurrentVirtualSettingsData;
+static Byte SettingsStorage[sizeof(CurrentSettings::SettingsData) + sizeof(CurrentSettings::VirtualSettingData) + sizeof(CurrentSettings::SettingsData)];
 
-CurrentSettings::SettingsData oldCurrentSettingsData;
+CurrentSettings::SettingsData& GetCurrentSettingsData() {
+	return *(CurrentSettings::SettingsData*)SettingsStorage;
+}
+
+CurrentSettings::VirtualSettingData& GetCurrentVirtualSettingsData() {
+	return *(CurrentSettings::VirtualSettingData*)(SettingsStorage + sizeof(CurrentSettings::SettingsData));
+}
+
+CurrentSettings::SettingsData& GetOldCurrentSettingsData() {
+	return *(CurrentSettings::SettingsData*)(SettingsStorage + sizeof(CurrentSettings::SettingsData) + sizeof(CurrentSettings::VirtualSettingData));
+}
+
+#define CurrentSettingsData GetCurrentSettingsData()
+#define CurrentVirtualSettingsData GetCurrentVirtualSettingsData()
+#define OldCurrentSettingsData GetOldCurrentSettingsData()
 
 Threading::SRWLock& GetSettingsLockObj() {
 	static Threading::SRWLock settingsLock;
@@ -52,7 +65,7 @@ namespace Seed {
 		}
 
 		CurrentSettings::SettingsData& CurrentSettings::SetCurrentSettingDataRaw() {
-			oldCurrentSettingsData = CurrentSettingsData;
+			OldCurrentSettingsData = CurrentSettingsData;
 			return CurrentSettingsData;
 		}
 
@@ -62,7 +75,7 @@ namespace Seed {
 				auto callback = GetChangeSettingCallback();
 				if (callback != nullptr)
 				{
-					callback(oldCurrentSettingsData, CurrentSettingsData);
+					callback(OldCurrentSettingsData, CurrentSettingsData);
 				}
 			}
 			catch (...)

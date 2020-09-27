@@ -4,22 +4,3 @@
 #include "Seed.Core.Services.SerilizationService.h"
 
 using namespace Seed;
-
-String Seed::Core::Services::SerilizationService::GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) const {
-	auto& typeRegistry = This->idi.GetTypesRegistry();
-
-	if (typeRegistry.Any([&] (const auto& item) InlineLambda
-	{
-		return item.Key == data.ValueType;
-	}))
-	{
-		auto typeRecord = typeRegistry.First([&] (const auto& item) InlineLambda
-		{
-			return item.Key == data.ValueType;
-		});
-
-		return typeRecord.Value.TypeMetaData;
-	}
-
-	Throw(NotFoundException(ExceptionPosition));
-}

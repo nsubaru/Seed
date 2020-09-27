@@ -6,7 +6,7 @@
 #include "Seed.Core.Math.h"
 #include "Seed.Core.SettingsAPI.h"
 #include "Seed.Core.Memory.h"
-#include "Seed.Core.DateTime.h"
+#include "Seed.Core.Time.Base.h"
 #include "Seed.Core.Containers.NonConcurency.Array.h"
 #include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.Containers.NonConcurency.Map.h"
@@ -520,17 +520,60 @@ namespace Seed
                     return TBaseString(MoveRValue(buffer), sizeof(UUID::UUIDStringWildCard), ReservedSize);
                 }
 
-                ///<summary>Перетворення дати і часу в строкове представлення</summary>
-                ForceInline static TBaseString toString(Seed::Core::Date date) {
-                    Char buffer[22];
+                /// <summary>
+                /// Перетворення дати і часу в рядкове представлення
+                /// </summary>
+                /// <typeparam name="date">Об'єкт дати</typeparam>
+                ForceInline static TBaseString toString(Seed::Core::Time::Date date) {
+                    Char buffer[22] = { 0 };
                     Internals::ConvertDateToStringImpl(date, buffer);
                     return buffer;
                 }
 
-                ///<summary>Перетворення часу і дати в строкове представлення</summary>
-                ForceInline static TBaseString toString(Seed::Core::DateTime time) {
-                    Char buffer[22];
+                /// <summary>
+                /// Перетворення дати і часу в рядкове представлення
+                /// </summary>
+                /// <param name="time">Об'єкт часу і дати</param>
+                ForceInline static TBaseString toString(Seed::Core::Time::DateTime time) {
+                    Char buffer[22] = { 0 };
                     Internals::ConvertDateTimeToStringImpl(time, buffer);
+                    return buffer;
+                }
+
+                /// <summary>
+                /// Перетворення часу і дати в рядкове представлення
+                /// </summary>
+                /// <param name="dateSpan">Об'єкт відрізку дат</param>
+                ForceInline static TBaseString toString(Seed::Core::Time::DateSpan dateSpan) {
+                    Char buffer[22] = { 0 };
+                    auto value = static_cast<Time::DateTime>(time);
+                    Internals::ConvertDateTimeToStringImpl(value, buffer);
+                    return buffer;
+                }
+
+                /// <summary>
+                /// Перетворення часу і дати в рядкове представлення
+                /// </summary>
+                /// <param name="time">Об'єкт відрізку часу</param>
+                ForceInline static TBaseString toString(Seed::Core::Time::TimeSpan time) {
+                    Char buffer[22] = { 0 };
+                    auto value = static_cast<Time::DateTime>(static_cast<Time::DateSpan>(time));
+                    Internals::ConvertDateTimeToStringImpl(value, buffer);
+                    return buffer;
+                }
+
+                /// <summary>
+                /// Перетворення часу і дати в рядкове представлення
+                /// </summary>
+                /// <param name="time">Об'єкт діапазону часу</param>
+                static TBaseString toString(Seed::Core::Time::TimeRange time) {
+                    Char buffer[47] = { 0 };
+                    Internals::ConvertDateTimeToStringImpl(time.StartTime, buffer);
+                    buffer[21] = L' ';
+                    buffer[22] = L'-';
+                    buffer[23] = L' ';
+                    auto value = static_cast<Time::DateTime>(time.StartTime.Ticks + time.Durration.Ticks);
+                    Internals::ConvertDateTimeToStringImpl(value, buffer + 24);
                     return buffer;
                 }
 
@@ -554,6 +597,25 @@ namespace Seed
                     Memory::Copy(array.GetRaw(), str.str, array.Count);
                     str.str[str.CurrentSize] = L'\0';
                     return str;
+                }
+
+                /// <summary>
+                /// Перетворення перелічення в рядкове представлення
+                /// </summary>
+                /// <typeparam name="enumValue">Числове значення перелічення</typeparam>
+                template<typename T> requires TypeTraits::IsEnumV<T>
+                ForceInline static TBaseString toString(T enumValue) {
+                    return TBaseString::toString((TypeTraits::EnumUnderlyingTypeV<T>)enumValue);
+                }
+
+                /// <summary>
+                /// Перетворення текстового представлення в значення перелічення
+                /// </summary>
+                /// <typeparam name="T">Тип перелічення</typeparam>
+                /// <returns>Значення перелічення</returns>
+                template<typename T> requires TypeTraits::IsEnumV<T>
+                ForceInline T toEnum() const {
+                    return (T) this->toInt<typename TypeTraits::EnumUnderlyingTypeV<T>>();
                 }
 
                 ///<summary>Конвертація з рядкового в бінарне представлення UUID </summary>

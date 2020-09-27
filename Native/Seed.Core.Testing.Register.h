@@ -15,8 +15,9 @@ namespace Seed {
 				/// <summary>
 				/// Запуск тестів
 				/// </summary>
-				/// <returns>Інформацію про результат тестів</returns>
-				static TestPackResult RunAllTest();
+				/// <param name = "isLogging"> Вказує чи необхідно записувати в логи інформаціб про перебіг тестування </param>
+				/// <returns> Інформацію про результат тестів </returns>
+				static TestPackResult RunAllTest(Boolean isLogging = false);
 			public:
 				/// <summary>
 				/// Вертає список завантажених тестів

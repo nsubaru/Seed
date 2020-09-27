@@ -97,7 +97,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="timeOut">Таймаут очікування</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Join(DateTime timeOut);
+				SeedKernelCall Thread& Join(Time::DateTime timeOut);
 				/// <summary>
 				/// Переривання виконання потоку
 				/// </summary>

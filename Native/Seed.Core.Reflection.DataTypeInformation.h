@@ -11,6 +11,12 @@ namespace Seed
 		{
 			using NonSerelizableType = Serilization::NonSerelizableType;
 
+			template<typename THeap>
+			using BaseTypeMetaDataRecord = Serilization::BaseTypeMetaDataRecord<THeap>;
+
+			using TypeMetaDataRecord = Serilization::TypeMetaDataRecord;
+			using SensitiveTypeMetaDataRecord = Serilization::SensitiveTypeMetaDataRecord;
+
 			/// <summary>
 			/// Запис про тип даних(який підтримує серелізацію)
 			/// </summary>
@@ -26,23 +32,41 @@ namespace Seed
 						) -> void
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
-							if (data.GetImplementationTypeInfo() != typeid(T))
-							{
-								Throw(Reflection::InvlaidDynamicFunctionArgs(__FILE__, "SerelizeFrom", __LINE__));
+							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple) {
+								if (data.GetImplementationTypeInfo() != typeid(T))
+								{
+									Throw(Reflection::InvlaidDynamicFunctionArgs(__FILE__, "SerelizeFrom", __LINE__));
+								}
+								else
+								{
+									const T& tuple = data.GetTuple<T>();
+
+									return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::SerilizeImpl
+										(tuple, rawStream, offset, registry);
+								}
 							}
-							else
-							{
-								const T& tuple = data.GetTuple<T>();
-								return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::SerilizeImpl
-											(tuple, rawStream, offset, registry);
+							else {
+								if (data.GetItemsCount() != 1 || data.GetImplementationItem1TypeInfo() != typeid(T))
+								{
+									Throw(Reflection::InvlaidDynamicFunctionArgs(__FILE__, "SerelizeFrom", __LINE__));
+								}
+								else
+								{
+									const T& item = data.GetValue<T>().GetByIdx<0>();
+
+									return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::SerilizeImpl
+										(item, rawStream, offset, registry);
+								}
 							}
 						}
 						else
 						{
-							Throw(NonSerelizableType(__FILE__, "", __LINE__, ExceptionString(CTTI::TypeName<T>())));
+							Throw(NonSerelizableType(__FILE__, "SerelizeFrom", __LINE__, ExceptionString(CTTI::TypeName<T>())));
 						}
+
+						Throw(NonSerelizableType(__FILE__, "SerelizeFrom", __LINE__, ExceptionString(CTTI::TypeName<T>())));
 					};
 
 					static constexpr auto SerelizeFromDynamic = [] (
@@ -53,7 +77,7 @@ namespace Seed
 						) -> void
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							if (data.GetVariableType() != typeid(T))
 							{
@@ -62,6 +86,7 @@ namespace Seed
 							else
 							{
 								const T& tuple = data.GetVariablesTuple<T>();
+
 								return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::SerilizeImpl
 										(tuple, rawStream, offset, registry);
 							}
@@ -79,16 +104,30 @@ namespace Seed
 						UnusedData const Serilization::TypesRegistry& registry
 						) -> void
 					{
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
-						{
-							T object = T();
-							Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DeserelizeImpl(object, rawStream, offset, registry);
-							data = DynamicObject(MoveRValue(object));
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple) {
+							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && Core::TypeTraits::IsConstructible<T>)
+							{
+								T object = T();
+
+								Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DeserelizeImpl(object, rawStream, offset, registry);
+								data = DynamicObject(MoveRValue(object));
+							}
+							else
+							{
+								Throw(NonSerelizableType(__FILE__, "DeserelizeTo", __LINE__, ExceptionString(CTTI::TypeName<T>())));
+							}
 						}
-						else
-						{
-							Throw(NonSerelizableType(__FILE__, "DeserelizeTo", __LINE__, ExceptionString(CTTI::TypeName<T>())));
+						else {
+							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && Core::TypeTraits::IsConstructible<T>) {
+								T object = T();
+
+								Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DeserelizeImpl(object, rawStream, offset, registry);
+								data = DynamicObject(MoveRValue(Containers::Tuple<T>(MoveRValue(object))));
+							}
+							else
+							{
+								Throw(NonSerelizableType(__FILE__, "DeserelizeTo", __LINE__, ExceptionString(CTTI::TypeName<T>())));
+							}
 						}
 					};
 
@@ -99,8 +138,9 @@ namespace Seed
 						UnusedData const Serilization::TypesRegistry& registry
 						) -> void
 					{
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+						if constexpr (Core::TypeTraits::IsConstructible<T> &&
+									  CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							T object = T();
 							Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DeserelizeImpl(object, rawStream, offset, registry);
@@ -116,8 +156,12 @@ namespace Seed
 					{
 						if constexpr (Core::TypeTraits::IsConstructible<T>)
 						{
-							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable &&
-								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
+								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass != CTTI::EType::Tuple))
+							{
+								return DynamicObject(Containers::Tuple<T>());
+							} 
+							else if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 							{
 								return DynamicObject(T{});
 							}
@@ -138,7 +182,7 @@ namespace Seed
 						if constexpr (Core::TypeTraits::IsConstructible<T>)
 						{
 							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable &&
-								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 							{
 								return Containers::Dynamic(T{});
 							}
@@ -159,14 +203,20 @@ namespace Seed
 						) -> SizeT
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+							(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass != CTTI::EType::Tuple))
+						{
+							const T& val = data.GetValue<T>().GetByIdx<0>();
+							return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DataSize
+								(val, registry);
+						} 
+						else if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 						{
 							return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DataSize
 								(data.GetTuple<T>(), registry);
 						}
 						else
 						{
-							return 0;
+							return 0ui64;
 						}
 					};
 
@@ -176,7 +226,7 @@ namespace Seed
 						) -> SizeT
 					{
 						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
-									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Tuple))
+									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							return Serilization::Details::BaseSerlizationHandler<Memory::Heap, T>::DataSize
 								(data.GetVariablesTuple<T>(), registry);
@@ -220,10 +270,12 @@ namespace Seed
 				using DataSizeDynamicFunctionType = SizeT(*)(const Containers::Dynamic&, UnusedData const Serilization::TypesRegistry&);
 			private:
 				struct Data {
-					String typeName;
-					String cxxTypeName;
-					String typeMetaData;
-					Boolean isSereilizable;
+					String TypeName;
+					String CxxTypeName;
+					String TypeMetaData;
+					Boolean IsSereilizable;
+
+					TypeMetaDataRecord TypeShema;
 
 					SerelizeFunctionType serelizeFunction;
 					DeSerelizeFunctionType deSerelizeFunction;
@@ -246,6 +298,8 @@ namespace Seed
 						String&& typeMetaData,
 						Boolean isSereilizable,
 
+						TypeMetaDataRecord&& typeMetaDataRecord,
+
 						SerelizeFunctionType serelizeFunction,
 						DeSerelizeFunctionType deSerelizeFunction,
 						BuilderFunctionType builderFunction,
@@ -259,10 +313,12 @@ namespace Seed
 
 						RTTI::RTTITypeRecord&& typeInfo
 					) :
-						typeName(MoveRValue(typeName)),
-						cxxTypeName(MoveRValue(cxxTypeName)),
-						typeMetaData(MoveRValue(typeMetaData)),
-						isSereilizable(isSereilizable),
+						TypeName(MoveRValue(typeName)),
+						CxxTypeName(MoveRValue(cxxTypeName)),
+						TypeMetaData(MoveRValue(typeMetaData)),
+						IsSereilizable(isSereilizable),
+
+						TypeShema(MoveRValue(typeMetaDataRecord)),
 
 						serelizeFunction(serelizeFunction),
 						deSerelizeFunction(deSerelizeFunction),
@@ -288,10 +344,11 @@ namespace Seed
 				}
 			public:
 				DefStructMetaData(Data,
-					DefStructFieldData(Data, typeName),
-					DefStructFieldData(Data, cxxTypeName),
-					DefStructFieldData(Data, typeMetaData),
-					DefStructFieldData(Data, isSereilizable)
+					DefStructFieldData(Data, TypeName),
+					DefStructFieldData(Data, CxxTypeName),
+					DefStructFieldData(Data, TypeMetaData),
+					DefStructFieldData(Data, IsSereilizable),
+					DefStructFieldData(Data, TypeShema)
 				);
 			public:
 				/// <summary>
@@ -303,6 +360,8 @@ namespace Seed
 					CTTI::CXXTypeName<TypeTraits::RemoveCVRefV<T>>(),
 					Serilization::MetaDataGen<TypeTraits::RemoveCVRefV<T>>(),
 					CTTI::TypeTraits::CTTITypeMetaData<TypeTraits::RemoveCVRefV<T>>::IsSerilizable,
+
+					Serilization::GetTypeRecordForType<TypeTraits::RemoveCVRefV<T>>(),
 
 					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCVRefV<T>>::SerelizeFrom,
 					DataTypeMetaFunctionsBuilder<TypeTraits::RemoveCVRefV<T>>::DeserelizeTo,
@@ -324,7 +383,7 @@ namespace Seed
 				/// </summary>
 				/// <returns>Вертає текстове представлення імені типу</returns>
 				const String& GetTypeName() const {
-					return data->typeName;
+					return data->TypeName;
 				}
 
 				/// <summary>
@@ -332,7 +391,7 @@ namespace Seed
 				/// </summary>
 				/// <returns>Вертає текстове представлення декорованого імені типу</returns>
 				const String& GetCxxTypeName() const {
-					return data->cxxTypeName;
+					return data->CxxTypeName;
 				}
 
 				/// <summary>
@@ -340,7 +399,7 @@ namespace Seed
 				/// </summary>
 				/// <returns>Вертає текстове представлення схеми типу</returns>
 				const String& GetTypeMetaData() const {
-					return data->typeMetaData;
+					return data->TypeMetaData;
 				}
 
 				/// <summary>
@@ -348,7 +407,15 @@ namespace Seed
 				/// </summary>
 				/// <returns>Логічне значення</returns>
 				bool GetIsSerelizableType() const {
-					return data->isSereilizable;
+					return data->IsSereilizable;
+				}
+
+				/// <summary>
+				/// Схема типу
+				/// </summary>
+				/// <returns>Об'єкт схеми типу</returns>
+				const TypeMetaDataRecord& GetTypeShema() const {
+					return data->TypeShema;
 				}
 
 				/// <summary>
@@ -445,6 +512,11 @@ namespace Seed
 				Boolean Property(GetIsSerelizableType) IsSerelizableType;
 
 				/// <summary>
+				/// Вказує чи тип серелізується
+				/// </summary>
+				TypeMetaDataRecord Property(GetTypeShema) TypeShema;
+
+				/// <summary>
 				/// Інформація про тип
 				/// </summary>
 				RTTI::RTTITypeRecord Property(GetTypeInfo) TypeRecord;
@@ -498,8 +570,8 @@ namespace Seed
 				/// <param name="other">Лівий операнд</param>
 				/// <returns>Результат порівняння</returns>
 				bool operator==(const DataTypeRecord& other) const {
-					return this->data->typeInfo == other.data->typeInfo ||
-						this->data->cxxTypeName == other.data->cxxTypeName;
+					return
+						this->data->typeInfo == other.data->typeInfo;
 				}
 
 				/// <summary>

@@ -10,7 +10,7 @@ namespace Seed
 			namespace Details
 			{
 				template<typename T>
-				constexpr bool IsSerilizableStruct = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Struct
+				constexpr bool IsSerilizableStruct = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Struct
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, typename TStruct>
@@ -105,32 +105,32 @@ namespace Seed
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return
-									CTTI::Details::CreateTypeStr("[") +
-									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"[") +
+									FieldMetaData.FieldName +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
-									CTTI::Details::CreateTypeStr("-") +
-									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::CreateTypeStr("]")
+									CTTI::Details::CreateTypeStr(L"-") +
+									CTTI::TypeName<Type>() +
+									CTTI::Details::CreateTypeStr(L"]")
 									+
 									TypeHintFieldsImp<I + 1>();
 							else
 								return
-									CTTI::Details::CreateTypeStr("[") +
-									FieldMetaData.FieldName.Resize<FieldMetaData.FieldName.Count - 1>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"[") +
+									FieldMetaData.FieldName +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
-									CTTI::Details::CreateTypeStr("-") +
+									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
-									CTTI::Details::CreateTypeStr("-") +
-									CTTI::TypeName<Type>().Resize<CTTI::TypeName<Type>().Count - 1>() +
-									CTTI::Details::CreateTypeStr("]");
+									CTTI::Details::CreateTypeStr(L"-") +
+									CTTI::TypeName<Type>() +
+									CTTI::Details::CreateTypeStr(L"]");
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr("");
+							return CTTI::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -150,7 +150,7 @@ namespace Seed
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr("");
+							return CTTI::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -177,25 +177,62 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<TStruct>().Resize<CTTI::TypeName<TStruct>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<TStruct>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TStruct>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TStruct)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeMetaDataFieldsImp() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
+
+					template<SizeT I = 0>
+					ForceInline static Containers::BaseList<THeap, BaseTypeMetaDataRecord<THeap>> GetFieldsTypeMetaDataRecord() {
+						if constexpr (I < StructFieldsMetaData.Count)
+						{
+							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
+							using Type = decltype(FieldMetaData)::Type;
+
+							if constexpr (I + 1 < StructFieldsMetaData.Count)
+								return
+									Containers::BaseList<THeap, BaseTypeMetaDataRecord<THeap>>{
+										BaseSerlizationHandler<THeap, Type>::GetTypeMetaDataRecord()
+									}
+									+=
+										GetFieldsTypeMetaDataRecord<I + 1>();
+							else
+								return
+									Containers::BaseList<THeap, BaseTypeMetaDataRecord<THeap>>{
+										BaseSerlizationHandler<THeap, Type>::GetTypeMetaDataRecord()
+									};
+								}
+						else
+						{
+							return Containers::BaseList<THeap, BaseTypeMetaDataRecord<THeap>>{};
+						}
+					}
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<TStruct>(),
+							CTTI::TypeTraits::CTTITypeMetaData<TStruct>::TypeClass,
+							sizeof(TStruct),
+							0,
+							TypeHint(),
+							GetFieldsTypeMetaDataRecord()
+						);
+					}
 				};
 			}
 		}

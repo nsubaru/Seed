@@ -7,6 +7,7 @@
 #include "Seed.Core.CTTI.TypeTraits.Pod.h"
 #include "Seed.Core.CTTI.TypeTraits.Struct.h"
 #include "Seed.Core.CTTI.TypeTraits.StructDefintionBuild.h"
+#include "Seed.Core.CTTI.TypeTraits.StructRemoteDefinition.h"
 
 namespace Seed
 {

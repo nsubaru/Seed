@@ -7,13 +7,14 @@
 
 namespace Seed {
 	inline namespace Core {
-		class SeedKernelCall Tokenizer final {
+		template<typename THeap>
+		class BaseTokenizer final : Memory::Allocator<THeap> {
 		private:
 			struct Data;
 		public:
 			class Token;
 
-			class TokenView {
+			class TokenView : Memory::Allocator<THeap> {
 				const Token& This;
 			public:
 				TokenView(const Token& This) : This(This) {}
@@ -33,31 +34,43 @@ namespace Seed {
 						Throw(Exceptions::IndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, This.Size));
 				}
 
-				operator String() const {
+				operator BaseString<THeap>() const {
+					return this->GetValue();
+				}
+
+				BaseString<THeap> GetValue() const {
 					return String(This.Text->GetCharStr() + This.OffSet, This.Size);
 				}
 
-				const String& GetDelimiter() {
+				const BaseString<THeap>& GetDelimiter() const  {
 					return This.Text->data->Delims[This.DelimIndex];
 				}
+
+				SizeT GetValueSize() const {
+					return This.Size;
+				}
+			public:
+				BaseString<THeap> Property(GetValue) Value;
+				BaseString<THeap> Property(GetDelimiter) Delimiter;
+				SizeT Property(GetValueSize) ValueSize;
 			};
 
-			class SeedKernelCall Token final {
-				Tokenizer* Text;
+			class Token final : Memory::Allocator<THeap> {
+				BaseTokenizer* Text;
 				SizeT OffSet;
 				SizeT Size;
 				SizeT DelimIndex;
 
 			public:
-				friend class Tokenizer;
+				friend class BaseTokenizer;
 				friend class TokenView;
-				friend struct Tokenizer::Data;
+				friend struct BaseTokenizer::Data;
 			private:
-				Token(Tokenizer* Text, SizeT OffSet, SizeT Size, SizeT DelimIndex)
+				Token(BaseTokenizer* Text, SizeT OffSet, SizeT Size, SizeT DelimIndex)
 					:Text(Text), OffSet(OffSet), Size(Size), DelimIndex(DelimIndex)
 				{}
 			public:
-				Token(const Token& orig) : Text(new Tokenizer(*orig.Text)), OffSet(orig.OffSet), Size(orig.Size), DelimIndex(orig.DelimIndex) {};
+				Token(const Token& orig) : Text(new BaseTokenizer(*orig.Text)), OffSet(orig.OffSet), Size(orig.Size), DelimIndex(orig.DelimIndex) {};
 				Token(Token&& from) : Text(from.Text), OffSet(from.OffSet), Size(from.Size), DelimIndex(from.DelimIndex) { from.Text = nullptr; from.OffSet = from.Size = from.DelimIndex = 0; };
 				Token& operator=(const Token& orig) {
 					this->~Token();
@@ -78,6 +91,10 @@ namespace Seed {
 				}
 
 				TokenView operator*() {
+					return GetView();
+				}
+
+				TokenView GetView() {
 					if (Text != nullptr)
 						return TokenView(*this);
 					else
@@ -92,10 +109,8 @@ namespace Seed {
 						return *this;
 					}
 
-					extern Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
-
-					auto [NewOffSet, NewSize, NewDelimIndex] = //-V688
-						GetNextToken(
+					auto [NewOffSet, NewSize, NewDelimIndex] =
+						BaseTokenizer::GetNextToken(
 							this->Text->GetCharStr(),
 							this->Text->GetCharStrSize(),
 							(CharStr*)(const CharStr*)this->Text->data->DelimsRaw,
@@ -125,12 +140,14 @@ namespace Seed {
 					Text = nullptr;
 					OffSet = Size = DelimIndex = 0;
 				}
+			public:
+				TokenView Property(GetView) View;
 			};
 
 			friend class Token;
 			friend class TokenView;
 		private:
-			struct Data {
+			struct Data : Memory::Allocator<THeap> {
 				union {
 					struct ParentTokenData {
 						Token ParentToken;
@@ -142,7 +159,7 @@ namespace Seed {
 					};
 
 					ParentTokenData ParentToken;
-					String Text;
+					BaseString<THeap> Text;
 				};
 
 				enum class DataTypes {
@@ -151,13 +168,13 @@ namespace Seed {
 
 				DataTypes DataType;
 
-				Containers::Array<String> Delims;
+				Containers::Array<BaseString<THeap>> Delims;
 				Containers::Array<CharStr> DelimsRaw;
 				Containers::Array<SizeT> DelimsSize;
 
 				SizeT RefCount;
 
-				Data(const String& Text, const Containers::Array<String>& Delims) :
+				Data(const String& Text, const Containers::Array<BaseString<THeap>>& Delims) :
 					DataType(DataTypes::String),
 					Text(Text), Delims(Delims),
 					DelimsRaw(Delims.Count),
@@ -167,7 +184,7 @@ namespace Seed {
 					LoadCachesData();
 				}
 
-				Data(const Token& ParentToken, const Containers::Array<String>& Delims) :
+				Data(const Token& ParentToken, const Containers::Array<BaseString<THeap>>& Delims) :
 					DataType(DataTypes::ParentToken),
 					ParentToken(ParentToken, ParentToken.Text->GetCharStr(), ParentToken.Text->GetCharStrSize()),
 					Delims(Delims),
@@ -182,7 +199,7 @@ namespace Seed {
 					for (SizeT i = 0; i < Delims.Count; i++)
 					{
 						DelimsRaw[i] = const_cast<CharStr>(static_cast<ConstCharStr>(Delims[i]));
-						DelimsSize[i] = Delims[i].Size;
+						DelimsSize[i] = Delims[i].Lenght;
 					}
 				}
 
@@ -202,10 +219,35 @@ namespace Seed {
 
 			Data* data;
 		private:
-			//struct TokenPos { SizeT OffSet; SizeT Size; };
+			static Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(const CharStr Text, SizeT Size, CharStr* Delims, SizeT* DelimSizes, SizeT DelimsCount, SizeT StartSize)
+			{
+				for (SizeT i = StartSize + 1; i < Size; i++)
+				{
+					for (SizeT j = 0; j < DelimsCount; j++)
+					{
+						if (Text[i] == Delims[j][0] && Size - i > DelimSizes[j]) {
+							SizeT Pos = i;
+							Boolean Found = true;
 
-			//friend auto GetNextToken(CharStr Text, SizeT Size, CharStr* Delims, SizeT* DelimSizes, SizeT DelimsCount, SizeT StartSize = 0);
+							if (DelimSizes[j] > 1) {
+								for (i; i < Pos + DelimSizes[j]; i++)
+								{
+									if (Text[i] != Delims[j][i - Pos]) {
+										Found = false;
+										break;
+									}
+								}
+							}
 
+							if (Found)
+								return Containers::Tuple<SizeT, SizeT, SizeT>(StartSize, i - StartSize, j);
+							else
+								i = Pos;
+						}
+					}
+				}
+				return Containers::Tuple<SizeT, SizeT, SizeT>(StartSize, Size - StartSize, Seed::Math::Max<SizeT>());
+			}
 		private:
 			CharStr GetCharStr() {
 				switch (data->DataType) {
@@ -227,12 +269,10 @@ namespace Seed {
 				__assume(false);
 			}
 		public:
-			Tokenizer(const String& Text, const Containers::Array<String>& Delims) : data(new Data(Text, Delims)) {}
-			Tokenizer(const Token& ParentToken, const Containers::Array<String>& Delims) : data(new Data(ParentToken, Delims)) {}
+			BaseTokenizer(const String& Text, const Containers::Array<BaseString<THeap>>& Delims) : data(new Data(Text, Delims)) {}
+			BaseTokenizer(const Token& ParentToken, const Containers::Array<BaseString<THeap>>& Delims) : data(new Data(ParentToken, Delims)) {}
 
 			Token begin() {
-				extern Containers::Tuple<SizeT, SizeT, SizeT> GetNextToken(const CharStr Text, SizeT Size, CharStr * Delims, SizeT * DelimSizes, SizeT DelimsCount, SizeT StartSize);
-
 				auto [OffSet, Size, DelimIndex] =
 					GetNextToken(
 						GetCharStr(),
@@ -244,12 +284,14 @@ namespace Seed {
 				if (OffSet == 0 && Size == 0 && DelimIndex == 0)
 					return Token(nullptr, -1, -1, -1);
 				else
-					return Token(new Tokenizer(*this), OffSet, Size, DelimIndex);
+					return Token(new BaseTokenizer(*this), OffSet, Size, DelimIndex);
 			}
 
 			Token end() {
 				return Token(nullptr, Math::Max<SizeT>(), Math::Max<SizeT>(), Math::Max<SizeT>());
 			}
+		public:
+			friend class Token;
 		};
 	}
 }

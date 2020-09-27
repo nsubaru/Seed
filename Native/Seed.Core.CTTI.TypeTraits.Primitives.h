@@ -68,7 +68,7 @@ namespace Seed
 #pragma region Character
 					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<UChar, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<UChar, EType::Character, true, TIsConst, TIsVolatile>
 					{
-						static constexpr auto CodePage = CTTI::Details::CreateTypeStr("UTF-16LE");
+						static constexpr auto CodePage = CTTI::Details::CreateTypeStr(L"UTF-16LE");
 
 						static constexpr UChar Max = static_cast<UChar>(Math::Max<UInt16>());
 						static constexpr UChar Min = static_cast<UChar>(Math::Min<UInt16>());
@@ -80,7 +80,7 @@ namespace Seed
 
 					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<AChar, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<UChar, EType::Character, true, TIsConst, TIsVolatile>
 					{
-						static constexpr auto CodePage = CTTI::Details::CreateTypeStr("ASCII");
+						static constexpr auto CodePage = CTTI::Details::CreateTypeStr(L"ASCII");
 
 						static constexpr AChar Max = static_cast<AChar>(Math::Max<Int8>());
 						static constexpr AChar Min = static_cast<AChar>(Math::Min<Int8>());
@@ -92,7 +92,7 @@ namespace Seed
 
 					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<U8Char, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<UChar, EType::Character, true, TIsConst, TIsVolatile>
 					{
-						static constexpr auto CodePage = CTTI::Details::CreateTypeStr("UTF-8");
+						static constexpr auto CodePage = CTTI::Details::CreateTypeStr(L"UTF-8");
 
 						static constexpr U8Char Max = static_cast<U8Char>(Math::Max<UInt8>());
 						static constexpr U8Char Min = static_cast<U8Char>(Math::Max<UInt8>());
@@ -104,7 +104,7 @@ namespace Seed
 
 					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<U16Char, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<UChar, EType::Character, true, TIsConst, TIsVolatile>
 					{
-						static constexpr auto CodePage = CTTI::Details::CreateTypeStr("UTF-16");
+						static constexpr auto CodePage = CTTI::Details::CreateTypeStr(L"UTF-16");
 
 						static constexpr U16Char Max = static_cast<U16Char>(Math::Max<UInt16>());
 						static constexpr U16Char Min = static_cast<U16Char>(Math::Max<UInt16>());
@@ -116,7 +116,7 @@ namespace Seed
 
 					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<U32Char, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<UChar, EType::Character, true, TIsConst, TIsVolatile>
 					{
-						static constexpr auto CodePage = CTTI::Details::CreateTypeStr("UTF-32");
+						static constexpr auto CodePage = CTTI::Details::CreateTypeStr(L"UTF-32");
 
 						static constexpr U32Char Max = static_cast<U32Char>(Math::Max<UInt32>());
 						static constexpr U32Char Min = static_cast<U32Char>(Math::Max<UInt32>());
@@ -162,29 +162,6 @@ namespace Seed
                         : CTTIEnumTypeDataImpl<typename Seed::TypeTraits::RemoveCV<T>, Seed::TypeTraits::IsConstV<T>, Seed::TypeTraits::IsVolatileV<T>> {
 
                     };
-#pragma endregion
-#pragma region Date and DateTime
-					template<bool TIsConst, bool TIsVolatile> 
-					struct CTTITypeDataImpl<DateTime, TIsConst, TIsVolatile> : 
-						BaseCTTITypeDataImpl<DateTime, EType::NtTime, true, TIsConst, TIsVolatile>
-					{
-						using NumericType = UInt64;
-						using NumericTypeMetaData = CTTITypeMetaData<NumericType>;
-					};
-
-					template<bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl<Date, TIsConst, TIsVolatile> : 
-						BaseCTTITypeDataImpl<Date, EType::NtTime, true, TIsConst, TIsVolatile>
-					{
-						using PlainTime = DateTime;
-					};
-
-					template<bool TIsConst, bool TIsVolatile>
-					struct CTTITypeDataImpl<DateSpan, TIsConst, TIsVolatile> : 
-						BaseCTTITypeDataImpl<DateSpan, EType::NtTime, true, TIsConst, TIsVolatile>
-					{
-						using PlainTime = DateTime;
-					};
 #pragma endregion
 				}
 			}

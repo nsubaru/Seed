@@ -20,7 +20,7 @@ bool Seed::Core::Testing::Test::CTTI::ToTuple::Excecute() {
 
 	Asserts::AssertTrue([] () InlineLambda
 	{
-		return Core::CTTI::TypeTraits::CTTITypeMetaData<Data>::TypeClass == Core::CTTI::TypeTraits::EType::Struct;
+		return Core::CTTI::TypeTraits::CTTITypeMetaData<Data>::TypeClass == Core::CTTI::EType::Struct;
 	});
 
 	Asserts::AssertTrue([] () InlineLambda

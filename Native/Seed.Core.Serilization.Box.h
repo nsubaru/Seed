@@ -11,7 +11,7 @@ namespace Seed
             {
                 template<typename T>
                 constexpr bool IsSerilizableBox = 
-                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Box
+                    CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Box
                     &&
                     CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
@@ -31,12 +31,12 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::CreateTypeStr("");
+                            CTTI::Details::CreateTypeStr(L"");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
                         return
-                            CTTI::Details::ToCharStr<sizeof(BaseLazy<TLazyHeap, T>)>();
+                            CTTI::Details::CreateTypeStr(L"0");
                     }
 
                     ForceInline static void DeserelizeImpl(BaseLazy<TLazyHeap, T>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -49,19 +49,30 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<BaseLazy<TLazyHeap, T>>().Resize<CTTI::TypeName<BaseLazy<TLazyHeap, T>>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<BaseLazy<TLazyHeap, T>>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<BaseLazy<TLazyHeap, T>>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(BaseLazy<TLazyHeap, T>)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
+                    }
+
+                    ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+                        return BaseTypeMetaDataRecord<THeap>(
+                            CTTI::TypeName<T>(),
+                            CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+                            sizeof(T),
+                            0,
+                            TypeHint(),
+                            { BaseSerlizationHandler<THeap, ItemType>::GetTypeMetaDataRecord() }
+                        );
                     }
                 };
 
@@ -81,12 +92,12 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::CreateTypeStr("");
+                            CTTI::Details::CreateTypeStr(L"");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
                         return
-                            CTTI::Details::ToCharStr<sizeof(BaseSmartPtr<TSmartPtrHeap, T>)>();
+                            CTTI::Details::CreateTypeStr(L"0");
                     }
 
                     ForceInline static void DeserelizeImpl(BaseSmartPtr<TSmartPtrHeap, T>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -99,19 +110,30 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
+                            CTTI::Details::CreateTypeStr(L"{") +
                             CTTI::TypeName<BaseSmartPtr<TSmartPtrHeap, T>>().Resize<CTTI::TypeName<BaseSmartPtr<TSmartPtrHeap, T>>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<BaseSmartPtr<TSmartPtrHeap, T>>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(BaseSmartPtr<TSmartPtrHeap, T>)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
+                    }
+
+                    ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+                        return BaseTypeMetaDataRecord<THeap>(
+                            CTTI::TypeName<T>(),
+                            CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+                            sizeof(T),
+                            0,
+                            TypeHint(),
+                            { BaseSerlizationHandler<THeap, ItemType>::GetTypeMetaDataRecord() }
+                        );
                     }
                 };
             }

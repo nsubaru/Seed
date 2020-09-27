@@ -20,7 +20,7 @@ namespace Seed
 					Lazy<String> CxxTypeName;
 
 
-					CTTI::TypeTraits::EType TypeClass;
+					CTTI::EType TypeClass;
 					Boolean IsSerilizeable;
 					const TypeInfo* rttiTypeInfo;
 					RefCountT RefCount;
@@ -28,7 +28,7 @@ namespace Seed
 					Data(
 						Lazy<String> && TypeName, 
 						Lazy<String> && CxxTypeName, 
-						CTTI::TypeTraits::EType TypeClass, 
+						CTTI::EType TypeClass, 
 						Boolean IsSerilizeable, 
 						const TypeInfo* rttiTypeInfo
 					) : TypeName(MoveRValue(TypeName)), 
@@ -46,6 +46,13 @@ namespace Seed
 			public:
 				RefCountClass(RTTITypeRecord, data);
 			public:
+				/// <summary>
+				/// Пустий конструктор, не валідний для даного типу
+				/// </summary>
+				ForceInline RTTITypeRecord() : data(nullptr) {
+					Throw(NotImplementedException(ExceptionPosition));
+				}
+
 				/// <summary>
 				/// Конструктор запису типу
 				/// </summary>
@@ -79,7 +86,7 @@ namespace Seed
 				/// Вертає CTTI клас типу
 				/// </summary>
 				/// <returns></returns>
-				ForceInline CTTI::TypeTraits::EType GetCxxTypeClass() const {
+				ForceInline CTTI::EType GetCxxTypeClass() const {
 					return data->TypeClass;
 				}
 
@@ -118,7 +125,7 @@ namespace Seed
 				/// <summary>
 				/// CTTI клас типу
 				/// </summary>
-				CTTI::TypeTraits::EType Property(GetCxxTypeClass)	CxxTypeClass;
+				CTTI::EType				Property(GetCxxTypeClass)	CxxTypeClass;
 				/// <summary>
 				/// Вказує чи тип підтримує серелізацію
 				/// </summary>

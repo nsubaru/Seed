@@ -1,6 +1,6 @@
 #pragma once
-#include "Seed.Core.Stage1.h"
-#include "Seed.Core.DepencyInjection.h"
+#include "Seed.Core.Services.Base.h"
+#include "Seed.Core.Services.BootupServicesManager.h"
 
 namespace Seed
 {
@@ -86,7 +86,7 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::CreateTypeStr("N/A");
+                            CTTI::Details::CreateTypeStr(L"N/A");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
@@ -119,20 +119,30 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<T>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(T)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-							CTTI::Details::CreateTypeStr("|") +
-                            CTTI::Details::CreateTypeStr("") +
-                            CTTI::Details::CreateTypeStr("}");
+							CTTI::Details::CreateTypeStr(L"|") +
+                            CTTI::Details::CreateTypeStr(L"") +
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<T>(),
+							CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+							sizeof(T),
+							0,
+							TypeHint()
+						);
+					}
                 };
 
 				template<typename THeap, typename T>
@@ -186,7 +196,7 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::CreateTypeStr("N/A");
+                            CTTI::Details::CreateTypeStr(L"N/A");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
@@ -219,27 +229,58 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<T>().Resize<CTTI::TypeName<T>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<T>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(T)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-							CTTI::Details::CreateTypeStr("|") +
-                            CTTI::Details::CreateTypeStr("") +
-                            CTTI::Details::CreateTypeStr("}");
+							CTTI::Details::CreateTypeStr(L"|") +
+                            CTTI::Details::CreateTypeStr(L"") +
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<T>(),
+							CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass,
+							sizeof(T),
+							0,
+							TypeHint()
+							);
+					}
                 };
 			}
 		}
 
 		namespace Services
 		{
-			class SerilizationService final : public IDisposable {
+			/// <summary>
+			/// Сервіс серелізації даних
+			/// </summary>
+			class SerilizationService final : public IDisposable, IBootUpService<SerilizationService, DI::IDI> {
+			public:
+				/// <summary>
+				/// Схема сервісу
+				/// </summary>
+				/// <returns>Рантайм опис типу сервіса</returns>
+				static auto GetRttiInformation() {
+					constexpr auto SerilizationServiceDefinition = ObjectDefinition(
+						Services::SerilizationService,
+						NullCtorDescription(Services::SerilizationService),
+						ObjectMethodsDefs(
+							MethodDescription(Services::SerilizationService, SerelizeDynObj),
+							MethodDescription(Services::SerilizationService, DeserelizeDynObj)
+						),
+						ObjectPropsDefs()
+					);
+
+					return GenObjectRTTIRecord(SerilizationServiceDefinition);
+				}
 			private:
 				struct Data {
 					DI::IDI idi;
@@ -252,34 +293,73 @@ namespace Seed
 			protected:
 				virtual void Dispose() override {}
 			public:
+				/// <summary>
+				/// Конструктор завантажує інформацію про типи з сховища типів
+				/// </summary>
+				/// <param name="idi">Сховище типів</param>
 				SerilizationService(const DI::IDI& idi) : This(new Data(idi)) {}
 			public:
-				template<typename T>// requires CTTI::Concepts::IsCttiSerelizable<T>
+				/// <summary>
+				/// Серелізація типу
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <param name="data">Об'єкт даних</param>
+				/// <returns>Масив байтів</returns>
+				template<typename T> requires CTTI::Concepts::IsCttiSerelizable<T>
 				Containers::Blob Serelize(const T& data) const {
 					return Serilization::Serilize(data, This->idi.GetTypesRegistry());
 				}
 
-				template<typename T> requires Concepts::IsConstructibleWith<T>// && CTTI::Concepts::IsCttiSerelizable<T>
+				/// <summary>
+				/// Десерелізація
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <param name="data">Масив байтів який містить дані</param>
+				/// <returns>Об'єкт даних</returns>
+				template<typename T> requires Concepts::IsConstructibleWith<T> && CTTI::Concepts::IsCttiSerelizable<T>
 				T Deserelize(const Containers::Blob& data) const {
 					T val = T();
 					Serilization::Deserilize(data, val, This->idi.GetTypesRegistry());
 					return val;
 				}
 
-				template<typename T>// requires CTTI::Concepts::IsCttiSerelizable<T>
+				/// <summary>
+				/// Вертає рядкове представлення схеми типу
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <returns>Рядкове представлення схеми даних</returns>
+				template<typename T> requires CTTI::Concepts::IsCttiSerelizable<T>
 				String GetTypeMetaData() const {
 					return Serilization::MetaDataGen<T>();
 				}
 
+				/// <summary>
+				/// Вертає схему типу
+				/// </summary>
+				/// <typeparam name="T">Тип даних</typeparam>
+				/// <returns>Схема типу</returns>
+				template<typename T> requires CTTI::Concepts::IsCttiSerelizable<T>
+				Serilization::TypeMetaDataRecord GetTypeShema() const {
+					return Serilization::GetTypeRecordForType<T>();
+				}
+				
+				/// <summary>
+				/// Серелізація динамічного об'єкта
+				/// </summary>
+				/// <param name="data">Об'єкт даних</param>
+				/// <returns>Масив байтів</returns>
 				Containers::Blob SerelizeDynObj(const Reflection::DynamicObject& data) const {
 					return Serelize(data);
 				}
 
+				/// <summary>
+				/// Десерелізація в динамічний об'єкт
+				/// </summary>
+				/// <param name="data">Масив байтів</param>
+				/// <returns>Динамічний об'єкт</returns>
 				Reflection::DynamicObject DeserelizeDynObj(const Containers::Blob& data) const {
 					return Deserelize<Reflection::DynamicObject>(data);
 				}
-
-				String GetTypeMetaDataDynObj(const Reflection::DynamicObject& data) const;
 			public:
 				RefCountClass(SerilizationService, This);
 			};

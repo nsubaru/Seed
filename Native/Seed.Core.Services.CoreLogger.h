@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Services.Base.h"
+#include "Seed.Core.Services.BootupServicesManager.h"
 
 #include "Seed.Core.CoreLog.h"
 #include "Seed.Core.CoreLog.Managed.h"
@@ -11,9 +12,27 @@ namespace Seed
 		namespace Services
 		{
 			/// <summary>
-			/// Сервіс логера ядра, надає можливість запису в лог і проглядання записів
+			/// Сервіс логера ядра, надає можливість запису в лог і перегляду записів поточного запуску
 			/// </summary>
-			class SeedKernelCall CoreLogger {
+			class CoreLogger final: IBootUpService<CoreLogger> {
+			public:
+				/// <summary>
+				/// Схема сервісу
+				/// </summary>
+				/// <returns>Рантайм опис типу сервіса</returns>
+				static auto GetRttiInformation() {
+					constexpr auto CoreLoggerServiceDefinition = ObjectDefinition(
+						Services::CoreLogger,
+						NullCtorDescription(Services::CoreLogger),
+						ObjectMethodsDefs(
+							MethodDescription(Services::CoreLogger, ReadLog),
+							MethodDescription(Services::CoreLogger, ToLog)
+						),
+						ObjectPropsDefs()
+					);
+
+					return GenObjectRTTIRecord(CoreLoggerServiceDefinition);
+				}
 			public:
 				CoreLogger() {}
 

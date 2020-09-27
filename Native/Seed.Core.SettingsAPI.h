@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.SettingsAPI.ConstSettings.h"
+#include "Seed.Core.Time.Base.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
 
 namespace Seed {
@@ -64,7 +65,7 @@ namespace Seed {
 						///<summary>Максиальний розмір стеку потоків</summary>
 						SizeT StackStartSize;
 						/// <summary> Таймаут очікуванння на потоки при завершені роботи ядра </summary>
-						SizeT StopKernelThreadsTimeout;
+						Time::TimeSpan StopKernelThreadsTimeout;
 					};
 					///<summary>Налаштування потоків</summary>
 					ThreadCfg Thread;
@@ -75,10 +76,35 @@ namespace Seed {
 					///<summary>Налаштування планувальника задач</summary>
 					struct TaskShedulerCfgT {
 						///<summary>Стандартна роздільна здатність таймера для задач в планувальнику задач</summary>
-						Int32 DefaultTimerProximity;
+						Time::TimeSpan DefaultTimerProximity;
 					};
 					///<summary>Налаштування планувальника задач</summary>
 					TaskShedulerCfgT TaskSheduler;
+
+					/// <summary>
+					/// Налаштування сервісу самотестування
+					/// </summary>
+					struct AutomaticTestingServiceCfgT {
+						/// <summary>
+						/// Таймаут між запусками тестів
+						/// </summary>
+						Time::TimeSpan SelfTestingRetryTimeout;
+
+						/// <summary>
+						/// Кількість збереженних записів про тестування
+						/// </summary>
+						UInt32 SavedTestsCount;
+
+						/// <summary>
+						/// Вказує чи потрібно записувати в логи інформацію про прогресс виконання тестів при тестувані
+						/// </summary>
+						Boolean IsLogTestProcessing;
+					};
+
+					/// <summary>
+					/// Налаштування сервісу самотестування
+					/// </summary>
+					AutomaticTestingServiceCfgT AutomaticTestingServiceCfg;
 				};
 
 				///<summary>Налаштування менеджера пам'яті</summary>
@@ -128,11 +154,17 @@ namespace Seed {
 				InformAboutSettingsChange();
 			}
 		public:
-			///<summary>Налаштування середовища</summary>
+			/// <summary> 
+			/// Налаштування середовища 
+			/// </summary>
 			struct VirtualSettingData {
-				///<summary>Розташування виконавчого файла ядра</summary>
+				/// <summary>
+				/// Розташування виконавчого файла ядра
+				/// </summary>
 				Char KernelExecutableLocation[Math::Max<Int16>()];
-				///<summary>Кількість ядер в хост ситема ядра</summary>
+				/// <summary>
+				/// Кількість ядер в хост ситема ядра
+				/// </summary>
 				UInt64 CpuCoresCount;
 			};
 		private:
@@ -238,23 +270,34 @@ namespace Seed {
 						});
 					}
 				public:
-					///<summary>Стартовий розмір кучі</summary>
+					/// <summary>
+					/// Стартовий розмір кучі
+					/// </summary>
 					SizeT Property(GetStartSize, SetStartSize) StartSize;
-					///<summary>Максимальний розмір кучі
-					///<para>0 - значить без обмежень</para>
-					///</summary>
+					/// <summary>Максимальний розмір кучі
+					/// <para>0 - значить без обмежень</para>
+					/// </summary>
 					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
-					///<summary>Провірка кучі на цілісність при звільнені ділянки пам'яті</summary>
+					/// <summary>
+					/// Провірка кучі на цілісність при звільнені ділянки пам'яті
+					/// </summary>
 					Boolean Property(GetHeapFreeCheck, SetHeapFreeCheck) HeapFreeCheck;
-					///<summary>Провірка хвоста кучі</summary>
+					/// <summary>
+					/// Провірка хвоста кучі
+					/// </summary>
 					Boolean Property(GetHeapTailCheck, SetHeapTailCheck) HeapTailCheck;
-					///<summary>Провірка аргументів при виділенні\звільнені</summary>
+					/// <summary>
+					/// Провірка аргументів при виділенні\звільнені
+					/// </summary>
 					Boolean Property(GetHeapArgsCheck, SetHeapArgsCheck) HeapArgsCheck;
-					///<summary>Провірка кучі при виділенні\звільненні пам'яті</summary>
+					/// <summary>
+					/// Провірка кучі при виділенні\звільненні пам'яті
+					/// </summary>
 					Boolean Property(GetHeapValidationChecks, SetHeapValidationChecks) HeapValidationChecks;
 
-					///<summary>Логування всіх алокацій і звільненнь пам'яті</summary>
+					/// <summary>
+					/// Логування всіх алокацій і звільненнь пам'яті</summary>
 					Boolean Property(GetHeapAllocsLogging, SetHeapAllocsLogging) HeapAllocsLogging;
 				};
 
@@ -353,23 +396,35 @@ namespace Seed {
 						});
 					}
 				public:
-					///<summary>Стартовий розмір кучі</summary>
+					/// <summary>
+					/// Стартовий розмір кучі
+					/// </summary>
 					SizeT Property(GetStartSize, SetStartSize) StartSize;
-					///<summary>Максимальний розмір кучі
-					///<para>0 - значить без обмежень</para>
-					///</summary>
+					/// <summary>Максимальний розмір кучі
+					/// <para>0 - значить без обмежень</para>
+					/// </summary>
 					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
-					///<summary>Провірка кучі на цілісність при звільнені ділянки пам'яті</summary>
+					/// <summary>
+					/// Провірка кучі на цілісність при звільнені ділянки пам'яті
+					/// </summary>
 					Boolean Property(GetHeapFreeCheck, SetHeapFreeCheck) HeapFreeCheck;
-					///<summary>Провірка хвоста кучі</summary>
+					/// <summary>
+					/// Провірка хвоста кучі
+					/// </summary>
 					Boolean Property(GetHeapTailCheck, SetHeapTailCheck) HeapTailCheck;
-					///<summary>Провірка аргументів при виділенні\звільнені</summary>
+					/// <summary>
+					/// Провірка аргументів при виділенні\звільнені
+					/// </summary>
 					Boolean Property(GetHeapArgsCheck, SetHeapArgsCheck) HeapArgsCheck;
-					///<summary>Провірка кучі при виділенні\звільненні пам'яті</summary>
+					/// <summary>
+					/// Провірка кучі при виділенні\звільненні пам'яті
+					/// </summary>
 					Boolean Property(GetHeapValidationChecks, SetHeapValidationChecks) HeapValidationChecks;
 
-					///<summary>Логування всіх алокацій і звільненнь пам'яті</summary>
+					/// <summary>
+					/// Логування всіх алокацій і звільненнь пам'яті
+					/// </summary>
 					Boolean Property(GetHeapAllocsLogging, SetHeapAllocsLogging) HeapAllocsLogging;
 				};
 
@@ -462,13 +517,21 @@ namespace Seed {
 					///</summary>
 					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
-					///<summary>Провірка кучі на цілісність при звільнені ділянки пам'яті</summary>
+					/// <summary>
+					/// Провірка кучі на цілісність при звільнені ділянки пам'яті
+					/// </summary>
 					Boolean Property(GetHeapFreeCheck, SetHeapFreeCheck) HeapFreeCheck;
-					///<summary>Провірка хвоста кучі</summary>
+					/// <summary>
+					/// Провірка хвоста кучі
+					/// </summary>
 					Boolean Property(GetHeapTailCheck, SetHeapTailCheck) HeapTailCheck;
-					///<summary>Провірка аргументів при виділенні\звільнені</summary>
+					/// <summary>
+					/// Провірка аргументів при виділенні\звільнені
+					/// </summary>
 					Boolean Property(GetHeapArgsCheck, SetHeapArgsCheck) HeapArgsCheck;
-					///<summary>Провірка кучі при виділенні\звільненні пам'яті</summary>
+					/// <summary>
+					/// Провірка кучі при виділенні\звільненні пам'яті
+					/// </summary>
 					Boolean Property(GetHeapValidationChecks, SetHeapValidationChecks) HeapValidationChecks;
 				};
 			public:
@@ -548,20 +611,34 @@ namespace Seed {
 					});
 				}
 			public:
-				///<summary>Налаштування стандартної кучі пам'яті</summary>
+				/// <summary>
+				/// Налаштування стандартної кучі пам'яті
+				/// </summary>
 				DefaultHeapT Property(GetDefaultHeap, SetDefaultHeap) DefaultHeap;
-				///<summary>Налаштування чутливої кучі пам'яті</summary>
+				/// <summary>
+				/// Налаштування чутливої кучі пам'яті
+				/// </summary>
 				SensitiveDataHeapT Property(GetSensitiveDataHeap, SetSensitiveDataHeap) SensitiveDataHeap;
-				///<summary>Налаштування кучі для помилок</summary>
+				/// <summary>
+				/// Налаштування кучі для помилок
+				/// </summary>
 				ExceptionHeapT Property(GetExceptionHeap, SetExceptionHeap) ExceptionHeap;
 
-				///<summary>Розмір резервування дял рядкової зміної в кількості символів</summary>
+				/// <summary>
+				/// Розмір резервування дял рядкової зміної в кількості символів
+				/// </summary>
 				SizeT Property(GetStringReserveSize, SetStringReserveSize) StringReserveSize;
-				///<summary>Стандартна максимальна кількість елементів чергів</summary>
+				/// <summary>
+				/// Стандартна максимальна кількість елементів чергів
+				/// </summary>
 				SizeT Property(GetDefaultPriorityQueueMaxSize, SetDefaultPriorityQueueMaxSize) DefaultPriorityQueueMaxSize;
-				///<summary>Розмір резервування для стеку у кількості елементів</summary>
+				/// <summary>
+				/// Розмір резервування для стеку у кількості елементів
+				/// </summary>
 				SizeT Property(GetStackReserveSize, SetStackReserveSize) StackReserveSize;
-				///<summary>Розмір резервування для черги у кількості елементів</summary>
+				/// <summary>
+				/// Розмір резервування для черги у кількості елементів
+				/// </summary>
 				SizeT Property(GetQueueReserveSize, SetQueueReserveSize) QueueReserveSize;
 				/// <summary>Стартовий розмір динамічного циклічного буферу </summary>
 				SizeT Property(GetDynamicCircularBufferStartSize, SetDynamicCircularBufferStartSize) DynamicCircularBufferStartSize;
@@ -599,25 +676,31 @@ namespace Seed {
 						});
 					}
 
-					SizeT GetStopKernelThreadsTimeout() {
+					Time::TimeSpan GetStopKernelThreadsTimeout() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.Threading.Thread.StopKernelThreadsTimeout;
 						});
 					}
-					void SetStopKernelThreadsTimeout(SizeT NewStopKernelThreadsTimeout) {
+					void SetStopKernelThreadsTimeout(Time::TimeSpan NewStopKernelThreadsTimeout) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.Threading.Thread.StopKernelThreadsTimeout = NewStopKernelThreadsTimeout;
 						});
 					}
 				public:
-					///<summary>Стартовий розмір стеку у потоків</summary>
+					/// <summary>
+					/// Стартовий розмір стеку у потоків
+					/// </summary>
 					SizeT Property(GetStackStartSize, SetStackStartSize) StackStartSize;
-					///<summary>Максимальний розмір стеку у потоків</summary>
+					/// <summary>
+					/// Максимальний розмір стеку у потоків
+					/// </summary>
 					SizeT Property(GetStackMaxSize, SetStackMaxSize) StackMaxSize;
-					///<summary>Таймаут очікуванння на потоки при завершені роботи ядра</summary>
-					SizeT Property(GetStopKernelThreadsTimeout, SetStopKernelThreadsTimeout) StopKernelThreadsTimeout;
+					/// <summary>
+					/// Таймаут очікуванння на потоки при завершені роботи ядра
+					/// </summary>
+					Time::TimeSpan Property(GetStopKernelThreadsTimeout, SetStopKernelThreadsTimeout) StopKernelThreadsTimeout;
 				};
 			public:
 				ThreadingCfgT() {}
@@ -625,7 +708,9 @@ namespace Seed {
 				ThreadCfg GetThread() { return ThreadCfg(); }
 				void SetThread(ThreadCfg) {}
 			public:
-				///<summary>Налаштування потоків</summary>
+				/// <summary>
+				/// Налаштування потоків
+				/// </summary>
 				ThreadCfg Property(GetThread, SetThread) Thread;
 			};
 
@@ -635,28 +720,120 @@ namespace Seed {
 				public:
 					TaskShedulerCfgT() {} //-V730
 
-					Int32 GetDefaultTimerProximity() {
+					Time::TimeSpan GetDefaultTimerProximity() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.KernelServicesConfig.TaskSheduler.DefaultTimerProximity;
 						});
 					}
-					void SetDefaultTimerProximity(Int32 NewDefaultTimerProximity) {
+
+					void SetDefaultTimerProximity(Time::TimeSpan NewDefaultTimerProximity) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.KernelServicesConfig.TaskSheduler.DefaultTimerProximity = NewDefaultTimerProximity;
 						});
 					}
 				public:
-					///<summary>Стандартна точність таймера для задач</summary>
-					Int32 Property(GetDefaultTimerProximity, SetDefaultTimerProximity) DefaultTimerProximity;
+					/// <summary>
+					/// Стандартна точність таймера для задач
+					/// </summary>
+					Time::TimeSpan Property(GetDefaultTimerProximity, SetDefaultTimerProximity) DefaultTimerProximity;
+				};
+
+				class AutomaticTestingSerivceCfgT final {
+				public:
+					AutomaticTestingSerivceCfgT() {}
+
+					/// <summary>
+					/// Таймаут між запусками тестів
+					/// </summary>
+					Time::TimeSpan GetSelfTestingRetryTimeout() {
+						return GetCurrentSettingData([](auto& CurrentSettingsData) InlineLambda
+						{
+							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout;
+						});
+					}
+
+					/// <summary>
+					/// Кількість збереженних записів про тестування
+					/// </summary>
+					UInt32 GetSavedTestsCount() {
+						return GetCurrentSettingData([](auto& CurrentSettingsData) InlineLambda
+						{
+							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount;
+						});
+					}
+
+					/// <summary>
+					/// Таймаут між запусками тестів
+					/// </summary>
+					void SetSelfTestingRetryTimeout(Time::TimeSpan value) {
+						SetCurrentSettingData([&](auto& CurrentSettingsData) InlineLambda
+						{
+							CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout = value;
+						});
+					}
+
+					/// <summary>
+					/// Кількість збереженних записів про тестування
+					/// </summary>
+					void GetSavedTestsCount(UInt32 newValue) {
+						SetCurrentSettingData([&](auto& CurrentSettingsData) InlineLambda
+						{
+							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount = newValue;
+						});
+					}
+					
+					/// <summary>
+					/// Вказує чи потрібно записувати в логи інформацію про прогресс виконання тестів при тестувані
+					/// </summary>
+					Boolean GetIsLogTestProcessing() {
+						return GetCurrentSettingData([](auto& CurrentSettingsData) InlineLambda
+						{
+							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.IsLogTestProcessing;
+						});
+					}
+
+					/// <summary>
+					/// Вказує чи потрібно записувати в логи інформацію про прогресс виконання тестів при тестувані
+					/// </summary>
+					void GetIsLogTestProcessing(Boolean newValue) {
+						SetCurrentSettingData([&](auto& CurrentSettingsData) InlineLambda
+						{
+							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.IsLogTestProcessing = newValue;
+						});
+					}
+				public:
+					/// <summary>
+					/// Таймаут між запусками тестів
+					/// </summary>
+					Time::TimeSpan Property(GetSelfTestingRetryTimeout, SetSelfTestingRetryTimeout) SelfTestingRetryTimeout;
+
+					/// <summary>
+					/// Кількість збереженних записів про тестування
+					/// </summary>
+					UInt32 Property(GetSavedTestsCount, GetSavedTestsCount) SavedTestsCount;
+
+					/// <summary>
+					/// Вказує чи потрібно записувати в логи інформацію про прогресс виконання тестів при тестувані
+					/// </summary>
+					Boolean Property(GetIsLogTestProcessing, GetIsLogTestProcessing) IsLogTestProcessing;
 				};
 			public:
 				TaskShedulerCfgT GetTaskSheduler() { return TaskShedulerCfgT(); }
 				void SetTaskSheduler(TaskShedulerCfgT) {}
+
+				AutomaticTestingSerivceCfgT GetAutomaticTestingSerivceCfg() { return AutomaticTestingSerivceCfgT(); }
+				void SetAutomaticTestingSerivceCfg(AutomaticTestingSerivceCfgT) {}
 			public:
-				///<summary>Налаштування сервісу планування задач</summary>
+				/// <summary>
+				/// Налаштування сервісу планування задач
+				/// </summary>
 				TaskShedulerCfgT Property(GetTaskSheduler, SetTaskSheduler) TaskSheduler;
+				/// <summary>
+				/// Налаштування сервісу самотестування
+				/// </summary>
+				AutomaticTestingSerivceCfgT Property(GetAutomaticTestingSerivceCfg, SetAutomaticTestingSerivceCfg) AutomaticTestingServiceCfg;
 			};
 
 			class VirtualSettingDataT final {
@@ -673,9 +850,13 @@ namespace Seed {
 					return GetVirtualSettingDataRaw().CpuCoresCount;
 				}
 			public:
-				///<summary>Повний NT адресс виконавчого файла ядра</summary>
+				/// <summary>
+				/// Повний NT адресс виконавчого файла ядра
+				/// </summary>
 				KernelExcecutableLocationT Property(GetKernelExcecutableLocation) KernelExcecutableLocation;
-				///<summary>Кількість ядер в процесора у робочої системи</summary>
+				/// <summary>
+				/// Кількість ядер в процесора у робочої системи
+				/// </summary>
 				UInt64 Property(GetCpuCoresCount) CpuCoresCount;
 			};
 

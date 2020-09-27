@@ -12,10 +12,10 @@ namespace Seed {
             namespace Details {
                 class CompileStringView {
                 private:
-                    const AChar* ptr;
+                    const Char* ptr;
                     SizeT size;
                 public:
-                    constexpr CompileStringView(const AChar* ptr)
+                    constexpr CompileStringView(const Char* ptr)
                         :ptr(ptr), size(CStr::Size(ptr))
                     {}
 
@@ -42,7 +42,7 @@ namespace Seed {
 
                     template<SizeT N>
                     constexpr auto AsArray() {
-                        ConstexprArray<char, N> ret;
+                        ConstexprArray<Char, N> ret;
                         if constexpr (N == 0)
                         {
                             return ret;
@@ -55,14 +55,14 @@ namespace Seed {
                         }
                     }
 
-                    constexpr SizeT Find(char ch) {
+                    constexpr SizeT Find(Char ch) {
                         for (SizeT i = 0ui64; i < size; i++)
                             if (ptr[i] == ch)
                                 return i;
                         return static_cast<SizeT>(-1);
                     }
 
-                    constexpr SizeT Find(char ch, SizeT StartPos) {
+                    constexpr SizeT Find(Char ch, SizeT StartPos) {
                         for (SizeT i = StartPos; i < size; i++)
                             if (ptr[i] == ch)
                                 return i;
@@ -265,7 +265,7 @@ namespace Seed {
                             suffix--;
                         }
                         suffix = CStr::Size(__FUNCSIG__) - suffix;
-                        return CompileStringView(__FUNCSIG__).Shrink(suffix).Offset(prefix);
+                        return CompileStringView(L"" __FUNCSIG__).Shrink(suffix).Offset(prefix);
                     }
 
 					template <typename U>
@@ -291,7 +291,7 @@ namespace Seed {
 
                 template<typename T>
                 ForceInline constexpr auto TypeName() {
-                    return (Details::type_name<T>().AsArray<Details::type_name_size<T>()>()).Resize<Details::type_name_size<T>() + 1>();
+                    return (Details::type_name<T>().AsArray<Details::type_name_size<T>()>());
                 }
 
                 template<SizeT I>
@@ -306,18 +306,18 @@ namespace Seed {
                         }
                         return Count;
                     }();
-                    ConstexprArray<char, N> ret;
+                    ConstexprArray<Char, N> ret;
                     SizeT i = I; SizeT Pos = 0;
 					if constexpr (I == 0)
 					{
-						ret[0] = '0';
+						ret[0] = L'0';
 						return ret.Reverse();
 					}
 					else
 					{
 						while (i > 0)
 						{
-							ret[Pos] = '0' + i % 10;
+							ret[Pos] = L'0' + i % 10;
 							Pos++; i /= 10;
 						}
 						return ret.Reverse();
@@ -325,16 +325,16 @@ namespace Seed {
                 }
 
                 template <Seed::SizeT N>
-                using fakeStr = Seed::Core::CTTI::Details::ConstexprArray<char, N>;
+                using fakeStr = Seed::Core::CTTI::Details::ConstexprArray<Char, N>;
 
 
                 template <Seed::SizeT N, Seed::SizeT ... Is>
-                ForceInline constexpr fakeStr<sizeof...(Is)> mFSh (char const (& str)[N],
+                ForceInline constexpr fakeStr<sizeof...(Is)> mFSh (Char const (& str)[N],
                                                        Seed::TypeTraits::Indexator<Is...> const &)
                  { return { str[Is]... }; }
 
                 template <Seed::SizeT N>
-                ForceInline constexpr auto CreateTypeStr (char const (& str)[N])
+                ForceInline constexpr auto CreateTypeStr (Char const (& str)[N])
                  { return mFSh(str, Seed::TypeTraits::Indexer<N-1>::Type{}).Reverse(); }
             }
         }

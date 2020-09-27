@@ -11,46 +11,65 @@ namespace Seed
 			/// Динамічний об'єкт, містить у собі кортеж з типів, доступ отримати можна якщо відомий тип
 			/// </summary>
 			class DynamicObject final : IDisposable{
+			public:
+				template<typename THeap, typename T, typename TEnable>
+				friend struct Serilization::Details::BaseSerlizationHandler;
 			private:
 				class IDynamicImpl {
 				public:
-					virtual String GetSerilizationMetadata() const = 0;
+					template<typename THeap, typename T, typename TEnable>
+					friend struct Serilization::Details::BaseSerlizationHandler;
+				public:
+					virtual const String& GetTypeName() const = 0;
+					virtual const String& GetCxxTypeName() const = 0;
+					virtual const String& GetSerilizationMetadata() const = 0;
 					virtual RTTI::RTTITypeRecord GetValueType() const = 0;
 
 					virtual const TypeInfo& GetImplementationTypeInfo() const = 0;
+					virtual const TypeInfo& GetImplementationItem1TypeInfo() const = 0;
+					virtual SizeT GetItemsCount() const = 0;
+
+					virtual const Serilization::TypeMetaDataRecord GetTypeShema() const = 0;
 				public:
 					virtual ~IDynamicImpl() =0 {}
 				};
 
 				template<typename ... TTypes>
 				class DynamicImpl final : public IDynamicImpl {
+				public:
+					template<typename THeap, typename T, typename TEnable>
+					friend struct Serilization::Details::BaseSerlizationHandler;
 				private:
 					using Tuple = Containers::Tuple<TTypes...>;
 				private:
 					Tuple tuple;
-					String typeName;
-					String cxxTypeName;
-					String serelizableMetaData;
+					Lazy<String> typeName;
+					Lazy<String> cxxTypeName;
+					Lazy<String> serelizableMetaData;
+					Lazy<Serilization::TypeMetaDataRecord> typeShema;
 				public:
 					DynamicImpl() : 
 						tuple(), 
-						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
-						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
-						serelizableMetaData(Serilization::MetaDataGen<Tuple>())
+						typeName(ArrowFunct(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName)),
+						cxxTypeName(ArrowFunct(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName)),
+						serelizableMetaData(ArrowFunct(Serilization::MetaDataGen<Tuple>())),
+						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>()))
 					{}
 
 					DynamicImpl(const Tuple & tuple) : 
 						tuple(tuple),
 						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
 						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
-						serelizableMetaData(Serilization::MetaDataGen<Tuple>())
+						serelizableMetaData(Serilization::MetaDataGen<Tuple>()),
+						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>()))
 					{}
 
 					DynamicImpl(Tuple && tuple) : 
 						tuple(MoveRValue(tuple)),
 						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
 						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
-						serelizableMetaData(Serilization::MetaDataGen<Tuple>())
+						serelizableMetaData(Serilization::MetaDataGen<Tuple>()),
+						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>()))
 					{}
 
 					Tuple& GetValue() { return tuple; }
@@ -61,9 +80,27 @@ namespace Seed
 						return type;
 					}
 
-					virtual String GetSerilizationMetadata() const { return serelizableMetaData; }
+					virtual const String& GetTypeName() const { return *typeName; }
+					virtual const String& GetCxxTypeName() const { return *cxxTypeName; }
 
-					virtual const TypeInfo& GetImplementationTypeInfo() const { return typeid(Tuple); }
+					virtual const String& GetSerilizationMetadata() const { return *serelizableMetaData; }
+
+					virtual const TypeInfo& GetImplementationTypeInfo() const { 
+						return typeid(Tuple);
+					}
+
+					virtual const TypeInfo& GetImplementationItem1TypeInfo() const { 
+						if constexpr (Tuple::Count == 0) {
+							Throw(NotImplementedException(ExceptionPosition));
+						}
+						else {
+							return typeid(typename Tuple::ItemType<0>);
+						}
+					}
+
+					virtual const Serilization::TypeMetaDataRecord GetTypeShema() const { return *typeShema; }
+
+					virtual SizeT GetItemsCount() const { return Tuple::Count; }
 				public:
 					virtual ~DynamicImpl() override {}
 				};
@@ -119,16 +156,46 @@ namespace Seed
 				RTTI::RTTITypeRecord GetValueType() const { return data->impl->GetValueType(); }
 
 				/// <summary>
-				/// Вертає схему типу для серелізатора
+				/// Вертає рядкове представлення імені типу
+				/// </summary>
+				/// <returns>Рядкове представлення імені типу</returns>
+				const String& GetTypeName() const { return data->impl->GetTypeName(); }
+
+				/// <summary>
+				/// Вертає рядкове представлення cxx імені типу
+				/// </summary>
+				/// <returns>Рядкове представлення cxx імені типу</returns>
+				const String& GetCxxTypeName() const { return data->impl->GetCxxTypeName(); }
+
+				/// <summary>
+				/// Вертає рядкове представлення схеми типу для серелізатора
 				/// </summary>
 				/// <returns>Рядкове представлення схеми типів</returns>
 				const String& GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }
 
 				/// <summary>
-				/// Вертає cxx rtti опис типу
+				/// Вертає cxx rtti опис типу кортежа
 				/// </summary>
 				/// <returns></returns>
 				const TypeInfo& GetImplementationTypeInfo() const { return data->impl->GetImplementationTypeInfo(); }
+
+				/// <summary>
+				/// Вертає cxx rtti опис типу першого елементам кортежу при умові що кортеж містить лише один елемент
+				/// </summary>
+				/// <returns></returns>
+				const TypeInfo& GetImplementationItem1TypeInfo() const { return data->impl->GetImplementationItem1TypeInfo(); }
+
+				/// <summary>
+				/// Вертає кільксть елементва в кортежі
+				/// </summary>
+				/// <returns></returns>
+				SizeT GetItemsCount() const { return data->impl->GetItemsCount(); }
+
+				/// <summary>
+				/// Вертає схему типу для серелізатора
+				/// </summary>
+				/// <returns>Об'єкт схеми типу</returns>
+				const Serilization::TypeMetaDataRecord GetTypeShema() const { return data->impl->GetTypeShema(); }
 
 				/// <summary>
 				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
@@ -202,9 +269,29 @@ namespace Seed
 				RTTI::RTTITypeRecord Property(GetValueType) ValueType;
 
 				/// <summary>
+				/// Ім'я типу який містить кортеж
+				/// </summary>
+				String Property(GetTypeName) TypeName;
+
+				/// <summary>
+				/// Ім'я cxx типу який містить кортеж
+				/// </summary>
+				String Property(GetCxxTypeName) CxxTypeName;
+
+				/// <summary>
 				/// Схема серелізації
 				/// </summary>
+				Serilization::TypeMetaDataRecord Property(GetTypeShema) TypeShema;
+
+				/// <summary>
+				/// Рядкове представлення схеми серелізації
+				/// </summary>
 				String Property(GetSerilizationMetadata) SerilizationMetadata;
+
+				/// <summary>
+				/// Кільксть елементва в кортежі
+				/// </summary>
+				SizeT Property(GetItemsCount) ItemsCount;
 
 				RefCountClass(DynamicObject, data);
 			};

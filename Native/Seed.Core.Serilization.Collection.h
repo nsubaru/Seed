@@ -1,5 +1,5 @@
 #pragma once
-#include "Seed.Core.Serilization.Base.h"
+#include "Seed.Core.Serilization.Core.h"
 
 namespace Seed
 {
@@ -10,7 +10,7 @@ namespace Seed
             namespace Details
             {
 				template<typename T>
-				constexpr bool IsSerilizableString = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::String
+				constexpr bool IsSerilizableString = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::String
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<class THeap> typename TString, typename TStringHeap>
@@ -43,36 +43,47 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<TString<TStringHeap>>().Resize<CTTI::TypeName<TString<TStringHeap>>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<TString<TStringHeap>>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TString<TStringHeap>>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TString<TStringHeap>)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, CharacterType>::TypeMetaData() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static void DeserelizeImpl(TString<TStringHeap>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						SizeT Count;
+						SizeT Count = 0;
 						BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);
 						data = TString<TStringHeap>(reinterpret_cast<const CharStr>(const_cast<Byte*>(rawStream + offset)), (Count - sizeof(CharacterType)) / sizeof(CharacterType));
 						offset += Count;
 					}
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return TypeMetaDataRecord(
+							CTTI::TypeName<TString<TStringHeap>>(),
+							CTTI::TypeTraits::CTTITypeMetaData<TString<TStringHeap>>::TypeClass,
+							sizeof(TString<TStringHeap>),
+							0,
+							TypeHint(),
+							{ BaseSerlizationHandler<THeap, CharacterType>::GetTypeMetaDataRecord() }
+						);
+					}
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizablePair = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Pair
+				constexpr bool IsSerilizablePair = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Pair
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<class THeap, typename TKey, typename TValue> typename TPair, typename TPairHeap, typename TKey, typename TValue>
@@ -92,43 +103,54 @@ namespace Seed
 					}
 
 					ForceInline static constexpr auto TypeHint() {
-						return CTTI::Details::CreateTypeStr("");
+						return CTTI::Details::CreateTypeStr(L"");
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<TPair<TPairHeap, TKey, TValue>>().Resize<CTTI::TypeName<TPair<TPairHeap, TKey, TValue>>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<TPair<TPairHeap, TKey, TValue>>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TPair<TPairHeap, TKey, TValue>>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TPair<TPairHeap, TKey, TValue>)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, TKey>::TypeMetaData() +
 							BaseSerlizationHandler<THeap, TValue>::TypeMetaData() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static void DeserelizeImpl(TPair<TPairHeap, TKey, TValue>& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						TKey key;
-						TValue value;
+						TKey key{};
+						TValue value{};
 						BaseSerlizationHandler<THeap, TKey>::DeserelizeImpl(key, rawStream, offset, registry);
 						BaseSerlizationHandler<THeap, TValue>::DeserelizeImpl(value, rawStream, offset, registry);
 						data = TPair<TPairHeap, TKey, TValue>(MoveRValue(key), MoveRValue(value));
 					}
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<TPair<TPairHeap, TKey, TValue>>(),
+							CTTI::TypeTraits::CTTITypeMetaData<TPair<TPairHeap, TKey, TValue>>::TypeClass,
+							sizeof(TPair<TPairHeap, TKey, TValue>),
+							0,
+							TypeHint(),
+							{ BaseSerlizationHandler<THeap, TKey>::GetTypeMetaDataRecord(), BaseSerlizationHandler<THeap, TValue>::GetTypeMetaDataRecord() }
+						);
+					}
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::Collection
+				constexpr bool IsSerilizableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Collection
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<typename TCollectionHeap, typename T> typename TCollection, typename TCollectionHeap, typename T>
@@ -165,35 +187,35 @@ namespace Seed
 
 					ForceInline static constexpr auto TypeHint() {
 						return
-							CTTI::Details::CreateTypeStr("");
+							CTTI::Details::CreateTypeStr(L"");
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<TCollectionClass>().Resize<CTTI::TypeName<TCollectionClass>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<TCollectionClass>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TCollectionClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && TypeTraits::IsConstructible<T>)
 						{
-							SizeT Count;
+							SizeT Count = 0;
 							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);
 
 							if constexpr (!TCollectionClass::IsDynamic)
@@ -222,10 +244,21 @@ namespace Seed
 							Throw(NullPointException(ExceptionPosition));
 						}
 					}
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<TCollectionClass>(),
+							CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass,
+							sizeof(TCollectionClass),
+							0,
+							TypeHint(),
+							{ BaseSerlizationHandler<THeap, T>::GetTypeMetaDataRecord() }
+						);
+					}
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableFixedCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::FixedCollection
+				constexpr bool IsSerilizableFixedCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::FixedCollection
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				template<typename THeap, template<typename TCollectionHeap, SizeT TSize, typename T> typename TFixedCollection, typename TCollectionHeap, SizeT TSize, typename T>
@@ -262,33 +295,33 @@ namespace Seed
 
 					ForceInline static constexpr auto TypeHint() {
 						return
-							CTTI::Details::ToCharStr<TSize>().Resize<CTTI::Details::ToCharStr<TSize>().Count - 1>();
+							CTTI::Details::ToCharStr<TSize>();
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<TCollectionClass>().Resize<CTTI::TypeName<TCollectionClass>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<TCollectionClass>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TCollectionClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && TypeTraits::IsConstructible<T>)
 						{
 							SizeT Count;
 							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);
@@ -306,10 +339,21 @@ namespace Seed
 							Throw(NullPointException(ExceptionPosition));
 						}
 					}
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<TCollectionClass>(),
+							CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass,
+							sizeof(TCollectionClass),
+							0,
+							TypeHint(),
+							{ BaseSerlizationHandler<THeap, T>::GetTypeMetaDataRecord() }
+						);
+					}
 				};
 
 				template<typename T>
-				constexpr bool IsSerilizableAssociableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::TypeTraits::EType::AssociableCollection
+				constexpr bool IsSerilizableAssociableCollection = CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::AssociableCollection
 					&& CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable;
 
 				constexpr bool f = IsSerilizableAssociableCollection<Containers::Dictionary<Int32>>;
@@ -348,43 +392,61 @@ namespace Seed
 
 					ForceInline static constexpr auto TypeHint() {
 						return
-							CTTI::Details::CreateTypeStr("");
+							CTTI::Details::CreateTypeStr(L"");
 					}
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr("0");
+							CTTI::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr("{") +
-                            CTTI::TypeName<TCollectionClass>().Resize<CTTI::TypeName<TCollectionClass>().Count - 1>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"{") +
+                            CTTI::TypeName<TCollectionClass>() +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             CTTI::Details::ToCharStr<sizeof(TCollectionClass)>() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr("|") +
+                            CTTI::Details::CreateTypeStr(L"|") +
                             BaseSerlizationHandler<THeap, T>::TypeMetaData() +
-                            CTTI::Details::CreateTypeStr("}");
+                            CTTI::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						SizeT Count;
-						BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);
-
-						data = TCollectionClass();
-
-						for (SizeT i = 0; i < Count; i++)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && TypeTraits::IsConstructible<T>)
 						{
-							T tmp = T();
-							BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset, registry);
-							data.UnsafeAdd(MoveRValue(tmp)); 
+							SizeT Count = 0;
+							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);
+
+							data = TCollectionClass();
+
+							for (SizeT i = 0; i < Count; i++)
+							{
+								T tmp = T();
+								BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset, registry);
+								data.UnsafeAdd(MoveRValue(tmp));
+							}
 						}
+						else
+						{
+							Throw(NullPointException(ExceptionPosition));
+						}
+					}
+
+					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
+						return BaseTypeMetaDataRecord<THeap>(
+							CTTI::TypeName<TCollectionClass>(),
+							CTTI::TypeTraits::CTTITypeMetaData<TCollectionClass>::TypeClass,
+							sizeof(TCollectionClass),
+							0,
+							TypeHint(),
+							{ BaseSerlizationHandler<THeap, T>::GetTypeMetaDataRecord() }
+						);
 					}
 				};
             }

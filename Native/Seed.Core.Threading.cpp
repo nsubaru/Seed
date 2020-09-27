@@ -66,7 +66,7 @@ ID Seed::Core::Threading::GetTID()
 	return reinterpret_cast<ID>(NtCurrentThreadId());
 }
 
-void Seed::Core::Threading::Sleep(DateTime time, Boolean IsRelative) //-V813
+void Seed::Core::Threading::Sleep(Time::DateTime time, Boolean IsRelative) //-V813
 {
 	LARGE_INTEGER delay;
 	delay.QuadPart = (IsRelative) ? time.RelativeTime : time.TimeFromStartEpoch;
@@ -128,9 +128,9 @@ namespace Seed {
 				virtual IThreadable& Interupt() { thread->Interupt(); return *this; }
 
 				virtual IThreadable& Join() { thread->Join(); return *this; }
-				virtual IThreadable& Join(DateTime timeOut) { thread->Join(timeOut); return *this; }
+				virtual IThreadable& Join(Time::DateTime timeOut) { thread->Join(timeOut); return *this; }
 				virtual const IThreadable& Join() const { thread->Join(); return *this; }
-				virtual const IThreadable& Join(DateTime timeOut) const { thread->Join(timeOut); return *this; }
+				virtual const IThreadable& Join(Time::DateTime timeOut) const { thread->Join(timeOut); return *this; }
 
 				virtual ~ThreadableThread() override
 				{
@@ -164,9 +164,9 @@ namespace Seed {
 				virtual IThreadable& Interupt() { thread->Interupt(); return *this; }
 
 				virtual IThreadable& Join() { thread->Join(); return *this; }
-				virtual IThreadable& Join(DateTime timeOut) { thread->Join(timeOut); return *this; }
+				virtual IThreadable& Join(Time::DateTime timeOut) { thread->Join(timeOut); return *this; }
 				virtual const IThreadable& Join() const { thread->Join(); return *this; }
-				virtual const IThreadable& Join(DateTime timeOut) const { thread->Join(timeOut); return *this; }
+				virtual const IThreadable& Join(Time::DateTime timeOut) const { thread->Join(timeOut); return *this; }
 
 				virtual ~ThreadableJobPool()
 				{
@@ -200,9 +200,9 @@ namespace Seed {
 				virtual IThreadable& Interupt() { thread->Interupt(); return *this; }
 
 				virtual IThreadable& Join() { thread->Join(); return *this; }
-				virtual IThreadable& Join(DateTime timeOut) { thread->Join(timeOut); return *this; }
+				virtual IThreadable& Join(Time::DateTime timeOut) { thread->Join(timeOut); return *this; }
 				virtual const IThreadable& Join() const { thread->Join(); return *this; }
-				virtual const IThreadable& Join(DateTime timeOut) const { thread->Join(timeOut); return *this; }
+				virtual const IThreadable& Join(Time::DateTime timeOut) const { thread->Join(timeOut); return *this; }
 
 				virtual ~ThreadableSheduledTask()
 				{
@@ -319,7 +319,7 @@ namespace Seed
 				{
 					toCoreLog(L"Помилка: Потік з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
 					thread->Interupt()
-						.Join(CurrentSettings().Threading.Thread.StopKernelThreadsTimeout);
+						.Join(CurrentSettings().Threading.Thread.StopKernelThreadsTimeout.Ticks);
 				});
 				//Kill each exist thread
 				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread) InlineLambda
@@ -399,7 +399,7 @@ namespace Seed
 				return *this;
 			}
 
-			Thread& Thread::Join(DateTime timeOut) //-V813
+			Thread& Thread::Join(Time::DateTime timeOut) //-V813
 			{
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = timeOut.TimeFromStartEpoch;
@@ -797,7 +797,7 @@ namespace Seed
 				return *this;
 			}
 
-			JobPool& JobPool::Join(DateTime timeOut) //-V813
+			JobPool& JobPool::Join(Time::DateTime timeOut) //-V813
 			{
 				LARGE_INTEGER delay;
 				delay.QuadPart = timeOut.TimeFromStartEpoch;
@@ -841,7 +841,7 @@ namespace Seed
 				ReSetName(thread->This->hThread);
 				NtClose(thread->This->hThread);
 				thread->This->State = EThreadabledStates::Ended;
-				if (thread->This->RemainingPeriodsCount == 0 && thread->This->PeriodsCount != 1)
+				if (thread->This->RemainingPeriodsCount == 0 && thread->This->PeriodsCount != 0)
 					TpReleaseTimer(reinterpret_cast<PTP_TIMER>(thread->This->hTask));
 				DestroyTls();
 			}
@@ -864,6 +864,11 @@ namespace Seed
 
 			ForceInline SRWLock& GetTaskLock(SheduledJob* thread) {
 				return thread->This->lock;
+			}
+
+			void ZeroingTaskHadle(SheduledJob* thread)
+			{
+				thread->This->hTask = nullptr;
 			}
 		}
 	}
@@ -888,7 +893,7 @@ VOID NTAPI TaskShedulerTaskCallback(
 			{
 				EntryPoint([&] ()
 				{
-					GetJobEntryPoint(thread).Execute(DateTime::GetCurrentSystemTimeData());
+					GetJobEntryPoint(thread).Execute(Time::DateTime::GetCurrentSystemTimeData());
 				}, thread);
 			}
 			))
@@ -910,6 +915,7 @@ VOID NTAPI TaskShedulerCleanupCallback(
 	if (ObjectContext == NULL)
 		return;
 	Seed::Core::Threading::SheduledJob* This = (Seed::Core::Threading::SheduledJob*)ObjectContext;
+	Seed::Core::Threading::ZeroingTaskHadle(This);
 	delete This;
 }
 
@@ -926,6 +932,38 @@ namespace Seed
 
 				TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(CurrentSettings().VirtualSetting.CpuCoresCount / 2));
 				TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(CurrentSettings().VirtualSetting.CpuCoresCount));
+				TP_POOL_STACK_INFORMATION info;
+				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
+				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
+				TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info);
+				status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
+
+				if (!NT_SUCCESS(status))
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(reinterpret_cast<PTP_CLEANUP_GROUP>(This->cleanupData)), NullPointException::Types::Write));
+
+				This->env = new TP_CALLBACK_ENVIRON;
+				auto threadPoolEnviroment = reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->env);
+
+				threadPoolEnviroment->Version = 3;
+				threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(This->pool);
+				threadPoolEnviroment->CleanupGroup = reinterpret_cast<PTP_CLEANUP_GROUP>(This->cleanupData);
+				threadPoolEnviroment->CleanupGroupCancelCallback = TaskShedulerCleanupCallback;
+				threadPoolEnviroment->RaceDll = NULL;
+				threadPoolEnviroment->ActivationContext = NULL;
+				threadPoolEnviroment->FinalizationCallback = NULL;
+				threadPoolEnviroment->u.Flags = 0;
+				threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
+				threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+			}
+
+			void TaskSheduler::InitTaskSheduler(UInt32 minThreadCount, UInt32 maxThreadCount)
+			{
+				NTSTATUS status = TpAllocPool(reinterpret_cast<PTP_POOL*>(&This->pool), NULL);
+				if (!NT_SUCCESS(status))
+					Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(reinterpret_cast<PTP_POOL*>(&This->pool)), NullPointException::Types::Write));
+
+				TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(minThreadCount));
+				TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(maxThreadCount));
 				TP_POOL_STACK_INFORMATION info;
 				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
 				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
@@ -988,7 +1026,7 @@ namespace Seed
 				if (!NT_SUCCESS(status)) //TODO: Analyse status code to more precision exception generation
 					Throw(NtException(ExceptionPosition, status));
 
-				LARGE_INTEGER DueTime;
+				LARGE_INTEGER DueTime = { 0 };
 
 				DueTime.QuadPart = (this->IsExcecutionTimeRelative) ? This->StartTime.RelativeTime : This->StartTime.TimeFromStartEpoch;
 
@@ -1007,6 +1045,9 @@ namespace Seed
 				{
 					if (This->RemainingPeriodsCount != 0 && This->PeriodsCount != 1)
 						TpReleaseTimer(reinterpret_cast<PTP_TIMER>(This->hTask));
+				}
+
+				if (This->Task != nullptr) {
 					delete This->Task;
 				}
 			}
@@ -1105,7 +1146,7 @@ namespace Seed
 				return *this;
 			}
 
-			SheduledJob& SheduledJob::Join(DateTime timeOut) { //-V813
+			SheduledJob& SheduledJob::Join(Time::DateTime timeOut) { //-V813
 				LARGE_INTEGER delay;
 				delay.QuadPart = timeOut.TimeFromStartEpoch;
 				if (This->State == EThreadabledStates::Starting ||
