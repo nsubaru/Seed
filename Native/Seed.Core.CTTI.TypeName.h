@@ -9,16 +9,41 @@ namespace Seed {
 			namespace TypeNameSpecializations {
 				static constexpr auto CLASS_TYPE_NAME = Details::CreateTypeStr(L"class ");
 				static constexpr auto STRUCT_TYPE_NAME = Details::CreateTypeStr(L"struct ");
+				static constexpr auto ENUM_TYPE_NAME = Details::CreateTypeStr(L"enum ");
+
 
 				template<typename T>
-				struct TTypeName {
+				struct TClassTypeName {
 					ForceInline static constexpr auto TypeName() {
 						if constexpr (CTTI::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
 							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
 						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(STRUCT_TYPE_NAME))
 							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - STRUCT_TYPE_NAME.Count>();
+						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(ENUM_TYPE_NAME))
+							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - ENUM_TYPE_NAME.Count>();
 						else
 							return CTTI::Details::TypeName<T>();
+					}
+				};
+
+				static constexpr auto SEED_CORE_NAMESPACE_PREFIX = Details::CreateTypeStr(L"Seed::Core::");
+
+				static constexpr auto SEED_NAMESPACE_PREFIX = Details::CreateTypeStr(L"Seed::");
+
+				template<typename T>
+				struct TNamespaceTypeName {
+					ForceInline static constexpr auto TypeName() {
+						if constexpr (TClassTypeName<T>::TypeName().IsStartWith(SEED_CORE_NAMESPACE_PREFIX))
+							return SEED_NAMESPACE_PREFIX + TClassTypeName<T>::TypeName().ResizeLeft<TClassTypeName<T>::TypeName().Count - SEED_CORE_NAMESPACE_PREFIX.Count>();
+						else
+							return TClassTypeName<T>::TypeName();
+					}
+				};
+
+				template<typename T>
+				struct TTypeName {
+					ForceInline static constexpr auto TypeName() {
+						return TNamespaceTypeName<T>::TypeName();
 					}
 				};
 #pragma region Specializations for array and reference
@@ -710,6 +735,48 @@ namespace Seed {
 					}
 				};
 #pragma endregion
+#pragma region SmartPtr
+				template<typename T>
+				struct TTypeName<Seed::SmartPtr<T>> {
+					ForceInline static constexpr auto TypeName() {
+						return
+							Details::CreateTypeStr(L"Seed::SmartPtr<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(L">");
+					}
+				};
+
+				template<typename T>
+				struct TTypeName<Seed::SensitiveSmartPtr<T>> {
+					ForceInline static constexpr auto TypeName() {
+						return
+							Details::CreateTypeStr(L"Seed::SensitiveSmartPtr<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(L">");
+					}
+				};
+#pragma endregion
+#pragma region Lazy
+				template<typename T>
+				struct TTypeName<Seed::Lazy<T>> {
+					ForceInline static constexpr auto TypeName() {
+						return
+							Details::CreateTypeStr(L"Seed::Lazy<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(L">");
+					}
+				};
+
+				template<typename T>
+				struct TTypeName<Seed::SensitiveLazy<T>> {
+					ForceInline static constexpr auto TypeName() {
+						return
+							Details::CreateTypeStr(L"Seed::SensitiveLazy<") +
+							TTypeName<T>::TypeName() +
+							Details::CreateTypeStr(L">");
+					}
+				};
+#pragma endregion
 #pragma region String
 				template<>
 				struct TTypeName<Seed::String>
@@ -774,15 +841,6 @@ namespace Seed {
 				{
 					using T = TTemplate<TTypes...>;
 
-					constexpr static auto FullTypeName() {
-						if constexpr (CTTI::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
-							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
-						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(STRUCT_TYPE_NAME))
-							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - STRUCT_TYPE_NAME.Count>();
-						else
-							return CTTI::Details::TypeName<T>();
-					}
-
 					template<typename THead, typename ... TTypes>
 					struct TSubTypeName {
 						constexpr static auto Name() {
@@ -800,10 +858,10 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						if constexpr (sizeof...(TTypes) == 0)
-							return FullTypeName();
+							return TNamespaceTypeName<T>::TypeName(); 
 						else
 							return
-								FullTypeName().Resize<FullTypeName().Find('<') + 1>() + TSubTypeName<TTypes...>::Name() + Details::CreateTypeStr(L">");
+								TNamespaceTypeName<T>::TypeName().Resize<TNamespaceTypeName<T>::TypeName().Find('<') + 1>() + TSubTypeName<TTypes...>::Name() + Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -820,7 +878,7 @@ namespace Seed {
 #pragma endregion
 			}
 #pragma region Public API
-			//<summary>Декороване ім'я типу для серелізації</summary>
+			///<summary>Декороване ім'я типу для серелізації</summary>
 			template<typename T>
 			constexpr auto TypeName() {
 				return TypeNameSpecializations::TTypeName<T>::TypeName();

@@ -178,11 +178,9 @@ Seed::Boolean DisableDllExtensionPolicy() {
 	return NT_SUCCESS(status);
 }
 
-extern volatile Seed::Boolean isFirstBootInProcess;
-
-Seed::Boolean Seed::Core::Init::Protection() noexcept
+Seed::Boolean Seed::Core::Init::Protection(bool isFirstboot) noexcept
 {
-	if (isFirstBootInProcess)
+	if (isFirstboot)
 	{
 		if (!DisableWin32kSystemCalls())
 			return false;

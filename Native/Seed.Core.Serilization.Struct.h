@@ -110,8 +110,6 @@ namespace Seed
 									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
 									CTTI::Details::CreateTypeStr(L"-") +
-									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
-									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>() +
 									CTTI::Details::CreateTypeStr(L"]")
 									+
@@ -122,8 +120,6 @@ namespace Seed
 									FieldMetaData.FieldName +
 									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldOffset)>() +
-									CTTI::Details::CreateTypeStr(L"-") +
-									CTTI::Details::ToCharStr<static_cast<SizeT>(FieldMetaData.FieldSize)>() +
 									CTTI::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>() +
 									CTTI::Details::CreateTypeStr(L"]");

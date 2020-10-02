@@ -7,7 +7,21 @@ namespace Seed {
 	inline namespace Core {
 		///<summary>Конфігурації рантайму  Рем<summary>
 		namespace Settings {
+			/// <summary>
+			/// Ім'я файла з налаштуваннями ядраІ
+			/// </summary>
 			constexpr Char SettingsFileName[16] = L"CoreSettings";
+
+			/// <summary>
+			/// Стартовий розмір стеку головного потоку
+			/// </summary>
+			constexpr UInt64 MainThreadStackStartSize = 512Kb;
+
+			/// <summary>
+			/// Максимальний розмір стеку головного потоку
+			/// </summary>
+			constexpr UInt64 MainThreadStackMaxSize = 1Mb;
+
 			///<summary>Стандартні налаштування рантайму Seed</summary>
 			namespace Default {
 				ForceInline CurrentSettings::SettingsData InitDefaultSettings() {

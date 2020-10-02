@@ -87,11 +87,11 @@ void FormatCurrentTime(Seed::Char* buffer) {
 Seed::Boolean Seed::Core::Init::Loging(void* logFileStructData) noexcept
 {
 	LogFileStructData = (TLogFile*)logFileStructData;
-	BOOLEAN state;
+	BOOLEAN state = FALSE;
 	RtlAdjustPrivilege(SE_TIME_ZONE_PRIVILEGE, TRUE, FALSE, &state);
-	Char raw[sizeof(size_t) + 1024];
+	Char raw[sizeof(size_t) + Math::Max<UInt16>()] = { 0 };
 	UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005 //-V1032 //-V2533
-	UNICODE_STRING name;
+	UNICODE_STRING name = { 0 };
 	{
 		str->Length = 0;
 		str->MaximumLength = 0;

@@ -141,7 +141,7 @@ Boolean Seed::Core::IsFirstStartup() noexcept
 Boolean Seed::Core::Init::SettingsAPI() noexcept
 {
 	{
-		Char raw[sizeof(size_t) + 1024];
+		Char raw[sizeof(size_t) + Math::Max<UInt16>()] = { 0 };
 		UNICODE_STRING* str = (UNICODE_STRING*)raw; //-V2005 //-V1032 //-V2533
 		str->Length = 0;
 		str->MaximumLength = 0;
