@@ -76,8 +76,14 @@ namespace Seed
 					const Tuple& GetValue() const { return tuple; }
 				public:
 					virtual RTTI::RTTITypeRecord GetValueType() const {
-						static auto type = TypeRecord<Tuple>();
-						return type;
+						if constexpr (Tuple::Count == 1) {
+							static auto type = TypeRecord<typename Tuple::ItemType<0>>();
+							return type;
+						}
+						else {
+							static auto type = TypeRecord<Tuple>();
+							return type;
+						}
 					}
 
 					virtual const String& GetTypeName() const { return *typeName; }
@@ -136,6 +142,18 @@ namespace Seed
 				/// Пустий конструктор ініціалізовує пустий кортеж 
 				/// </summary>
 				DynamicObject() : data(new Data(new DynamicImpl(Containers::Tuple<>()))) {}
+				/// <summary>
+				/// Конструктор з даних
+				/// </summary>
+				/// <param name="data">Кортеж даних</param>
+				template<typename ... TTypes> requires (!(sizeof...(TTypes) == 1 && (Concepts::IsSame<DynamicObject, TypeTraits::RemoveCVRefV<TTypes>> && ...)))
+				DynamicObject(const TTypes&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(data)))) {}
+				/// <summary>
+				/// Конструктор з даних
+				/// </summary>
+				/// <param name="data">Кортеж даних</param>
+				template<typename ... TTypes> requires (!(sizeof...(TTypes) == 1 && (Concepts::IsSame<DynamicObject, TypeTraits::RemoveCVRefV<TTypes>> && ...)))
+				DynamicObject(TTypes&&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(ForwardReference<TTypes>(data)...)))){}
 				/// <summary>
 				/// Конструктор з кортежу
 				/// </summary>

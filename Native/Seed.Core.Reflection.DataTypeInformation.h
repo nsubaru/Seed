@@ -31,7 +31,7 @@ namespace Seed
 						UnusedData const Serilization::TypesRegistry& registry
 						) -> void
 					{
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable || 
 									 (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple))
 						{
 							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple) {
@@ -104,7 +104,7 @@ namespace Seed
 						UnusedData const Serilization::TypesRegistry& registry
 						) -> void
 					{
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple) {
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable || CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass == CTTI::EType::Tuple) {
 							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && Core::TypeTraits::IsConstructible<T>)
 							{
 								T object = T();

@@ -17,7 +17,7 @@ namespace Seed
 			class TestResult : IDisposable, public Serilization::ISerilizable<TestResult> {
 			public:
 				enum class EStatus : UInt8 {
-					Success, Failure, Exception
+					Success, Failure, Exception, Canceled
 				};
 			private:
 				struct Data {

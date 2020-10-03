@@ -114,7 +114,7 @@ void Seed::Core::DI::DepencyInjector::Dispose() {
 };
 
 Seed::Core::DI::DepencyInjector::DepencyInjector() : data(new Data()) {
-#define RegisterTypeDef(x) RegisterType<x>(); RegisterType<Containers::Tuple<x>>();
+#define RegisterTypeDef(x) RegisterType<x>(); //RegisterType<Containers::Tuple<x>>();
 	RegisterTypeDef(Int8);
 	RegisterTypeDef(Int16);
 	RegisterTypeDef(Int32);

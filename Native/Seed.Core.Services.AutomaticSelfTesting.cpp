@@ -14,17 +14,24 @@ void Seed::Core::Services::AutomatiSelfTestingService::AutomaticTestingTask::Exe
 
 void Seed::Core::Services::AutomatiSelfTestingService::Dispose()
 {
-	This->testRunnerJob->Interupt().Join();
+	if (This->sheduler != nullptr && This->testRunnerJob != nullptr) {
+		This->testRunnerJob->Interupt().Join();
 
-	delete This->testRunnerJob;
-	delete This->sheduler;
+		delete This->testRunnerJob;
+		delete This->sheduler;
+	}
 }
 
-Seed::Core::Services::AutomatiSelfTestingService::AutomatiSelfTestingService() : This(new Data())
+void Seed::Core::Services::AutomatiSelfTestingService::InitAutoTesting()
 {
+	if (This->sheduler != nullptr || This->testRunnerJob != nullptr)
+	{
+		Throw(InvalidArgumentException(ExceptionPosition, L"", L"Тестування вже виконується"));
+	}
 	auto testSheduler = Threading::TaskSheduler(L"Automatic self tetsing thread pool", 1, 1);
 	auto testTask = testSheduler
 		.NewTask(new AutomaticTestingTask(This))
+		.SetTimerProximity(Time::DateTime(Time::MinutesTicksCount))
 		.SetLoopDuration(Time::TimeSpan(CurrentSettings().KernelServices.AutomaticTestingServiceCfg.SelfTestingRetryTimeout))
 		.SetLoopsCount(Math::Max<Int32>())
 		.SetName(L"Automatic self testing task")
@@ -32,6 +39,18 @@ Seed::Core::Services::AutomatiSelfTestingService::AutomatiSelfTestingService() :
 
 	This->sheduler = new Threading::TaskSheduler(MoveRValue(testSheduler));
 	This->testRunnerJob = new Threading::SheduledJob(MoveRValue(testTask));
+}
+
+void Seed::Core::Services::AutomatiSelfTestingService::StopTesting()
+{
+	if (This->sheduler != nullptr && This->testRunnerJob != nullptr) {
+		This->testRunnerJob->Interupt().Join();
+		delete This->testRunnerJob;
+		delete This->sheduler;
+
+		This->testRunnerJob = nullptr;
+		This->sheduler = nullptr;
+	}
 }
 
 Seed::Core::Testing::TestPackResult Seed::Core::Services::AutomatiSelfTestingService::RunTestsNow(Boolean isLogging)

@@ -7,7 +7,21 @@ namespace Seed {
 	inline namespace Core {
 		///<summary>Конфігурації рантайму  Рем<summary>
 		namespace Settings {
+			/// <summary>
+			/// Ім'я файла з налаштуваннями ядраІ
+			/// </summary>
 			constexpr Char SettingsFileName[16] = L"CoreSettings";
+
+			/// <summary>
+			/// Стартовий розмір стеку головного потоку
+			/// </summary>
+			constexpr UInt64 MainThreadStackStartSize = 512Kb;
+
+			/// <summary>
+			/// Максимальний розмір стеку головного потоку
+			/// </summary>
+			constexpr UInt64 MainThreadStackMaxSize = 1Mb;
+
 			///<summary>Стандартні налаштування рантайму Seed</summary>
 			namespace Default {
 				ForceInline CurrentSettings::SettingsData InitDefaultSettings() {
@@ -71,6 +85,7 @@ namespace Seed {
 							DefaultSettings.Threading.Thread.StackStartSize = 5Mb;
 							DefaultSettings.Threading.Thread.StackMaxSize = 10Mb;
 							DefaultSettings.Threading.Thread.StopKernelThreadsTimeout = Time::TimeSpan().AddMinutes(3);
+							DefaultSettings.Threading.Thread.ThreadCreatingLogging = false;
 						}
 					}
 
@@ -83,7 +98,7 @@ namespace Seed {
 						}
 
 						{
-							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount = 10;
+							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount = Time::WeekTicksCount / Time::MinutesTicksCount;
 							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout = Time::TimeSpan(60 * Time::SecondInNtTime);
 						}
 					}

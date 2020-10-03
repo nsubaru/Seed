@@ -3,9 +3,38 @@
 
 #include "Seed.Core.Services.ExcecutableStatusManagment.h"
 
-extern volatile Seed::Boolean fastReboot;
+#include "Seed.Core.BTLDR.Public.h"
+
+#define SEED_RT_ALLOW_INTERNAL_NT_API
+#include "Seed.Core.Base.NTAPI.h"
+
 
 void Seed::Core::Services::ExcecutableStatusManagmentService::ReloadKernel() {
-	fastReboot = true;
+	Btlrd::SetFastReboot();
 	data->waitableReloadEvent.Set();
+}
+
+Seed::Time::TimeSpan Seed::Core::Services::ExcecutableStatusManagmentService::GetKernelUptime()
+{
+	return Time::TimeSpan(Time::DateTime::GetCurrentSystemTimeData().Ticks - Btlrd::GetProcessInitTime());
+}
+
+Seed::Time::DateTime Seed::Core::Services::ExcecutableStatusManagmentService::GetProcessInitTime()
+{
+	return Time::DateTime(Btlrd::GetProcessInitTime());
+}
+
+Seed::Time::DateTime Seed::Core::Services::ExcecutableStatusManagmentService::GetLastReloadTime()
+{
+	return Time::DateTime(Btlrd::GetLastReloadTime());
+}
+
+void Seed::Core::Services::ExcecutableStatusManagmentService::InPlaceKernelUpdate(String filePath)
+{
+	Throw(NotImplementedException(ExceptionPosition));
+}
+
+Seed::UInt64 Seed::Core::Services::ExcecutableStatusManagmentService::GetReloadsCount()
+{
+	return Btlrd::GetReloadsCount();
 }
