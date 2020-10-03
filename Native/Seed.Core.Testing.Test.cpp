@@ -85,7 +85,7 @@ namespace Seed
 								msg += L" тривалість: ";
 								msg += String::toString(testDurration.Ticks);
 								msg += L" tiks";
-								msg += L", тест не пройдено";
+								msg += L", тест скасовано";
 								toCoreLog(msg);
 							}
 

@@ -74,7 +74,7 @@ namespace Seed
 				/// <summary>
 				/// Конструктор, ініціалізовує автоматичне регулярне тестування
 				/// </summary>
-				AutomatiSelfTestingService();
+				AutomatiSelfTestingService() : This(new Data()) {}
 			public:
 				/// <summary>
 				/// Вертає інформацію про останнє тестування
@@ -107,6 +107,22 @@ namespace Seed
 				Containers::List<Time::TimeRange> GetSavedTestsStartAndDurationTime() const {
 					return This->testsResults.CopyTo<Containers::List>(ArrowFunct(x, x.TestTimeRange));
 				}
+
+				/// <summary>
+				/// Ініціалізація тестування
+				/// </summary>
+				void InitAutoTesting();
+
+				/// <summary>
+				/// Зупинка тестування
+				/// </summary>
+				void StopTesting();
+
+				/// <summary>
+				/// Вказує чи тестування виконується
+				/// </summary>
+				/// <returns>Логічне значення</returns>
+				Boolean GetIsTestingExecutes() { return This->sheduler != nullptr || This->testRunnerJob != nullptr; }
 			public:
 				/// <summary>
 				/// Запуск тестів
@@ -114,6 +130,8 @@ namespace Seed
 				/// <param name = "isLogging"> Вказує чи необхідно записувати в логи інформаціб про перебіг тестування </param>
 				/// <returns> Інформацію про результат тестів </returns>
 				Testing::TestPackResult RunTestsNow(Boolean isLogging = false);
+			public:
+				Boolean Property(GetIsTestingExecutes) IsTestingExecutes;
 			public:
 				RefCountClass(AutomatiSelfTestingService, This);
 			};

@@ -85,6 +85,7 @@ namespace Seed {
 							DefaultSettings.Threading.Thread.StackStartSize = 5Mb;
 							DefaultSettings.Threading.Thread.StackMaxSize = 10Mb;
 							DefaultSettings.Threading.Thread.StopKernelThreadsTimeout = Time::TimeSpan().AddMinutes(3);
+							DefaultSettings.Threading.Thread.ThreadCreatingLogging = false;
 						}
 					}
 
@@ -97,7 +98,7 @@ namespace Seed {
 						}
 
 						{
-							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount = 10;
+							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount = Time::WeekTicksCount / Time::MinutesTicksCount;
 							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout = Time::TimeSpan(60 * Time::SecondInNtTime);
 						}
 					}

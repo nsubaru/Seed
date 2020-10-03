@@ -384,7 +384,17 @@ namespace Seed
 					&id);
 				this->This->State = EThreadabledStates::Starting;
 				this->This->TID = reinterpret_cast<SizeT>(id.UniqueThread);
-				toCoreLog(String::Combine({ L"Запуск потоку з ім'ям \"", this->GetName(), L"\" з ID ", String::toString(this->This->TID), L" з потоку з ID ", String::toString(Threading::GetTID()) }));
+
+				if (CurrentSettings().Threading.Thread.ThreadCreatingLogging) {
+					toCoreLog(
+						String::Combine({ L"Запуск потоку з ім'ям \"", 
+							this->GetName(), 
+							L"\" з ID ", 
+							String::toString(this->This->TID), 
+							L" з потоку з ID ", 
+							String::toString(Threading::GetTID()) }));
+				}
+
 				return *this;
 			}
 
@@ -1092,7 +1102,7 @@ namespace Seed
 			}
 
 			SheduledJob& SheduledJob::Join() {
-				LARGE_INTEGER delay;
+				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = Math::Max<Int64>();
 				if (This->State == EThreadabledStates::Starting ||
 					This->State == EThreadabledStates::Executing ||

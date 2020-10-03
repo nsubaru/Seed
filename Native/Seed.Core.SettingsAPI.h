@@ -66,6 +66,8 @@ namespace Seed {
 						SizeT StackStartSize;
 						/// <summary> Таймаут очікуванння на потоки при завершені роботи ядра </summary>
 						Time::TimeSpan StopKernelThreadsTimeout;
+						/// <summary> Логування створення потоків </summary>
+						Boolean ThreadCreatingLogging;
 					};
 					///<summary>Налаштування потоків</summary>
 					ThreadCfg Thread;
@@ -688,6 +690,20 @@ namespace Seed {
 							CurrentSettingsData.Threading.Thread.StopKernelThreadsTimeout = NewStopKernelThreadsTimeout;
 						});
 					}
+
+					Boolean GetThreadCreatingLogging() {
+						return GetCurrentSettingData([](auto& data) InlineLambda
+						{
+							return data.Threading.Thread.ThreadCreatingLogging;
+						});
+					}
+
+					void SetThreadCreatingLogging(Boolean newValue) {
+						SetCurrentSettingData([&](auto& CurrentSettingsData) InlineLambda
+						{
+							CurrentSettingsData.Threading.Thread.ThreadCreatingLogging = newValue;
+						});
+					}
 				public:
 					/// <summary>
 					/// Стартовий розмір стеку у потоків
@@ -701,6 +717,10 @@ namespace Seed {
 					/// Таймаут очікуванння на потоки при завершені роботи ядра
 					/// </summary>
 					Time::TimeSpan Property(GetStopKernelThreadsTimeout, SetStopKernelThreadsTimeout) StopKernelThreadsTimeout;
+					/// <summary>
+					/// Логування створення потоків 
+					/// </summary>
+					Boolean Property(GetThreadCreatingLogging, SetThreadCreatingLogging) ThreadCreatingLogging;
 				};
 			public:
 				ThreadingCfgT() {}

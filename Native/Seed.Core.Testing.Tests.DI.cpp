@@ -213,15 +213,15 @@ bool Seed::Core::Testing::Test::DI::TestSerilizationService::Excecute() {
 
 	auto serilizationService = injector.Resolve<Core::Services::SerilizationService>();
 
-	auto dynamic = Dynamic(10);
+	auto dynamic = Reflection::DynamicObject(10);
 
 	auto serilizedDynamic = serilizationService.Serelize(dynamic);
 
-	auto dynamicDeserilized = serilizationService.Deserelize<Dynamic>(serilizedDynamic);
+	auto dynamicDeserilized = serilizationService.Deserelize<Reflection::DynamicObject>(serilizedDynamic);
 
 	Asserts::AssertEqual(
-		dynamic.GetVariables<int>().GetByIdx<0>(), 
-		dynamicDeserilized.GetVariables<int>().GetByIdx<0>());
+		dynamic.GetValue<int>().GetByIdx<0>(), 
+		dynamicDeserilized.GetValue<int>().GetByIdx<0>());
 
 	return true;
 }

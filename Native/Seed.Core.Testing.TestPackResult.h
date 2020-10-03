@@ -79,28 +79,46 @@ namespace Seed
 				}
 			public:
 				SizeT GetSucessCount() const {
-					return This->Results.GetCountIf([] (const TestResult& result)
+					return This->Results.GetCountIf([] (const TestResult& result) InlineLambda
 					{
 						return result.Status == TestResult::EStatus::Success;
 					});
 				}
 			public:
 				SizeT GetFailCount() const {
-					return This->Results.GetCountIf([] (const TestResult& result)
+					return This->Results.GetCountIf([] (const TestResult& result) InlineLambda
 					{
 						return result.Status == TestResult::EStatus::Failure;
 					});
 				}
 			public:
 				SizeT GetExceptionCount() const {
-					return This->Results.GetCountIf([] (const TestResult& result)
+					return This->Results.GetCountIf([] (const TestResult& result) InlineLambda
 					{
 						return result.Status == TestResult::EStatus::Exception;
 					});
 				}
 			public:
-				Boolean GetIsAllSucess() const {
+				SizeT GetCanceledCount() const {
+					return This->Results.GetCountIf([](const TestResult& result) InlineLambda
+					{
+						return result.Status == TestResult::EStatus::Canceled;
+					});
+				}
+			public:
+				SizeT GetExecutedCount() const {
+					return This->Results.GetCountIf([](const TestResult& result) InlineLambda
+					{
+						return result.Status != TestResult::EStatus::Canceled;
+					});
+				}
+			public:
+				Boolean GetIsAllSuccess() const {
 					return GetFailCount() == 0 && GetExceptionCount() == 0;
+				}
+			public:
+				Boolean GetIsAllExecuted() const {
+					return GetCanceledCount() == 0;
 				}
 			public:
 				String Property(GetName) Name;
@@ -111,7 +129,10 @@ namespace Seed
 				SizeT Property(GetSucessCount) SucessCount;
 				SizeT Property(GetFailCount) FailCount;
 				SizeT Property(GetExceptionCount) ExceptionCount;
-				Boolean Property(GetIsAllSucess) IsAllSucess;
+				SizeT Property(GetCanceledCount) CanceledCount;
+				SizeT Property(GetExecutedCount) ExecutedCount;
+				Boolean Property(GetIsAllSuccess) IsAllSucess;
+				Boolean Property(GetIsAllExecuted) IsAllExecuted;
 				Containers::List<TestResult> Property(GetResults) Results;
 			public:
 				RefCountClass(TestPackResult, This)
