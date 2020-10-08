@@ -44,11 +44,18 @@ namespace Seed
 
 				Time::DateTime startTime = Time::DateTime::GetCurrentSystemTimeData();
 
-				auto maxTestNameSz = GetAllTests().Max(ArrowFunct(record, record.Key.TypeName.Lenght));
+				auto msg = String();
+				auto maxTestNameSz = 0ULL;
 
-				maxTestNameSz += 10;
+				if (isLogging) {
+					maxTestNameSz = GetAllTests().Max(ArrowFunct(record, record.Key.TypeName.Lenght));
 
-				String msg = (isLogging) ? String(maxTestNameSz + 100Kb) : String();
+					maxTestNameSz += 10;
+
+					String msg = String(Memory::DataSizeT(maxTestNameSz) + 100Kb);
+				}
+
+				
 
 				GetAllTests().ForEach([&](TestRecord& record) InlineLambda {
 					Time::TimeSpan testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks;

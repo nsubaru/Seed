@@ -409,7 +409,7 @@ bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MinBy
 }
 
 bool Seed::Core::Testing::Test::API::Containers::DynamicQueue::Concurency::MultiThreadQueueProcessingDynamicQueue::Excecute() {
-	constexpr auto queueSize = 10Kb;
+	constexpr auto queueSize = (10Kb).Bytes;
 
 	auto queue = Core::Containers::ConcurencyDynamicQueue<SizeT>(queueSize);
 	

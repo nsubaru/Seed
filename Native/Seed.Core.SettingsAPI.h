@@ -1,4 +1,5 @@
 #pragma once
+#include "Seed.Core.Memory.DataSize.h"
 #include "Seed.Core.SettingsAPI.ConstSettings.h"
 #include "Seed.Core.Time.Base.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
@@ -15,9 +16,9 @@ namespace Seed {
 					///<summary>Налаштування кучі</summary>
 					struct HeapCfg {
 						///<summary>Стартовий розмір кучі</summary>
-						Bytes StartSize;
+						Memory::DataSizeT StartSize;
 						///<summary>Максимальний розмір кучі</summary>
-						Bytes MaxSize;
+						Memory::DataSizeT MaxSize;
 
 						///<summary>Додаткові флаги кучі</summary>
 						struct PosibleAdditionalСhecks {
@@ -44,7 +45,7 @@ namespace Seed {
 					///<summary>Куча для помилок</summary>
 					HeapCfg ExceptionHeap;
 
-					///<summary>Розмір резервування для рядків у кількості рядки</summary>
+					///<summary>Розмір резервування для рядків у кількості символів</summary>
 					SizeT StringReserveSize;
 					///<summary>Стандартна максимальна кількість елементів чергів</summary>
 					SizeT DefaultPriorityQueueMaxSize;
@@ -61,9 +62,9 @@ namespace Seed {
 					///<summary>Налаштування потоків</summary>
 					struct ThreadCfg {
 						///<summary>Стартовий розмір стеку потоків</summary>
-						SizeT StackMaxSize;
+						Memory::DataSizeT StackMaxSize;
 						///<summary>Максиальний розмір стеку потоків</summary>
-						SizeT StackStartSize;
+						Memory::DataSizeT StackStartSize;
 						/// <summary> Таймаут очікуванння на потоки при завершені роботи ядра </summary>
 						Time::TimeSpan StopKernelThreadsTimeout;
 						/// <summary> Логування створення потоків </summary>
@@ -181,26 +182,26 @@ namespace Seed {
 				public:
 					DefaultHeapT() {} //-V730
 				public:
-					SizeT GetStartSize() {
+					Memory::DataSizeT GetStartSize() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.DefaultHeap.StartSize;
 						});
 					}
-					void SetStartSize(SizeT NewSize) {
+					void SetStartSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& data) InlineLambda
 						{
 							data.MainMemoryManager.DefaultHeap.StartSize = NewSize;
 						});
 					}
 
-					SizeT GetMaxSize() {
+					Memory::DataSizeT GetMaxSize() {
 						return GetCurrentSettingData([&] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.DefaultHeap.MaxSize;
 						});
 					}
-					void SetMaxSize(SizeT NewSize) {
+					void SetMaxSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.MainMemoryManager.DefaultHeap.MaxSize = NewSize;
@@ -275,11 +276,11 @@ namespace Seed {
 					/// <summary>
 					/// Стартовий розмір кучі
 					/// </summary>
-					SizeT Property(GetStartSize, SetStartSize) StartSize;
+					Memory::DataSizeT Property(GetStartSize, SetStartSize) StartSize;
 					/// <summary>Максимальний розмір кучі
 					/// <para>0 - значить без обмежень</para>
 					/// </summary>
-					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
+					Memory::DataSizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
 					/// <summary>
 					/// Провірка кучі на цілісність при звільнені ділянки пам'яті
@@ -307,26 +308,26 @@ namespace Seed {
 				public:
 					SensitiveDataHeapT() {} //-V730
 				public:
-					SizeT GetStartSize() {
+					Memory::DataSizeT GetStartSize() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.StartSize;
 						});
 					}
-					void SetStartSize(SizeT NewSize) {
+					void SetStartSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.StartSize = NewSize;
 						});
 					}
 
-					SizeT GetMaxSize() {
+					Memory::DataSizeT GetMaxSize() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.MaxSize;
 						});
 					}
-					void SetMaxSize(SizeT NewSize) {
+					void SetMaxSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.MainMemoryManager.SensitiveDataHeap.MaxSize = NewSize;
@@ -401,11 +402,11 @@ namespace Seed {
 					/// <summary>
 					/// Стартовий розмір кучі
 					/// </summary>
-					SizeT Property(GetStartSize, SetStartSize) StartSize;
+					Memory::DataSizeT Property(GetStartSize, SetStartSize) StartSize;
 					/// <summary>Максимальний розмір кучі
 					/// <para>0 - значить без обмежень</para>
 					/// </summary>
-					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
+					Memory::DataSizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
 					/// <summary>
 					/// Провірка кучі на цілісність при звільнені ділянки пам'яті
@@ -434,26 +435,26 @@ namespace Seed {
 				public:
 					ExceptionHeapT() {} //-V730
 				public:
-					SizeT GetStartSize() {
+					Memory::DataSizeT GetStartSize() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.StartSize;
 						});
 					}
-					void SetStartSize(SizeT NewSize) {
+					void SetStartSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.StartSize = NewSize;
 						});
 					}
 
-					SizeT GetMaxSize() {
+					Memory::DataSizeT GetMaxSize() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.MaxSize;
 						});
 					}
-					void SetMaxSize(SizeT NewSize) {
+					void SetMaxSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.MainMemoryManager.ExceptionHeap.MaxSize = NewSize;
@@ -513,11 +514,11 @@ namespace Seed {
 					}
 				public:
 					///<summary>Стартовий розмір кучі</summary>
-					SizeT Property(GetStartSize, SetStartSize) StartSize;
+					Memory::DataSizeT Property(GetStartSize, SetStartSize) StartSize;
 					///<summary>Максимальний розмір кучі
 					///<para>0 - значить без обмежень</para>
 					///</summary>
-					SizeT Property(GetMaxSize, SetMaxSize) MaxSize;
+					Memory::DataSizeT Property(GetMaxSize, SetMaxSize) MaxSize;
 
 					/// <summary>
 					/// Провірка кучі на цілісність при звільнені ділянки пам'яті
@@ -652,26 +653,26 @@ namespace Seed {
 				public:
 					ThreadCfg() {}
 
-					SizeT GetStackStartSize() {
+					Memory::DataSizeT GetStackStartSize() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.Threading.Thread.StackStartSize;
 						});
 					}
-					void SetStackStartSize(SizeT NewSize) {
+					void SetStackStartSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.Threading.Thread.StackStartSize = NewSize;
 						});
 					}
 
-					SizeT GetStackMaxSize() {
+					Memory::DataSizeT GetStackMaxSize() {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.Threading.Thread.StackMaxSize;
 						});
 					}
-					void SetStackMaxSize(SizeT NewSize) {
+					void SetStackMaxSize(Memory::DataSizeT NewSize) {
 						SetCurrentSettingData([&] (auto& CurrentSettingsData) InlineLambda
 						{
 							CurrentSettingsData.Threading.Thread.StackMaxSize = NewSize;
@@ -708,11 +709,11 @@ namespace Seed {
 					/// <summary>
 					/// Стартовий розмір стеку у потоків
 					/// </summary>
-					SizeT Property(GetStackStartSize, SetStackStartSize) StackStartSize;
+					Memory::DataSizeT Property(GetStackStartSize, SetStackStartSize) StackStartSize;
 					/// <summary>
 					/// Максимальний розмір стеку у потоків
 					/// </summary>
-					SizeT Property(GetStackMaxSize, SetStackMaxSize) StackMaxSize;
+					Memory::DataSizeT Property(GetStackMaxSize, SetStackMaxSize) StackMaxSize;
 					/// <summary>
 					/// Таймаут очікуванння на потоки при завершені роботи ядра
 					/// </summary>
@@ -956,7 +957,7 @@ namespace Seed {
 					return Settings::ObjectManagerConfigurations::RemotePathName;
 				}
 
-				constexpr SizeT GetToManyRedirectsTreshold() {
+				constexpr UInt64 GetToManyRedirectsTreshold() {
 					return Settings::ObjectManagerConfigurations::ToManyRedirectsTreshold;
 				}
 			public:

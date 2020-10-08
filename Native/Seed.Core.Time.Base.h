@@ -21,7 +21,7 @@ namespace Seed {
 			/// <summary>
 			/// Кількість тіків в секунді
 			/// </summary>
-			static constexpr UInt64 SecondTicksCount = MiliSecondsTicksCount * 10000ULL;
+			static constexpr UInt64 SecondTicksCount = MiliSecondsTicksCount * 1000ULL;
 			/// <summary>
 			/// Кількість тіків в хвилині
 			/// </summary>

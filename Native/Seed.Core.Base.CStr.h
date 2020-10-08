@@ -10,37 +10,47 @@ namespace Seed {
     inline namespace Core {
         ///<summary>Простір імен функцій для роботи з C-подібними рядковими змінними</summary>
         namespace CStr {
-#pragma inline_recursion(on)
-#pragma inline_depth(256)
         	/// <summary>
         	/// Compile-time функція визначення кількості символів в символьному масиві
         	/// </summary>
         	/// <param name="cStr">Рядкова зміна</param>
         	/// <returns>Кількість елементів в рядковому масиві</returns>
             __forceinline constexpr SizeT Size(const CharStr cStr) noexcept {
-                return *cStr == '\0' ? 0 : Size(cStr + 1) + 1;
+                SizeT i = 0;
+                while (cStr[i] != '\0')
+                {
+                    i++;
+                }
+                return i;
             }
 
-#pragma inline_recursion(on)
-#pragma inline_depth(256)
         	/// <summary>
         	/// Compile-time функція визначення кількості символів в символьному масиві
         	/// </summary>
         	/// <param name="cStr">Рядкова зміна</param>
         	/// <returns>Кількість елементів в рядковому масиві</returns>
             __forceinline constexpr SizeT Size(const Char* cStr) noexcept {
-                return *cStr == '\0' ? 0 : Size(cStr + 1) + 1;
+                SizeT i = 0;
+                while (cStr[i] != '\0')
+                {
+                    i++;
+                }
+                return i;
             }
 
-#pragma inline_recursion(on)
-#pragma inline_depth(256)
+
         	/// <summary>
         	/// Compile-time функція визначення кількості ASCII символів в символьному масиві
         	/// </summary>
         	/// <param name="cStr">Рядкова зміна</param>
         	/// <returns>Кількість елементів в рядковому масиві</returns>
             __forceinline constexpr SizeT Size(const AChar* cStr) noexcept {
-                return *cStr == '\0' ? 0 : Size(cStr + 1) + 1;
+                SizeT i = 0;
+                while (cStr[i] != '\0')
+                {
+                    i++;
+                }
+                return i;
             }
 
         	/// <summary>

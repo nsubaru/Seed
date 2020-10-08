@@ -193,7 +193,7 @@ namespace Seed {
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(this->exceptionName),
-						ExceptionString(L". Не знайдено потоку з ID "), ExceptionString(tid), ExceptionString(L". "),
+						ExceptionString(L". Не знайдено потоку з ID "), ExceptionString::toString(tid), ExceptionString(L". "),
 						Location.toString(), 
 						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});

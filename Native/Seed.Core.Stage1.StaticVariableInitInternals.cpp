@@ -27,11 +27,11 @@ extern __declspec(noreturn) void EmergencyShutdown(
 
 class InternalHeap final: public Seed::Memory::BasicHeap {
 public:
-    virtual void* Allocate(Seed::SizeT Size) final {
-        return InternalHeapAllocate(Size);
+    virtual void* Allocate(Seed::Core::Memory::DataSizeT Size) final {
+        return InternalHeapAllocate(Size.Bytes);
     }
 
-    virtual void* AllignedAllocate(Seed::SizeT Size, Seed::SizeT AllocationReq) final {
+    virtual void* AllignedAllocate(Seed::Core::Memory::DataSizeT Size, Seed::Core::Memory::DataSizeT AllocationReq) final {
         Throw(Seed::NotImplementedException(ExceptionPosition));
     }
 
@@ -39,7 +39,7 @@ public:
         return InternalHeapFree(MemBlk);
     }
 
-    virtual void* AllignedFree(void* MemBlk, Seed::SizeT AllocationReq) final {
+    virtual void* AllignedFree(void* MemBlk, Seed::Core::Memory::DataSizeT AllocationReq) final {
         Throw(Seed::NotImplementedException(ExceptionPosition));
     }
 
@@ -48,11 +48,11 @@ public:
         return Seed::Core::Memory::CurrentInternalHeapAllocatedMemBlks();
     }
 
-    virtual Seed::SizeT CurrentAllocatedMemory() final {
+    virtual Seed::Core::Memory::DataSizeT CurrentAllocatedMemory() final {
         return Seed::Core::Memory::CurrentInternalHeapAllocatedMemory();
     }
 
-    virtual Seed::SizeT CurrentHeapUsage() final {
+    virtual Seed::Core::Memory::DataSizeT CurrentHeapUsage() final {
         return Seed::Core::Memory::CurrentInternalHeapHeapsUsage();
     }
 };

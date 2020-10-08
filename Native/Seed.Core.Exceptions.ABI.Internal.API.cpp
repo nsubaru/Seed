@@ -1959,7 +1959,7 @@ void _CopyException(RawExceptionInfo* orig, RawExceptionInfo* copy, void*(*alloc
         auto typeInfo = (CatchableType *)(ppCatchable);
         
         //HACK: hardcoded max buffer size for exception
-        pExceptionBuffer = allocator((typeInfo->sizeOrOffset == 0) ? 4Kb - 1 : typeInfo->sizeOrOffset);
+        pExceptionBuffer = allocator((typeInfo->sizeOrOffset == 0) ? (4Kb).Bytes - 1 : typeInfo->sizeOrOffset);
 
         _CallCopyCtor(pExceptionBuffer, orig->CxxExceptionInfo.params.pExceptionObject, typeInfo->sizeOrOffset, typeInfo, orig->CxxExceptionInfo.params.pThrowImageBase);
 
@@ -2055,10 +2055,10 @@ void ThrowStoredException(void* exception)
         void* pExceptionBuffer = NULL;
         auto typeInfo = (CatchableType *)(ppCatchable);
 
-        __assume(typeInfo->sizeOrOffset < 4Kb);
+        __assume(typeInfo->sizeOrOffset < (4Kb).GetBytes());
 #pragma warning(push)
 #pragma warning(disable: 6255)
-        GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca((typeInfo->sizeOrOffset == 0) ? 4Kb - 1 : typeInfo->sizeOrOffset);
+        GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca((typeInfo->sizeOrOffset == 0) ? (4Kb).GetBytes() - 1 : typeInfo->sizeOrOffset);
 #pragma warning(pop)
         pExceptionBuffer = GetThreadExceptionData()->_throwObjStorageForStoredException;
 

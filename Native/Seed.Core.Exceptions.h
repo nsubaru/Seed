@@ -18,12 +18,12 @@ namespace Seed {
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<returns>Виділену ділянку</returns>
-				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(DataSizeT Size) final;
 				///<summary>Вирівнняне виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
 				///<returns>Виділену ділянку</returns>
-				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(DataSizeT Size, DataSizeT AllocationReq) final;
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
@@ -31,14 +31,14 @@ namespace Seed {
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) final;
+				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, DataSizeT AllocationReq) final;
 
 				///<summary>Кількість виділених блоків даних</summary>
 				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept final;
+				virtual SeedKernelCall DataSizeT CurrentAllocatedMemory() noexcept final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept final;
+				virtual SeedKernelCall DataSizeT CurrentHeapUsage() noexcept final;
 
 				ExceptionHeap& operator=(const ExceptionHeap&) = delete;
 			};
@@ -68,7 +68,7 @@ namespace Seed {
 					/// <summary>
 					/// Максимальна кількість адресів функцій які можуть зберігатись в сховищі
 					/// </summary>
-					static inline constexpr SizeT MaxStackTraceItemCount = 8Kb / sizeof(SizeT);
+					static inline constexpr SizeT MaxStackTraceItemCount = (8Kb).GetBytes() / sizeof(SizeT);
 
 					/// <summary>
 					/// Реальна кількість адресів функцій

@@ -376,8 +376,8 @@ namespace Seed
 					NULL,
 					false,
 					0,
-					Seed::CurrentSettings().Threading.Thread.StackMaxSize,
-					Seed::CurrentSettings().Threading.Thread.StackStartSize,
+					Seed::CurrentSettings().Threading.Thread.StackMaxSize.Bytes,
+					Seed::CurrentSettings().Threading.Thread.StackStartSize.Bytes,
 					threadStartRoutineDynEntryPoint,
 					(void*)new Thread(*this), //-V572
 					&This->hThread,
@@ -618,8 +618,8 @@ namespace Seed
 				TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG) CurrentSettings().VirtualSetting.CpuCoresCount / 2);
 				TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), (LONG) CurrentSettings().VirtualSetting.CpuCoresCount); //-V2571
 				TP_POOL_STACK_INFORMATION info;
-				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
-				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
+				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize.Bytes;
+				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize.Bytes;
 				TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info); //-V2571
 				status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
 
@@ -943,8 +943,8 @@ namespace Seed
 				TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(CurrentSettings().VirtualSetting.CpuCoresCount / 2));
 				TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(CurrentSettings().VirtualSetting.CpuCoresCount));
 				TP_POOL_STACK_INFORMATION info;
-				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
-				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
+				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize.Bytes;
+				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize.Bytes;
 				TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info);
 				status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
 
@@ -975,8 +975,8 @@ namespace Seed
 				TpSetPoolMinThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(minThreadCount));
 				TpSetPoolMaxThreads(reinterpret_cast<PTP_POOL>(This->pool), static_cast<LONG>(maxThreadCount));
 				TP_POOL_STACK_INFORMATION info;
-				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize;
-				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize;
+				info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize.Bytes;
+				info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize.Bytes;
 				TpSetPoolStackInformation(reinterpret_cast<PTP_POOL>(This->pool), &info);
 				status = TpAllocCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP*>(&This->cleanupData));
 
