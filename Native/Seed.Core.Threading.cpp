@@ -1327,4 +1327,277 @@ void Seed::Core::Stage1Complete() noexcept
 
 #pragma endregion
 
+#include "Seed.Core.Threading.UnifiedThreadPool.h"
+
+#pragma region Unified thread pool
+
+#pragma region Implementation specific
+VOID NTAPI UnifiedThreadPoolJobsCleanupCallback(
+	_Inout_opt_ PVOID ObjectContext,
+	_Inout_opt_ PVOID CleanupContext
+) {
+	//TODO: implement it
+}
+
+VOID NTAPI UnifiedThreadPoolTasksCleanupCallback(
+	_Inout_opt_ PVOID ObjectContext,
+	_Inout_opt_ PVOID CleanupContext
+) {
+	//TODO: implement it
+}
+
+VOID NTAPI UnifiedThreadPoolIrpCleanupCallback(
+	_Inout_opt_ PVOID ObjectContext,
+	_Inout_opt_ PVOID CleanupContext
+) {
+	//TODO: implement it
+}
+
+#pragma endregion
+
+
+UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateThreadPool() &&
+{
+	if (This->maxThreadCount != 0 && This->minThreadCount > This->maxThreadCount)
+		Throw(InvalidArgumentException(ExceptionPosition, L"MinThreadCount", L"Мінімальна кількість потоків не може бути менщою ніж максимальна"));
+
+	PTP_POOL hPool = nullptr;
+	//Create thread pool object
+	NTSTATUS status = TpAllocPool(&hPool, NULL);
+
+	if (!NT_SUCCESS(status)) {
+		Throw(NtException(ExceptionPosition, status));
+	}
+
+	//Set min\max threads count
+	TpSetPoolMinThreads(hPool, static_cast<LONG>(This->minThreadCount));
+	TpSetPoolMaxThreads(hPool, static_cast<LONG>(This->maxThreadCount));
+
+	//Set min\max stack size
+	TP_POOL_STACK_INFORMATION info = { 0 };
+
+	info.StackCommit = CurrentSettings().Threading.Thread.StackStartSize.Bytes;
+	info.StackReserve = CurrentSettings().Threading.Thread.StackMaxSize.Bytes;
+
+	TpSetPoolStackInformation(hPool, &info);
+
+	//Creating configuration
+
+	//Job configuration
+	UnifiedThreadPool::PoolConfigureation jobsConfiguration = { 0 };
+	try {
+		jobsConfiguration = CreateJobConfiguration(hPool);
+	}
+	catch (...) {
+		UnifiedThreadPool::DestroyPoolObject(hPool);
+		ReThrow;
+	}
+
+	//Sheduled task configuration
+	UnifiedThreadPool::PoolConfigureation tasksConfiguration = { 0 };
+	try {
+		tasksConfiguration = CreateSheduledTaskConfiguration(hPool);
+	}
+	catch (...) {
+		UnifiedThreadPool::DestroyConfiguration(jobsConfiguration);
+		UnifiedThreadPool::DestroyPoolObject(hPool);
+		ReThrow;
+	}
+
+	//Irp configuration
+	UnifiedThreadPool::PoolConfigureation irpConfiguration = { 0 };
+	try {
+		irpConfiguration = CreateIrpConfiguration(hPool);
+	}
+	catch (...) {
+		UnifiedThreadPool::DestroyConfiguration(jobsConfiguration);
+		UnifiedThreadPool::DestroyConfiguration(tasksConfiguration);
+		UnifiedThreadPool::DestroyPoolObject(hPool);
+		ReThrow;
+	}
+
+	//Create impl object
+
+	UnifiedThreadPool::ImplementationSpecificData implData = { 0 };
+	implData.PoolHandle = hPool;
+	implData.JobConfiguration = jobsConfiguration;
+	implData.TaskConfiguration = tasksConfiguration;
+	implData.IrpConfiguration = irpConfiguration;
+	
+
+	//Create pool data struct
+	UnifiedThreadPool::Data* poolData = new UnifiedThreadPool::Data(This->minThreadCount, This->maxThreadCount, MoveRValue(This->threadPoolName), MoveRValue(implData));
+
+	//Delete this object data as it invalidated
+	delete This;
+	This = nullptr;
+
+	//Return pool object
+	return UnifiedThreadPool(MoveRValue(poolData));
+}
+
+#pragma region Pool configuration creating
+
+UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateJobConfiguration(ImplSpecificT PoolHandle)
+{
+	PTP_CLEANUP_GROUP clenupData = nullptr;
+
+	NTSTATUS status = TpAllocCleanupGroup(&clenupData);
+
+	if (!NT_SUCCESS(status)) {
+		Throw(NtException(ExceptionPosition, status));
+	}
+
+	auto threadPoolEnviroment = new TP_CALLBACK_ENVIRON;
+
+	threadPoolEnviroment->Version = 3;
+	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(PoolHandle);
+	threadPoolEnviroment->CleanupGroup = clenupData;
+	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolJobsCleanupCallback;
+	threadPoolEnviroment->RaceDll = NULL;
+	threadPoolEnviroment->ActivationContext = NULL;
+	threadPoolEnviroment->FinalizationCallback = NULL;
+	threadPoolEnviroment->u.Flags = 0;
+
+	switch (This->jobsPriority)
+	{
+	case UnifiedThreadPool::EPoolThreadsPriority::Low:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_LOW;
+		break;
+	case UnifiedThreadPool::EPoolThreadsPriority::Medium:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
+		break;
+	case UnifiedThreadPool::EPoolThreadsPriority::High:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_HIGH;
+		break;
+	default:
+		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for jobs"));
+		break;
+	}
+
+	threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
+	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+
+	UnifiedThreadPool::PoolConfigureation configuration = { 0 };
+
+	configuration.CallbackEnviroment = threadPoolEnviroment;
+	configuration.ClenupGroup = clenupData;
+	configuration.Priority = This->jobsPriority;
+
+	return configuration;
+}
+
+UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateSheduledTaskConfiguration(ImplSpecificT PoolHandle)
+{
+	PTP_CLEANUP_GROUP clenupData = nullptr;
+
+	NTSTATUS status = TpAllocCleanupGroup(&clenupData);
+
+	if (!NT_SUCCESS(status)) {
+		Throw(NtException(ExceptionPosition, status));
+	}
+
+	auto threadPoolEnviroment = new TP_CALLBACK_ENVIRON;
+
+	threadPoolEnviroment->Version = 3;
+	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(PoolHandle);
+	threadPoolEnviroment->CleanupGroup = clenupData;
+	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolTasksCleanupCallback;
+	threadPoolEnviroment->RaceDll = NULL;
+	threadPoolEnviroment->ActivationContext = NULL;
+	threadPoolEnviroment->FinalizationCallback = NULL;
+	threadPoolEnviroment->u.Flags = 0;
+
+	switch (This->sheduledTasksPriority)
+	{
+	case UnifiedThreadPool::EPoolThreadsPriority::Low:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_LOW;
+		break;
+	case UnifiedThreadPool::EPoolThreadsPriority::Medium:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
+		break;
+	case UnifiedThreadPool::EPoolThreadsPriority::High:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_HIGH;
+		break;
+	default:
+		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for jobs"));
+		break;
+	}
+
+	threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
+	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+
+	UnifiedThreadPool::PoolConfigureation configuration = { 0 };
+
+	configuration.CallbackEnviroment = threadPoolEnviroment;
+	configuration.ClenupGroup = clenupData;
+	configuration.Priority = This->sheduledTasksPriority;
+
+	return configuration;
+}
+
+UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateIrpConfiguration(ImplSpecificT PoolHandle)
+{
+	PTP_CLEANUP_GROUP clenupData = nullptr;
+
+	NTSTATUS status = TpAllocCleanupGroup(&clenupData);
+
+	if (!NT_SUCCESS(status)) {
+		Throw(NtException(ExceptionPosition, status));
+	}
+
+	auto threadPoolEnviroment = new TP_CALLBACK_ENVIRON;
+
+	threadPoolEnviroment->Version = 3;
+	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(PoolHandle);
+	threadPoolEnviroment->CleanupGroup = clenupData;
+	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolIrpCleanupCallback;
+	threadPoolEnviroment->RaceDll = NULL;
+	threadPoolEnviroment->ActivationContext = NULL;
+	threadPoolEnviroment->FinalizationCallback = NULL;
+	threadPoolEnviroment->u.Flags = 0;
+
+	switch (This->irpRequestPriority)
+	{
+	case UnifiedThreadPool::EPoolThreadsPriority::Low:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_LOW;
+		break;
+	case UnifiedThreadPool::EPoolThreadsPriority::Medium:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
+		break;
+	case UnifiedThreadPool::EPoolThreadsPriority::High:
+		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_HIGH;
+		break;
+	default:
+		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for jobs"));
+		break;
+	}
+
+	threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
+	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+
+	UnifiedThreadPool::PoolConfigureation configuration = { 0 };
+
+	configuration.CallbackEnviroment = threadPoolEnviroment;
+	configuration.ClenupGroup = clenupData;
+	configuration.Priority = This->irpRequestPriority;
+
+	return configuration;
+}
+
+#pragma endregion
+
+
+void Seed::Core::Threading::UnifiedThreadPool::DestroyConfiguration(PoolConfigureation& poolConfiguration)
+{
+	TpReleaseCleanupGroupMembers(reinterpret_cast<PTP_CLEANUP_GROUP>(poolConfiguration.ClenupGroup), TRUE, NULL);
+	TpReleaseCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP>(poolConfiguration.ClenupGroup));
+	delete poolConfiguration.CallbackEnviroment;
+}
+
+void Seed::Core::Threading::UnifiedThreadPool::DestroyPoolObject(ImplSpecificT PoolHandle)
+{
+	TpReleasePool(reinterpret_cast<PTP_POOL>(PoolHandle));
+}
+
 #pragma warning(pop)
