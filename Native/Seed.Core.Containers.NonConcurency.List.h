@@ -782,13 +782,6 @@ namespace Seed {
 				///<param name = "Value">Значення нового елемента</param>
 				ForceInline Iterator AddLast(const T& Value)
 				{
-					if (This == nullptr)
-					{
-						This = new list_data;
-						This->last = This->root = new elem(Value, This);
-						This->size = 1;
-						return This->last;
-					}
 					if (This->root == nullptr)
 					{
 						This->last = This->root = new elem(Value, This);
@@ -804,13 +797,6 @@ namespace Seed {
 				///<param name = "Value">rvalue силка на значення нового елемента</param>
 				ForceInline Iterator AddLast(T&& Value)
 				{
-					if (This == nullptr)
-					{
-						This = new list_data;
-						This->last = This->root = new elem(MoveRValue(Value), This);
-						This->size = 1;
-						return This->last;
-					}
 					if (This->root == nullptr)
 					{
 						This->last = This->root = new elem(MoveRValue(Value), This);

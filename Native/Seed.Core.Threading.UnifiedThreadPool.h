@@ -59,6 +59,95 @@ namespace Seed {
 
 			class UnifiedThreadPoolBuilder;
 
+			class UnifiedThreadPoolJob final : protected IDisposable {
+			public:
+				friend class UnifiedThreadPool;
+				friend class ThreadableUnifiedThreadPoolJob;
+			private:
+				struct Data {
+					ImplSpecificT pOwnerPool;
+					String jobName;
+					Delegate action;
+					ImplSpecificT hWork;
+					ImplSpecificT hInstance;
+					ImplSpecificT hEvent;
+					ID threadId;
+					Handle hThread;
+					EThreadabledStates threadableState;
+					EThreadabledStates secondThreadableState;
+					Containers::ConcurencyList<UnifiedThreadPoolJob>::Iterator poolQueueRef;
+					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator threadbleRef;
+
+					RefCountT RefCount;
+
+					Data(
+						ImplSpecificT pOwnerPool,
+						String&& jobName,
+						Delegate&& action,
+						ImplSpecificT hEvent
+					) :
+						pOwnerPool(pOwnerPool),
+						jobName(MoveRValue(jobName)),
+						action(MoveRValue(action)),
+						hWork(nullptr),
+						hInstance(nullptr),
+						hEvent(hEvent),
+						threadId(0),
+						hThread(nullptr),
+						threadableState(EThreadabledStates::NotStarted),
+						secondThreadableState(EThreadabledStates::Paused),
+						poolQueueRef(),
+						RefCount(1)
+					{}
+				};
+			private:
+				Data* This;
+			protected:
+				virtual void Dispose() override;
+			private:
+				friend void SetUnifiedThreadPoolJobInstanceHandleObj(UnifiedThreadPoolJob* jobObj, ImplSpecificT hInstance);
+				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolJob* jobObj);
+				friend void SetEventOnJobFinish(UnifiedThreadPoolJob* jobObj);
+				friend void RegisterThread(UnifiedThreadPoolJob* thread);
+				friend void UnRegisterThread(UnifiedThreadPoolJob* thread);
+				friend Delegate& GetJobEntryPoint(UnifiedThreadPoolJob* jobObj);
+				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolJob* jobObj);
+				friend void UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj);
+			private:
+				UnifiedThreadPoolJob(Data* This) : This(This) {}
+			public:
+				const String& GetName() {
+					return This->jobName;
+				}
+				void SetName(const String& newName) {
+					SetName(String(newName));
+				}
+				void SetName(String&& newName);
+			public:
+				Boolean GetIsAlredyExecuted() const {
+					return This->action.GetIsEnded();
+				}
+				Boolean GetIsStartedExecution() const {
+					return This->action.GetIsStarted();
+				}
+				UnifiedThreadPool GetOwnerPool() const;
+			public:
+				String Property(GetName, SetName) Name;
+				Boolean Property(GetIsAlredyExecuted) IsAlredyExecuted;
+				Boolean Property(GetIsStartedExecution) IsStartedExecution;
+			public:
+				virtual UnifiedThreadPoolJob& Suspend();
+				virtual UnifiedThreadPoolJob& Resume();
+				virtual UnifiedThreadPoolJob& Interupt();
+
+				virtual UnifiedThreadPoolJob& Join();
+				virtual UnifiedThreadPoolJob& Join(Time::DateTime timeOut);
+				virtual const UnifiedThreadPoolJob& Join() const;
+				virtual const UnifiedThreadPoolJob& Join(Time::DateTime timeOut) const;
+			public:
+				RefCountClass(UnifiedThreadPoolJob, This);
+			};
+
 			class UnifiedThreadPool final : protected IDisposable {
 			public:
 				enum class EPoolThreadsPriority {
@@ -75,9 +164,10 @@ namespace Seed {
 				friend class IO::IAsyncIOBase;
 			private:
 				struct PoolConfigureation {
-					ImplSpecificT CallbackEnviroment;
-					ImplSpecificT ClenupGroup;
-					EPoolThreadsPriority Priority;\
+					ImplSpecificT CallbackEnviroment = nullptr;
+					ImplSpecificT ClenupGroup = nullptr;
+					EPoolThreadsPriority Priority = EPoolThreadsPriority::Medium;
+					SRWLock PoolLock = {};
 				};
 
 				struct ImplementationSpecificData {
@@ -98,6 +188,8 @@ namespace Seed {
 
 					String threadPoolName;
 
+					volatile Boolean isPoolTermination;
+
 					ImplementationSpecificData handlesData;
 
 					RefCountT RefCount;
@@ -107,6 +199,7 @@ namespace Seed {
 						JobsQueue(), TaskQueue(), IrpQueue(), 
 						threadPoolName(MoveRValue(threadPoolName)),
 						handlesData(MoveRValue(handlesData)),
+						isPoolTermination(false),
 						RefCount(1)
 					{}
 				};
@@ -124,11 +217,20 @@ namespace Seed {
 				static void DestroyPoolObject(ImplSpecificT PoolHandle);
 				static void DestroyConfiguration(PoolConfigureation& poolConfiguration);
 			private:
+				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolJob* jobObj);
+				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolJob* jobObj);
+			private:
 				UnifiedThreadPool(Data*&& This) :This(MoveRValue(This)) {}
-			//public:
-			//	UnifiedThreadPoolJob PostJob(Delegate&& action);
-			//	UnifiedThreadPoolJob PostJob(String&& jobName, Delegate&& action);
-			//	UnifiedThreadPoolJob PostJob(const String& jobName, Delegate&& action);
+				UnifiedThreadPool(Data*& This) :This(This) { ++This->RefCount;  }
+			public:
+				UnifiedThreadPoolJob PostJob(String&& jobName, Delegate&& action);
+
+				UnifiedThreadPoolJob PostJob(Delegate&& action) {
+					return PostJob(String(), MoveRValue(action));
+				}
+				UnifiedThreadPoolJob PostJob(const String& jobName, Delegate&& action) {
+					return PostJob(String(jobName), MoveRValue(action));
+				}
 			//public:
 			//	UnifiedThreadPoolSheduledTaskBuilder SheduleJob(Delegate&& action);
 			//	UnifiedThreadPoolSheduledTaskBuilder SheduleJob(String&& jobName, Delegate&& action);
@@ -162,6 +264,7 @@ namespace Seed {
 			};
 
 			class UnifiedThreadPoolBuilder final {
+			private:
 				struct Data {
 					String threadPoolName;
 					UInt32 minThreadCount;
@@ -275,7 +378,46 @@ namespace Seed {
 				}
 			};
 
-			class UnifiedThreadPoolJob {};
+			class ThreadableUnifiedThreadPoolJob;
+
+			
+
+			class ThreadableUnifiedThreadPoolJob final : public Seed::Core::Threading::IThreadable {
+			private:
+				friend void RegisterThread(UnifiedThreadPoolJob* thread);
+			private:
+				UnifiedThreadPoolJob* thread;
+			private:
+				ThreadableUnifiedThreadPoolJob(UnifiedThreadPoolJob* thread) : thread(thread) {}
+			public:
+				virtual const String& GetName() const { return thread->This->jobName; }
+				virtual void SetName(const String& newName) { thread->SetName(newName); }
+
+				virtual UInt64 GetID() const { return thread->This->threadId; }
+
+				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::JobTask; }
+				virtual EThreadabledStates GetThreadabledState() const { return thread->This->threadableState; }
+
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
+
+				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
+				virtual Boolean IsHaveParrentThreadable() const { return false; }
+
+				virtual IThreadable& Suspend() { thread->Suspend(); return *this; }
+				virtual IThreadable& Resume() { thread->Resume(); return *this; }
+				virtual IThreadable& Interupt() { thread->Interupt(); return *this; }
+
+				virtual IThreadable& Join() { thread->Join(); return *this; }
+				virtual IThreadable& Join(Time::DateTime timeOut) { thread->Join(timeOut); return *this; }
+				virtual const IThreadable& Join() const { thread->Join(); return *this; }
+				virtual const IThreadable& Join(Time::DateTime timeOut) const { thread->Join(timeOut); return *this; }
+
+				virtual ~ThreadableUnifiedThreadPoolJob()
+				{
+					delete thread;
+				}
+			};
+
 			class UnifiedThreadPoolSheduledTask {};
 			class UnifiedThreadPoolSheduledTaskBuilder {};
 			class UnifiedThreadPoolIoTask {};

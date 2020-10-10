@@ -42,6 +42,7 @@ void Seed::Core::Threading::Internals::AcquireLockSharedSRWLock(void* PSRWLock) 
 
 void Seed::Core::Threading::Internals::ReleaseLockSharedSRWLock(void* PSRWLock) {
 	RtlReleaseSRWLockShared(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));
+	_ReadWriteBarrier();
 }
 
 bool Seed::Core::Threading::Internals::TryAcquireLockSharedSRWLock(void* PSRWLock) {

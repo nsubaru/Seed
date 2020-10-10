@@ -1332,11 +1332,20 @@ void Seed::Core::Stage1Complete() noexcept
 #pragma region Unified thread pool
 
 #pragma region Implementation specific
+
+void Seed::Core::Threading::UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj)
+{
+	jobObj->This->poolQueueRef.Remove();
+}
+
 VOID NTAPI UnifiedThreadPoolJobsCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
-	//TODO: implement it
+
+	auto jobObj = (UnifiedThreadPoolJob*)ObjectContext;
+	UnregisterJobFromJobList(jobObj);
+	delete jobObj;
 }
 
 VOID NTAPI UnifiedThreadPoolTasksCleanupCallback(
@@ -1585,19 +1594,300 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	return configuration;
 }
 
-#pragma endregion
-
-
 void Seed::Core::Threading::UnifiedThreadPool::DestroyConfiguration(PoolConfigureation& poolConfiguration)
 {
-	TpReleaseCleanupGroupMembers(reinterpret_cast<PTP_CLEANUP_GROUP>(poolConfiguration.ClenupGroup), TRUE, NULL);
-	TpReleaseCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP>(poolConfiguration.ClenupGroup));
-	delete poolConfiguration.CallbackEnviroment;
+	poolConfiguration.PoolLock.ExclusiveLock([&]() {
+		TpReleaseCleanupGroupMembers(reinterpret_cast<PTP_CLEANUP_GROUP>(poolConfiguration.ClenupGroup), TRUE, NULL);
+		TpReleaseCleanupGroup(reinterpret_cast<PTP_CLEANUP_GROUP>(poolConfiguration.ClenupGroup));
+		delete poolConfiguration.CallbackEnviroment;
+	});
 }
 
 void Seed::Core::Threading::UnifiedThreadPool::DestroyPoolObject(ImplSpecificT PoolHandle)
 {
 	TpReleasePool(reinterpret_cast<PTP_POOL>(PoolHandle));
 }
+
+
+#pragma region Unified thread pool job
+
+void Seed::Core::Threading::SetUnifiedThreadPoolJobInstanceHandleObj(UnifiedThreadPoolJob* jobObj, ImplSpecificT hInstance)
+{
+	jobObj->This->hInstance = hInstance;
+}
+
+bool Seed::Core::Threading::IsUnifiedThreadPoolTerminate(UnifiedThreadPoolJob* jobObj)
+{
+	return ((UnifiedThreadPool::Data*)jobObj->This->pOwnerPool)->isPoolTermination;
+}
+
+void Seed::Core::Threading::SetEventOnJobFinish(UnifiedThreadPoolJob* jobObj)
+{
+	TpCallbackSetEventOnCompletion((PTP_CALLBACK_INSTANCE)jobObj->This->hInstance, jobObj->This->hEvent);
+}
+
+Delegate& Seed::Core::Threading::GetJobEntryPoint(UnifiedThreadPoolJob* jobObj)
+{
+	return jobObj->This->action;
+}
+namespace Seed {
+	inline namespace Core {
+		namespace Threading {
+			Seed::Core::Threading::SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolJob* jobObj)
+			{
+				return ((UnifiedThreadPool::Data*)jobObj->This->pOwnerPool)->handlesData.JobConfiguration.PoolLock;
+			}
+		}
+	}
+}
+
+
+void Seed::Core::Threading::RegisterThread(UnifiedThreadPoolJob* thread)
+{
+	thread->This->threadbleRef = AllActiveThreadable->AddLast(SmartPtr<IThreadable>(new ThreadableUnifiedThreadPoolJob(new UnifiedThreadPoolJob(*thread))));
+	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &thread->This->hThread, GENERIC_ALL, 0, 0);
+	ConfigureTls(new ThreadableUnifiedThreadPoolJob(thread), &thread->This->threadableState);
+	SetName(thread->This->jobName, thread->This->hThread);
+	thread->This->threadableState = EThreadabledStates::Executing;
+}
+
+void Seed::Core::Threading::UnRegisterThread(UnifiedThreadPoolJob* thread)
+{
+	AllActiveThreadable->Remove(thread->This->threadbleRef);
+	ReSetName(thread->This->hThread);
+	NtClose(thread->This->hThread);
+	thread->This->hThread = nullptr;
+	thread->This->threadableState = EThreadabledStates::Ended;
+	thread->This->hInstance = nullptr;
+	thread->This->poolQueueRef.Remove();
+	DestroyTls();
+}
+
+UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolJob::GetOwnerPool() const
+{
+	auto poolObj = (UnifiedThreadPool::Data*)(UnifiedThreadPool::Data*)This->pOwnerPool;
+	return UnifiedThreadPool((UnifiedThreadPool::Data*&)poolObj);
+}
+
+VOID NTAPI UnifiedPoolWorkCallbak(
+	_Inout_     PTP_CALLBACK_INSTANCE Instance,
+	_Inout_opt_ PVOID                 Context,
+	_Inout_     PTP_WORK              Work
+) {
+	using namespace Seed;
+	if (Context == nullptr)
+		return;
+	UnifiedThreadPoolJob* thread = (UnifiedThreadPoolJob*)Context;
+	SetUnifiedThreadPoolJobInstanceHandleObj(thread, Instance);
+	if (!IsUnifiedThreadPoolTerminate(thread)) {
+		SetEventOnJobFinish(thread);
+		SRWLock& lock = GetUnifiedPoolLock(thread);
+		if (!lock.TryInShareLock([&]() { EntryPoint(GetJobEntryPoint(thread), thread); })) {
+			UnregisterJobFromJobList(thread);
+			delete thread;
+		}
+	}
+	else {
+		UnregisterJobFromJobList(thread);
+		delete thread;
+	}
+	//Free work as we use each work object only one time
+	//(if we don't free each work also will be free in cleanup group close callback and we catch double free exception)
+	TpReleaseWork(Work); 
+}
+
+UnifiedThreadPoolJob Seed::Core::Threading::UnifiedThreadPool::PostJob(String&& jobName, Delegate&& action)
+{
+	PTP_WORK work = nullptr;
+	HANDLE event = nullptr;
+	UnifiedThreadPoolJob* jobObj = nullptr;
+
+	try
+	{
+		NTSTATUS status = NtCreateEvent(&event, GENERIC_ALL, NULL, EVENT_TYPE::NotificationEvent, FALSE);
+		if (!NT_SUCCESS(status))
+			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(event), NullPointException::Types::Write));
+
+		jobObj = new UnifiedThreadPoolJob(new UnifiedThreadPoolJob::Data(This, MoveRValue(jobName), MoveRValue(action), event));
+
+		status = TpAllocWork(&work, UnifiedPoolWorkCallbak, jobObj, reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->handlesData.JobConfiguration.CallbackEnviroment)); //-V2571
+
+		if (!NT_SUCCESS(status))
+			Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(work), NullPointException::Types::Write));
+
+		auto jobObjCp = UnifiedThreadPoolJob(*jobObj);
+
+		jobObj->This->hWork = work;
+		jobObj->This->poolQueueRef = This->JobsQueue.AddLast(jobObjCp);
+
+		TpPostWork(work);
+
+		return jobObjCp;
+	}
+	catch (...)
+	{
+		if (jobObj != nullptr) {
+			if (jobObj->This->poolQueueRef != nullptr) {
+				jobObj->This->poolQueueRef.Remove();
+			}
+
+			delete jobObj;
+		}
+
+		if (event != nullptr)
+		{
+			NtClose(event);
+		}
+		ReThrow;
+	}
+}
+
+UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join()
+{
+	NtWaitForSingleObject(This->hEvent, TRUE, NULL);
+	return *this;
+}
+
+const UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join() const
+{
+	NtWaitForSingleObject(This->hEvent, TRUE, NULL);
+	return *this;
+}
+
+UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join(Time::DateTime timeOut)
+{
+	LARGE_INTEGER delay = { 0 };
+	delay.QuadPart = timeOut.TimeFromStartEpoch;
+	NtWaitForSingleObject(This->hEvent, TRUE, &delay);
+	return *this;
+}
+
+const UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join(Time::DateTime timeOut) const
+{
+	LARGE_INTEGER delay = { 0 };
+	delay.QuadPart = timeOut.TimeFromStartEpoch;
+	NtWaitForSingleObject(This->hEvent, TRUE, &delay);
+	return *this;
+}
+
+UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Suspend()
+{
+	switch (This->threadableState)
+	{
+	case EThreadabledStates::NotStarted: break;
+	case EThreadabledStates::Interupted: break;
+	case EThreadabledStates::Unknown: break;
+	case EThreadabledStates::Starting: break;
+	case EThreadabledStates::Executing:
+	case EThreadabledStates::ExceptionProcessing:
+	{
+		This->secondThreadableState = EThreadabledStates::Paused;
+		Swap(This->threadableState, This->secondThreadableState);
+		TpDisassociateCallback((PTP_CALLBACK_INSTANCE)This->hInstance);
+		NtSuspendThread(This->hThread, NULL);
+		break;
+	}
+	case EThreadabledStates::Paused: break;
+	default:
+		break;
+	}
+	return *this;
+}
+
+UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Resume()
+{
+	switch (This->threadableState)
+	{
+	case EThreadabledStates::NotStarted: break;
+	case EThreadabledStates::Interupted: break;
+	case EThreadabledStates::Unknown: break;
+	case EThreadabledStates::Starting: break;
+	case EThreadabledStates::Executing: break;
+	case EThreadabledStates::ExceptionProcessing: break;
+	case EThreadabledStates::Paused:
+	{
+		This->secondThreadableState = EThreadabledStates::Paused;
+		Swap(This->threadableState, This->secondThreadableState);
+		NtAlertResumeThread(This->hThread, NULL);
+		break;
+	}
+	default:
+		break;
+	}
+	return *this;
+}
+
+UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Interupt()
+{
+	switch (This->threadableState)
+	{
+	case EThreadabledStates::NotStarted: break;
+	case EThreadabledStates::Interupted: break;
+	case EThreadabledStates::Unknown: break;
+	case EThreadabledStates::Starting: break;
+	default:
+		switch (This->threadableState)
+		{
+		case EThreadabledStates::Executing:
+		case EThreadabledStates::ExceptionProcessing:
+		case EThreadabledStates::Paused:
+		{
+			NtSuspendThread(This->hThread, NULL);
+			CONTEXT ctx;
+			ctx.ContextFlags = CONTEXT_ALL;
+			NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
+			if (!NT_SUCCESS(status))
+			{
+				NtResumeThread(This->hThread, NULL);
+				Throw(NtException(ExceptionPosition, status));
+			}
+			DWORD64 ret_point = ctx.Rip;
+			ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
+			status = ZwSetContextThread(This->hThread, &ctx);
+			NtResumeThread(This->hThread, NULL);
+			if (!NT_SUCCESS(status))
+				Throw(NtException(ExceptionPosition, status));
+			NtAlertThread(This->hThread);
+		}
+		default:
+			break;
+		}
+		break;
+	}
+	return *this;
+}
+
+void Seed::Core::Threading::UnifiedThreadPoolJob::SetName(String&& newName)
+{
+	switch (This->threadableState)
+	{
+	case EThreadabledStates::NotStarted:
+	case EThreadabledStates::Interupted: 
+	case EThreadabledStates::Unknown:
+	case EThreadabledStates::Starting:
+		This->jobName = MoveRValue(newName);
+	break;
+	default:
+		switch (This->threadableState)
+		{
+		case EThreadabledStates::Executing:
+		case EThreadabledStates::ExceptionProcessing:
+		case EThreadabledStates::Paused:
+		default:
+			This->jobName = MoveRValue(newName);
+			::SetName(This->jobName, This->hThread);
+			break;
+		}
+	}
+}
+
+void Seed::Core::Threading::UnifiedThreadPoolJob::Dispose()
+{
+	NtClose(This->hEvent);
+}
+
+#pragma endregion
+
+#pragma endregion
 
 #pragma warning(pop)

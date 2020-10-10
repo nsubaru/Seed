@@ -76,6 +76,26 @@ namespace Seed {
 			}
 
 			/// <summary>
+			/// Спроба отримати значення як константне посилання на інтерфейс типу U
+			/// </summary>
+			/// <typeparam name="U">Тип інтерфейсу</typeparam>
+			/// <returns>Константне посилання на інтерфейс</returns>
+			template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T>
+			ForceInline const TInterface& As() const {
+				return dynamic_cast<const TInterface&>(*This->ptr);
+			}
+
+			/// <summary>
+			/// Спроба отримати значення як посилання на інтерфейс типу U
+			/// </summary>
+			/// <typeparam name="U">Тип інтерфейсу</typeparam>
+			/// <returns>Посилання на інтерфейс</returns>
+			template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T>
+			ForceInline TInterface& As()   {
+				return dynamic_cast<TInterface&>(*This->ptr);
+			}
+
+			/// <summary>
 			/// Кількість силок на даний об'єкт
 			/// </summary>
 			/// <returns>Кількість силок</returns>

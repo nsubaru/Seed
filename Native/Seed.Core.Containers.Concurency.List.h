@@ -850,52 +850,40 @@ namespace Seed {
 				///<param name = "Value">Значення нового елемента</param>
 				Iterator AddLast(const T& Value)
 				{
-					if (This == nullptr)
-					{
-						This = new list_data;
-						This->last = This->root = new elem(Value, This);
-						This->size = 1;
-						return This->last;
-					}
-					if (This->root == nullptr)
-					{
-						This->last = This->root = new elem(Value, This);
-						This->size = 1;
-						return This->last;
-					}
 					//Виконується в ексклюзивній блокировці
 					return this->This->lock.ExclusiveLock([&]() mutable InlineLambda
+					{
+						if (This->root == nullptr)
 						{
-							this->This->last = this->This->last->next = new elem(Value, This, This->last);
-							++This->size;
+							This->last = This->root = new elem(Value, This);
+							This->size = 1;
 							return This->last;
-						});
+						}
+
+						this->This->last = this->This->last->next = new elem(Value, This, This->last);
+						++This->size;
+						return This->last;
+					});
 				}
 
 				///<summary>Оптимізоване додавання елемента до списку</summary>
 				///<param name = "Value">rvalue силка на значення нового елемента</param>
 				Iterator AddLast(T&& Value)
 				{
-					if (This == nullptr)
-					{
-						This = new list_data;
-						This->last = This->root = new elem(MoveRValue(Value), This);
-						This->size = 1;
-						return This->last;
-					}
-					if (This->root == nullptr)
-					{
-						This->last = This->root = new elem(MoveRValue(Value), This);
-						This->size = 1;
-						return This->last;
-					}
 					//Виконується в ексклюзивній блокировці
 					return this->This->lock.ExclusiveLock([&]() mutable InlineLambda
+					{
+						if (This->root == nullptr)
 						{
-							this->This->last = this->This->last->next = new elem(MoveRValue(Value), This, This->last);
-							++This->size;
+							This->last = This->root = new elem(MoveRValue(Value), This);
+							This->size = 1;
 							return This->last;
-						});
+						}
+
+						this->This->last = this->This->last->next = new elem(MoveRValue(Value), This, This->last);
+						++This->size;
+						return This->last;
+					});
 				}
 				///<summary>Додавання нового елемента після заданого ітератором</summary>
 				///<param name = "Item">Ітератор на елмент</param>
