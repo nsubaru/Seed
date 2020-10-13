@@ -1335,24 +1335,52 @@ void Seed::Core::Stage1Complete() noexcept
 
 void Seed::Core::Threading::UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj)
 {
-	jobObj->This->poolQueueRef.Remove();
+	((UnifiedThreadPool::Data*)jobObj->This->pOwnerPool)->JobsQueue.Remove(jobObj->This->poolQueueRef);
+}
+
+void Seed::Core::Threading::UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread)
+{
+	((UnifiedThreadPool::Data*)thread->This->ownerPool)->TaskQueue.Remove(thread->This->poolQueueRef);
+}
+
+void Seed::Core::Threading::ZeroingTaskHadle(UnifiedThreadPoolSheduledTask* thread)
+{
+	thread->This->hTask = nullptr;
 }
 
 VOID NTAPI UnifiedThreadPoolJobsCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
-
+	ConfigureTls(nullptr, nullptr);
+	try {
 	auto jobObj = (UnifiedThreadPoolJob*)ObjectContext;
 	UnregisterJobFromJobList(jobObj);
 	delete jobObj;
+	}
+	catch (...) {
+		toCoreLog(L"Невідома помилка при знищенні об'єкта задачі в пулі");
+	}
+	DestroyTls();
 }
 
 VOID NTAPI UnifiedThreadPoolTasksCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
-	//TODO: implement it
+	ConfigureTls(nullptr, nullptr);
+	try {
+		if (ObjectContext == NULL)
+			return;
+		Seed::Core::Threading::UnifiedThreadPoolSheduledTask* This = (Seed::Core::Threading::UnifiedThreadPoolSheduledTask*)ObjectContext;
+		Seed::Core::Threading::ZeroingTaskHadle(This);
+		UnRegisterTaskFromPoolQueue(This);
+		delete This;
+	}
+	catch (...) {
+		toCoreLog(L"Невідома помилка при знищенні об'єкта задачі в пулі");
+	}
+	DestroyTls();
 }
 
 VOID NTAPI UnifiedThreadPoolIrpCleanupCallback(
@@ -1364,7 +1392,7 @@ VOID NTAPI UnifiedThreadPoolIrpCleanupCallback(
 
 #pragma endregion
 
-
+#pragma region Pool Creating
 UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateThreadPool() &&
 {
 	if (This->maxThreadCount != 0 && This->minThreadCount > This->maxThreadCount)
@@ -1444,6 +1472,7 @@ UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateThreadP
 	//Return pool object
 	return UnifiedThreadPool(MoveRValue(poolData));
 }
+#pragma endregion
 
 #pragma region Pool configuration creating
 
@@ -1607,7 +1636,87 @@ void Seed::Core::Threading::UnifiedThreadPool::DestroyPoolObject(ImplSpecificT P
 {
 	TpReleasePool(reinterpret_cast<PTP_POOL>(PoolHandle));
 }
+#pragma endregion
 
+#pragma region Unified thread pool threadables
+namespace Seed {
+	inline namespace Core {
+		namespace Threading {
+			class ThreadableUnifiedThreadPoolSheduledTask final : public Seed::Core::Threading::IThreadable {
+			private:
+				friend void RegisterThread(UnifiedThreadPoolSheduledTask* thread);
+			private:
+				UnifiedThreadPoolSheduledTask* thread;
+			private:
+				ThreadableUnifiedThreadPoolSheduledTask(UnifiedThreadPoolSheduledTask* thread) : thread(thread) {}
+			public:
+				virtual const String& GetName() const { return thread->This->taskName; }
+				virtual void SetName(const String& newName) { thread->SetName(newName); }
+
+				virtual UInt64 GetID() const { return thread->This->activeTid; }
+
+				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::ScheduledTask; }
+				virtual EThreadabledStates GetThreadabledState() const { return thread->This->activeState; }
+
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
+
+				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
+				virtual Boolean IsHaveParrentThreadable() const { return false; }
+
+				virtual IThreadable& Suspend() { thread->Suspend(); return *this; }
+				virtual IThreadable& Resume() { thread->Resume(); return *this; }
+				virtual IThreadable& Interupt() { thread->Interupt(); return *this; }
+
+				virtual IThreadable& Join() { thread->Join(); return *this; }
+				virtual IThreadable& Join(Time::DateTime timeOut) { thread->Join(timeOut); return *this; }
+				virtual const IThreadable& Join() const { thread->Join(); return *this; }
+				virtual const IThreadable& Join(Time::DateTime timeOut) const { thread->Join(timeOut); return *this; }
+
+				virtual ~ThreadableUnifiedThreadPoolSheduledTask()
+				{
+					delete thread;
+				}
+			};
+
+			class ThreadableUnifiedThreadPoolJob final : public Seed::Core::Threading::IThreadable {
+			private:
+				friend void RegisterThread(UnifiedThreadPoolJob* thread);
+			private:
+				UnifiedThreadPoolJob* thread;
+			private:
+				ThreadableUnifiedThreadPoolJob(UnifiedThreadPoolJob* thread) : thread(thread) {}
+			public:
+				virtual const String& GetName() const { return thread->This->jobName; }
+				virtual void SetName(const String& newName) { thread->SetName(newName); }
+
+				virtual UInt64 GetID() const { return thread->This->threadId; }
+
+				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::JobTask; }
+				virtual EThreadabledStates GetThreadabledState() const { return thread->This->threadableState; }
+
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
+
+				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
+				virtual Boolean IsHaveParrentThreadable() const { return false; }
+
+				virtual IThreadable& Suspend() { thread->Suspend(); return *this; }
+				virtual IThreadable& Resume() { thread->Resume(); return *this; }
+				virtual IThreadable& Interupt() { thread->Interupt(); return *this; }
+
+				virtual IThreadable& Join() { thread->Join(); return *this; }
+				virtual IThreadable& Join(Time::DateTime timeOut) { thread->Join(timeOut); return *this; }
+				virtual const IThreadable& Join() const { thread->Join(); return *this; }
+				virtual const IThreadable& Join(Time::DateTime timeOut) const { thread->Join(timeOut); return *this; }
+
+				virtual ~ThreadableUnifiedThreadPoolJob()
+				{
+					delete thread;
+				}
+			};
+		}
+	}
+}
+#pragma endregion
 
 #pragma region Unified thread pool job
 
@@ -1649,6 +1758,7 @@ void Seed::Core::Threading::RegisterThread(UnifiedThreadPoolJob* thread)
 	ConfigureTls(new ThreadableUnifiedThreadPoolJob(thread), &thread->This->threadableState);
 	SetName(thread->This->jobName, thread->This->hThread);
 	thread->This->threadableState = EThreadabledStates::Executing;
+	_ReadWriteBarrier();
 }
 
 void Seed::Core::Threading::UnRegisterThread(UnifiedThreadPoolJob* thread)
@@ -1660,6 +1770,7 @@ void Seed::Core::Threading::UnRegisterThread(UnifiedThreadPoolJob* thread)
 	thread->This->threadableState = EThreadabledStates::Ended;
 	thread->This->hInstance = nullptr;
 	thread->This->poolQueueRef.Remove();
+	_ReadWriteBarrier();
 	DestroyTls();
 }
 
@@ -1772,6 +1883,8 @@ const UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join(Ti
 
 UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Suspend()
 {
+	_ReadWriteBarrier();
+
 	switch (This->threadableState)
 	{
 	case EThreadabledStates::NotStarted: break;
@@ -1783,8 +1896,13 @@ UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Suspend()
 	{
 		This->secondThreadableState = EThreadabledStates::Paused;
 		Swap(This->threadableState, This->secondThreadableState);
+		
+		NTSTATUS status = NtSuspendThread(This->hThread, NULL);
+		if (!NT_SUCCESS(status)) {
+			Swap(This->threadableState, This->secondThreadableState);
+			return *this;
+		}
 		TpDisassociateCallback((PTP_CALLBACK_INSTANCE)This->hInstance);
-		NtSuspendThread(This->hThread, NULL);
 		break;
 	}
 	case EThreadabledStates::Paused: break;
@@ -1796,6 +1914,8 @@ UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Suspend()
 
 UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Resume()
 {
+	_ReadWriteBarrier();
+
 	switch (This->threadableState)
 	{
 	case EThreadabledStates::NotStarted: break;
@@ -1819,6 +1939,8 @@ UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Resume()
 
 UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Interupt()
 {
+	_ReadWriteBarrier();
+
 	switch (This->threadableState)
 	{
 	case EThreadabledStates::NotStarted: break;
@@ -1833,7 +1955,7 @@ UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Interupt()
 		case EThreadabledStates::Paused:
 		{
 			NtSuspendThread(This->hThread, NULL);
-			CONTEXT ctx;
+			CONTEXT ctx = { 0 };
 			ctx.ContextFlags = CONTEXT_ALL;
 			NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
 			if (!NT_SUCCESS(status))
@@ -1859,6 +1981,8 @@ UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Interupt()
 
 void Seed::Core::Threading::UnifiedThreadPoolJob::SetName(String&& newName)
 {
+	_ReadWriteBarrier();
+
 	switch (This->threadableState)
 	{
 	case EThreadabledStates::NotStarted:
@@ -1885,9 +2009,327 @@ void Seed::Core::Threading::UnifiedThreadPoolJob::Dispose()
 {
 	NtClose(This->hEvent);
 }
-
 #pragma endregion
 
+#pragma region Unified thread pool sheduler task
+
+Seed::Core::Threading::UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::UnifiedThreadPool::SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+{
+	return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback));
+}
+
+Seed::Core::Threading::UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::UnifiedThreadPool::SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+{
+	return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), MoveRValue(taskName));
+}
+
+UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::UnifiedThreadPool::SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+{
+	return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), String(taskName));
+}
+
+SRWLock& Seed::Core::Threading::GetTaskLock(UnifiedThreadPoolSheduledTask* task)
+{
+	return task->This->taskLock;
+}
+
+void Seed::Core::Threading::SetCallbackInstanceObj(UnifiedThreadPoolSheduledTask* task, ImplSpecificT callbackInstance)
+{
+	task->This->callbackInstance = callbackInstance;
+}
+
+bool Seed::Core::Threading::IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task)
+{
+	return ((UnifiedThreadPool::Data*)(task->This->ownerPool))->isPoolTermination;
+}
+
+SRWLock& Seed::Core::Threading::GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task)
+{
+	return ((UnifiedThreadPool::Data*)(task->This->ownerPool))->handlesData.TaskConfiguration.PoolLock;
+}
+
+SmartPtr<IUnifiedThreadPoolShedulerCallback>& Seed::Core::Threading::GetJobEntryPoint(UnifiedThreadPoolSheduledTask* task)
+{
+	return task->This->callback;
+}
+
+void Seed::Core::Threading::PulseEvent(UnifiedThreadPoolSheduledTask* task)
+{
+	NtPulseEvent(task->This->hEvent, NULL);
+}
+
+UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolSheduledTask::GetOwnerPool() const
+{
+	auto poolData = ((UnifiedThreadPool::Data*)(This->ownerPool));
+	return UnifiedThreadPool(poolData);
+}
+
+void Seed::Core::Threading::RegisterThread(UnifiedThreadPoolSheduledTask* thread)
+{
+	thread->This->activeTid = (SizeT)NtCurrentThreadId();
+	thread->This->threadbleRef = AllActiveThreadable->AddLast(SmartPtr<IThreadable>(new ThreadableUnifiedThreadPoolSheduledTask(new UnifiedThreadPoolSheduledTask(*thread))));
+	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &thread->This->hActiveThread, GENERIC_ALL, 0, 0);
+	ConfigureTls(new ThreadableUnifiedThreadPoolSheduledTask(new UnifiedThreadPoolSheduledTask(*thread)), &thread->This->activeState);
+	SetName(thread->This->taskName, thread->This->hActiveThread);
+	thread->This->activeState = EThreadabledStates::Executing;
+	_ReadWriteBarrier();
+}
+
+void Seed::Core::Threading::UnRegisterThread(UnifiedThreadPoolSheduledTask* thread)
+{
+	AllActiveThreadable->Remove(thread->This->threadbleRef);
+	ReSetName(thread->This->hActiveThread);
+	NtClose(thread->This->hActiveThread);
+
+	thread->This->activeState = EThreadabledStates::Ended;
+	thread->This->callbackInstance = nullptr;
+	thread->This->activeTid = 0;
+	thread->This->hActiveThread = nullptr;
+	thread->This->executedCount++;
+
+	if (thread->This->remainingCount != 0) {
+		--thread->This->remainingCount;
+	}
+
+	if (thread->This->remainingCount == 0 && thread->This->intervalsCount != 0) {
+		TpReleaseTimer(reinterpret_cast<PTP_TIMER>(thread->This->hTask));
+		delete thread;
+	}
+
+	_ReadWriteBarrier();
+	DestroyTls();
+}
+
+VOID NTAPI UnifiedTaskShedulerTaskCallback(
+	_Inout_					PTP_CALLBACK_INSTANCE Instance,
+	_Inout_ _Notnull_		PVOID                 Context,
+	_Inout_					PTP_TIMER             Timer
+) {
+	using namespace Seed;
+
+	if (Context == NULL)
+		return;
+
+	UnifiedThreadPoolSheduledTask* thread = (UnifiedThreadPoolSheduledTask*)Context;
+	GetTaskLock(thread).ExclusiveLock([&]()
+		{
+			SetCallbackInstanceObj(thread, Instance);
+			if (!IsUnifiedThreadPoolTerminate(thread))
+			{
+				SRWLock& lock = GetUnifiedPoolLock(thread);
+				if (!lock.TryInShareLock([&]()
+					{
+						EntryPoint([&]()
+							{
+								GetJobEntryPoint(thread)->Shedule();
+							}, thread);
+					}
+				))
+				{
+					
+					delete thread;
+				}
+			}
+			else
+			{
+				delete thread;
+			}
+		});
+}
+
+Seed::Core::Threading::UnifiedThreadPoolSheduledTask Seed::Core::Threading::UnifiedThreadPoolSheduledTaskBuilder::Shedule()&&
+{
+	if (This->proximity.Miliseconds > Math::Max<Int32>())
+		Throw(InvalidArgumentException(ExceptionPosition, L"TimerProximity", L"Too low timer proximity(too big maximum allowd delay)"));
+
+	if(This->intervalLenght.Ticks > Math::Max<Int32>())
+		Throw(InvalidArgumentException(ExceptionPosition, L"IntervalLenght", L"Too big interval lenght"));
+
+	Time::DateTime startTime = (!This->isRelaive) ? This->startTime : Time::DateTime::GetCurrentSystemTimeData().Ticks + This->startTime;
+
+	auto shedulerTask = UnifiedThreadPoolSheduledTask(
+		new UnifiedThreadPoolSheduledTask::Data(
+			MoveRValue(This->taskName),
+			MoveRValue(This->callback),
+			This->ownerPool.This,
+			This->startTime,
+			This->intervalLenght,
+			This->intervalsCount,
+			(Int32)This->proximity.Ticks
+		));
+
+	NTSTATUS status = NtCreateEvent(&shedulerTask.This->hEvent, GENERIC_ALL, NULL, EVENT_TYPE::NotificationEvent, FALSE);
+
+	if (!NT_SUCCESS(status))
+		Throw(NtException(ExceptionPosition, status));
+
+	status = TpAllocTimer(
+		(PTP_TIMER*)&shedulerTask.This->hTask,
+		UnifiedTaskShedulerTaskCallback,
+		new UnifiedThreadPoolSheduledTask(shedulerTask),
+		reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->ownerPool.This->handlesData.TaskConfiguration.CallbackEnviroment)
+	);
+
+	if (!NT_SUCCESS(status))
+		Throw(NtException(ExceptionPosition, status));
+
+	LARGE_INTEGER DueTime = { 0 };
+
+	DueTime.QuadPart = startTime.Ticks; 
+
+	TpSetTimer(
+		(PTP_TIMER)shedulerTask.This->hTask,
+		&DueTime,
+		static_cast<Int32>(This->intervalLenght.Miliseconds),
+		static_cast<Int32>(This->proximity.Ticks)
+	);
+
+	return shedulerTask;
+}
+
+void Seed::Core::Threading::UnifiedThreadPoolSheduledTask::SetName(String&& newTaskName)
+{
+	_ReadWriteBarrier();
+	This->taskName = MoveRValue(newTaskName);
+	if (This->hActiveThread != nullptr) {
+		::SetName(This->taskName, This->hActiveThread);
+	}
+}
+
+UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Suspend()
+{
+	_ReadWriteBarrier();
+	switch (This->activeState)
+	{
+	case EThreadabledStates::NotStarted: break;
+	case EThreadabledStates::Interupted: break;
+	case EThreadabledStates::Unknown: break;
+	case EThreadabledStates::Starting: break;
+	case EThreadabledStates::Executing:
+	case EThreadabledStates::ExceptionProcessing:
+	{
+		This->secondState = EThreadabledStates::Paused;
+		Swap(This->activeState, This->secondState);
+		
+		NTSTATUS status = NtSuspendThread(This->hActiveThread, NULL);
+		if (!NT_SUCCESS(status)) {
+			Swap(This->activeState, This->secondState);
+			return *this;
+		}
+		TpDisassociateCallback((PTP_CALLBACK_INSTANCE)This->callbackInstance);
+		break;
+	}
+	case EThreadabledStates::Paused: break;
+	default:
+		break;
+	}
+	return *this;
+}
+
+UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Resume()
+{
+	_ReadWriteBarrier();
+	switch (This->activeState)
+	{
+	case EThreadabledStates::NotStarted: break;
+	case EThreadabledStates::Interupted: break;
+	case EThreadabledStates::Unknown: break;
+	case EThreadabledStates::Starting: break;
+	case EThreadabledStates::Executing: break;
+	case EThreadabledStates::ExceptionProcessing: break;
+	case EThreadabledStates::Paused:
+	{
+		This->secondState = EThreadabledStates::Paused;
+		Swap(This->activeState, This->secondState);
+		NTSTATUS status = NtAlertResumeThread(This->hActiveThread, NULL);
+		if (!NT_SUCCESS(status)) {
+			Swap(This->activeState, This->secondState);
+		}
+		break;
+	}
+	default:
+		break;
+	}
+	return *this;
+}
+
+UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Interupt()
+{
+	_ReadWriteBarrier();
+	switch (This->activeState)
+	{
+	case EThreadabledStates::NotStarted: break;
+	case EThreadabledStates::Interupted: break;
+	case EThreadabledStates::Unknown: break;
+	case EThreadabledStates::Starting: break;
+	default:
+		switch (This->activeState)
+		{
+		case EThreadabledStates::Executing:
+		case EThreadabledStates::ExceptionProcessing:
+		case EThreadabledStates::Paused:
+		{
+			NTSTATUS status = NtSuspendThread(This->hActiveThread, NULL);
+			if (!NT_SUCCESS(status)) {
+				return *this;
+			}
+			CONTEXT ctx = { 0 };
+			ctx.ContextFlags = CONTEXT_ALL;
+			status = ZwGetContextThread(This->hActiveThread, &ctx);
+			if (!NT_SUCCESS(status))
+			{
+				NtResumeThread(This->hActiveThread, NULL);
+				Throw(NtException(ExceptionPosition, status));
+			}
+			DWORD64 ret_point = ctx.Rip;
+			ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
+			status = ZwSetContextThread(This->hActiveThread, &ctx);
+			NtResumeThread(This->hActiveThread, NULL);
+			if (!NT_SUCCESS(status))
+				Throw(NtException(ExceptionPosition, status));
+			NtAlertThread(This->hActiveThread);
+		}
+		default:
+			break;
+		}
+		break;
+	}
+	return *this;
+}
+
+UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Join()
+{
+	NtWaitForSingleObject(This->hEvent, TRUE, NULL);
+	return *this;
+}
+
+UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Join(Time::DateTime timeOut)
+{
+	LARGE_INTEGER delay = { 0 };
+	delay.QuadPart = timeOut.TimeFromStartEpoch;
+	NtWaitForSingleObject(This->hEvent, TRUE, &delay);
+	return *this;
+}
+
+const UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Join() const
+{
+	NtWaitForSingleObject(This->hEvent, TRUE, NULL);
+	return *this;
+}
+
+const UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Join(Time::DateTime timeOut) const
+{
+	LARGE_INTEGER delay = { 0 };
+	delay.QuadPart = timeOut.TimeFromStartEpoch;
+	NtWaitForSingleObject(This->hEvent, TRUE, &delay);
+	return *this;
+}
+
+void Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Dispose()
+{
+}
+
+#pragma endregion
 #pragma endregion
 
 #pragma warning(pop)

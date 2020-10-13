@@ -119,6 +119,7 @@ namespace Seed {
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual const IThreadable& Join(Time::DateTime timeOut) const = 0;
+
 				virtual ~IThreadable() = 0 {}
 			};
 
@@ -153,7 +154,13 @@ namespace Seed {
 			/// Призупиняє виконання потоку на задану кількість мілісекунд
 			/// </summary>
 			/// <param name="ms">Кількість мілісекунд</param>
-			inline void Sleep(UInt64 ms) { Sleep(Time::DateTime((Time::SecondInNtTime / 1000) * ms), true); }
+			ForceInline void Sleep(UInt64 ms) { Sleep(Time::DateTime((Time::SecondInNtTime / 1000) * ms), true); }
+
+			/// <summary>
+			/// Призупиняє виконання потоку на заданий проміжок часу
+			/// </summary>
+			/// <param name="time">Заданий проміжок часу</param>
+			ForceInline void Sleep(Time::TimeSpan time) { Sleep(Time::DateTime(time.Ticks), true); }
 
 			/// <summary>
 			/// Стани задач

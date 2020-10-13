@@ -27,7 +27,7 @@ bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateEmptyUn
     return true;
 }
 
-bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnifiedThreadPoolWithjobs::Excecute()
+bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnifiedThreadPoolWithJobs::Excecute()
 {
     constexpr SizeT jobsCount = 1000;
 
@@ -71,6 +71,56 @@ bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnified
     Asserts::AssertTrue(jobsResults.All(ArrowFunct(x, x == true)));
 
     Asserts::AssertEqual(pool.JobsCount, 0);
+
+    return true;
+}
+
+bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnifiedThreadPoolWithSheduledTasks::Excecute()
+{
+    class TestSheduleCallback final : public Core::Threading::IUnifiedThreadPoolShedulerCallback {
+    private:
+        Core::Containers::ConcurencyList<bool> list;
+    protected:
+        virtual void Dispose() override {}
+    public:
+        TestSheduleCallback(const Core::Containers::ConcurencyList<bool>& list) : list(list) {}
+
+        virtual void Shedule() override {
+            list += Core::Threading::GetThis().GetThreadabledState() == Core::Threading::EThreadabledStates::Executing;
+            list += Core::Threading::GetThis().GetThreadableType() == Core::Threading::EThreadableTypes::ScheduledTask;
+            list += Core::Threading::GetThis().GetID() != 0;
+        }
+
+        virtual ~TestSheduleCallback() { Dispose(); }
+    };
+
+    auto pool = Core::Threading::UnifiedThreadPoolBuilder()
+        .SetName(L"Test thread pool")
+        .SetThreadPoolPriority(Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::Low)
+        .SetJobThreadsPriority(Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High)
+        .SetShedulerThreadsPriority(Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::Low)
+        .SetIOThreadsPriority(Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High)
+        .SetMinThreadCount(1)
+        .SetMaxThreadCount(8)
+        .CreateThreadPool();
+
+    auto jobsResults = Core::Containers::ConcurencyList<bool>();
+
+    auto task = pool.SheduleJob(L"Tests task"S, new TestSheduleCallback(jobsResults))
+        .SetExecutionCount(3)
+        .SetIntervalLenght(100ms)
+        .SetProximity(10ms)
+        .SetStartTime(0s)
+        .Shedule();
+
+    Core::Threading::Sleep(100ms * 4);
+
+    Asserts::AssertEqual(task.ExecutedCount, 3);
+    Asserts::AssertEqual(task.TimerProximity, 10ms);
+
+    Asserts::AssertEqual(jobsResults.Count, 3 * 3);
+
+    Asserts::AssertTrue(jobsResults.All(ArrowFunct(x, x == true)));
 
     return true;
 }

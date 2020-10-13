@@ -59,6 +59,13 @@ namespace Seed {
 
 			class UnifiedThreadPoolBuilder;
 
+			class IUnifiedThreadPoolShedulerCallback : protected IDisposable {
+			public:
+				virtual void Shedule() = 0;
+			public:
+				virtual ~IUnifiedThreadPoolShedulerCallback() = 0 {}
+			};
+
 			class UnifiedThreadPoolJob final : protected IDisposable {
 			public:
 				friend class UnifiedThreadPool;
@@ -135,17 +142,136 @@ namespace Seed {
 				String Property(GetName, SetName) Name;
 				Boolean Property(GetIsAlredyExecuted) IsAlredyExecuted;
 				Boolean Property(GetIsStartedExecution) IsStartedExecution;
+			private:
+				UnifiedThreadPoolJob& Suspend();
+				UnifiedThreadPoolJob& Resume();
+				UnifiedThreadPoolJob& Interupt();
 			public:
-				virtual UnifiedThreadPoolJob& Suspend();
-				virtual UnifiedThreadPoolJob& Resume();
-				virtual UnifiedThreadPoolJob& Interupt();
-
-				virtual UnifiedThreadPoolJob& Join();
-				virtual UnifiedThreadPoolJob& Join(Time::DateTime timeOut);
-				virtual const UnifiedThreadPoolJob& Join() const;
-				virtual const UnifiedThreadPoolJob& Join(Time::DateTime timeOut) const;
+				UnifiedThreadPoolJob& Join();
+				UnifiedThreadPoolJob& Join(Time::DateTime timeOut);
+				const UnifiedThreadPoolJob& Join() const;
+				const UnifiedThreadPoolJob& Join(Time::DateTime timeOut) const;
 			public:
 				RefCountClass(UnifiedThreadPoolJob, This);
+			};
+
+			class UnifiedThreadPoolSheduledTask final : protected IDisposable {
+			private:
+				friend class UnifiedThreadPoolSheduledTaskBuilder;
+				friend class ThreadableUnifiedThreadPoolSheduledTask;
+			private:
+				struct Data {
+					String taskName;
+					SmartPtr<IUnifiedThreadPoolShedulerCallback> callback;
+					
+					ImplSpecificT ownerPool;
+					Containers::ConcurencyList<UnifiedThreadPoolSheduledTask>::Iterator poolQueueRef;
+					
+					
+					Time::DateTime startTime;
+					Time::TimeSpan intervalLenght;
+					Time::DateTime lastStartTime;
+
+					RefCountT intervalsCount;
+					RefCountT executedCount;
+					RefCountT remainingCount;
+					Int32 timerProximity;
+
+					Handle hTask;
+					SRWLock taskLock;
+
+					ID activeTid;
+					Handle hActiveThread;
+					Handle hEvent;
+					EThreadabledStates activeState;
+					EThreadabledStates secondState;
+					ImplSpecificT callbackInstance;
+					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator threadbleRef;
+
+					RefCountT RefCount;
+
+					Data(String&& taskName,
+						SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback,
+						ImplSpecificT ownerPool,
+						Time::DateTime startTime,
+						Time::TimeSpan intervalLenght,
+						UInt64 intervalsCount,
+						Int32 timerProximity	
+					) :
+						taskName(MoveRValue(taskName)),
+						callback(MoveRValue(callback)),
+						ownerPool(ownerPool),
+						poolQueueRef(),
+						startTime(startTime),
+						intervalLenght(intervalLenght),
+						lastStartTime(0),
+						intervalsCount(intervalsCount),
+						executedCount(0),
+						remainingCount(intervalsCount),
+						timerProximity(timerProximity),
+						hTask(nullptr),
+						taskLock(),
+						activeTid(0),
+						hActiveThread(nullptr),
+						hEvent(nullptr),
+						activeState(EThreadabledStates::NotStarted),
+						secondState(EThreadabledStates::NotStarted),
+						callbackInstance(nullptr),
+						threadbleRef(),
+						RefCount(1)
+					{}
+				};
+			private:
+				Data* This;
+			protected:
+				virtual void Dispose() override;
+			private:
+				UnifiedThreadPoolSheduledTask(Data* This) : This(This) {}
+			private:
+				friend SRWLock& GetTaskLock(UnifiedThreadPoolSheduledTask* task);
+				friend void SetCallbackInstanceObj(UnifiedThreadPoolSheduledTask* task, ImplSpecificT callbackInstance);
+				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task);
+				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task);
+				friend SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetJobEntryPoint(UnifiedThreadPoolSheduledTask* task);
+				friend void PulseEvent(UnifiedThreadPoolSheduledTask* task);
+				friend void ZeroingTaskHadle(UnifiedThreadPoolSheduledTask* thread);
+			private:
+				friend void RegisterThread(UnifiedThreadPoolSheduledTask* thread);
+				friend void UnRegisterThread(UnifiedThreadPoolSheduledTask* thread);
+				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
+			public:
+				const String& GetTaskName() const { return This->taskName; }
+				void SetName(String&& newTaskName);
+				void SetName(const String& newTaskName) { SetName(String(newTaskName)); }
+			public:
+				SizeT GetExecutedCount() const { return This->executedCount; }
+				Time::DateTime GetLastStartTime() const { return This->lastStartTime; }
+				Boolean GetIsActive() const { return This->hActiveThread != nullptr; }
+				UnifiedThreadPool GetOwnerPool() const;
+				Time::TimeSpan GetTimerProximity() const { return Time::TimeSpan(This->timerProximity); }
+				Time::DateTime GetFirstStartTime() const { return This->startTime; }
+				SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetCallbackObject() const { return This->callback; }
+			public:
+				SizeT Property(GetExecutedCount) ExecutedCount;
+				Time::DateTime Property(GetLastStartTime) LastStartTime;
+				Boolean Property(GetIsActive) IsActive;
+				UnifiedThreadPool Property(OwnerPool) OwnerPool;
+				Time::TimeSpan Property(GetTimerProximity) TimerProximity;
+				Time::DateTime Property(GetFirstStartTime)FirstStartTime;
+				SmartPtr<IUnifiedThreadPoolShedulerCallback> Property(GetCallbackObject) CallbackObject;
+			private:
+				UnifiedThreadPoolSheduledTask& Suspend();
+				UnifiedThreadPoolSheduledTask& Resume();
+				UnifiedThreadPoolSheduledTask& Interupt();
+			public:
+				UnifiedThreadPoolSheduledTask& Join();
+				UnifiedThreadPoolSheduledTask& Join(Time::DateTime timeOut);
+				const UnifiedThreadPoolSheduledTask& Join() const;
+				const UnifiedThreadPoolSheduledTask& Join(Time::DateTime timeOut) const;
+			public:
+				static constexpr auto MaxIntervalLenght = Time::TimeSpan().AddMiliSeconds(Math::Max<Int32>());
+			public:
+				RefCountClass(UnifiedThreadPoolSheduledTask, This);
 			};
 
 			class UnifiedThreadPool final : protected IDisposable {
@@ -218,7 +344,12 @@ namespace Seed {
 				static void DestroyConfiguration(PoolConfigureation& poolConfiguration);
 			private:
 				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolJob* jobObj);
+				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task);
 				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolJob* jobObj);
+				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task);
+
+				friend void UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj);
+				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
 			private:
 				UnifiedThreadPool(Data*&& This) :This(MoveRValue(This)) {}
 				UnifiedThreadPool(Data*& This) :This(This) { ++This->RefCount;  }
@@ -231,10 +362,10 @@ namespace Seed {
 				UnifiedThreadPoolJob PostJob(const String& jobName, Delegate&& action) {
 					return PostJob(String(jobName), MoveRValue(action));
 				}
-			//public:
-			//	UnifiedThreadPoolSheduledTaskBuilder SheduleJob(Delegate&& action);
-			//	UnifiedThreadPoolSheduledTaskBuilder SheduleJob(String&& jobName, Delegate&& action);
-			//	UnifiedThreadPoolSheduledTaskBuilder SheduleJob(const String& jobName, Delegate&& action);
+			public:
+				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
+				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
+				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
 			public:
 				SizeT GetJobsCount() const { return This->JobsQueue.Count; }
 				SizeT GetSheduledTaskCount() const { return This->TaskQueue.Count; }
@@ -378,48 +509,108 @@ namespace Seed {
 				}
 			};
 
-			class ThreadableUnifiedThreadPoolJob;
-
-			
-
-			class ThreadableUnifiedThreadPoolJob final : public Seed::Core::Threading::IThreadable {
+			class UnifiedThreadPoolSheduledTaskBuilder final {
 			private:
-				friend void RegisterThread(UnifiedThreadPoolJob* thread);
+				friend class UnifiedThreadPool;
 			private:
-				UnifiedThreadPoolJob* thread;
-			private:
-				ThreadableUnifiedThreadPoolJob(UnifiedThreadPoolJob* thread) : thread(thread) {}
-			public:
-				virtual const String& GetName() const { return thread->This->jobName; }
-				virtual void SetName(const String& newName) { thread->SetName(newName); }
-
-				virtual UInt64 GetID() const { return thread->This->threadId; }
-
-				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::JobTask; }
-				virtual EThreadabledStates GetThreadabledState() const { return thread->This->threadableState; }
-
-				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
-
-				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
-				virtual Boolean IsHaveParrentThreadable() const { return false; }
-
-				virtual IThreadable& Suspend() { thread->Suspend(); return *this; }
-				virtual IThreadable& Resume() { thread->Resume(); return *this; }
-				virtual IThreadable& Interupt() { thread->Interupt(); return *this; }
-
-				virtual IThreadable& Join() { thread->Join(); return *this; }
-				virtual IThreadable& Join(Time::DateTime timeOut) { thread->Join(timeOut); return *this; }
-				virtual const IThreadable& Join() const { thread->Join(); return *this; }
-				virtual const IThreadable& Join(Time::DateTime timeOut) const { thread->Join(timeOut); return *this; }
-
-				virtual ~ThreadableUnifiedThreadPoolJob()
+				struct Data
 				{
-					delete thread;
+					String taskName;
+					UInt16 intervalsCount;
+					Time::TimeSpan proximity;
+					Time::TimeSpan intervalLenght;
+					UInt64 startTime;
+					Boolean isRelaive;
+					SmartPtr<IUnifiedThreadPoolShedulerCallback> callback;
+					UnifiedThreadPool ownerPool;
+
+					Data(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback) :
+						taskName(),
+						proximity(100ms),
+						intervalsCount(0),
+						intervalLenght(0),
+						startTime(0),
+						isRelaive(true),
+						callback(MoveRValue(callback)),
+						ownerPool(ownerPool)
+					{}
+
+					Data(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& taskName) :
+						taskName(MoveRValue(taskName)),
+						proximity(100ms),
+						intervalsCount(0),
+						intervalLenght(0),
+						startTime(0),
+						isRelaive(true),
+						callback(MoveRValue(callback)),
+						ownerPool(ownerPool)
+					{}
+				};
+			private:
+				Data* This;
+			private:
+				UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+					: This(new Data(ownerPool, MoveRValue(callback))) {}
+				UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& taskName)
+					: This(new Data(ownerPool, MoveRValue(callback), MoveRValue(taskName))) {}
+			public:
+				UnifiedThreadPoolSheduledTaskBuilder&& SetCallback(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)&& {
+					This->callback = MoveRValue(callback);
+					return MoveRValue(*this);
+				}
+			public:
+				UnifiedThreadPoolSheduledTaskBuilder&& SetName(String&& name)&& {
+					This->taskName = MoveRValue(name);
+					return MoveRValue(*this);
+				}
+
+				UnifiedThreadPoolSheduledTaskBuilder&& SetName(const String& name)&& {
+					This->taskName = name;
+					return MoveRValue(*this);
+				}
+
+				UnifiedThreadPoolSheduledTaskBuilder&& SetExecutionCount(UInt16 count)&& {
+					This->intervalsCount = count;
+					return MoveRValue(*this);
+				}
+
+				UnifiedThreadPoolSheduledTaskBuilder&& SetIntervalLenght(Time::TimeSpan intervalLenght)&& {
+					if(This->intervalLenght > MaxIntervalLenght)
+						Throw(InvalidArgumentException(ExceptionPosition, L"IntervalLenght", L"Too big interval lenght"));
+					This->intervalLenght = intervalLenght;
+					return MoveRValue(*this);
+				}
+
+				UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::DateTime absoluteStartTime)&& {
+					This->startTime = absoluteStartTime.TimeFromStartEpoch;
+					This->isRelaive = false;
+					return MoveRValue(*this);
+				}
+
+				UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::TimeSpan relativeStartTime)&& {
+					This->startTime = relativeStartTime.Ticks;
+					This->isRelaive = true;
+					return MoveRValue(*this);
+				}
+
+				UnifiedThreadPoolSheduledTaskBuilder&& SetProximity(Time::TimeSpan proximity)&& {
+					This->proximity = proximity;
+					return MoveRValue(*this);
+				}
+			public:
+				UnifiedThreadPoolSheduledTask Shedule()&&;
+			public:
+				static constexpr auto MaxIntervalLenght = UnifiedThreadPoolSheduledTask::MaxIntervalLenght;
+			public:
+				~UnifiedThreadPoolSheduledTaskBuilder()
+				{
+					if (This != nullptr) {
+						delete This;
+					}
 				}
 			};
 
-			class UnifiedThreadPoolSheduledTask {};
-			class UnifiedThreadPoolSheduledTaskBuilder {};
+			class ThreadableUnifiedThreadPoolJob;
 			class UnifiedThreadPoolIoTask {};
 		}
 

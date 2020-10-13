@@ -16,7 +16,11 @@ namespace Seed
                             virtual bool Excecute() override;
                         };
 
-                        class CreateUnifiedThreadPoolWithjobs final : public TestClass<CreateUnifiedThreadPoolWithjobs> {
+                        class CreateUnifiedThreadPoolWithJobs final : public TestClass<CreateUnifiedThreadPoolWithJobs> {
+                            virtual bool Excecute() override;
+                        };
+
+                        class CreateUnifiedThreadPoolWithSheduledTasks final : public TestClass<CreateUnifiedThreadPoolWithSheduledTasks> {
                             virtual bool Excecute() override;
                         };
                     }

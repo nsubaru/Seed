@@ -88,7 +88,7 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор, ініціалізує даьу 1600.0.0 0:0:0.0
 				/// </summary>
-				constexpr Date() noexcept :Year(1600), Month(0), WeekDay(0), Day(0), Hour(0), Minutes(0), Second(0), MiliSecond(0) {};
+				ForceInline constexpr Date() noexcept :Year(1600), Month(0), WeekDay(0), Day(0), Hour(0), Minutes(0), Second(0), MiliSecond(0) {};
 				/// <summary>
 				/// Конструктор з дати і часу
 				/// </summary>
@@ -100,7 +100,7 @@ namespace Seed {
 				/// <param name="Minutes">Хвилина</param>
 				/// <param name="Seconds">Секунда</param>
 				/// <param name="MiliSeconds">Мілісекунда</param>
-				constexpr Date(UInt16 Year, UInt16 Month, UInt16 WeekDay, UInt16 Day,
+				ForceInline constexpr Date(UInt16 Year, UInt16 Month, UInt16 WeekDay, UInt16 Day,
 					UInt16 Hour, UInt16 Minutes, UInt16 Seconds, UInt16 MiliSeconds)
 					noexcept :Year(Year), Month(Month), WeekDay(WeekDay), Day(Day),
 					Hour(Hour), Minutes(Minutes), Second(Seconds), MiliSecond(MiliSeconds) {};
@@ -171,7 +171,7 @@ namespace Seed {
 				/// <param name="Seconds">Секунда</param>
 				/// <param name="MiliSeconds">Мілісекунда</param>
 				/// <param name="Ticks">Кількість тіків</param>
-				constexpr DateSpan(
+				ForceInline constexpr DateSpan(
 					UInt16 Year = 0,
 					UInt16 Month = 0,
 					UInt16 Weeks = 0,
@@ -215,17 +215,17 @@ namespace Seed {
 				/// <summary>
 				/// Конструктор ініціалізує нульльовий відрізок
 				/// </summary>
-				constexpr TimeSpan() : Ticks(0) {}
+				ForceInline constexpr TimeSpan() : Ticks(0) {}
 				/// <summary>
 				/// Конструктор з кількост тіків, створює відрізок з вказаною кількість тіків
 				/// </summary>
 				/// <param name="ticks">Кількість тіків</param>
-				constexpr TimeSpan(UInt64 ticks) : Ticks(ticks) {}
+				ForceInline constexpr TimeSpan(UInt64 ticks) : Ticks(ticks) {}
 				/// <summary>
 				/// Конструктор з відрізку дати, ствоює відрізок з вказаного відрізку дати
 				/// </summary>
 				/// <param name="dateSpan">Відрізок дати</param>
-				constexpr TimeSpan(DateSpan dateSpan) : Ticks(0) {
+				ForceInline constexpr TimeSpan(DateSpan dateSpan) : Ticks(0) {
 					Ticks += dateSpan.MiliSecond * MiliSecondsTicksCount;
 					Ticks += dateSpan.Second * SecondTicksCount;
 					Ticks += dateSpan.Minutes * MinutesTicksCount;
@@ -241,7 +241,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="ticksCount">Кількість тіків</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddTicks(Int32 ticksCount) {
+				ForceInline constexpr TimeSpan& AddTicks(Int32 ticksCount) {
 					if (ticksCount < 0) {
 						Ticks -= (-ticksCount);
 					}
@@ -257,7 +257,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="miliSeconds">Кількість мілісекунд</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddMiliSeconds(Int32 miliSeconds) {
+				ForceInline constexpr TimeSpan& AddMiliSeconds(Int32 miliSeconds) {
 					if (miliSeconds < 0) {
 						Ticks -= (-miliSeconds) * MiliSecondsTicksCount;
 					}
@@ -273,7 +273,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="seconds">Кількість секунд</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddSeconds(Int32 seconds) {
+				ForceInline constexpr TimeSpan& AddSeconds(Int32 seconds) {
 					if (seconds < 0) {
 						Ticks -= (-seconds) * SecondTicksCount;
 					}
@@ -289,7 +289,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="minutes">Кількість хвилин</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddMinutes(Int32 minutes) {
+				ForceInline constexpr TimeSpan& AddMinutes(Int32 minutes) {
 					if (minutes < 0) {
 						Ticks -= (-minutes) * MinutesTicksCount;
 					}
@@ -305,7 +305,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="hours">Кількість годин</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddHours(Int32 hours) {
+				ForceInline constexpr TimeSpan& AddHours(Int32 hours) {
 					if (hours < 0) {
 						Ticks -= (-hours) * HourTicksCount;
 					}
@@ -321,7 +321,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="days">Кількість днів</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddDays(Int32 days) {
+				ForceInline constexpr TimeSpan& AddDays(Int32 days) {
 					if (days < 0) {
 						Ticks -= (-days) * DayTicksCount;
 					}
@@ -337,7 +337,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="weeks">Кількість тижнів</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddWeeks(Int32 weeks) {
+				ForceInline constexpr TimeSpan& AddWeeks(Int32 weeks) {
 					if (weeks < 0) {
 						Ticks -= (-weeks) * WeekTicksCount;
 					}
@@ -353,7 +353,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="months">Кількість місяців</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddMonths(Int32 months) {
+				ForceInline constexpr TimeSpan& AddMonths(Int32 months) {
 					if (months < 0) {
 						Ticks -= (-months) * MonthTicksCount;
 					}
@@ -369,7 +369,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="years">Кількість років</param>
 				/// <returns>Нове значення об'єкта</returns>
-				constexpr TimeSpan& AddYears(Int32 years) {
+				ForceInline constexpr TimeSpan& AddYears(Int32 years) {
 					if (years < 0) {
 						Ticks -= (-years) * YearTicksCount;
 					}
@@ -384,7 +384,7 @@ namespace Seed {
 				/// Вертає кількість мілісекунд
 				/// </summary>
 				/// <returns>Кількість мілісекунд</returns>
-				constexpr Double GetMiliseconds() const {
+				ForceInline constexpr Double GetMiliseconds() const {
 					return this->Ticks / (MiliSecondsTicksCount * 1.0);
 				}
 
@@ -392,7 +392,7 @@ namespace Seed {
 				/// Вертає кількість секунд
 				/// </summary>
 				/// <returns>Кількість секунд</returns>
-				constexpr Double GetSeconds() const {
+				ForceInline constexpr Double GetSeconds() const {
 					return this->Ticks / (SecondTicksCount * 1.0);
 				}
 
@@ -400,7 +400,7 @@ namespace Seed {
 				/// Вертає кількість хвилин
 				/// </summary>
 				/// <returns>Кількість хвилин</returns>
-				constexpr Double GetMinutes() const {
+				ForceInline constexpr Double GetMinutes() const {
 					return this->Ticks / (MinutesTicksCount * 1.0);
 				}
 
@@ -408,7 +408,7 @@ namespace Seed {
 				/// Вертає кількість годин
 				/// </summary>
 				/// <returns>Кількість годин</returns>
-				constexpr Double GetHours() const {
+				ForceInline constexpr Double GetHours() const {
 					return this->Ticks / (HourTicksCount * 1.0);
 				}
 
@@ -416,7 +416,7 @@ namespace Seed {
 				/// Вертає кількість днів
 				/// </summary>
 				/// <returns>Кількість днів</returns>
-				constexpr Double GetDays() const {
+				ForceInline constexpr Double GetDays() const {
 					return this->Ticks / (DayTicksCount * 1.0);
 				}
 
@@ -424,7 +424,7 @@ namespace Seed {
 				/// Вертає кількість тижнів
 				/// </summary>
 				/// <returns>Кількість тижнів</returns>
-				constexpr Double GetWeeks() const {
+				ForceInline constexpr Double GetWeeks() const {
 					return this->Ticks / (WeekTicksCount * 1.0);
 				}
 
@@ -432,7 +432,7 @@ namespace Seed {
 				/// Вертає кількість місяців
 				/// </summary>
 				/// <returns>Кількість місяців</returns>
-				constexpr Double GetMonths() const {
+				ForceInline constexpr Double GetMonths() const {
 					return this->Ticks / (MonthTicksCount * 1.0);
 				}
 
@@ -440,7 +440,7 @@ namespace Seed {
 				/// Вертає кількість років
 				/// </summary>
 				/// <returns>Кількість років</returns>
-				constexpr Double GetYears() const {
+				ForceInline constexpr Double GetYears() const {
 					return this->Ticks / (YearTicksCount * 1.0);
 				}
 			public:
@@ -488,7 +488,7 @@ namespace Seed {
 				/// <summary>
 				/// Перетворення в відрізок дат
 				/// </summary>
-				constexpr operator DateSpan() const {
+				ForceInline constexpr operator DateSpan() const {
 					UInt64 delta = 0;
 
 					UInt64 yearsCount = Ticks / YearTicksCount;
@@ -532,9 +532,56 @@ namespace Seed {
 				/// Вертає кількість тіків
 				/// </summary>
 				/// <returns>Кількість тіків</returns>
-				constexpr UInt64 GetTicks() const {
+				ForceInline constexpr UInt64 GetTicks() const {
 					return this->Ticks;
 				}
+			public:
+				/// <summary>
+				/// Перевірка на рівність двох відрізків часу
+				/// </summary>
+				/// <param name="other">Другий операнд</param>
+				/// <returns>true якщо відрізки рівні, інакше false</returns>
+				ForceInline constexpr bool operator==(const TimeSpan& other) const { return this->Ticks == other.Ticks; }
+
+				/// <summary>
+				/// Перевірка на нерівність двох відрізків часу
+				/// </summary>
+				/// <param name="other">Другий операнд</param>
+				/// <returns>true якщо відрізки не рівні, інакше false</returns>
+				ForceInline constexpr bool operator!=(const TimeSpan& other) const { return this->Ticks != other.Ticks; }
+
+				/// <summary>
+				/// Порівняння двох відрізків
+				/// </summary>
+				/// <param name="other">Другий операнд</param>
+				/// <returns>Результат порівняння</returns>
+				ForceInline constexpr auto operator<=>(const TimeSpan& other) const { return this->Ticks <=> other.Ticks; }
+			public:
+				/// <summary>
+				/// Множення часу на число, збільшує проміжок у задану кількість раз
+				/// </summary>
+				/// <param name="number">Множник</param>
+				/// <returns>Результуюче значення</returns>
+				constexpr TimeSpan operator*(SizeT number) { return TimeSpan(this->Ticks * number); }
+				/// <summary>
+				/// Ділення часу на число, зменшує проміжок часу у задану кількість раз
+				/// </summary>
+				/// <param name="number">Дільник</param>
+				/// <returns>Результуюче значення</returns>
+				constexpr TimeSpan operator/(SizeT number) { return TimeSpan(this->Ticks / number); }
+
+				/// <summary>
+				/// Множення поточного об'єкту часу на число, збільшкє проміжок у задану кількість раз
+				/// </summary>
+				/// <param name="number">Множник</param>
+				/// <returns>Поточний об'єкт</returns>
+				constexpr TimeSpan& operator*=(SizeT number) { this->Ticks *= number; return *this; }
+				/// <summary>
+				/// Ділення поточно об'єкт часу на число, зменшує проміжок у задану кількість раз
+				/// </summary>
+				/// <param name="number">Дільник</param>
+				/// <returns>Поточний об'єкт</returns>
+				constexpr TimeSpan& operator/=(SizeT number) { this->Ticks /= number; return *this; }
 			};
 
 			/// <summary>
@@ -547,51 +594,51 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор
 				/// </summary>
-				constexpr DateTime() = default;//-V730
+				ForceInline constexpr DateTime() = default;
 				/// <summary>
 				/// Конструктор з задаванням 100 наносекндних інтервалах
 				/// </summary>
-				constexpr DateTime(UInt64 time) :Ticks(time) {}; //-V730
+				ForceInline constexpr DateTime(UInt64 time) :Ticks(time) {}; 
 				/// <summary>
 				/// Копіювальний конструктор
 				/// </summary>
-				constexpr DateTime(const DateTime& orig) :Ticks(orig.Ticks) {}; //-V730
+				ForceInline constexpr DateTime(const DateTime& orig) :Ticks(orig.Ticks) {}; 
 				/// <summary>
 				/// Оператор додавання до поточного часу
 				/// </summary>
 				/// <param name="time">Правий операнд</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				constexpr DateTime& operator+=(DateTime time) { this->Ticks += time.Ticks; return *this; }
+				ForceInline constexpr DateTime& operator+=(DateTime time) { this->Ticks += time.Ticks; return *this; }
 				/// <summary>
 				/// Оператор віднімання від поточного часу
 				/// </summary>
 				/// <param name="time">Правий операнд</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				constexpr DateTime& operator-=(DateTime time) { this->Ticks -= time.Ticks; return *this; }
+				ForceInline constexpr DateTime& operator-=(DateTime time) { this->Ticks -= time.Ticks; return *this; }
 				/// <summary>
 				/// Оператор додавання
 				/// </summary>
 				/// <param name="time1">Лівий операнд</param>
 				/// <param name="time2">Правий операнд</param>
 				/// <returns>Результат операції</returns>
-				constexpr friend DateTime operator+(DateTime time1, DateTime time2) { return time1.Ticks + time2.Ticks; }
+				ForceInline constexpr friend DateTime operator+(DateTime time1, DateTime time2) { return time1.Ticks + time2.Ticks; }
 				/// <summary>
 				/// Оператор віднімання
 				/// </summary>
 				/// <param name="time1">Лівий операнд</param>
 				/// <param name="time2">Правий операнд</param>
 				/// <returns>Результат операції</returns>
-				constexpr friend DateTime operator-(DateTime time1, DateTime time2) { return time1.Ticks - time2.Ticks; }
+				ForceInline constexpr friend DateTime operator-(DateTime time1, DateTime time2) { return time1.Ticks - time2.Ticks; }
 				/// <summary>
 				/// Вертає кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 				/// </summary>
 				/// <returns>Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року</returns>
-				constexpr UInt64 GetMsFrom1600() const volatile { return Ticks; }
+				ForceInline constexpr UInt64 GetMsFrom1600() const volatile { return Ticks; }
 				/// <summary>
 				/// Встановлює час як кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 				/// </summary>
 				/// <param name="AbsoluteTime">Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року</param>
-				constexpr void SetMsFrom1600(UInt64 AbsoluteTime) volatile { this->Ticks = AbsoluteTime; }
+				ForceInline constexpr void SetMsFrom1600(UInt64 AbsoluteTime) volatile { this->Ticks = AbsoluteTime; }
 				/// <summary>
 				/// Кількість 100 наносекудних інтервалів пройдених з 1 січня 1600 року
 				/// </summary>
@@ -600,7 +647,7 @@ namespace Seed {
 				/// Вертає кількість 100 наносекудних інтервалів у відносному форматі
 				/// </summary>
 				/// <returns></returns>
-				constexpr UInt64 GetAsRelativeTime() const volatile { return -static_cast<Int64>(Ticks); }
+				ForceInline constexpr UInt64 GetAsRelativeTime() const volatile { return -static_cast<Int64>(Ticks); }
 				/// <summary>
 				/// Кількість 100 наносекудних інтервалів у відносному форматі
 				/// </summary>
@@ -628,7 +675,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="newValue">Правий операнд</param>
 				/// <returns>Посилання на поточний об'єки</returns>
-				DateTime& operator=(DateTime newValue) {
+				ForceInline constexpr DateTime& operator=(DateTime newValue) {
 					this->Ticks = newValue.Ticks; return *this;
 				}
 				/// <summary>
@@ -636,7 +683,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="newValue">Правий операнд</param>
 				/// <returns>Посилання на поточний об'єки</returns>
-				volatile DateTime& operator=(const volatile DateTime& newValue) volatile { this->Ticks = newValue.Ticks; return *this; }
+				ForceInline constexpr volatile DateTime& operator=(const volatile DateTime& newValue) volatile { this->Ticks = newValue.Ticks; return *this; }
 			};
 
 			/// <summary>
@@ -656,21 +703,21 @@ namespace Seed {
 				/// <summary>
 				/// Пустий конструктор, ініціалізує пустий часовий діапазон
 				/// </summary>
-				constexpr TimeRange() : StartTime(), Durration() {}
+				ForceInline constexpr TimeRange() : StartTime(), Durration() {}
 
 				/// <summary>
 				/// Конструктор з початку і тривалості діапазону часу
 				/// </summary>
 				/// <param name="startTime">Початок діапазону часу</param>
 				/// <param name="durration">Тривалість діапазону часу</param>
-				constexpr TimeRange(DateTime startTime, TimeSpan durration) : StartTime(startTime), Durration(durration) {}
+				ForceInline constexpr TimeRange(DateTime startTime, TimeSpan durration) : StartTime(startTime), Durration(durration) {}
 
 				/// <summary>
 				/// Конструктор з початку і кінця діапазону часу
 				/// </summary>
 				/// <param name="startTime">Початок діапазону часу</param>
 				/// <param name="endTime">Кінець діапазону часу</param>
-				constexpr TimeRange(DateTime startTime, DateTime endTime) : StartTime(0ULL), Durration(0ULL) {
+				ForceInline constexpr TimeRange(DateTime startTime, DateTime endTime) : StartTime(0ULL), Durration(0ULL) {
 					if (startTime.Ticks == endTime.Ticks) {
 						this->StartTime = startTime; 
 						this->Durration = TimeSpan(0);
@@ -691,13 +738,13 @@ namespace Seed {
 				/// </summary>
 				/// <param name="startTime">Початок діапазону часу</param>
 				/// <param name="durration">Тривалість діапазону часу</param>
-				constexpr TimeRange(DateTime startTime, DateSpan durration) : StartTime(startTime), Durration(durration) {}
+				ForceInline constexpr TimeRange(DateTime startTime, DateSpan durration) : StartTime(startTime), Durration(durration) {}
 			public:
 				/// <summary>
 				/// Чи діапазон нульової довжини
 				/// </summary>
 				/// <returns>Логічне значення</returns>
-				constexpr Boolean GetIsZeroRange() const { return Durration.Ticks == 0; }
+				ForceInline constexpr Boolean GetIsZeroRange() const { return Durration.Ticks == 0; }
 
 				/// <summary>
 				/// Чи діапазон нульової довжини
@@ -713,3 +760,90 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(push)
+//Disabled warnings using user defined literals
+#pragma warning(disable: 4455)
+#pragma warning(disable: 4114)
+
+/// <summary>
+/// Вертає діапазон часу у вказаних мілісекнудах
+/// </summary>
+/// <param name="time">Кількість мілісекунд</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline  constexpr Seed::Core::Time::TimeSpan operator "" ms(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(MiliSecondsTicksCount * time);
+}
+
+/// <summary>
+/// Вертає діапазон часу у вказаних секнудах
+/// </summary>
+/// <param name="time">Кількість секунд</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline  constexpr Seed::Core::Time::TimeSpan operator "" s(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(SecondTicksCount * time);
+}
+
+/// <summary>
+/// Вертає діапазон часу у вказаних хвилинах
+/// </summary>
+/// <param name="time">Кількість хвилин</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline constexpr Seed::Core::Time::TimeSpan operator "" m(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(MinutesTicksCount * time);
+}
+
+/// <summary>
+/// Вертає діапазон часу у вказаних годинах
+/// </summary>
+/// <param name="time">Кількість годин</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline constexpr Seed::Core::Time::TimeSpan operator "" h(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(HourTicksCount * time);
+}
+
+/// <summary>
+/// Вертає діапазон часу у вказаних днях
+/// </summary>
+/// <param name="time">Кількість днів</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline constexpr Seed::Core::Time::TimeSpan operator "" d(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(DayTicksCount * time);
+}
+
+/// <summary>
+/// Вертає діапазон часу у вказаних місяцях
+/// </summary>
+/// <param name="time">Кількість місяців</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline constexpr Seed::Core::Time::TimeSpan operator "" M(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(MonthTicksCount * time);
+}
+
+/// <summary>
+/// Вертає діапазон часу у вказаних тижнів
+/// </summary>
+/// <param name="time">Кількість тижнів</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline constexpr Seed::Core::Time::TimeSpan operator "" W(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(WeekTicksCount * time);
+}
+
+/// <summary>
+/// Вертає діапазон часу у вказаних роках
+/// </summary>
+/// <param name="time">Кількість років</param>
+/// <returns>Об'єкт діапазону часу</returns>
+ForceInline constexpr Seed::Core::Time::TimeSpan operator "" Y(const unsigned long long time) {
+	using namespace Seed::Core::Time;
+	return TimeSpan(YearTicksCount * time);
+}
+
+#pragma warning(pop)
