@@ -13,7 +13,7 @@ namespace Seed {
 			/// Типи потокових сутностей
 			/// </summary>
 			enum class EThreadableTypes : UInt8 {
-				Thread, JobTask, ScheduledTask, Unknown = 255
+				Thread, JobTask, ScheduledTask, IoTask, Unknown = 255
 			};
 
 			/// <summary>

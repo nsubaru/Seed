@@ -15,7 +15,7 @@ void Seed::Core::Services::AutomatiSelfTestingService::AutomaticTestingTask::Exe
 void Seed::Core::Services::AutomatiSelfTestingService::Dispose()
 {
 	if (This->sheduler != nullptr && This->testRunnerJob != nullptr) {
-		This->testRunnerJob->Interupt().Join();
+		This->testRunnerJob->Interupt().Join((30s).Ticks);
 
 		delete This->testRunnerJob;
 		delete This->sheduler;
@@ -44,7 +44,7 @@ void Seed::Core::Services::AutomatiSelfTestingService::InitAutoTesting()
 void Seed::Core::Services::AutomatiSelfTestingService::StopTesting()
 {
 	if (This->sheduler != nullptr && This->testRunnerJob != nullptr) {
-		This->testRunnerJob->Interupt().Join();
+		This->testRunnerJob->Interupt().Join((30s).Ticks);
 		delete This->testRunnerJob;
 		delete This->sheduler;
 

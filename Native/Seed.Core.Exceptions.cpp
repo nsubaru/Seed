@@ -483,6 +483,8 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 		}
 		Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
 	}
+	case STATUS_INVALID_PARAMETER:
+		Throw(InvalidArgumentException(ExceptionPosition, L"ntapi", L"From NT Api"));
 	break;
 	default:
 		break;

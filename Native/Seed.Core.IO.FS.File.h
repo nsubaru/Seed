@@ -428,6 +428,19 @@ namespace Seed
 						Name(MoveRValue(Name))
 					{}
 
+					FSObjectInformation() :
+						Type(Types::Uknown),
+						IsReparsePoint(false),
+						IsArchived(false),
+						IsSystem(false),
+						IsHiden(false),
+						IsCompresed(false),
+						IsReadOnly(false),
+						IsTemporary(false),
+						Size(0),
+						Name()
+					{}
+
 					StructCttiDef(FSObjectInformation,
 						DefStructFieldData(FSObjectInformation, Type),
 						DefStructFieldData(FSObjectInformation, IsReparsePoint),
@@ -667,7 +680,7 @@ namespace Seed
 				/// </summary>
 				/// <param name="FileAdress">Шлях</param>
 				/// <returns>true якщо шлях в Nt форматі</returns>
-				static bool IsNtAdressFormat(const String& FileAdress);
+				bool IsNtAdressFormat(const String& FileAdress);
 
 				/// <summary>
 				/// Відкриває існуючий файл
@@ -675,7 +688,7 @@ namespace Seed
 				/// <param name="path">Шлях в Win32 або Nt форматі</param>
 				/// <param name="mode">Режим відкритя</param>
 				/// <returns>Об'єкт файла</returns>
-				static File RawOpenFile(String&& path, File::OpeningMode mode) {
+				ForceInline static File RawOpenFile(String&& path, File::OpeningMode mode) {
 					return File(
 						MoveRValue(path),
 						mode,
@@ -690,7 +703,7 @@ namespace Seed
 				/// <param name="mode">Режим відкритя</param>
 				/// <param name="OverrideIfExist">якщо true то </param>
 				/// <returns>Об'єкт файла</returns>
-				static File RawCreateFile(String&& path, File::OpeningMode mode, bool OverrideIfExist) {
+				ForceInline static File RawCreateFile(String&& path, File::OpeningMode mode, bool OverrideIfExist) {
 					return File(
 						MoveRValue(path),
 						mode,
@@ -705,7 +718,7 @@ namespace Seed
 				/// <param name="mode">Режим відкритя</param>
 				/// <param name="policy">Політика відритя файла(поведінка при наявності або відсутності файла</param>
 				/// <returns>Об'єкт файла</returns>
-				static File RawCreateFile(String&& path, File::OpeningMode mode, File::OpenDisposition policy) {
+				ForceInline static File RawCreateFile(String&& path, File::OpeningMode mode, File::OpenDisposition policy) {
 					return File(
 						MoveRValue(path),
 						mode,

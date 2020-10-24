@@ -616,5 +616,5 @@ void IO::FS::File::Delete()&& {
 		);
 
 	if (!NT_SUCCESS(status))
-		Throw(GenericFileException(ExceptionPosition, This->name, L"Can't flush file"));
+		Throw(GenericFileException(ExceptionPosition, This->name, L"Can't close file"));
 }

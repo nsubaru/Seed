@@ -1245,13 +1245,13 @@ namespace Seed
 			}
 
 			void SynchronizeEvent::Wait() const {
-				LARGE_INTEGER delay;
+				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = Math::Max<Int64>();
 				NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 			}
 
 			void SynchronizeEvent::Wait(SizeT TimeOutMs) const {
-				LARGE_INTEGER delay;
+				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = (TimeOutMs > 0) ? -10000LL * TimeOutMs : Math::Max<Int64>();
 				NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 			}
@@ -1262,7 +1262,7 @@ namespace Seed
 
 				HANDLE* hEvents = nullptr;
 
-				LARGE_INTEGER delay;
+				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = (TimeOutMs > 0 && TimeOutMs != Math::Max<SizeT>()) ? -10000LL * TimeOutMs : Math::Max<Int64>();
 
 				try
@@ -1348,6 +1348,25 @@ void Seed::Core::Threading::ZeroingTaskHadle(UnifiedThreadPoolSheduledTask* thre
 	thread->This->hTask = nullptr;
 }
 
+void Seed::Core::Threading::DestroyIoPoolObj(UnifiedThreadPoolIoTask* task)
+{
+	TpReleaseIoCompletion((PTP_IO)task->This->hIoPoolObj);
+	task->This->hIoPoolObj = nullptr;
+}
+
+namespace Seed{
+	inline namespace Core {
+		namespace IO {
+			void* GetIrpFromReserved(void* reservedAddr)
+			{
+				return (void*)(StructOffsetOfMember(IO::IRPBase, Reserverd) + (SizeT)reservedAddr);
+			}
+		}
+	}
+}
+
+
+
 VOID NTAPI UnifiedThreadPoolJobsCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
@@ -1387,7 +1406,29 @@ VOID NTAPI UnifiedThreadPoolIrpCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
-	//TODO: implement it
+	ConfigureTls(nullptr, nullptr);
+	try {
+		auto jobObj = (UnifiedThreadPoolIoTask*)ObjectContext;
+		delete jobObj;
+	}
+	catch (...) {
+		toCoreLog(L"Невідома помилка при знищенні об'єкта I/O задачі в пулі");
+	}
+	DestroyTls();
+}
+
+VOID NTAPI IoFinalizer(
+	_Inout_     PTP_CALLBACK_INSTANCE Instance,
+	_Inout_opt_ PVOID                 Context
+	) {
+	ConfigureTls(nullptr, nullptr);
+	try{
+		//delete IO::GetIrpFromReserved(Context);
+	}
+	catch (...) {
+		toCoreLog(L"Невідома помилка при знищенні об'єкта I/O задачі в пулі");
+	}
+	DestroyTls();
 }
 
 #pragma endregion
@@ -1460,7 +1501,6 @@ UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateThreadP
 	implData.JobConfiguration = jobsConfiguration;
 	implData.TaskConfiguration = tasksConfiguration;
 	implData.IrpConfiguration = irpConfiguration;
-	
 
 	//Create pool data struct
 	UnifiedThreadPool::Data* poolData = new UnifiedThreadPool::Data(This->minThreadCount, This->maxThreadCount, MoveRValue(This->threadPoolName), MoveRValue(implData));
@@ -1470,7 +1510,7 @@ UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateThreadP
 	This = nullptr;
 
 	//Return pool object
-	return UnifiedThreadPool(MoveRValue(poolData));
+	return UnifiedThreadPool(poolData);
 }
 #pragma endregion
 
@@ -1493,9 +1533,10 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	threadPoolEnviroment->CleanupGroup = clenupData;
 	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolJobsCleanupCallback;
 	threadPoolEnviroment->RaceDll = NULL;
-	threadPoolEnviroment->ActivationContext = NULL;
 	threadPoolEnviroment->FinalizationCallback = NULL;
 	threadPoolEnviroment->u.Flags = 0;
+	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+	(SizeT&)threadPoolEnviroment->ActivationContext = -1;
 
 	switch (This->jobsPriority)
 	{
@@ -1542,9 +1583,10 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	threadPoolEnviroment->CleanupGroup = clenupData;
 	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolTasksCleanupCallback;
 	threadPoolEnviroment->RaceDll = NULL;
-	threadPoolEnviroment->ActivationContext = NULL;
 	threadPoolEnviroment->FinalizationCallback = NULL;
 	threadPoolEnviroment->u.Flags = 0;
+	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+	(SizeT&)threadPoolEnviroment->ActivationContext = -1;
 
 	switch (This->sheduledTasksPriority)
 	{
@@ -1594,6 +1636,8 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	threadPoolEnviroment->ActivationContext = NULL;
 	threadPoolEnviroment->FinalizationCallback = NULL;
 	threadPoolEnviroment->u.Flags = 0;
+	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
+	(SizeT&)threadPoolEnviroment->ActivationContext = -1;
 
 	switch (This->irpRequestPriority)
 	{
@@ -1712,6 +1756,175 @@ namespace Seed {
 				{
 					delete thread;
 				}
+			};
+
+			class ThreadableUnifiedThreadPoolIoTask final : public Seed::Core::Threading::IThreadable, protected IDisposable {
+			private:
+				friend Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator RegisterThread(UnifiedThreadPoolIoTask* task, PTP_CALLBACK_INSTANCE instance);
+				friend void UnRegisterThread(Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator&& threadable);
+			private:
+				struct Data {
+					UnifiedThreadPoolIoTask* task;
+					EThreadabledStates state;
+					EThreadabledStates secondState;
+					Handle hThread;
+					ID threadId;
+					PTP_CALLBACK_INSTANCE instance;
+
+					RefCountT RefCount;
+
+					Data(UnifiedThreadPoolIoTask* task,
+						Handle hThread,
+						ID threadId,
+						PTP_CALLBACK_INSTANCE instanc
+					) :
+						task(task),
+						hThread(hThread),
+						threadId(threadId),
+						instance(instance),
+						state(EThreadabledStates::Starting),
+						secondState(EThreadabledStates::Paused),
+						RefCount(1)
+					{}
+				};
+			private:
+				Data* This;
+			protected:
+				virtual void Dispose() override {
+					if(This->hThread != nullptr)
+						NtClose(This->hThread);
+
+					This->hThread = nullptr;
+					This->task = nullptr;
+					This->instance = nullptr;
+				}
+			private:
+				ThreadableUnifiedThreadPoolIoTask(
+					UnifiedThreadPoolIoTask* task, 
+					Handle hThread, 
+					ID threadId,
+					PTP_CALLBACK_INSTANCE instance
+				)  : This(new Data(task, hThread, threadId, instance))
+				{}
+			public:
+				virtual const String& GetName() const { return This->task->GetName(); }
+				virtual void SetName(const String& newName) { This->task->SetName(newName); if(This->hThread != nullptr) ::SetName(newName, This->hThread); }
+
+				virtual UInt64 GetID() const { return This->threadId; }
+
+				virtual EThreadableTypes GetThreadableType() const { return EThreadableTypes::IoTask; }
+				virtual EThreadabledStates GetThreadabledState() const { return This->state; }
+
+				virtual Containers::Array<String> GetCallStack() const { Throw(Exceptions::NotImplementedException(ExceptionPosition)); }
+
+				virtual IThreadable& GetParrentThreadable() const { Throw(Exceptions::NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), Exceptions::NullPointException::Types::Read)); }
+				virtual Boolean IsHaveParrentThreadable() const { return false; }
+
+				virtual IThreadable& Suspend() { 
+
+					_ReadWriteBarrier();
+
+					switch (This->state)
+					{
+						case EThreadabledStates::NotStarted: break;
+						case EThreadabledStates::Interupted: break;
+						case EThreadabledStates::Unknown: break;
+						case EThreadabledStates::Starting: break;
+						case EThreadabledStates::Executing:
+						case EThreadabledStates::ExceptionProcessing:
+						{
+							if (This->hThread != nullptr) {
+								This->secondState = EThreadabledStates::Paused;
+								Swap(This->state, This->secondState);
+
+								NTSTATUS status = NtSuspendThread(This->hThread, NULL);
+								if (!NT_SUCCESS(status)) {
+									Swap(This->state, This->secondState);
+									return *this;
+								}
+								TpDisassociateCallback(This->instance);
+							}
+							break;
+						}
+						case EThreadabledStates::Paused: break;
+						default:
+							break;
+					}
+					return *this;
+				}
+
+				virtual IThreadable& Resume() {
+					_ReadWriteBarrier();
+
+					switch (This->state)
+					{
+					case EThreadabledStates::NotStarted: break;
+					case EThreadabledStates::Interupted: break;
+					case EThreadabledStates::Unknown: break;
+					case EThreadabledStates::Starting: break;
+					case EThreadabledStates::Executing: break;
+					case EThreadabledStates::ExceptionProcessing: break;
+					case EThreadabledStates::Paused:
+					{
+						if (This->hThread != nullptr) {
+							This->secondState = EThreadabledStates::Paused;
+							Swap(This->state, This->secondState);
+							NtAlertResumeThread(This->hThread, NULL);
+							break;
+						}
+					}
+					default:
+						break;
+					}
+					return *this;
+				}
+				virtual IThreadable& Interupt() {
+					_ReadWriteBarrier();
+
+					switch (This->state)
+					{
+					case EThreadabledStates::NotStarted: break;
+					case EThreadabledStates::Interupted: break;
+					case EThreadabledStates::Unknown: break;
+					case EThreadabledStates::Starting: break;
+					default:
+						switch (This->state)
+						{
+						case EThreadabledStates::Executing:
+						case EThreadabledStates::ExceptionProcessing:
+						case EThreadabledStates::Paused:
+						{
+							NtSuspendThread(This->hThread, NULL);
+							CONTEXT ctx = { 0 };
+							ctx.ContextFlags = CONTEXT_ALL;
+							NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
+							if (!NT_SUCCESS(status))
+							{
+								NtResumeThread(This->hThread, NULL);
+								Throw(NtException(ExceptionPosition, status));
+							}
+							DWORD64 ret_point = ctx.Rip;
+							ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
+							status = ZwSetContextThread(This->hThread, &ctx);
+							NtResumeThread(This->hThread, NULL);
+							if (!NT_SUCCESS(status))
+								Throw(NtException(ExceptionPosition, status));
+							NtAlertThread(This->hThread);
+						}
+						default:
+							break;
+						}
+						break;
+					}
+					return *this;
+				}
+
+				virtual IThreadable& Join() { Throw(NotImplementedException(ExceptionPosition)); }
+				virtual IThreadable& Join(Time::DateTime timeOut) { Throw(NotImplementedException(ExceptionPosition)); }
+				virtual const IThreadable& Join() const { Throw(NotImplementedException(ExceptionPosition)); }
+				virtual const IThreadable& Join(Time::DateTime timeOut) const { Throw(NotImplementedException(ExceptionPosition)); }
+			public:
+				RefCountClass(ThreadableUnifiedThreadPoolIoTask, This);
 			};
 		}
 	}
@@ -2328,6 +2541,165 @@ const UnifiedThreadPoolSheduledTask& Seed::Core::Threading::UnifiedThreadPoolShe
 void Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Dispose()
 {
 }
+
+#pragma endregion
+
+#pragma region Unified thread pool io tasks
+
+Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator Seed::Core::Threading::RegisterThread(UnifiedThreadPoolIoTask* task, PTP_CALLBACK_INSTANCE instance)
+{
+	Handle hThread = nullptr;
+	ID threadId = Threading::GetTID();
+	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
+
+	auto threadable = ThreadableUnifiedThreadPoolIoTask(new UnifiedThreadPoolIoTask(*task), hThread, threadId, instance);
+
+	auto threadbleRef = 
+		AllActiveThreadable->AddLast(SmartPtr<IThreadable>(new ThreadableUnifiedThreadPoolIoTask(threadable)));
+	
+	ConfigureTls(new ThreadableUnifiedThreadPoolIoTask(threadable), &threadable.This->state);
+	SetName(threadable.GetName(), threadable.This->hThread);
+	threadable.This->state = EThreadabledStates::Executing;
+	_ReadWriteBarrier();
+
+	return threadbleRef;
+}
+
+void Seed::Core::Threading::UnRegisterThread(Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator&& threadableRef)
+{
+	SmartPtr<IThreadable> ref = *threadableRef;
+	AllActiveThreadable->Remove(threadableRef);
+	ReSetName(ref.As<ThreadableUnifiedThreadPoolIoTask>().This->hThread);
+	NtClose(ref.As<ThreadableUnifiedThreadPoolIoTask>().This->hThread);
+	ref.As<ThreadableUnifiedThreadPoolIoTask>().This->hThread = nullptr;
+	ref.As<ThreadableUnifiedThreadPoolIoTask>().This->instance = nullptr;
+	ref.As<ThreadableUnifiedThreadPoolIoTask>().This->task = nullptr;
+	DestroyTls();
+	
+	_ReadWriteBarrier();
+}
+
+void Seed::Core::IO::SetEventIfEventAvaiable(IRPBase* irp)
+{
+	if (irp->event != nullptr)
+		irp->event->Set();
+}
+
+VOID NTAPI IoThreadPoolCallback(
+	_Inout_ PTP_CALLBACK_INSTANCE Instance,
+	_Inout_opt_ PVOID Context,
+	_In_ PVOID ApcContext,
+	_In_ PIO_STATUS_BLOCK IoSB,
+	_In_ PTP_IO Io
+) {
+	Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator threadableRef;
+	try {
+		try {
+			threadableRef = RegisterThread((UnifiedThreadPoolIoTask*)Context, Instance);
+			auto irp = (IO::IRPBase*)ApcContext;
+			irp->OnIORequestComplete(IoSB->Information, NT_SUCCESS(IoSB->Status), IoSB->Status);
+			IO::SetEventIfEventAvaiable(irp);
+			delete irp;
+		}
+		catch (InteruptException&) {
+			toCoreLog(L"I/O задача була скасована");
+		}
+		catch (Exception& ex) {
+			toCoreLog(L"Виникла помилка при обробці I/O задачі: ", ex);
+		}
+		catch (...) {
+			toCoreLog(L"Виникла невідома помилка при обробці I/O задачі");
+		}
+
+		UnRegisterThread(MoveRValue(threadableRef));
+	}
+	catch (InteruptException&) {
+		toCoreLog(L"I/O задача була скасована");
+	}
+	catch (Exception& ex) {
+		toCoreLog(L"Виникла помилка при обробці I/O задачі: ", ex);
+	}
+	catch (...) {
+		toCoreLog(L"Виникла невідома помилка при обробці I/O задачі");
+	}	
+}
+
+Seed::Core::Threading::UnifiedThreadPoolIoTask Seed::Core::IO::IAsyncIOBase::RegisterNtIoObjectInThreadPool(const Threading::UnifiedThreadPool& pool, Handle hFileObj)
+{
+	auto This = UnifiedThreadPoolIoTask(new UnifiedThreadPoolIoTask::Data(hFileObj, pool.This));
+	NTSTATUS status = TpAllocIoCompletion(
+		(PTP_IO*)&This.This->hIoPoolObj,
+		hFileObj,
+		IoThreadPoolCallback,
+		new UnifiedThreadPoolIoTask(This),
+		(PTP_CALLBACK_ENVIRON)pool.This->handlesData.IrpConfiguration.CallbackEnviroment);
+
+	if (!NT_SUCCESS(status)) {
+		Throw(NtException(ExceptionPosition, status));
+	}
+
+	This.This->poolRef = pool.This->IrpQueue.AddLast(This);
+
+	_ReadWriteBarrier();
+	return This;
+}
+
+void Seed::Core::IO::IAsyncIOBase::UnRegisterNtIoObjectInThreadPool(Seed::Core::Threading::UnifiedThreadPoolIoTask task)
+{
+	UnifiedThreadPool((UnifiedThreadPool::Data*&)task.This->ownerPool).This->IrpQueue.Remove(task.This->poolRef);
+	task.This->hFile = nullptr;
+	task.This->ownerPool = nullptr;
+	TpWaitForIoCompletion((PTP_IO)task.This->hIoPoolObj, TRUE);
+	DestroyIoPoolObj(&task);
+}
+
+void* Seed::Core::IO::IAsyncIOBase::GetReservedPlaceInIrp(IRPBase* irp)
+{
+	return &irp->Reserverd;
+}
+
+Seed::Core::IO::IOTask Seed::Core::IO::IAsyncIOBase::GetIOTaskFromIRPBase(IRPBase* irp)
+{
+	return IOTask(irp);
+}
+
+void Seed::Core::IO::IAsyncIOBase::NotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo)
+{
+	TpStartAsyncIoOperation((PTP_IO)ptpIo.This->hIoPoolObj);
+}
+
+void Seed::Core::IO::IAsyncIOBase::CancelNotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo)
+{
+	TpCancelAsyncIoOperation((PTP_IO)ptpIo.This->hIoPoolObj);
+}
+
+void Seed::Core::IO::IRPBase::CancelIo()
+{
+	HANDLE hFile = this->irpTarget->GetHandle();
+
+	if (hFile == nullptr) {
+		Throw(NullPointException(ExceptionPosition));
+	}
+
+	IO_STATUS_BLOCK ioSb = { 0 };
+	NTSTATUS status = NtCancelIoFileEx(hFile, (PIO_STATUS_BLOCK)&this->Reserverd, &ioSb);
+
+	if (!NT_SUCCESS(status)) {
+		Throw(NtException(ExceptionPosition, status));
+	}
+}
+
+void Seed::Core::Threading::UnifiedThreadPoolIoTask::Dispose()
+{
+	This->hFile = nullptr;
+	This->hIoPoolObj = nullptr;
+	if (This->ownerPool != nullptr) {
+		UnifiedThreadPool((UnifiedThreadPool::Data*&)This->ownerPool).This->IrpQueue.Remove(This->poolRef);
+		This->ownerPool = nullptr;
+	}
+}
+
+
 
 #pragma endregion
 #pragma endregion

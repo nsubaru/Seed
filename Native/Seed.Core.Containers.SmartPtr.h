@@ -80,7 +80,7 @@ namespace Seed {
 			/// </summary>
 			/// <typeparam name="U">Тип інтерфейсу</typeparam>
 			/// <returns>Константне посилання на інтерфейс</returns>
-			template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T>
+			template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
 			ForceInline const TInterface& As() const {
 				return dynamic_cast<const TInterface&>(*This->ptr);
 			}
@@ -90,7 +90,7 @@ namespace Seed {
 			/// </summary>
 			/// <typeparam name="U">Тип інтерфейсу</typeparam>
 			/// <returns>Посилання на інтерфейс</returns>
-			template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T>
+			template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
 			ForceInline TInterface& As()   {
 				return dynamic_cast<TInterface&>(*This->ptr);
 			}

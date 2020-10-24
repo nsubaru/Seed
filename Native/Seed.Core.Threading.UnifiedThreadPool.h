@@ -32,16 +32,16 @@ namespace Seed {
 			template<typename TDataType = Containers::Blob>
 			class IFinishReadCallback : public IExceptionCallback {
 			public:
-				virtual void OnReadFinish(TDataType&& data) volatile = 0;
-			private:
+				virtual void OnFinishRead(SizeT byteTransfered, TDataType&& data) volatile = 0;
+			public:
 				virtual ~IFinishReadCallback() = 0 {}
 			};
 
 			template<typename TDataType = Containers::Blob>
 			class IFinishWriteCallback : public IExceptionCallback {
 			public:
-				virtual void OnWriteFinish(const TDataType&& data) volatile = 0;
-			private:
+				virtual void OnWriteFinish(SizeT byteTransfered, const TDataType&& data) volatile = 0;
+			public:
 				virtual ~IFinishWriteCallback() = 0 {}
 			};
 		}
@@ -272,6 +272,40 @@ namespace Seed {
 				RefCountClass(UnifiedThreadPoolSheduledTask, This);
 			};
 
+			class UnifiedThreadPoolIoTask final : protected IDisposable {
+			public:
+				friend class IO::IAsyncIOBase;
+			private:
+				struct Data {
+					Handle hFile;
+					Containers::ConcurencyList<UnifiedThreadPoolIoTask>::Iterator poolRef;
+					ImplSpecificT ownerPool;
+					ImplSpecificT hIoPoolObj;
+					String ioTaskName;
+
+					RefCountT RefCount;
+
+					Data(Handle hFile, ImplSpecificT ownerPool) :
+						hFile(hFile), ownerPool(ownerPool), poolRef(), hIoPoolObj(nullptr), RefCount(1), ioTaskName("I\\O worker") {}
+				};
+			private:
+				Data* This;
+			protected:
+				friend void DestroyIoPoolObj(UnifiedThreadPoolIoTask* task);
+			protected:
+				virtual void Dispose() override;
+			protected:
+				UnifiedThreadPoolIoTask(Data* This) : This(MoveRValue(This)) {}
+			public:
+				const String& GetName() const { return This->ioTaskName; }
+				void SetName(const String& newName) { This->ioTaskName = newName; }
+				void SetName(String&& newName) { This->ioTaskName = MoveRValue(newName); }
+			public:
+				String Property(GetName, SetName) Name;
+			public:
+				RefCountClass(UnifiedThreadPoolIoTask, This);
+			};
+
 			class UnifiedThreadPool final : protected IDisposable {
 			public:
 				enum class EPoolThreadsPriority {
@@ -308,7 +342,7 @@ namespace Seed {
 
 					Containers::ConcurencyList<UnifiedThreadPoolJob> JobsQueue;
 					Containers::ConcurencyList<UnifiedThreadPoolSheduledTask> TaskQueue;
-					Containers::ConcurencyList<SmartPtr<IO::IRPBase>> IrpQueue;
+					Containers::ConcurencyList<UnifiedThreadPoolIoTask> IrpQueue;
 
 					String threadPoolName;
 
@@ -324,7 +358,7 @@ namespace Seed {
 						threadPoolName(MoveRValue(threadPoolName)),
 						handlesData(MoveRValue(handlesData)),
 						isPoolTermination(false),
-						RefCount(1)
+						RefCount(0)
 					{}
 				};
 			private:
@@ -349,7 +383,7 @@ namespace Seed {
 				friend void UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj);
 				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
 			private:
-				UnifiedThreadPool(Data*&& This) :This(MoveRValue(This)) {}
+				//UnifiedThreadPool(Data*&& This) :This(MoveRValue(This)) {}
 				UnifiedThreadPool(Data*& This) :This(This) { ++This->RefCount;  }
 			public:
 				UnifiedThreadPoolJob PostJob(String&& jobName, Delegate&& action);
@@ -371,7 +405,7 @@ namespace Seed {
 			public:
 				Containers::List<UnifiedThreadPoolJob> GetJobsQueue() const { return This->JobsQueue.CopyTo<Containers::List>(); }
 				Containers::List<UnifiedThreadPoolSheduledTask> GetSheduledTaskQueue() const { return This->TaskQueue.CopyTo<Containers::List>(); }
-				Containers::List<SmartPtr<IO::IRPBase>> GetIrpQueue() const { return This->IrpQueue.CopyTo<Containers::List>(); }
+				Containers::List<UnifiedThreadPoolIoTask> GetAsyncIOList() const { return This->IrpQueue.CopyTo<Containers::List>(); }
 			public:
 				SizeT Property(GetJobsCount) JobsCount;
 				SizeT Property(GetSheduledTaskCount) SheduledTaskCount;
@@ -388,6 +422,12 @@ namespace Seed {
 				EPoolThreadsPriority Property(GetJobsPriority) JobsPriority;
 				EPoolThreadsPriority Property(GetSheduledTasksPriority) SheduledTasksPriority;
 				EPoolThreadsPriority Property(GetIORequestPriority) IORequestPriority;
+			public:
+				UInt64 GetMaxThreadCount() const { return This->MaxThreadCount; }
+				UInt64 GetMinThreadCount() const { return This->MinThreadCount; }
+			public:
+				UInt64 Property(GetMaxThreadCount) MaxThreadCount;
+				UInt64 Property(GetMinThreadCount) MinThreadCount;
 			public: 
 				RefCountClass(UnifiedThreadPool, This);
 			};
@@ -609,157 +649,193 @@ namespace Seed {
 			};
 
 			class ThreadableUnifiedThreadPoolJob;
-			class UnifiedThreadPoolIoTask {};
 		}
 
 		namespace IO {
+			class IRPBase;
+			class IOTask;
+
 			class IAsyncIOBase : virtual protected IDisposable {
 			protected:
-				Threading::UnifiedThreadPool threadPool;
+				friend class IRPBase;
 			protected:
-				//TODO: void RegisterNtIoObjectInThreadPool(Handle ntIoObjectHandle);
-			public:
-				IAsyncIOBase(const Threading::UnifiedThreadPool& threadPool) : threadPool(threadPool) {}
-				IAsyncIOBase(const IAsyncIOBase&) = default;
-				IAsyncIOBase(IAsyncIOBase&&) = default;
-			public:
-				virtual Handle GetIOObjectHandle() = 0;
+				Seed::Core::Threading::UnifiedThreadPoolIoTask RegisterNtIoObjectInThreadPool(const Threading::UnifiedThreadPool& pool, Handle hFileObj);
+				void UnRegisterNtIoObjectInThreadPool(Seed::Core::Threading::UnifiedThreadPoolIoTask task);
+				void* GetReservedPlaceInIrp(IRPBase* irp);
+				IOTask GetIOTaskFromIRPBase(IRPBase* irp);
+				void NotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo);
+				void CancelNotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo);
+			protected:
+				virtual Handle GetHandle() = 0;
 			public:
 				virtual ~IAsyncIOBase() = 0 {}
 			};
 
 			template<typename TDataType = Containers::Blob>
-			class IAsyncIO : virtual public IAsyncIOBase {
+			class IAsyncIO : public IAsyncIOBase {
 			public:
 				IAsyncIO(const Threading::UnifiedThreadPool& threadPool) : IAsyncIOBase(threadPool) {}
 				IAsyncIO(const IAsyncIO&) = default;
 				IAsyncIO(IAsyncIO&&) = default;
 			public:
-				virtual void AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) = 0;
-				virtual void AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) = 0;
-				virtual void AsyncWrite(const TDataType&& data, SmartPtr<IExceptionCallback> onErrorAction) = 0;
+				virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction, bool isWaitable = true) = 0;
+				virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction, bool isWaitable = true) = 0;
 			public:
-				virtual void IsValid() = 0;
+				virtual bool IsValid() = 0;
 			public:
 				virtual ~IAsyncIO() = 0 {};
 			};
 
 			template<typename TDataType = Containers::Blob>
-			class IPositionAsyncIO : virtual public IAsyncIOBase {
+			class IPositionAsyncIO : public IAsyncIOBase {
 			public:
-				virtual void AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) = 0;
-				virtual void AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) = 0;
-				virtual void AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IExceptionCallback> onErrorAction) = 0;
+				virtual IOTask AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction, bool isWaitable = true) = 0;
+				virtual IOTask AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishReadAction, bool isWaitable = true) = 0;
 			public:
-				virtual void IsValid() = 0;
+				virtual bool IsValid() = 0;
 			public:
 				virtual ~IPositionAsyncIO() = 0 {};
 			};
 
-			class IRPBase {
+			class IRPBase : protected IClonable<IRPBase*> {
+			public:
+				friend class IOTask;
+				friend class IAsyncIOBase;
 			public:
 				enum class ECallbackType {
-					Read, Write, Exception
+					Read, Write
 				};
 			private:
-				ID irpId;
+				Byte Reserverd[16 + sizeof(SizeT)];
+				Threading::SynchronizeEvent* event;
 				ECallbackType irpCallbackType;
 				SmartPtr<IAsyncIOBase> irpTarget;
+			private:
+				friend void SetEventIfEventAvaiable(IRPBase* irp);
+				friend void* GetIrpFromReserved(void* reservedAddr);
 			public:
-				IRPBase(ID irpId, SmartPtr<IAsyncIOBase>&& irpTarget, ECallbackType irpCallbackType)
-					: irpId(irpId), irpCallbackType(irpCallbackType), irpTarget(irpTarget) {}
+				IRPBase(SmartPtr<IAsyncIOBase>&& irpTarget, ECallbackType irpCallbackType, const Threading::SynchronizeEvent& event)
+					:  irpCallbackType(irpCallbackType), irpTarget(irpTarget), event(new Threading::SynchronizeEvent(event)) {}
+
+				IRPBase(SmartPtr<IAsyncIOBase>&& irpTarget, ECallbackType irpCallbackType)
+					: irpCallbackType(irpCallbackType), irpTarget(irpTarget), event(nullptr) {}
 
 				IRPBase(const IRPBase&) = default;
 				IRPBase(IRPBase&&) = default;
 			public:
-				virtual void OnIORequestComplete(Boolean isSuccess, UInt32 errorCode) = 0;
-			public:
-				ID GetIrpId() { return irpId; }
+				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) = 0;
 
 				ECallbackType GetIrpCallbackType() const { return irpCallbackType; }
 
 				const SmartPtr<IAsyncIOBase>& GetIrpTarget() const { return irpTarget; }
 			public:
-				ID Property(GetIrpId) Id;
-
 				ECallbackType Property(GetIrpCallbackType) CallbackType;
 
 				SmartPtr<IAsyncIOBase> Property(GetIrpTarget) Target;
+			public:
+				void WaitOnCompleteIrp() const { if (event == nullptr) Throw(NullPointException(ExceptionPosition)); event->Wait(); }
+				void WaitOnCompleteIrp(Time::TimeSpan timeout) const { if (event == nullptr) Throw(NullPointException(ExceptionPosition)); event->Wait(timeout.Ticks / Time::MiliSecondsTicksCount); }
+				void CancelIo();
+			protected:
+				IRPBase* Clone() const = 0;
 			public:
 				virtual ~IRPBase() = 0 {}
 			};
 
 			template<typename TDataType>
 			class ReadIRP final : public IRPBase {
+			public:
+				friend class IOTask;
 			private:
 				SmartPtr<IFinishReadCallback<TDataType>> finishReadCallback;
 				TDataType buffer;
 			public:
-				ReadIRP(ID irpId, SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>>&& FinishReadCallback, TDataType&& buffer) :
-					IRPBase(irpId, MoveRValue(irpTarget), ECallbackType::Read), finishReadCallback(MoveRValue(FinishReadCallback)), buffer(MoveRValue(buffer)) {}
+				ReadIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>> FinishReadCallback, TDataType&& buffer) :
+					IRPBase(MoveRValue(irpTarget), ECallbackType::Read), finishReadCallback(FinishReadCallback), buffer(MoveRValue(buffer)) {}
+
+				ReadIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>> FinishReadCallback, TDataType&& buffer, const Threading::SynchronizeEvent& event) :
+					IRPBase(MoveRValue(irpTarget), ECallbackType::Read, event), finishReadCallback(FinishReadCallback), buffer(MoveRValue(buffer)) {}
 
 				ReadIRP(const ReadIRP&) = default;
 				ReadIRP(ReadIRP&&) = default;
 				ReadIRP& operator=(const ReadIRP&) = default;
 				ReadIRP& operator=(ReadIRP&&) = default;
 			public:
-				virtual void OnIORequestComplete(Boolean isSuccess, UInt32 errorCode) override {
+				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
 					if (isSuccess) {
-						finishReadCallback->OnReadFinish(MoveRValue(buffer));
+						finishReadCallback->OnFinishRead(byteTransfered, MoveRValue(buffer));
 					}
 					else {
 						finishReadCallback->OnError(errorCode);
 					}
 				}
+			protected:
+				IRPBase* Clone() const { return new ReadIRP(*this); }
 			public:
 				virtual ~ReadIRP() override {}
 			};
 
 			template<typename TDataType>
 			class WriteIRP final : public IRPBase {
+			public:
+				friend class IOTask;
 			private:
 				SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback;
 				TDataType buffer;
 			public:
-				WriteIRP(ID irpId, SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishWriteCallback<TDataType>>&& finishWriteCallback, TDataType&& buffer) :
-					IRPBase(irpId, MoveRValue(irpTarget), ECallbackType::Read), finishWriteCallback(MoveRValue(finishWriteCallback)), buffer(MoveRValue(buffer)) {}
+				WriteIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback, const TDataType&& buffer) :
+					IRPBase(MoveRValue(irpTarget), ECallbackType::Write), finishWriteCallback(finishWriteCallback), buffer(MoveRValue(buffer)) {}
+
+				WriteIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback, const TDataType&& buffer, const Threading::SynchronizeEvent& event) :
+					IRPBase(MoveRValue(irpTarget), ECallbackType::Write, event), finishWriteCallback(finishWriteCallback), buffer(MoveRValue(buffer)) {}
 
 				WriteIRP(const WriteIRP&) = default;
 				WriteIRP(WriteIRP&&) = default;
 				WriteIRP& operator=(const WriteIRP&) = default;
 				WriteIRP& operator=(WriteIRP&&) = default;
 			public:
-				virtual void OnIORequestComplete(Boolean isSuccess, UInt32 errorCode) override {
+				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
 					if (isSuccess) {
-						finishWriteCallback->OnWriteFinish(MoveRValue(buffer));
+						finishWriteCallback->OnWriteFinish(byteTransfered, MoveRValue(buffer));
 					}
 					else {
 						finishWriteCallback->OnError(errorCode);
 					}
 				}
+			protected:
+				IRPBase* Clone() const { return new WriteIRP(*this); }
 			public:
 				virtual ~WriteIRP() override {}
 			};
 
-			class ExceptionIRP final : public IRPBase {
+			class IOTask : public IDisposable {
+			public:
+				friend class IAsyncIOBase;
 			private:
-				SmartPtr<IExceptionCallback> exceptionCallback;
-			public:
-				ExceptionIRP(ID irpId, SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IExceptionCallback>&& exceptionCallback) :
-					IRPBase(irpId, MoveRValue(irpTarget), ECallbackType::Read), exceptionCallback(MoveRValue(exceptionCallback)) {}
+				struct Data {
+					IRPBase* irp;
 
-				ExceptionIRP(const ExceptionIRP&) = default;
-				ExceptionIRP(ExceptionIRP&&) = default;
-				ExceptionIRP& operator=(const ExceptionIRP&) = default;
-				ExceptionIRP& operator=(ExceptionIRP&&) = default;
-			public:
-				virtual void OnIORequestComplete(Boolean isSuccess, UInt32 errorCode) override {
-					if (!isSuccess) {
-						exceptionCallback->OnError(errorCode);
-					}
+					RefCountT RefCount;
+
+					Data(IRPBase* irp) :
+						irp(irp->Clone()), RefCount(1) {}
+				};
+			private:
+				Data* This;
+			protected:
+				IOTask(IRPBase* irp) :
+					This(new Data(irp)) {}
+			protected:
+				virtual void Dispose() {
+					delete This->irp;
 				}
 			public:
-				virtual ~ExceptionIRP() override {}
+				void CancleIo() { This->irp->CancelIo(); }
+			public:
+				void WaitComplete() const { This->irp->WaitOnCompleteIrp(); }
+				void WaitComplete(Time::TimeSpan timeout) const { This->irp->WaitOnCompleteIrp(timeout); }
+			public:
+				RefCountClass(IOTask, This);
 			};
 		}
 	}
