@@ -99,6 +99,17 @@ namespace Seed {
 				/// <returns>Посилання на поточний об'єкт</returns>
 				SeedKernelCall Thread& Join(Time::DateTime timeOut);
 				/// <summary>
+				/// Очікування завершення виконання потоку
+				/// </summary>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				SeedKernelCall const Thread& Join() const;
+				/// <summary>
+				/// Очікування завершення виконання потоку
+				/// </summary>
+				/// <param name="timeOut">Таймаут очікування</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				SeedKernelCall const Thread& Join(Time::DateTime timeOut) const;
+				/// <summary>
 				/// Переривання виконання потоку
 				/// </summary>
 				/// <returns>Посилання на поточний об'єкт</returns>
@@ -157,19 +168,19 @@ namespace Seed {
 				/// Поточне ім'я потоку
 				/// </summary>
 				/// <returns>Рядкове представлення імені потоку</returns>
-				ForceInline const String& GetName() { return const_cast<String&>(This->name); }
+				ForceInline const String& GetName() const { return const_cast<String&>(This->name); }
 
 				/// <summary>
 				/// Стан потоку
 				/// </summary>
 				/// <returns>Поточний стан потоку</returns>
-				ForceInline EThreadabledStates GetThreadState() { return this->This->State; }
+				ForceInline EThreadabledStates GetThreadState() const { return this->This->State; }
 
 				/// <summary>
 				/// Ідентифікатор потоку(номер)
 				/// </summary>
 				/// <returns>Числовий ідентифікатор потоку</returns>
-				ForceInline ID GetTID() { return this->This->TID; }
+				ForceInline ID GetTID() const { return this->This->TID; }
 
 				/// <summary>
 				/// Ім'я потоку

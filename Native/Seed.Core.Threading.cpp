@@ -1,7 +1,6 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
-#pragma once
 #include "Seed.Core.Threading.Base.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
 #include "Seed.Core.Threading.Event.h"
@@ -31,7 +30,7 @@ using namespace Seed::Threading;
 
 #pragma region Generic API
 
-static Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>* AllActiveThreadable;
+Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>* AllActiveThreadable;
 
 ForceInline IThreadable* GetThisThreadable() {
 	return Seed::Core::Threading::GetTLS()->Threadable;
@@ -110,6 +109,14 @@ namespace Seed {
 			private:
 				ThreadableThread(Thread* thread) : thread(thread) {}
 			public:
+				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const {
+					return new ThreadableThread(*this);
+				}
+			public:
 				virtual const String& GetName() const { return const_cast<String&>(thread->This->name); }
 				virtual void SetName(const String& NewName) { thread->SetName(NewName); }
 
@@ -146,6 +153,14 @@ namespace Seed {
 			private:
 				ThreadableJobPool(JobPool* thread) : thread(thread) {}
 			public:
+				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const {
+					return new ThreadableJobPool(*this);
+				}
+			public:
 				virtual const String& GetName() const { return const_cast<String&>(thread->This->Name); }
 				virtual void SetName(const String& NewName) { thread->SetName(NewName); }
 
@@ -181,6 +196,14 @@ namespace Seed {
 				SheduledJob* thread;
 			private:
 				ThreadableSheduledTask(SheduledJob* thread) : thread(thread) {}
+			public:
+				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const {
+					return new ThreadableSheduledTask(*this);
+				}
 			public:
 				virtual const String& GetName() const { return const_cast<String&>(thread->This->Name); }
 				virtual void SetName(const String& NewName) { thread->SetName(NewName); }
@@ -398,7 +421,8 @@ namespace Seed
 				return *this;
 			}
 
-			Thread& Thread::Join() {
+			Thread& Thread::Join()
+			{
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = Math::Max<Int64>();
 				if (This->State == EThreadabledStates::Starting ||
@@ -409,7 +433,31 @@ namespace Seed
 				return *this;
 			}
 
-			Thread& Thread::Join(Time::DateTime timeOut) //-V813
+			Thread& Thread::Join(Time::DateTime timeOut)
+			{
+				LARGE_INTEGER delay = { 0 };
+				delay.QuadPart = timeOut.TimeFromStartEpoch;
+				if (This->State == EThreadabledStates::Starting ||
+					This->State == EThreadabledStates::Executing ||
+					This->State == EThreadabledStates::ExceptionProcessing ||
+					This->State == EThreadabledStates::Paused)
+					NtWaitForSingleObject(This->hThread, TRUE, &delay);
+				return *this;
+			}
+
+			const Thread& Thread::Join() const
+			{
+				LARGE_INTEGER delay = { 0 };
+				delay.QuadPart = Math::Max<Int64>();
+				if (This->State == EThreadabledStates::Starting ||
+					This->State == EThreadabledStates::Executing ||
+					This->State == EThreadabledStates::ExceptionProcessing ||
+					This->State == EThreadabledStates::Paused)
+					NtWaitForSingleObject(This->hThread, TRUE, &delay);
+				return *this;
+			}
+
+			const Thread& Thread::Join(Time::DateTime timeOut) const
 			{
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = timeOut.TimeFromStartEpoch;
@@ -1256,6 +1304,13 @@ namespace Seed
 				NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 			}
 
+			void SynchronizeEvent::Wait(Time::TimeSpan timeOunt) const
+			{
+				LARGE_INTEGER delay = { 0 };
+				delay.QuadPart = timeOunt.Ticks;
+				NtWaitForSingleObject(this->data->handle, TRUE, &delay);
+			}
+
 			UInt64 WaitForMany(const Containers::Array<SynchronizeEvent>& events, Boolean isWaitAll, SizeT TimeOutMs) {
 				if (events.Count > static_cast<SizeT>(Math::Max<UInt32>()))
 					Throw(InvalidArgumentException(ExceptionPosition, L"events.Count", L"events count must be less than ULONG max"));
@@ -1693,6 +1748,16 @@ namespace Seed {
 				UnifiedThreadPoolSheduledTask* thread;
 			private:
 				ThreadableUnifiedThreadPoolSheduledTask(UnifiedThreadPoolSheduledTask* thread) : thread(thread) {}
+			private:
+				ThreadableUnifiedThreadPoolSheduledTask(const ThreadableUnifiedThreadPoolSheduledTask&) = default;
+			public:
+				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const {
+					return new ThreadableUnifiedThreadPoolSheduledTask(*this);
+				}
 			public:
 				virtual const String& GetName() const { return thread->This->taskName; }
 				virtual void SetName(const String& newName) { thread->SetName(newName); }
@@ -1729,6 +1794,14 @@ namespace Seed {
 				UnifiedThreadPoolJob* thread;
 			private:
 				ThreadableUnifiedThreadPoolJob(UnifiedThreadPoolJob* thread) : thread(thread) {}
+			public:
+				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const {
+					return new ThreadableUnifiedThreadPoolJob(*this);
+				}
 			public:
 				virtual const String& GetName() const { return thread->This->jobName; }
 				virtual void SetName(const String& newName) { thread->SetName(newName); }
@@ -1797,6 +1870,8 @@ namespace Seed {
 					This->hThread = nullptr;
 					This->task = nullptr;
 					This->instance = nullptr;
+
+					delete This->task;
 				}
 			private:
 				ThreadableUnifiedThreadPoolIoTask(
@@ -1806,6 +1881,14 @@ namespace Seed {
 					PTP_CALLBACK_INSTANCE instance
 				)  : This(new Data(task, hThread, threadId, instance))
 				{}
+			public:
+				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const {
+					return new ThreadableUnifiedThreadPoolIoTask(*this);
+				}
 			public:
 				virtual const String& GetName() const { return This->task->GetName(); }
 				virtual void SetName(const String& newName) { This->task->SetName(newName); if(This->hThread != nullptr) ::SetName(newName, This->hThread); }
@@ -1926,6 +2009,9 @@ namespace Seed {
 			public:
 				RefCountClass(ThreadableUnifiedThreadPoolIoTask, This);
 			};
+#pragma region New Threadable objects
+			
+#pragma endregion
 		}
 	}
 }
@@ -2573,6 +2659,7 @@ void Seed::Core::Threading::UnRegisterThread(Containers::ConcurencySensitiveList
 	NtClose(ref.As<ThreadableUnifiedThreadPoolIoTask>().This->hThread);
 	ref.As<ThreadableUnifiedThreadPoolIoTask>().This->hThread = nullptr;
 	ref.As<ThreadableUnifiedThreadPoolIoTask>().This->instance = nullptr;
+	delete ref.As<ThreadableUnifiedThreadPoolIoTask>().This->task;
 	ref.As<ThreadableUnifiedThreadPoolIoTask>().This->task = nullptr;
 	DestroyTls();
 	
@@ -2595,8 +2682,10 @@ VOID NTAPI IoThreadPoolCallback(
 	Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator threadableRef;
 	try {
 		try {
-			threadableRef = RegisterThread((UnifiedThreadPoolIoTask*)Context, Instance);
 			auto irp = (IO::IRPBase*)ApcContext;
+			irp->TargetTask;
+			threadableRef = RegisterThread((UnifiedThreadPoolIoTask*)Context, Instance);
+			
 			irp->OnIORequestComplete(IoSB->Information, NT_SUCCESS(IoSB->Status), IoSB->Status);
 			IO::SetEventIfEventAvaiable(irp);
 			delete irp;
@@ -2698,8 +2787,6 @@ void Seed::Core::Threading::UnifiedThreadPoolIoTask::Dispose()
 		This->ownerPool = nullptr;
 	}
 }
-
-
 
 #pragma endregion
 #pragma endregion

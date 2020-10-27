@@ -242,6 +242,8 @@ namespace Seed {
 				void SetName(String&& newTaskName);
 				void SetName(const String& newTaskName) { SetName(String(newTaskName)); }
 			public:
+				String Property(GetTaskName, SetName) Name;
+			public:
 				SizeT GetExecutedCount() const { return This->executedCount; }
 				Time::DateTime GetLastStartTime() const { return This->lastStartTime; }
 				Boolean GetIsActive() const { return This->hActiveThread != nullptr; }
@@ -667,6 +669,8 @@ namespace Seed {
 				void CancelNotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo);
 			protected:
 				virtual Handle GetHandle() = 0;
+			protected:
+				virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const = 0;
 			public:
 				virtual ~IAsyncIOBase() = 0 {}
 			};
@@ -733,6 +737,12 @@ namespace Seed {
 
 				SmartPtr<IAsyncIOBase> Property(GetIrpTarget) Target;
 			public:
+				const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetTargetTask() const {
+					return irpTarget->GetIoPoolTask();
+				}
+			public:
+				Seed::Core::Threading::UnifiedThreadPoolIoTask Property(GetTargetTask) TargetTask;
+			public:
 				void WaitOnCompleteIrp() const { if (event == nullptr) Throw(NullPointException(ExceptionPosition)); event->Wait(); }
 				void WaitOnCompleteIrp(Time::TimeSpan timeout) const { if (event == nullptr) Throw(NullPointException(ExceptionPosition)); event->Wait(timeout.Ticks / Time::MiliSecondsTicksCount); }
 				void CancelIo();
@@ -756,10 +766,29 @@ namespace Seed {
 				ReadIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>> FinishReadCallback, TDataType&& buffer, const Threading::SynchronizeEvent& event) :
 					IRPBase(MoveRValue(irpTarget), ECallbackType::Read, event), finishReadCallback(FinishReadCallback), buffer(MoveRValue(buffer)) {}
 
-				ReadIRP(const ReadIRP&) = default;
-				ReadIRP(ReadIRP&&) = default;
-				ReadIRP& operator=(const ReadIRP&) = default;
-				ReadIRP& operator=(ReadIRP&&) = default;
+				ReadIRP(const ReadIRP& from) :
+					IRPBase(from),
+					buffer(from.buffer),
+					finishReadCallback(from.finishReadCallback)
+				{}
+
+				ReadIRP(ReadIRP&& from) :
+					IRPBase(MoveRValue(from)),
+					buffer(MoveRValue(from.buffer)),
+					finishReadCallback(MoveRValue(from.finishReadCallback))
+				{}
+
+				ReadIRP& operator=(const ReadIRP& from) {
+					this->~ReadIRP();
+					this->ReadIRP::ReadIRP(from);
+					return *this;
+				}
+
+				ReadIRP& operator=(ReadIRP&& from) {
+					this->~ReadIRP();
+					this->ReadIRP::ReadIRP(MoveRValue(from));
+					return *this;
+				}
 			public:
 				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
 					if (isSuccess) {

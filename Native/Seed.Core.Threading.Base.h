@@ -36,6 +36,12 @@ namespace Seed {
 			class IThreadable {
 			public:
 				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const = 0;
+			public:
+				/// <summary>
 				/// Отримання імені сутності
 				/// </summary>
 				/// <returns>Рядкове представлення імені</returns>

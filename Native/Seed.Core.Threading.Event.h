@@ -52,6 +52,8 @@ namespace Seed {
 				SeedKernelCall void Wait() const;
 				///<summary>Очікування з таймаутом</summary>
 				SeedKernelCall void Wait(SizeT TimeOutMs) const;
+				///<summary>Очікування з таймаутом</summary>
+				SeedKernelCall void Wait(Time::TimeSpan timeOunt) const;
 
 				///<summary>Подати імпульс на подію</summary>
 				ForceInline void Signale() {

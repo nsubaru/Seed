@@ -2,7 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by Seed.Core.Resources.rc
 //
-#define BuildNumber 2821
+#define BuildNumber 2831
 
 // Next default values for new objects
 // 

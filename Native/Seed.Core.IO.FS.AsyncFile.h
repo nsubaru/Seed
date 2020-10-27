@@ -62,6 +62,9 @@ namespace Seed {
 				}
 			protected:
 				virtual Handle GetHandle() { return This->hFile; }
+				virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const {
+					return *This->poolTask;
+				}
 			public:
 				virtual bool IsValid() { return This->hFile != nullptr; }
 			public:
