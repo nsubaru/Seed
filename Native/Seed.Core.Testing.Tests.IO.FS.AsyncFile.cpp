@@ -155,8 +155,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::WriteAsyncFile::Excecute()
             auto task = asyncFile.AsyncWrite(
                 MoveRValue(data),
                 0,
-                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback)),
-                true);
+                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback))
+                );
 
             task.WaitComplete(10s);
 
@@ -213,8 +213,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadAsyncFile::Excecute()
             auto readTask = asyncFile.AsyncRead(
                 MoveRValue(readDataBuffer),
                 0,
-                SmartPtr<Core::IO::IFinishReadCallback<Core::Containers::Blob>>((Core::IO::IFinishReadCallback<Core::Containers::Blob>*&&)new FinishReadCallback(readCallback)),
-                true);
+                SmartPtr<Core::IO::IFinishReadCallback<Core::Containers::Blob>>((Core::IO::IFinishReadCallback<Core::Containers::Blob>*&&)new FinishReadCallback(readCallback))
+                );
 
             readTask.WaitComplete(10s);
 
@@ -276,8 +276,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadWriteAsyncFile::Excecute(
             auto writeTask = asyncFile.AsyncWrite(
                 MoveRValue(data),
                 0,
-                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(writeCallback)),
-                true);
+                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(writeCallback))
+                );
 
             writeTask.WaitComplete(10s);
             
@@ -286,8 +286,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadWriteAsyncFile::Excecute(
             auto readTask = asyncFile.AsyncRead(
                 MoveRValue(readDataBuffer),
                 0,
-                SmartPtr<Core::IO::IFinishReadCallback<Core::Containers::Blob>>((Core::IO::IFinishReadCallback<Core::Containers::Blob>*&&)new FinishReadCallback(readCallback)),
-                true);
+                SmartPtr<Core::IO::IFinishReadCallback<Core::Containers::Blob>>((Core::IO::IFinishReadCallback<Core::Containers::Blob>*&&)new FinishReadCallback(readCallback))
+                );
 
             readTask.WaitComplete(10s);
 
@@ -346,8 +346,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::TwoWritesAsyncFile::Excecute(
             auto task = asyncFile.AsyncWrite(
                 MoveRValue(data),
                 0,
-                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback)),
-                true);
+                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback))
+                );
 
             task.WaitComplete(10s);
 
@@ -355,8 +355,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::TwoWritesAsyncFile::Excecute(
             auto task2 = asyncFile.AsyncWrite(
                 MoveRValue(data2),
                 data2.Count,
-                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback)),
-                true);
+                SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback))
+                );
 
             task2.WaitComplete(10s);
 

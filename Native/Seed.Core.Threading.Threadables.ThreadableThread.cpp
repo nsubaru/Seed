@@ -12,10 +12,10 @@ ThreadableRef Seed::Core::Threading::Threadables::RegisterThreadThreadable(const
 	HANDLE hThread = nullptr;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
     auto threadable = new ThreadableThread(thread);
-	return RegisterThreadable(MoveRValue(threadable), state);
+	return RegisterIThreadable(MoveRValue(threadable), state);
 }
 
 void Seed::Core::Threading::Threadables::UnRegisterThreadThreadable(ThreadableRef&& ref)
 {
-	UnRegisterThreadable(MoveRValue(ref));
+	UnRegisterIThreadable(MoveRValue(ref));
 }

@@ -71,24 +71,6 @@ namespace Seed {
 				virtual EThreadabledStates GetThreadabledState() const = 0;
 
 				/// <summary>
-				/// Стек викликів даної потокової сутності
-				/// </summary>
-				/// <returns></returns>
-				virtual Containers::Array<String> GetCallStack() const = 0;
-
-				/// <summary>
-				/// Вертає батьківську потокову сутність якщо така є
-				/// </summary>
-				/// <returns></returns>
-				virtual IThreadable& GetParrentThreadable() const = 0;
-
-				/// <summary>
-				/// Вказує чи є батьківська потокова сутність
-				/// </summary>
-				/// <returns></returns>
-				virtual Boolean IsHaveParrentThreadable() const = 0;
-
-				/// <summary>
 				/// Заморозка виконання потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
@@ -113,7 +95,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
-				virtual IThreadable& Join(Time::DateTime timeOut) = 0;
+				virtual IThreadable& Join(Time::TimeSpan timeOut) = 0;
 				/// <summary>
 				/// Очікувння завершення потокової сутності
 				/// </summary>
@@ -124,10 +106,19 @@ namespace Seed {
 				/// </summary>
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
-				virtual const IThreadable& Join(Time::DateTime timeOut) const = 0;
+				virtual const IThreadable& Join(Time::TimeSpan timeOut) const = 0;
 
 				virtual ~IThreadable() = 0 {}
 			};
+
+			namespace Threadables {
+				/// <summary>
+				/// Посилання на потік
+				/// </summary>
+				namespace {
+					using ThreadableRef = Seed::Core::Containers::ConcurencySensitiveList<Seed::Core::SmartPtr<Seed::Core::Threading::IThreadable>>::Iterator;
+				}
+			}
 
 			/// <summary>
 			/// Вертає кількість активних потокових сутностей

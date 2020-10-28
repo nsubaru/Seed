@@ -74,14 +74,9 @@ namespace Seed {
 					String jobName;
 					Delegate action;
 					ImplSpecificT hWork;
-					ImplSpecificT hInstance;
 					ImplSpecificT hEvent;
-					ID threadId;
-					Handle hThread;
-					EThreadabledStates threadableState;
-					EThreadabledStates secondThreadableState;
+
 					Containers::ConcurencyList<UnifiedThreadPoolJob>::Iterator poolQueueRef;
-					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator threadbleRef;
 
 					RefCountT RefCount;
 
@@ -95,12 +90,7 @@ namespace Seed {
 						jobName(MoveRValue(jobName)),
 						action(MoveRValue(action)),
 						hWork(nullptr),
-						hInstance(nullptr),
 						hEvent(hEvent),
-						threadId(0),
-						hThread(nullptr),
-						threadableState(EThreadabledStates::NotStarted),
-						secondThreadableState(EThreadabledStates::Paused),
 						poolQueueRef(),
 						RefCount(1)
 					{}
@@ -110,12 +100,11 @@ namespace Seed {
 			protected:
 				virtual void Dispose() override;
 			private:
-				friend void SetUnifiedThreadPoolJobInstanceHandleObj(UnifiedThreadPoolJob* jobObj, ImplSpecificT hInstance);
 				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolJob* jobObj);
-				friend void SetEventOnJobFinish(UnifiedThreadPoolJob* jobObj);
-				friend void RegisterThread(UnifiedThreadPoolJob* thread);
-				friend void UnRegisterThread(UnifiedThreadPoolJob* thread);
+				friend Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolJob* thread, ImplSpecificT callbackInstance);
+				friend void UnRegisterThreadable(UnifiedThreadPoolJob* thread, Threadables::ThreadableRef&& ref);
 				friend Delegate& GetJobEntryPoint(UnifiedThreadPoolJob* jobObj);
+
 				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolJob* jobObj);
 				friend void UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj);
 			private:
@@ -125,9 +114,11 @@ namespace Seed {
 					return This->jobName;
 				}
 				void SetName(const String& newName) {
-					SetName(String(newName));
+					This->jobName = newName;
 				}
-				void SetName(String&& newName);
+				void SetName(String&& newName) {
+					This->jobName = MoveRValue(newName);
+				}
 			public:
 				Boolean GetIsAlredyExecuted() const {
 					return This->action.GetIsEnded();
@@ -140,15 +131,11 @@ namespace Seed {
 				String Property(GetName, SetName) Name;
 				Boolean Property(GetIsAlredyExecuted) IsAlredyExecuted;
 				Boolean Property(GetIsStartedExecution) IsStartedExecution;
-			private:
-				UnifiedThreadPoolJob& Suspend();
-				UnifiedThreadPoolJob& Resume();
-				UnifiedThreadPoolJob& Interupt();
 			public:
 				UnifiedThreadPoolJob& Join();
-				UnifiedThreadPoolJob& Join(Time::DateTime timeOut);
+				UnifiedThreadPoolJob& Join(Time::TimeSpan timeOut);
 				const UnifiedThreadPoolJob& Join() const;
-				const UnifiedThreadPoolJob& Join(Time::DateTime timeOut) const;
+				const UnifiedThreadPoolJob& Join(Time::TimeSpan timeOut) const;
 			public:
 				RefCountClass(UnifiedThreadPoolJob, This);
 			};
@@ -175,16 +162,9 @@ namespace Seed {
 					RefCountT remainingCount;
 					Int32 timerProximity;
 
-					Handle hTask;
-					SRWLock taskLock;
+					RefCountT activeInstanceRefCount;
 
-					ID activeTid;
-					Handle hActiveThread;
-					Handle hEvent;
-					EThreadabledStates activeState;
-					EThreadabledStates secondState;
-					ImplSpecificT callbackInstance;
-					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator threadbleRef;
+					Handle hTask;
 
 					RefCountT RefCount;
 
@@ -207,15 +187,8 @@ namespace Seed {
 						executedCount(0),
 						remainingCount(intervalsCount),
 						timerProximity(timerProximity),
+						activeInstanceRefCount(0),
 						hTask(nullptr),
-						taskLock(),
-						activeTid(0),
-						hActiveThread(nullptr),
-						hEvent(nullptr),
-						activeState(EThreadabledStates::NotStarted),
-						secondState(EThreadabledStates::NotStarted),
-						callbackInstance(nullptr),
-						threadbleRef(),
 						RefCount(1)
 					{}
 				};
@@ -226,16 +199,13 @@ namespace Seed {
 			private:
 				UnifiedThreadPoolSheduledTask(Data* This) : This(This) {}
 			private:
-				friend SRWLock& GetTaskLock(UnifiedThreadPoolSheduledTask* task);
-				friend void SetCallbackInstanceObj(UnifiedThreadPoolSheduledTask* task, ImplSpecificT callbackInstance);
 				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task);
 				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task);
 				friend SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetJobEntryPoint(UnifiedThreadPoolSheduledTask* task);
-				friend void PulseEvent(UnifiedThreadPoolSheduledTask* task);
 				friend void ZeroingTaskHadle(UnifiedThreadPoolSheduledTask* thread);
 			private:
-				friend void RegisterThread(UnifiedThreadPoolSheduledTask* thread);
-				friend void UnRegisterThread(UnifiedThreadPoolSheduledTask* thread);
+				friend Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolSheduledTask* thread, ImplSpecificT callbackInstance);
+				friend void UnRegisterThreadable(UnifiedThreadPoolSheduledTask* thread, Threadables::ThreadableRef&& ref);
 				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
 			public:
 				const String& GetTaskName() const { return This->taskName; }
@@ -246,7 +216,8 @@ namespace Seed {
 			public:
 				SizeT GetExecutedCount() const { return This->executedCount; }
 				Time::DateTime GetLastStartTime() const { return This->lastStartTime; }
-				Boolean GetIsActive() const { return This->hActiveThread != nullptr; }
+				Boolean GetIsActive() const { return This->activeInstanceRefCount != 0; }
+				UInt64 GetActiveInstancesCount() const { return This->activeInstanceRefCount; }
 				UnifiedThreadPool GetOwnerPool() const;
 				Time::TimeSpan GetTimerProximity() const { return Time::TimeSpan(This->timerProximity); }
 				Time::DateTime GetFirstStartTime() const { return This->startTime; }
@@ -259,15 +230,8 @@ namespace Seed {
 				Time::TimeSpan Property(GetTimerProximity) TimerProximity;
 				Time::DateTime Property(GetFirstStartTime)FirstStartTime;
 				SmartPtr<IUnifiedThreadPoolShedulerCallback> Property(GetCallbackObject) CallbackObject;
-			private:
-				UnifiedThreadPoolSheduledTask& Suspend();
-				UnifiedThreadPoolSheduledTask& Resume();
-				UnifiedThreadPoolSheduledTask& Interupt();
 			public:
-				UnifiedThreadPoolSheduledTask& Join();
-				UnifiedThreadPoolSheduledTask& Join(Time::DateTime timeOut);
-				const UnifiedThreadPoolSheduledTask& Join() const;
-				const UnifiedThreadPoolSheduledTask& Join(Time::DateTime timeOut) const;
+				void StopSheduling()&&;
 			public:
 				static constexpr auto MaxIntervalLenght = Time::TimeSpan().AddMiliSeconds(Math::Max<Int32>());
 			public:
@@ -294,6 +258,9 @@ namespace Seed {
 				Data* This;
 			protected:
 				friend void DestroyIoPoolObj(UnifiedThreadPoolIoTask* task);
+			protected:
+				friend Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolIoTask* task, const SynchronizeEvent& event, ImplSpecificT instance);
+				friend void UnRegisterThreadable(UnifiedThreadPoolIoTask* task, Threadables::ThreadableRef&& ref);
 			protected:
 				virtual void Dispose() override;
 			protected:
@@ -385,7 +352,6 @@ namespace Seed {
 				friend void UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj);
 				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
 			private:
-				//UnifiedThreadPool(Data*&& This) :This(MoveRValue(This)) {}
 				UnifiedThreadPool(Data*& This) :This(This) { ++This->RefCount;  }
 			public:
 				UnifiedThreadPoolJob PostJob(String&& jobName, Delegate&& action);
@@ -433,6 +399,8 @@ namespace Seed {
 			public: 
 				RefCountClass(UnifiedThreadPool, This);
 			};
+
+			using EPoolThreadsPriority = UnifiedThreadPool::EPoolThreadsPriority;
 
 			class UnifiedThreadPoolBuilder final {
 			private:
@@ -682,8 +650,8 @@ namespace Seed {
 				IAsyncIO(const IAsyncIO&) = default;
 				IAsyncIO(IAsyncIO&&) = default;
 			public:
-				virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction, bool isWaitable = true) = 0;
-				virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction, bool isWaitable = true) = 0;
+				virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) = 0;
+				virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) = 0;
 			public:
 				virtual bool IsValid() = 0;
 			public:
@@ -693,8 +661,8 @@ namespace Seed {
 			template<typename TDataType = Containers::Blob>
 			class IPositionAsyncIO : public IAsyncIOBase {
 			public:
-				virtual IOTask AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction, bool isWaitable = true) = 0;
-				virtual IOTask AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishReadAction, bool isWaitable = true) = 0;
+				virtual IOTask AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) = 0;
+				virtual IOTask AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishReadAction) = 0;
 			public:
 				virtual bool IsValid() = 0;
 			public:
@@ -711,18 +679,14 @@ namespace Seed {
 				};
 			private:
 				Byte Reserverd[16 + sizeof(SizeT)];
-				Threading::SynchronizeEvent* event;
+				Threading::SynchronizeEvent event;
 				ECallbackType irpCallbackType;
 				SmartPtr<IAsyncIOBase> irpTarget;
 			private:
-				friend void SetEventIfEventAvaiable(IRPBase* irp);
-				friend void* GetIrpFromReserved(void* reservedAddr);
+				friend const Threading::SynchronizeEvent& GetIrpCompleteEvent(IRPBase* irp);
 			public:
-				IRPBase(SmartPtr<IAsyncIOBase>&& irpTarget, ECallbackType irpCallbackType, const Threading::SynchronizeEvent& event)
-					:  irpCallbackType(irpCallbackType), irpTarget(irpTarget), event(new Threading::SynchronizeEvent(event)) {}
-
 				IRPBase(SmartPtr<IAsyncIOBase>&& irpTarget, ECallbackType irpCallbackType)
-					: irpCallbackType(irpCallbackType), irpTarget(irpTarget), event(nullptr) {}
+					:  irpCallbackType(irpCallbackType), irpTarget(irpTarget), event(false) {}
 
 				IRPBase(const IRPBase&) = default;
 				IRPBase(IRPBase&&) = default;
@@ -743,8 +707,8 @@ namespace Seed {
 			public:
 				Seed::Core::Threading::UnifiedThreadPoolIoTask Property(GetTargetTask) TargetTask;
 			public:
-				void WaitOnCompleteIrp() const { if (event == nullptr) Throw(NullPointException(ExceptionPosition)); event->Wait(); }
-				void WaitOnCompleteIrp(Time::TimeSpan timeout) const { if (event == nullptr) Throw(NullPointException(ExceptionPosition)); event->Wait(timeout.Ticks / Time::MiliSecondsTicksCount); }
+				void WaitOnCompleteIrp() const { event.Wait(); }
+				void WaitOnCompleteIrp(Time::TimeSpan timeout) const { event.Wait(timeout); }
 				void CancelIo();
 			protected:
 				IRPBase* Clone() const = 0;
@@ -763,32 +727,10 @@ namespace Seed {
 				ReadIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>> FinishReadCallback, TDataType&& buffer) :
 					IRPBase(MoveRValue(irpTarget), ECallbackType::Read), finishReadCallback(FinishReadCallback), buffer(MoveRValue(buffer)) {}
 
-				ReadIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>> FinishReadCallback, TDataType&& buffer, const Threading::SynchronizeEvent& event) :
-					IRPBase(MoveRValue(irpTarget), ECallbackType::Read, event), finishReadCallback(FinishReadCallback), buffer(MoveRValue(buffer)) {}
-
-				ReadIRP(const ReadIRP& from) :
-					IRPBase(from),
-					buffer(from.buffer),
-					finishReadCallback(from.finishReadCallback)
-				{}
-
-				ReadIRP(ReadIRP&& from) :
-					IRPBase(MoveRValue(from)),
-					buffer(MoveRValue(from.buffer)),
-					finishReadCallback(MoveRValue(from.finishReadCallback))
-				{}
-
-				ReadIRP& operator=(const ReadIRP& from) {
-					this->~ReadIRP();
-					this->ReadIRP::ReadIRP(from);
-					return *this;
-				}
-
-				ReadIRP& operator=(ReadIRP&& from) {
-					this->~ReadIRP();
-					this->ReadIRP::ReadIRP(MoveRValue(from));
-					return *this;
-				}
+				ReadIRP(const ReadIRP&) = default;
+				ReadIRP(ReadIRP&&) = default;
+				ReadIRP& operator=(const ReadIRP&) = default;
+				ReadIRP& operator=(ReadIRP&&) = default;
 			public:
 				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
 					if (isSuccess) {
@@ -814,9 +756,6 @@ namespace Seed {
 			public:
 				WriteIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback, const TDataType&& buffer) :
 					IRPBase(MoveRValue(irpTarget), ECallbackType::Write), finishWriteCallback(finishWriteCallback), buffer(MoveRValue(buffer)) {}
-
-				WriteIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback, const TDataType&& buffer, const Threading::SynchronizeEvent& event) :
-					IRPBase(MoveRValue(irpTarget), ECallbackType::Write, event), finishWriteCallback(finishWriteCallback), buffer(MoveRValue(buffer)) {}
 
 				WriteIRP(const WriteIRP&) = default;
 				WriteIRP(WriteIRP&&) = default;

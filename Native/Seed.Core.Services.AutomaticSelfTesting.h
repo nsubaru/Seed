@@ -40,27 +40,27 @@ namespace Seed
 			private:
 				struct Data
 				{
-					Threading::TaskSheduler* sheduler;
-					Threading::SheduledJob* testRunnerJob;
+					Threading::UnifiedThreadPoolSheduledTask* testRunnerJob;
 					Containers::ConcurencyList<Testing::TestPackResult> testsResults;
 					Threading::SRWLock testRunLock;
 
 					RefCountT RefCount;
 
 					Data() :
-						sheduler(nullptr),
 						testRunnerJob(nullptr),
 						testsResults(),
 						testRunLock(),
 						RefCount(1) {}
 				};
 			private:
-				class AutomaticTestingTask final : public Threading::ITask {
+				class AutomaticTestingTask final : public Threading::IUnifiedThreadPoolShedulerCallback {
 					Data* This;
+				private:
+					virtual void Dispose() override {}
 				private:
 					AutomaticTestingTask(Data* This) : This(This) {}
 				public:
-					virtual void Execute(Time::DateTime startTimeUtc) volatile;
+					virtual void Shedule();
 				public:
 					virtual ~AutomaticTestingTask() {}
 				public:
@@ -122,7 +122,7 @@ namespace Seed
 				/// Вказує чи тестування виконується
 				/// </summary>
 				/// <returns>Логічне значення</returns>
-				Boolean GetIsTestingExecutes() { return This->sheduler != nullptr || This->testRunnerJob != nullptr; }
+				Boolean GetIsTestingExecutes() { return This->testRunnerJob != nullptr; }
 			public:
 				/// <summary>
 				/// Запуск тестів

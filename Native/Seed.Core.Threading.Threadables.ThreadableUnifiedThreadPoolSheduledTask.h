@@ -28,8 +28,8 @@ namespace Seed {
 						) :
 							task(task),
 							event(event),
-							state(),
-							secondState(),
+							state(EThreadabledStates::Executing),
+							secondState(EThreadabledStates::Paused),
 							hThread(hThread),
 							threadId(threadId),
 							instance(instance),
@@ -101,30 +101,6 @@ namespace Seed {
 					}
 
 					/// <summary>
-					/// Стек викликів даної потокової сутності
-					/// </summary>
-					/// <returns></returns>
-					virtual Containers::Array<String> GetCallStack() const {
-						Throw(NotImplementedException(ExceptionPosition));
-					}
-
-					/// <summary>
-					/// Вертає батьківську потокову сутність якщо така є
-					/// </summary>
-					/// <returns></returns>
-					virtual IThreadable& GetParrentThreadable() const {
-						Throw(NullPointException(ExceptionPosition));
-					}
-
-					/// <summary>
-					/// Вказує чи є батьківська потокова сутність
-					/// </summary>
-					/// <returns></returns>
-					virtual Boolean IsHaveParrentThreadable() const {
-						return false;
-					}
-
-					/// <summary>
 					/// Заморозка виконання потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
@@ -152,8 +128,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="timeOut">Максимальний час очікування</param>
 					/// <returns>Посилання на об'єкт</returns>
-					virtual IThreadable& Join(Time::DateTime timeOut) {
-						This->event.Wait(Time::TimeSpan(timeOut.Ticks));
+					virtual IThreadable& Join(Time::TimeSpan timeOut) {
+						This->event.Wait(timeOut.Ticks);
 						return *this;
 					}
 					/// <summary>
@@ -169,8 +145,8 @@ namespace Seed {
 					/// </summary>
 					/// <param name="timeOut">Максимальний час очікування</param>
 					/// <returns>Посилання на об'єкт</returns>
-					virtual const IThreadable& Join(Time::DateTime timeOut) const {
-						This->event.Wait(Time::TimeSpan(timeOut.Ticks));
+					virtual const IThreadable& Join(Time::TimeSpan timeOut) const {
+						This->event.Wait(timeOut.Ticks);
 						return *this;
 					}
 				public:

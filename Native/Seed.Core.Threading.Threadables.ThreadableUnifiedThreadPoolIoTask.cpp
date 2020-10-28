@@ -20,7 +20,7 @@ Seed::Core::Threading::Threadables::ThreadableRef Seed::Core::Threading::Threada
 	HANDLE hThread = nullptr;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
 	auto threadable = new ThreadableUnifiedThreadPoolIoTaskV2(task, event, hThread, Threading::GetTID(), instance);
-	return RegisterThreadable(MoveRValue(threadable), &threadable->This->state);
+	return RegisterIThreadable(MoveRValue(threadable), &threadable->This->state);
 }
 
 void Seed::Core::Threading::Threadables::UnRegisterPoolIoThreadable(ThreadableRef&& ref)
@@ -28,7 +28,7 @@ void Seed::Core::Threading::Threadables::UnRegisterPoolIoThreadable(ThreadableRe
 	NtClose(ref->As<ThreadableUnifiedThreadPoolIoTaskV2>().This->hThread);
 	ref->As<ThreadableUnifiedThreadPoolIoTaskV2>().This->instance = nullptr;
 	ref->As<ThreadableUnifiedThreadPoolIoTaskV2>().This->state = Threading::EThreadabledStates::Ended;
-	UnRegisterThreadable(MoveRValue(ref));
+	UnRegisterIThreadable(MoveRValue(ref));
 }
 
 IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Suspend()
@@ -136,9 +136,9 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTa
 	return *this;
 }
 
-IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join(Time::DateTime timeOut)
+IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join(Time::TimeSpan timeOut)
 {
-	This->event.Wait(Time::TimeSpan(timeOut.Ticks));
+	This->event.Wait(timeOut);
 	return *this;
 }
 
@@ -148,8 +148,8 @@ const IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPo
 	return *this;
 }
 
-const IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join(Time::DateTime timeOut) const
+const IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join(Time::TimeSpan timeOut) const
 {
-	This->event.Wait(Time::TimeSpan(timeOut.Ticks));
+	This->event.Wait(timeOut);
 	return *this;
 }

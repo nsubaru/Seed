@@ -68,7 +68,7 @@ namespace Seed {
 			public:
 				virtual bool IsValid() { return This->hFile != nullptr; }
 			public:
-				virtual IOTask AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction, bool isWaitable = true) override {
+				virtual IOTask AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) override {
 					if (!IsValid())
 						Throw(InvalidHandleUsage(ExceptionPosition));
 					IRPBase* irp = nullptr;
@@ -77,13 +77,7 @@ namespace Seed {
 						void* buffer = (void*)(const Byte*)data;
 						SizeT size = data.Count;
 						//create irp packet
-						if (isWaitable) {
-							Threading::SynchronizeEvent event = Threading::SynchronizeEvent(true);
-							irp = new ReadIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishReadAction, MoveRValue(data), event);
-						}
-						else {
-							irp = new ReadIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishReadAction, MoveRValue(data));
-						}
+						irp = new ReadIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishReadAction, MoveRValue(data));
 						//create task object
 						auto task = GetIOTaskFromIRPBase(irp);
 
@@ -110,7 +104,7 @@ namespace Seed {
 					}
 				}
 
-				virtual IOTask AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction, bool isWaitable = true) override {
+				virtual IOTask AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) override {
 					if (!IsValid())
 						Throw(InvalidHandleUsage(ExceptionPosition));
 					IRPBase* irp = nullptr;
@@ -119,13 +113,7 @@ namespace Seed {
 						void* buffer = (void*)(const Byte*)data;
 						SizeT size = data.Count;
 						//create irp packet
-						if (isWaitable) {
-							Threading::SynchronizeEvent event = Threading::SynchronizeEvent(true);
-							irp = new WriteIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishWriteAction, MoveRValue(data), event);
-						}
-						else {
-							irp = new WriteIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishWriteAction, MoveRValue(data));
-						}
+						irp = new WriteIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishWriteAction, MoveRValue(data));
 						//create task object
 						auto task = GetIOTaskFromIRPBase(irp);
 						

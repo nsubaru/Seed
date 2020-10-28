@@ -18,7 +18,7 @@ Seed::Core::Threading::Threadables::ThreadableRef Seed::Core::Threading::Threada
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
 	SynchronizeEvent event = SynchronizeEvent(true);
 	auto threadable = new ThreadableUnifiedThreadPoolSheduledTaskV2(task, event, hThread, Threading::GetTID(), instance);
-	return RegisterThreadable(MoveRValue(threadable), &threadable->This->state);
+	return RegisterIThreadable(MoveRValue(threadable), &threadable->This->state);
 }
 
 void Seed::Core::Threading::Threadables::UnRegisterPoolSheduledThreadable(ThreadableRef&& ref)
@@ -26,7 +26,7 @@ void Seed::Core::Threading::Threadables::UnRegisterPoolSheduledThreadable(Thread
 	NtClose(ref->As<ThreadableUnifiedThreadPoolSheduledTaskV2>().This->hThread);
 	ref->As<ThreadableUnifiedThreadPoolSheduledTaskV2>().This->instance = nullptr;
 	ref->As<ThreadableUnifiedThreadPoolSheduledTaskV2>().This->state = Threading::EThreadabledStates::Ended;
-	UnRegisterThreadable(MoveRValue(ref));
+	UnRegisterIThreadable(MoveRValue(ref));
 }
 
 IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolSheduledTaskV2::Suspend()

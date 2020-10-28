@@ -17,7 +17,7 @@ Seed::Core::Threading::Threadables::ThreadableRef Seed::Core::Threading::Threada
 	HANDLE hThread = nullptr;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
 	auto threadable = new ThreadableUnifiedThreadPoolJobV2(task, hThread, Threading::GetTID() , instance);
-	return RegisterThreadable(MoveRValue(threadable), &threadable->This->state);
+	return RegisterIThreadable(MoveRValue(threadable), &threadable->This->state);
 }
 
 void Seed::Core::Threading::Threadables::UnRegisterPoolJobThreadable(Seed::Core::Threading::Threadables::ThreadableRef&& ref)
@@ -25,7 +25,7 @@ void Seed::Core::Threading::Threadables::UnRegisterPoolJobThreadable(Seed::Core:
 	NtClose(ref->As<ThreadableUnifiedThreadPoolJobV2>().This->hThread);
 	ref->As<ThreadableUnifiedThreadPoolJobV2>().This->instance = nullptr;
 	ref->As<ThreadableUnifiedThreadPoolJobV2>().This->state = Threading::EThreadabledStates::Ended;
-	UnRegisterThreadable(MoveRValue(ref));
+	UnRegisterIThreadable(MoveRValue(ref));
 }
 
 IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolJobV2::Suspend()

@@ -11,7 +11,7 @@ namespace Seed
 			/// <summary>
 			/// Сервіс системного пула задач
 			/// </summary>
-			class SystemTaskPoolService final : IDisposable, IBootUpService<SystemTaskPoolService> {
+			class SystemTaskPoolService final : IBootUpService<SystemTaskPoolService> {
 			public:
 				/// <summary>
 				/// Схема сервісу
@@ -23,59 +23,113 @@ namespace Seed
 						NullCtorDescription(Services::SystemTaskPoolService),
 						ObjectMethodsDefs(),
 						ObjectPropsDefs(
-							ObjectProperty(Services::SystemTaskPoolService, JobsCount, GetJobsCount)
+							ObjectProperty(Services::SystemTaskPoolService, AllItemQueueLenght, GetAllItemQueueLenght),
+
+							ObjectProperty(Services::SystemTaskPoolService, AllItemLowPriorityQueueLenght, GetAllItemLowPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, AllItemMediumPriorityQueueLenght, GetAllItemMediumPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, AllItemHighPriorityQueueLenght, GetAllItemHighPriorityQueueLenght),
+
+							ObjectProperty(Services::SystemTaskPoolService, JobQueueLenght, GetJobQueueLenght),
+
+							ObjectProperty(Services::SystemTaskPoolService, JobLowPriorityQueueLenght, GetJobLowPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, JobMediumPriorityQueueLenght, GetJobMediumPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, JobHighPriorityQueueLenght, GetJobHighPriorityQueueLenght),
+
+							ObjectProperty(Services::SystemTaskPoolService, ScheduledTaskQueueLenght, GetScheduledTaskQueueLenght),
+
+							ObjectProperty(Services::SystemTaskPoolService, ScheduledTaskLowPriorityQueueLenght, GetScheduledTaskLowPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, ScheduledTaskMediumPriorityQueueLenght, GetScheduledTaskMediumPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, ScheduledTaskHighPriorityQueueLenght, GetScheduledTaskHighPriorityQueueLenght),
+
+							ObjectProperty(Services::SystemTaskPoolService, IoTaskQueueLenght, GetIoTaskQueueLenght),
+
+							ObjectProperty(Services::SystemTaskPoolService, IoTaskLowPriorityQueueLenght, GetIoTaskLowPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, IoTaskMediumPriorityQueueLenght, GetIoTaskMediumPriorityQueueLenght),
+							ObjectProperty(Services::SystemTaskPoolService, IoTaskHighPriorityQueueLenght, GetIoTaskHighPriorityQueueLenght)
 						)
 					);
 
 					return GenObjectRTTIRecord(SystemTaskPoolServiceDefinition);
 				}
 			private:
-				struct Data {
-					Threading::ThreadPool pool;
-
-					RefCountT RefCount;
-
-					Data() : pool(L"System task pool service"), RefCount(1) {}
-				};
-			private:
-				Data* This;
-			protected:
-				virtual void Dispose() override {}
 			public:
 				/// <summary>
-				/// Конструктор, ініціалізовує пул задач
+				/// Конструктор
 				/// </summary>
-				SystemTaskPoolService() : This(new Data()) {};
+				SystemTaskPoolService() {};
 			public:
-				/// <summary>
-				/// Занесення задачі в пул для виконання
-				/// </summary>
-				/// <param name="name">Ім'я задачі</param>
-				/// <param name="action">Дія</param>
-				/// <returns>Об'єкт задачі</returns>
-				Threading::JobPool PoolJob(const String& name, Delegate&& action) {
-					return This->pool.Dispatch(name, MoveRValue(action));
+#pragma region Jobs
+				Threading::UnifiedThreadPoolJob PostPriorityJob(Delegate&& action, String&& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+					return Threading::SystemThreadPool::PostPriorityJob(MoveRValue(action), MoveRValue(name), priority);
 				}
+				Threading::UnifiedThreadPoolJob PostPriorityJob(Delegate&& action, const String& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+					return Threading::SystemThreadPool::PostPriorityJob(MoveRValue(action), name, priority);
+				}
+				Threading::UnifiedThreadPoolJob PostPriorityJob(Delegate&& action, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+					return Threading::SystemThreadPool::PostPriorityJob(MoveRValue(action), priority);
+				}
+#pragma endregion
+#pragma region Sheduled task
+				Threading::UnifiedThreadPoolSheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, String&& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+					return Threading::SystemThreadPool::CreatePriorityScheduledTask(MoveRValue(callback), MoveRValue(name), priority);
+				}
+				Threading::UnifiedThreadPoolSheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, const String& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+					return Threading::SystemThreadPool::CreatePriorityScheduledTask(MoveRValue(callback), name, priority);
+				}
+				Threading::UnifiedThreadPoolSheduledTaskBuilder CreateLowPriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+					return Threading::SystemThreadPool::CreatePriorityScheduledTask(MoveRValue(callback), priority);
+				}
+#pragma endregion
+#pragma region Statistic
+				SizeT GetAllItemQueueLenght() const { return Threading::SystemThreadPool::AllItemQueueLenght(); }
 
-				/// <summary>
-				/// Занесення задачі в пул для виконання
-				/// </summary>
-				/// <param name="name">Ім'я задачі</param>
-				/// <param name="action">Дія</param>
-				/// <returns>Об'єкт задачі</returns>
-				Threading::JobPool PoolJob(String&& name, Delegate&& action) {
-					return This->pool.Dispatch(MoveRValue(name), MoveRValue(action));
-				}
-			public:
-				/// <summary>
-				/// Кількість задач в пулі на даний момент
-				/// </summary>
-				/// <returns>Кількість задач в пулі на даний момент</returns>
-				UInt64 GetJobsCount() const {
-					return This->pool.GetTasksCount();
-				}
-			public:
-				RefCountClass(SystemTaskPoolService, This);
+				SizeT GetAllItemLowPriorityQueueLenght() const { return Threading::SystemThreadPool::AllItemSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Low); }
+				SizeT GetAllItemMediumPriorityQueueLenght()  const { return Threading::SystemThreadPool::AllItemSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Medium); }
+				SizeT GetAllItemHighPriorityQueueLenght() const { return Threading::SystemThreadPool::AllItemSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::High); }
+
+				SizeT GetJobQueueLenght() const { return Threading::SystemThreadPool::JobQueueLenght(); }
+
+				SizeT GetJobLowPriorityQueueLenght() const { return Threading::SystemThreadPool::JobSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Low); }
+				SizeT GetJobMediumPriorityQueueLenght() const { return Threading::SystemThreadPool::JobSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Medium); }
+				SizeT GetJobHighPriorityQueueLenght() const { return Threading::SystemThreadPool::JobSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::High); }
+
+				SizeT GetScheduledTaskQueueLenght() const { return Threading::SystemThreadPool::ScheduledTaskQueueLenght(); }
+
+				SizeT GetScheduledTaskLowPriorityQueueLenght() const { return Threading::SystemThreadPool::ScheduledTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Low); }
+				SizeT GetScheduledTaskMediumPriorityQueueLenght() const { return Threading::SystemThreadPool::ScheduledTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Medium); }
+				SizeT GetScheduledTaskHighPriorityQueueLenght() const { return Threading::SystemThreadPool::ScheduledTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::High); }
+
+				SizeT GetIoTaskQueueLenght() const { return Threading::SystemThreadPool::IoTaskQueueLenght(); }
+
+				SizeT GetIoTaskLowPriorityQueueLenght() const { return Threading::SystemThreadPool::IoTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Low); }
+				SizeT GetIoTaskMediumPriorityQueueLenght() const { return Threading::SystemThreadPool::IoTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::Medium); }
+				SizeT GetIoTaskHighPriorityQueueLenght() const { return Threading::SystemThreadPool::IoTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority::High); }
+#pragma region Properties
+				SizeT Property(GetAllItemQueueLenght) AllItemQueueLenght;
+
+				SizeT Property(GetAllItemLowPriorityQueueLenght) AllItemLowPriorityQueueLenght;
+				SizeT Property(GetAllItemMediumPriorityQueueLenght) AllItemMediumPriorityQueueLenght;
+				SizeT Property(GetAllItemHighPriorityQueueLenght) AllItemHighPriorityQueueLenght;
+
+				SizeT Property(GetJobQueueLenght) JobQueueLenght;
+
+				SizeT Property(GetJobLowPriorityQueueLenght) JobLowPriorityQueueLenght;
+				SizeT Property(GetJobMediumPriorityQueueLenght) JobMediumPriorityQueueLenght;
+				SizeT Property(GetJobHighPriorityQueueLenght) JobHighPriorityQueueLenght;
+
+				SizeT Property(GetScheduledTaskQueueLenght) ScheduledTaskQueueLenght;
+
+				SizeT Property(GetScheduledTaskLowPriorityQueueLenght) ScheduledTaskLowPriorityQueueLenght;
+				SizeT Property(GetScheduledTaskMediumPriorityQueueLenght) ScheduledTaskMediumPriorityQueueLenght;
+				SizeT Property(GetScheduledTaskHighPriorityQueueLenght) ScheduledTaskHighPriorityQueueLenght;
+
+				SizeT Property(GetIoTaskQueueLenght) IoTaskQueueLenght;
+
+				SizeT Property(GetIoTaskLowPriorityQueueLenght) IoTaskLowPriorityQueueLenght;
+				SizeT Property(GetIoTaskMediumPriorityQueueLenght) IoTaskMediumPriorityQueueLenght;
+				SizeT Property(GetIoTaskHighPriorityQueueLenght) IoTaskHighPriorityQueueLenght;
+#pragma endregion
+#pragma endregion
 			};
 		}
 	}

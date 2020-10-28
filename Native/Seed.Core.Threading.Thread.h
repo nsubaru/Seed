@@ -53,14 +53,15 @@ namespace Seed {
 			private:
 				Data* This = nullptr;
 			private:
-				SeedKernelCall friend void RegisterThread(Thread* thread);
-				SeedKernelCall friend void UnRegisterThread(Thread* thread);
-				SeedKernelCall friend volatile Delegate& ThreadEntryPoint(Thread* thread);
-				SeedKernelCall friend bool MainThread(Delegate&& delegate);
+				friend void RegisterThread(Thread* thread);
+				friend void UnRegisterThread(Thread* thread);
+				friend volatile Delegate& ThreadEntryPoint(Thread* thread);
+				friend volatile EThreadabledStates* GetActiveState(Thread* thread);
+				friend bool MainThread(Delegate&& delegate);
 
 				friend void KillThread(Thread& target, UInt32 statusCode);
 			private:
-				SeedKernelCall void RefreshName();
+				void RefreshName();
 			protected:
 				virtual void Dispose() override final;
 			public:
@@ -86,44 +87,44 @@ namespace Seed {
 				/// Запуск потоку на виконання
 				/// </summary>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Start();
+				Thread& Start();
 				/// <summary>
 				/// Очікування завершення виконання потоку
 				/// </summary>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Join();
-				/// <summary>
-				/// Очікування завершення виконання потоку
-				/// </summary>
-				/// <param name="timeOut">Таймаут очікування</param>
-				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Join(Time::DateTime timeOut);
-				/// <summary>
-				/// Очікування завершення виконання потоку
-				/// </summary>
-				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall const Thread& Join() const;
+				Thread& Join();
 				/// <summary>
 				/// Очікування завершення виконання потоку
 				/// </summary>
 				/// <param name="timeOut">Таймаут очікування</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall const Thread& Join(Time::DateTime timeOut) const;
+				Thread& Join(Time::TimeSpan timeOut);
+				/// <summary>
+				/// Очікування завершення виконання потоку
+				/// </summary>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				const Thread& Join() const;
+				/// <summary>
+				/// Очікування завершення виконання потоку
+				/// </summary>
+				/// <param name="timeOut">Таймаут очікування</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				const Thread& Join(Time::TimeSpan timeOut) const;
 				/// <summary>
 				/// Переривання виконання потоку
 				/// </summary>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Interupt();
+				Thread& Interupt();
 				/// <summary>
 				/// Замороження виконання потоку
 				/// </summary>
 				/// <returns></returns>
-				SeedKernelCall Thread& Suspend();
+				Thread& Suspend();
 				/// <summary>
 				/// Продовження виконання потоку
 				/// </summary>
 				/// <returns></returns>
-				SeedKernelCall Thread& Resume();
+				Thread& Resume();
 			public:
 				/// <summary>
 				/// Вертає результат виконання потоку
