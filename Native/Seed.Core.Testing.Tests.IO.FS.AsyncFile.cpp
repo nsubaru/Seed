@@ -158,7 +158,7 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::WriteAsyncFile::Excecute()
                 SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback))
                 );
 
-            task.WaitComplete(10s);
+            task.WaitComplete();
 
             MoveRValue(asyncFile).DeleteFile();
 
@@ -216,7 +216,7 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadAsyncFile::Excecute()
                 SmartPtr<Core::IO::IFinishReadCallback<Core::Containers::Blob>>((Core::IO::IFinishReadCallback<Core::Containers::Blob>*&&)new FinishReadCallback(readCallback))
                 );
 
-            readTask.WaitComplete(10s);
+            readTask.WaitComplete();
 
             decltype(fileList) readedFileList;
 
@@ -279,7 +279,7 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadWriteAsyncFile::Excecute(
                 SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(writeCallback))
                 );
 
-            writeTask.WaitComplete(10s);
+            writeTask.WaitComplete();
             
             auto readDataBuffer = Containers::Blob(data.Count);
             FinishReadCallback readCallback;
@@ -289,7 +289,7 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadWriteAsyncFile::Excecute(
                 SmartPtr<Core::IO::IFinishReadCallback<Core::Containers::Blob>>((Core::IO::IFinishReadCallback<Core::Containers::Blob>*&&)new FinishReadCallback(readCallback))
                 );
 
-            readTask.WaitComplete(10s);
+            readTask.WaitComplete();
 
             decltype(fileList) readedFileList;
 
@@ -349,7 +349,7 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::TwoWritesAsyncFile::Excecute(
                 SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback))
                 );
 
-            task.WaitComplete(10s);
+            task.WaitComplete();
 
             auto data2 = Core::Serilization::Serilize(fileList, registry);
             auto task2 = asyncFile.AsyncWrite(
@@ -358,7 +358,7 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::TwoWritesAsyncFile::Excecute(
                 SmartPtr<Core::IO::IFinishWriteCallback<Core::Containers::Blob>>((Core::IO::IFinishWriteCallback<Core::Containers::Blob>*&&)new FinishWriteCallback(callback))
                 );
 
-            task2.WaitComplete(10s);
+            task2.WaitComplete();
 
             MoveRValue(asyncFile).DeleteFile();
 

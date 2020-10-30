@@ -9,13 +9,14 @@ using namespace Seed::Threading::Threadables;
 
 ThreadableRef Seed::Core::Threading::Threadables::RegisterThreadThreadable(const Thread& thread, volatile EThreadabledStates* state)
 {
-	HANDLE hThread = nullptr;
-	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
     auto threadable = new ThreadableThread(thread);
+	*state = EThreadabledStates::Executing;
+	_ReadWriteBarrier();
 	return RegisterIThreadable(MoveRValue(threadable), state);
 }
 
 void Seed::Core::Threading::Threadables::UnRegisterThreadThreadable(ThreadableRef&& ref)
 {
 	UnRegisterIThreadable(MoveRValue(ref));
+	_ReadWriteBarrier();
 }

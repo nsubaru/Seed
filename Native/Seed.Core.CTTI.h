@@ -5,3 +5,4 @@
 #include "Seed.Core.CTTI.Concepts.h"
 
 #include "Seed.Core.Time.CTTI.h"
+#include "Seed.Core.Memory.DataSize.CTTI.h"

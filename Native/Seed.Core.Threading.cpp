@@ -183,7 +183,7 @@ namespace Seed {
 
 			volatile EThreadabledStates* GetActiveState(Thread* thread)
 			{
-				return &thread->This->ActiveState;
+				return &thread->This->State;
 			}
 		}
 	}
@@ -303,6 +303,8 @@ namespace Seed
 
 			Thread& Thread::Join()
 			{
+				_ReadWriteBarrier();
+
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = Math::Max<Int64>();
 				if (This->State == EThreadabledStates::Starting ||
@@ -315,6 +317,8 @@ namespace Seed
 
 			Thread& Thread::Join(Time::TimeSpan timeOut)
 			{
+				_ReadWriteBarrier();
+
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = timeOut.Ticks;
 				if (This->State == EThreadabledStates::Starting ||
@@ -327,6 +331,8 @@ namespace Seed
 
 			const Thread& Thread::Join() const
 			{
+				_ReadWriteBarrier();
+
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = Math::Max<Int64>();
 				if (This->State == EThreadabledStates::Starting ||
@@ -339,6 +345,8 @@ namespace Seed
 
 			const Thread& Thread::Join(Time::TimeSpan timeOut) const
 			{
+				_ReadWriteBarrier();
+
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = timeOut.Ticks;
 				if (This->State == EThreadabledStates::Starting ||
@@ -350,6 +358,8 @@ namespace Seed
 			}
 
 			Thread& Thread::Interupt() {
+				_ReadWriteBarrier();
+
 				switch (This->State)
 				{
 				case EThreadabledStates::NotStarted: break;
@@ -390,6 +400,8 @@ namespace Seed
 			}
 
 			Thread& Thread::Suspend() {
+				_ReadWriteBarrier();
+
 				switch (This->State)
 				{
 				case EThreadabledStates::NotStarted: break;
@@ -400,8 +412,8 @@ namespace Seed
 				case EThreadabledStates::Executing:
 				case EThreadabledStates::ExceptionProcessing:
 				{
-					This->ActiveState = EThreadabledStates::Paused;
-					Swap(This->State, This->ActiveState);
+					This->SecondState = EThreadabledStates::Paused;
+					Swap(This->State, This->SecondState);
 					NtSuspendThread(This->hThread, NULL);
 					break;
 				}
@@ -413,6 +425,8 @@ namespace Seed
 			}
 
 			Thread& Thread::Resume() {
+				_ReadWriteBarrier();
+
 				switch (This->State)
 				{
 				case EThreadabledStates::NotStarted: break;
@@ -423,7 +437,7 @@ namespace Seed
 				case EThreadabledStates::ExceptionProcessing: break;
 				case EThreadabledStates::Paused:
 				{
-					Swap(This->State, This->ActiveState);
+					Swap(This->State, This->SecondState);
 					NtAlertResumeThread(This->hThread, NULL);
 					break;
 				}
@@ -590,7 +604,9 @@ void Seed::Core::Threading::UnregisterJobFromJobList(UnifiedThreadPoolJob* jobOb
 
 void Seed::Core::Threading::UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread)
 {
-	((UnifiedThreadPool::Data*)thread->This->ownerPool)->TaskQueue.Remove(thread->This->poolQueueRef);
+	if (thread->This->poolQueueRef != nullptr) {
+		((UnifiedThreadPool::Data*)thread->This->ownerPool)->TaskQueue.Remove(thread->This->poolQueueRef);
+	}
 }
 
 void Seed::Core::Threading::ZeroingTaskHadle(UnifiedThreadPoolSheduledTask* thread)
@@ -643,29 +659,12 @@ VOID NTAPI UnifiedThreadPoolIrpCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
-	ConfigureTls(nullptr, nullptr);
-	try {
-		auto jobObj = (UnifiedThreadPoolIoTask*)ObjectContext;
-		delete jobObj;
-	}
-	catch (...) {
-		toCoreLog(L"Невідома помилка при знищенні об'єкта I/O задачі в пулі");
-	}
-	DestroyTls();
 }
 
 VOID NTAPI IoFinalizer(
 	_Inout_     PTP_CALLBACK_INSTANCE Instance,
 	_Inout_opt_ PVOID                 Context
 	) {
-	ConfigureTls(nullptr, nullptr);
-	try{
-		//delete IO::GetIrpFromReserved(Context);
-	}
-	catch (...) {
-		toCoreLog(L"Невідома помилка при знищенні об'єкта I/O задачі в пулі");
-	}
-	DestroyTls();
 }
 
 #pragma endregion
@@ -791,9 +790,6 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 		break;
 	}
 
-	threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
-	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
-
 	UnifiedThreadPool::PoolConfigureation configuration = { 0 };
 
 	configuration.CallbackEnviroment = threadPoolEnviroment;
@@ -840,9 +836,6 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for jobs"));
 		break;
 	}
-
-	threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
-	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
 
 	UnifiedThreadPool::PoolConfigureation configuration = { 0 };
 
@@ -892,9 +885,6 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 		break;
 	}
 
-	threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_NORMAL;
-	threadPoolEnviroment->Size = sizeof(TP_CALLBACK_ENVIRON);
-
 	UnifiedThreadPool::PoolConfigureation configuration = { 0 };
 
 	configuration.CallbackEnviroment = threadPoolEnviroment;
@@ -926,16 +916,16 @@ namespace Seed {
 		namespace Threading {
 			Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolJob* thread, ImplSpecificT callbackInstance) {
 				auto ref = Threadables::RegisterPoolJobThreadable(*thread, callbackInstance);
-				TpCallbackSetEventOnCompletion((PTP_CALLBACK_INSTANCE)callbackInstance, thread->This->hEvent);
-				UnregisterJobFromJobList(thread);
 				SetName(thread->This->jobName, NtCurrentThread());
 				_ReadWriteBarrier();
 				return ref;
 			}
 
 			void UnRegisterThreadable(UnifiedThreadPoolJob* thread, Threadables::ThreadableRef&& ref) {
-				Threadables::UnRegisterPoolSheduledThreadable(MoveRValue(ref));
+				Threadables::UnRegisterPoolJobThreadable(MoveRValue(ref));
+				UnregisterJobFromJobList(thread);
 				ReSetName(NtCurrentThread());
+				NtSetEvent(thread->This->hEvent, NULL);
 				_ReadWriteBarrier();
 				DestroyTls();
 			}
@@ -973,6 +963,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolJob* threa
 	try
 	{
 		Threading::UnRegisterThreadable(thread, MoveRValue(ref));
+		delete thread;
 	}
 	catch (Exception& ex)
 	{
@@ -1032,13 +1023,6 @@ VOID NTAPI UnifiedPoolWorkCallbak(
 		lock.TryInShareLock([&]() { EntryPoint(GetJobEntryPoint(thread), thread, Instance); });
 	}
 
-	try {
-		UnregisterJobFromJobList(thread);
-		delete thread;
-	}
-	catch (...) {
-		toCoreLog(L"Невідома помилка при дереєстрації задачі пулу потоків");
-	}
 	//Free work as we use each work object only one time
 	//(if we don't free each work also will be free in cleanup group close callback and we catch double free exception)
 	TpReleaseWork(Work); 
@@ -1121,6 +1105,7 @@ const UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join(Ti
 void Seed::Core::Threading::UnifiedThreadPoolJob::Dispose()
 {
 	NtClose(This->hEvent);
+	This->hEvent = nullptr;
 }
 #pragma endregion
 
@@ -1139,14 +1124,19 @@ namespace Seed {
 			void UnRegisterThreadable(UnifiedThreadPoolSheduledTask* thread, Threadables::ThreadableRef&& ref) {
 				Threadables::UnRegisterPoolSheduledThreadable(MoveRValue(ref));
 
+				++thread->This->executedCount;
+
 				if (thread->This->remainingCount != 0) {
 					--thread->This->remainingCount;
 				}
 
 				if (thread->This->remainingCount == 0 && thread->This->intervalsCount != 0) {
 					TpReleaseTimer(reinterpret_cast<PTP_TIMER>(thread->This->hTask));
+					UnRegisterTaskFromPoolQueue(thread);
 					delete thread;
 				}
+
+				ReSetName(NtCurrentThread());
 
 				_ReadWriteBarrier();
 				DestroyTls();
@@ -1352,15 +1342,14 @@ namespace Seed {
 		}
 
 		namespace Threading {
-
-			Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolIoTask* task, const SynchronizeEvent& event, ImplSpecificT instance) {
-				auto ref = Threadables::RegisterPoolIoThreadable(*task, event, instance);
-				SetName(task->Name, NtCurrentThread());
+			Threadables::ThreadableRef RegisterThreadable(const UnifiedThreadPoolIoTask& task, const SynchronizeEvent& event, ImplSpecificT instance) {
+				auto ref = Threadables::RegisterPoolIoThreadable(task, event, instance);
+				SetName(task.Name, NtCurrentThread());
 				_ReadWriteBarrier();
 				return ref;
 			}
 
-			void UnRegisterThreadable(UnifiedThreadPoolIoTask* task, Threadables::ThreadableRef&& ref) {
+			void UnRegisterThreadable(const UnifiedThreadPoolIoTask& task, Threadables::ThreadableRef&& ref) {
 				Threadables::UnRegisterPoolIoThreadable(MoveRValue(ref));
 				ReSetName(NtCurrentThread());
 			}
@@ -1369,7 +1358,7 @@ namespace Seed {
 }
 
 template<typename EntryPointT>
-static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolIoTask* thread, const SynchronizeEvent& event, ImplSpecificT instance) noexcept {
+static NTSTATUS EntryPoint(EntryPointT&& entryPoint, const UnifiedThreadPoolIoTask& thread, const SynchronizeEvent& event, ImplSpecificT instance) noexcept {
 	using namespace Seed;
 	using namespace Seed::Core::Threading;
 
@@ -1425,10 +1414,10 @@ VOID NTAPI IoThreadPoolCallback(
 
 	try {
 		auto irp = (IO::IRPBase*)ApcContext;
-
+		
 		EntryPoint(
 			[&]() { irp->OnIORequestComplete(IoSB->Information, NT_SUCCESS(IoSB->Status), IoSB->Status); },
-			(UnifiedThreadPoolIoTask*)Context,
+			irp->TargetTask,
 			GetIrpCompleteEvent(irp),
 			Instance
 		);
@@ -1447,7 +1436,7 @@ Seed::Core::Threading::UnifiedThreadPoolIoTask Seed::Core::IO::IAsyncIOBase::Reg
 		(PTP_IO*)&This.This->hIoPoolObj,
 		hFileObj,
 		IoThreadPoolCallback,
-		new UnifiedThreadPoolIoTask(This),
+		This.This,
 		(PTP_CALLBACK_ENVIRON)pool.This->handlesData.IrpConfiguration.CallbackEnviroment);
 
 	if (!NT_SUCCESS(status)) {
@@ -1465,7 +1454,7 @@ void Seed::Core::IO::IAsyncIOBase::UnRegisterNtIoObjectInThreadPool(Seed::Core::
 	UnifiedThreadPool((UnifiedThreadPool::Data*&)task.This->ownerPool).This->IrpQueue.Remove(task.This->poolRef);
 	task.This->hFile = nullptr;
 	task.This->ownerPool = nullptr;
-	TpWaitForIoCompletion((PTP_IO)task.This->hIoPoolObj, TRUE);
+	TpWaitForIoCompletion((PTP_IO)task.This->hIoPoolObj, FALSE);
 	DestroyIoPoolObj(&task);
 }
 
@@ -1503,6 +1492,8 @@ void Seed::Core::IO::IRPBase::CancelIo()
 	if (!NT_SUCCESS(status)) {
 		Throw(NtException(ExceptionPosition, status));
 	}
+
+	this->irpTarget->CancelNotifyIoOperation(this->TargetTask);
 }
 
 void Seed::Core::Threading::UnifiedThreadPoolIoTask::Dispose()

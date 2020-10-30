@@ -25,6 +25,7 @@ Seed::Core::Threading::Threadables::ThreadableRef Seed::Core::Threading::Threada
 
 void Seed::Core::Threading::Threadables::UnRegisterPoolIoThreadable(ThreadableRef&& ref)
 {
+	ref->As<ThreadableUnifiedThreadPoolIoTaskV2>().This->event.Set();
 	NtClose(ref->As<ThreadableUnifiedThreadPoolIoTaskV2>().This->hThread);
 	ref->As<ThreadableUnifiedThreadPoolIoTaskV2>().This->instance = nullptr;
 	ref->As<ThreadableUnifiedThreadPoolIoTaskV2>().This->state = Threading::EThreadabledStates::Ended;

@@ -11,8 +11,8 @@ namespace Seed {
 					struct Data {
 						UnifiedThreadPoolSheduledTask task;
 						SynchronizeEvent event;
-						EThreadabledStates state;
-						EThreadabledStates secondState;
+						volatile EThreadabledStates state;
+						volatile EThreadabledStates secondState;
 						Handle hThread;
 						ID threadId;
 						ImplSpecificT instance;
@@ -89,7 +89,7 @@ namespace Seed {
 					/// </summary>
 					/// <returns>Тип потокової сутності</returns>
 					virtual EThreadableTypes GetThreadableType() const {
-						return EThreadableTypes::JobTask;
+						return EThreadableTypes::ScheduledTask;
 					}
 
 					/// <summary>

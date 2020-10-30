@@ -68,7 +68,7 @@ namespace Seed {
 					/// <summary>
 					/// Максимальна кількість адресів функцій які можуть зберігатись в сховищі
 					/// </summary>
-					static inline constexpr SizeT MaxStackTraceItemCount = (8Kb).GetBytes() / sizeof(SizeT);
+					static inline constexpr SizeT MaxStackTraceItemCount = (8Kb).Bytes / sizeof(SizeT);
 
 					/// <summary>
 					/// Реальна кількість адресів функцій

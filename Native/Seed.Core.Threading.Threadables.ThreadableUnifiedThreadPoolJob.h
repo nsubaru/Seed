@@ -9,8 +9,8 @@ namespace Seed {
 				private:
 					struct Data {
 						UnifiedThreadPoolJob task;
-						EThreadabledStates state;
-						EThreadabledStates secondState;
+						volatile EThreadabledStates state;
+						volatile EThreadabledStates secondState;
 						Handle hThread;
 						ID threadId;
 						ImplSpecificT instance;

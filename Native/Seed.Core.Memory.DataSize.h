@@ -16,71 +16,67 @@ namespace Seed {
 				static constexpr ByteSizeT Exabyte = Petabyte * 1024;
 
 				static constexpr ByteSizeT Maxbytes = Math::Max<ByteSizeT>();
-			private:
-				ByteSizeT bytes;
 			public:
-				constexpr DataSizeT() : bytes(0) {}
-				constexpr explicit DataSizeT(ByteSizeT bytes) : bytes(bytes) {}
+				ByteSizeT Bytes;
 			public:
-				constexpr ByteSizeT GetBytes() const { return bytes; }
-				constexpr void SetBytes(ByteSizeT bytes) { this->bytes = bytes; }
-				constexpr void AddBytes(ByteSizeT bytes) { this->bytes += bytes; }
+				constexpr DataSizeT() : Bytes(0) {}
+				constexpr explicit DataSizeT(ByteSizeT bytes) : Bytes(bytes) {}
 			public:
-				ByteSizeT Property(GetBytes, SetBytes) Bytes;
+				constexpr void AddBytes(ByteSizeT bytes) { this->Bytes += bytes; }
 			public:
-				constexpr ByteSizeT GetKilobytes() const { return bytes / Kilobyte; }
-				constexpr void SetKilobytes(ByteSizeT kilobytes) { this->bytes = kilobytes * Kilobyte; }
-				constexpr DataSizeT& AddKilobytes(ByteSizeT kilobytes) { this->bytes += kilobytes * Kilobyte; return *this; }
+				constexpr ByteSizeT GetKilobytes() const { return Bytes / Kilobyte; }
+				constexpr void SetKilobytes(ByteSizeT kilobytes) { this->Bytes = kilobytes * Kilobyte; }
+				constexpr DataSizeT& AddKilobytes(ByteSizeT kilobytes) { this->Bytes += kilobytes * Kilobyte; return *this; }
 			public:
 				ByteSizeT Property(GetKilobytes, SetKilobytes) Kilobytes;
 			public:
-				constexpr ByteSizeT GetMegabytes() const { return bytes / Megabyte; }
-				constexpr void SetMegabytes(ByteSizeT megabytes) { this->bytes = megabytes * Megabyte; }
-				constexpr DataSizeT& AddMegabytes(ByteSizeT megabytes) { this->bytes += megabytes * Megabyte; return *this; }
+				constexpr ByteSizeT GetMegabytes() const { return Bytes / Megabyte; }
+				constexpr void SetMegabytes(ByteSizeT megabytes) { this->Bytes = megabytes * Megabyte; }
+				constexpr DataSizeT& AddMegabytes(ByteSizeT megabytes) { this->Bytes += megabytes * Megabyte; return *this; }
 			public:
 				ByteSizeT Property(GetMegabytes, SetMegabytes) Megabytes;
 			public:
-				constexpr UInt64 GetGigabytes() const { return bytes / Gigabyte; }
-				constexpr void SetGigabytes(ByteSizeT gigabytes) { this->bytes = gigabytes * Gigabyte; }
-				constexpr DataSizeT& AddGigabytes(ByteSizeT gigabytes) { this->bytes += gigabytes * Gigabyte; return *this; }
+				constexpr UInt64 GetGigabytes() const { return Bytes / Gigabyte; }
+				constexpr void SetGigabytes(ByteSizeT gigabytes) { this->Bytes = gigabytes * Gigabyte; }
+				constexpr DataSizeT& AddGigabytes(ByteSizeT gigabytes) { this->Bytes += gigabytes * Gigabyte; return *this; }
 			public:
 				ByteSizeT Property(GetGigabytes, SetGigabytes) Gigabytes;
 			public:
-				constexpr ByteSizeT GetTerabytes() const { return bytes / Terabyte; }
-				constexpr void SetTerabytes(ByteSizeT terabytes) { this->bytes = terabytes * Terabyte; }
-				constexpr DataSizeT& AddTerabytes(ByteSizeT terabytes) { this->bytes += terabytes * Terabyte; return *this; }
+				constexpr ByteSizeT GetTerabytes() const { return Bytes / Terabyte; }
+				constexpr void SetTerabytes(ByteSizeT terabytes) { this->Bytes = terabytes * Terabyte; }
+				constexpr DataSizeT& AddTerabytes(ByteSizeT terabytes) { this->Bytes += terabytes * Terabyte; return *this; }
 			public:
 				ByteSizeT Property(GetTerabytes, SetTerabytes) Terabytes;
 			public:
-				constexpr ByteSizeT GetPetabytes() const { return bytes / Petabyte; }
-				constexpr void SetPetabytes(ByteSizeT petabytes) { this->bytes = petabytes * Petabyte; }
-				constexpr DataSizeT& AddPetabytes(ByteSizeT petabytes) { this->bytes += petabytes * Petabyte; return *this; }
+				constexpr ByteSizeT GetPetabytes() const { return Bytes / Petabyte; }
+				constexpr void SetPetabytes(ByteSizeT petabytes) { this->Bytes = petabytes * Petabyte; }
+				constexpr DataSizeT& AddPetabytes(ByteSizeT petabytes) { this->Bytes += petabytes * Petabyte; return *this; }
 			public:
 				ByteSizeT Property(GetPetabytes, SetPetabytes) Petabytes;
 			public:
-				constexpr ByteSizeT GetExabytes() const { return bytes / Exabyte; }
-				constexpr void SetExabytes(ByteSizeT exabytes) { this->bytes = exabytes * Exabyte; }
-				constexpr DataSizeT& AddExabytes(ByteSizeT exabytes) { this->bytes += exabytes * Exabyte; return *this; }
+				constexpr ByteSizeT GetExabytes() const { return Bytes / Exabyte; }
+				constexpr void SetExabytes(ByteSizeT exabytes) { this->Bytes = exabytes * Exabyte; }
+				constexpr DataSizeT& AddExabytes(ByteSizeT exabytes) { this->Bytes += exabytes * Exabyte; return *this; }
 			public:
 				ByteSizeT Property(GetExabytes, SetExabytes) Exabytes;
 			public:
-				constexpr DataSizeT operator+(DataSizeT other) const { return DataSizeT(this->bytes + other.bytes); }
-				constexpr DataSizeT operator-(DataSizeT other) const { return DataSizeT(this->bytes - other.bytes); }
+				constexpr DataSizeT operator+(DataSizeT other) const { return DataSizeT(this->Bytes + other.Bytes); }
+				constexpr DataSizeT operator-(DataSizeT other) const { return DataSizeT(this->Bytes - other.Bytes); }
 
-				constexpr DataSizeT operator+(ByteSizeT other) const { return DataSizeT(this->bytes + bytes); }
-				constexpr DataSizeT operator-(ByteSizeT other) const { return DataSizeT(this->bytes - bytes); }
+				constexpr DataSizeT operator+(ByteSizeT other) const { return DataSizeT(this->Bytes + Bytes); }
+				constexpr DataSizeT operator-(ByteSizeT other) const { return DataSizeT(this->Bytes - Bytes); }
 			public:
-				constexpr DataSizeT& operator+=(DataSizeT other) { this->bytes += other.bytes; return *this; }
-				constexpr DataSizeT& operator-=(DataSizeT other) { this->bytes -= other.bytes; return *this; }
+				constexpr DataSizeT& operator+=(DataSizeT other) { this->Bytes += other.Bytes; return *this; }
+				constexpr DataSizeT& operator-=(DataSizeT other) { this->Bytes -= other.Bytes; return *this; }
 
-				constexpr DataSizeT& operator+=(ByteSizeT other) { this->bytes += other; return *this; }
-				constexpr DataSizeT& operator-=(ByteSizeT other) { this->bytes -= other; return *this; }
+				constexpr DataSizeT& operator+=(ByteSizeT other) { this->Bytes += other; return *this; }
+				constexpr DataSizeT& operator-=(ByteSizeT other) { this->Bytes -= other; return *this; }
 			public:
-				constexpr auto operator<=>(const DataSizeT& other) const { return this->bytes <=> other.bytes; }
-				constexpr auto operator==(const DataSizeT& other) const { return this->bytes == other.bytes; }
-				constexpr auto operator!=(const DataSizeT& other) const { return this->bytes != other.bytes; }
+				constexpr auto operator<=>(const DataSizeT& other) const { return this->Bytes <=> other.Bytes; }
+				constexpr auto operator==(const DataSizeT& other) const { return this->Bytes == other.Bytes; }
+				constexpr auto operator!=(const DataSizeT& other) const { return this->Bytes != other.Bytes; }
 			public:
-				constexpr explicit operator ByteSizeT() { return this->GetBytes(); }
+				constexpr explicit operator ByteSizeT() { return this->Bytes; }
 			};
 		}
 	}

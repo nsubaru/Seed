@@ -23,7 +23,7 @@ namespace Seed {
 					volatile String name;
 					volatile ID TID;
 					volatile EThreadabledStates State;
-					volatile EThreadabledStates ActiveState;
+					volatile EThreadabledStates SecondState;
 					Handle hThread;
 					SynchronizeEvent* AbortEvent;
 					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;

@@ -1,6 +1,6 @@
 #pragma once
-#include "Seed.Core.CTTI.TypeTraits.StructRemoteDefinition.h"
 #include "Seed.Core.Time.Base.h"
+#include "Seed.Core.CTTI.TypeTraits.StructRemoteDefinition.h"
 
 namespace Seed {
 	inline namespace Core {

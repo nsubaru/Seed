@@ -145,7 +145,7 @@ namespace Seed {
 						Throw(InvalidHandleUsage(ExceptionPosition));
 
 					//notify about arrived io operation
-					NotifyIoOperation(*This->poolTask);
+					//NotifyIoOperation(*This->poolTask);
 
 					This->DeleteFile();
 

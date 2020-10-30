@@ -2055,10 +2055,10 @@ void ThrowStoredException(void* exception)
         void* pExceptionBuffer = NULL;
         auto typeInfo = (CatchableType *)(ppCatchable);
 
-        __assume(typeInfo->sizeOrOffset < (4Kb).GetBytes());
+        __assume(typeInfo->sizeOrOffset < (4Kb).Bytes);
 #pragma warning(push)
 #pragma warning(disable: 6255)
-        GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca((typeInfo->sizeOrOffset == 0) ? (4Kb).GetBytes() - 1 : typeInfo->sizeOrOffset);
+        GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca((typeInfo->sizeOrOffset == 0) ? (4Kb).Bytes - 1 : typeInfo->sizeOrOffset);
 #pragma warning(pop)
         pExceptionBuffer = GetThreadExceptionData()->_throwObjStorageForStoredException;
 

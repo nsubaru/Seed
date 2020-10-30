@@ -259,8 +259,8 @@ namespace Seed {
 			protected:
 				friend void DestroyIoPoolObj(UnifiedThreadPoolIoTask* task);
 			protected:
-				friend Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolIoTask* task, const SynchronizeEvent& event, ImplSpecificT instance);
-				friend void UnRegisterThreadable(UnifiedThreadPoolIoTask* task, Threadables::ThreadableRef&& ref);
+				friend Threadables::ThreadableRef RegisterThreadable(const UnifiedThreadPoolIoTask& task, const SynchronizeEvent& event, ImplSpecificT instance);
+				friend void UnRegisterThreadable(const UnifiedThreadPoolIoTask& task, Threadables::ThreadableRef&& ref);
 			protected:
 				virtual void Dispose() override;
 			protected:

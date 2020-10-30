@@ -138,6 +138,8 @@ Seed::Core::DI::DepencyInjector::DepencyInjector() : data(new Data()) {
 	RegisterTypeDef(Time::DateTime);
 	RegisterTypeDef(Time::TimeRange);
 
+	RegisterTypeDef(Memory::DataSizeT);
+
 	RegisterTypeDef(Containers::Blob);
 	RegisterTypeDef(Containers::Dynamic);
 	RegisterTypeDef(Reflection::DynamicObject);

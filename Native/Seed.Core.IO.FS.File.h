@@ -280,7 +280,7 @@ namespace Seed
 					/// <summary>
 					/// Сирі дані точки повторної обробки
 					/// </summary>
-					Byte ReparsePointData[(16Kb).GetBytes()];
+					Byte ReparsePointData[(16Kb).Bytes];
 				};
 
 				/// <summary>
