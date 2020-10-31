@@ -66,7 +66,7 @@ namespace Seed {
 				/// <summary>
 				/// Add bytes
 				/// </summary>
-				/// <param name="bytes"Bytes count></param>
+				/// <param name="bytes">Bytes count></param>
 				constexpr void AddBytes(ByteSizeT bytes) { this->Bytes += bytes; }
 			public:
 				/// <summary>
@@ -231,14 +231,14 @@ namespace Seed {
 				/// Add bytes to data size
 				/// </summary>
 				/// <param name="other">Second operand</param>
-				/// <returnsResult value></returns>
+				/// <returns>Result value></returns>
 				constexpr DataSizeT operator+(ByteSizeT other) const { return DataSizeT(this->Bytes + Bytes); }
 
 				/// <summary>
 				/// Substract bytes to data size
 				/// </summary>
 				/// <param name="other">Second operand</param>
-				/// <returnsResult value></returns>
+				/// <returns>Result value></returns>
 				constexpr DataSizeT operator-(ByteSizeT other) const { return DataSizeT(this->Bytes - Bytes); }
 
 				/// <summary>

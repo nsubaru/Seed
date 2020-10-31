@@ -1115,6 +1115,9 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolSheduledTask* thread, ImplSpecificT callbackInstance) {
+				thread->This->lastStartTime = Time::DateTime::GetCurrentSystemTimeData();
+				thread->This->activeInstanceRefCount++;
+
 				auto ref = Threadables::RegisterPoolSheduledThreadable(*thread, callbackInstance);
 				SetName(thread->This->taskName, NtCurrentThread());
 				_ReadWriteBarrier();
@@ -1124,6 +1127,7 @@ namespace Seed {
 			void UnRegisterThreadable(UnifiedThreadPoolSheduledTask* thread, Threadables::ThreadableRef&& ref) {
 				Threadables::UnRegisterPoolSheduledThreadable(MoveRValue(ref));
 
+				--thread->This->activeInstanceRefCount;
 				++thread->This->executedCount;
 
 				if (thread->This->remainingCount != 0) {
@@ -1193,21 +1197,6 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolSheduledTa
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
-			{
-				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback));
-			}
-
-			UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
-			{
-				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), MoveRValue(taskName));
-			}
-
-			UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
-			{
-				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), String(taskName));
-			}
-
 			bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task)
 			{
 				return ((UnifiedThreadPool::Data*)(task->This->ownerPool))->isPoolTermination;
@@ -1339,6 +1328,12 @@ namespace Seed {
 			{
 				return irp->event;
 			}
+
+			void Seed::Core::IO::MarkIrpCompleted(IRPBase* irp)
+			{
+				irp->isCompleted = true;
+				_ReadWriteBarrier();
+			}
 		}
 
 		namespace Threading {
@@ -1421,6 +1416,8 @@ VOID NTAPI IoThreadPoolCallback(
 			GetIrpCompleteEvent(irp),
 			Instance
 		);
+
+		MarkIrpCompleted(irp);
 
 		delete irp;
 	}

@@ -22,32 +22,65 @@ namespace Seed {
 		}
 
 		namespace IO {
+			/// <summary>
+			/// Інтерфейс колбеку помилки I/O операції 
+			/// </summary>
 			class IExceptionCallback : protected IDisposable {
 			public:
+				/// <summary>
+				/// Викликається з кодом помилки, якщо операція завершилась не успішно
+				/// </summary>
+				/// <param name="errorCode">Код помилки</param>
 				virtual void OnError(UInt32 errorCode) = 0;
 			public:
-				virtual ~IExceptionCallback() = 0 {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~IExceptionCallback() = 0 {}
 			};
 
+			/// <summary>
+			/// Інтерфейс колбеку завершення операції читання
+			/// </summary>
+			/// <typeparam name="TDataType">Тип блоку даних</typeparam>
 			template<typename TDataType = Containers::Blob>
-			class IFinishReadCallback : public IExceptionCallback {
+			class IFinishReadCallback : public virtual IExceptionCallback {
 			public:
+				/// <summary>
+				/// Викликається після успішного завершення операції читання
+				/// </summary>
+				/// <param name="byteTransfered">Вказує кількість зчитаних байтів</param>
+				/// <param name="data">Буфер даних</param>
 				virtual void OnFinishRead(SizeT byteTransfered, TDataType&& data) volatile = 0;
 			public:
-				virtual ~IFinishReadCallback() = 0 {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~IFinishReadCallback() = 0 {}
 			};
 
+			/// <summary>
+			/// Інтерфейс колбеку завершення операції запису
+			/// </summary>
+			/// <typeparam name="TDataType">Тип блоку даних</typeparam>
 			template<typename TDataType = Containers::Blob>
-			class IFinishWriteCallback : public IExceptionCallback {
+			class IFinishWriteCallback : public virtual IExceptionCallback {
 			public:
+				/// <summary>
+				/// Викликається після успішного завершення операції запису
+				/// </summary>
+				/// <param name="byteTransfered">Вказує кількість зчитаних байтів</param>
+				/// <param name="data">Буфер даних</param>
 				virtual void OnWriteFinish(SizeT byteTransfered, const TDataType&& data) volatile = 0;
 			public:
-				virtual ~IFinishWriteCallback() = 0 {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~IFinishWriteCallback() = 0 {}
 			};
 		}
 
 		namespace Threading {
-			
 			class IThreadPoolObject;
 
 			class UnifiedThreadPoolJob;
@@ -57,13 +90,25 @@ namespace Seed {
 
 			class UnifiedThreadPoolBuilder;
 
+			/// <summary>
+			/// Колбек таймера задачі в пулі
+			/// </summary>
 			class IUnifiedThreadPoolShedulerCallback : protected IDisposable {
 			public:
+				/// <summary>
+				/// Викликається при настані заданого часу
+				/// </summary>
 				virtual void Shedule() = 0;
 			public:
-				virtual ~IUnifiedThreadPoolShedulerCallback() = 0 {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~IUnifiedThreadPoolShedulerCallback() = 0 {}
 			};
 
+			/// <summary>
+			/// Задача в пулі задач
+			/// </summary>
 			class UnifiedThreadPoolJob final : protected IDisposable {
 			public:
 				friend class UnifiedThreadPool;
@@ -110,36 +155,99 @@ namespace Seed {
 			private:
 				UnifiedThreadPoolJob(Data* This) : This(This) {}
 			public:
-				const String& GetName() {
+				/// <summary>
+				/// Вертає ім'я задачі
+				/// </summary>
+				/// <returns></returns>
+				ForceInline const String& GetName() {
 					return This->jobName;
 				}
-				void SetName(const String& newName) {
+
+				/// <summary>
+				/// Встановлює ім'я задачі
+				/// </summary>
+				/// <param name="newName">Нове ім'я задачі</param>
+				ForceInline void SetName(const String& newName) {
 					This->jobName = newName;
 				}
-				void SetName(String&& newName) {
+
+				/// <summary>
+				/// Встановлює ім'я задачі
+				/// </summary>
+				/// <param name="newName">Нове ім'я задачі</param>
+				ForceInline void SetName(String&& newName) {
 					This->jobName = MoveRValue(newName);
 				}
 			public:
-				Boolean GetIsAlredyExecuted() const {
+				/// <summary>
+				/// Вказує чи задача вже виконана
+				/// </summary>
+				/// <returns>true якщо задача виконана</returns>
+				ForceInline Boolean GetIsAlredyExecuted() const {
 					return This->action.GetIsEnded();
 				}
-				Boolean GetIsStartedExecution() const {
+
+				/// <summary>
+				/// Вказує чи задача виконується
+				/// </summary>
+				/// <returns>true якщо задача в процесі виконання</returns>
+				ForceInline Boolean GetIsStartedExecution() const {
 					return This->action.GetIsStarted();
 				}
+
+				/// <summary>
+				/// Вертає пул потоків в якому зареєстрована задача
+				/// </summary>
+				/// <returns>Об'єкт пул потоків</returns>
 				UnifiedThreadPool GetOwnerPool() const;
 			public:
+				/// <summary>
+				/// Ім'я задачі
+				/// </summary>
 				String Property(GetName, SetName) Name;
+
+				/// <summary>
+				/// Вказує чи задача вже виконана
+				/// </summary>
 				Boolean Property(GetIsAlredyExecuted) IsAlredyExecuted;
+
+				/// <summary>
+				/// Вказує чи задача виконується
+				/// </summary>
 				Boolean Property(GetIsStartedExecution) IsStartedExecution;
 			public:
+				/// <summary>
+				/// Очікування завершення задачі
+				/// </summary>
+				/// <returns>Посилання на поточний об'єкт</returns>
 				UnifiedThreadPoolJob& Join();
+
+				/// <summary>
+				/// Очікування завершення задачі з таймаутом
+				/// </summary>
+				/// <param name="timeOut">Таймаут очікування</param>
+				/// <returns></returns>
 				UnifiedThreadPoolJob& Join(Time::TimeSpan timeOut);
+
+				/// <summary>
+				/// Очікування завершення задачі
+				/// </summary>
+				/// <returns>Посилання на поточний об'єкт</returns>
 				const UnifiedThreadPoolJob& Join() const;
+
+				/// <summary>
+				/// Очікування завершення задачі з таймаутом
+				/// </summary>
+				/// <param name="timeOut">Таймаут очікування</param>
+				/// <returns></returns>
 				const UnifiedThreadPoolJob& Join(Time::TimeSpan timeOut) const;
 			public:
 				RefCountClass(UnifiedThreadPoolJob, This);
 			};
 
+			/// <summary>
+			/// Таймер в пулі задач
+			/// </summary>
 			class UnifiedThreadPoolSheduledTask final : protected IDisposable {
 			private:
 				friend class UnifiedThreadPoolSheduledTaskBuilder;
@@ -197,7 +305,7 @@ namespace Seed {
 			protected:
 				virtual void Dispose() override;
 			private:
-				UnifiedThreadPoolSheduledTask(Data* This) : This(This) {}
+				ForceInline UnifiedThreadPoolSheduledTask(Data* This) : This(This) {}
 			private:
 				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task);
 				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task);
@@ -208,36 +316,130 @@ namespace Seed {
 				friend void UnRegisterThreadable(UnifiedThreadPoolSheduledTask* thread, Threadables::ThreadableRef&& ref);
 				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
 			public:
-				const String& GetTaskName() const { return This->taskName; }
+				/// <summary>
+				/// Вертай ім'я таймера
+				/// </summary>
+				/// <returns>Тескстове ім'я таймера</returns>
+				ForceInline const String& GetTaskName() const { return This->taskName; }
+
+				/// <summary>
+				/// Встановлює нове ім'я таймера
+				/// </summary>
+				/// <param name="newTaskName">Нове ім'я таймера</param>
 				void SetName(String&& newTaskName);
-				void SetName(const String& newTaskName) { SetName(String(newTaskName)); }
+
+				/// <summary>
+				/// Встановлює нове ім'я таймера
+				/// </summary>
+				/// <param name="newTaskName">Нове ім'я таймера</param>
+				ForceInline void SetName(const String& newTaskName) { SetName(String(newTaskName)); }
 			public:
+				/// <summary>
+				/// Ім'я таймера
+				/// </summary>
 				String Property(GetTaskName, SetName) Name;
 			public:
-				SizeT GetExecutedCount() const { return This->executedCount; }
-				Time::DateTime GetLastStartTime() const { return This->lastStartTime; }
-				Boolean GetIsActive() const { return This->activeInstanceRefCount != 0; }
-				UInt64 GetActiveInstancesCount() const { return This->activeInstanceRefCount; }
+				/// <summary>
+				/// Вертає кількість пройдених циклів
+				/// </summary>
+				/// <returns>Кількість пройдениз циклів</returns>
+				ForceInline SizeT GetExecutedCount() const { return This->executedCount; }
+
+				/// <summary>
+				/// Вертає остані час виклику таймера
+				/// </summary>
+				/// <returns>Останій час вилику таймера</returns>
+				ForceInline Time::DateTime GetLastStartTime() const { return This->lastStartTime; }
+
+				/// <summary>
+				/// Вертає чм активна задача таймера
+				/// </summary>
+				/// <returns>Чм активна задача таймера</returns>
+				ForceInline Boolean GetIsActive() const { return This->activeInstanceRefCount != 0; }
+
+				/// <summary>
+				/// Вертає поточну кількість актичних екземплярів задачі таймера
+				/// </summary>
+				/// <returns>Поточна кількість актичних екземплярів задачі таймера</returns>
+				ForceInline UInt64 GetActiveInstancesCount() const { return This->activeInstanceRefCount; }
+
+				/// <summary>
+				/// Вертає пул задач який обробляє таймер
+				/// </summary>
+				/// <returns>Пул задач який обробляє таймер</returns>
 				UnifiedThreadPool GetOwnerPool() const;
-				Time::TimeSpan GetTimerProximity() const { return Time::TimeSpan(This->timerProximity); }
-				Time::DateTime GetFirstStartTime() const { return This->startTime; }
-				SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetCallbackObject() const { return This->callback; }
+
+				/// <summary>
+				/// Вертає точність таймера
+				/// </summary>
+				/// <returns>Точність таймера</returns>
+				ForceInline Time::TimeSpan GetTimerProximity() const { return Time::TimeSpan(This->timerProximity); }
+
+				/// <summary>
+				/// Вказує перший час запуску
+				/// </summary>
+				/// <returns>Час першого запуску</returns>
+				ForceInline Time::DateTime GetFirstStartTime() const { return This->startTime; }
+
+				/// <summary>
+				/// Вертає екземплря колбеку
+				/// </summary>
+				/// <returns>Екземпляр колбеку</returns>
+				ForceInline const SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetCallbackObject() const { return This->callback; }
 			public:
+				/// <summary>
+				/// Кількість пройдениз циклів
+				/// </summary>
 				SizeT Property(GetExecutedCount) ExecutedCount;
+
+				/// <summary>
+				/// Останій час вилику таймера
+				/// </summary>
 				Time::DateTime Property(GetLastStartTime) LastStartTime;
+
+				/// <summary>
+				/// Чм активна задача таймера зараз
+				/// </summary>
 				Boolean Property(GetIsActive) IsActive;
+
+				/// <summary>
+				/// Вертає пул задач який обробляє таймер
+				/// </summary>
 				UnifiedThreadPool Property(OwnerPool) OwnerPool;
+
+				/// <summary>
+				/// Точність таймера
+				/// </summary>
 				Time::TimeSpan Property(GetTimerProximity) TimerProximity;
+
+				/// <summary>
+				/// Час першого запуску
+				/// </summary>
 				Time::DateTime Property(GetFirstStartTime)FirstStartTime;
+
+				/// <summary>
+				/// Екземпляр колбеку
+				/// </summary>
 				SmartPtr<IUnifiedThreadPoolShedulerCallback> Property(GetCallbackObject) CallbackObject;
 			public:
+				/// <summary>
+				/// Зупиняє таймер
+				/// </summary>
+				/// <returns></returns>
 				void StopSheduling()&&;
 			public:
+				/// <summary>
+				/// Максиальний інтервал між запусками задач таймера
+				/// </summary>
 				static constexpr auto MaxIntervalLenght = Time::TimeSpan().AddMiliSeconds(Math::Max<Int32>());
 			public:
 				RefCountClass(UnifiedThreadPoolSheduledTask, This);
 			};
 
+
+			/// <summary>
+			/// Об'єкт вводу/виводу пулу задач
+			/// </summary>
 			class UnifiedThreadPoolIoTask final : protected IDisposable {
 			public:
 				friend class IO::IAsyncIOBase;
@@ -251,7 +453,7 @@ namespace Seed {
 
 					RefCountT RefCount;
 
-					Data(Handle hFile, ImplSpecificT ownerPool) :
+					ForceInline Data(Handle hFile, ImplSpecificT ownerPool) :
 						hFile(hFile), ownerPool(ownerPool), poolRef(), hIoPoolObj(nullptr), RefCount(1), ioTaskName("I\\O worker") {}
 				};
 			private:
@@ -264,21 +466,55 @@ namespace Seed {
 			protected:
 				virtual void Dispose() override;
 			protected:
-				UnifiedThreadPoolIoTask(Data* This) : This(MoveRValue(This)) {}
+				ForceInline UnifiedThreadPoolIoTask(Data* This) : This(MoveRValue(This)) {}
 			public:
-				const String& GetName() const { return This->ioTaskName; }
-				void SetName(const String& newName) { This->ioTaskName = newName; }
-				void SetName(String&& newName) { This->ioTaskName = MoveRValue(newName); }
+				/// <summary>
+				/// Вертає ім'я задачі
+				/// </summary>
+				/// <returns>Ім'я задачі</returns>
+				ForceInline const String& GetName() const { return This->ioTaskName; }
+
+				/// <summary>
+				/// Встановлює нове ім'я задачі
+				/// </summary>
+				/// <param name="newName">Нове ім'я задачі</param>
+				ForceInline void SetName(const String& newName) { This->ioTaskName = newName; }
+
+				/// <summary>
+				/// Встановлює нове ім'я задачі
+				/// </summary>
+				/// <param name="newName">Нове ім'я задачі</param>
+				ForceInline void SetName(String&& newName) { This->ioTaskName = MoveRValue(newName); }
 			public:
+				/// <summary>
+				/// Ім'я задачі
+				/// </summary>
 				String Property(GetName, SetName) Name;
 			public:
 				RefCountClass(UnifiedThreadPoolIoTask, This);
 			};
 
+			/// <summary>
+			/// Пул потоків
+			/// </summary>
 			class UnifiedThreadPool final : protected IDisposable {
 			public:
+				/// <summary>
+				/// Пріоритет задач пулу потоків
+				/// </summary>
 				enum class EPoolThreadsPriority {
-					Low, Medium, High
+					/// <summary>
+					/// Низький пріоритет
+					/// </summary>
+					Low, 
+					/// <summary>
+					/// Середній(стандартний) пріоритет
+					/// </summary>
+					Medium, 
+					/// <summary>
+					/// Високий пріортет
+					/// </summary>
+					High
 				};
 			private:
 				friend class UnifiedThreadPoolJob;
@@ -333,7 +569,7 @@ namespace Seed {
 			private:
 				Data* This;
 			protected:
-				virtual void Dispose() override {
+				ForceInline virtual void Dispose() override {
 					DestroyConfiguration(This->handlesData.JobConfiguration);
 					DestroyConfiguration(This->handlesData.TaskConfiguration);
 					DestroyConfiguration(This->handlesData.IrpConfiguration);
@@ -352,56 +588,198 @@ namespace Seed {
 				friend void UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj);
 				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
 			private:
-				UnifiedThreadPool(Data*& This) :This(This) { ++This->RefCount;  }
+				ForceInline UnifiedThreadPool(Data*& This) :This(This) { ++This->RefCount;  }
 			public:
-				UnifiedThreadPoolJob PostJob(String&& jobName, Delegate&& action);
+				/// <summary>
+				/// Запускає задачі в пулі потоків
+				/// </summary>
+				/// <param name="jobName">Ім'я задачі</param>
+				/// <param name="action">Делегат задачі</param>
+				/// <returns>Об'єкт задачі пулу потоків</returns>
+				ForceInline UnifiedThreadPoolJob PostJob(String&& jobName, Delegate&& action);
 
-				UnifiedThreadPoolJob PostJob(Delegate&& action) {
+				/// <summary>
+				/// Запуск безіменої задачі в пулі потоків
+				/// </summary>
+				/// <param name="action">Делегат задачі</param>
+				/// <returns>Об'єкт задачі пулу потоків</returns>
+				ForceInline UnifiedThreadPoolJob PostJob(Delegate&& action) {
 					return PostJob(String(), MoveRValue(action));
 				}
-				UnifiedThreadPoolJob PostJob(const String& jobName, Delegate&& action) {
+
+				/// <summary>
+				/// Запускає задачі в пулі потоків
+				/// </summary>
+				/// <param name="jobName">Ім'я задачі</param>
+				/// <param name="action">Делегат задачі</param>
+				/// <returns>Об'єкт задачі пулу потоків</returns>
+				ForceInline UnifiedThreadPoolJob PostJob(const String& jobName, Delegate&& action) {
 					return PostJob(String(jobName), MoveRValue(action));
 				}
 			public:
+				/// <summary>
+				/// Запуск безіменого таймера
+				/// </summary>
+				/// <param name="callback">Колбек таймера</param>
+				/// <returns>Об'єкт побудови таймера</returns>
 				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
+
+				/// <summary>
+				/// Запуск таймера
+				/// </summary>
+				/// <param name="taskName">Ім'я таймера</param>
+				/// <param name="callback">Колбек</param>
+				/// <returns>Об'єкт побудови таймера</returns>
 				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
+
+				/// <summary>
+				/// Запуск таймера
+				/// </summary>
+				/// <param name="taskName">Ім'я таймера</param>
+				/// <param name="callback">Колбек</param>
+				/// <returns>Об'єкт побудови таймера</returns>
 				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
 			public:
-				SizeT GetJobsCount() const { return This->JobsQueue.Count; }
-				SizeT GetSheduledTaskCount() const { return This->TaskQueue.Count; }
-				SizeT GetIORequestCount() const { return This->IrpQueue.Count; }
+				/// <summary>
+				/// Вертає кількість зареєстровних задач в пулі
+				/// </summary>
+				/// <returns>Кількість зареєстровних задач в пулі</returns>
+				ForceInline SizeT GetJobsCount() const { return This->JobsQueue.Count; }
+
+				/// <summary>
+				/// Вертає кількість зареєстровних таймерів в пулі
+				/// </summary>
+				/// <returns>Кількість зареєстровних таймерів в пулі</returns>
+				ForceInline SizeT GetSheduledTaskCount() const { return This->TaskQueue.Count; }
+
+				/// <summary>
+				/// Вертає кількість зареєстрованих об'єктів вводу/виводу в пулі
+				/// </summary>
+				/// <returns>Кількість зареєстрованих об'єктів вводу/виводу в пулі</returns>
+				ForceInline SizeT GetIORequestCount() const { return This->IrpQueue.Count; }
 			public:
+				/// <summary>
+				/// Вертає чергу задач
+				/// </summary>
+				/// <returns>Черга задач у вигляді списку</returns>
 				Containers::List<UnifiedThreadPoolJob> GetJobsQueue() const { return This->JobsQueue.CopyTo<Containers::List>(); }
-				Containers::List<UnifiedThreadPoolSheduledTask> GetSheduledTaskQueue() const { return This->TaskQueue.CopyTo<Containers::List>(); }
+
+				/// <summary>
+				/// Вертає список таймерів
+				/// </summary>
+				/// <returns>Список таймерів</returns>
+				Containers::List<UnifiedThreadPoolSheduledTask> GetSheduledTaskList() const { return This->TaskQueue.CopyTo<Containers::List>(); }
+
+				/// <summary>
+				/// Вертає список об'єктів вводу виводу
+				/// </summary>
+				/// <returns>Список об'єктів вводу виводу</returns>
 				Containers::List<UnifiedThreadPoolIoTask> GetAsyncIOList() const { return This->IrpQueue.CopyTo<Containers::List>(); }
 			public:
+				/// <summary>
+				/// Кількість зареєстровних задач в пулі
+				/// </summary>
 				SizeT Property(GetJobsCount) JobsCount;
+
+				/// <summary>
+				/// Кількість зареєстровних таймерів в пулі
+				/// </summary>
 				SizeT Property(GetSheduledTaskCount) SheduledTaskCount;
+
+				/// <summary>
+				/// Кількість зареєстрованих об'єктів вводу/виводу в пулі
+				/// </summary>
 				SizeT Property(GetIORequestCount) IORequestCount;
 			public:
-				const String& GetName() const { return This->threadPoolName; }
+				/// <summary>
+				/// Вертає ім'я пул задач
+				/// </summary>
+				/// <returns>Ім'я пулу задач</returns>
+				ForceInline const String& GetName() const { return This->threadPoolName; }
+
+				/// <summary>
+				/// Встановлює нове ім'я пулу задач
+				/// </summary>
+				/// <param name="newName">Нове ім'я пулу задач</param>
+				ForceInline void SetName(const String& newName) { This->threadPoolName = newName; }
+
+				/// <summary>
+				/// Встановлює нове ім'я пулу задач
+				/// </summary>
+				/// <param name="newName">Нове ім'я пулу задач</param>
+				ForceInline void SetName(String&& newName) { This->threadPoolName = MoveRValue(newName); }
 			public:
-				String Property(GetName) Name;
+				/// <summary>
+				/// Ім'я пуду задач
+				/// </summary>
+				String Property(GetName,SetName) Name;
 			public:
-				EPoolThreadsPriority GetJobsPriority() const { return This->handlesData.JobConfiguration.Priority; }
-				EPoolThreadsPriority GetSheduledTasksPriority() const { return This->handlesData.TaskConfiguration.Priority; }
-				EPoolThreadsPriority GetIORequestPriority() const { return This->handlesData.IrpConfiguration.Priority; }
+				/// <summary>
+				/// Вертає пріоритет зада в пулу потоку
+				/// </summary>
+				/// <returns>Пріортет задач в пулі потоку</returns>
+				ForceInline EPoolThreadsPriority GetJobsPriority() const { return This->handlesData.JobConfiguration.Priority; }
+
+				/// <summary>
+				/// Вертає пріоритет таймерів в пулі потоку
+				/// </summary>
+				/// <returns>Пріоритет таймерів в пулі потоку</returns>
+				ForceInline EPoolThreadsPriority GetSheduledTasksPriority() const { return This->handlesData.TaskConfiguration.Priority; }
+
+				/// <summary>
+				/// Вертає пріоритет інформуванні про завершення операцій вводу/виводу в пулів потоків 
+				/// </summary>
+				/// <returns>Пріоритет інформуванні про завершення операцій вводу/виводу в пулів потоків</returns>
+				ForceInline EPoolThreadsPriority GetIORequestPriority() const { return This->handlesData.IrpConfiguration.Priority; }
 			public:
+				/// <summary>
+				/// Пріортет задач в пулі потоку
+				/// </summary>
 				EPoolThreadsPriority Property(GetJobsPriority) JobsPriority;
+
+				/// <summary>
+				/// Пріоритет таймерів в пулі потоку
+				/// </summary>
 				EPoolThreadsPriority Property(GetSheduledTasksPriority) SheduledTasksPriority;
+
+				/// <summary>
+				/// Пріоритет інформуванні про завершення операцій вводу/виводу в пулів потоків 
+				/// </summary>
 				EPoolThreadsPriority Property(GetIORequestPriority) IORequestPriority;
 			public:
-				UInt64 GetMaxThreadCount() const { return This->MaxThreadCount; }
-				UInt64 GetMinThreadCount() const { return This->MinThreadCount; }
+				/// <summary>
+				/// Вертає максимальну кількість потоків пулу
+				/// </summary>
+				/// <returns>Максимальна кількість потоків пулу</returns>
+				ForceInline UInt64 GetMaxThreadCount() const { return This->MaxThreadCount; }
+
+				/// <summary>
+				/// Вертає мінімальну кількість потоків пулу
+				/// </summary>
+				/// <returns>Мінімальна кількість потоків пулу</returns>
+				ForceInline UInt64 GetMinThreadCount() const { return This->MinThreadCount; }
 			public:
+				/// <summary>
+				/// Максимальна кількість потоків пулу
+				/// </summary>
 				UInt64 Property(GetMaxThreadCount) MaxThreadCount;
+
+				/// <summary>
+				/// Мінімальна кількість потоків пулу
+				/// </summary>
 				UInt64 Property(GetMinThreadCount) MinThreadCount;
 			public: 
 				RefCountClass(UnifiedThreadPool, This);
 			};
 
+			/// <summary>
+			/// Пріоритети задач в пулі потоків
+			/// </summary>
 			using EPoolThreadsPriority = UnifiedThreadPool::EPoolThreadsPriority;
 
+			/// <summary>
+			/// Конструктор пулу потоків
+			/// </summary>
 			class UnifiedThreadPoolBuilder final {
 			private:
 				struct Data {
@@ -431,7 +809,14 @@ namespace Seed {
 			private:
 				Data* This;
 			public:
-				UnifiedThreadPoolBuilder() :This(new Data(
+				/// <summary>
+				/// Пустий конструктор пулу задач, 
+				/// ініціалізовує налаштування безіменого пулу потоків,
+				/// з мінімальною кількістю потоків яка рівна клькості половинів ядер процесора хоста,
+				/// з максимальною кількістю потоків яка рівна клькості ядер процесора хоста,
+				/// і стандартним пріоритетом всіх типів задач
+				/// </summary>
+				ForceInline UnifiedThreadPoolBuilder() :This(new Data(
 					String(),
 					(UInt32)CurrentSettings().VirtualSetting.CpuCoresCount / 2,
 					(UInt32)CurrentSettings().VirtualSetting.CpuCoresCount,
@@ -439,7 +824,15 @@ namespace Seed {
 					UnifiedThreadPool::EPoolThreadsPriority::Medium,
 					UnifiedThreadPool::EPoolThreadsPriority::Medium)) {}
 
-				UnifiedThreadPoolBuilder(String&& threadPoolName) :This(new Data(
+				/// <summary>
+				/// Пустий конструктор пулу задач, 
+				/// ініціалізовує налаштування іменованого пулу потоків,
+				/// з мінімальною кількістю потоків яка рівна клькості половинів ядер процесора хоста,
+				/// з максимальною кількістю потоків яка рівна клькості ядер процесора хоста,
+				/// і стандартним пріоритетом всіх типів задач
+				/// </summary>
+				/// <param name="threadPoolName">Ім'я пулу задач</param>
+				ForceInline UnifiedThreadPoolBuilder(String&& threadPoolName) :This(new Data(
 					MoveRValue(threadPoolName),
 					(UInt32)CurrentSettings().VirtualSetting.CpuCoresCount / 2,
 					(UInt32)CurrentSettings().VirtualSetting.CpuCoresCount,
@@ -447,57 +840,112 @@ namespace Seed {
 					UnifiedThreadPool::EPoolThreadsPriority::Medium,
 					UnifiedThreadPool::EPoolThreadsPriority::Medium)) {}
 
-				UnifiedThreadPoolBuilder(const String& threadPoolName) : UnifiedThreadPoolBuilder(String(threadPoolName)) {}
+				/// <summary>
+				/// Пустий конструктор пулу задач, 
+				/// ініціалізовує налаштування іменованого пулу потоків,
+				/// з мінімальною кількістю потоків яка рівна клькості половинів ядер процесора хоста,
+				/// з максимальною кількістю потоків яка рівна клькості ядер процесора хоста,
+				/// і стандартним пріоритетом всіх типів задач
+				/// </summary>
+				/// <param name="threadPoolName">Ім'я пулу задач</param>
+				ForceInline UnifiedThreadPoolBuilder(const String& threadPoolName) : UnifiedThreadPoolBuilder(String(threadPoolName)) {}
 			public:
-				UnifiedThreadPoolBuilder&& SetThreadPoolPriority(UnifiedThreadPool::EPoolThreadsPriority newThreadPoolPriority) && {
+				/// <summary>
+				/// Встновлює пріоритет всіз типів задач
+				/// </summary>
+				/// <param name="newThreadPoolPriority">Пріоритет, який буде встановлено</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetThreadPoolPriority(UnifiedThreadPool::EPoolThreadsPriority newThreadPoolPriority) && {
 					This->irpRequestPriority = newThreadPoolPriority;
 					This->jobsPriority = newThreadPoolPriority;
 					This->sheduledTasksPriority = newThreadPoolPriority;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolBuilder&& SetIOThreadsPriority(UnifiedThreadPool::EPoolThreadsPriority newIoThreadsPriority) && {
+				/// <summary>
+				/// Встановлює пріортет обробки інформування I/O операцій
+				/// </summary>
+				/// <param name="newIoThreadsPriority">Пріоритет, який буде встановлено</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetIOThreadsPriority(UnifiedThreadPool::EPoolThreadsPriority newIoThreadsPriority) && {
 					This->irpRequestPriority = newIoThreadsPriority;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolBuilder&& SetShedulerThreadsPriority(UnifiedThreadPool::EPoolThreadsPriority newShedulerThreadsPriority) && {
+				/// <summary>
+				/// Встановлює пріоритет задач таймера
+				/// </summary>
+				/// <param name="newIoThreadsPriority">Пріоритет, який буде встановлено</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetShedulerThreadsPriority(UnifiedThreadPool::EPoolThreadsPriority newShedulerThreadsPriority) && {
 					This->sheduledTasksPriority = newShedulerThreadsPriority;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolBuilder&& SetJobThreadsPriority(UnifiedThreadPool::EPoolThreadsPriority newJobThreadsPriority) && {
+				/// <summary>
+				/// Пріоритет задач пулу потоків
+				/// </summary>
+				/// <param name="newIoThreadsPriority">Пріоритет, який буде встановлено</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetJobThreadsPriority(UnifiedThreadPool::EPoolThreadsPriority newJobThreadsPriority) && {
 					This->jobsPriority = newJobThreadsPriority;
 					return MoveRValue(*this);
 				}
 			public:
-				UnifiedThreadPoolBuilder&& SetMinThreadCount(UInt32 newMinThreadCount) && {
+				/// <summary>
+				/// Встановлює мінімальну кількість потоків пулу, може бути 0
+				/// </summary>
+				/// <param name="newMinThreadCount">Мінімальна кількість потоків пулу</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetMinThreadCount(UInt32 newMinThreadCount) && {
 					This->minThreadCount = newMinThreadCount;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolBuilder&& SetMaxThreadCount(UInt32 newMaxThreadCount) && {
+				/// <summary>
+				/// Встановлює максимальну кількість потоків пулу потоків
+				/// </summary>
+				/// <param name="newMaxThreadCount">Макстмальна кількість потоків пуду потоків</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetMaxThreadCount(UInt32 newMaxThreadCount) && {
 					This->maxThreadCount = newMaxThreadCount;
 					return MoveRValue(*this);
 				}
 			public:
-				UnifiedThreadPoolBuilder&& SetName(String&& newName) && {
+				/// <summary>
+				/// Встановлює ім'я пулу потоків
+				/// </summary>
+				/// <param name="newName">Нове ім'я пулу</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetName(String&& newName) && {
 					This->threadPoolName = MoveRValue(newName);
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolBuilder&& SetName(const String& newName) && {
+				/// <summary>
+				/// Встановлює ім'я пулу потоків
+				/// </summary>
+				/// <param name="newName">Нове ім'я пулу</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder&& SetName(const String& newName) && {
 					This->threadPoolName = newName;
 					return MoveRValue(*this);
 				}
 			public:
+				/// <summary>
+				/// Створює пул потоків з задною конфігурацією
+				/// </summary>
+				/// <returns></returns>
 				UnifiedThreadPool CreateThreadPool() &&;
 			private:
 				UnifiedThreadPool::PoolConfigureation CreateJobConfiguration(ImplSpecificT PoolHandle);
 				UnifiedThreadPool::PoolConfigureation CreateSheduledTaskConfiguration(ImplSpecificT PoolHandle);
 				UnifiedThreadPool::PoolConfigureation CreateIrpConfiguration(ImplSpecificT PoolHandle);
 			public:
-				~UnifiedThreadPoolBuilder()
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline ~UnifiedThreadPoolBuilder()
 				{
 					if (This != nullptr) {
 						delete This;
@@ -508,15 +956,23 @@ namespace Seed {
 				UnifiedThreadPoolBuilder(const UnifiedThreadPoolBuilder&) = delete;
 				UnifiedThreadPoolBuilder& operator=(const UnifiedThreadPoolBuilder&) = delete;
 			public:
-				UnifiedThreadPoolBuilder(UnifiedThreadPoolBuilder&& orig) : This(orig.This) { orig.This = nullptr; }
+				ForceInline UnifiedThreadPoolBuilder(UnifiedThreadPoolBuilder&& orig) : This(orig.This) { orig.This = nullptr; }
 
-				UnifiedThreadPoolBuilder& operator=(UnifiedThreadPoolBuilder&& orig) {
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolBuilder& operator=(UnifiedThreadPoolBuilder&& orig) {
 					this->~UnifiedThreadPoolBuilder();
 					this->UnifiedThreadPoolBuilder::UnifiedThreadPoolBuilder(MoveRValue(orig));
 					return *this;
 				}
 			};
 
+			/// <summary>
+			/// Конструктор таймера пулу потоків
+			/// </summary>
 			class UnifiedThreadPoolSheduledTaskBuilder final {
 			private:
 				friend class UnifiedThreadPool;
@@ -553,63 +1009,151 @@ namespace Seed {
 						callback(MoveRValue(callback)),
 						ownerPool(ownerPool)
 					{}
+
+					Data(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& taskName) :
+						taskName(taskName),
+						proximity(100ms),
+						intervalsCount(0),
+						intervalLenght(0),
+						startTime(0),
+						isRelaive(true),
+						callback(MoveRValue(callback)),
+						ownerPool(ownerPool)
+					{}
 				};
 			private:
 				Data* This;
 			private:
-				UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+				/// <summary>
+				/// Створює конфігурацію безіменого таймера
+				/// з точністю 100ms, одноразовим запуском зразу після створення
+				/// та з задним колбеком
+				/// </summary>
+				/// <param name="ownerPool">Пул потоків</param>
+				/// <param name="callback">Колбек</param>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
 					: This(new Data(ownerPool, MoveRValue(callback))) {}
-				UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& taskName)
+
+				/// <summary>
+				/// Створює конфігурацію іменованого таймера
+				/// з точністю 100ms, одноразовим запуском зразу після створення
+				/// та з задним колбеком
+				/// </summary>
+				/// <param name="ownerPool">Пул потоків</param>
+				/// <param name="callback">Колбек</param>
+				/// <param name="taskName">Ім'я задачі</param>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& taskName)
 					: This(new Data(ownerPool, MoveRValue(callback), MoveRValue(taskName))) {}
+
+				/// <summary>
+				/// Створює конфігурацію іменованого таймера
+				/// з точністю 100ms, одноразовим запуском зразу після створення
+				/// та з задним колбеком
+				/// </summary>
+				/// <param name="ownerPool">Пул потоків</param>
+				/// <param name="callback">Колбек</param>
+				/// <param name="taskName">Ім'я задачі</param>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& taskName)
+					: This(new Data(ownerPool, MoveRValue(callback), taskName)) {}
 			public:
-				UnifiedThreadPoolSheduledTaskBuilder&& SetCallback(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)&& {
+				/// <summary>
+				/// Встановлює новий колбек
+				/// </summary>
+				/// <param name="callback">Новий колбек</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetCallback(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)&& {
 					This->callback = MoveRValue(callback);
 					return MoveRValue(*this);
 				}
 			public:
-				UnifiedThreadPoolSheduledTaskBuilder&& SetName(String&& name)&& {
+				/// <summary>
+				/// Встановлю ім'я таймера
+				/// </summary>
+				/// <param name="name">Нове ім'я таймера</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetName(String&& name)&& {
 					This->taskName = MoveRValue(name);
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolSheduledTaskBuilder&& SetName(const String& name)&& {
+				/// <summary>
+				/// Встановлю ім'я таймера
+				/// </summary>
+				/// <param name="name">Нове ім'я таймера</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetName(const String& name)&& {
 					This->taskName = name;
 					return MoveRValue(*this);
 				}
-
-				UnifiedThreadPoolSheduledTaskBuilder&& SetExecutionCount(UInt16 count)&& {
+			public:
+				/// <summary>
+				/// Встановлює кількість запусків таймера
+				/// </summary>
+				/// <param name="count">Кількість запусків таймера</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetExecutionCount(UInt16 count)&& {
 					This->intervalsCount = count;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolSheduledTaskBuilder&& SetIntervalLenght(Time::TimeSpan intervalLenght)&& {
+				/// <summary>
+				/// Встановлює довжину інтервалу між запусками таймера
+				/// </summary>
+				/// <param name="intervalLenght">Довжина між інтервалами</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetIntervalLenght(Time::TimeSpan intervalLenght)&& {
 					if(This->intervalLenght > MaxIntervalLenght)
 						Throw(InvalidArgumentException(ExceptionPosition, L"IntervalLenght", L"Too big interval lenght"));
 					This->intervalLenght = intervalLenght;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::DateTime absoluteStartTime)&& {
+				/// <summary>
+				/// Встановлює абсолютний час запуск таймера
+				/// </summary>
+				/// <param name="absoluteStartTime">Абсолютний час запуску таймера</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::DateTime absoluteStartTime)&& {
 					This->startTime = absoluteStartTime.TimeFromStartEpoch;
 					This->isRelaive = false;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::TimeSpan relativeStartTime)&& {
+				/// <summary>
+				/// Встановлює відносний час запуску таймера
+				/// </summary>
+				/// <param name="relativeStartTime">Віднисний час запуску таймера</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::TimeSpan relativeStartTime)&& {
 					This->startTime = relativeStartTime.Ticks;
 					This->isRelaive = true;
 					return MoveRValue(*this);
 				}
 
-				UnifiedThreadPoolSheduledTaskBuilder&& SetProximity(Time::TimeSpan proximity)&& {
+				/// <summary>
+				/// Встановлює точність таймера
+				/// </summary>
+				/// <param name="proximity">Точність таймера</param>
+				/// <returns>RValue посилання на поточний об'єкт</returns>
+				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetProximity(Time::TimeSpan proximity)&& {
 					This->proximity = proximity;
 					return MoveRValue(*this);
 				}
 			public:
+				/// <summary>
+				/// Створює таймер з заданими конфігураціями
+				/// </summary>
+				/// <returns></returns>
 				UnifiedThreadPoolSheduledTask Shedule()&&;
 			public:
+				/// <summary>
+				/// Максимальний допустимий інтервал між запусками таймера
+				/// </summary>
 				static constexpr auto MaxIntervalLenght = UnifiedThreadPoolSheduledTask::MaxIntervalLenght;
 			public:
+				/// <summary>
+				/// Деструктор
+				/// </summary>
 				~UnifiedThreadPoolSheduledTaskBuilder()
 				{
 					if (This != nullptr) {
@@ -619,103 +1163,290 @@ namespace Seed {
 			};
 
 			class ThreadableUnifiedThreadPoolJob;
+
+			ForceInline UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+			{
+				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback));
+			}
+
+			ForceInline UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+			{
+				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), MoveRValue(taskName));
+			}
+
+			ForceInline UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+			{
+				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), String(taskName));
+			}
 		}
 
 		namespace IO {
 			class IRPBase;
 			class IOTask;
 
+			/// <summary>
+			/// Базовий інтерфес асинхроного об'єкта I/O
+			/// </summary>
 			class IAsyncIOBase : virtual protected IDisposable {
 			protected:
 				friend class IRPBase;
 			protected:
 				Seed::Core::Threading::UnifiedThreadPoolIoTask RegisterNtIoObjectInThreadPool(const Threading::UnifiedThreadPool& pool, Handle hFileObj);
+
 				void UnRegisterNtIoObjectInThreadPool(Seed::Core::Threading::UnifiedThreadPoolIoTask task);
+
 				void* GetReservedPlaceInIrp(IRPBase* irp);
+
 				IOTask GetIOTaskFromIRPBase(IRPBase* irp);
+
 				void NotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo);
+
 				void CancelNotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo);
 			protected:
 				virtual Handle GetHandle() = 0;
 			protected:
 				virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const = 0;
 			public:
+				/// <summary>
+				/// Перевірка чи об'єкт коректний
+				/// </summary>
+				/// <returns>true якщо об'єкт допускає I/O операції</returns>
+				virtual bool IsValid() = 0;
+			public:
+				/// <summary>
+				/// Деструктор
+				/// </summary>
 				virtual ~IAsyncIOBase() = 0 {}
 			};
 
+			/// <summary>
+			/// Інтерфес асинхроного об'єкта I/O
+			/// </summary>
+			/// <typeparam name="TDataType">Тип об'єкта пакета(блоку) даних</typeparam>
 			template<typename TDataType = Containers::Blob>
 			class IAsyncIO : public IAsyncIOBase {
 			public:
-				IAsyncIO(const Threading::UnifiedThreadPool& threadPool) : IAsyncIOBase(threadPool) {}
-				IAsyncIO(const IAsyncIO&) = default;
-				IAsyncIO(IAsyncIO&&) = default;
+				/// <summary>
+				/// Конструктор з пулу потоків, який буде обробляти операції
+				/// </summary>
+				/// <param name="threadPool">Пул потоків</param>
+				ForceInline IAsyncIO(const Threading::UnifiedThreadPool& threadPool) : IAsyncIOBase(threadPool) {}
+
+				/// <summary>
+				/// Стандратний конструктор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline IAsyncIO(const IAsyncIO& orig) = default;
+
+				/// <summary>
+				/// Стандарний конструктор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline IAsyncIO(IAsyncIO&& orig) = default;
 			public:
+				/// <summary>
+				/// Ініціалізація асинхроної операції читання
+				/// </summary>
+				/// <param name="data">Буфер даних</param>
+				/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+				/// <returns>Об'єкт задачі I/O</returns>
 				virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) = 0;
+
+				/// <summary>
+				/// Ініціалізація асинхроної операції запису
+				/// </summary>
+				/// <param name="data">Буфер даних</param>
+				/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+				/// <returns>Об'єкт задачі I/O</returns>
 				virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) = 0;
 			public:
+				/// <summary>
+				/// Перевірка чи об'єкт коректний
+				/// </summary>
+				/// <returns>true якщо об'єкт допускає I/O операції</returns>
 				virtual bool IsValid() = 0;
 			public:
+				/// <summary>
+				/// Деструктор
+				/// </summary>
 				virtual ~IAsyncIO() = 0 {};
 			};
 
+			/// <summary>
+			/// Інтерфес об'єта асинхроного I/O з позиційним читанням
+			/// </summary>
+			/// <typeparam name="TDataType">Тип буфера даних</typeparam>
 			template<typename TDataType = Containers::Blob>
 			class IPositionAsyncIO : public IAsyncIOBase {
 			public:
+				/// <summary>
+				/// Ініціаліщація операції асихроного читання
+				/// </summary>
+				/// <param name="data">Буфер даних</param>
+				/// <param name="position">Позиція в клькіост байтів</param>
+				/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+				/// <returns>Об'єкт задачі I/O</returns>
 				virtual IOTask AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) = 0;
+
+				/// <summary>
+				/// Ініціаліщація операції асихроного запису
+				/// </summary>
+				/// <param name="data">Буфер даних</param>
+				/// <param name="position">Позиція в клькіост байтів</param>
+				/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+				/// <returns>Об'єкт задачі I/O</returns>
 				virtual IOTask AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishReadAction) = 0;
 			public:
+				/// <summary>
+				/// Перевірка чи об'єкт коректний
+				/// </summary>
+				/// <returns>true якщо об'єкт допускає I/O операції</returns>
 				virtual bool IsValid() = 0;
 			public:
 				virtual ~IPositionAsyncIO() = 0 {};
 			};
 
+			/// <summary>
+			/// Клас базового пакета I/O операції
+			/// </summary>
 			class IRPBase : protected IClonable<IRPBase*> {
 			public:
 				friend class IOTask;
 				friend class IAsyncIOBase;
 			public:
+				/// <summary>
+				/// Тип колбека
+				/// </summary>
 				enum class ECallbackType {
-					Read, Write
+					/// <summary>
+					/// Читання
+					/// </summary>
+					Read, 
+					/// <summary>
+					/// Запис
+					/// </summary>
+					Write
 				};
 			private:
 				Byte Reserverd[16 + sizeof(SizeT)];
+
 				Threading::SynchronizeEvent event;
+
 				ECallbackType irpCallbackType;
+
 				SmartPtr<IAsyncIOBase> irpTarget;
+
+				volatile bool isCompleted;
 			private:
 				friend const Threading::SynchronizeEvent& GetIrpCompleteEvent(IRPBase* irp);
-			public:
-				IRPBase(SmartPtr<IAsyncIOBase>&& irpTarget, ECallbackType irpCallbackType)
-					:  irpCallbackType(irpCallbackType), irpTarget(irpTarget), event(false) {}
 
-				IRPBase(const IRPBase&) = default;
-				IRPBase(IRPBase&&) = default;
+				friend void MarkIrpCompleted(IRPBase* irp);
 			public:
+				/// <summary>
+				/// Конструктор з об'єкту асинхроного I/O ти типу колбека
+				/// </summary>
+				/// <param name="irpTarget">Об'єкт асинхроного I/O</param>
+				/// <param name="irpCallbackType">Тип колбеку</param>
+				ForceInline IRPBase(SmartPtr<IAsyncIOBase>&& irpTarget, ECallbackType irpCallbackType)
+					:  irpCallbackType(irpCallbackType), irpTarget(irpTarget), event(false), isCompleted(false) {}
+
+				/// <summary>
+				/// Стандарний конструктор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				IRPBase(const IRPBase& orig) = default;
+
+				/// <summary>
+				/// Стандартнтй конструкор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				IRPBase(IRPBase&& orig) = default;
+			public:
+				/// <summary>
+				/// Викликає колбек
+				/// </summary>
+				/// <param name="byteTransfered">Вказує кількість переданих байтів даних</param>
+				/// <param name="isSuccess">Успішність операції</param>
+				/// <param name="errorCode">Код помилки</param>
 				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) = 0;
-
-				ECallbackType GetIrpCallbackType() const { return irpCallbackType; }
-
-				const SmartPtr<IAsyncIOBase>& GetIrpTarget() const { return irpTarget; }
 			public:
+				/// <summary>
+				/// Вертає тип колбеку
+				/// </summary>
+				/// <returns>Тип колбеку</returns>
+				ForceInline ECallbackType GetIrpCallbackType() const { return irpCallbackType; }
+
+				/// <summary>
+				/// Вертає об'єкт асинхроного I/O
+				/// </summary>
+				/// <returns>Об'єкт асинхроного I/O</returns>
+				ForceInline const SmartPtr<IAsyncIOBase>& GetIrpTarget() const { return irpTarget; }
+			public:
+				/// <summary>
+				/// Тип колбеку
+				/// </summary>
 				ECallbackType Property(GetIrpCallbackType) CallbackType;
 
+				/// <summary>
+				/// Об'єкт асинхроного I/O
+				/// </summary>
 				SmartPtr<IAsyncIOBase> Property(GetIrpTarget) Target;
 			public:
-				const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetTargetTask() const {
-					return irpTarget->GetIoPoolTask();
-				}
+				/// <summary>
+				/// Вертає задачу пулу потоків, в контексті якої виконується I/O операція
+				/// </summary>
+				/// <returns>Задача пулу потоків, в контексті якої виконується I/O операція</returns>
+				ForceInline const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetTargetTask() const { return irpTarget->GetIoPoolTask(); }
 			public:
+				/// <summary>
+				/// Задача пулу потоків, в контексті якої виконується I/O операція
+				/// </summary>
 				Seed::Core::Threading::UnifiedThreadPoolIoTask Property(GetTargetTask) TargetTask;
 			public:
-				void WaitOnCompleteIrp() const { event.Wait(); }
-				void WaitOnCompleteIrp(Time::TimeSpan timeout) const { event.Wait(timeout); }
+				/// <summary>
+				/// Очікування на заверщення операції
+				/// </summary>
+				ForceInline void WaitOnCompleteIrp() const { event.Wait(); }
+
+				/// <summary>
+				/// Очікування на завершення операції з таймаутом
+				/// </summary>
+				/// <param name="timeout">Таймаут</param>
+				ForceInline void WaitOnCompleteIrp(Time::TimeSpan timeout) const { event.Wait(timeout); }
+
+				/// <summary>
+				/// Скасування операції
+				/// </summary>
 				void CancelIo();
+			public:
+				/// <summary>
+				/// Вертає чи операція вже завершена
+				/// </summary>
+				/// <returns>Чи операція вже завершена</returns>
+				ForceInline Boolean GetIsCompleted() const { return isCompleted; }
+			public:
+				/// <summary>
+				/// Чи операція вже завершенаo
+				/// </summary>
+				Boolean Property(GetIsCompleted) IsCompleted;
 			protected:
 				IRPBase* Clone() const = 0;
 			public:
-				virtual ~IRPBase() = 0 {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~IRPBase() = 0 {}
 			};
 
+			/// <summary>
+			/// Тип колбеку
+			/// </summary>
+			using ECallbackType = IRPBase::ECallbackType;
+
+			/// <summary>
+			/// Пакет асинхроного читання даних
+			/// </summary>
+			/// <typeparam name="TDataType">Тип блоку даних</typeparam>
 			template<typename TDataType>
 			class ReadIRP final : public IRPBase {
 			public:
@@ -724,15 +1455,48 @@ namespace Seed {
 				SmartPtr<IFinishReadCallback<TDataType>> finishReadCallback;
 				TDataType buffer;
 			public:
-				ReadIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>> FinishReadCallback, TDataType&& buffer) :
-					IRPBase(MoveRValue(irpTarget), ECallbackType::Read), finishReadCallback(FinishReadCallback), buffer(MoveRValue(buffer)) {}
-
-				ReadIRP(const ReadIRP&) = default;
-				ReadIRP(ReadIRP&&) = default;
-				ReadIRP& operator=(const ReadIRP&) = default;
-				ReadIRP& operator=(ReadIRP&&) = default;
+				/// <summary>
+				/// Конструктор з об'єкту асинхроного I/O, буфера та колбеку
+				/// </summary>
+				/// <param name="irpTarget">Об'єкт асинхроного I/O</param>
+				/// <param name="finishWriteCallback">Колбек завершення операції</param>
+				/// <param name="buffer">Буфер даних</param>
+				ForceInline ReadIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishReadCallback<TDataType>> finishWriteCallback, TDataType&& buffer) :
+					IRPBase(MoveRValue(irpTarget), ECallbackType::Read), finishReadCallback(finishWriteCallback), buffer(MoveRValue(buffer)) {}
 			public:
-				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
+				/// <summary>
+				/// Стандарний конструктор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline ReadIRP(const ReadIRP& orig) = default;
+
+				/// <summary>
+				/// Стандартнтй конструкор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline ReadIRP(ReadIRP&& orig) = default;
+
+				/// <summary>
+				/// Стандартний оператор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ForceInline ReadIRP& operator=(const ReadIRP& orig) = default;
+
+				/// <summary>
+				/// Стандартний оператор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ForceInline ReadIRP& operator=(ReadIRP&&) = default;
+			public:
+				/// <summary>
+				/// Виклик колбеку операції
+				/// </summary>
+				/// <param name="byteTransfered">Кількість прочитаних байтів</param>
+				/// <param name="isSuccess">Успішність операції</param>
+				/// <param name="errorCode">Код помилки</param>
+				ForceInline virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
 					if (isSuccess) {
 						finishReadCallback->OnFinishRead(byteTransfered, MoveRValue(buffer));
 					}
@@ -741,11 +1505,18 @@ namespace Seed {
 					}
 				}
 			protected:
-				IRPBase* Clone() const { return new ReadIRP(*this); }
+				ForceInline virtual IRPBase* Clone() const { return new ReadIRP(*this); }
 			public:
-				virtual ~ReadIRP() override {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~ReadIRP() override {}
 			};
 
+			/// <summary>
+			/// Пакет асинхроного запису даних
+			/// </summary>
+			/// <typeparam name="TDataType">Тип блоку даних</typeparam>
 			template<typename TDataType>
 			class WriteIRP final : public IRPBase {
 			public:
@@ -754,15 +1525,48 @@ namespace Seed {
 				SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback;
 				TDataType buffer;
 			public:
-				WriteIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback, const TDataType&& buffer) :
+				/// <summary>
+				/// Конструктор з об'єкту асинхроного I/O, буфера та колбеку
+				/// </summary>
+				/// <param name="irpTarget">Об'єкт асинхроного I/O</param>
+				/// <param name="finishWriteCallback">Колбек завершення операції</param>
+				/// <param name="buffer">Буфер даних</param>
+				ForceInline WriteIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishWriteCallback<TDataType>> finishWriteCallback, const TDataType&& buffer) :
 					IRPBase(MoveRValue(irpTarget), ECallbackType::Write), finishWriteCallback(finishWriteCallback), buffer(MoveRValue(buffer)) {}
 
-				WriteIRP(const WriteIRP&) = default;
-				WriteIRP(WriteIRP&&) = default;
-				WriteIRP& operator=(const WriteIRP&) = default;
-				WriteIRP& operator=(WriteIRP&&) = default;
+				/// <summary>
+				/// Стандарний конструктор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline WriteIRP(const WriteIRP& orig) = default;
+
+				/// <summary>
+				/// Стандартнтй конструкор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline WriteIRP(WriteIRP&&) = default;
+
+				/// <summary>
+				/// Стандартний оператор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ForceInline WriteIRP& operator=(const WriteIRP&) = default;
+
+				/// <summary>
+				/// Стандартний оператор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ForceInline WriteIRP& operator=(WriteIRP&&) = default;
 			public:
-				virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
+				/// <summary>
+				/// Виклик колбеку операції
+				/// </summary>
+				/// <param name="byteTransfered">Кількість прочитаних байтів</param>
+				/// <param name="isSuccess">Успішність операції</param>
+				/// <param name="errorCode">Код помилки</param>
+				ForceInline virtual void OnIORequestComplete(SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
 					if (isSuccess) {
 						finishWriteCallback->OnWriteFinish(byteTransfered, MoveRValue(buffer));
 					}
@@ -771,11 +1575,17 @@ namespace Seed {
 					}
 				}
 			protected:
-				IRPBase* Clone() const { return new WriteIRP(*this); }
+				ForceInline virtual IRPBase* Clone() const { return new WriteIRP(*this); }
 			public:
-				virtual ~WriteIRP() override {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~WriteIRP() override {}
 			};
 
+			/// <summary>
+			/// Об'єкт I/O операції
+			/// </summary>
 			class IOTask : public IDisposable {
 			public:
 				friend class IAsyncIOBase;
@@ -798,10 +1608,65 @@ namespace Seed {
 					delete This->irp;
 				}
 			public:
-				void CancleIo() { This->irp->CancelIo(); }
+				/// <summary>
+				/// Вертає тип колбеку
+				/// </summary>
+				/// <returns>Тип колбеку</returns>
+				ForceInline ECallbackType GetIrpCallbackType() const { return This->irp->CallbackType; }
+
+				/// <summary>
+				/// Вертає об'єкт асинхроного I/O
+				/// </summary>
+				/// <returns>Об'єкт асинхроного I/O</returns>
+				ForceInline const SmartPtr<IAsyncIOBase>& GetIrpTarget() const { return This->irp->Target; }
 			public:
-				void WaitComplete() const { This->irp->WaitOnCompleteIrp(); }
-				void WaitComplete(Time::TimeSpan timeout) const { This->irp->WaitOnCompleteIrp(timeout); }
+				/// <summary>
+				/// Тип колбеку
+				/// </summary>
+				ECallbackType Property(GetIrpCallbackType) CallbackType;
+
+				/// <summary>
+				/// Об'єкт асинхроного I/O
+				/// </summary>
+				SmartPtr<IAsyncIOBase> Property(GetIrpTarget) Target;
+			public:
+				/// <summary>
+				/// Вертає задачу пулу потоків, в контексті якої виконується I/O операція
+				/// </summary>
+				/// <returns>Задача пулу потоків, в контексті якої виконується I/O операція</returns>
+				ForceInline const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetTargetTask() const { return This->irp->TargetTask; }
+			public:
+				/// <summary>
+				/// Задача пулу потоків, в контексті якої виконується I/O операція
+				/// </summary>
+				Seed::Core::Threading::UnifiedThreadPoolIoTask Property(GetTargetTask) TargetTask;
+			public:
+				/// <summary>
+				/// Очікування на заверщення операції
+				/// </summary>
+				ForceInline void WaitComplete() const { This->irp->WaitOnCompleteIrp(); }
+
+				/// <summary>
+				/// Очікування на завершення операції з таймаутом
+				/// </summary>
+				/// <param name="timeout">Таймаут</param>
+				ForceInline void WaitComplete(Time::TimeSpan timeout) const { This->irp->WaitOnCompleteIrp(timeout); }
+
+				/// <summary>
+				/// Скасування операції
+				/// </summary>
+				ForceInline void CancelIo() { This->irp->CancelIo(); }
+			public:
+				/// <summary>
+				/// Вертає чи операція вже завершена
+				/// </summary>
+				/// <returns>Чи операція вже завершена</returns>
+				ForceInline Boolean GetIsCompleted() const { return This->irp->IsCompleted; }
+			public:
+				/// <summary>
+				/// Чи операція вже завершенаo
+				/// </summary>
+				Boolean Property(GetIsCompleted) IsCompleted;
 			public:
 				RefCountClass(IOTask, This);
 			};
