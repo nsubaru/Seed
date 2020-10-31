@@ -6,6 +6,9 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			namespace Threadables {
+				/// <summary>
+				/// Об'єки потоку в процесі виконання
+				/// </summary>
 				class ThreadableThread final : public Seed::Core::Threading::IThreadable {
 				private:
 					Thread thread;
@@ -15,13 +18,34 @@ namespace Seed {
 					friend ThreadableRef RegisterThreadThreadable(const Thread& thread, volatile EThreadabledStates* State);
 					friend void UnRegisterThreadThreadable(ThreadableRef&& ref);
 				public:
+					/// <summary>
+					/// Копіювальний конструктор
+					/// </summary>
+					/// <param name="from">Оригинал</param>
 					ThreadableThread(const ThreadableThread& from) : thread(from.thread) {}
+
+					/// <summary>
+					/// Конструктор переміщення
+					/// </summary>
+					/// <param name="from">Оригинал</param>
 					ThreadableThread(ThreadableThread&& from) : thread(MoveRValue(from.thread)) {}
+
+					/// <summary>
+					/// Оператор копіювання
+					/// </summary>
+					/// <param name="from">Правий операнд</param>
+					/// <returns>Посилання на поточний об'єкт</returns>
 					ThreadableThread& operator=(const ThreadableThread& from) {
 						this->~ThreadableThread();
 						this->ThreadableThread::ThreadableThread(from);
 						return *this;
 					}
+
+					/// <summary>
+					/// Оператор переміщення
+					/// </summary>
+					/// <param name="from">Правий операнд</param>
+					/// <returns>Посилання на поточний об'єкт</returns>
 					ThreadableThread& operator=(ThreadableThread&& from) {
 						this->~ThreadableThread();
 						this->ThreadableThread::ThreadableThread(MoveRValue(from));
@@ -43,6 +67,7 @@ namespace Seed {
 					virtual const String& GetName() const {
 						return thread.Name;
 					}
+
 					/// <summary>
 					/// Встановлення імені сутності
 					/// </summary>
@@ -91,6 +116,7 @@ namespace Seed {
 						thread.Resume();
 						return *this;
 					}
+
 					/// <summary>
 					/// Переривання виконання потокової сутності
 					/// </summary>
@@ -99,6 +125,7 @@ namespace Seed {
 						thread.Interupt();
 						return *this;
 					}
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності
 					/// </summary>
@@ -107,6 +134,7 @@ namespace Seed {
 						thread.Join();
 						return *this;
 					}
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>
@@ -116,6 +144,7 @@ namespace Seed {
 						thread.Join(timeOut);
 						return *this;
 					}
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності
 					/// </summary>
@@ -124,6 +153,7 @@ namespace Seed {
 						thread.Join();
 						return *this;
 					}
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>

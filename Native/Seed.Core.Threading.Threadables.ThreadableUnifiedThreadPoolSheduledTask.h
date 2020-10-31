@@ -6,6 +6,9 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			namespace Threadables {
+				/// <summary>
+				/// Об'єкт задачі таймера пулу потоків в процесі виконяння
+				/// </summary>
 				class ThreadableUnifiedThreadPoolSheduledTaskV2 final : public Seed::Core::Threading::IThreadable, public IDisposable {
 				private:
 					struct Data {
@@ -68,6 +71,7 @@ namespace Seed {
 					virtual const String& GetName() const {
 						return This->task.Name;
 					}
+
 					/// <summary>
 					/// Встановлення імені сутності
 					/// </summary>
@@ -105,16 +109,19 @@ namespace Seed {
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Suspend();
+
 					/// <summary>
 					/// Розмороження виконання потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Resume();
+
 					/// <summary>
 					/// Переривання виконання потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Interupt();
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності
 					/// </summary>
@@ -123,6 +130,7 @@ namespace Seed {
 						This->event.Wait();
 						return *this;
 					}
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>
@@ -132,6 +140,7 @@ namespace Seed {
 						This->event.Wait(timeOut.Ticks);
 						return *this;
 					}
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності
 					/// </summary>
@@ -140,6 +149,7 @@ namespace Seed {
 						This->event.Wait();
 						return *this;
 					}
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>

@@ -6,6 +6,9 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			namespace Threadables {
+				/// <summary>
+				/// Об'єкт задачі I/O пулу в процесі виконня
+				/// </summary>
 				class ThreadableUnifiedThreadPoolIoTaskV2 final : public Seed::Core::Threading::IThreadable, public IDisposable {
 				private:
 					struct Data {
@@ -68,6 +71,7 @@ namespace Seed {
 					virtual const String& GetName() const {
 						return This->task.Name;
 					}
+
 					/// <summary>
 					/// Встановлення імені сутності
 					/// </summary>
@@ -105,32 +109,38 @@ namespace Seed {
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Suspend();
+
 					/// <summary>
 					/// Розмороження виконання потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Resume();
+
 					/// <summary>
 					/// Переривання виконання потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Interupt();
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Join();
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>
 					/// <param name="timeOut">Максимальний час очікування</param>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual IThreadable& Join(Time::TimeSpan timeOut);
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
 					virtual const IThreadable& Join() const;
+
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>

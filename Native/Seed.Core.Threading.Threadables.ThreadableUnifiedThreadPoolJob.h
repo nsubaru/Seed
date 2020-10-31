@@ -5,6 +5,9 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			namespace Threadables {
+				/// <summary>
+				/// Об'єкт задачі пулу потоків в процесі виконання
+				/// </summary>
 				class ThreadableUnifiedThreadPoolJobV2 final : public Seed::Core::Threading::IThreadable, public IDisposable {
 				private:
 					struct Data {
