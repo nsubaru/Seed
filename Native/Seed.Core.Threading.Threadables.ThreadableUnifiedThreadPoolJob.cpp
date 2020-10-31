@@ -1,5 +1,7 @@
 #include "Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolJob.h"
 
+#include "Seed.Core.Threading.Threadables.Base.Internal.h"
+
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
