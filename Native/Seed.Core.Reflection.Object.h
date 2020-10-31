@@ -104,7 +104,7 @@ namespace Seed
 					{
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
-							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
+							MethodType method = reinterpret_cast<MethodType const&>(const_cast<void*&>(pMethod));
 							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
