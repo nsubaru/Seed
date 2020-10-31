@@ -1604,7 +1604,7 @@ UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::Cr
 }
 #pragma endregion
 #pragma region Statistic
-SizeT Seed::Core::Threading::SystemThreadPool::AllItemQueueLenght()
+SizeT Seed::Core::Threading::SystemThreadPool::AllItemCount()
 {
 	return
 		lowPriorityPool->JobsCount		+ lowPriorityPool->SheduledTaskCount	+ lowPriorityPool->IORequestCount	 +
@@ -1612,7 +1612,7 @@ SizeT Seed::Core::Threading::SystemThreadPool::AllItemQueueLenght()
 		highPriorityPool->JobsCount		+ highPriorityPool->SheduledTaskCount	+ highPriorityPool->IORequestCount;
 }
 
-SizeT Seed::Core::Threading::SystemThreadPool::AllItemSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority priority)
+SizeT Seed::Core::Threading::SystemThreadPool::AllItemSpecificPriorityCount(Threading::EPoolThreadsPriority priority)
 {
 	switch (priority)
 	{
@@ -1627,12 +1627,12 @@ SizeT Seed::Core::Threading::SystemThreadPool::AllItemSpecificPriorityQueueLengh
 	}
 }
 
-SizeT Seed::Core::Threading::SystemThreadPool::JobQueueLenght()
+SizeT Seed::Core::Threading::SystemThreadPool::JobCount()
 {
 	return lowPriorityPool->JobsCount + mediumPriorityPool->JobsCount + highPriorityPool->JobsCount;
 }
 
-SizeT Seed::Core::Threading::SystemThreadPool::JobSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority priority)
+SizeT Seed::Core::Threading::SystemThreadPool::JobSpecificPriorityCount(Threading::EPoolThreadsPriority priority)
 {
 	switch (priority)
 	{
@@ -1647,12 +1647,12 @@ SizeT Seed::Core::Threading::SystemThreadPool::JobSpecificPriorityQueueLenght(Th
 	}
 }
 
-SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskQueueLenght()
+SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskCount()
 {
 	return lowPriorityPool->SheduledTaskCount + mediumPriorityPool->SheduledTaskCount + highPriorityPool->SheduledTaskCount;
 }
 
-SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority priority)
+SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskSpecificPriorityCount(Threading::EPoolThreadsPriority priority)
 {
 	switch (priority)
 	{
@@ -1667,12 +1667,12 @@ SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskSpecificPriorityQueu
 	}
 }
 
-SizeT Seed::Core::Threading::SystemThreadPool::IoTaskQueueLenght()
+SizeT Seed::Core::Threading::SystemThreadPool::IoTaskCount()
 {
 	return lowPriorityPool->IORequestCount + mediumPriorityPool->IORequestCount + highPriorityPool->IORequestCount;
 }
 
-SizeT Seed::Core::Threading::SystemThreadPool::IoTaskSpecificPriorityQueueLenght(Threading::EPoolThreadsPriority priority)
+SizeT Seed::Core::Threading::SystemThreadPool::IoTaskSpecificPriorityCount(Threading::EPoolThreadsPriority priority)
 {
 	switch (priority)
 	{
