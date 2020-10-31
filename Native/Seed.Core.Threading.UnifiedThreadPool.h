@@ -1223,26 +1223,26 @@ namespace Seed {
 			/// Інтерфес асинхроного об'єкта I/O
 			/// </summary>
 			/// <typeparam name="TDataType">Тип об'єкта пакета(блоку) даних</typeparam>
-			template<typename TDataType = Containers::Blob>
-			class IAsyncIO : public IAsyncIOBase {
+			template<typename TDataType> requires TypeTraits::Collection::IsArray<TDataType>
+			class IBaseAsyncIO : public IAsyncIOBase {
 			public:
 				/// <summary>
 				/// Конструктор з пулу потоків, який буде обробляти операції
 				/// </summary>
 				/// <param name="threadPool">Пул потоків</param>
-				ForceInline IAsyncIO(const Threading::UnifiedThreadPool& threadPool) : IAsyncIOBase(threadPool) {}
+				ForceInline IBaseAsyncIO(const Threading::UnifiedThreadPool& threadPool) : IAsyncIOBase(threadPool) {}
 
 				/// <summary>
 				/// Стандратний конструктор копіювання
 				/// </summary>
 				/// <param name="orig">Оригинал</param>
-				ForceInline IAsyncIO(const IAsyncIO& orig) = default;
+				ForceInline IBaseAsyncIO(const IBaseAsyncIO& orig) = default;
 
 				/// <summary>
 				/// Стандарний конструктор переміщення
 				/// </summary>
 				/// <param name="orig">Оригинал</param>
-				ForceInline IAsyncIO(IAsyncIO&& orig) = default;
+				ForceInline IBaseAsyncIO(IBaseAsyncIO&& orig) = default;
 			public:
 				/// <summary>
 				/// Ініціалізація асинхроної операції читання
@@ -1269,15 +1269,15 @@ namespace Seed {
 				/// <summary>
 				/// Деструктор
 				/// </summary>
-				virtual ~IAsyncIO() = 0 {};
+				virtual ~IBaseAsyncIO() = 0 {};
 			};
 
 			/// <summary>
 			/// Інтерфес об'єта асинхроного I/O з позиційним читанням
 			/// </summary>
 			/// <typeparam name="TDataType">Тип буфера даних</typeparam>
-			template<typename TDataType = Containers::Blob>
-			class IPositionAsyncIO : public IAsyncIOBase {
+			template<typename TDataType> requires TypeTraits::Collection::IsArray<TDataType>
+			class IBasePositionAsyncIO : public IAsyncIOBase {
 			public:
 				/// <summary>
 				/// Ініціаліщація операції асихроного читання
@@ -1303,7 +1303,7 @@ namespace Seed {
 				/// <returns>true якщо об'єкт допускає I/O операції</returns>
 				virtual bool IsValid() = 0;
 			public:
-				virtual ~IPositionAsyncIO() = 0 {};
+				virtual ~IBasePositionAsyncIO() = 0 {};
 			};
 
 			/// <summary>
