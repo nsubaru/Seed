@@ -136,7 +136,7 @@ static __declspec(noinline) bool ThrowDtorGenInnerExceptionFunct() {
 	return false;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::StoringException::Excecute() {
+bool Seed::Core::Testing::Test::Exceptions::Abi::Transfering::StoringException::Excecute() {
 	try
 	{
 		Threading::Thread(L"Потік тестування передачі помилки", [] ()
@@ -164,7 +164,7 @@ bool Seed::Core::Testing::Test::Exceptions::StoringException::Excecute() {
 	return false;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrow::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrow::Excecute()
 {
 	bool testResult = false;
 
@@ -187,7 +187,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrow::Excecute()
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowWithTwoCatches::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowWithTwoCatches::Excecute()
 {
 	bool testResult = false;
 
@@ -214,7 +214,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowWithTwoCatches::Exce
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowCatchAsParrentType::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowCatchAsParrentType::Excecute()
 {
 	bool testResult = true;
 
@@ -236,7 +236,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowCatchAsParrentType::
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowElipseCatch::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowElipseCatch::Excecute()
 {
 	bool testResult = false;
 
@@ -254,7 +254,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowElipseCatch::Excecut
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowInnerCatch::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowInnerCatch::Excecute()
 {
 	bool innerCacth = false;
 	bool outerCatch = false;
@@ -290,7 +290,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowInnerCatch::Excecute
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowSubMethod::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowSubMethod::Excecute()
 {
 	auto result = ThrowSubMethodFunct();
 
@@ -299,7 +299,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowSubMethod::Excecute()
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowSubMethodElipse::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowSubMethodElipse::Excecute()
 {
 	auto result = ThrowSubMethodElipseFunct();
 
@@ -308,7 +308,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowSubMethodElipse::Excecute(
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowCatchSubSubMethod::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowCatchSubSubMethod::Excecute()
 {
 	auto result = ThrowCatchSubSubMethodFunct();
 
@@ -317,7 +317,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowCatchSubSubMethod::Excecut
 	return true;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowDtorGenInnerException::Excecute()
+bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowDtorGenInnerException::Excecute()
 {
 	auto result = ThrowDtorGenInnerExceptionFunct();
 
