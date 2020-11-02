@@ -62,3 +62,26 @@ bool Seed::Core::Testing::Test::Serilization::PrimitiveMetaData::Excecute() {
     auto MetaData = Core::Serilization::MetaDataGen<Int32[10][10][10]>();
     return true;
 }
+
+bool Seed::Core::Testing::Test::Serilization::DataSizeTSerilization::Excecute()
+{
+    auto registry = Core::Serilization::TypesRegistry();
+
+    auto value = 10Gb;
+
+    auto stream = Core::Serilization::Serilize(value, registry);
+    decltype(value) deserelizedValue;
+    Core::Serilization::Deserilize(stream, deserelizedValue, registry);
+
+    Asserts::AssertEqual(value, deserelizedValue);
+
+    return true;
+}
+
+bool Seed::Core::Testing::Test::Serilization::DataSizeTMetaData::Excecute()
+{
+    Asserts::AssertEqual(CTTI::TypeTraits::CTTITypeMetaData<Memory::DataSizeT>::TypeClass, CTTI::EType::Numeric);
+    Asserts::AssertTrue(CTTI::TypeTraits::CTTITypeMetaData<Memory::DataSizeT>::IsSerilizable);
+
+    return true;
+}

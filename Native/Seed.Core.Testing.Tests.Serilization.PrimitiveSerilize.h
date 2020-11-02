@@ -34,6 +34,14 @@ namespace Seed
                     class PrimitiveMetaData : public TestClass<PrimitiveMetaData> {
                         virtual bool Excecute() override;
                     };
+
+                    class DataSizeTSerilization : public TestClass<DataSizeTSerilization> {
+                        virtual bool Excecute() override;
+                    };
+
+                    class DataSizeTMetaData : public TestClass<DataSizeTMetaData> {
+                        virtual bool Excecute() override;
+                    };
                 }
             }
         }
