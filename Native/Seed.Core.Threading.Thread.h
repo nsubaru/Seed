@@ -23,7 +23,7 @@ namespace Seed {
 					volatile String name;
 					volatile ID TID;
 					volatile EThreadabledStates State;
-					volatile EThreadabledStates ActiveState;
+					volatile EThreadabledStates SecondState;
 					Handle hThread;
 					SynchronizeEvent* AbortEvent;
 					Containers::ConcurencySensitiveList<SmartPtr<IThreadable>>::Iterator This;
@@ -40,7 +40,7 @@ namespace Seed {
 					{}
 
 					ForceInline Data(String&& Name, Delegate&& delegate) :
-						name(Name),
+						name(MoveRValue(Name)),
 						delegate(MoveRValue(delegate)),
 						State(EThreadabledStates::NotStarted),
 						hThread(nullptr),
@@ -53,14 +53,15 @@ namespace Seed {
 			private:
 				Data* This = nullptr;
 			private:
-				SeedKernelCall friend void RegisterThread(Thread* thread);
-				SeedKernelCall friend void UnRegisterThread(Thread* thread);
-				SeedKernelCall friend volatile Delegate& ThreadEntryPoint(Thread* thread);
-				SeedKernelCall friend bool MainThread(Delegate&& delegate);
+				friend void RegisterThread(Thread* thread);
+				friend void UnRegisterThread(Thread* thread);
+				friend volatile Delegate& ThreadEntryPoint(Thread* thread);
+				friend volatile EThreadabledStates* GetActiveState(Thread* thread);
+				friend bool MainThread(Delegate&& delegate);
 
 				friend void KillThread(Thread& target, UInt32 statusCode);
 			private:
-				SeedKernelCall void RefreshName();
+				void RefreshName();
 			protected:
 				virtual void Dispose() override final;
 			public:
@@ -69,12 +70,14 @@ namespace Seed {
 				/// </summary>
 				/// <param name="delegate">Дія яку буде виконувати потік</param>
 				ForceInline Thread(Delegate&& delegate) : This(new Data(L"Unnamed Thread", MoveRValue(delegate))) {}
+
 				/// <summary>
 				/// Конструктор з імені потоку і делегата
 				/// </summary>
 				/// <param name="Name">Ім'я потоку</param>
 				/// <param name="delegate">Дія яку буде виконувати потік</param>
 				ForceInline Thread(String&& Name, Delegate&& delegate) : This(new Data(MoveRValue(Name), MoveRValue(delegate))) {}
+
 				/// <summary>
 				/// Конструктор з імені потоку і делегата
 				/// </summary>
@@ -86,33 +89,51 @@ namespace Seed {
 				/// Запуск потоку на виконання
 				/// </summary>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Start();
+				Thread& Start();
+
 				/// <summary>
 				/// Очікування завершення виконання потоку
 				/// </summary>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Join();
+				Thread& Join();
+
 				/// <summary>
 				/// Очікування завершення виконання потоку
 				/// </summary>
 				/// <param name="timeOut">Таймаут очікування</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Join(Time::DateTime timeOut);
+				Thread& Join(Time::TimeSpan timeOut);
+
+				/// <summary>
+				/// Очікування завершення виконання потоку
+				/// </summary>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				const Thread& Join() const;
+
+				/// <summary>
+				/// Очікування завершення виконання потоку
+				/// </summary>
+				/// <param name="timeOut">Таймаут очікування</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				const Thread& Join(Time::TimeSpan timeOut) const;
+
 				/// <summary>
 				/// Переривання виконання потоку
 				/// </summary>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				SeedKernelCall Thread& Interupt();
+				Thread& Interupt();
+
 				/// <summary>
 				/// Замороження виконання потоку
 				/// </summary>
 				/// <returns></returns>
-				SeedKernelCall Thread& Suspend();
+				Thread& Suspend();
+
 				/// <summary>
 				/// Продовження виконання потоку
 				/// </summary>
 				/// <returns></returns>
-				SeedKernelCall Thread& Resume();
+				Thread& Resume();
 			public:
 				/// <summary>
 				/// Вертає результат виконання потоку
@@ -126,17 +147,34 @@ namespace Seed {
 				/// Конвертація у посилання на інтерфейс потоку
 				/// </summary>
 				/// <returns>Посилання на інтерфейс потоку</returns>
-				ForceInline operator volatile IThreadable& () { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
+				ForceInline operator volatile IThreadable& () {
+					if (This->This != nullptr) {
+						return **This->This;
+					}
+					else {
+						Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read));
+					}
+				}
+
 				/// <summary>
 				/// Конвертація у константне посилання на інтерфейс потоку
 				/// </summary>
 				/// <returns>Константне посилання на інтерфейс потоку</returns>
-				ForceInline operator const volatile IThreadable& () const { if (This->This != nullptr) return **This->This; else Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read)); }
+				ForceInline operator const volatile IThreadable& () const { 
+					if (This->This != nullptr) {
+						return **This->This;
+					}
+					else {
+						Throw(NullPointException(ExceptionPosition, reinterpret_cast<SizeT>(nullptr), NullPointException::Types::Read));
+					}
+				}
+
 				/// <summary>
 				/// Конвертація в ідентифікатор потоку
 				/// </summary>
 				/// <returns>Ідентифікатор потоку</returns>
 				ForceInline operator ID () const { return This->TID; }
+
 				/// <summary>
 				/// Конвертація в логічне значення
 				/// </summary>
@@ -148,37 +186,41 @@ namespace Seed {
 				/// </summary>
 				/// <param name="name">Нове ім'я потоку</param>
 				ForceInline void SetName(const String& name) { const_cast<String&>(This->name) = name; RefreshName(); }
+
 				/// <summary>
 				/// Встановлення імені потоку
 				/// </summary>
 				/// <param name="name">Нове ім'я потоку</param>
 				ForceInline void SetName(String&& name) { const_cast<String&>(This->name) = MoveRValue(name); RefreshName(); }
+
 				/// <summary>
 				/// Поточне ім'я потоку
 				/// </summary>
 				/// <returns>Рядкове представлення імені потоку</returns>
-				ForceInline const String& GetName() { return const_cast<String&>(This->name); }
+				ForceInline const String& GetName() const { return const_cast<String&>(This->name); }
 
 				/// <summary>
 				/// Стан потоку
 				/// </summary>
 				/// <returns>Поточний стан потоку</returns>
-				ForceInline EThreadabledStates GetThreadState() { return this->This->State; }
+				ForceInline EThreadabledStates GetThreadState() const { return this->This->State; }
 
 				/// <summary>
 				/// Ідентифікатор потоку(номер)
 				/// </summary>
 				/// <returns>Числовий ідентифікатор потоку</returns>
-				ForceInline ID GetTID() { return this->This->TID; }
+				ForceInline ID GetTID() const { return this->This->TID; }
 
 				/// <summary>
 				/// Ім'я потоку
 				/// </summary>
 				String Property(GetName, SetName) Name;
+
 				/// <summary>
 				/// Стан потоку
 				/// </summary>
 				EThreadabledStates Property(GetThreadState) ThreadState;
+
 				/// <summary>
 				/// Ідентифікатор потоку
 				/// </summary>

@@ -13,7 +13,7 @@ namespace Seed {
 			/// Типи потокових сутностей
 			/// </summary>
 			enum class EThreadableTypes : UInt8 {
-				Thread, JobTask, ScheduledTask, Unknown = 255
+				Thread, JobTask, ScheduledTask, IoTask, Unknown = 255
 			};
 
 			/// <summary>
@@ -36,15 +36,28 @@ namespace Seed {
 			class IThreadable {
 			public:
 				/// <summary>
+				/// Вертає новий референс
+				/// </summary>
+				/// <returns></returns>
+				virtual SmartPtr<IThreadable> MakeRef() const = 0;
+			public:
+				/// <summary>
 				/// Отримання імені сутності
 				/// </summary>
 				/// <returns>Рядкове представлення імені</returns>
 				virtual const String& GetName() const = 0;
+
 				/// <summary>
 				/// Встановлення імені сутності
 				/// </summary>
 				/// <param name="NewName">Нове ім'я сутності</param>
-				virtual void SetName(const String& NewName) = 0;
+				virtual void SetName(const String& newName) = 0;
+
+				/// <summary>
+				/// Встановлення імені сутності
+				/// </summary>
+				/// <param name="NewName">Нове ім'я сутності</param>
+				virtual void SetName(String&& newName) = 0;
 				
 				/// <summary>
 				/// Ідентифікатор сутності
@@ -65,82 +78,81 @@ namespace Seed {
 				virtual EThreadabledStates GetThreadabledState() const = 0;
 
 				/// <summary>
-				/// Стек викликів даної потокової сутності
-				/// </summary>
-				/// <returns></returns>
-				virtual Containers::Array<String> GetCallStack() const = 0;
-
-				/// <summary>
-				/// Вертає батьківську потокову сутність якщо така є
-				/// </summary>
-				/// <returns></returns>
-				virtual IThreadable& GetParrentThreadable() const = 0;
-
-				/// <summary>
-				/// Вказує чи є батьківська потокова сутність
-				/// </summary>
-				/// <returns></returns>
-				virtual Boolean IsHaveParrentThreadable() const = 0;
-
-				/// <summary>
 				/// Заморозка виконання потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Suspend() = 0;
+
 				/// <summary>
 				/// Розмороження виконання потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Resume() = 0;
+
 				/// <summary>
 				/// Переривання виконання потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Interupt() = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Join() = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності з таймаутом
 				/// </summary>
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
-				virtual IThreadable& Join(Time::DateTime timeOut) = 0;
+				virtual IThreadable& Join(Time::TimeSpan timeOut) = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual const IThreadable& Join() const = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності з таймаутом
 				/// </summary>
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
-				virtual const IThreadable& Join(Time::DateTime timeOut) const = 0;
+				virtual const IThreadable& Join(Time::TimeSpan timeOut) const = 0;
+
 				virtual ~IThreadable() = 0 {}
 			};
+
+			namespace Threadables {
+				/// <summary>
+				/// Посилання на потік
+				/// </summary>
+				namespace {
+					using ThreadableRef = Seed::Core::Containers::ConcurencySensitiveList<Seed::Core::SmartPtr<Seed::Core::Threading::IThreadable>>::Iterator;
+				}
+			}
 
 			/// <summary>
 			/// Вертає кількість активних потокових сутностей
 			/// </summary>
 			/// <param name="WithPseudoThreadable">якщо true то окрім потоків будуть рахуватись і інші потокові сутності</param>
-			SeedKernelCall SizeT GetThreadableCount(Boolean WithPseudoThreadable = false);
+			SizeT GetThreadableCount(Boolean WithPseudoThreadable = false);
 
 			/// <summary>
 			/// Вертає список всіх потокових сутностей
 			/// </summary>
-			SeedKernelCall Containers::ConcurencyList<SmartPtr<IThreadable>> GetAllThreadable();
+			Containers::List<SmartPtr<IThreadable>> GetAllThreadable();
 
 			/// <summary>
-			/// Вертає посилання на потокову сутність в межає якої виконується поточний код
+			/// Вертає посилання на потокову сутність в межах якої виконується поточний код
 			/// </summary>
-			SeedKernelCall IThreadable& GetThis();
+			IThreadable& GetThis();
+
 			/// <summary>
-			/// Вертає ідентифікатор потокової сутності в межає якої виконується поточний код
+			/// Вертає ідентифікатор потокової сутності в межах якої виконується поточний код
 			/// </summary>
-			SeedKernelCall ID GetTID();
+			ID GetTID();
 
 			/// <summary>
 			/// Призупиняє виконання потоку на задану кількість часу
@@ -153,47 +165,113 @@ namespace Seed {
 			/// Призупиняє виконання потоку на задану кількість мілісекунд
 			/// </summary>
 			/// <param name="ms">Кількість мілісекунд</param>
-			inline void Sleep(UInt64 ms) { Sleep(Time::DateTime((Time::SecondInNtTime / 1000) * ms), true); }
+			ForceInline void Sleep(UInt64 ms) { Sleep(Time::DateTime((Time::SecondInNtTime / 1000) * ms), true); }
+
+			/// <summary>
+			/// Призупиняє виконання потоку на заданий проміжок часу
+			/// </summary>
+			/// <param name="time">Заданий проміжок часу</param>
+			ForceInline void Sleep(Time::TimeSpan time) { Sleep(Time::DateTime(time.Ticks), true); }
 
 			/// <summary>
 			/// Стани задач
 			/// </summary>
 			enum class EJobStates :UInt8 {
-				NotStarted, Executing, Finished, ExceptionCatched, Unknown = 255
+				/// <summary>
+				/// Ще не запущена
+				/// </summary>
+				NotStarted, 
+				/// <summary>
+				/// В процесі виконання
+				/// </summary>
+				Executing,
+				/// <summary>
+				/// Завершена
+				/// </summary>
+				Finished, 
+				/// <summary>
+				/// В процесі обробки помилок
+				/// </summary>
+				ExceptionCatched,
+				/// <summary>
+				/// Не відомий стан
+				/// </summary>
+				Unknown = 255
 			};
 
-
-			///<summary>Неіснуючий потік або він не є керований через Core</summary>
+			/// <summary>
+			/// Неіснуючий потік або він не є керований через Core
+			/// </summary>
 			class InvalidThread final : public Exception {
 			private:
-				///<summary>ID не існуючого потоку</summary>
+				/// <summary>
+				/// ID не існуючого потоку
+				/// </summary>
 				ID tid;
 			public:
+				/// <summary>
+				/// Копіювальний конструктор
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
 				InvalidThread(const InvalidThread& orig) : Exception(orig), tid(orig.tid) {}
+
+				/// <summary>
+				/// Конструктор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
 				InvalidThread(InvalidThread&& from) : Exception(MoveRValue(from)), tid(from.tid) {}
-				InvalidThread& operator=(const InvalidThread& from) { this->~InvalidThread(); this->InvalidThread::InvalidThread(from); return *this; }
-				InvalidThread& operator=(InvalidThread&& from) { this->~InvalidThread(); this->InvalidThread::InvalidThread(MoveRValue(from)); return *this; }
+
+				/// <summary>
+				/// Оператор копіювання
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				InvalidThread& operator=(const InvalidThread& from) { 
+					this->~InvalidThread(); 
+					this->InvalidThread::InvalidThread(from);
+					return *this; 
+				}
+
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				InvalidThread& operator=(InvalidThread&& from) { 
+					this->~InvalidThread(); 
+					this->InvalidThread::InvalidThread(MoveRValue(from));
+					return *this;
+				}
 			public:
-				///<summary>Конструктор помилки</summary>
-				///<param name = 'File'>Файл в якому згенерована помилка</param>
-				///<param name = 'FunctName'>Ім'я функції</param>
-				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				///<param name = 'TID'>Id не існуючого потоку</param>
+				/// <summary>
+				/// Конструктор помилки
+				/// </summary>
+				/// <param name = 'File'>Файл в якому згенерована помилка</param>
+				/// <param name = 'FunctName'>Ім'я функції</param>
+				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				/// <param name = 'TID'>Id не існуючого потоку</param>
 				ForceInline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID)
 					noexcept : Exception(File, FunctName, Line, L"Не можна працювати з незареєстрованим в рантаймі потоком"), tid(TID)
 				{};
 
-				///<summary>Вертаж ID неіснуючого потку</summary>
-				ID GetTID() { return tid; }
+				/// <summary>
+				/// Вертає ID неіснуючого потку
+				/// </summary>
+				/// <returns>ID неіснуючого потоку</returns>
+				ID GetTID() const { return tid; }
 
-				///<summary>ID не існуючого потоку</summary>
+				/// <summary>
+				/// ID неіснуючого потоку
+				/// </summary>
 				ID Property(GetTID) TID;
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				/// <summary>
+				/// Текстове представлення інформації про помилки помилки
+				/// </summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(this->exceptionName),
-						ExceptionString(L". Не знайдено потоку з ID "), ExceptionString(tid), ExceptionString(L". "),
+						ExceptionString(L". Не знайдено потоку з ID "), ExceptionString::toString(tid), ExceptionString(L". "),
 						Location.toString(), 
 						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
 					});
@@ -207,26 +285,64 @@ namespace Seed {
 					return ExceptionHolderType(new InvalidThread(*this));
 				}
 
+				/// <summary>
+				/// Деструктор
+				/// </summary>
 				ForceInline virtual ~InvalidThread() override final {};
 			};
 
-			///<summary>Не валідний об'єкт потоку</summary>
+			/// <summary>
+			/// Не валідний об'єкт потоку
+			/// </summary>
 			class InvalidThreadObj final : public Exception {
 			public:
+				/// <summary>
+				/// Копіювальний конструктор
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
 				InvalidThreadObj(const InvalidThreadObj& orig) : Exception(orig) {}
+
+				/// <summary>
+				/// Конструктор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
 				InvalidThreadObj(InvalidThreadObj&& from) : Exception(MoveRValue(from)) {}
-				InvalidThreadObj& operator=(const InvalidThreadObj& from) { this->~InvalidThreadObj(); this->InvalidThreadObj::InvalidThreadObj(from); return *this; }
-				InvalidThreadObj& operator=(InvalidThreadObj&& from) { this->~InvalidThreadObj(); this->InvalidThreadObj::InvalidThreadObj(MoveRValue(from)); return *this; }
+
+				/// <summary>
+				/// Оператор копіювання
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				InvalidThreadObj& operator=(const InvalidThreadObj& from) { 
+					this->~InvalidThreadObj(); 
+					this->InvalidThreadObj::InvalidThreadObj(from); 
+					return *this; 
+				}
+				
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				InvalidThreadObj& operator=(InvalidThreadObj&& from) { 
+					this->~InvalidThreadObj(); 
+					this->InvalidThreadObj::InvalidThreadObj(MoveRValue(from)); 
+					return *this; }
+
 			public:
-				///<summary>Конструктор помилки</summary>
-				///<param name = 'File'>Файл в якому згенерована помилка</param>
-				///<param name = 'FunctName'>Ім'я функції</param>
-				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				/// <summary>
+				/// Конструктор помилки
+				/// </summary>
+				/// <param name = 'File'>Файл в якому згенерована помилка</param>
+				/// <param name = 'FunctName'>Ім'я функції</param>
+				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				ForceInline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Не валідний об'єкт потоку")
 				{};
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				/// <summary>
+				/// Текстове представлення інформації про помилки помилки
+				/// </summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
                         ExceptionString(exceptionName), ExceptionString(L". "),
@@ -243,25 +359,64 @@ namespace Seed {
 					return ExceptionHolderType(new InvalidThreadObj(*this));
 				}
 
+				/// <summary>
+				/// Деструктор
+				/// </summary>
 				ForceInline virtual ~InvalidThreadObj() override final {}
 			};
-			///<summary>Запуск запущеного об'єкта</summary>
+
+			/// <summary>
+			/// Запуск запущеного об'єкта
+			/// </summary>
 			class ThreadableAlredyStarted final : public Exception {
 			public:
+				/// <summary>
+				/// Копіювальний конструктор
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
 				ThreadableAlredyStarted(const ThreadableAlredyStarted& orig) : Exception(orig) {}
+
+				/// <summary>
+				/// Конструктор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
 				ThreadableAlredyStarted(ThreadableAlredyStarted&& from) : Exception(MoveRValue(from)) {}
-				ThreadableAlredyStarted& operator=(const ThreadableAlredyStarted& from) { this->~ThreadableAlredyStarted(); this->ThreadableAlredyStarted::ThreadableAlredyStarted(from); return *this; }
-				ThreadableAlredyStarted& operator=(ThreadableAlredyStarted&& from) { this->~ThreadableAlredyStarted(); this->ThreadableAlredyStarted::ThreadableAlredyStarted(MoveRValue(from)); return *this; }
+
+				/// <summary>
+				/// Оператор копіювання
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ThreadableAlredyStarted& operator=(const ThreadableAlredyStarted& from) { 
+					this->~ThreadableAlredyStarted(); 
+					this->ThreadableAlredyStarted::ThreadableAlredyStarted(from); 
+					return *this; 
+				}
+
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ThreadableAlredyStarted& operator=(ThreadableAlredyStarted&& from) { 
+					this->~ThreadableAlredyStarted(); 
+					this->ThreadableAlredyStarted::ThreadableAlredyStarted(MoveRValue(from)); 
+					return *this; 
+				}
 			public:
-				///<summary>Конструктор помилки</summary>
-				///<param name = 'File'>Файл в якому згенерована помилка</param>
-				///<param name = 'FunctName'>Ім'я функції</param>
-				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				/// <summary>
+				/// Конструктор помилки
+				/// </summary>
+				/// <param name = 'File'>Файл в якому згенерована помилка</param>
+				/// <param name = 'FunctName'>Ім'я функції</param>
+				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				ForceInline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Запуск запущеного об'єкта")
 				{};
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				/// <summary>
+				/// Текстове представлення інформації про помилки помилки
+				/// </summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
                         ExceptionString(exceptionName), ExceptionString(L". "),
@@ -278,26 +433,64 @@ namespace Seed {
 					return ExceptionHolderType(new ThreadableAlredyStarted(*this));
 				}
 
+				/// <summary>
+				/// Деструктор
+				/// </summary>
 				ForceInline virtual ~ThreadableAlredyStarted() override final {}
 			};
 
-			///<summary>Взаємне блокування</summary>
-			class DedlockExpected final : public Exception {
+			/// <summary>
+			/// Взаємне блокування
+			/// </summary>
+			class DeadlockExpected final : public Exception {
 			public:
-				DedlockExpected(const DedlockExpected& orig) : Exception(orig) {}
-				DedlockExpected(DedlockExpected&& from) : Exception(MoveRValue(from)) {}
-				DedlockExpected& operator=(const DedlockExpected& from) { this->~DedlockExpected(); this->DedlockExpected::DedlockExpected(from); return *this; }
-				DedlockExpected& operator=(DedlockExpected&& from) { this->~DedlockExpected(); this->DedlockExpected::DedlockExpected(MoveRValue(from)); return *this; }
+				/// <summary>
+				/// Копіювальний конструктор
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				DeadlockExpected(const DeadlockExpected& orig) : Exception(orig) {}
+
+				/// <summary>
+				/// Конструктор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				DeadlockExpected(DeadlockExpected&& from) : Exception(MoveRValue(from)) {}
+
+				/// <summary>
+				/// Оператор копіювання
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				DeadlockExpected& operator=(const DeadlockExpected& from) { 
+					this->~DeadlockExpected(); 
+					this->DeadlockExpected::DeadlockExpected(from); 
+					return *this; 
+				}
+
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="from">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				DeadlockExpected& operator=(DeadlockExpected&& from) {
+					this->~DeadlockExpected(); 
+					this->DeadlockExpected::DeadlockExpected(MoveRValue(from));
+					return *this; 
+				}
 			public:
-				///<summary>Конструктор помилки</summary>
-				///<param name = 'File'>Файл в якому згенерована помилка</param>
-				///<param name = 'FunctName'>Ім'я функції</param>
-				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				ForceInline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				/// <summary>
+				/// Конструктор помилки
+				/// </summary>
+				/// <param name = 'File'>Файл в якому згенерована помилка</param>
+				/// <param name = 'FunctName'>Ім'я функції</param>
+				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
+				ForceInline DeadlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Взаємне блокування")
 				{};
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				/// <summary>
+				/// Текстове представлення інформації про помилки помилки
+				/// </summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
                         ExceptionString(exceptionName), ExceptionString(L". "),
@@ -311,10 +504,13 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Розумний покажчик на об'єкт помилки</returns>
 				virtual ExceptionHolderType Clone() const override {
-					return ExceptionHolderType(new DedlockExpected(*this));
+					return ExceptionHolderType(new DeadlockExpected(*this));
 				}
 
-				ForceInline virtual ~DedlockExpected() override final {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~DeadlockExpected() override final {}
 			};
 		}
 	}

@@ -43,11 +43,11 @@ namespace Seed
 #pragma warning(pop)
 				}
 
-				SizeT CurrentTotalAllocatedMemory() const {
+				Memory::DataSizeT CurrentTotalAllocatedMemory() const {
 					return Memory::CurrentTotalAllocatedMemory();
 				}
 
-				SizeT CurrentTotalHeapsUsage() const {
+				Memory::DataSizeT CurrentTotalHeapsUsage() const {
 					return Memory::CurrentTotalHeapsUsage();
 				}
 

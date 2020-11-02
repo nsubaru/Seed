@@ -42,6 +42,9 @@ namespace Seed
 			private:
 				virtual void Dispose() override {}
 			public:
+				TestPackResult() 
+					: This(new Data(String(), {}, {})) {}
+
 				TestPackResult(const String& name, const Containers::List<TestResult>& results, Time::TimeRange testTimeRange)
 					: This(new Data(name, results, testTimeRange)) {}
 

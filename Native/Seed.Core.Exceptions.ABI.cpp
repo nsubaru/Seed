@@ -14,7 +14,7 @@ EXCEPTION_DISPOSITION __cdecl __CxxFrameHandler4(
 	DispatcherContext* pDC
 ) {
 	FuncInfo4          FuncInfo;
-	EXCEPTION_DISPOSITION   result;
+	EXCEPTION_DISPOSITION   result{};
 	EHRegistrationNode      EstablisherFrame = RN;
 	GetThreadExceptionData()->_ImageBase = pDC->ImageBase;
 	GetThreadExceptionData()->_ThrowImageBase = (uintptr_t)pExcept->params.pThrowImageBase;

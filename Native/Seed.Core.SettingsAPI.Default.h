@@ -2,6 +2,7 @@
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Time.Base.h"
 #include "Seed.Core.SettingsAPI.h"
+#include "Seed.Core.Memory.DataSize.h"
 
 namespace Seed {
 	inline namespace Core {
@@ -15,12 +16,12 @@ namespace Seed {
 			/// <summary>
 			/// Стартовий розмір стеку головного потоку
 			/// </summary>
-			constexpr UInt64 MainThreadStackStartSize = 512Kb;
+			constexpr Memory::DataSizeT MainThreadStackStartSize = 512Kb;
 
 			/// <summary>
 			/// Максимальний розмір стеку головного потоку
 			/// </summary>
-			constexpr UInt64 MainThreadStackMaxSize = 1Mb;
+			constexpr Memory::DataSizeT MainThreadStackMaxSize = 1Mb;
 
 			///<summary>Стандартні налаштування рантайму Seed</summary>
 			namespace Default {

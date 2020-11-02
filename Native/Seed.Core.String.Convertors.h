@@ -602,7 +602,7 @@ namespace Seed
                 /// <summary>
                 /// Перетворення перелічення в рядкове представлення
                 /// </summary>
-                /// <typeparam name="enumValue">Числове значення перелічення</typeparam>
+                /// <params name="enumValue">Числове значення перелічення</typeparam>
                 template<typename T> requires TypeTraits::IsEnumV<T>
                 ForceInline static TBaseString toString(T enumValue) {
                     return TBaseString::toString((TypeTraits::EnumUnderlyingTypeV<T>)enumValue);
@@ -616,6 +616,57 @@ namespace Seed
                 template<typename T> requires TypeTraits::IsEnumV<T>
                 ForceInline T toEnum() const {
                     return (T) this->toInt<typename TypeTraits::EnumUnderlyingTypeV<T>>();
+                }
+
+                /// <summary>
+                /// Перетворення розмірного типу в рядок
+                /// </summary>
+                /// <params name = "dataSize"> Значення </params>
+                /// <params name = "formatSize"> Якщо true то використовується форматування, якщо ні то перетворюється як кількість байт </params>
+                /// <returns> Рядкове предствлення </returns>
+                ForceInline static TBaseString toString(Memory::DataSizeT dataSize, bool formatSize = false) {
+                    if (!formatSize) {
+                        return TBaseString::toString(dataSize.Bytes);
+                    }
+                    else {
+                        SizeT data = dataSize.Bytes;
+
+                        if (data < Memory::DataSizeT::Kilobyte) {
+                            auto result = TBaseString::toString(dataSize.Bytes);
+                            result += L" b";
+                            return result;
+                        }
+                        else if (data < Memory::DataSizeT::Megabyte) {
+                            auto result = TBaseString::toString(dataSize.Bytes / (Memory::DataSizeT::Kilobyte * 1.0), 3);
+                            result += L" Kb";
+                            return result;
+                        }
+                        else if (data < Memory::DataSizeT::Gigabyte) {
+                            auto result = TBaseString::toString(dataSize.Bytes / (Memory::DataSizeT::Megabyte * 1.0), 3);
+                            result += L" Mb";
+                            return result;
+                        }
+                        else if (data < Memory::DataSizeT::Terabyte) {
+                            auto result = TBaseString::toString(dataSize.Bytes / (Memory::DataSizeT::Gigabyte * 1.0), 3);
+                            result += L" Gb";
+                            return result;
+                        }
+                        else if (data < Memory::DataSizeT::Petabyte) {
+                            auto result = TBaseString::toString(dataSize.Bytes / (Memory::DataSizeT::Terabyte * 1.0), 3);
+                            result += L" Tb";
+                            return result;
+                        }
+                        else if (data < Memory::DataSizeT::Exabyte) {
+                            auto result = TBaseString::toString(dataSize.Bytes / (Memory::DataSizeT::Petabyte * 1.0), 3);
+                            result += L" Pb";
+                            return result;
+                        }
+                        else {
+                            auto result = TBaseString::toString(dataSize.Bytes / (Memory::DataSizeT::Exabyte * 1.0), 3);
+                            result += L" Eb";
+                            return result;
+                        }
+                    }
                 }
 
                 ///<summary>Конвертація з рядкового в бінарне представлення UUID </summary>

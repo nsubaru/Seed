@@ -121,14 +121,15 @@ namespace Seed
                 /// <param name="strings">Масив рядків</param>
                 /// <returns>Рядоку який є сумою масиву вхідних рядків</returns>
                 ForceInline static TBaseString Combine(Containers::Array<TBaseString>&& strings) {
-                    return strings.Aggregate(
-                        ArrowFunct(x, y, x + y),
-                        TBaseString(
-                            strings.Aggregate<SizeT>(
-                                ArrowFunct(x, y, x + y.Lenght)
-                            )
-                        )
+                    auto data = TBaseString(
+                        strings.Aggregate<Memory::DataSizeT>(ArrowFunct(x, y, x + y.Size))
                     );
+
+                    strings.ForEach([&](const auto& string) mutable InlineLambda{
+                        data += string;
+                    });
+
+                    return data;
                 }
 
                 //Заміна по таблиці символів
@@ -505,7 +506,7 @@ namespace Seed
                 /// <param name="fillerCharacter">Символ заповнювач</param>
                 /// <returns>Заповнений рядок</returns>
                 static TBaseString CreateFilledString(SizeT requiredSize, Char fillerCharacter = L' ') {
-                    TBaseString str(requiredSize);
+                    TBaseString str(Memory::DataSizeT(requiredSize * sizeof(Char)));
                     str.ResizeToFixed(requiredSize, fillerCharacter);
                     return str;
                 }

@@ -21,7 +21,7 @@ namespace Seed {
 				static constexpr SizeT BitCountInFragment = sizeof(T) * 8ui64;
 			private:
 				static_assert(BitCount != 0, "BitMap bit count must not equal zero");
-				static_assert(Seed::Math::RoundToUpper(BitCount, BitCountInFragment) < 2Gb, "BitMap Size must not bigger then 2GB - 1b");
+				static_assert(Seed::Math::RoundToUpper(BitCount, BitCountInFragment) < (2Gb).Bytes, "BitMap Size must not bigger then 2GB - 1b");
 			public:
 				static constexpr SizeT Size = Seed::Math::RoundToUpper(BitCount, BitCountInFragment);
 				static constexpr SizeT FullClustersCount = BitCount / BitCountInFragment;

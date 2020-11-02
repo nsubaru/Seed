@@ -1,6 +1,6 @@
 #include "Seed.Core.Testing.Tests.Serilization.TypeMetaDataRecord.h"
 
-#include "Seed.Core.FS.h"
+#include "Seed.Core.IO.FS.h"
 
 bool Seed::Core::Testing::Test::Serilization::TypeMetadataRecordCreate::Excecute()
 {
@@ -20,12 +20,12 @@ bool Seed::Core::Testing::Test::Serilization::TypeMetadataRecordCreate::Excecute
 bool Seed::Core::Testing::Test::Serilization::TypeMetaDataRecordDecode::Excecute()
 {
     auto strMetaData = Core::Serilization::MetaDataGen
-        <Core::Containers::Tuple<Core::Containers::Dictionary<Core::FS::FSObjectInformation>, Core::Containers::List<Core::FS::VolumeInformation>, SizeT, Boolean>>();
+        <Core::Containers::Tuple<Core::Containers::Dictionary<Core::IO::FS::FSObjectInformation>, Core::Containers::List<Core::IO::FS::ObjectProvider::VolumeInformation>, SizeT, Boolean>>();
 
     auto metaDataDecoded = Core::Serilization::TypeMetaDataRecord::DecodeTypeMetaDataRecord(strMetaData);
 
     Asserts::AssertEqual(String(Core::CTTI::TypeName
-        <Core::Containers::Tuple<Core::Containers::Dictionary<Core::FS::FSObjectInformation>, Core::Containers::List<Core::FS::VolumeInformation>, SizeT, Boolean>>()),
+        <Core::Containers::Tuple<Core::Containers::Dictionary<Core::IO::FS::FSObjectInformation>, Core::Containers::List<Core::IO::FS::ObjectProvider::VolumeInformation>, SizeT, Boolean>>()),
         metaDataDecoded.TypeName);
 
     Asserts::AssertEqual(metaDataDecoded.TypeClass, Core::CTTI::EType::Tuple);

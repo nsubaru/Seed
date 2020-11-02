@@ -5,7 +5,7 @@
 
 #include "Seed.Core.Services.AutomaticSelfTesting.h"
 #include "Seed.Core.Services.CoreLogger.h"
-#include "Seed.Core.Services.SystemTaskPoolService.h"
+#include "Seed.Core.Services.SystemThreadPoolService.h"
 #include "Seed.Core.Services.InternalSensors.h"
 #include "Seed.Core.Services.EventService.h"
 #include "Seed.Core.Services.ExcecutableStatusManagment.h"

@@ -485,5 +485,6 @@ void CatchIt(
 //   unwind.
 //
 extern "C" int __cdecl __FrameUnwindFilter(
-    EXCEPTION_POINTERS * pExPtrs
+    EXCEPTION_POINTERS * pExPtrs,
+    EHExceptionRecord * pOuterExcept
 );

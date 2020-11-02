@@ -17,7 +17,7 @@ namespace Seed
 			class TestResult : IDisposable, public Serilization::ISerilizable<TestResult> {
 			public:
 				enum class EStatus : UInt8 {
-					Success, Failure, Exception, Canceled
+					Success, Failure, Exception, Canceled, Uknown
 				};
 			private:
 				struct Data {
@@ -57,15 +57,21 @@ namespace Seed
 			private:
 				virtual void Dispose() override {}
 			public:
+				TestResult()
+					: This(new Data(EStatus::Uknown, String(), String(), {})) {}
+
 				TestResult(const String& testName, EStatus status, const String& message, Time::TimeSpan durration)
 					: This(new Data(status, testName, message, durration)) {}
+
 				TestResult(String&& testName, EStatus status, const String& message, Time::TimeSpan durration)
 					: This(new Data(status, MoveRValue(testName), message, durration)) {}
+
 				TestResult(const String& testName, EStatus status, String&& message, Time::TimeSpan durration)
 					: This(new Data(status, testName, message, durration)) {}
+
 				TestResult(String&& testName, EStatus status, String&& message, Time::TimeSpan durration)
 					: This(new Data(status, MoveRValue(testName), MoveRValue(message), durration)) {}
-
+			public:
 				EStatus GetStatus() const {
 					return This->Status;
 				}

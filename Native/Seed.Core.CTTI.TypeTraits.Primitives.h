@@ -133,6 +133,18 @@ namespace Seed
 						static constexpr Boolean LogicFalse = false;
 					};
 #pragma endregion
+#pragma region Memory::DataSizeT
+					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<Memory::DataSizeT, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<Boolean, EType::Numeric, true, TIsConst, TIsVolatile>
+					{
+						using TNumeric = Memory::DataSizeT::ByteSizeT;
+
+						static constexpr TNumeric Max = Math::Max<TNumeric>();
+						static constexpr TNumeric Min = Math::Min<TNumeric>();
+
+						static constexpr Boolean IsSigned = Seed::TypeTraits::IsSigned<TNumeric>;
+						static constexpr Boolean IsUnsigned = Seed::TypeTraits::IsUnsigned<TNumeric>;
+					};
+#pragma endregion
 #pragma region RefCountT
 					template<bool TIsConst, bool TIsVolatile> struct CTTITypeDataImpl<RefCountT, TIsConst, TIsVolatile> : BaseCTTITypeDataImpl<Boolean, EType::Numeric, true, TIsConst, TIsVolatile>
 					{

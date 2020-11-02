@@ -131,31 +131,9 @@ __forceinline constexpr Seed::Core::CharStr operator "" U(const wchar_t* const t
 	return const_cast<const CharStr>(text); //-V2533
 }
 
-__forceinline constexpr Seed::Core::Bytes operator "" Kb(const unsigned long long size) {
-	using namespace Seed;
-	return size * 1024;
-}
-
-__forceinline constexpr Seed::Core::Bytes operator "" Mb(const unsigned long long size) {
-	using namespace Seed;
-	return size * 1024Kb;
-}
-
-__forceinline constexpr Seed::Core::Bytes operator "" Gb(const unsigned long long size) {
-	using namespace Seed;
-	return size * 1024Mb;
-}
-
-__forceinline constexpr Seed::Core::Bytes operator "" Tb(const unsigned long long size) {
-	using namespace Seed;
-	return size * 1024Gb;
-}
-
 __forceinline constexpr Seed::SizeT operator "" Sz(const unsigned long long size) {
 	using namespace Seed;
 	return static_cast<Seed::SizeT>(size);
 }
-
-#pragma warning(pop)
 
 #define interface __interface

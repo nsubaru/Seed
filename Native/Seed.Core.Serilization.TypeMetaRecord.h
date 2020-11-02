@@ -199,7 +199,7 @@ namespace Seed
                 /// </summary>
                 Containers::BaseList<THeap, BaseTypeMetaDataRecord> Property(GetNestedTypes) NestedTypes;
             private:
-                SizeT GetMetaDataMaxStringSize() const {
+                Memory::DataSizeT GetMetaDataMaxStringSize() const {
                     
                     constexpr auto GetTypeNameCharacterTypeSize = 
                         CTTI::TypeTraits::CTTITypeMetaData<typename Core::TypeTraits::RemoveCVRefV<decltype(GetTypeName())>>::CharacterTypeMetaData::Size;
@@ -213,13 +213,15 @@ namespace Seed
                     constexpr auto SizeTValueMaxSize = 
                         CTTI::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<SizeT>::Max>().Count;
                     
-                    return BracketSize +
-                        (TypeName.Size * sizeof(GetTypeNameCharacterTypeSize)) + DelimiterSize +
+                    auto fullSize = BracketSize +
+                        (TypeName.Lenght * sizeof(GetTypeNameCharacterTypeSize)) + DelimiterSize +
                         ETypeValueMaxSize + DelimiterSize +
                         SizeTValueMaxSize + DelimiterSize +
                         SizeTValueMaxSize + DelimiterSize +
-                        (AdditionalInfo.Size * sizeof(GetGetAdditionalInfoCharacterTypeSize)) + DelimiterSize +
-                        NestedTypes.Aggregate<SizeT>(ArrowFunct(value, item, value + item.GetMetaDataMaxStringSize()));
+                        (AdditionalInfo.Lenght * sizeof(GetGetAdditionalInfoCharacterTypeSize)) + DelimiterSize;
+
+                    return Memory::DataSizeT(fullSize) + 
+                        NestedTypes.Aggregate<Memory::DataSizeT>(ArrowFunct(value, item, value + item.GetMetaDataMaxStringSize()));
                 }
             private:
                 void ToStringImpl(BaseString<THeap>& buffer) const {

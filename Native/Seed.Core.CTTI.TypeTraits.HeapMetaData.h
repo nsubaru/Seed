@@ -26,12 +26,12 @@ namespace Seed
 							return Memory::Heap().CurrentMemBlkCount();
 						}
 
-						static SizeT CurrentAllocatedMemory()
+						static Memory::DataSizeT CurrentAllocatedMemory()
 						{
 							return Memory::Heap().CurrentAllocatedMemory();
 						}
 
-						static SizeT CurrentHeapUsage()
+						static Memory::DataSizeT CurrentHeapUsage()
 						{
 							return Memory::Heap().CurrentHeapUsage();
 						}
@@ -52,12 +52,12 @@ namespace Seed
 							return Memory::SensitiveDataHeap().CurrentMemBlkCount();
 						}
 
-						static SizeT CurrentAllocatedMemory()
+						static Memory::DataSizeT CurrentAllocatedMemory()
 						{
 							return Memory::SensitiveDataHeap().CurrentAllocatedMemory();
 						}
 
-						static SizeT CurrentHeapUsage()
+						static Memory::DataSizeT CurrentHeapUsage()
 						{
 							return Memory::SensitiveDataHeap().CurrentHeapUsage();
 						}

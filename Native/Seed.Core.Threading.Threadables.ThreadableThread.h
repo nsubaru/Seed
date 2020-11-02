@@ -1,0 +1,177 @@
+#pragma once
+#include "Seed.Core.Threading.Threadables.Base.h"
+
+namespace Seed {
+	inline namespace Core {
+		namespace Threading {
+			namespace Threadables {
+				/// <summary>
+				/// Об'єки потоку в процесі виконання
+				/// </summary>
+				class ThreadableThread final : public Seed::Core::Threading::IThreadable {
+				private:
+					Thread thread;
+				protected:
+					ThreadableThread(const Thread& thread) : thread(thread) {}
+				protected:
+					friend ThreadableRef RegisterThreadThreadable(const Thread& thread, volatile EThreadabledStates* State);
+					friend void UnRegisterThreadThreadable(ThreadableRef&& ref);
+				public:
+					/// <summary>
+					/// Копіювальний конструктор
+					/// </summary>
+					/// <param name="from">Оригинал</param>
+					ThreadableThread(const ThreadableThread& from) : thread(from.thread) {}
+
+					/// <summary>
+					/// Конструктор переміщення
+					/// </summary>
+					/// <param name="from">Оригинал</param>
+					ThreadableThread(ThreadableThread&& from) : thread(MoveRValue(from.thread)) {}
+
+					/// <summary>
+					/// Оператор копіювання
+					/// </summary>
+					/// <param name="from">Правий операнд</param>
+					/// <returns>Посилання на поточний об'єкт</returns>
+					ThreadableThread& operator=(const ThreadableThread& from) {
+						this->~ThreadableThread();
+						this->ThreadableThread::ThreadableThread(from);
+						return *this;
+					}
+
+					/// <summary>
+					/// Оператор переміщення
+					/// </summary>
+					/// <param name="from">Правий операнд</param>
+					/// <returns>Посилання на поточний об'єкт</returns>
+					ThreadableThread& operator=(ThreadableThread&& from) {
+						this->~ThreadableThread();
+						this->ThreadableThread::ThreadableThread(MoveRValue(from));
+						return *this;
+					}
+				public:
+					/// <summary>
+					/// Вертає новий референс
+					/// </summary>
+					/// <returns></returns>
+					virtual SmartPtr<IThreadable> MakeRef() const {
+						return new ThreadableThread(*this);
+					}
+				public:
+					/// <summary>
+					/// Отримання імені сутності
+					/// </summary>
+					/// <returns>Рядкове представлення імені</returns>
+					virtual const String& GetName() const {
+						return thread.Name;
+					}
+
+					/// <summary>
+					/// Встановлення імені сутності
+					/// </summary>
+					/// <param name="NewName">Нове ім'я сутності</param>
+					virtual void SetName(const String& NewName) {
+						thread.Name = NewName;
+					}
+
+					/// <summary>
+					/// Встановлення імені сутності
+					/// </summary>
+					/// <param name="NewName">Нове ім'я сутності</param>
+					virtual void SetName(String&& NewName) {
+						thread.Name = MoveRValue(NewName);
+					}
+
+					/// <summary>
+					/// Ідентифікатор сутності
+					/// </summary>
+					/// <returns></returns>
+					virtual ID GetID() const {
+						return thread.TID;
+					}
+
+					/// <summary>
+					/// Тип потокової сутності
+					/// </summary>
+					/// <returns>Тип потокової сутності</returns>
+					virtual EThreadableTypes GetThreadableType() const {
+						return EThreadableTypes::Thread;
+					}
+
+					/// <summary>
+					/// Стан потокової сутності
+					/// </summary>
+					/// <returns>Стан потокової сутності</returns>
+					virtual EThreadabledStates GetThreadabledState() const {
+						return thread.ThreadState;
+					}
+
+					/// <summary>
+					/// Заморозка виконання потокової сутності
+					/// </summary>
+					/// <returns>Посилання на об'єкт</returns>
+					virtual IThreadable& Suspend() {
+						thread.Suspend();
+						return *this;
+					}
+					/// <summary>
+					/// Розмороження виконання потокової сутності
+					/// </summary>
+					/// <returns>Посилання на об'єкт</returns>
+					virtual IThreadable& Resume() {
+						thread.Resume();
+						return *this;
+					}
+
+					/// <summary>
+					/// Переривання виконання потокової сутності
+					/// </summary>
+					/// <returns>Посилання на об'єкт</returns>
+					virtual IThreadable& Interupt() {
+						thread.Interupt();
+						return *this;
+					}
+
+					/// <summary>
+					/// Очікувння завершення потокової сутності
+					/// </summary>
+					/// <returns>Посилання на об'єкт</returns>
+					virtual IThreadable& Join() {
+						thread.Join();
+						return *this;
+					}
+
+					/// <summary>
+					/// Очікувння завершення потокової сутності з таймаутом
+					/// </summary>
+					/// <param name="timeOut">Максимальний час очікування</param>
+					/// <returns>Посилання на об'єкт</returns>
+					virtual IThreadable& Join(Time::TimeSpan timeOut) {
+						thread.Join(timeOut);
+						return *this;
+					}
+
+					/// <summary>
+					/// Очікувння завершення потокової сутності
+					/// </summary>
+					/// <returns>Посилання на об'єкт</returns>
+					virtual const IThreadable& Join() const {
+						thread.Join();
+						return *this;
+					}
+
+					/// <summary>
+					/// Очікувння завершення потокової сутності з таймаутом
+					/// </summary>
+					/// <param name="timeOut">Максимальний час очікування</param>
+					/// <returns>Посилання на об'єкт</returns>
+					virtual const IThreadable& Join(Time::TimeSpan timeOut) const {
+						thread.Join(timeOut);
+						return *this;
+					}
+				};
+			}
+		}
+	}
+}

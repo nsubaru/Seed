@@ -3,7 +3,7 @@
 
 namespace Seed {
 	inline namespace Core {
-		namespace Testing::Test::FS::ObjectProvider {
+		namespace Testing::Test::IO::FS::ObjectProvider {
 			class QueryWindowsFolder final : public TestClass<QueryWindowsFolder> {
 				virtual bool Excecute() override;
 			};

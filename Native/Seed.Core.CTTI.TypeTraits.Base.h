@@ -29,20 +29,16 @@ namespace Seed
 				concept IsLogicCttiType = Core::Concepts::IsSame<T, Boolean>;
 
 				template<typename T>
-				concept IsNumericCttiType = Core::TypeTraits::IsIntegerNumber<T>;
+				concept IsNumericCttiType = 
+					Core::TypeTraits::IsIntegerNumber<T> || 
+					Core::TypeTraits::IsSameV<RefCountT, T> || 
+					Core::TypeTraits::IsSameV<Memory::DataSizeT, T>;
 
 				template<typename T>
 				concept IsEnumertationCttiType = Core::TypeTraits::IsEnumV<T>;
 
 				template<typename T>
 				concept IsCharacterCttiType = Core::TypeTraits::IsCharacter<T>;
-
-				template<typename T>
-				concept IsNtTimeCttiType =
-					Core::TypeTraits::IsSameV<T, Time::Date> ||
-					Core::TypeTraits::IsSameV<T, Time::DateTime> ||
-					Core::TypeTraits::IsSameV<T, Time::TimeSpan> ||
-					Core::TypeTraits::IsSameV<T, Time::DateSpan>;
 
 				template<typename T>
 				concept IsCollectionCttiType = Core::TypeTraits::IsBasedOnV<Containers::LINQ::ICollectionGenericBase, T>;

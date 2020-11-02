@@ -81,29 +81,29 @@ namespace Seed {
             ///<summary>Конструктор з готової константного рядка</summary>
             ///<param name = "Text">Літерал рядка</param>
             ForceInline BaseString(const ConstString& Text) {
-                if (Text.Size < 2)
+                if (Text.Lenght < 2)
                 {
                     this->str = nullptr;
                     this->CurrentSize = this->ReservedSize = 0;
                 }
                 else {
-                    CurrentSize = Text.Size;
+                    CurrentSize = Text.Lenght;
                     ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
-                    Memory::Copy(Text.Str, this->str, Text.Size * sizeof(Char));
+                    Memory::Copy(Text.Str, this->str, Text.Lenght * sizeof(Char));
                 }
             }
 
             ///<summary>Конструктор з готової константного ASCII рядка</summary>
             ///<param name = "str">Константний рядок</param>
             BaseString(const ConstAString& cstr) {
-                if (cstr.Size < 2)
+                if (cstr.Lenght < 2)
                 {
                     this->str = nullptr;
                     this->CurrentSize = this->ReservedSize = 0;
                 }
                 else {
-                    CurrentSize = cstr.Size;
+                    CurrentSize = cstr.Lenght;
                     ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                     CharStr temp_str = this->str;
@@ -196,14 +196,14 @@ namespace Seed {
             ///<summary>Конструктор з стартовим резервованим розміром</summary>
             ///<param name = "StartSize">Стартовий розмір в кількості символів без нуль-термінатора</param>
             ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
-            ForceInline explicit BaseString(SizeT StartSize) {
-                if (StartSize > Math::Max<SizeT>())
-                    Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize);
-                if (StartSize == 0 || StartSize < CurrentSettings().MemoryManager.StringReserveSize)
-                    StartSize = CurrentSettings().MemoryManager.StringReserveSize;
-                this->ReservedSize = StartSize + 1;
+            ForceInline explicit BaseString(Memory::DataSizeT StartSize) {
+                if (StartSize.Bytes == Math::Max<SizeT>())
+                    Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize.Bytes);
+                if (StartSize.Bytes == 0 || StartSize.Bytes < CurrentSettings().MemoryManager.StringReserveSize)
+                    StartSize = Memory::DataSizeT(CurrentSettings().MemoryManager.StringReserveSize);
+                this->ReservedSize = (StartSize.Bytes / 2) + 1;
                 this->CurrentSize = 1;
-                this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
+                this->str = (CharStr)BaseString::operator new[](ReservedSize * 2);
                 this->str[0] = L'\0';
             }
 
@@ -528,7 +528,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             ForceInline StrongOrdering operator<=>(const ConstString& right) const {
-                auto res = Internals::CompareString(this->str, (Char*)right.Str, this->Lenght, right.GetSize() - 1);
+                auto res = Internals::CompareString(this->str, (Char*)right.Str, this->Lenght, right.GetLenght() - 1);
                 if (res == 0)
                     return StrongOrdering::equal;
                 else if (res > 0)
@@ -543,7 +543,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             ForceInline StrongOrdering operator<=>(const ConstAString& right) const {
-                auto countedSize = Min(this->Size, right.Size);
+                auto countedSize = Min(this->Size, right.Lenght);
 
                 for (SizeT i = 0; i < countedSize; i++)
                 {
@@ -556,7 +556,7 @@ namespace Seed {
                     }
                 }
 
-                return (this->Size <=> right.Size);
+                return (this->Size <=> right.Lenght);
             }
 
             /// <summary>
@@ -1020,31 +1020,39 @@ namespace Seed {
             /// <summary>
             /// Вертає поточну довжину рядка з нуль-термінатором
             /// </summary>
-            ForceInline SizeT GetSize() const {
+            ForceInline SizeT GetFullLenght() const {
                 return CurrentSize;
             }
 
             /// <summary>
             /// Поточна довжина рядка з нуль-термінатором
             /// </summary>
-            SizeT Property(GetSize) Size;
+            SizeT Property(GetFullLenght) Size;
 
+            ///<summary>Вертає істину якщо рядок пустий</summary>
+            ForceInline Boolean GetIsEmpty() const { return GetFullLenght() == 0; }
+            ///<summary>Вертає істину якщо рядок пустий</summary>
+            Boolean Property(GetIsEmpty) IsEmpty;
+
+            /// <summary>
+            /// Розмір даних
+            /// </summary>
+            /// <returns>Розмір даних</returns>
+            Memory::DataSizeT GetSize() const { return Memory::DataSizeT(CurrentSize * sizeof(Char)); }
             /// <summary>
             /// Вертає розмір буфера рядка
             /// </summary>
-            ForceInline SizeT GetBufferSize() const {
-                return ReservedSize;
-            }
+            Memory::DataSizeT GetBufferSize() const { return Memory::DataSizeT(ReservedSize * sizeof(Char)); }
 
             /// <summary>
             /// Розмір буфера рядка
             /// </summary>
-            SizeT Property(GetBufferSize) BufferSize;
+            Memory::DataSizeT Property(GetSize) Size;
 
-            ///<summary>Вертає істину якщо рядок пустий</summary>
-            ForceInline Boolean GetIsEmpty() const { return GetSize() == 0; }
-            ///<summary>Вертає істину якщо рядок пустий</summary>
-            Boolean Property(GetIsEmpty) IsEmpty;
+            /// <summary>
+            /// Розмір буфера
+            /// </summary>
+            Memory::DataSizeT Property(GetBufferSize) BufferSize;
 
             ///<summary>Конвертація в масив байт. Якщо рядок пустий верне пустий масив</summary>
             ///<returns>Масив байт який є копією вмісту рядка</returns>

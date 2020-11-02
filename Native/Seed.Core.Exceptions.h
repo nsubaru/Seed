@@ -18,27 +18,27 @@ namespace Seed {
 				///<summary>Виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<returns>Виділену ділянку</returns>
-				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(SizeT Size) final;
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Allocate(DataSizeT Size) final;
 				///<summary>Вирівнняне виділення пам'яті</summary>
 				///<param name='Size'>Розмір ділянки в байтах</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
 				///<returns>Виділену ділянку</returns>
-				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(SizeT Size, SizeT AllocationReq) final;
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedAllocate(DataSizeT Size, DataSizeT AllocationReq) final;
 
 				///<summary>Звільнення пам'яті</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
-				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) final;
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* Free(void* MemBlk) final;
 				///<summary>Звільнення пам'яті яка буа виділена по границі</summary>
 				///<param name='MemBlk'>Блок пам'яті який звільняється</param>
 				///<param name='AllocationReq'>Границя вирівнювання</param>
-				virtual SeedKernelCall DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, SizeT AllocationReq) final;
+				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, DataSizeT AllocationReq) final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SeedKernelCall SizeT CurrentMemBlkCount() noexcept final;
+				virtual SizeT CurrentMemBlkCount() noexcept final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentAllocatedMemory() noexcept final;
+				virtual DataSizeT CurrentAllocatedMemory() noexcept final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual SeedKernelCall SizeT CurrentHeapUsage() noexcept final;
+				virtual DataSizeT CurrentHeapUsage() noexcept final;
 
 				ExceptionHeap& operator=(const ExceptionHeap&) = delete;
 			};
@@ -49,12 +49,12 @@ namespace Seed {
 		{
 			///<summary>Класс базової помилки</summary>
 			class Exception;
-		}
 
-		///<summary>Рядок для збереження тексту помилок</summary>
-		namespace { using ExceptionString = BaseString<Memory::ExceptionHeap>; }
-		/// <summary> Об'єкт для збереження помилки  </summary>
-		namespace { using ExceptionHolderType = BaseSmartPtr<Memory::ExceptionHeap, Exception>; }
+			///<summary>Рядок для збереження тексту помилок</summary>
+			namespace { using ExceptionString = BaseString<Memory::ExceptionHeap>; }
+			/// <summary> Об'єкт для збереження помилки  </summary>
+			namespace { using ExceptionHolderType = BaseSmartPtr<Memory::ExceptionHeap, Exception>; }
+		}
 
 		///<summary>Підсистема помилок в рантаймі</summary>
 		inline namespace Exceptions {
@@ -68,7 +68,7 @@ namespace Seed {
 					/// <summary>
 					/// Максимальна кількість адресів функцій які можуть зберігатись в сховищі
 					/// </summary>
-					static inline constexpr SizeT MaxStackTraceItemCount = 8Kb / sizeof(SizeT);
+					static inline constexpr SizeT MaxStackTraceItemCount = (8Kb).Bytes / sizeof(SizeT);
 
 					/// <summary>
 					/// Реальна кількість адресів функцій
@@ -110,8 +110,9 @@ namespace Seed {
 				///<summary>Внутрішня помилка</summary>
 				ExceptionHolderType innerException;
 			private:
-				static SeedKernelCall ID GetTargetThreadID();
-				friend SeedKernelCall void GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace);
+				static ID GetTargetThreadID();
+				friend void GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace);
+				friend ExceptionHolderType* GetInnerExceptionObjectPtr(Exception* exception);
 			public:
 				/// <summary>
 				/// Копіювальний конструктор 
@@ -240,6 +241,9 @@ namespace Seed {
 				///<summary>Деструктор оголошений для правильного знищення об'єктів які наслідуються</summary>
 				virtual ~Exception() {}
 			public:
+				/// <summary>
+				/// Не оброблена помилка
+				/// </summary>
 				class RawException final : IDisposable {
 				private:
 					struct Data : Memory::Allocator<Memory::ExceptionHeap> {
@@ -255,8 +259,14 @@ namespace Seed {
 				protected:
 					virtual void Dispose() override final;
 				public:
+					/// <summary>
+					/// Пустий конструктор
+					/// </summary>
 					RawException() :This(new Data(nullptr)) {};
 
+					/// <summary>
+					/// Генерує збережену помилку
+					/// </summary>
 					void ThrowThis() {
 						ThrowRawException(*this);
 					}
@@ -266,9 +276,21 @@ namespace Seed {
 					friend Exception;
 				};
 			public:
-				static SeedKernelCall RawException StoreCurrentException();
-				static SeedKernelCall void ThrowRawException(RawException& exception);
+				/// <summary>
+				/// Зберігає поточний об'єкт помилкт
+				/// </summary>
+				/// <returns></returns>
+				static RawException StoreCurrentException();
+				/// <summary>
+				/// Генерує збережену помилку
+				/// </summary>
+				/// <param name="exception">Збережена помилка</param>
+				static void ThrowRawException(RawException& exception);
 			public:
+				/// <summary>
+				/// Клонує помилку
+				/// </summary>
+				/// <returns></returns>
 				virtual ExceptionHolderType Clone() const override {
 					return ExceptionHolderType(new Exception(*this));
 				}
@@ -1183,7 +1205,18 @@ namespace Seed {
 				NtException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, Int32 StatusCode)
 					noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 				{}
+			public:
+				/// <summary>
+				/// Повертає код помилки
+				/// </summary>
+				/// <returns>Код помилки</returns>
+				Int32 GetCode() const { return statusCode; }
 
+				/// <summary>
+				/// Код помилки
+				/// </summary>
+				Int32 Property(GetCode) Code;
+			public:
 				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({

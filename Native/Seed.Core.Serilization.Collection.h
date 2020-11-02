@@ -213,7 +213,7 @@ namespace Seed
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && TypeTraits::IsConstructible<T>)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 						{
 							SizeT Count = 0;
 							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);
@@ -221,6 +221,7 @@ namespace Seed
 							if constexpr (!TCollectionClass::IsDynamic)
 							{
 								data = TCollectionClass(Count);
+
 								for (SizeT i = 0; i < Count; i++)
 								{
 									T tmp = T();
@@ -231,9 +232,10 @@ namespace Seed
 							else
 							{
 								data = TCollectionClass();
+
 								for (SizeT i = 0; i < Count; i++)
 								{
-									T tmp = T();
+									T tmp;
 									BaseSerlizationHandler<THeap, T>::DeserelizeImpl(tmp, rawStream, offset, registry);
 									data.UnsafeAdd(MoveRValue(tmp));
 								}
@@ -321,12 +323,13 @@ namespace Seed
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && TypeTraits::IsConstructible<T>)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 						{
-							SizeT Count;
+							SizeT Count = 0;
 							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);
 
 							data = TCollectionClass();
+
 							for (SizeT i = 0; i < Count; i++)
 							{
 								T tmp = T();
@@ -418,7 +421,7 @@ namespace Seed
                     }
 
 					ForceInline static void DeserelizeImpl(TCollectionClass& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
-						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && TypeTraits::IsConstructible<T>)
+						if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 						{
 							SizeT Count = 0;
 							BaseSerlizationHandler<THeap, SizeT>::DeserelizeImpl(Count, rawStream, offset, registry);

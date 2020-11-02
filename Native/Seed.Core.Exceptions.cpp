@@ -30,7 +30,7 @@ struct ExceptionsHeapT
 };
 
 static ForceInline ExceptionsHeapT& GetExceptionsHeap() {
-	static ExceptionsHeapT ExceptionsHeap;
+	static ExceptionsHeapT ExceptionsHeap{};
 	return ExceptionsHeap;
 }
 
@@ -57,8 +57,8 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 	ExceptionsHeap.HeapHandle = RtlCreateHeap(
 		Flags,
 		NULL,
-		cfg.MaxSize,
-		cfg.StartSize,
+		cfg.MaxSize.Bytes,
+		cfg.StartSize.Bytes,
 		NULL,
 		NULL);
 
@@ -78,16 +78,16 @@ void Seed::Core::Stop::Exceptions() noexcept
 	RtlDestroyHeap(ExceptionsHeap.HeapHandle);
 }
 
-SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
+SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Allocate(DataSizeT Size)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(ExceptionsHeap.HeapHandle, 0, nullptr);
 #endif
 	//Якщо розмір задано максимальне можливе значення SizeT то це явно помилка і генеруєм виключення OutOfMemory
-	if (Size == Math::Max<SizeT>())
+	if (Size.Bytes == Math::Max<SizeT>())
 		return nullptr;
 	//Обчислюєм повний розмір ділянки пам'яті
-	SizeT FullSize = sizeof(SizeT) + Size;
+	SizeT FullSize = sizeof(SizeT) + Size.Bytes;
 	//Пробуєм виділити ділянку пам'яті з кучі
 	SizeT* obj = (SizeT*)RtlAllocateHeap(ExceptionsHeap.HeapHandle, 0, FullSize);
 	//Якщо покажчик рівний nullptr то це значить що не можливо виділити пам'ять, а це значить що не достатньо пам'яті в системі
@@ -95,29 +95,29 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Allocate(SizeT Size)
 	if (obj == nullptr)
 		return nullptr;
 	//Записуєм розмір ділянки в заголовок
-	obj[0] = Size;
+	obj[0] = Size.Bytes;
 	//Атомарно оновлюєм статистику
 	InterlockedIncrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-	InterlockedExchangeAddSizeT(&ExceptionsHeap.AllocatedMemory, Size);
+	InterlockedExchangeAddSizeT(&ExceptionsHeap.AllocatedMemory, Size.Bytes);
 	InterlockedExchangeAddSizeT(&ExceptionsHeap.CurrentHeapSize, FullSize);
 	//Вертаєм покажчик на ділянку після заголовку
 	return obj + 1;
 }
 
-SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT Size, SizeT AllocationReq)
+SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedAllocate(DataSizeT Size, DataSizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(ExceptionsHeap.HeapHandle, 0, nullptr);
 #endif
 	//Якщо вирівннювання 0 або 1 то це означає що вирівнювання не потрібне,
 	//а отже викликаєм просте виділення пам'яті
-	if (AllocationReq == 0 || AllocationReq == 1)
+	if (AllocationReq.Bytes == 0 || AllocationReq.Bytes == 1)
 		return Allocate(Size);
 	//Пробуєм виділити пам'ять з кучі
 	//Виділяєм ділянку більшу для того щоб помістити розмір і реальний початок ділянки пам'яті
 	//Також враховуєм що ділянка може бути не вирівнена тому додаєм AllocationReq до розміру,
 	//щоб гарантувати щоб вирівнений адрес знайдеться в ділянці
-	void* obj = RtlAllocateHeap(ExceptionsHeap.HeapHandle, 0, Size + AllocationReq + sizeof(SizeT) + sizeof(SizeT)); //-V119
+	void* obj = RtlAllocateHeap(ExceptionsHeap.HeapHandle, 0, Size.Bytes + AllocationReq.Bytes + sizeof(SizeT) + sizeof(SizeT)); //-V119
 	//Якщо функція вернула nullptr то це значить що або розмір завеликий або пам'яті немає
 	//В обох випадках генеруєм помилку OutOfMemory
 	if (obj == nullptr)
@@ -125,17 +125,17 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedAllocate(SizeT S
 	//Вираховуєм мінімальний можливий адресс початку даних в ділянці пам'яті
 	SizeT Address = ((SizeT)obj) + sizeof(SizeT) + sizeof(SizeT); //-V119
 	//Вираховуєм точний адресс початку ділянки
-	SizeT AllignedAddress = Math::RoundToUpper(Address, AllocationReq) * AllocationReq;
+	SizeT AllignedAddress = Math::RoundToUpper(Address, AllocationReq.Bytes) * AllocationReq.Bytes;
 	//Отримуєм заголовок ділянки пам'яті
 	SizeT* RealPtr = (SizeT*)(AllignedAddress - 2);
 	//Записуєм реальний початок ділянки пам'яті
 	RealPtr[0] = (SizeT)obj;
 	//Та розмір даних
-	RealPtr[1] = Size;
+	RealPtr[1] = Size.Bytes;
 	//Атомарно оновлюєм статитистику
 	InterlockedIncrementSizeTNoFence(&ExceptionsHeap.AllocatedMemBlksCount);
-	InterlockedExchangeAddSizeT(&ExceptionsHeap.AllocatedMemory, Size);
-	InterlockedExchangeAddSizeT(&ExceptionsHeap.CurrentHeapSize, Size + Size + sizeof(SizeT) + sizeof(SizeT));
+	InterlockedExchangeAddSizeT(&ExceptionsHeap.AllocatedMemory, Size.Bytes);
+	InterlockedExchangeAddSizeT(&ExceptionsHeap.CurrentHeapSize, Size.Bytes + AllocationReq.Bytes + sizeof(SizeT) + sizeof(SizeT));
 	//Вертаєм покажчик на початок даних
 	return (void*)AllignedAddress;
 }
@@ -165,7 +165,7 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::Free(void* MemBlk)
 	else return MemBlk;
 }
 
-SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBlk, SizeT AllocationReq)
+SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBlk, DataSizeT AllocationReq)
 {
 #if PreReleaseMode || DebugMode
 	RtlValidateHeap(ExceptionsHeap.HeapHandle, 0, nullptr);
@@ -179,7 +179,7 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBl
 	//Отрмуєм покажчик на початок ділянки пам'яті
 	void* RealPtr = (void*)Header[1];
 	//Обчислюєм повний розмір ділянки пам'яті
-	SizeT FullSize = sizeof(SizeT) + sizeof(SizeT) + AllocationReq + DataSize;
+	SizeT FullSize = sizeof(SizeT) + sizeof(SizeT) + AllocationReq.Bytes + DataSize;
 	//Пробуєм звільнити ділянку пам'яті
 	if (RtlFreeHeap(ExceptionsHeap.HeapHandle, 0, RealPtr)) {
 		//Якшо успішно то оновлюєм статистику
@@ -197,14 +197,14 @@ SizeT Seed::Core::Memory::ExceptionHeap::CurrentMemBlkCount() noexcept
 	return ExceptionsHeap.AllocatedMemBlksCount;
 }
 
-SizeT Seed::Core::Memory::ExceptionHeap::CurrentAllocatedMemory() noexcept
+Seed::Core::Memory::DataSizeT Seed::Core::Memory::ExceptionHeap::CurrentAllocatedMemory() noexcept
 {
-	return ExceptionsHeap.AllocatedMemory;
+	return DataSizeT(ExceptionsHeap.AllocatedMemory);
 }
 
-SizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsage() noexcept
+Seed::Core::Memory::DataSizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsage() noexcept
 {
-	return ExceptionsHeap.CurrentHeapSize;
+	return DataSizeT(ExceptionsHeap.CurrentHeapSize);
 }
 
 #pragma warning(pop)
@@ -255,7 +255,7 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 				__debugbreak();
 	#endif
 			EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)exData->ExceptionRecord; //-V1027
-			NullPointException::Types type;
+			NullPointException::Types type{};
 			switch (sehException->ExceptionInformation[0])
 			{
 			case 0:
@@ -415,7 +415,7 @@ Seed::Exception::RawException Seed::Core::Exceptions::Exception::StoreCurrentExc
     void* ptr = nullptr;
     StoreException(ptr, [] (SizeT size) -> void*
     {
-        return Seed::Core::Memory::ExceptionHeap().Allocate(size);
+        return Seed::Core::Memory::ExceptionHeap().Allocate(Memory::DataSizeT(size));
     });
     return RawException(ptr);
 }
@@ -431,6 +431,26 @@ void Seed::Core::Exceptions::Exception::RawException::Dispose() {
 		Seed::Core::Memory::ExceptionHeap().Free(ptr);
 	});
 }
+namespace Seed {
+	inline namespace Core {
+		inline namespace Exceptions {
+			ExceptionHolderType* GetInnerExceptionObjectPtr(Exception* exception)
+			{
+				return &exception->innerException;
+			}
+		}
+	}
+}
+
+
+void StoreInnerException(Exception* outerException, Exception* innnerException) {
+	auto place = GetInnerExceptionObjectPtr(outerException);
+	while ((*place) != nullptr) {
+		place = GetInnerExceptionObjectPtr(place->operator->());
+	}
+	(*place) = innnerException->Clone();
+}
+
 #pragma endregion
 
 #pragma region VEH handler
@@ -465,7 +485,7 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 			__debugbreak();
 #endif
 		EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)ExceptionInfo->ExceptionRecord; //-V1027
-		NullPointException::Types type;
+		NullPointException::Types type{};
 		switch (sehException->ExceptionInformation[0])
 		{
 		case 0:
@@ -483,6 +503,8 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 		}
 		Throw(Seed::NullPointException(ExceptionPosition, sehException->ExceptionInformation[1], type));
 	}
+	case STATUS_INVALID_PARAMETER:
+		Throw(InvalidArgumentException(ExceptionPosition, L"ntapi", L"From NT Api"));
 	break;
 	default:
 		break;

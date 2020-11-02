@@ -96,9 +96,9 @@ namespace Seed {
 		public:
 			///<summary>Конструктор константного ASCII рядка</summary>
 			///<param name = "Text">Рядковий літерал ASCII символів</param>
-			///<param name = "Size">Його розмір</param>
-			template<SizeT Size>
-			constexpr ConstAString(const char(&Text)[Size]) : str(Text), size(Size) {}
+			///<param name = "Lenght">Його розмір</param>
+			template<SizeT TLenght>
+			constexpr ConstAString(const char(&Text)[TLenght]) : str(Text), size(TLenght) {}
 
 			///<summary>Копіювальний конструктор</summary>
 			///<param name = "orig">Оригинал константного рядка</param>
@@ -124,10 +124,10 @@ namespace Seed {
 			}
 
 			///<summary>Вертає розмір константного ASCII рядка</summary>
-			constexpr SizeT GetSize() const { return this->size; }
+			constexpr SizeT GetLenght() const { return this->size; }
 
 			///<summary>Розмір константного ASCII рядка</summary>
-			SizeT Property(GetSize) Size;
+			SizeT Property(GetLenght) Lenght;
 
 			///<summary>Вертає константний масив символів цього константного ASCII рядка</summary>
 			constexpr ConstACharStr GetString() const { return this->str; }
@@ -146,9 +146,9 @@ namespace Seed {
 		public:
 			///<summary>Конструктор константного рядка</summary>
 			///<param name = "Text">Рядковий літерал</param>
-			///<param name = "Size">Його розмір</param>
-			template<SizeT Size>
-			constexpr ConstString(const wchar_t(&Text)[Size]) : str(Text), size(Size) {}
+			///<param name = "Lenght">Його розмір</param>
+			template<SizeT TLenght>
+			constexpr ConstString(const wchar_t(&Text)[TLenght]) : str(Text), size(TLenght) {}
 
 			///<summary>Копіювальний конструктор</summary>
 			///<param name = "orig">Оригинал константного рядка</param>
@@ -174,10 +174,10 @@ namespace Seed {
 			}
 
 			///<summary>Вертає розмір константного рядка</summary>
-			constexpr SizeT GetSize() const { return this->size; }
+			constexpr SizeT GetLenght() const { return this->size; }
 
 			///<summary>Розмір константного рядка</summary>
-			SizeT Property(GetSize) Size;
+			SizeT Property(GetLenght) Lenght;
 
 			///<summary>Вертає константний масив символів цього константного рядка</summary>
 			constexpr ConstCharStr GetString() const { return this->str; }

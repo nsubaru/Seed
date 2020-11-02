@@ -182,10 +182,11 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 	if (lines.Count == 0) return true;
 	try
 	{
-		SizeT worldCount = 0;
-		for (SizeT i = 0; i < lines.Count; i++)
-			worldCount += lines[i].Lenght;
-		ExceptionString data(worldCount);
+		Memory::DataSizeT worldCount = {};
+		for (SizeT i = 0; i < lines.Count; i++) {
+			worldCount += lines[i].Size;
+		}
+		ExceptionString data = ExceptionString(worldCount);
 		data += lines[0];
 		if (lines.Count > 1)
 		{
@@ -228,7 +229,7 @@ bool SeedKernelCall Seed::Core::toCoreLog(const Seed::Containers::Array<Seed::Ex
 	catch (Seed::Exception & ex)
 	{
 		toCoreLog(L"Internal coreLog exeption: ");
-		toCoreLog(ex.Name.Str, ex.Name.Size);
+		toCoreLog(ex.Name.Str, ex.Name.Lenght);
 		toCoreLog(L"Passed data(only first line): ");
 		toCoreLog(lines[0]);
 		return false;
