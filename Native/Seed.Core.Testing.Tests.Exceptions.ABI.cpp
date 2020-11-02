@@ -7,12 +7,8 @@
 
 using namespace Seed;
 
-/// <summary>
-/// Тестова помилка
-/// </summary>
 class TestException : public Exception {
 private:
-	///<summary>Тестове значення</summary>
 	Int32 statusCode;
 public:
 	TestException(const TestException& orig) : Exception(orig), statusCode(orig.statusCode) {}
@@ -20,27 +16,14 @@ public:
 	TestException& operator=(const TestException& from) { this->~TestException(); this->TestException::TestException(from); return *this; }
 	TestException& operator=(TestException&& from) { this->~TestException(); this->TestException::TestException(MoveRValue(from)); return *this; }
 public:
-	///<summary>Конструктор помилки</summary>
-	///<param name = 'File'>Файл в якому згенерована помилка</param>
-	///<param name = 'FunctName'>Ім'я функції</param>
-	///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-	///<param name = 'StatusCode'>Тестове значення</param>
 	TestException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, Int32 StatusCode)
 		noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 	{}
 public:
-	/// <summary>
-	/// Повертає тестовий код
-	/// </summary>
-	/// <returns>Тестовий код</returns>
 	Int32 GetCode() const { return statusCode; }
 
-	/// <summary>
-	/// Тестовий код
-	/// </summary>
 	Int32 Property(GetCode) Code;
 public:
-	///<summary>Текстове представлення інформації про помилку</summary>
 	virtual ExceptionString toString() const override {
 		return ExceptionString::Combine({
 			ExceptionString(exceptionName),
@@ -51,16 +34,13 @@ public:
 			});
 	}
 
-	/// <summary>
-	/// Вертає копію об'єкта помилки
-	/// </summary>
-	/// <returns>Розумний покажчик на об'єкт помилки</returns>
 	virtual ExceptionHolderType Clone() const override {
 		return ExceptionHolderType(new TestException(*this));
 	}
 
 	virtual ~TestException() {}
 };
+
 
 static __declspec(noinline) void ThrowExceptionFunct() {
 	String str = L"123";
