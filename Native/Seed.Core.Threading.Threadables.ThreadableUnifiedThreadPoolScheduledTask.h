@@ -1,7 +1,6 @@
 #pragma once
 #include "Seed.Core.Threading.Threadables.Base.h"
 
-#pragma region Unified thread pool threadables
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
@@ -9,10 +8,10 @@ namespace Seed {
 				/// <summary>
 				/// Об'єкт задачі таймера пулу потоків в процесі виконяння
 				/// </summary>
-				class ThreadableUnifiedThreadPoolSheduledTaskV2 final : public Seed::Core::Threading::IThreadable, public IDisposable {
+				class ThreadableUnifiedThreadPoolScheduledTaskV2 final : public Seed::Core::Threading::IThreadable, public IDisposable {
 				private:
 					struct Data {
-						UnifiedThreadPoolSheduledTask task;
+						UnifiedThreadPoolScheduledTask task;
 						SynchronizeEvent event;
 						volatile EThreadabledStates state;
 						volatile EThreadabledStates secondState;
@@ -23,7 +22,7 @@ namespace Seed {
 						RefCountT RefCount;
 
 						Data(
-							const UnifiedThreadPoolSheduledTask& task,
+							const UnifiedThreadPoolScheduledTask& task,
 							SynchronizeEvent event,
 							Handle hThread,
 							ID threadId,
@@ -44,8 +43,8 @@ namespace Seed {
 				protected:
 					virtual void Dispose() {}
 				protected:
-					ThreadableUnifiedThreadPoolSheduledTaskV2(
-						const UnifiedThreadPoolSheduledTask& task,
+					ThreadableUnifiedThreadPoolScheduledTaskV2(
+						const UnifiedThreadPoolScheduledTask& task,
 						const SynchronizeEvent event,
 						Handle hThread,
 						ID threadId,
@@ -53,15 +52,15 @@ namespace Seed {
 					) :
 						This(new Data(task, event, hThread, threadId, instance)) {}
 				protected:
-					friend ThreadableRef RegisterPoolSheduledThreadable(const UnifiedThreadPoolSheduledTask& task, ImplSpecificT instance);
-					friend void UnRegisterPoolSheduledThreadable(ThreadableRef&& ref);
+					friend ThreadableRef RegisterPoolScheduledThreadable(const UnifiedThreadPoolScheduledTask& task, ImplSpecificT instance);
+					friend void UnRegisterPoolScheduledThreadable(ThreadableRef&& ref);
 				public:
 					/// <summary>
 					/// Вертає новий референс
 					/// </summary>
 					/// <returns></returns>
 					virtual SmartPtr<IThreadable> MakeRef() const {
-						return new ThreadableUnifiedThreadPoolSheduledTaskV2(*this);
+						return new ThreadableUnifiedThreadPoolScheduledTaskV2(*this);
 					}
 				public:
 					/// <summary>
@@ -78,6 +77,14 @@ namespace Seed {
 					/// <param name="NewName">Нове ім'я сутності</param>
 					virtual void SetName(const String& NewName) {
 						This->task.Name = NewName;
+					}
+
+					/// <summary>
+					/// Встановлення імені сутності
+					/// </summary>
+					/// <param name="NewName">Нове ім'я сутності</param>
+					virtual void SetName(String&& NewName) {
+						This->task.Name = MoveRValue(NewName);
 					}
 
 					/// <summary>
@@ -160,10 +167,9 @@ namespace Seed {
 						return *this;
 					}
 				public:
-					RefCountClass(ThreadableUnifiedThreadPoolSheduledTaskV2, This);
+					RefCountClass(ThreadableUnifiedThreadPoolScheduledTaskV2, This);
 				};
 			}
 		}
 	}
 }
-#pragma endregion

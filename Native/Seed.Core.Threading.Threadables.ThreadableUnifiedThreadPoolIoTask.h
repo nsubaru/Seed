@@ -1,7 +1,6 @@
 #pragma once
 #include "Seed.Core.Threading.Threadables.Base.h"
 
-#pragma region Unified thread pool threadables
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
@@ -81,6 +80,14 @@ namespace Seed {
 					}
 
 					/// <summary>
+					/// Встановлення імені сутності
+					/// </summary>
+					/// <param name="NewName">Нове ім'я сутності</param>
+					virtual void SetName(String&& NewName) {
+						This->task.Name = MoveRValue(NewName);
+					}
+
+					/// <summary>
 					/// Ідентифікатор сутності
 					/// </summary>
 					/// <returns></returns>
@@ -126,27 +133,39 @@ namespace Seed {
 					/// Очікувння завершення потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
-					virtual IThreadable& Join();
+					virtual IThreadable& Join() {
+						This->event.Wait();
+						return *this;
+					}
 
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>
 					/// <param name="timeOut">Максимальний час очікування</param>
 					/// <returns>Посилання на об'єкт</returns>
-					virtual IThreadable& Join(Time::TimeSpan timeOut);
+					virtual IThreadable& Join(Time::TimeSpan timeOut) {
+						This->event.Wait(timeOut);
+						return *this;
+					}
 
 					/// <summary>
 					/// Очікувння завершення потокової сутності
 					/// </summary>
 					/// <returns>Посилання на об'єкт</returns>
-					virtual const IThreadable& Join() const;
+					virtual const IThreadable& Join() const {
+						This->event.Wait();
+						return *this;
+					}
 
 					/// <summary>
 					/// Очікувння завершення потокової сутності з таймаутом
 					/// </summary>
 					/// <param name="timeOut">Максимальний час очікування</param>
 					/// <returns>Посилання на об'єкт</returns>
-					virtual const IThreadable& Join(Time::TimeSpan timeOut) const;
+					virtual const IThreadable& Join(Time::TimeSpan timeOut) const {
+						This->event.Wait(timeOut);
+						return *this;
+					}
 				public:
 					RefCountClass(ThreadableUnifiedThreadPoolIoTaskV2, This);
 				};
@@ -154,4 +173,3 @@ namespace Seed {
 		}
 	}
 }
-#pragma endregion

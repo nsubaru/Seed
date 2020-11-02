@@ -91,7 +91,7 @@ namespace Seed
 					return Threading::SystemThreadPool::PostPriorityJob(MoveRValue(action), priority);
 				}
 #pragma endregion
-#pragma region Sheduled task
+#pragma region Scheduled task
 				/// <summary>
 				/// Запуск таймера в системному пулі задач
 				/// </summary>
@@ -99,7 +99,7 @@ namespace Seed
 				/// <param name="name">Ім'я таймера</param>
 				/// <param name="priority">Пріоритет таймера</param>
 				/// <returns>Конструктор таймера</returns>
-				ForceInline Threading::UnifiedThreadPoolSheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, String&& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+				ForceInline Threading::UnifiedThreadPoolScheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, String&& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
 					return Threading::SystemThreadPool::CreatePriorityScheduledTask(MoveRValue(callback), MoveRValue(name), priority);
 				}
 
@@ -110,7 +110,7 @@ namespace Seed
 				/// <param name="name">Ім'я таймера</param>
 				/// <param name="priority">Пріоритет таймера</param>
 				/// <returns>Конструктор таймера</returns>
-				ForceInline Threading::UnifiedThreadPoolSheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, const String& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+				ForceInline Threading::UnifiedThreadPoolScheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, const String& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
 					return Threading::SystemThreadPool::CreatePriorityScheduledTask(MoveRValue(callback), name, priority);
 				}
 
@@ -120,7 +120,7 @@ namespace Seed
 				/// <param name="callback">Колбек таймера</param>
 				/// <param name="priority">Пріоритет таймера</param>
 				/// <returns>Конструктор таймера</returns>
-				ForceInline Threading::UnifiedThreadPoolSheduledTaskBuilder CreateLowPriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
+				ForceInline Threading::UnifiedThreadPoolScheduledTaskBuilder CreateLowPriorityScheduledTask(SmartPtr<Threading::IUnifiedThreadPoolShedulerCallback>&& callback, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium) {
 					return Threading::SystemThreadPool::CreatePriorityScheduledTask(MoveRValue(callback), priority);
 				}
 #pragma endregion

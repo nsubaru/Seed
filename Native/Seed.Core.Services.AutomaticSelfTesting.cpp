@@ -33,7 +33,7 @@ void Seed::Core::Services::AutomatiSelfTestingService::InitAutoTesting()
 		.SetName(L"Automatic self testing task")
 		.Shedule();
 
-	This->testRunnerJob = new Threading::UnifiedThreadPoolSheduledTask(MoveRValue(testTask));
+	This->testRunnerJob = new Threading::UnifiedThreadPoolScheduledTask(MoveRValue(testTask));
 }
 
 void Seed::Core::Services::AutomatiSelfTestingService::StopTesting()

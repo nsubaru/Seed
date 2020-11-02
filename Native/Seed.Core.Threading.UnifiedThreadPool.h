@@ -11,8 +11,8 @@ namespace Seed {
 			class IThreadPoolObject;
 
 			class UnifiedThreadPoolJob;
-			class UnifiedThreadPoolSheduledTask;
-			class UnifiedThreadPoolSheduledTaskBuilder;
+			class UnifiedThreadPoolScheduledTask;
+			class UnifiedThreadPoolScheduledTaskBuilder;
 			class UnifiedThreadPoolIoTask;
 		}
 
@@ -84,8 +84,8 @@ namespace Seed {
 			class IThreadPoolObject;
 
 			class UnifiedThreadPoolJob;
-			class UnifiedThreadPoolSheduledTask;
-			class UnifiedThreadPoolSheduledTaskBuilder;
+			class UnifiedThreadPoolScheduledTask;
+			class UnifiedThreadPoolScheduledTaskBuilder;
 			class UnifiedThreadPoolIoTask;
 
 			class UnifiedThreadPoolBuilder;
@@ -248,17 +248,17 @@ namespace Seed {
 			/// <summary>
 			/// Таймер в пулі задач
 			/// </summary>
-			class UnifiedThreadPoolSheduledTask final : protected IDisposable {
+			class UnifiedThreadPoolScheduledTask final : protected IDisposable {
 			private:
-				friend class UnifiedThreadPoolSheduledTaskBuilder;
-				friend class ThreadableUnifiedThreadPoolSheduledTask;
+				friend class UnifiedThreadPoolScheduledTaskBuilder;
+				friend class ThreadableUnifiedThreadPoolScheduledTask;
 			private:
 				struct Data {
 					String taskName;
 					SmartPtr<IUnifiedThreadPoolShedulerCallback> callback;
 					
 					ImplSpecificT ownerPool;
-					Containers::ConcurencyList<UnifiedThreadPoolSheduledTask>::Iterator poolQueueRef;
+					Containers::ConcurencyList<UnifiedThreadPoolScheduledTask>::Iterator poolQueueRef;
 					
 					
 					Time::DateTime startTime;
@@ -305,16 +305,16 @@ namespace Seed {
 			protected:
 				virtual void Dispose() override;
 			private:
-				ForceInline UnifiedThreadPoolSheduledTask(Data* This) : This(This) {}
+				ForceInline UnifiedThreadPoolScheduledTask(Data* This) : This(This) {}
 			private:
-				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task);
-				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task);
-				friend SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetJobEntryPoint(UnifiedThreadPoolSheduledTask* task);
-				friend void ZeroingTaskHadle(UnifiedThreadPoolSheduledTask* thread);
+				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolScheduledTask* task);
+				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolScheduledTask* task);
+				friend SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetJobEntryPoint(UnifiedThreadPoolScheduledTask* task);
+				friend void ZeroingTaskHadle(UnifiedThreadPoolScheduledTask* thread);
 			private:
-				friend Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolSheduledTask* thread, ImplSpecificT callbackInstance);
-				friend void UnRegisterThreadable(UnifiedThreadPoolSheduledTask* thread, Threadables::ThreadableRef&& ref);
-				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
+				friend Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolScheduledTask* thread, ImplSpecificT callbackInstance);
+				friend void UnRegisterThreadable(UnifiedThreadPoolScheduledTask* thread, Threadables::ThreadableRef&& ref);
+				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolScheduledTask* thread);
 			public:
 				/// <summary>
 				/// Вертай ім'я таймера
@@ -388,7 +388,7 @@ namespace Seed {
 				ForceInline const SmartPtr<IUnifiedThreadPoolShedulerCallback>& GetCallbackObject() const { return This->callback; }
 			public:
 				/// <summary>
-				/// Кількість пройдениз циклів
+				/// Кількість пройдених циклів
 				/// </summary>
 				SizeT Property(GetExecutedCount) ExecutedCount;
 
@@ -433,7 +433,7 @@ namespace Seed {
 				/// </summary>
 				static constexpr auto MaxIntervalLenght = Time::TimeSpan().AddMiliSeconds(Math::Max<Int32>());
 			public:
-				RefCountClass(UnifiedThreadPoolSheduledTask, This);
+				RefCountClass(UnifiedThreadPoolScheduledTask, This);
 			};
 
 
@@ -518,8 +518,8 @@ namespace Seed {
 				};
 			private:
 				friend class UnifiedThreadPoolJob;
-				friend class UnifiedThreadPoolSheduledTask;
-				friend class UnifiedThreadPoolSheduledTaskBuilder;
+				friend class UnifiedThreadPoolScheduledTask;
+				friend class UnifiedThreadPoolScheduledTaskBuilder;
 				friend class UnifiedThreadPoolIoTask;
 
 				friend class UnifiedThreadPoolBuilder;
@@ -546,7 +546,7 @@ namespace Seed {
 					SizeT MaxThreadCount;
 
 					Containers::ConcurencyList<UnifiedThreadPoolJob> JobsQueue;
-					Containers::ConcurencyList<UnifiedThreadPoolSheduledTask> TaskQueue;
+					Containers::ConcurencyList<UnifiedThreadPoolScheduledTask> TaskQueue;
 					Containers::ConcurencyList<UnifiedThreadPoolIoTask> IrpQueue;
 
 					String threadPoolName;
@@ -581,12 +581,12 @@ namespace Seed {
 				static void DestroyConfiguration(PoolConfigureation& poolConfiguration);
 			private:
 				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolJob* jobObj);
-				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task);
+				friend bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolScheduledTask* task);
 				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolJob* jobObj);
-				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task);
+				friend SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolScheduledTask* task);
 
 				friend void UnregisterJobFromJobList(UnifiedThreadPoolJob* jobObj);
-				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread);
+				friend void UnRegisterTaskFromPoolQueue(UnifiedThreadPoolScheduledTask* thread);
 			private:
 				ForceInline UnifiedThreadPool(Data*& This) :This(This) { ++This->RefCount;  }
 			public:
@@ -622,7 +622,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="callback">Колбек таймера</param>
 				/// <returns>Об'єкт побудови таймера</returns>
-				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
+				UnifiedThreadPoolScheduledTaskBuilder SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
 
 				/// <summary>
 				/// Запуск таймера
@@ -630,7 +630,7 @@ namespace Seed {
 				/// <param name="taskName">Ім'я таймера</param>
 				/// <param name="callback">Колбек</param>
 				/// <returns>Об'єкт побудови таймера</returns>
-				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
+				UnifiedThreadPoolScheduledTaskBuilder SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
 
 				/// <summary>
 				/// Запуск таймера
@@ -638,7 +638,7 @@ namespace Seed {
 				/// <param name="taskName">Ім'я таймера</param>
 				/// <param name="callback">Колбек</param>
 				/// <returns>Об'єкт побудови таймера</returns>
-				UnifiedThreadPoolSheduledTaskBuilder SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
+				UnifiedThreadPoolScheduledTaskBuilder SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback);
 			public:
 				/// <summary>
 				/// Вертає кількість зареєстровних задач в пулі
@@ -650,7 +650,7 @@ namespace Seed {
 				/// Вертає кількість зареєстровних таймерів в пулі
 				/// </summary>
 				/// <returns>Кількість зареєстровних таймерів в пулі</returns>
-				ForceInline SizeT GetSheduledTaskCount() const { return This->TaskQueue.Count; }
+				ForceInline SizeT GetScheduledTaskCount() const { return This->TaskQueue.Count; }
 
 				/// <summary>
 				/// Вертає кількість зареєстрованих об'єктів вводу/виводу в пулі
@@ -668,7 +668,7 @@ namespace Seed {
 				/// Вертає список таймерів
 				/// </summary>
 				/// <returns>Список таймерів</returns>
-				Containers::List<UnifiedThreadPoolSheduledTask> GetSheduledTaskList() const { return This->TaskQueue.CopyTo<Containers::List>(); }
+				Containers::List<UnifiedThreadPoolScheduledTask> GetScheduledTaskList() const { return This->TaskQueue.CopyTo<Containers::List>(); }
 
 				/// <summary>
 				/// Вертає список об'єктів вводу виводу
@@ -684,7 +684,7 @@ namespace Seed {
 				/// <summary>
 				/// Кількість зареєстровних таймерів в пулі
 				/// </summary>
-				SizeT Property(GetSheduledTaskCount) SheduledTaskCount;
+				SizeT Property(GetScheduledTaskCount) ScheduledTaskCount;
 
 				/// <summary>
 				/// Кількість зареєстрованих об'єктів вводу/виводу в пулі
@@ -724,7 +724,7 @@ namespace Seed {
 				/// Вертає пріоритет таймерів в пулі потоку
 				/// </summary>
 				/// <returns>Пріоритет таймерів в пулі потоку</returns>
-				ForceInline EPoolThreadsPriority GetSheduledTasksPriority() const { return This->handlesData.TaskConfiguration.Priority; }
+				ForceInline EPoolThreadsPriority GetScheduledTasksPriority() const { return This->handlesData.TaskConfiguration.Priority; }
 
 				/// <summary>
 				/// Вертає пріоритет інформуванні про завершення операцій вводу/виводу в пулів потоків 
@@ -740,7 +740,7 @@ namespace Seed {
 				/// <summary>
 				/// Пріоритет таймерів в пулі потоку
 				/// </summary>
-				EPoolThreadsPriority Property(GetSheduledTasksPriority) SheduledTasksPriority;
+				EPoolThreadsPriority Property(GetScheduledTasksPriority) ScheduledTasksPriority;
 
 				/// <summary>
 				/// Пріоритет інформуванні про завершення операцій вводу/виводу в пулів потоків 
@@ -851,7 +851,7 @@ namespace Seed {
 				ForceInline UnifiedThreadPoolBuilder(const String& threadPoolName) : UnifiedThreadPoolBuilder(String(threadPoolName)) {}
 			public:
 				/// <summary>
-				/// Встновлює пріоритет всіз типів задач
+				/// Встновлює пріоритет всі[ типів задач
 				/// </summary>
 				/// <param name="newThreadPoolPriority">Пріоритет, який буде встановлено</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
@@ -939,7 +939,7 @@ namespace Seed {
 				UnifiedThreadPool CreateThreadPool() &&;
 			private:
 				UnifiedThreadPool::PoolConfigureation CreateJobConfiguration(ImplSpecificT PoolHandle);
-				UnifiedThreadPool::PoolConfigureation CreateSheduledTaskConfiguration(ImplSpecificT PoolHandle);
+				UnifiedThreadPool::PoolConfigureation CreateScheduledTaskConfiguration(ImplSpecificT PoolHandle);
 				UnifiedThreadPool::PoolConfigureation CreateIrpConfiguration(ImplSpecificT PoolHandle);
 			public:
 				/// <summary>
@@ -956,6 +956,10 @@ namespace Seed {
 				UnifiedThreadPoolBuilder(const UnifiedThreadPoolBuilder&) = delete;
 				UnifiedThreadPoolBuilder& operator=(const UnifiedThreadPoolBuilder&) = delete;
 			public:
+				/// <summary>
+				/// Конструктор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
 				ForceInline UnifiedThreadPoolBuilder(UnifiedThreadPoolBuilder&& orig) : This(orig.This) { orig.This = nullptr; }
 
 				/// <summary>
@@ -973,7 +977,7 @@ namespace Seed {
 			/// <summary>
 			/// Конструктор таймера пулу потоків
 			/// </summary>
-			class UnifiedThreadPoolSheduledTaskBuilder final {
+			class UnifiedThreadPoolScheduledTaskBuilder final {
 			private:
 				friend class UnifiedThreadPool;
 			private:
@@ -1031,7 +1035,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="ownerPool">Пул потоків</param>
 				/// <param name="callback">Колбек</param>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
 					: This(new Data(ownerPool, MoveRValue(callback))) {}
 
 				/// <summary>
@@ -1042,7 +1046,7 @@ namespace Seed {
 				/// <param name="ownerPool">Пул потоків</param>
 				/// <param name="callback">Колбек</param>
 				/// <param name="taskName">Ім'я задачі</param>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& taskName)
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& taskName)
 					: This(new Data(ownerPool, MoveRValue(callback), MoveRValue(taskName))) {}
 
 				/// <summary>
@@ -1053,7 +1057,7 @@ namespace Seed {
 				/// <param name="ownerPool">Пул потоків</param>
 				/// <param name="callback">Колбек</param>
 				/// <param name="taskName">Ім'я задачі</param>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& taskName)
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder(UnifiedThreadPool& ownerPool, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& taskName)
 					: This(new Data(ownerPool, MoveRValue(callback), taskName)) {}
 			public:
 				/// <summary>
@@ -1061,7 +1065,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="callback">Новий колбек</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetCallback(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetCallback(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)&& {
 					This->callback = MoveRValue(callback);
 					return MoveRValue(*this);
 				}
@@ -1071,7 +1075,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="name">Нове ім'я таймера</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetName(String&& name)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetName(String&& name)&& {
 					This->taskName = MoveRValue(name);
 					return MoveRValue(*this);
 				}
@@ -1081,7 +1085,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="name">Нове ім'я таймера</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetName(const String& name)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetName(const String& name)&& {
 					This->taskName = name;
 					return MoveRValue(*this);
 				}
@@ -1091,7 +1095,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="count">Кількість запусків таймера</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetExecutionCount(UInt16 count)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetExecutionCount(UInt16 count)&& {
 					This->intervalsCount = count;
 					return MoveRValue(*this);
 				}
@@ -1101,7 +1105,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="intervalLenght">Довжина між інтервалами</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetIntervalLenght(Time::TimeSpan intervalLenght)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetIntervalLenght(Time::TimeSpan intervalLenght)&& {
 					if(This->intervalLenght > MaxIntervalLenght)
 						Throw(InvalidArgumentException(ExceptionPosition, L"IntervalLenght", L"Too big interval lenght"));
 					This->intervalLenght = intervalLenght;
@@ -1113,7 +1117,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="absoluteStartTime">Абсолютний час запуску таймера</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::DateTime absoluteStartTime)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetStartTime(Time::DateTime absoluteStartTime)&& {
 					This->startTime = absoluteStartTime.TimeFromStartEpoch;
 					This->isRelaive = false;
 					return MoveRValue(*this);
@@ -1124,7 +1128,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="relativeStartTime">Віднисний час запуску таймера</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetStartTime(Time::TimeSpan relativeStartTime)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetStartTime(Time::TimeSpan relativeStartTime)&& {
 					This->startTime = relativeStartTime.Ticks;
 					This->isRelaive = true;
 					return MoveRValue(*this);
@@ -1135,7 +1139,7 @@ namespace Seed {
 				/// </summary>
 				/// <param name="proximity">Точність таймера</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
-				ForceInline UnifiedThreadPoolSheduledTaskBuilder&& SetProximity(Time::TimeSpan proximity)&& {
+				ForceInline UnifiedThreadPoolScheduledTaskBuilder&& SetProximity(Time::TimeSpan proximity)&& {
 					This->proximity = proximity;
 					return MoveRValue(*this);
 				}
@@ -1144,17 +1148,17 @@ namespace Seed {
 				/// Створює таймер з заданими конфігураціями
 				/// </summary>
 				/// <returns></returns>
-				UnifiedThreadPoolSheduledTask Shedule()&&;
+				UnifiedThreadPoolScheduledTask Shedule()&&;
 			public:
 				/// <summary>
 				/// Максимальний допустимий інтервал між запусками таймера
 				/// </summary>
-				static constexpr auto MaxIntervalLenght = UnifiedThreadPoolSheduledTask::MaxIntervalLenght;
+				static constexpr auto MaxIntervalLenght = UnifiedThreadPoolScheduledTask::MaxIntervalLenght;
 			public:
 				/// <summary>
 				/// Деструктор
 				/// </summary>
-				~UnifiedThreadPoolSheduledTaskBuilder()
+				~UnifiedThreadPoolScheduledTaskBuilder()
 				{
 					if (This != nullptr) {
 						delete This;
@@ -1164,19 +1168,19 @@ namespace Seed {
 
 			class ThreadableUnifiedThreadPoolJob;
 
-			ForceInline UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+			ForceInline UnifiedThreadPoolScheduledTaskBuilder UnifiedThreadPool::SheduleJob(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
 			{
-				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback));
+				return UnifiedThreadPoolScheduledTaskBuilder(*this, MoveRValue(callback));
 			}
 
-			ForceInline UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+			ForceInline UnifiedThreadPoolScheduledTaskBuilder UnifiedThreadPool::SheduleJob(String&& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
 			{
-				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), MoveRValue(taskName));
+				return UnifiedThreadPoolScheduledTaskBuilder(*this, MoveRValue(callback), MoveRValue(taskName));
 			}
 
-			ForceInline UnifiedThreadPoolSheduledTaskBuilder UnifiedThreadPool::SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
+			ForceInline UnifiedThreadPoolScheduledTaskBuilder UnifiedThreadPool::SheduleJob(const String& taskName, SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback)
 			{
-				return UnifiedThreadPoolSheduledTaskBuilder(*this, MoveRValue(callback), String(taskName));
+				return UnifiedThreadPoolScheduledTaskBuilder(*this, MoveRValue(callback), String(taskName));
 			}
 		}
 
@@ -1422,11 +1426,11 @@ namespace Seed {
 				/// <summary>
 				/// Вертає чи операція вже завершена
 				/// </summary>
-				/// <returns>Чи операція вже завершена</returns>
+				/// <returns>true, якщо операція вже завершена</returns>
 				ForceInline Boolean GetIsCompleted() const { return isCompleted; }
 			public:
 				/// <summary>
-				/// Чи операція вже завершенаo
+				/// true, якщо операція вже завершена
 				/// </summary>
 				Boolean Property(GetIsCompleted) IsCompleted;
 			protected:

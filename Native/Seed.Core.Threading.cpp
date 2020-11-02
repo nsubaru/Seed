@@ -52,9 +52,9 @@ SizeT Seed::Core::Threading::GetThreadableCount(Boolean WithPseudoThreadable)
 		return AllActiveThreadable->Count;
 }
 
-Containers::ConcurencyList<SmartPtr<IThreadable>> Seed::Core::Threading::GetAllThreadable()
+Containers::List<SmartPtr<IThreadable>> Seed::Core::Threading::GetAllThreadable()
 {
-	return AllActiveThreadable->CopyTo<Containers::ConcurencyList>();
+	return AllActiveThreadable->CopyTo<Containers::List>();
 }
 
 IThreadable& Seed::Core::Threading::GetThis()
@@ -110,8 +110,8 @@ namespace Seed {
 				extern ThreadableRef RegisterPoolIoThreadable(const UnifiedThreadPoolIoTask& task, const SynchronizeEvent& event, ImplSpecificT instance);
 				extern void UnRegisterPoolIoThreadable(ThreadableRef&& ref);
 
-				extern ThreadableRef RegisterPoolSheduledThreadable(const UnifiedThreadPoolSheduledTask& task, ImplSpecificT instance);
-				extern void UnRegisterPoolSheduledThreadable(ThreadableRef&& ref);
+				extern ThreadableRef RegisterPoolScheduledThreadable(const UnifiedThreadPoolScheduledTask& task, ImplSpecificT instance);
+				extern void UnRegisterPoolScheduledThreadable(ThreadableRef&& ref);
 
 				extern ThreadableRef RegisterPoolJobThreadable(const UnifiedThreadPoolJob& task, ImplSpecificT instance);
 				extern void UnRegisterPoolJobThreadable(ThreadableRef&& ref);
@@ -222,7 +222,7 @@ namespace Seed
 				{
 					toCoreLog(L"Помилка: Потік з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
 					thread->Interupt()
-						.Join(CurrentSettings().Threading.Thread.StopKernelThreadsTimeout.Ticks);
+						.Join(CurrentSettings().Threading.Thread.StopKernelThreadsTimeout);
 				});
 				//Kill each exist thread
 				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread) InlineLambda
@@ -240,7 +240,10 @@ namespace Seed
 				//Removing all threadable objects
 				AllActiveThreadable->RemoveAll([] (SmartPtr<IThreadable>&& thread) InlineLambda
 				{
-					thread->Join();
+					if (thread->GetThreadableType() == EThreadableTypes::Thread)
+					{
+						thread->Join();
+					}
 				});
 				delete AllActiveThreadable;
 				return true;
@@ -380,16 +383,15 @@ namespace Seed
 						NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
 						if (!NT_SUCCESS(status))
 						{
-							NtResumeThread(This->hThread, NULL);
+							NtAlertResumeThread(This->hThread, NULL);
 							return *this;
 						}
 						DWORD64 ret_point = ctx.Rip;
 						ctx.Rip = (DWORD64) (PDWORD64) InteruptThread;
 						status = ZwSetContextThread(This->hThread, &ctx);
-						NtResumeThread(This->hThread, NULL);
+						NtAlertResumeThread(This->hThread, NULL);
 						if (!NT_SUCCESS(status))
 							Throw(NtException(ExceptionPosition, status));
-						NtAlertThread(This->hThread);
 					}
 					default:
 						break;
@@ -463,12 +465,12 @@ namespace Seed
 					NtClose(data->handle);
 			}
 
-			SynchronizeEvent::SynchronizeEvent(Boolean IsManualReset) : data(new event_data(IsManualReset, String())) {
+			SynchronizeEvent::SynchronizeEvent(Boolean isManualReset) : data(new Data(isManualReset, String())) {
 				NTSTATUS status = NtCreateEvent(
 					&data->handle,
 					GENERIC_ALL,
 					NULL,
-					(IsManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
+					(isManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
 					FALSE
 				);
 
@@ -480,7 +482,7 @@ namespace Seed
 				}
 			}
 
-			SynchronizeEvent::SynchronizeEvent(const String& name, Boolean IsManualReset) : data(new event_data(IsManualReset, name)) {
+			SynchronizeEvent::SynchronizeEvent(const String& name, Boolean isManualReset) : data(new Data(isManualReset, name)) {
 				OBJECT_ATTRIBUTES attrbs;
 				UNICODE_STRING label;
 				RtlInitUnicodeStringEx(&label, (PWSTR) (ConstCharStr) data->Name);
@@ -490,7 +492,7 @@ namespace Seed
 					&data->handle,
 					GENERIC_ALL,
 					&attrbs,
-					(IsManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
+					(isManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
 					FALSE
 				);
 
@@ -502,7 +504,7 @@ namespace Seed
 				}
 			}
 
-			SynchronizeEvent::SynchronizeEvent(String&& name, Boolean IsManualReset) : data(new event_data(IsManualReset, MoveRValue(name))) {
+			SynchronizeEvent::SynchronizeEvent(String&& name, Boolean isManualReset) : data(new Data(isManualReset, MoveRValue(name))) {
 				OBJECT_ATTRIBUTES attrbs;
 				UNICODE_STRING label;
 				RtlInitUnicodeStringEx(&label, (PWSTR) (ConstCharStr) data->Name);
@@ -512,7 +514,7 @@ namespace Seed
 					&data->handle,
 					GENERIC_ALL,
 					&attrbs,
-					(IsManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
+					(isManualReset) ? EVENT_TYPE::NotificationEvent : EVENT_TYPE::SynchronizationEvent,
 					FALSE
 				);
 
@@ -580,7 +582,7 @@ namespace Seed
 
 					delete[] hEvents;
 
-					return status - STATUS_WAIT_0;
+					return static_cast<Seed::Core::UInt64>(status) - STATUS_WAIT_0;
 				}
 				catch (...)
 				{
@@ -602,14 +604,14 @@ void Seed::Core::Threading::UnregisterJobFromJobList(UnifiedThreadPoolJob* jobOb
 	((UnifiedThreadPool::Data*)jobObj->This->pOwnerPool)->JobsQueue.Remove(jobObj->This->poolQueueRef);
 }
 
-void Seed::Core::Threading::UnRegisterTaskFromPoolQueue(UnifiedThreadPoolSheduledTask* thread)
+void Seed::Core::Threading::UnRegisterTaskFromPoolQueue(UnifiedThreadPoolScheduledTask* thread)
 {
 	if (thread->This->poolQueueRef != nullptr) {
 		((UnifiedThreadPool::Data*)thread->This->ownerPool)->TaskQueue.Remove(thread->This->poolQueueRef);
 	}
 }
 
-void Seed::Core::Threading::ZeroingTaskHadle(UnifiedThreadPoolSheduledTask* thread)
+void Seed::Core::Threading::ZeroingTaskHadle(UnifiedThreadPoolScheduledTask* thread)
 {
 	thread->This->hTask = nullptr;
 }
@@ -624,15 +626,24 @@ VOID NTAPI UnifiedThreadPoolJobsCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
-	ConfigureTls(nullptr, nullptr);
+	volatile EThreadabledStates state = EThreadabledStates::Unknown;
+
+	ConfigureTls(nullptr, &state);
+
 	try {
-	auto jobObj = (UnifiedThreadPoolJob*)ObjectContext;
-	UnregisterJobFromJobList(jobObj);
-	delete jobObj;
+		try {
+			auto jobObj = (UnifiedThreadPoolJob*)ObjectContext;
+			UnregisterJobFromJobList(jobObj);
+			delete jobObj;
+		}
+		catch (Exception& ex) {
+			toCoreLog(L"Виникла помилка при знищенні об'єкта задачі в пулі, деталі: ", ex);
+		}
 	}
 	catch (...) {
 		toCoreLog(L"Невідома помилка при знищенні об'єкта задачі в пулі");
 	}
+
 	DestroyTls();
 }
 
@@ -644,7 +655,7 @@ VOID NTAPI UnifiedThreadPoolTasksCleanupCallback(
 	try {
 		if (ObjectContext == NULL)
 			return;
-		Seed::Core::Threading::UnifiedThreadPoolSheduledTask* This = (Seed::Core::Threading::UnifiedThreadPoolSheduledTask*)ObjectContext;
+		Seed::Core::Threading::UnifiedThreadPoolScheduledTask* This = (Seed::Core::Threading::UnifiedThreadPoolScheduledTask*)ObjectContext;
 		Seed::Core::Threading::ZeroingTaskHadle(This);
 		UnRegisterTaskFromPoolQueue(This);
 		delete This;
@@ -707,10 +718,10 @@ UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateThreadP
 		ReThrow;
 	}
 
-	//Sheduled task configuration
+	//Scheduled task configuration
 	UnifiedThreadPool::PoolConfigureation tasksConfiguration = { 0 };
 	try {
-		tasksConfiguration = CreateSheduledTaskConfiguration(hPool);
+		tasksConfiguration = CreateScheduledTaskConfiguration(hPool);
 	}
 	catch (...) {
 		UnifiedThreadPool::DestroyConfiguration(jobsConfiguration);
@@ -799,7 +810,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	return configuration;
 }
 
-UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateSheduledTaskConfiguration(ImplSpecificT PoolHandle)
+UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateScheduledTaskConfiguration(ImplSpecificT PoolHandle)
 {
 	PTP_CLEANUP_GROUP clenupData = nullptr;
 
@@ -1114,18 +1125,18 @@ void Seed::Core::Threading::UnifiedThreadPoolJob::Dispose()
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolSheduledTask* thread, ImplSpecificT callbackInstance) {
+			Threadables::ThreadableRef RegisterThreadable(UnifiedThreadPoolScheduledTask* thread, ImplSpecificT callbackInstance) {
 				thread->This->lastStartTime = Time::DateTime::GetCurrentSystemTimeData();
 				thread->This->activeInstanceRefCount++;
 
-				auto ref = Threadables::RegisterPoolSheduledThreadable(*thread, callbackInstance);
+				auto ref = Threadables::RegisterPoolScheduledThreadable(*thread, callbackInstance);
 				SetName(thread->This->taskName, NtCurrentThread());
 				_ReadWriteBarrier();
 				return ref;
 			}
 
-			void UnRegisterThreadable(UnifiedThreadPoolSheduledTask* thread, Threadables::ThreadableRef&& ref) {
-				Threadables::UnRegisterPoolSheduledThreadable(MoveRValue(ref));
+			void UnRegisterThreadable(UnifiedThreadPoolScheduledTask* thread, Threadables::ThreadableRef&& ref) {
+				Threadables::UnRegisterPoolScheduledThreadable(MoveRValue(ref));
 
 				--thread->This->activeInstanceRefCount;
 				++thread->This->executedCount;
@@ -1151,7 +1162,7 @@ namespace Seed {
 
 
 template<typename EntryPointT>
-static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolSheduledTask* thread, ImplSpecificT instance) noexcept {
+static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolScheduledTask* thread, ImplSpecificT instance) noexcept {
 	using namespace Seed;
 
 	NTSTATUS status = STATUS_SUCCESS;
@@ -1163,8 +1174,8 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolSheduledTa
 			ref = RegisterThreadable(thread, instance);
 			entryPoint();
 		}
-		catch (UnusedData Exceptions::InteruptException& er) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()));
+		catch (Exceptions::InteruptException&) {
+			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception& ex) {
@@ -1197,22 +1208,22 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolSheduledTa
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolSheduledTask* task)
+			bool IsUnifiedThreadPoolTerminate(UnifiedThreadPoolScheduledTask* task)
 			{
 				return ((UnifiedThreadPool::Data*)(task->This->ownerPool))->isPoolTermination;
 			}
 
-			SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolSheduledTask* task)
+			SRWLock& GetUnifiedPoolLock(UnifiedThreadPoolScheduledTask* task)
 			{
 				return ((UnifiedThreadPool::Data*)(task->This->ownerPool))->handlesData.TaskConfiguration.PoolLock;
 			}
 
-			SmartPtr<IUnifiedThreadPoolShedulerCallback>& Seed::Core::Threading::GetJobEntryPoint(UnifiedThreadPoolSheduledTask* task)
+			SmartPtr<IUnifiedThreadPoolShedulerCallback>& Seed::Core::Threading::GetJobEntryPoint(UnifiedThreadPoolScheduledTask* task)
 			{
 				return task->This->callback;
 			}
 
-			UnifiedThreadPool UnifiedThreadPoolSheduledTask::GetOwnerPool() const
+			UnifiedThreadPool UnifiedThreadPoolScheduledTask::GetOwnerPool() const
 			{
 				auto poolData = ((UnifiedThreadPool::Data*)(This->ownerPool));
 				return UnifiedThreadPool(poolData);
@@ -1232,42 +1243,65 @@ VOID NTAPI UnifiedTaskShedulerTaskCallback(
 	if (Context == NULL)
 		return;
 
-	UnifiedThreadPoolSheduledTask* thread = (UnifiedThreadPoolSheduledTask*)Context;
+	volatile EThreadabledStates state = EThreadabledStates::Unknown;
 
-	if (!IsUnifiedThreadPoolTerminate(thread))
-	{
-		SRWLock& lock = GetUnifiedPoolLock(thread);
-		if (!lock.TryInShareLock([&]()
+	UnifiedThreadPoolScheduledTask* thread = (UnifiedThreadPoolScheduledTask*)Context;
+
+	try {
+		try {
+
+
+			if (!IsUnifiedThreadPoolTerminate(thread))
 			{
-				EntryPoint([&]()
+				SRWLock& lock = GetUnifiedPoolLock(thread);
+				if (!lock.TryInShareLock([&]()
 					{
-						GetJobEntryPoint(thread)->Shedule();
-					}, thread, Instance);
+						EntryPoint(
+							[&] () { GetJobEntryPoint(thread)->Shedule(); }, 
+							thread,
+							Instance
+						);
+					}
+				)) {
+					//Init min tls
+					ConfigureTls(nullptr, &state);
+
+					delete thread;
+				}
 			}
-		))
-		{
-					
-			delete thread;
+			else {
+				//Init min tls
+				ConfigureTls(nullptr, &state);
+
+				delete thread;
+			}
+		}
+		catch (Exception& ex) {
+			toCoreLog(L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:", ex);
 		}
 	}
-	else
-	{
-		delete thread;
+	catch (...) {
+		toCoreLog(L"Виникла невідома помилка при обробці асинхроної операції в пулі потоків");
+	}
+
+	//Destroy tls only if it created before deleting job obj
+	if (GetTLS()->State == &state) {
+		DestroyTls();
 	}
 }
 
-Seed::Core::Threading::UnifiedThreadPoolSheduledTask Seed::Core::Threading::UnifiedThreadPoolSheduledTaskBuilder::Shedule()&&
+Seed::Core::Threading::UnifiedThreadPoolScheduledTask Seed::Core::Threading::UnifiedThreadPoolScheduledTaskBuilder::Shedule()&&
 {
 	if (This->proximity.Miliseconds > Math::Max<Int32>())
-		Throw(InvalidArgumentException(ExceptionPosition, L"TimerProximity", L"Too low timer proximity(too big maximum allowd delay)"));
+		Throw(InvalidArgumentException(ExceptionPosition, L"TimerProximity", L"Too low timer proximity(too big maximum allowed delay)"));
 
 	if(This->intervalLenght.Ticks > Math::Max<Int32>())
 		Throw(InvalidArgumentException(ExceptionPosition, L"IntervalLenght", L"Too big interval lenght"));
 
 	Time::DateTime startTime = (!This->isRelaive) ? This->startTime : Time::DateTime::GetCurrentSystemTimeData().Ticks + This->startTime;
 
-	auto shedulerTask = UnifiedThreadPoolSheduledTask(
-		new UnifiedThreadPoolSheduledTask::Data(
+	auto shedulerTask = UnifiedThreadPoolScheduledTask(
+		new UnifiedThreadPoolScheduledTask::Data(
 			MoveRValue(This->taskName),
 			MoveRValue(This->callback),
 			This->ownerPool.This,
@@ -1280,7 +1314,7 @@ Seed::Core::Threading::UnifiedThreadPoolSheduledTask Seed::Core::Threading::Unif
 	NTSTATUS status = TpAllocTimer(
 		(PTP_TIMER*)&shedulerTask.This->hTask,
 		UnifiedTaskShedulerTaskCallback,
-		new UnifiedThreadPoolSheduledTask(shedulerTask),
+		new UnifiedThreadPoolScheduledTask(shedulerTask),
 		reinterpret_cast<PTP_CALLBACK_ENVIRON>(This->ownerPool.This->handlesData.TaskConfiguration.CallbackEnviroment)
 	);
 
@@ -1301,19 +1335,19 @@ Seed::Core::Threading::UnifiedThreadPoolSheduledTask Seed::Core::Threading::Unif
 	return shedulerTask;
 }
 
-void Seed::Core::Threading::UnifiedThreadPoolSheduledTask::SetName(String&& newTaskName)
+void Seed::Core::Threading::UnifiedThreadPoolScheduledTask::SetName(String&& newTaskName)
 {
 	_ReadWriteBarrier();
 	This->taskName = MoveRValue(newTaskName);
 }
 
-void Seed::Core::Threading::UnifiedThreadPoolSheduledTask::StopSheduling()&&
+void Seed::Core::Threading::UnifiedThreadPoolScheduledTask::StopSheduling()&&
 {
 	TpWaitForTimer((PTP_TIMER)This->hTask, TRUE);
 	UnRegisterTaskFromPoolQueue(this);
 }
 
-void Seed::Core::Threading::UnifiedThreadPoolSheduledTask::Dispose()
+void Seed::Core::Threading::UnifiedThreadPoolScheduledTask::Dispose()
 {
 }
 
@@ -1367,7 +1401,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, const UnifiedThreadPoolIoTa
 			entryPoint();
 		}
 		catch (UnusedData Exceptions::InteruptException& er) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()));
+			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" був призупинений");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception& ex) {
@@ -1408,18 +1442,23 @@ VOID NTAPI IoThreadPoolCallback(
 	using namespace Seed::Core::Threading;
 
 	try {
-		auto irp = (IO::IRPBase*)ApcContext;
-		
-		EntryPoint(
-			[&]() { irp->OnIORequestComplete(IoSB->Information, NT_SUCCESS(IoSB->Status), IoSB->Status); },
-			irp->TargetTask,
-			GetIrpCompleteEvent(irp),
-			Instance
-		);
+		try {
+			auto irp = (IO::IRPBase*)ApcContext;
 
-		MarkIrpCompleted(irp);
+			EntryPoint(
+				[&]() { irp->OnIORequestComplete(IoSB->Information, NT_SUCCESS(IoSB->Status), IoSB->Status); },
+				irp->TargetTask,
+				GetIrpCompleteEvent(irp),
+				Instance
+			);
 
-		delete irp;
+			MarkIrpCompleted(irp);
+
+			delete irp;
+		}
+		catch (Exception& ex) {
+			toCoreLog(L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:", ex);
+		}
 	}
 	catch (...) {
 		toCoreLog(L"Виникла невідома помилка при обробці асинхроної операції в пулі потоків");
@@ -1558,7 +1597,7 @@ UnifiedThreadPoolJob Seed::Core::Threading::SystemThreadPool::PostPriorityJob(De
 }
 #pragma endregion
 #pragma region Scheduled tasks
-UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& name, Threading::EPoolThreadsPriority priority)
+UnifiedThreadPoolScheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& name, Threading::EPoolThreadsPriority priority)
 {
 	switch (priority)
 	{
@@ -1573,7 +1612,7 @@ UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::Cr
 	}
 }
 
-UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& name, Threading::EPoolThreadsPriority priority)
+UnifiedThreadPoolScheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& name, Threading::EPoolThreadsPriority priority)
 {
 	switch (priority)
 	{
@@ -1588,7 +1627,7 @@ UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::Cr
 	}
 }
 
-UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, Threading::EPoolThreadsPriority priority)
+UnifiedThreadPoolScheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, Threading::EPoolThreadsPriority priority)
 {
 	switch (priority)
 	{
@@ -1607,9 +1646,9 @@ UnifiedThreadPoolSheduledTaskBuilder Seed::Core::Threading::SystemThreadPool::Cr
 SizeT Seed::Core::Threading::SystemThreadPool::AllItemCount()
 {
 	return
-		lowPriorityPool->JobsCount		+ lowPriorityPool->SheduledTaskCount	+ lowPriorityPool->IORequestCount	 +
-		mediumPriorityPool->JobsCount	+ mediumPriorityPool->SheduledTaskCount + mediumPriorityPool->IORequestCount +
-		highPriorityPool->JobsCount		+ highPriorityPool->SheduledTaskCount	+ highPriorityPool->IORequestCount;
+		lowPriorityPool->JobsCount		+ lowPriorityPool->ScheduledTaskCount	+ lowPriorityPool->IORequestCount	 +
+		mediumPriorityPool->JobsCount	+ mediumPriorityPool->ScheduledTaskCount + mediumPriorityPool->IORequestCount +
+		highPriorityPool->JobsCount		+ highPriorityPool->ScheduledTaskCount	+ highPriorityPool->IORequestCount;
 }
 
 SizeT Seed::Core::Threading::SystemThreadPool::AllItemSpecificPriorityCount(Threading::EPoolThreadsPriority priority)
@@ -1617,11 +1656,11 @@ SizeT Seed::Core::Threading::SystemThreadPool::AllItemSpecificPriorityCount(Thre
 	switch (priority)
 	{
 	case Threading::EPoolThreadsPriority::Low:
-		return lowPriorityPool->JobsCount + lowPriorityPool->SheduledTaskCount + lowPriorityPool->IORequestCount;
+		return lowPriorityPool->JobsCount + lowPriorityPool->ScheduledTaskCount + lowPriorityPool->IORequestCount;
 	case Threading::EPoolThreadsPriority::Medium:
-		return mediumPriorityPool->JobsCount + mediumPriorityPool->SheduledTaskCount + mediumPriorityPool->IORequestCount;
+		return mediumPriorityPool->JobsCount + mediumPriorityPool->ScheduledTaskCount + mediumPriorityPool->IORequestCount;
 	case Threading::EPoolThreadsPriority::High:
-		return highPriorityPool->JobsCount + highPriorityPool->SheduledTaskCount + highPriorityPool->IORequestCount;
+		return highPriorityPool->JobsCount + highPriorityPool->ScheduledTaskCount + highPriorityPool->IORequestCount;
 	default:
 		Throw(InvalidArgumentException(ExceptionPosition, L"priority", L"Invalid thread pool task priority"));
 	}
@@ -1649,7 +1688,7 @@ SizeT Seed::Core::Threading::SystemThreadPool::JobSpecificPriorityCount(Threadin
 
 SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskCount()
 {
-	return lowPriorityPool->SheduledTaskCount + mediumPriorityPool->SheduledTaskCount + highPriorityPool->SheduledTaskCount;
+	return lowPriorityPool->ScheduledTaskCount + mediumPriorityPool->ScheduledTaskCount + highPriorityPool->ScheduledTaskCount;
 }
 
 SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskSpecificPriorityCount(Threading::EPoolThreadsPriority priority)
@@ -1657,11 +1696,11 @@ SizeT Seed::Core::Threading::SystemThreadPool::ScheduledTaskSpecificPriorityCoun
 	switch (priority)
 	{
 	case Threading::EPoolThreadsPriority::Low:
-		return lowPriorityPool->SheduledTaskCount;
+		return lowPriorityPool->ScheduledTaskCount;
 	case Threading::EPoolThreadsPriority::Medium:
-		return mediumPriorityPool->SheduledTaskCount;
+		return mediumPriorityPool->ScheduledTaskCount;
 	case Threading::EPoolThreadsPriority::High:
-		return highPriorityPool->SheduledTaskCount;
+		return highPriorityPool->ScheduledTaskCount;
 	default:
 		Throw(InvalidArgumentException(ExceptionPosition, L"priority", L"Invalid thread pool task priority"));
 	}

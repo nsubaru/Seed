@@ -114,45 +114,20 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTa
 			NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
 			if (!NT_SUCCESS(status))
 			{
-				NtResumeThread(This->hThread, NULL);
+				NtAlertResumeThread(This->hThread, NULL);
 				Throw(NtException(ExceptionPosition, status));
 			}
 			DWORD64 ret_point = ctx.Rip;
 			ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
 			status = ZwSetContextThread(This->hThread, &ctx);
-			NtResumeThread(This->hThread, NULL);
+			NtAlertResumeThread(This->hThread, NULL);
 			if (!NT_SUCCESS(status))
 				Throw(NtException(ExceptionPosition, status));
-			NtAlertThread(This->hThread);
 		}
 		default:
 			break;
 		}
 		break;
 	}
-	return *this;
-}
-
-IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join()
-{
-	This->event.Wait();
-	return *this;
-}
-
-IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join(Time::TimeSpan timeOut)
-{
-	This->event.Wait(timeOut);
-	return *this;
-}
-
-const IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join() const
-{
-	This->event.Wait();
-	return *this;
-}
-
-const IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTaskV2::Join(Time::TimeSpan timeOut) const
-{
-	This->event.Wait(timeOut);
 	return *this;
 }

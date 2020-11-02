@@ -110,16 +110,15 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolJobV
 			NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
 			if (!NT_SUCCESS(status))
 			{
-				NtResumeThread(This->hThread, NULL);
+				NtAlertResumeThread(This->hThread, NULL);
 				Throw(NtException(ExceptionPosition, status));
 			}
 			DWORD64 ret_point = ctx.Rip;
 			ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
 			status = ZwSetContextThread(This->hThread, &ctx);
-			NtResumeThread(This->hThread, NULL);
+			NtAlertResumeThread(This->hThread, NULL);
 			if (!NT_SUCCESS(status))
 				Throw(NtException(ExceptionPosition, status));
-			NtAlertThread(This->hThread);
 		}
 		default:
 			break;

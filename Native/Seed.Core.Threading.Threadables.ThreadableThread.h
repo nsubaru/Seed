@@ -1,7 +1,6 @@
 #pragma once
 #include "Seed.Core.Threading.Threadables.Base.h"
 
-#pragma region Unified thread pool threadables
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
@@ -74,6 +73,14 @@ namespace Seed {
 					/// <param name="NewName">Нове ім'я сутності</param>
 					virtual void SetName(const String& NewName) {
 						thread.Name = NewName;
+					}
+
+					/// <summary>
+					/// Встановлення імені сутності
+					/// </summary>
+					/// <param name="NewName">Нове ім'я сутності</param>
+					virtual void SetName(String&& NewName) {
+						thread.Name = MoveRValue(NewName);
 					}
 
 					/// <summary>
@@ -168,4 +175,3 @@ namespace Seed {
 		}
 	}
 }
-#pragma endregion

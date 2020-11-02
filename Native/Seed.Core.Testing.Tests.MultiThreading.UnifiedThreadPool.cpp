@@ -16,12 +16,12 @@ bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateEmptyUn
 
     Asserts::AssertEqual(pool.IORequestCount, 0);
     Asserts::AssertEqual(pool.JobsCount, 0);
-    Asserts::AssertEqual(pool.SheduledTaskCount, 0);
+    Asserts::AssertEqual(pool.ScheduledTaskCount, 0);
 
     Asserts::AssertEqual(pool.Name, L"Test thread pool");
 
     Asserts::AssertEqual(pool.JobsPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High);
-    Asserts::AssertEqual(pool.SheduledTasksPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::Low);
+    Asserts::AssertEqual(pool.ScheduledTasksPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::Low);
     Asserts::AssertEqual(pool.IORequestPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High);
 
     return true;
@@ -75,7 +75,7 @@ bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnified
     return true;
 }
 
-bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnifiedThreadPoolWithSheduledTasks::Excecute()
+bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnifiedThreadPoolWithScheduledTasks::Excecute()
 {
     class TestSheduleCallback final : public Core::Threading::IUnifiedThreadPoolShedulerCallback {
     private:

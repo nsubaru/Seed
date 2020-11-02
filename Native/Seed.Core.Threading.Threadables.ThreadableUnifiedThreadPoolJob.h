@@ -61,12 +61,21 @@ namespace Seed {
 					virtual const String& GetName() const {
 						return This->task.Name;
 					}
+
 					/// <summary>
 					/// Встановлення імені сутності
 					/// </summary>
 					/// <param name="NewName">Нове ім'я сутності</param>
 					virtual void SetName(const String& NewName) {
 						This->task.Name = NewName;
+					}
+
+					/// <summary>
+					/// Встановлення імені сутності
+					/// </summary>
+					/// <param name="NewName">Нове ім'я сутності</param>
+					virtual void SetName(String&& NewName) {
+						This->task.Name = MoveRValue(NewName);
 					}
 
 					/// <summary>

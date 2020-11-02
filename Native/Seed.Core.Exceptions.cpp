@@ -30,7 +30,7 @@ struct ExceptionsHeapT
 };
 
 static ForceInline ExceptionsHeapT& GetExceptionsHeap() {
-	static ExceptionsHeapT ExceptionsHeap;
+	static ExceptionsHeapT ExceptionsHeap{};
 	return ExceptionsHeap;
 }
 
@@ -255,7 +255,7 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 				__debugbreak();
 	#endif
 			EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)exData->ExceptionRecord; //-V1027
-			NullPointException::Types type;
+			NullPointException::Types type{};
 			switch (sehException->ExceptionInformation[0])
 			{
 			case 0:
@@ -431,6 +431,26 @@ void Seed::Core::Exceptions::Exception::RawException::Dispose() {
 		Seed::Core::Memory::ExceptionHeap().Free(ptr);
 	});
 }
+namespace Seed {
+	inline namespace Core {
+		inline namespace Exceptions {
+			ExceptionHolderType* GetInnerExceptionObjectPtr(Exception* exception)
+			{
+				return &exception->innerException;
+			}
+		}
+	}
+}
+
+
+void StoreInnerException(Exception* outerException, Exception* innnerException) {
+	auto place = GetInnerExceptionObjectPtr(outerException);
+	while ((*place) != nullptr) {
+		place = GetInnerExceptionObjectPtr(place->operator->());
+	}
+	(*place) = innnerException->Clone();
+}
+
 #pragma endregion
 
 #pragma region VEH handler
@@ -465,7 +485,7 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 			__debugbreak();
 #endif
 		EXCEPTION_RECORD* sehException = (EXCEPTION_RECORD*)ExceptionInfo->ExceptionRecord; //-V1027
-		NullPointException::Types type;
+		NullPointException::Types type{};
 		switch (sehException->ExceptionInformation[0])
 		{
 		case 0:

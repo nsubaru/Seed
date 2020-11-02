@@ -82,32 +82,38 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Suspend() = 0;
+
 				/// <summary>
 				/// Розмороження виконання потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Resume() = 0;
+
 				/// <summary>
 				/// Переривання виконання потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Interupt() = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Join() = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності з таймаутом
 				/// </summary>
 				/// <param name="timeOut">Максимальний час очікування</param>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual IThreadable& Join(Time::TimeSpan timeOut) = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності
 				/// </summary>
 				/// <returns>Посилання на об'єкт</returns>
 				virtual const IThreadable& Join() const = 0;
+
 				/// <summary>
 				/// Очікувння завершення потокової сутності з таймаутом
 				/// </summary>
@@ -136,14 +142,15 @@ namespace Seed {
 			/// <summary>
 			/// Вертає список всіх потокових сутностей
 			/// </summary>
-			Containers::ConcurencyList<SmartPtr<IThreadable>> GetAllThreadable();
+			Containers::List<SmartPtr<IThreadable>> GetAllThreadable();
 
 			/// <summary>
-			/// Вертає посилання на потокову сутність в межає якої виконується поточний код
+			/// Вертає посилання на потокову сутність в межах якої виконується поточний код
 			/// </summary>
 			IThreadable& GetThis();
+
 			/// <summary>
-			/// Вертає ідентифікатор потокової сутності в межає якої виконується поточний код
+			/// Вертає ідентифікатор потокової сутності в межах якої виконується поточний код
 			/// </summary>
 			ID GetTID();
 
@@ -435,28 +442,28 @@ namespace Seed {
 			/// <summary>
 			/// Взаємне блокування
 			/// </summary>
-			class DedlockExpected final : public Exception {
+			class DeadlockExpected final : public Exception {
 			public:
 				/// <summary>
 				/// Копіювальний конструктор
 				/// </summary>
 				/// <param name="orig">Оригинал</param>
-				DedlockExpected(const DedlockExpected& orig) : Exception(orig) {}
+				DeadlockExpected(const DeadlockExpected& orig) : Exception(orig) {}
 
 				/// <summary>
 				/// Конструктор переміщення
 				/// </summary>
 				/// <param name="from">Оригинал</param>
-				DedlockExpected(DedlockExpected&& from) : Exception(MoveRValue(from)) {}
+				DeadlockExpected(DeadlockExpected&& from) : Exception(MoveRValue(from)) {}
 
 				/// <summary>
 				/// Оператор копіювання
 				/// </summary>
 				/// <param name="from">Оригинал</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				DedlockExpected& operator=(const DedlockExpected& from) { 
-					this->~DedlockExpected(); 
-					this->DedlockExpected::DedlockExpected(from); 
+				DeadlockExpected& operator=(const DeadlockExpected& from) { 
+					this->~DeadlockExpected(); 
+					this->DeadlockExpected::DeadlockExpected(from); 
 					return *this; 
 				}
 
@@ -465,9 +472,9 @@ namespace Seed {
 				/// </summary>
 				/// <param name="from">Оригинал</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				DedlockExpected& operator=(DedlockExpected&& from) {
-					this->~DedlockExpected(); 
-					this->DedlockExpected::DedlockExpected(MoveRValue(from));
+				DeadlockExpected& operator=(DeadlockExpected&& from) {
+					this->~DeadlockExpected(); 
+					this->DeadlockExpected::DeadlockExpected(MoveRValue(from));
 					return *this; 
 				}
 			public:
@@ -477,7 +484,7 @@ namespace Seed {
 				/// <param name = 'File'>Файл в якому згенерована помилка</param>
 				/// <param name = 'FunctName'>Ім'я функції</param>
 				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				ForceInline DedlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
+				ForceInline DeadlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					noexcept : Exception(File, FunctName, Line, L"Взаємне блокування")
 				{};
 
@@ -497,13 +504,13 @@ namespace Seed {
 				/// </summary>
 				/// <returns>Розумний покажчик на об'єкт помилки</returns>
 				virtual ExceptionHolderType Clone() const override {
-					return ExceptionHolderType(new DedlockExpected(*this));
+					return ExceptionHolderType(new DeadlockExpected(*this));
 				}
 
 				/// <summary>
 				/// Деструктор
 				/// </summary>
-				ForceInline virtual ~DedlockExpected() override final {}
+				ForceInline virtual ~DeadlockExpected() override final {}
 			};
 		}
 	}

@@ -49,12 +49,12 @@ namespace Seed {
 		{
 			///<summary>Класс базової помилки</summary>
 			class Exception;
-		}
 
-		///<summary>Рядок для збереження тексту помилок</summary>
-		namespace { using ExceptionString = BaseString<Memory::ExceptionHeap>; }
-		/// <summary> Об'єкт для збереження помилки  </summary>
-		namespace { using ExceptionHolderType = BaseSmartPtr<Memory::ExceptionHeap, Exception>; }
+			///<summary>Рядок для збереження тексту помилок</summary>
+			namespace { using ExceptionString = BaseString<Memory::ExceptionHeap>; }
+			/// <summary> Об'єкт для збереження помилки  </summary>
+			namespace { using ExceptionHolderType = BaseSmartPtr<Memory::ExceptionHeap, Exception>; }
+		}
 
 		///<summary>Підсистема помилок в рантаймі</summary>
 		inline namespace Exceptions {
@@ -112,6 +112,7 @@ namespace Seed {
 			private:
 				static ID GetTargetThreadID();
 				friend void GetStackBackTrace(Seed::Exceptions::Exception::StackTraceRecord& stackTrace);
+				friend ExceptionHolderType* GetInnerExceptionObjectPtr(Exception* exception);
 			public:
 				/// <summary>
 				/// Копіювальний конструктор 
@@ -1204,7 +1205,18 @@ namespace Seed {
 				NtException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, Int32 StatusCode)
 					noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 				{}
+			public:
+				/// <summary>
+				/// Повертає код помилки
+				/// </summary>
+				/// <returns>Код помилки</returns>
+				Int32 GetCode() const { return statusCode; }
 
+				/// <summary>
+				/// Код помилки
+				/// </summary>
+				Int32 Property(GetCode) Code;
+			public:
 				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override {
 					return ExceptionString::Combine({

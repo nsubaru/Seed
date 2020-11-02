@@ -1,26 +1,81 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
-#include "Seed.Core.Testing.Tests.Exceptions.ABI.h"
+#include "Seed.Core.Testing.Tests.Exceptions.Abi.h"
 
 #include "Seed.Core.Threading.h"
 
 using namespace Seed;
 
-void Throw1() {
+/// <summary>
+/// Тестова помилка
+/// </summary>
+class TestException : public Exception {
+private:
+	///<summary>Тестове значення</summary>
+	Int32 statusCode;
+public:
+	TestException(const TestException& orig) : Exception(orig), statusCode(orig.statusCode) {}
+	TestException(TestException&& from) : Exception(MoveRValue(from)), statusCode(from.statusCode) {}
+	TestException& operator=(const TestException& from) { this->~TestException(); this->TestException::TestException(from); return *this; }
+	TestException& operator=(TestException&& from) { this->~TestException(); this->TestException::TestException(MoveRValue(from)); return *this; }
+public:
+	///<summary>Конструктор помилки</summary>
+	///<param name = 'File'>Файл в якому згенерована помилка</param>
+	///<param name = 'FunctName'>Ім'я функції</param>
+	///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
+	///<param name = 'StatusCode'>Тестове значення</param>
+	TestException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, Int32 StatusCode)
+		noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
+	{}
+public:
+	/// <summary>
+	/// Повертає тестовий код
+	/// </summary>
+	/// <returns>Тестовий код</returns>
+	Int32 GetCode() const { return statusCode; }
+
+	/// <summary>
+	/// Тестовий код
+	/// </summary>
+	Int32 Property(GetCode) Code;
+public:
+	///<summary>Текстове представлення інформації про помилку</summary>
+	virtual ExceptionString toString() const override {
+		return ExceptionString::Combine({
+			ExceptionString(exceptionName),
+			ExceptionString(L". Тестова помилка з кодом "),
+			BaseString<Memory::ExceptionHeap>::Int32asHex(statusCode), ExceptionString(L". "),
+			location.toString(),
+			(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
+			});
+	}
+
+	/// <summary>
+	/// Вертає копію об'єкта помилки
+	/// </summary>
+	/// <returns>Розумний покажчик на об'єкт помилки</returns>
+	virtual ExceptionHolderType Clone() const override {
+		return ExceptionHolderType(new TestException(*this));
+	}
+
+	virtual ~TestException() {}
+};
+
+static __declspec(noinline) void ThrowExceptionFunct() {
 	String str = L"123";
-	Throw(NtException(ExceptionPosition, 0));
+	Throw(TestException(ExceptionPosition, 1));
 }
 
-bool Throw2() {
+static __declspec(noinline) bool ThrowSubMethodFunct() {
 	try
 	{
 		String str = L"123";
-		Throw1();
+		ThrowExceptionFunct();
 	}
-	catch (NtException & ex)
+	catch (TestException & ex)
 	{
-		if (ex.Location.File == String(__FILE__) && ex.Location.FunctName != String(__FUNCSIG__))
+		if (ex.Location.File == String(__FILE__) && ex.Location.FunctName != String(__FUNCSIG__) && ex.Code == 1)
 			return true;
 		else
 			return false;
@@ -28,11 +83,11 @@ bool Throw2() {
 	return false;
 }
 
-bool Throw3() {
+static __declspec(noinline) bool ThrowSubMethodElipseFunct() {
 	try
 	{
 		String str = L"123";
-		Throw1();
+		ThrowExceptionFunct();
 	}
 	catch (...)
 	{
@@ -41,16 +96,16 @@ bool Throw3() {
 	return false;
 }
 
-void Throw4() {
+static __declspec(noinline) void ThrowMethodWithoutExceptionFunct() {
 	String str = L"123";
-	Throw1();
+	ThrowExceptionFunct();
 }
 
-bool Throw5() {
+static __declspec(noinline) bool ThrowCatchSubSubMethodFunct() {
 	try
 	{
 		String str = L"123";
-		Throw4();
+		ThrowMethodWithoutExceptionFunct();
 	}
 	catch (...)
 	{
@@ -59,86 +114,26 @@ bool Throw5() {
 	return false;
 }
 
-bool Seed::Core::Testing::Test::Exceptions::Abi::Excecute() {
-	bool testResult = true;
+class TestDtorException {
+public:
+	String text;
+	__declspec(noinline) TestDtorException(String&& text) : text(MoveRValue(text)) {}
+	__declspec(noinline) ~TestDtorException() {
+		Throw(TestException(ExceptionPosition, 8));
+	}
+};
 
+static __declspec(noinline) bool ThrowDtorGenInnerExceptionFunct() {
 	try
 	{
-		Throw(NtException(ExceptionPosition, 0));
+		TestDtorException obj(L"123"S);
+		ThrowMethodWithoutExceptionFunct();
 	}
-	catch (NtException & ex)
+	catch (TestException& ex)
 	{
-		if (!(ex.Location.File == String(__FILE__) &&
-			ex.Location.FunctName == String(__FUNCSIG__)))
-			if (testResult) //-V547
-				testResult = false;
+		return ex.Code == 1 && ex.InnerException != nullptr && ex.InnerException.As<TestException>().Code == 8;
 	}
-
-	try
-	{
-		Throw(NtException(ExceptionPosition, 0));
-	}
-	catch (NotImplementedException & ex)
-	{
-		if (!(ex.Location.File == String(__FILE__) &&
-			ex.Location.FunctName == String(__FUNCSIG__)))
-			if (testResult)
-				testResult = false;
-	}
-	catch (NtException & ex)
-	{
-		if (!(ex.Location.File == String(__FILE__) &&
-			ex.Location.FunctName == String(__FUNCSIG__)))
-			if (testResult)
-				testResult = false;
-	}
-
-	try
-	{
-		Throw(NtException(ExceptionPosition, 0));
-	}
-	catch (Exception & ex)
-	{
-		if (!(ex.Location.File == String(__FILE__) &&
-			ex.Location.FunctName == String(__FUNCSIG__)))
-			if (testResult)
-				testResult = false;
-	}
-
-	try
-	{
-		Throw(NtException(ExceptionPosition, 0));
-	}
-	catch (...)
-	{ //-V565
-		;
-	}
-
-	try
-	{
-		try
-		{
-			Throw(NtException(ExceptionPosition, 0));
-		}
-		catch (NtException& ex)
-		{
-			if (!(ex.Location.File == String(__FILE__) &&
-				ex.Location.FunctName == String(__FUNCSIG__)))
-				if (testResult)
-					testResult = false;
-			ReThrow;
-		}
-	}
-	catch (...)
-	{ //-V565
-		;
-	}
-
-	auto result2 = Throw2();
-	auto result3 = Throw3();
-	auto result4 = Throw5();
-
-	return testResult && result2 && result3 && result4;
+	return false;
 }
 
 bool Seed::Core::Testing::Test::Exceptions::StoringException::Excecute() {
@@ -148,22 +143,185 @@ bool Seed::Core::Testing::Test::Exceptions::StoringException::Excecute() {
 		{
 			try
 			{
-				Throw1();
+				ThrowExceptionFunct();
 			}
 			catch (...)
 			{
 				return Seed::Exceptions::Exception::StoreCurrentException();
 			}
-			Throw(NullPointException(ExceptionPosition));
+
+			Throw(TestException(ExceptionPosition, 7));
 		})
 			.Start()
 			.Join()
 			.GetThreadResult<Seed::Exceptions::Exception::RawException>().ThrowThis();
 	}
-	catch (NtException & ex)
+	catch (TestException & ex)
 	{
 		(void) (ex);
 		return true;
 	}
 	return false;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrow::Excecute()
+{
+	bool testResult = false;
+
+	try
+	{
+		Throw(TestException(ExceptionPosition, 2));
+	}
+	catch (TestException& ex)
+	{
+		if (ex.Location.File == String(__FILE__) &&
+			ex.Location.FunctName == String(__FUNCSIG__) &&
+			ex.Code == 2
+			) {
+			testResult = true;
+		}
+	}
+
+	Asserts::AssertTrue(testResult);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowWithTwoCatches::Excecute()
+{
+	bool testResult = false;
+
+	try
+	{
+		Throw(TestException(ExceptionPosition, 3));
+	}
+	catch (UnusedData NotImplementedException& ex)
+	{
+		testResult = false;
+	}
+	catch (TestException& ex)
+	{
+		if (ex.Location.File == String(__FILE__) &&
+			ex.Location.FunctName == String(__FUNCSIG__) &&
+			ex.Code == 3
+			) {
+			testResult = true;
+		}
+	}
+
+	Asserts::AssertTrue(testResult);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowCatchAsParrentType::Excecute()
+{
+	bool testResult = true;
+
+	try
+	{
+		Throw(TestException(ExceptionPosition, 4));
+	}
+	catch (Exception& ex)
+	{
+		if (!(ex.Location.File == String(__FILE__) &&
+			ex.Location.FunctName == String(__FUNCSIG__))
+			) {
+			testResult = false;
+		}
+	}
+
+	Asserts::AssertTrue(testResult);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowElipseCatch::Excecute()
+{
+	bool testResult = false;
+
+	try
+	{
+		Throw(TestException(ExceptionPosition, 5));
+	}
+	catch (...)
+	{
+		testResult = true;
+	}
+
+	Asserts::AssertTrue(testResult);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::SimpleThrowInnerCatch::Excecute()
+{
+	bool innerCacth = false;
+	bool outerCatch = false;
+
+	try
+	{
+		try
+		{
+			Throw(TestException(ExceptionPosition, 6));
+		}
+		catch (TestException& ex)
+		{
+			if (
+				ex.Location.File == String(__FILE__) &&
+				ex.Location.FunctName == String(__FUNCSIG__) &&
+				ex.Code == 6
+				) {
+				innerCacth = true;
+			}
+
+			ReThrow;
+		}
+	}
+	catch (...)
+	{
+		if (innerCacth == true)
+			outerCatch = true;
+	}
+
+	Asserts::AssertTrue(innerCacth);
+	Asserts::AssertTrue(outerCatch);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowSubMethod::Excecute()
+{
+	auto result = ThrowSubMethodFunct();
+
+	Asserts::AssertTrue(result);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowSubMethodElipse::Excecute()
+{
+	auto result = ThrowSubMethodElipseFunct();
+
+	Asserts::AssertTrue(result);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowCatchSubSubMethod::Excecute()
+{
+	auto result = ThrowCatchSubSubMethodFunct();
+
+	Asserts::AssertTrue(result);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Exceptions::Abi::ThrowDtorGenInnerException::Excecute()
+{
+	auto result = ThrowDtorGenInnerExceptionFunct();
+
+	Asserts::AssertTrue(result);
+
+	return true;
 }

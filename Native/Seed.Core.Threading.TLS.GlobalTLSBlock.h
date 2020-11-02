@@ -18,6 +18,7 @@ namespace Seed {
 
 			inline __declspec(thread) struct TLS {
 				IThreadable* Threadable = 0;
+				volatile EThreadabledStates SecondState;
 				volatile EThreadabledStates* State;
 				TlsExceptionData ExceptionInfo;
 			} TLSData = { 0 };

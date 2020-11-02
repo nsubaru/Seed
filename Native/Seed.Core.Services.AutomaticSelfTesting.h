@@ -40,7 +40,7 @@ namespace Seed
 			private:
 				struct Data
 				{
-					Threading::UnifiedThreadPoolSheduledTask* testRunnerJob;
+					Threading::UnifiedThreadPoolScheduledTask* testRunnerJob;
 					Containers::ConcurencyList<Testing::TestPackResult> testsResults;
 					Threading::SRWLock testRunLock;
 

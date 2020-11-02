@@ -947,44 +947,96 @@ namespace Seed {
 					else
 						//якщо власник ≥снуЇ то видаленн€ виконуЇтьс€ в екслюзивному блокуванн≥
 						node.This->father->lock.ExclusiveLock([&]() InlineLambda
+						{
+							__assume(node.This->father != nullptr);
+							if (node.This->next == nullptr && node.This->prev == nullptr)
 							{
-								__assume(node.This->father != nullptr);
-								if (node.This->next == nullptr && node.This->prev == nullptr)
-								{
-									node.This->father->root = node.This->father->last = nullptr;
-								}
-								else if (node.This->next != nullptr && node.This->prev != nullptr)
-								{
-									node.This->prev->next = node.This->next;
-									node.This->next->prev = node.This->prev;
-								}
-								else if (node.This->next == nullptr)
-								{
-									if (node.This->prev != nullptr)
-										node.This->prev->next = nullptr;
-									node.This->father->last = node.This->prev;
-								}
-								else if (node.This->prev == nullptr) //-V2516
-								{
-									node.This->next->prev = nullptr;
-									node.This->father->root = node.This->next;
-								}
+								node.This->father->root = node.This->father->last = nullptr;
+							}
+							else if (node.This->next != nullptr && node.This->prev != nullptr)
+							{
+								node.This->prev->next = node.This->next;
+								node.This->next->prev = node.This->prev;
+							}
+							else if (node.This->next == nullptr)
+							{
+								if (node.This->prev != nullptr)
+									node.This->prev->next = nullptr;
+								node.This->father->last = node.This->prev;
+							}
+							else if (node.This->prev == nullptr) //-V2516
+							{
+								node.This->next->prev = nullptr;
+								node.This->father->root = node.This->next;
+							}
 
-								--((node.This)->father->size);
+							--((node.This)->father->size);
 
-								if (--node.This->RefCount == 1)
-								{
-									auto newThis = node.This->next;
-									delete node.This;
-									node.This = nullptr;
-								}
-								else
-								{
-									node.This->next = nullptr;
-									node.This->prev = nullptr;
-									node.This = nullptr;
-								}
-							});
+							if (--node.This->RefCount == 1)
+							{
+								delete node.This;
+								node.This = nullptr;
+							}
+							else
+							{
+								node.This->next = nullptr;
+								node.This->prev = nullptr;
+								node.This = nullptr;
+							}
+						});
+				}
+
+				///<summary>¬идаленн€ елемента по ≥тератору. ≤тератор обнулюЇ</summary>
+				void Remove(Iterator&& node)
+				{
+					if (node.This == nullptr)
+						Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
+					if (node.This->father == nullptr)
+					{
+						if (--node.This->RefCount == 0)
+							delete node.This;
+						node.This = nullptr;
+					}
+					else
+						//якщо власник ≥снуЇ то видаленн€ виконуЇтьс€ в екслюзивному блокуванн≥
+						node.This->father->lock.ExclusiveLock([&]() InlineLambda
+						{
+							__assume(node.This->father != nullptr);
+							if (node.This->next == nullptr && node.This->prev == nullptr)
+							{
+								node.This->father->root = node.This->father->last = nullptr;
+							}
+							else if (node.This->next != nullptr && node.This->prev != nullptr)
+							{
+								node.This->prev->next = node.This->next;
+								node.This->next->prev = node.This->prev;
+							}
+							else if (node.This->next == nullptr)
+							{
+								if (node.This->prev != nullptr)
+									node.This->prev->next = nullptr;
+								node.This->father->last = node.This->prev;
+							}
+							else if (node.This->prev == nullptr) //-V2516
+							{
+								node.This->next->prev = nullptr;
+								node.This->father->root = node.This->next;
+							}
+
+							--((node.This)->father->size);
+
+							if (--node.This->RefCount == 1)
+							{
+								delete node.This;
+								node.This = nullptr;
+							}
+							else
+							{
+								node.This->next = nullptr;
+								node.This->prev = nullptr;
+								node.This = nullptr;
+							}
+						});
 				}
 
 				template<typename U>

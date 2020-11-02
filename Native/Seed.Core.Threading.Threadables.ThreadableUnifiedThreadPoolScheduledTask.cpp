@@ -1,4 +1,4 @@
-#include "Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolSheduledTask.h"
+#include "Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolScheduledTask.h"
 
 #include "Seed.Core.Threading.Threadables.Base.Internal.h"
 
@@ -14,24 +14,24 @@ extern __declspec(noreturn, noinline, safebuffers) void InteruptThread();
 using namespace Seed;
 using namespace Seed::Threading;
 
-Seed::Core::Threading::Threadables::ThreadableRef Seed::Core::Threading::Threadables::RegisterPoolSheduledThreadable(const UnifiedThreadPoolSheduledTask& task, ImplSpecificT instance)
+Seed::Core::Threading::Threadables::ThreadableRef Seed::Core::Threading::Threadables::RegisterPoolScheduledThreadable(const UnifiedThreadPoolScheduledTask& task, ImplSpecificT instance)
 {
 	HANDLE hThread = nullptr;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
 	SynchronizeEvent event = SynchronizeEvent(true);
-	auto threadable = new ThreadableUnifiedThreadPoolSheduledTaskV2(task, event, hThread, Threading::GetTID(), instance);
+	auto threadable = new ThreadableUnifiedThreadPoolScheduledTaskV2(task, event, hThread, Threading::GetTID(), instance);
 	return RegisterIThreadable(MoveRValue(threadable), &threadable->This->state);
 }
 
-void Seed::Core::Threading::Threadables::UnRegisterPoolSheduledThreadable(ThreadableRef&& ref)
+void Seed::Core::Threading::Threadables::UnRegisterPoolScheduledThreadable(ThreadableRef&& ref)
 {
-	NtClose(ref->As<ThreadableUnifiedThreadPoolSheduledTaskV2>().This->hThread);
-	ref->As<ThreadableUnifiedThreadPoolSheduledTaskV2>().This->instance = nullptr;
-	ref->As<ThreadableUnifiedThreadPoolSheduledTaskV2>().This->state = Threading::EThreadabledStates::Ended;
+	NtClose(ref->As<ThreadableUnifiedThreadPoolScheduledTaskV2>().This->hThread);
+	ref->As<ThreadableUnifiedThreadPoolScheduledTaskV2>().This->instance = nullptr;
+	ref->As<ThreadableUnifiedThreadPoolScheduledTaskV2>().This->state = Threading::EThreadabledStates::Ended;
 	UnRegisterIThreadable(MoveRValue(ref));
 }
 
-IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolSheduledTaskV2::Suspend()
+IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolScheduledTaskV2::Suspend()
 {
 	_ReadWriteBarrier();
 
@@ -64,7 +64,7 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolShed
 	return *this;
 }
 
-IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolSheduledTaskV2::Resume()
+IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolScheduledTaskV2::Resume()
 {
 	_ReadWriteBarrier();
 
@@ -88,7 +88,7 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolShed
 	return *this;
 }
 
-IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolSheduledTaskV2::Interupt()
+IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolScheduledTaskV2::Interupt()
 {
 	_ReadWriteBarrier();
 
@@ -111,16 +111,15 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolShed
 			NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
 			if (!NT_SUCCESS(status))
 			{
-				NtResumeThread(This->hThread, NULL);
+				NtAlertResumeThread(This->hThread, NULL);
 				Throw(NtException(ExceptionPosition, status));
 			}
 			DWORD64 ret_point = ctx.Rip;
 			ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
 			status = ZwSetContextThread(This->hThread, &ctx);
-			NtResumeThread(This->hThread, NULL);
+			NtAlertResumeThread(This->hThread, NULL);
 			if (!NT_SUCCESS(status))
 				Throw(NtException(ExceptionPosition, status));
-			NtAlertThread(This->hThread);
 		}
 		default:
 			break;

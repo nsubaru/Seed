@@ -32,7 +32,7 @@ namespace Seed {
 				/// <returns>Об'єкт задачі</returns>
 				UnifiedThreadPoolJob PostPriorityJob(Delegate&& action, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium);
 #pragma endregion
-#pragma region Sheduled task
+#pragma region Scheduled task
 				/// <summary>
 				/// Запуск таймера в системному пулі задач
 				/// </summary>
@@ -40,7 +40,7 @@ namespace Seed {
 				/// <param name="name">Ім'я таймера</param>
 				/// <param name="priority">Пріоритет таймера</param>
 				/// <returns>Конструктор таймера</returns>
-				UnifiedThreadPoolSheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium);
+				UnifiedThreadPoolScheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, String&& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium);
 				
 				/// <summary>
 				/// Запуск таймера в системному пулі задач
@@ -49,7 +49,7 @@ namespace Seed {
 				/// <param name="name">Ім'я таймера</param>
 				/// <param name="priority">Пріоритет таймера</param>
 				/// <returns>Конструктор таймера</returns>
-				UnifiedThreadPoolSheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium);
+				UnifiedThreadPoolScheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, const String& name, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium);
 				
 				/// <summary>
 				/// Запуск безіменого таймера в системному пулі задач
@@ -57,7 +57,7 @@ namespace Seed {
 				/// <param name="callback">Колбек таймера</param>
 				/// <param name="priority">Пріоритет таймера</param>
 				/// <returns>Конструктор таймера</returns>
-				UnifiedThreadPoolSheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium);
+				UnifiedThreadPoolScheduledTaskBuilder CreatePriorityScheduledTask(SmartPtr<IUnifiedThreadPoolShedulerCallback>&& callback, Threading::EPoolThreadsPriority priority = Threading::EPoolThreadsPriority::Medium);
 #pragma endregion
 #pragma region Statistic
 				/// <summary>
