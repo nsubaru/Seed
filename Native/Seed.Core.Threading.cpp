@@ -133,8 +133,8 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile ET
 			ref = Threadables::RegisterThreadThreadable(*thread, State);
 			entryPoint();
 		}
-		catch (UnusedData Exceptions::InteruptException & er) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()));
+		catch (Exceptions::InteruptException&) {
+			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception & ex) {
@@ -143,7 +143,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile ET
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -159,7 +159,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile ET
 	}
 	catch (...)
 	{
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;
@@ -653,12 +653,18 @@ VOID NTAPI UnifiedThreadPoolTasksCleanupCallback(
 ) {
 	ConfigureTls(nullptr, nullptr);
 	try {
-		if (ObjectContext == NULL)
-			return;
-		Seed::Core::Threading::UnifiedThreadPoolScheduledTask* This = (Seed::Core::Threading::UnifiedThreadPoolScheduledTask*)ObjectContext;
-		Seed::Core::Threading::ZeroingTaskHadle(This);
-		UnRegisterTaskFromPoolQueue(This);
-		delete This;
+		try {
+			if (ObjectContext == NULL)
+				return;
+
+			Seed::Core::Threading::UnifiedThreadPoolScheduledTask* This = (Seed::Core::Threading::UnifiedThreadPoolScheduledTask*)ObjectContext;
+			Seed::Core::Threading::ZeroingTaskHadle(This);
+			UnRegisterTaskFromPoolQueue(This);
+			delete This;
+		}
+		catch (Exception& ex) {
+			toCoreLog(L"Виникла помилка при знищенні об'єкта задачі в пулі, деталі: ", ex);
+		}
 	}
 	catch (...) {
 		toCoreLog(L"Невідома помилка при знищенні об'єкта задачі в пулі");
@@ -763,7 +769,7 @@ UnifiedThreadPool Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateThreadP
 
 #pragma region Pool configuration creating
 
-UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateJobConfiguration(ImplSpecificT PoolHandle)
+UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateJobConfiguration(ImplSpecificT poolHandle)
 {
 	PTP_CLEANUP_GROUP clenupData = nullptr;
 
@@ -776,7 +782,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	auto threadPoolEnviroment = new TP_CALLBACK_ENVIRON;
 
 	threadPoolEnviroment->Version = 3;
-	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(PoolHandle);
+	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(poolHandle);
 	threadPoolEnviroment->CleanupGroup = clenupData;
 	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolJobsCleanupCallback;
 	threadPoolEnviroment->RaceDll = NULL;
@@ -797,7 +803,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_HIGH;
 		break;
 	default:
-		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for jobs"));
+		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for task"));
 		break;
 	}
 
@@ -810,7 +816,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	return configuration;
 }
 
-UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateScheduledTaskConfiguration(ImplSpecificT PoolHandle)
+UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateScheduledTaskConfiguration(ImplSpecificT poolHandle)
 {
 	PTP_CLEANUP_GROUP clenupData = nullptr;
 
@@ -823,7 +829,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	auto threadPoolEnviroment = new TP_CALLBACK_ENVIRON;
 
 	threadPoolEnviroment->Version = 3;
-	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(PoolHandle);
+	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(poolHandle);
 	threadPoolEnviroment->CleanupGroup = clenupData;
 	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolTasksCleanupCallback;
 	threadPoolEnviroment->RaceDll = NULL;
@@ -844,7 +850,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_HIGH;
 		break;
 	default:
-		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for jobs"));
+		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for timers"));
 		break;
 	}
 
@@ -857,7 +863,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	return configuration;
 }
 
-UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateIrpConfiguration(ImplSpecificT PoolHandle)
+UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBuilder::CreateIrpConfiguration(ImplSpecificT poolHandle)
 {
 	PTP_CLEANUP_GROUP clenupData = nullptr;
 
@@ -870,7 +876,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 	auto threadPoolEnviroment = new TP_CALLBACK_ENVIRON;
 
 	threadPoolEnviroment->Version = 3;
-	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(PoolHandle);
+	threadPoolEnviroment->Pool = reinterpret_cast<PTP_POOL>(poolHandle);
 	threadPoolEnviroment->CleanupGroup = clenupData;
 	threadPoolEnviroment->CleanupGroupCancelCallback = UnifiedThreadPoolIrpCleanupCallback;
 	threadPoolEnviroment->RaceDll = NULL;
@@ -892,7 +898,7 @@ UnifiedThreadPool::PoolConfigureation Seed::Core::Threading::UnifiedThreadPoolBu
 		threadPoolEnviroment->CallbackPriority = TP_CALLBACK_PRIORITY_HIGH;
 		break;
 	default:
-		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for jobs"));
+		Throw(InvalidArgumentException(ExceptionPosition, L"JobsPriority", L"Invalid priority for irp"));
 		break;
 	}
 
@@ -914,9 +920,9 @@ void Seed::Core::Threading::UnifiedThreadPool::DestroyConfiguration(PoolConfigur
 	});
 }
 
-void Seed::Core::Threading::UnifiedThreadPool::DestroyPoolObject(ImplSpecificT PoolHandle)
+void Seed::Core::Threading::UnifiedThreadPool::DestroyPoolObject(ImplSpecificT poolHandle)
 {
-	TpReleasePool(reinterpret_cast<PTP_POOL>(PoolHandle));
+	TpReleasePool(reinterpret_cast<PTP_POOL>(poolHandle));
 }
 #pragma endregion
 
@@ -957,8 +963,8 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolJob* threa
 			ref = Threading::RegisterThreadable(thread, instance);
 			entryPoint();
 		}
-		catch (UnusedData Exceptions::InteruptException& er) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()));
+		catch (Exceptions::InteruptException&) {
+			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception& ex) {
@@ -967,7 +973,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolJob* threa
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -983,7 +989,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolJob* threa
 	}
 	catch (...)
 	{
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;
@@ -1034,8 +1040,10 @@ VOID NTAPI UnifiedPoolWorkCallbak(
 		lock.TryInShareLock([&]() { EntryPoint(GetJobEntryPoint(thread), thread, Instance); });
 	}
 
-	//Free work as we use each work object only one time
-	//(if we don't free each work also will be free in cleanup group close callback and we catch double free exception)
+	//Free work tp object as we use each work tp object only one time
+	// If we don't free work tp object, 
+	// it will be free in cleanup group close callback and 
+	// we catch double free exception
 	TpReleaseWork(Work); 
 }
 
@@ -1184,7 +1192,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolScheduledT
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -1199,7 +1207,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolScheduledT
 	}
 	catch (...)
 	{
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;
@@ -1400,7 +1408,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, const UnifiedThreadPoolIoTa
 			ref = RegisterThreadable(thread, event, instance);
 			entryPoint();
 		}
-		catch (UnusedData Exceptions::InteruptException& er) {
+		catch (Exceptions::InteruptException&) {
 			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" був призупинений");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
@@ -1410,7 +1418,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, const UnifiedThreadPoolIoTa
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -1425,7 +1433,7 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, const UnifiedThreadPoolIoTa
 	}
 	catch (...)
 	{
-		toCoreLog(L"Не передбачувана помилка в " __FUNCSIG__);
+		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;

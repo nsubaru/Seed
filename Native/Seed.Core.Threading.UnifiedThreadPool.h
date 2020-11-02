@@ -851,7 +851,7 @@ namespace Seed {
 				ForceInline UnifiedThreadPoolBuilder(const String& threadPoolName) : UnifiedThreadPoolBuilder(String(threadPoolName)) {}
 			public:
 				/// <summary>
-				/// Встновлює пріоритет всі[ типів задач
+				/// Встновлює пріоритет всіх типів задач
 				/// </summary>
 				/// <param name="newThreadPoolPriority">Пріоритет, який буде встановлено</param>
 				/// <returns>RValue посилання на поточний об'єкт</returns>
@@ -938,9 +938,9 @@ namespace Seed {
 				/// <returns></returns>
 				UnifiedThreadPool CreateThreadPool() &&;
 			private:
-				UnifiedThreadPool::PoolConfigureation CreateJobConfiguration(ImplSpecificT PoolHandle);
-				UnifiedThreadPool::PoolConfigureation CreateScheduledTaskConfiguration(ImplSpecificT PoolHandle);
-				UnifiedThreadPool::PoolConfigureation CreateIrpConfiguration(ImplSpecificT PoolHandle);
+				UnifiedThreadPool::PoolConfigureation CreateJobConfiguration(ImplSpecificT poolHandle);
+				UnifiedThreadPool::PoolConfigureation CreateScheduledTaskConfiguration(ImplSpecificT poolHandle);
+				UnifiedThreadPool::PoolConfigureation CreateIrpConfiguration(ImplSpecificT poolHandle);
 			public:
 				/// <summary>
 				/// Деструктор

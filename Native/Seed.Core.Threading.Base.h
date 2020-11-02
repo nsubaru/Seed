@@ -255,7 +255,7 @@ namespace Seed {
 				{};
 
 				/// <summary>
-				/// Вертаж ID неіснуючого потку
+				/// Вертає ID неіснуючого потку
 				/// </summary>
 				/// <returns>ID неіснуючого потоку</returns>
 				ID GetTID() const { return tid; }
