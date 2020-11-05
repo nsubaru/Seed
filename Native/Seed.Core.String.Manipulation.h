@@ -87,6 +87,32 @@ namespace Seed
                     return *This;
                 }
 
+                /// <summary> 
+                /// Зміна розміру рядка з знищенням символів зліва 
+                /// </summary>
+                /// <param name = "newSize"> Новий розмір тексту без нуль-термінатора </param>
+                /// <returns> Силку на поточний рядок </returns>
+                TBaseString& LeftResize(SizeT newSize) {
+                    TBaseString* This = static_cast<TBaseString*>(this);
+                    newSize++;
+
+                    if (newSize > This->CurrentSize) {
+                        Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, newSize, This->CurrentSize);
+                    }
+
+                    auto delta = This->CurrentSize - newSize;
+
+                    for (SizeT i = delta; i < This->CurrentSize; i++)
+                    {
+                        This->str[i - delta] = This->str[i];
+                    }
+
+                    This->str[newSize - 1] = L'\0';
+                    This->CurrentSize = newSize;
+
+                    return *This;
+                }
+
                 /// <summary>
                 /// Резервування буферу рядка, якщо буфер вже достатній то нічого не відбудеться в іншому випадку відбудеться реалокація рядка
                 /// </summary>

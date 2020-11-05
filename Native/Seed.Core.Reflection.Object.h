@@ -884,6 +884,9 @@ namespace Seed
 				};
 			}
 
+			/// <summary>
+			/// Об'єкт який містить схему об'єкта яка складається з набору методів і властивостей та конструктора якщо він заданий
+			/// </summary>
 			class ObjectRTTIRecord final : IDisposable, public Serilization::ISerilizable<ObjectRTTIRecord> {
 			public:
 				using CtorCaller = DynamicObject (*)(const Containers::Array<DynamicObject>&);
@@ -891,6 +894,9 @@ namespace Seed
 				using MethodCaller = DynamicObject(*)(const void* const&, DynamicObject&, const Containers::Array<DynamicObject>&);
 				using TypeInformationGetterType = Containers::List<DataTypeRecord>(*)();
 			public:
+				/// <summary>
+				/// Запис про метод
+				/// </summary>
 				class MethodRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
 				private:
 					struct Data {
@@ -977,70 +983,152 @@ namespace Seed
 							TMethodDescriptor::IsVolatile
 						)) {}
 
+					/// <summary>
+					/// Вертає ім'я метода
+					/// </summary>
 					ForceInline const String& GetName() const {
 						return this->data->MethodName;
 					}
 
+					/// <summary>
+					/// Вертає покажчик на функцію динамічного виклику методу
+					/// </summary>
 					ForceInline MethodCaller GetMethodCaller() const {
 						return this->data->methodCaller;
 					}
 
+					/// <summary>
+					/// Вертає ім'я типу кортежу вхідних аргументів
+					/// </summary>
 					ForceInline const String& GetArgsTypeName() const {
 						return this->data->MethodArgs;
 					}
 
+					/// <summary>
+					/// Вертає ім'я типу кортежу результуючого типу методу
+					/// </summary>
 					ForceInline const String& GetRetTypeName() const {
 						return this->data->MethodRet;
 					}
 
+					/// <summary>
+					/// Вертає схему кортежу аргументів метода
+					/// </summary>
 					ForceInline const String& GetArgsMetaData() const {
 						return this->data->MethodArgsMetaData;
 					}
 
+					/// <summary>
+					/// Вертає схему кортежу результуючого типу методу
+					/// </summary>
 					ForceInline const String& GetRetMetaData() const {
 						return this->data->MethodRetMetaData;
 					}
 
+					/// <summary>
+					/// Вертає список інформацій про кожен аргумент
+					/// </summary>
 					ForceInline TypeInformationGetterType GetTypeInformationGetter() const {
 						return this->data->typeInformationGetter;
 					}
 
+					/// <summary>
+					/// Вертає логічне значення яке вказує чи результуючийтип серелізується
+					/// </summary>
 					ForceInline bool GetIsRetSerilizable() const {
 						return this->data->IsRetSerilizable;
 					}
 
+					/// <summary>
+					/// Вертає логічне значення яке вказує чи типи аргументів серелізуються
+					/// </summary>
 					ForceInline bool GetIsArgsSerilizable() const {
 						return this->data->IsArgsSerilizable;
 					}
 
+					/// <summary>
+					/// Вертає логічне значення яке вказує чи метод має модифікатор константи
+					/// </summary>
 					ForceInline bool GetIsConst() const {
 						return this->data->IsConstMethod;
 					}
 
+					/// <summary>
+					/// Вертаж логічне значення яке вказує чи метод має модифікатор волатильності 
+					/// </summary>
 					ForceInline bool GetIsVolatile() const {
 						return this->data->IsVolatileMethod;
 					}
 
+					/// <summary>
+					/// Вертає сирий покажчик на метод
+					/// </summary>
 					ForceInline const void* const& GetMethodPointer() const {
 						return this->data->pMethod;
 					}
 
+				public:
+					/// <summary>
+					/// Ім'я методу
+					/// </summary>
 					String Property(GetName) Name;
+
+					/// <summary>
+					/// Покажчик на функцію динамічного виклику метода
+					/// </summary>
 					MethodCaller Property(GetMethodCaller) MethodCallerFunction;
+
+					/// <summary>
+					/// Ім'я кортежу аргументів метода
+					/// </summary>
 					String Property(GetArgsTypeName) ArgsTypeName;
+
+					/// <summary>
+					/// Ім'я кортежу результуючого типу
+					/// </summary>
 					String Property(GetRetTypeName) RetTypeName;
+
+					/// <summary>
+					/// Схема кортежу аргументів
+					/// </summary>
 					String Property(GetArgsMetaData) ArgsMetaData;
+
+					/// <summary>
+					/// Схема кортежу результуючого типу
+					/// </summary>
 					String Property(GetRetMetaData) RetMetaData;
+
+					/// <summary>
+					/// Список об'єктів інформації аргументів
+					/// </summary>
 					TypeInformationGetterType Property(GetTypeInformationGetter) TypeInformationGetterFunction;
+
+					/// <summary>
+					/// Вказує чи результуючий тип серелізується
+					/// </summary>
 					bool Property(GetIsRetSerilizable) IsRetSerilizable;
+
+					/// <summary>
+					/// Вертає чи тип кортежу аргументів серелізується
+					/// </summary>
 					bool Property(GetIsArgsSerilizable) IsArgsSerilizable;
+
+					/// <summary>
+					/// Вертає чи метода містить модифікатор const
+					/// </summary>
 					bool Property(GetIsConst) IsConst;
+
+					/// <summary>
+					/// Вертає чи метод містить модифікатор volatile
+					/// </summary>
 					bool Property(GetIsVolatile) IsVolatile;
-
-
+				public:
 					RefCountClass(MethodRTTIRecord, data);
 				};
 
+				/// <summary>
+				/// Об'єкт мета опису властивості об'єкту
+				/// </summary>
 				class PropertyRTTIRecord final : IDisposable, public Serilization::ISerilizable<MethodRTTIRecord> {
 				public:
 					using TSerilizationFunction = Containers::Blob(*)(const DynamicObject&, const Core::Serilization::TypesRegistry&);
@@ -1153,59 +1241,127 @@ namespace Seed
 							TPropertyDescriptor::SerilizeTypeMetaData
 						)) {}
 				public:
+					/// <summary>
+					/// Вертає ім'я властивості
+					/// </summary>
 					ForceInline String GetName() const {
 						return data->Name;
 					}
 
+					/// <summary>
+					/// Вертає ім'я типу властивості
+					/// </summary>
 					ForceInline String GetPropTypeName() const {
 						return data->PropTypeName;
 					}
 
+					/// <summary>
+					/// Вертає покажчик на функцію динамічого виклику
+					/// </summary>
 					ForceInline MethodCaller GetGetter() const {
 						return data->Getter;
 					}
 
+					/// <summary>
+					/// Вертає список об'єктів мета описів сетерів властивосі
+					/// </summary>
 					ForceInline const Containers::List<CallerData>& GetSetters() const {
 						return data->Setters;
 					}
 
+					/// <summary>
+					/// Вертає значення яке вказує чи властивість має сеттери
+					/// </summary>
 					ForceInline Boolean GetIsRW() const {
 						return data->IsRW;
 					}
 
+					/// <summary>
+					/// Вертає сирикй покажчик на геттер
+					/// </summary>
 					ForceInline const void* const& GetGetterAddr() const {
 						return data->pGetter;
 					}
 
+					/// <summary>
+					/// Вертає покажчик на функцію яка вертає опис типу властивості
+					/// </summary>
 					ForceInline TypeInformationGetterType GetTypeInformationGetter() const {
 						return data->typeInformationGetter;
 					}
 
+					/// <summary>
+					/// Викликає гетер для заданого об'єкту
+					/// </summary>
 					ForceInline DynamicObject CallGetterForObject(DynamicObject& obj) const {
 						auto args = Containers::Array<DynamicObject>();
 						return data->Getter(data->pGetter, obj, args);
 					}
 
+					/// <summary>
+					/// Вказує чи властивість серелізується
+					/// </summary>
 					ForceInline Boolean GetIsSerilizable() const {
 						return data->IsValueSerilizable;
 					}
 
+					/// <summary>
+					/// Вертає функцію серелізації типу властивості
+					/// </summary>
 					ForceInline TSerilizationFunction GetSerilizableFunction() const {
 						return data->serilizationFunction;
 					}
 
+					/// <summary>
+					/// Вертає функцію яка надає метадані для серелізації
+					/// </summary>
 					ForceInline TSerilizationMetaDataGetter GetSerilizableMetaDataGetter() const {
 						return data->serilizationMetaDataGetter;
 					}
-
+				public:
+					/// <summary>
+					/// Ім'я властивості
+					/// </summary>
 					String Property(GetName) Name;
+
+					/// <summary>
+					/// Ім'я кортежу типу властивості
+					/// </summary>
 					String Property(GetPropTypeName) PropertieTypeName;
+
+					/// <summary>
+					/// Функція виклику геттера
+					/// </summary>
 					MethodCaller Property(GetGetter) Getter;
+
+					/// <summary>
+					/// Вертає список покажчиків на сеттери і їх мета описів
+					/// </summary>
 					Containers::List<CallerData> Property(GetSetters) Setters;
+
+					/// <summary>
+					/// Вказує чи є сеттери в властивості
+					/// </summary>
 					Boolean Property(GetIsRW) IsRW;
+
+					/// <summary>
+					/// Функція яка вертає мета запис інформації про тип геттера
+					/// </summary>
 					TypeInformationGetterType Property(GetTypeInformationGetter) TypeInformationGetter;
+
+					/// <summary>
+					/// Вказує чи тип властивості підтримує серелізацію
+					/// </summary>
 					Boolean Property(GetIsSerilizable) IsSerilizable;
+
+					/// <summary>
+					/// Вертає функцію серелізації типу властивості
+					/// </summary>
 					TSerilizationFunction Property(GetSerilizableFunction) SerilizationFunction;
+
+					/// <summary>
+					/// Вертає функцію яка вертає мета інформацію про тип властивості
+					/// </summary>
 					TSerilizationMetaDataGetter Property(GetSerilizableMetaDataGetter) SerilizableMetaDataGetter;
 				public:
 					RefCountClass(PropertyRTTIRecord, data);
@@ -1275,7 +1431,7 @@ namespace Seed
 						return Containers::List<PropertyRTTIRecord>(MoveRValue(
 							(
 								Containers::List<PropertyRTTIRecord>({
-									PropertyRTTIRecord(Properties.GetByIdx<0>())
+									PropertyRTTIRecord(Properties.GetByIdx<TId>())
 								}) += 
 									MoveRValue(GenerateRTTIPropertieInfo<TId + 1>(Properties)
 								)
@@ -1308,47 +1464,98 @@ namespace Seed
 						GenerateRTTIMethodInfo<0>(ObjectDescriptor.Methods),
 						GenerateRTTIPropertieInfo<0>(ObjectDescriptor.Properties)
 					)) {};
-
+			public:
+				/// <summary>
+				/// Ім'я типу об'єкта
+				/// </summary>
 				ForceInline const String& GetName() const {
 					return this->data->ClassName;
 				}
 
+				/// <summary>
+				/// Вертає ім'я кортежу аргументів конструктора
+				/// </summary>
 				ForceInline const String& GetCtorArgs() const {
 					return this->data->CtorArgs;
 				}
 
+				/// <summary>
+				/// Вертає схему типу кортежу аргументів конструктора
+				/// </summary>
 				ForceInline const String& GetArgsMetaData() const {
 					return this->data->CtorMetaDate;
 				}
 
+				/// <summary>
+				/// Вертає функцію динамічного створення об'єкта
+				/// </summary>
 				ForceInline CtorCaller GetCtorCaller() const {
 					return this->data->ctorCaller;
 				}
 
+				/// <summary>
+				/// Вертає функцію знищення об'єкта
+				/// </summary>
 				ForceInline DtorCaller GetDtorCaller() const {
 					return this->data->dtorCaller;
 				}
 
+				/// <summary>
+				/// Вертає список мета описів методів типу об'єкта
+				/// </summary>
 				ForceInline const Containers::List<MethodRTTIRecord>& GetAllMethods() const {
 					return this->data->Methods;
 				}
 
+				/// <summary>
+				/// Вертає список мета описів властивостей типу ооб'єкта
+				/// </summary>
 				ForceInline const Containers::List<PropertyRTTIRecord>& GetAllProperties() const {
 					return this->data->Properties;
 				}
 
+				/// <summary>
+				/// Вертає RTTI інформацію про тип об'єкта 
+				/// </summary>
 				ForceInline RTTI::RTTITypeRecord GetRTTITypeInfo() const {
 					return this->data->RttiTypeInfo;
 				}
-
+			public:
+				/// <summary>
+				/// Ім'я типу
+				/// </summary>
 				String Property(GetName) ClassName;
-				String Property(GetCtorArgs) CtorArgs;
-				String Property(GetArgsMetaData) ArgsMetaData;
-				CtorCaller Property(GetCtorCaller) CtorCallerFunction;
-				DtorCaller Property(GetDtorCaller) DtorCallerFunction;
-				Containers::List<MethodRTTIRecord> Property(GetAllMethods) Methods;
-				Containers::List<PropertyRTTIRecord> Property(GetAllProperties) Properties;
 
+				/// <summary>
+				/// Ім'я тип кортежа аргументів конструктора
+				/// </summary>
+				String Property(GetCtorArgs) CtorArgs;
+
+				/// <summary>
+				/// Схема кортежа аргументів конструктора
+				/// </summary>
+				String Property(GetArgsMetaData) ArgsMetaData;
+
+				/// <summary>
+				/// Функція динамічного конструкювання об'єкта
+				/// </summary>
+				CtorCaller Property(GetCtorCaller) CtorCallerFunction;
+
+				/// <summary>
+				/// Функція динамічого знищення об'єкта
+				/// </summary>
+				DtorCaller Property(GetDtorCaller) DtorCallerFunction;
+
+				/// <summary>
+				/// Список мета описів методів об'єкта
+				/// </summary>
+				Containers::List<MethodRTTIRecord> Property(GetAllMethods) Methods;
+
+				/// <summary>
+				/// Список мета описів властивостей об'єкта
+				/// </summary>
+				Containers::List<PropertyRTTIRecord> Property(GetAllProperties) Properties;
+			public:
 				RefCountClass(ObjectRTTIRecord, data);
 			};
 		}
