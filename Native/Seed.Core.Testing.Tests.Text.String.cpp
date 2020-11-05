@@ -314,3 +314,12 @@ bool Seed::Core::Testing::Test::Text::StringCtorFromConstArray::Excecute() {
 
 	return true;
 }
+
+bool Seed::Core::Testing::Test::Text::StringLeftResize::Excecute()
+{
+	auto testStr = L"12345678"S;
+
+	Asserts::AssertEqual(testStr.LeftResize(testStr.Lenght - 2), L"345678"S);
+
+	return true;
+}

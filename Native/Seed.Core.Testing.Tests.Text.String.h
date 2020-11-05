@@ -50,6 +50,10 @@ namespace Seed
                     class StringCtorFromConstArray final : public TestClass<StringCtorFromConstArray> {
                         virtual bool Excecute() override;
                     };
+
+                    class StringLeftResize final : public TestClass<StringLeftResize>{
+                        virtual bool Excecute() override;
+                    };
 				}
 			}
 		}
