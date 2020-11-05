@@ -25,6 +25,7 @@ void Seed::Core::DI::DepencyInjector::RegisterServiceTypes(const SmartPtr<Servic
 			this->data->dataTypeRecordRefs.Insert({ typeRecord.GetTypeInfo(), 1 });
 			this->data->dataTypeTableForNativeLevel.Insert(typeRecord.GetTypeInfo(), typeRecord);
 			this->data->dataTypeTableForManagedLevel.Insert(typeRecord.TypeName, typeRecord);
+			this->data->dataTypesListForSerilization.AddLast({ typeRecord.TypeRecord, typeRecord });
 		});
 	});
 }
@@ -78,6 +79,8 @@ void Seed::Core::DI::DepencyInjector::UnregisterServiceTypes(const SmartPtr<Serv
 					data->dataTypeTableForManagedLevel.Remove(typeRecord.TypeName);
 
 					data->dataTypeRecordRefs.Delete(typeRecord.GetTypeInfo());
+
+					data->dataTypesListForSerilization.RemoveIf([&](const auto& item) { return item.Key == typeRecord.TypeRecord; });
 
 					return;
 				}
