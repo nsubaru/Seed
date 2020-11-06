@@ -1,7 +1,7 @@
 #pragma once
-#include "Seed.Core.Threading.h"
-
 #include "Seed.Core.IO.FS.File.h"
+
+#include "Seed.Core.Threading.h"
 
 namespace Seed {
 	inline namespace Core {

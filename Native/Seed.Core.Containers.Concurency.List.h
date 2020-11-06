@@ -412,7 +412,7 @@ namespace Seed {
 #pragma endregion
 #pragma region List element manipulations
 					///<summary>¬идаленн€ значенн€ ≥тератора, ≥тератор отримуЇ значенн€ наступного елемента</summary>
-					Iterator Remove()
+					Iterator Remove(bool isReciveNextItInstead = true)
 					{
 						if (this->This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -426,49 +426,61 @@ namespace Seed {
 						else
 							//якщо власник ≥снуЇ то видаленн€ виконуЇтьс€ в екслюзивному блокуванн≥
 							this->This->father->lock.ExclusiveLock([&]() InlineLambda
+							{
+								__assume(this->This->father != nullptr);
+
+								if (this->This->next == nullptr && this->This->prev == nullptr)
 								{
-									__assume(this->This->father != nullptr);
-									if (this->This->next == nullptr && this->This->prev == nullptr)
-									{
-										this->This->father->root = this->This->father->last = nullptr;
-									}
-									else if (this->This->next != nullptr && this->This->prev != nullptr)
-									{
-										this->This->prev->next = this->This->next;
-										this->This->next->prev = this->This->prev;
-									}
-									else if (this->This->next == nullptr)
-									{
-										if (this->This->prev != nullptr)
-											this->This->prev->next = nullptr;
-										this->This->father->last = this->This->prev;
-									}
-									else if (this->This->prev == nullptr) //-V2516
-									{
-										this->This->next->prev = nullptr;
-										this->This->father->root = this->This->next;
-									}
+									this->This->father->root = this->This->father->last = nullptr;
+								}
+								else if (this->This->next != nullptr && this->This->prev != nullptr)
+								{
+									this->This->prev->next = this->This->next;
+									this->This->next->prev = this->This->prev;
+								}
+								else if (this->This->next == nullptr)
+								{
+									if (this->This->prev != nullptr)
+										this->This->prev->next = nullptr;
+									this->This->father->last = this->This->prev;
+								}
+								else if (this->This->prev == nullptr) //-V2516
+								{
+									this->This->next->prev = nullptr;
+									this->This->father->root = this->This->next;
+								}
 
-									--((This)->father->size);
+								--((This)->father->size);
 
-									if (--this->This->RefCount == 1)
-									{
-										auto newThis = this->This->next;
-										delete this->This;
+								if (--this->This->RefCount == 1)
+								{
+									auto newThis = this->This->next;
+									delete this->This;
+									if (isReciveNextItInstead) {
 										this->This = newThis;
 										if (this->This != nullptr)
 											++this->This->RefCount;
 									}
-									else
-									{
-										auto newThis = this->This->next;
-										this->This->next = nullptr;
-										this->This->prev = nullptr;
+									else {
+										this->This = nullptr;
+									}
+								}
+								else
+								{
+									auto newThis = this->This->next;
+									this->This->next = nullptr;
+									this->This->prev = nullptr;
+									if (isReciveNextItInstead) {
 										this->This = newThis;
 										if (this->This != nullptr)
 											++this->This->RefCount;
 									}
-								});
+									else {
+										this->This = nullptr;
+									}
+								}
+							});
+
 						return *this;
 					}
 #pragma region Adding element to list by iterator
