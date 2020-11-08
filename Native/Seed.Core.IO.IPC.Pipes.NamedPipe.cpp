@@ -3,6 +3,9 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+using namespace Seed;
+using namespace Seed::Core::IO::IPC::Pipes;
+
 #pragma region Named pipe client
 
 void Seed::Core::IO::IPC::Pipes::NamedPipeClient::Dispose()
@@ -76,6 +79,20 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeClient::WriteRawData(const Containers:
 	}
 }
 
+void Seed::Core::IO::IPC::Pipes::NamedPipeClient::Flush()
+{
+	if (this->This == nullptr || this->This->pipe == nullptr)
+		Throw(NullPointException(ExceptionPosition));
+
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
+	NTSTATUS status = NtFlushBuffersFile(This->pipe, &ioStatusBlock);
+
+	if (status == STATUS_PIPE_BROKEN) {
+		this->Close();
+		Throw(PipeBrokenException(ExceptionPosition));
+	}
+}
+
 void Seed::Core::IO::IPC::Pipes::NamedPipeClient::Close()
 {
 	if (this->This != nullptr)
@@ -99,7 +116,7 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeClient::WaitClosing() const
 
 #pragma region Named pipe server
 
-Handle Seed::Core::IO::IPC::Pipes::NamedPipeServer::CreateServerPipeHandle()
+Handle Seed::Core::IO::IPC::Pipes::NamedPipeServer::CreateServerPipeHandle(bool isNoCache)
 {
 	IO_STATUS_BLOCK ioStatusBlock = { 0 };
 	OBJECT_ATTRIBUTES objectAttributes = { 0 };
@@ -146,7 +163,7 @@ Handle Seed::Core::IO::IPC::Pipes::NamedPipeServer::CreateServerPipeHandle()
 		&ioStatusBlock,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		FILE_OPEN_IF,
-		FILE_SYNCHRONOUS_IO_ALERT,
+		FILE_SYNCHRONOUS_IO_ALERT | (isNoCache ? FILE_WRITE_THROUGH : NULL),
 		TRUE,
 		TRUE,
 		FALSE,
@@ -166,7 +183,7 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServer::Dispose()
 	this->DestroyPipe();
 }
 
-Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance Seed::Core::IO::IPC::Pipes::NamedPipeServer::Connect()
+NamedPipeServerInstance Seed::Core::IO::IPC::Pipes::NamedPipeServer::Connect(Boolean isNoCache)
 {
 	if (This == nullptr)
 		Throw(NullPointException(ExceptionPosition));
@@ -196,6 +213,7 @@ Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance Seed::Core::IO::IPC::Pipes::
 				NamedPipeServerInstance(
 					new NamedPipeServerInstance::Data(
 						String(This->name),
+						isNoCache,
 						pipeHandle,
 						This->mode)
 				)
@@ -239,6 +257,7 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServer::DestroyPipe()
 
 void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::Dispose()
 {
+	this->Close();
 }
 
 void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::ReadRaw(Containers::Blob& data)
@@ -324,20 +343,32 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::WaitClosing() const
 	NtWaitForSingleObject(This->pipe, TRUE, NULL);
 }
 
-#pragma endregion
+void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::Flush()
+{
+	if (this->This == nullptr || this->This->pipe == nullptr)
+		Throw(NullPointException(ExceptionPosition));
 
-using namespace Seed;
-using namespace Seed::Core::IO::IPC::Pipes;
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
+	NTSTATUS status = NtFlushBuffersFile(This->pipe, &ioStatusBlock);
+
+	if (status == STATUS_PIPE_BROKEN) {
+		this->Close();
+		Throw(PipeBrokenException(ExceptionPosition));
+	}
+}
+
+#pragma endregion
 
 NamedPipeServer Seed::IO::IPC::Pipes::CreatePipe(
 	const String& name, 
 	UInt8 MaxInstanceCount, 
-	PipeMode mode)
+	PipeMode mode,
+	bool isNoCache)
 {
-	return NamedPipeServer(new NamedPipeServer::Data(mode, MaxInstanceCount, name));
+	return NamedPipeServer(new NamedPipeServer::Data(mode, isNoCache, MaxInstanceCount, name));
 }
 
-NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectPipe(const String& name, PipeMode mode)
+NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectPipe(const String& name, PipeMode mode, bool isNoCache)
 {
 	IO_STATUS_BLOCK ioStatusBlock = { 0 };
 	OBJECT_ATTRIBUTES objectAttributes = { 0 };
@@ -381,7 +412,7 @@ NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectPipe(const String& name, Pipe
 		NULL,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		FILE_OPEN,
-		FILE_SYNCHRONOUS_IO_ALERT,
+		FILE_SYNCHRONOUS_IO_ALERT | (isNoCache ? FILE_WRITE_THROUGH : NULL),
 		NULL,
 		0);
 
@@ -389,5 +420,5 @@ NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectPipe(const String& name, Pipe
 		Throw(NullPointException(ExceptionPosition));
 
 	realPipeName.LeftResize(realPipeName.Lenght - 9);
-	return NamedPipeClient(new NamedPipeClient::Data(pipe, mode, MoveRValue(realPipeName)));
+	return NamedPipeClient(new NamedPipeClient::Data(pipe, isNoCache, mode, MoveRValue(realPipeName)));
 }

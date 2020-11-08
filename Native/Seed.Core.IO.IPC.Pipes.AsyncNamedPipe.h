@@ -128,7 +128,7 @@ namespace Seed {
 
 						virtual void WaitClosing() const = 0;
 
-						virtual void WaitClosing(Time::TimeSpan timeout) const;
+						virtual void WaitClosing(Time::TimeSpan timeout) const = 0;
 
 						virtual ~IAsyncNamedPipe() = 0 {};
 					};

@@ -10,8 +10,29 @@ namespace Seed {
 					/// Режими роботи коналу 
 					/// </summary>
 					enum class PipeMode : UInt8 {
-						In = 0b01, Out = 0b10, Both = 0b11
+						/// <summary>
+						/// Тільки читання
+						/// </summary>
+						In = 0b01, 
+						/// <summary>
+						/// Тільки запис
+						/// </summary>
+						Out = 0b10, 
+						/// <summary>
+						/// Читання і запис
+						/// </summary>
+						Both = 0b011
 					};
+
+					/// <summary>
+					/// Оператор об'єдання режимів роботи каналу
+					/// </summary>
+					/// <param name="right">Правий операнд</param>
+					/// <param name="left">Лівий операнд</param>
+					/// <returns>Об'єднаний режим</returns>
+					constexpr PipeMode operator|(PipeMode right, PipeMode left) {
+						return static_cast<PipeMode>(static_cast<UInt8>(right) | static_cast<UInt8>(left));
+					}
 
 					/// <summary>
 					/// Інтерфейс каналу
@@ -34,7 +55,7 @@ namespace Seed {
 						/// Вказує чи канал робочий
 						/// </summary>
 						/// <returns>Логічне значення, true, якщо канал робочий</returns>
-						virtual Boolean IsValid() const = 0;
+						virtual Boolean GetIsValid() const = 0;
 
 						/// <summary>
 						/// Закриває канал якщо він робочий, інакше нічого не робить
@@ -59,6 +80,7 @@ namespace Seed {
 					private:
 						struct Data {
 							PipeMode mode;
+							Boolean isNoCache;
 							Handle pipe;
 							Threading::SRWLock inputLock;
 							Threading::SRWLock ouputLock;
@@ -67,10 +89,12 @@ namespace Seed {
 
 							Data(
 								Handle pipe,
+								Boolean isNoCache,
 								PipeMode mode,
 								String&& name
 							) :
 								pipe(pipe),
+								isNoCache(isNoCache),
 								mode(mode),
 								inputLock(),
 								ouputLock(),
@@ -113,23 +137,55 @@ namespace Seed {
 						virtual void WaitClosing() const override final;
 
 						/// <summary>
+						/// Очікування на очищення буферів
+						/// </summary>
+						void Flush();
+					public:
+						/// <summary>
 						/// Вказує чи канал робочий
 						/// </summary>
 						/// <returns>Логічне значення, true, якщо канал робочий</returns>
-						virtual Boolean IsValid() const override final { return This != nullptr && This->pipe != nullptr; }
-					public:
+						virtual Boolean GetIsValid() const override final { return This != nullptr && This->pipe != nullptr; }
+
 						/// <summary>
 						/// Вертає ім'я каналу
 						/// </summary>
 						/// <returns>Рядок з іменем каналу</returns>
-						const String& GetPipeName() const { return This->name; }
+						const String& GetName() const { return This->name; }
+
+						/// <summary>
+						/// Режим каналу
+						/// </summary>
+						/// <returns>Поточний режим каналу</returns>
+						PipeMode GetSupportedMode() const { return This->mode; }
+
+						/// <summary>
+						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
+						Boolean GetIsNoCache() const { return This->isNoCache; }
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						Boolean Property(GetIsValid) IsValid;
 
 						/// <summary>
 						/// Ім'я каналу
 						/// </summary>
-						String Property(GetPipeName) Name;
+						String Property(GetName) Name;
+
+						/// <summary>
+						/// Режим роботи каналу
+						/// </summary>
+						PipeMode Property(GetSupportedMode) SupportedMode;
+
+						/// <summary>
+						/// Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
-						friend NamedPipeClient ConnectPipe(const String& name, PipeMode mode);
+						friend NamedPipeClient ConnectPipe(const String& name, PipeMode mode, bool isNoCache);
 					public:
 						RefCountClass(NamedPipeClient, This)
 					};
@@ -143,6 +199,7 @@ namespace Seed {
 					private:
 						struct Data {
 							PipeMode mode;
+							Boolean isNoCache;
 							UInt32 maxInstanceCount;
 							Containers::ConcurencyList<NamedPipeServerInstance> instances;
 							String name;
@@ -151,10 +208,12 @@ namespace Seed {
 
 							Data(
 								PipeMode mode,
+								Boolean isNoCache,
 								UInt32 maxInstanceCount,
 								String name
 							) :
 								mode(mode),
+								isNoCache(isNoCache),
 								maxInstanceCount(maxInstanceCount),
 								name(name),
 								instances(),
@@ -166,7 +225,7 @@ namespace Seed {
 					private:
 						NamedPipeServer(Data*&& This) :This(This) {};
 					private:
-						Handle CreateServerPipeHandle();
+						Handle CreateServerPipeHandle(bool isNoCache);
 					protected:
 						virtual void Dispose() override;
 					public:
@@ -179,7 +238,16 @@ namespace Seed {
 						/// Очікує і приєднюється до клієнту вертаюче екземпляр з'єднання
 						/// </summary>
 						/// <returns>Екземпляр з'єднання каналу з другою стороною</returns>
-						NamedPipeServerInstance Connect();
+						NamedPipeServerInstance Connect() {
+							return this->Connect(This->isNoCache);
+						}
+
+						/// <summary>
+						/// Очікує і приєднюється до клієнту вертаюче екземпляр з'єднання
+						/// </summary>
+						/// <param name="isNoCache">Вказує чи даному екземпляру виконувати передачу даних без буферизації</param>
+						/// <returns>Екземпляр з'єднання каналу з другою стороною</returns>
+						NamedPipeServerInstance Connect(Boolean isNoCache);
 
 						/// <summary>
 						/// Закриває всі з'єднання з клієнтами
@@ -201,19 +269,25 @@ namespace Seed {
 						/// Вертає кількість активних з'єднаннь
 						/// </summary>
 						/// <returns>Число яке вказує кількість активних з'єднаннь</returns>
-						SizeT GetInstanceCount() { return This == nullptr ? 0 : This->instances.Count; }
+						SizeT GetInstanceCount() const { return This == nullptr ? 0 : This->instances.Count; }
 
 						/// <summary>
 						/// Вертає ім'я каналу
 						/// </summary>
 						/// <returns>Рядок з іменем каналу</returns>
-						const String& GetName() { return This->name; }
+						const String& GetName() const { return This->name; }
 
 						/// <summary>
 						/// Режим каналу
 						/// </summary>
 						/// <returns>Поточний режим каналу</returns>
-						PipeMode GetSupportedMode() { return This->mode; }
+						PipeMode GetSupportedMode() const { return This->mode; }
+
+						/// <summary>
+						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
+						Boolean GetIsNoCache() const { return This->isNoCache; }
 					public:
 						/// <summary>
 						/// Вказує чи канал робочий
@@ -234,10 +308,15 @@ namespace Seed {
 						/// Режим роботи каналу
 						/// </summary>
 						PipeMode Property(GetSupportedMode) SupportedMode;
+
+						/// <summary>
+						/// Логічне значення яке вказує чи підтримує автоскидання буферів після кожної операції
+						/// </summary>
+						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
 						RefCountClass(NamedPipeServer, This)
 					public:
-						friend NamedPipeServer CreatePipe(const String& name, UInt8 maxInstanceCount, PipeMode mode);
+						friend NamedPipeServer CreatePipe(const String& name, UInt8 maxInstanceCount, PipeMode mode, bool isNoCache);
 					};
 
 					/// <summary>
@@ -248,6 +327,7 @@ namespace Seed {
 						struct Data {
 							String pipeName;
 							PipeMode mode;
+							Boolean isNoCache;
 							Handle pipe;
 							RefCountT RefCount;
 							Containers::ConcurencyList<NamedPipeServerInstance>::Iterator ThisInstanceLink;
@@ -256,10 +336,12 @@ namespace Seed {
 
 							Data(
 								String&& pipeName,
+								Boolean isNoCache,
 								Handle pipe,
 								PipeMode mode
 							) :
 								pipe(pipe),
+								isNoCache(isNoCache),
 								mode(mode),
 								RefCount(1),
 								inputLock(),
@@ -302,14 +384,58 @@ namespace Seed {
 						virtual void WaitClosing() const override final;
 
 						/// <summary>
+						/// Очікування на очищення буферів
+						/// </summary>
+						void Flush();
+					public:
+						/// <summary>
 						/// Вказує чи канал робочий
 						/// </summary>
 						/// <returns>Логічне значення, true, якщо канал робочий</returns>
-						virtual Boolean IsValid() const override final { return This != nullptr && This->pipe != nullptr; }
+						virtual Boolean GetIsValid() const override final { return This != nullptr && This->pipe != nullptr; }
+
+						/// <summary>
+						/// Вертає ім'я каналу
+						/// </summary>
+						/// <returns>Рядок з іменем каналу</returns>
+						const String& GetName() const { return This->pipeName; }
+
+						/// <summary>
+						/// Режим каналу
+						/// </summary>
+						/// <returns>Поточний режим каналу</returns>
+						PipeMode GetSupportedMode() const { return This->mode; }
+
+						/// <summary>
+						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
+						Boolean GetIsNoCache() const { return This->isNoCache; }
+
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						Boolean Property(GetIsValid) IsValid;
+
+						/// <summary>
+						/// Ім'я каналу
+						/// </summary>
+						String Property(GetName) Name;
+
+						/// <summary>
+						/// Режим роботи каналу
+						/// </summary>
+						PipeMode Property(GetSupportedMode) SupportedMode;
+
+						/// <summary>
+						/// Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
 						RefCountClass(NamedPipeServerInstance, This);
 					public:
-						friend NamedPipeServerInstance NamedPipeServer::Connect();
+						friend NamedPipeServerInstance NamedPipeServer::Connect(bool isNoCache);
 					};
 
 					/// <summary>
@@ -319,7 +445,7 @@ namespace Seed {
 					/// <param name="maxInstanceCount">Максимальна кільість екземплярів з'єднаннь каналів</param>
 					/// <param name="mode">Режим каналів</param>
 					/// <returns>Об'єкт сервера каналу</returns>
-					NamedPipeServer CreatePipe(const String& name, UInt8 maxInstanceCount = Math::Max<UInt8>(), PipeMode mode = PipeMode::Both);
+					NamedPipeServer CreatePipe(const String& name, UInt8 maxInstanceCount = Math::Max<UInt8>(), PipeMode mode = PipeMode::Both, bool isNoCache = true);
 
 					/// <summary>
 					/// Приєднання до існуючого каналу
@@ -327,7 +453,7 @@ namespace Seed {
 					/// <param name="name">Ім'я каналу</param>
 					/// <param name="mode">Режим каналу</param>
 					/// <returns>Об'єкт клієнтського з'єднання каналу</returns>
-					NamedPipeClient ConnectPipe(const String& name, PipeMode mode = PipeMode::Both);
+					NamedPipeClient ConnectPipe(const String& name, PipeMode mode = PipeMode::Both, bool isNoCache = true);
 				}
 			}
 		}
