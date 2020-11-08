@@ -91,10 +91,18 @@ namespace Seed {
 							virtual void Dispose();
 						protected:
 							BaseAsyncNamedPipeServerInstance(
-								String&& pipeName, 
+								String&& pipeName,
 								Handle hPipe,
 								PipeMode mode,
-								Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef);
+								Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef
+							) : 
+								pipeName(MoveRValue(pipeName)), 
+								hPipe(hPipe), 
+								mode(mode), 
+								poolTask(nullptr), 
+								serverRef(serverRef), 
+								RefCount(1) 
+							{}
 						protected:
 							void InitAsyncConnect(IRPBase*&& irp, void* ioStatusBlk);
 						protected:
