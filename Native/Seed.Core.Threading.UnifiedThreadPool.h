@@ -78,6 +78,14 @@ namespace Seed {
 				/// </summary>
 				ForceInline virtual ~IFinishWriteCallback() = 0 {}
 			};
+
+			template<typename TAsyncObject>
+			class IFinishConnectCallback : public virtual IExceptionCallback {
+			public:
+				virtual void OnConnectFinish(TAsyncObject&& connectionObject) volatile = 0;
+			public:
+				virtual ~IFinishConnectCallback() = 0 {}
+			};
 		}
 
 		namespace Threading {
@@ -1228,25 +1236,7 @@ namespace Seed {
 			/// </summary>
 			/// <typeparam name="TDataType">Тип об'єкта пакета(блоку) даних</typeparam>
 			template<typename TDataType> requires TypeTraits::Collection::IsArray<TDataType>
-			class IBaseAsyncIO : public IAsyncIOBase {
-			public:
-				/// <summary>
-				/// Конструктор з пулу потоків, який буде обробляти операції
-				/// </summary>
-				/// <param name="threadPool">Пул потоків</param>
-				ForceInline IBaseAsyncIO(const Threading::UnifiedThreadPool& threadPool) : IAsyncIOBase(threadPool) {}
-
-				/// <summary>
-				/// Стандратний конструктор копіювання
-				/// </summary>
-				/// <param name="orig">Оригинал</param>
-				ForceInline IBaseAsyncIO(const IBaseAsyncIO& orig) = default;
-
-				/// <summary>
-				/// Стандарний конструктор переміщення
-				/// </summary>
-				/// <param name="orig">Оригинал</param>
-				ForceInline IBaseAsyncIO(IBaseAsyncIO&& orig) = default;
+			class IBaseAsyncIO : virtual public IAsyncIOBase {
 			public:
 				/// <summary>
 				/// Ініціалізація асинхроної операції читання
@@ -1276,12 +1266,21 @@ namespace Seed {
 				virtual ~IBaseAsyncIO() = 0 {};
 			};
 
+			template<typename TAsyncObject> requires TypeTraits::IsBasedOnV<IAsyncIOBase, TAsyncObject>
+			class IBaseConnectableAsyncIO : virtual public IAsyncIOBase {
+				virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<TAsyncObject>> onFinishConnectAction) = 0;
+			public:
+				virtual bool IsValid() = 0;
+			public:
+				virtual ~IBaseConnectableAsyncIO() = 0;
+			};
+
 			/// <summary>
 			/// Інтерфес об'єта асинхроного I/O з позиційним читанням
 			/// </summary>
 			/// <typeparam name="TDataType">Тип буфера даних</typeparam>
 			template<typename TDataType> requires TypeTraits::Collection::IsArray<TDataType>
-			class IBasePositionAsyncIO : public IAsyncIOBase {
+			class IBasePositionAsyncIO : virtual public IAsyncIOBase {
 			public:
 				/// <summary>
 				/// Ініціаліщація операції асихроного читання
@@ -1329,7 +1328,11 @@ namespace Seed {
 					/// <summary>
 					/// Запис
 					/// </summary>
-					Write
+					Write,
+					/// <summary>
+					/// З'єднання
+					/// </summary>
+					Connect
 				};
 			private:
 				Byte Reserverd[16 + sizeof(SizeT)];
@@ -1585,6 +1588,76 @@ namespace Seed {
 				/// Деструктор
 				/// </summary>
 				ForceInline virtual ~WriteIRP() override {}
+			};
+
+			/// <summary>
+			/// Пакет асинхроного запису даних
+			/// </summary>
+			/// <typeparam name="TDataType">Тип блоку даних</typeparam>
+			template<typename TAsyncObject>
+			class ConnectIRP final : public IRPBase {
+			public:
+				friend class IOTask;
+			private:
+				SmartPtr<IFinishConnectCallback<TAsyncObject>> finishConnectCallback;
+				TAsyncObject connectionObject;
+			public:
+				/// <summary>
+				/// Конструктор з об'єкту асинхроного I/O, буфера та колбеку
+				/// </summary>
+				/// <param name="irpTarget">Об'єкт асинхроного I/O</param>
+				/// <param name="finishWriteCallback">Колбек завершення операції</param>
+				/// <param name="buffer">Буфер даних</param>
+				ForceInline ConnectIRP(SmartPtr<IAsyncIOBase>&& irpTarget, SmartPtr<IFinishConnectCallback<TAsyncObject>> finishConnectCallback, TAsyncObject&& connectionObject) :
+					IRPBase(MoveRValue(irpTarget), ECallbackType::Connect), finishConnectCallback(finishConnectCallback), connectionObject(MoveRValue(connectionObject)) {}
+
+				/// <summary>
+				/// Стандарний конструктор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline ConnectIRP(const ConnectIRP& orig) = default;
+
+				/// <summary>
+				/// Стандартнтй конструкор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				ForceInline ConnectIRP(ConnectIRP&&) = default;
+
+				/// <summary>
+				/// Стандартний оператор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ForceInline ConnectIRP& operator=(const ConnectIRP&) = default;
+
+				/// <summary>
+				/// Стандартний оператор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				ForceInline ConnectIRP& operator=(ConnectIRP&&) = default;
+			public:
+				/// <summary>
+				/// Виклик колбеку операції
+				/// </summary>
+				/// <param name="byteTransfered">Кількість прочитаних байтів</param>
+				/// <param name="isSuccess">Успішність операції</param>
+				/// <param name="errorCode">Код помилки</param>
+				ForceInline virtual void OnIORequestComplete(UnusedData SizeT byteTransfered, Boolean isSuccess, UInt32 errorCode) override {
+					if (isSuccess) {
+						finishConnectCallback->OnConnectFinish(MoveRValue(connectionObject));
+					}
+					else {
+						finishConnectCallback->OnError(errorCode);
+					}
+				}
+			protected:
+				ForceInline virtual IRPBase* Clone() const { return new WriteIRP(*this); }
+			public:
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~ConnectIRP() override {}
 			};
 
 			/// <summary>

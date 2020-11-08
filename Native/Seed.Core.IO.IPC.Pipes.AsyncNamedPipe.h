@@ -1,182 +1,538 @@
-//#pragma once
-//#include "Seed.Core.IO.IPC.Pipes.Base.h"
-//#include "Seed.Core.IO.IPC.Pipes.NamedPipe.h"
-//
-//#include "Seed.Core.Threading.h"
-//
-//namespace Seed {
-//	inline namespace Core {
-//		namespace IO {
-//			namespace IPC {
-//				namespace Pipes {
-//					namespace Details {
-//						class BaseAsyncNamedPipeClient final : protected IDisposable {
-//						protected:
-//							Handle hPipe;
-//
-//						protected:
-//							virtual void Dispose();
-//						};
-//					}
-//					template<typename TBufferType>
-//					class IAsyncNamedPipe : public IO::IBaseAsyncIO<TBufferType> {
-//					public:
-//						virtual void Close() = 0;
-//
-//						virtual void WaitClosing() const = 0;
-//
-//						virtual ~IAsyncNamedPipe() = 0 {};
-//					};
-//
-//					template<typename TBufferType>
-//					class AsyncNamedPipeClient final : public IAsyncNamedPipe<TBufferType> {
-//					protected:
-//						virtual void Dispose() override;
-//					public:
-//						/// <summary>
-//						/// Ініціалізація асинхроної операції читання
-//						/// </summary>
-//						/// <param name="data">Буфер даних</param>
-//						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
-//						/// <returns>Об'єкт задачі I/O</returns>
-//						virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) {
-//
-//						}
-//
-//						/// <summary>
-//						/// Ініціалізація асинхроної операції запису
-//						/// </summary>
-//						/// <param name="data">Буфер даних</param>
-//						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
-//						/// <returns>Об'єкт задачі I/O</returns>
-//						virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) {
-//
-//						}
-//					public:
-//						/// <summary>
-//						/// Перевірка чи об'єкт коректний
-//						/// </summary>
-//						/// <returns>true якщо об'єкт допускає I/O операції</returns>
-//						virtual bool IsValid() {
-//
-//						}
-//					public:
-//						friend AsyncNamedPipeClient AsyncConnectPipe(const String& name, PipeMode mode);
-//					public:
-//						RefCountClass(AsyncNamedPipeClient, This)
-//					};
-//
-//					class IAsyncNamedPipeServerInstance {
-//					public:
-//						virtual ~IAsyncNamedPipeServerInstance() = 0 {}
-//					};
-//
-//					template<typename TBufferType>
-//					class AsyncNamedPipeServerInstance;
-//
-//					class AsyncNamedPipeServer final : protected IDisposable {
-//					private:
-//						struct Data {
-//							PipeMode mode;
-//							Handle pipeHandle;
-//							UInt32 MaxInstance;
-//							Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>> Instances;
-//							String name;
-//
-//							RefCountT RefCount;
-//
-//							Data(
-//								Handle pipeHandle,
-//								PipeMode mode,
-//								UInt32 MaxInstance,
-//								String name
-//							) :
-//								pipeHandle(pipeHandle),
-//								mode(mode),
-//								MaxInstance(MaxInstance),
-//								name(name),
-//								Instances(),
-//								RefCount(1)
-//							{};
-//						};
-//
-//						Data* This;
-//					private:
-//						AsyncNamedPipeServer(Data*&& This) :This(This) {};
-//					protected:
-//						virtual void Dispose() override;
-//					public:
-//						AsyncNamedPipeServer() :This(nullptr) {};
-//
-//						template<typename TBufferType>
-//						NamedPipeServerInstance AsyncConnect() {
-//
-//						}
-//
-//						void CloseAllInstance();
-//
-//						void DestroyPipe();
-//
-//						SizeT InstanceCount() { return This == nullptr ? 0 : This->Instances.Count; }
-//
-//						bool IsValid() const { return This != nullptr && This->pipeHandle != nullptr; }
-//					public:
-//						RefCountClass(AsyncNamedPipeServer, This)
-//					public:
-//						friend AsyncNamedPipeServer CreateAsyncPipe(const String& name, UInt32 MaxInstanceCount, PipeMode mode);
-//					};
-//
-//					template<typename TBufferType>
-//					class AsyncNamedPipeServerInstance : public IAsyncNamedPipe<TBufferType>, public IAsyncNamedPipeServerInstance {
-//					protected:
-//						virtual void Dispose() override;
-//					public:
-//						/// <summary>
-//						/// Ініціалізація асинхроної операції читання
-//						/// </summary>
-//						/// <param name="data">Буфер даних</param>
-//						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
-//						/// <returns>Об'єкт задачі I/O</returns>
-//						virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) {
-//
-//						}
-//
-//						/// <summary>
-//						/// Ініціалізація асинхроної операції запису
-//						/// </summary>
-//						/// <param name="data">Буфер даних</param>
-//						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
-//						/// <returns>Об'єкт задачі I/O</returns>
-//						virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) {
-//
-//						}
-//					public:
-//						/// <summary>
-//						/// Перевірка чи об'єкт коректний
-//						/// </summary>
-//						/// <returns>true якщо об'єкт допускає I/O операції</returns>
-//						virtual bool IsValid() {
-//
-//						}
-//					public:
-//						RefCountClass(AsyncNamedPipeServerInstance, This)
-//					public:
-//						friend class AsyncNamedPipeServer;
-//					};
-//
-//
-//					template<typename TBufferType>
-//					AsyncNamedPipeClient<TBufferType> AsyncConnectPipe(const String& name, PipeMode mode)
-//					{
-//						return AsyncNamedPipeClient();
-//					}
-//
-//					AsyncNamedPipeServer Seed::Core::IO::IPC::Pipes::CreateAsyncPipe(const String& name, UInt32 MaxInstanceCount, PipeMode mode)
-//					{
-//						return AsyncNamedPipeServer();
-//					}
-//				}
-//			}
-//		}
-//	}
-//}
+#pragma once
+#include "Seed.Core.IO.IPC.Pipes.Base.h"
+#include "Seed.Core.IO.IPC.Pipes.NamedPipe.h"
+
+#include "Seed.Core.Threading.h"
+
+namespace Seed {
+	inline namespace Core {
+		namespace IO {
+			namespace IPC {
+				namespace Pipes {
+					class IAsyncNamedPipeServerInstance {
+					public:
+						virtual void CloseConnection() = 0;
+					public:
+						virtual ~IAsyncNamedPipeServerInstance() = 0 {}
+					};
+
+					template<typename TBufferType>
+					class AsyncNamedPipeClient;
+
+					template<typename TBufferType>
+					class AsyncNamedPipeServer;
+
+					template<typename TBufferType>
+					class AsyncNamedPipeServerInstance;
+
+					namespace Details {
+						class BaseAsyncNamedPipeClient final : protected IDisposable {
+						protected:
+							Handle hPipe;
+							String pipeName;
+							PipeMode mode;
+							Threading::UnifiedThreadPoolIoTask* poolTask;
+
+							RefCountT RefCount;
+						protected:
+							virtual void Dispose();
+						protected:
+							BaseAsyncNamedPipeClient(String&& pipeName, PipeMode mode);
+						protected:
+							void InitAsyncConnect(IRPBase*&& irp, void* ioStatusBlk);
+						protected:
+							void InitAsyncRead(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
+							void InitAsyncWrite(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
+						protected:
+							void CloseConnection();
+							void WaitClosing() const;
+							void WaitClosing(Time::TimeSpan timeout) const;
+						protected:
+							bool IsValid() { return hPipe != nullptr; }
+						public:
+							template<typename TBufferType>
+							friend class AsyncNamedPipeClient;
+						};
+
+						class BaseAsyncNamedPipeServer final : protected IDisposable {
+						protected:
+							String pipeName;
+							PipeMode mode;
+							UInt8 maxConnectionCount;
+
+							Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>> instances;
+
+							RefCountT RefCount;
+						protected:
+							virtual void Dispose();
+						protected:
+							BaseAsyncNamedPipeServer(String&& pipeName, PipeMode mode, UInt8 maxConnectionCount)
+								: pipeName(MoveRValue(pipeName)), mode(mode), maxConnectionCount(maxConnectionCount), instances(), RefCount(1) {}
+						protected:
+							Handle CreateServerPipeHandle();
+						protected:
+							bool IsValid() const { return instances.Count < maxConnectionCount; }
+						public:
+							template<typename TBufferType>
+							friend class AsyncNamedPipeServer;
+						};
+
+						class BaseAsyncNamedPipeServerInstance final : protected IDisposable {
+						protected:
+							Handle hPipe;
+							String pipeName;
+							PipeMode mode;
+							Threading::UnifiedThreadPoolIoTask* poolTask;
+
+							Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef;
+
+							RefCountT RefCount;
+						protected:
+							virtual void Dispose();
+						protected:
+							BaseAsyncNamedPipeServerInstance(
+								String&& pipeName, 
+								Handle hPipe,
+								PipeMode mode,
+								Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef);
+						protected:
+							void InitAsyncConnect(IRPBase*&& irp, void* ioStatusBlk);
+						protected:
+							void InitAsyncRead(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
+							void InitAsyncWrite(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
+						protected:
+							void CloseConnection();
+							void WaitClosing() const;
+							void WaitClosing(Time::TimeSpan timeout) const;
+						protected:
+							bool IsValid() { return hPipe != nullptr; }
+						public:
+							template<typename TBufferType>
+							friend class AsyncNamedPipeServerInstance;
+						};
+					}
+
+					template<typename TBufferType>
+					class IAsyncNamedPipe : public IO::IBaseAsyncIO<TBufferType> {
+					public:
+
+						virtual void CloseConnection() = 0;
+
+						virtual void WaitClosing() const = 0;
+
+						virtual void WaitClosing(Time::TimeSpan timeout) const;
+
+						virtual ~IAsyncNamedPipe() = 0 {};
+					};
+
+					template<typename TDataType>
+					class AsyncNamedPipeClient final : public IAsyncNamedPipe<TDataType>, public IBaseConnectableAsyncIO<AsyncNamedPipeClient<TDataType>> {
+					private:
+						Details::BaseAsyncNamedPipeClient* This;
+					protected:
+						virtual void Dispose() override {
+							This->Dispose();
+						}
+					protected:
+						virtual Handle GetHandle() {
+							return This->hPipe;
+						}
+					protected:
+						AsyncNamedPipeClient(String&& pipeName, PipeMode mode, const Threading::UnifiedThreadPool& ownerPool)
+							: This(new Details::BaseAsyncNamedPipeClient(MoveRValue(pipeName), mode)
+						) {
+							This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(ownerPool, This->hPipe));
+						}
+					protected:
+						virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeClient<TDataType>>> onFinishConnectAction) {
+							if(IsValid())
+								Throw(InvalidHandleUsage(ExceptionPosition));
+
+							IRPBase* irp = nullptr;
+							try {
+								//create irp packet
+								irp = new ConnectIRP<AsyncNamedPipeClient>(
+										SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeClient(*this)), 
+										onFinishConnectAction,
+										AsyncNamedPipeClient(*this));
+								//create task object
+								auto task = GetIOTaskFromIRPBase(irp);
+
+								try {
+									//notify about arrived io operation
+									NotifyIoOperation(*This->poolTask);
+									//Perfome os specific connect operations
+									This->InitAsyncConnect(MoveRValue(irp), GetReservedPlaceInIrp(irp));
+								}
+								catch (...) {
+									//If connect failed cancel notification
+									CancelNotifyIoOperation(*This->poolTask);
+									//and rethrow exception as we don't how handle it
+									ReThrow;
+								}
+
+								//return task object
+								return task;
+							}
+							catch (...) {
+								if (irp != nullptr)
+									delete irp;
+								ReThrow;
+							}
+						}
+					public:
+						/// <summary>
+						/// Ініціалізація асинхроної операції читання
+						/// </summary>
+						/// <param name="data">Буфер даних</param>
+						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+						/// <returns>Об'єкт задачі I/O</returns>
+						virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) {
+							if (!IsValid())
+								Throw(InvalidHandleUsage(ExceptionPosition));
+
+							if (This->mode != PipeMode::In && This->mode != PipeMode::Both)
+								Throw(InvalidPipeException(ExceptionPosition));
+
+							IRPBase* irp = nullptr;
+							try {
+								//Get buffer and its size
+								void* buffer = (void*)(const Byte*)data;
+								SizeT size = data.Count;
+								//create irp packet
+								irp = new ReadIRP<TDataType>(
+									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeClient(*this)),
+									onFinishReadAction, 
+									MoveRValue(data));
+								//create task object
+								auto task = GetIOTaskFromIRPBase(irp);
+
+								try {
+									//notify about arrived io operation
+									NotifyIoOperation(*This->poolTask);
+									//Perfome os specific read operations
+									This->InitAsyncRead(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+								}
+								catch (...) {
+									//If read failed cancel notification
+									CancelNotifyIoOperation(*This->poolTask);
+									//and rethrow exception as we don't how handle it
+									ReThrow;
+								}
+
+								//return task object
+								return task;
+							}
+							catch (...) {
+								if (irp != nullptr)
+									delete irp;
+								ReThrow;
+							}
+						}
+
+						/// <summary>
+						/// Ініціалізація асинхроної операції запису
+						/// </summary>
+						/// <param name="data">Буфер даних</param>
+						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+						/// <returns>Об'єкт задачі I/O</returns>
+						virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) {
+							if (!IsValid())
+								Throw(InvalidHandleUsage(ExceptionPosition));
+
+							if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
+								Throw(InvalidPipeException(ExceptionPosition));
+
+							IRPBase* irp = nullptr;
+							try {
+								//Get buffer and its size
+								void* buffer = (void*)(const Byte*)data;
+								SizeT size = data.Count;
+								//create irp packet
+								irp = new WriteIRP<TDataType>(
+									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeClient(*this)),
+									onFinishWriteAction, 
+									MoveRValue(data));
+								//create task object
+								auto task = GetIOTaskFromIRPBase(irp);
+
+								try {
+									//notify about arrived io operation
+									NotifyIoOperation(*This->poolTask);
+									//Perfome os specific read operations
+									This->InitAsyncWrite(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+								}
+								catch (...) {
+									//If read failed cancel notification
+									CancelNotifyIoOperation(*This->poolTask);
+									//and rethrow exception as we don't how handle it
+									ReThrow;
+								}
+
+								//return task object
+								return task;
+							}
+							catch (...) {
+								if (irp != nullptr)
+									delete irp;
+								ReThrow;
+							}
+						}
+					public:
+						/// <summary>
+						/// Перевірка чи об'єкт коректний
+						/// </summary>
+						/// <returns>true якщо об'єкт допускає I/O операції</returns>
+						virtual bool IsValid() {
+							return This->hPipe != nullptr;
+						}
+					public:
+						virtual void CloseConnection() { This->CloseConnection(); }
+						virtual void WaitClosing() const { This->WaitClosing(); }
+						virtual void WaitClosing(Time::TimeSpan timeout) const { This->WaitClosing(timeout); }
+					public:
+						virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const {
+							return *This->poolTask;
+						}
+					public:
+						template<typename UDataType>
+						friend AsyncNamedPipeClient<UDataType> AsyncConnectPipe(const String& name, PipeMode mode, const Threading::UnifiedThreadPool& ownerPool);
+					public:
+						RefCountClass(AsyncNamedPipeClient, This)
+					};
+
+					template<typename TBufferType>
+					class AsyncNamedPipeServerInstance;
+
+					template<typename TBufferType>
+					class AsyncNamedPipeServer final : IDisposable {
+					private:
+						Details::BaseAsyncNamedPipeServer* This;
+					protected:
+						virtual void Dispose() override {
+							This->Dispose();
+						}
+					protected:
+						AsyncNamedPipeServer(String pipeName, PipeMode mode, UInt8 maxConnectionCount) 
+						: This(new Details::BaseAsyncNamedPipeServer(MoveRValue(pipeName), mode, maxConnectionCount)) {}
+					public:
+						IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TBufferType>>> onFinishConnectAction) {
+							return AsyncNamedPipeServerInstance<TBufferType>(This->CreateServerPipeHandle(), This->pipeName, This->mode)
+								.AsyncConnect(onFinishConnectAction);
+						}
+
+						void CloseAllInstance() {
+							This->instances.CopyTo<Containers::List>().RemoveAll([](auto&& instance) { instance->CloseConnection(); });
+						}
+
+						void DestroyPipe() {
+							CloseAllInstance();
+							Dispose();
+						}
+
+						SizeT InstanceCount() { return This == nullptr ? 0 : This->instances.Count; }
+
+						bool IsValid() const { return This->IsValid(); }
+					public:
+						RefCountClass(AsyncNamedPipeServer, This)
+					public:
+						template<typename UBufferType>
+						friend AsyncNamedPipeServer<UBufferType> CreateAsyncPipe(const String& name, UInt32 MaxInstanceCount, PipeMode mode);
+					};
+
+					template<typename TDataType>
+					class AsyncNamedPipeServerInstance final : 
+						public IAsyncNamedPipe<TDataType>,
+						public IAsyncNamedPipeServerInstance, 
+						public IBaseConnectableAsyncIO<AsyncNamedPipeServerInstance<TDataType>> {
+					private:
+						Details::BaseAsyncNamedPipeServerInstance* This;
+					protected:
+						virtual void Dispose() override {
+							This->Dispose();
+						}
+					protected:
+						virtual Handle GetHandle() {
+							return This->hPipe;
+						}
+					protected:
+						AsyncNamedPipeServerInstance(Handle hPipe, const String& name, PipeMode mode) {
+
+						}
+					protected:
+						virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TDataType>>> onFinishConnectAction) {
+							if (IsValid())
+								Throw(InvalidHandleUsage(ExceptionPosition));
+
+							IRPBase* irp = nullptr;
+							try {
+								//create irp packet
+								irp = new ConnectIRP<AsyncNamedPipeServerInstance>(
+									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)),
+									onFinishConnectAction,
+									AsyncNamedPipeServerInstance(*this));
+								//create task object
+								auto task = GetIOTaskFromIRPBase(irp);
+
+								try {
+									//notify about arrived io operation
+									NotifyIoOperation(*This->poolTask);
+									//Perfome os specific connect operations
+									This->InitAsyncConnect(MoveRValue(irp), GetReservedPlaceInIrp(irp));
+								}
+								catch (...) {
+									//If connect failed cancel notification
+									CancelNotifyIoOperation(*This->poolTask);
+									//and rethrow exception as we don't how handle it
+									ReThrow;
+								}
+
+								//return task object
+								return task;
+							}
+							catch (...) {
+								if (irp != nullptr)
+									delete irp;
+								ReThrow;
+							}
+						}
+					public:
+						/// <summary>
+						/// Ініціалізація асинхроної операції читання
+						/// </summary>
+						/// <param name="data">Буфер даних</param>
+						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+						/// <returns>Об'єкт задачі I/O</returns>
+						virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) {
+							if (!IsValid())
+								Throw(InvalidHandleUsage(ExceptionPosition));
+
+							if (This->mode != PipeMode::In && This->mode != PipeMode::Both)
+								Throw(InvalidPipeException(ExceptionPosition));
+
+							IRPBase* irp = nullptr;
+							try {
+								//Get buffer and its size
+								void* buffer = (void*)(const Byte*)data;
+								SizeT size = data.Count;
+								//create irp packet
+								irp = new ReadIRP<TDataType>(
+									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)), 
+									onFinishReadAction, 
+									MoveRValue(data));
+								//create task object
+								auto task = GetIOTaskFromIRPBase(irp);
+
+								try {
+									//notify about arrived io operation
+									NotifyIoOperation(*This->poolTask);
+									//Perfome os specific read operations
+									This->InitAsyncRead(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+								}
+								catch (...) {
+									//If read failed cancel notification
+									CancelNotifyIoOperation(*This->poolTask);
+									//and rethrow exception as we don't how handle it
+									ReThrow;
+								}
+
+								//return task object
+								return task;
+							}
+							catch (...) {
+								if (irp != nullptr)
+									delete irp;
+								ReThrow;
+							}
+						}
+
+						/// <summary>
+						/// Ініціалізація асинхроної операції запису
+						/// </summary>
+						/// <param name="data">Буфер даних</param>
+						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
+						/// <returns>Об'єкт задачі I/O</returns>
+						virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) {
+							if (!IsValid())
+								Throw(InvalidHandleUsage(ExceptionPosition));
+
+							if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
+								Throw(InvalidPipeException(ExceptionPosition));
+
+							IRPBase* irp = nullptr;
+							try {
+								//Get buffer and its size
+								void* buffer = (void*)(const Byte*)data;
+								SizeT size = data.Count;
+								//create irp packet
+								irp = new WriteIRP<TDataType>(
+									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)),
+									onFinishWriteAction, 
+									MoveRValue(data));
+								//create task object
+								auto task = GetIOTaskFromIRPBase(irp);
+
+								try {
+									//notify about arrived io operation
+									NotifyIoOperation(*This->poolTask);
+									//Perfome os specific read operations
+									This->InitAsyncWrite(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+								}
+								catch (...) {
+									//If read failed cancel notification
+									CancelNotifyIoOperation(*This->poolTask);
+									//and rethrow exception as we don't how handle it
+									ReThrow;
+								}
+
+								//return task object
+								return task;
+							}
+							catch (...) {
+								if (irp != nullptr)
+									delete irp;
+								ReThrow;
+							}
+						}
+					public:
+						/// <summary>
+						/// Перевірка чи об'єкт коректний
+						/// </summary>
+						/// <returns>true якщо об'єкт допускає I/O операції</returns>
+						virtual bool IsValid() {
+
+						}
+					public:
+						virtual void CloseConnection() { This->CloseConnection(); }
+						virtual void WaitClosing() const { This->WaitClosing(); }
+						virtual void WaitClosing(Time::TimeSpan timeout) const { This->WaitClosing(timeout); }
+					public:
+						virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const {
+							return *This->poolTask;
+						}
+					public:
+						virtual void CloseConnection();
+					public:
+						RefCountClass(AsyncNamedPipeServerInstance, This)
+					public:
+						template<typename TBufferType>
+						friend class AsyncNamedPipeServer;
+					};
+
+
+					template<typename TBufferType>
+					AsyncNamedPipeClient<TBufferType> AsyncConnectPipe(const String& name, PipeMode mode, const Threading::UnifiedThreadPool& ownerPool)
+					{
+						return AsyncNamedPipeClient<TBufferType>(String(name), mode, ownerPool);
+					}
+
+					template<typename TBufferType>
+					AsyncNamedPipeServer<TBufferType> CreateAsyncPipe(const String& name, UInt32 maxInstanceCount, PipeMode mode)
+					{
+						return AsyncNamedPipeServer(String(name), mode, maxInstanceCount);
+					}
+				}
+			}
+		}
+	}
+}
