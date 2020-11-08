@@ -39,8 +39,6 @@ namespace Seed {
 						protected:
 							BaseAsyncNamedPipeClient(String&& pipeName, PipeMode mode);
 						protected:
-							void InitAsyncConnect(IRPBase*&& irp, void* ioStatusBlk);
-						protected:
 							void InitAsyncRead(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
 							void InitAsyncWrite(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
 						protected:
@@ -72,6 +70,8 @@ namespace Seed {
 							Handle CreateServerPipeHandle();
 						protected:
 							bool IsValid() const { return instances.Count < maxConnectionCount; }
+						protected:
+							void CloseAllInstances();
 						public:
 							template<typename TBufferType>
 							friend class AsyncNamedPipeServer;
@@ -126,7 +126,7 @@ namespace Seed {
 					};
 
 					template<typename TDataType>
-					class AsyncNamedPipeClient final : public IAsyncNamedPipe<TDataType>, public IBaseConnectableAsyncIO<AsyncNamedPipeClient<TDataType>> {
+					class AsyncNamedPipeClient final : public IAsyncNamedPipe<TDataType> {
 					private:
 						Details::BaseAsyncNamedPipeClient* This;
 					protected:
@@ -142,43 +142,6 @@ namespace Seed {
 							: This(new Details::BaseAsyncNamedPipeClient(MoveRValue(pipeName), mode)
 						) {
 							This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(ownerPool, This->hPipe));
-						}
-					protected:
-						virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeClient<TDataType>>> onFinishConnectAction) {
-							if(IsValid())
-								Throw(InvalidHandleUsage(ExceptionPosition));
-
-							IRPBase* irp = nullptr;
-							try {
-								//create irp packet
-								irp = new ConnectIRP<AsyncNamedPipeClient>(
-										SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeClient(*this)), 
-										onFinishConnectAction,
-										AsyncNamedPipeClient(*this));
-								//create task object
-								auto task = GetIOTaskFromIRPBase(irp);
-
-								try {
-									//notify about arrived io operation
-									NotifyIoOperation(*This->poolTask);
-									//Perfome os specific connect operations
-									This->InitAsyncConnect(MoveRValue(irp), GetReservedPlaceInIrp(irp));
-								}
-								catch (...) {
-									//If connect failed cancel notification
-									CancelNotifyIoOperation(*This->poolTask);
-									//and rethrow exception as we don't how handle it
-									ReThrow;
-								}
-
-								//return task object
-								return task;
-							}
-							catch (...) {
-								if (irp != nullptr)
-									delete irp;
-								ReThrow;
-							}
 						}
 					public:
 						/// <summary>
@@ -321,12 +284,11 @@ namespace Seed {
 								.AsyncConnect(onFinishConnectAction);
 						}
 
-						void CloseAllInstance() {
-							This->instances.CopyTo<Containers::List>().RemoveAll([](auto&& instance) { instance->CloseConnection(); });
+						void CloseAllInstances() {
+							This->CloseAllInstances();
 						}
 
 						void DestroyPipe() {
-							CloseAllInstance();
 							Dispose();
 						}
 

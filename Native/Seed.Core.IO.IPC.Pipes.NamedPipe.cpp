@@ -255,9 +255,14 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::WaitClosing() const
 
 #pragma endregion
 
-Seed::Core::IO::IPC::Pipes::NamedPipeServer Seed::Core::IO::IPC::Pipes::CreatePipe(const String& name, UInt8 MaxInstanceCount, PipeMode mode)
-{
+using namespace Seed;
+using namespace Seed::Core::IO::IPC::Pipes;
 
+NamedPipeServer Seed::IO::IPC::Pipes::CreatePipe(
+	const String& name, 
+	UInt8 MaxInstanceCount, 
+	PipeMode mode)
+{
 	IO_STATUS_BLOCK IoStatusBlock = { 0 };
 	OBJECT_ATTRIBUTES ObjectAttributes = { 0 };
 	UNICODE_STRING usPipeName = { 0 };
