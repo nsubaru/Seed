@@ -30,6 +30,7 @@ namespace Seed {
 						protected:
 							Handle hPipe;
 							String pipeName;
+							Boolean isNoCache;
 							PipeMode mode;
 							Threading::UnifiedThreadPoolIoTask* poolTask;
 
@@ -37,12 +38,13 @@ namespace Seed {
 						protected:
 							virtual void Dispose();
 						protected:
-							BaseAsyncNamedPipeClient(String&& pipeName, PipeMode mode);
+							BaseAsyncNamedPipeClient(String&& pipeName, PipeMode mode, Boolean isNoCache);
 						protected:
 							void InitAsyncRead(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
 							void InitAsyncWrite(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
 						protected:
 							void CloseConnection();
+							void Flush();
 							void WaitClosing() const;
 							void WaitClosing(Time::TimeSpan timeout) const;
 						protected:
@@ -56,6 +58,7 @@ namespace Seed {
 						protected:
 							String pipeName;
 							PipeMode mode;
+							Boolean isNoCache;
 							UInt8 maxConnectionCount;
 
 							Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>> instances;
@@ -64,8 +67,8 @@ namespace Seed {
 						protected:
 							virtual void Dispose();
 						protected:
-							BaseAsyncNamedPipeServer(String&& pipeName, PipeMode mode, UInt8 maxConnectionCount)
-								: pipeName(MoveRValue(pipeName)), mode(mode), maxConnectionCount(maxConnectionCount), instances(), RefCount(1) {}
+							BaseAsyncNamedPipeServer(String&& pipeName, PipeMode mode, Boolean isNoCache, UInt8 maxConnectionCount)
+								: pipeName(MoveRValue(pipeName)), mode(mode), isNoCache(isNoCache), maxConnectionCount(maxConnectionCount), instances(), RefCount(1) {}
 						protected:
 							Handle CreateServerPipeHandle();
 						protected:
@@ -82,6 +85,7 @@ namespace Seed {
 							Handle hPipe;
 							String pipeName;
 							PipeMode mode;
+							Boolean isNoCache;
 							Threading::UnifiedThreadPoolIoTask* poolTask;
 
 							Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef;
@@ -94,13 +98,14 @@ namespace Seed {
 								String&& pipeName,
 								Handle hPipe,
 								PipeMode mode,
-								Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef
+								Boolean isNoCache
 							) : 
 								pipeName(MoveRValue(pipeName)), 
 								hPipe(hPipe), 
 								mode(mode), 
+								isNoCache(isNoCache),
 								poolTask(nullptr), 
-								serverRef(serverRef), 
+								serverRef(), 
 								RefCount(1) 
 							{}
 						protected:
@@ -110,6 +115,7 @@ namespace Seed {
 							void InitAsyncWrite(IRPBase*&& irp, void* buffer, SizeT size, void* ioStatusBlk);
 						protected:
 							void CloseConnection();
+							void Flush();
 							void WaitClosing() const;
 							void WaitClosing(Time::TimeSpan timeout) const;
 						protected:
@@ -146,8 +152,8 @@ namespace Seed {
 							return This->hPipe;
 						}
 					protected:
-						AsyncNamedPipeClient(String&& pipeName, PipeMode mode, const Threading::UnifiedThreadPool& ownerPool)
-							: This(new Details::BaseAsyncNamedPipeClient(MoveRValue(pipeName), mode)
+						AsyncNamedPipeClient(String&& pipeName, PipeMode mode, Boolean isNoCache, const Threading::UnifiedThreadPool& ownerPool)
+							: This(new Details::BaseAsyncNamedPipeClient(MoveRValue(pipeName), mode, isNoCache)
 						) {
 							This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(ownerPool, This->hPipe));
 						}
@@ -267,7 +273,11 @@ namespace Seed {
 						}
 					public:
 						template<typename UDataType>
-						friend AsyncNamedPipeClient<UDataType> AsyncConnectPipe(const String& name, PipeMode mode, const Threading::UnifiedThreadPool& ownerPool);
+						friend AsyncNamedPipeClient<UDataType> AsyncConnectPipe(
+							const Threading::UnifiedThreadPool& ownerPool, 
+							const String& name, 
+							PipeMode mode = PipeMode::Both, 
+							Boolean isNoCache = true);
 					public:
 						RefCountClass(AsyncNamedPipeClient, This)
 					};
@@ -284,12 +294,16 @@ namespace Seed {
 							This->Dispose();
 						}
 					protected:
-						AsyncNamedPipeServer(String pipeName, PipeMode mode, UInt8 maxConnectionCount) 
-						: This(new Details::BaseAsyncNamedPipeServer(MoveRValue(pipeName), mode, maxConnectionCount)) {}
+						AsyncNamedPipeServer(String pipeName, PipeMode mode, Boolean isNoCache, UInt8 maxConnectionCount)
+						: This(new Details::BaseAsyncNamedPipeServer(MoveRValue(pipeName), mode, isNoCache, maxConnectionCount)) {}
 					public:
 						IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TBufferType>>> onFinishConnectAction) {
-							return AsyncNamedPipeServerInstance<TBufferType>(This->CreateServerPipeHandle(), This->pipeName, This->mode)
-								.AsyncConnect(onFinishConnectAction);
+							//create pipe object
+							auto pipe = AsyncNamedPipeServerInstance<TBufferType>(This->CreateServerPipeHandle(), This->pipeName, This->mode, This->isNoCache);
+							//store it in list and save ref in object
+							pipe.SetInstaceRef(This->instances.AddLast(new AsyncNamedPipeServerInstance(pipe)));
+							//call pipe async connect
+							return pipe.AsyncConnect(onFinishConnectAction);
 						}
 
 						void CloseAllInstances() {
@@ -307,7 +321,11 @@ namespace Seed {
 						RefCountClass(AsyncNamedPipeServer, This)
 					public:
 						template<typename UBufferType>
-						friend AsyncNamedPipeServer<UBufferType> CreateAsyncPipe(const String& name, UInt32 MaxInstanceCount, PipeMode mode);
+						friend AsyncNamedPipeServer<UBufferType> CreateAsyncPipe(
+							const String& name, 
+							UInt32 maxInstanceCount, 
+							PipeMode mode = PipeMode::Both, 
+							Boolean isNoCache = true);
 					};
 
 					template<typename TDataType>
@@ -326,8 +344,14 @@ namespace Seed {
 							return This->hPipe;
 						}
 					protected:
-						AsyncNamedPipeServerInstance(Handle hPipe, const String& name, PipeMode mode) {
-
+						AsyncNamedPipeServerInstance(Handle hPipe, const String& name, PipeMode mode, Boolean isNoCache)
+							: This(new Details::BaseAsyncNamedPipeServerInstance(String(name), hPipe, mode, isNoCache))
+						{}
+					protected:
+						void SetInstaceRef(Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef) {
+							This->serverRef = serverRef;
+							//Must as serverRef container ref to this object in server pipe
+							--This->RefCount;
 						}
 					protected:
 						virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TDataType>>> onFinishConnectAction) {
@@ -491,13 +515,21 @@ namespace Seed {
 
 
 					template<typename TBufferType>
-					AsyncNamedPipeClient<TBufferType> AsyncConnectPipe(const String& name, PipeMode mode, const Threading::UnifiedThreadPool& ownerPool)
+					AsyncNamedPipeClient<TBufferType> AsyncConnectPipe(
+						const Threading::UnifiedThreadPool& ownerPool, 
+						const String& name, 
+						PipeMode mode = PipeMode::Both, 
+						Boolean isNoCache = true)
 					{
-						return AsyncNamedPipeClient<TBufferType>(String(name), mode, ownerPool);
+						return AsyncNamedPipeClient<TBufferType>(String(name), mode, isNoCache, ownerPool);
 					}
 
 					template<typename TBufferType>
-					AsyncNamedPipeServer<TBufferType> CreateAsyncPipe(const String& name, UInt32 maxInstanceCount, PipeMode mode)
+					AsyncNamedPipeServer<TBufferType> CreateAsyncPipe(
+						const String& name, 
+						UInt32 maxInstanceCount, 
+						PipeMode mode = PipeMode::Both,
+						Boolean isNoCache = true)
 					{
 						return AsyncNamedPipeServer(String(name), mode, maxInstanceCount);
 					}

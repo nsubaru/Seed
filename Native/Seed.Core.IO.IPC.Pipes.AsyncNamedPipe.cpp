@@ -5,8 +5,8 @@
 
 #pragma region Named pipe client
 
-Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::BaseAsyncNamedPipeClient(String&& pipeName, PipeMode mode) 
-	: pipeName(MoveRValue(pipeName)), mode(mode), hPipe(nullptr), poolTask(nullptr), RefCount(1)
+Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::BaseAsyncNamedPipeClient(String&& pipeName, PipeMode mode, Boolean isNoCache)
+	: pipeName(MoveRValue(pipeName)), mode(mode), isNoCache(isNoCache), hPipe(nullptr), poolTask(nullptr), RefCount(1)
 {
 	IO_STATUS_BLOCK IoStatusBlock = { 0 };
 	OBJECT_ATTRIBUTES ObjectAttributes = { 0 };
@@ -48,7 +48,7 @@ Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::BaseAsyncNamedPip
 		NULL,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		FILE_OPEN,
-		NULL,
+		(isNoCache ? FILE_WRITE_THROUGH : NULL),
 		NULL,
 		0);
 
@@ -109,6 +109,20 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::CloseConnect
 	if (this->hPipe != nullptr) {
 		NtClose(this->hPipe);
 		this->hPipe = nullptr;
+	}
+}
+
+void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::Flush()
+{
+	if (this->hPipe == nullptr)
+		Throw(NullPointException(ExceptionPosition));
+
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
+	NTSTATUS status = NtFlushBuffersFile(this->hPipe, &ioStatusBlock);
+
+	if (status == STATUS_PIPE_BROKEN) {
+		this->CloseConnection();
+		Throw(PipeBrokenException(ExceptionPosition));
 	}
 }
 
@@ -186,7 +200,7 @@ Seed::Core::Handle Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServer
 		&IoStatusBlock,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		FILE_OPEN_IF,
-		FILE_SYNCHRONOUS_IO_ALERT,
+		(isNoCache ? FILE_WRITE_THROUGH : NULL),
 		TRUE,
 		TRUE,
 		TRUE,
@@ -284,7 +298,22 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Clos
 {
 	if (this->hPipe != nullptr) {
 		NtClose(this->hPipe);
+		this->serverRef.Remove(true);
 		this->hPipe = nullptr;
+	}
+}
+
+void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Flush()
+{
+	if (this->hPipe == nullptr)
+		Throw(NullPointException(ExceptionPosition));
+
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
+	NTSTATUS status = NtFlushBuffersFile(this->hPipe, &ioStatusBlock);
+
+	if (status == STATUS_PIPE_BROKEN) {
+		this->CloseConnection();
+		Throw(PipeBrokenException(ExceptionPosition));
 	}
 }
 
@@ -308,7 +337,13 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Wait
 
 void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Dispose()
 {
-	CloseConnection();
+	if (this->hPipe != nullptr) {
+		//set fake ref count value as pipe dtor can call in close connection due removing server ref
+		this->RefCount = 2;
+		CloseConnection();
+		//restore real ref count value
+		this->RefCount = 0;
+	}
 }
 
 #pragma endregion
