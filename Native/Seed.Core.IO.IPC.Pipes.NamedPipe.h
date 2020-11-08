@@ -143,24 +143,21 @@ namespace Seed {
 					private:
 						struct Data {
 							PipeMode mode;
-							Handle pipeHandle;
-							UInt32 MaxInstance;
-							Containers::ConcurencyList<NamedPipeServerInstance> Instances;
+							UInt32 maxInstanceCount;
+							Containers::ConcurencyList<NamedPipeServerInstance> instances;
 							String name;
 
 							RefCountT RefCount;
 
 							Data(
-								Handle pipeHandle,
 								PipeMode mode,
-								UInt32 MaxInstance,
+								UInt32 maxInstanceCount,
 								String name
 							) :
-								pipeHandle(pipeHandle),
 								mode(mode),
-								MaxInstance(MaxInstance),
+								maxInstanceCount(maxInstanceCount),
 								name(name),
-								Instances(),
+								instances(),
 								RefCount(1)
 							{};
 						};
@@ -168,6 +165,8 @@ namespace Seed {
 						Data* This;
 					private:
 						NamedPipeServer(Data*&& This) :This(This) {};
+					private:
+						Handle CreateServerPipeHandle();
 					protected:
 						virtual void Dispose() override;
 					public:
@@ -196,13 +195,13 @@ namespace Seed {
 						/// Вказує чи канал робочий
 						/// </summary>
 						/// <returns>Логічне значення, true, якщо канал робочий</returns>
-						bool GetIsValid() const { return This != nullptr && This->pipeHandle != nullptr; }
+						bool GetIsValid() const { return This != nullptr && This->instances.Count <= This->maxInstanceCount; }
 						
 						/// <summary>
 						/// Вертає кількість активних з'єднаннь
 						/// </summary>
 						/// <returns>Число яке вказує кількість активних з'єднаннь</returns>
-						SizeT GetInstanceCount() { return This == nullptr ? 0 : This->Instances.Count; }
+						SizeT GetInstanceCount() { return This == nullptr ? 0 : This->instances.Count; }
 
 						/// <summary>
 						/// Вертає ім'я каналу
@@ -247,6 +246,7 @@ namespace Seed {
 					class NamedPipeServerInstance final : public INamedPipe {
 					private:
 						struct Data {
+							String pipeName;
 							PipeMode mode;
 							Handle pipe;
 							RefCountT RefCount;
@@ -255,6 +255,7 @@ namespace Seed {
 							Threading::SRWLock ouputLock;
 
 							Data(
+								String&& pipeName,
 								Handle pipe,
 								PipeMode mode
 							) :

@@ -21,7 +21,7 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeClient::ReadRaw(Containers::Blob& data
 
 	NTSTATUS status = STATUS_SUCCESS;
 
-	IO_STATUS_BLOCK IoStatusBlock = { 0 };
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
 
 	This->inputLock.ExclusiveLock([&]() InlineLambda
 	{
@@ -30,7 +30,7 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeClient::ReadRaw(Containers::Blob& data
 			NULL,
 			NULL,
 			NULL,
-			&IoStatusBlock,
+			&ioStatusBlock,
 			(void*)(const Byte*)data,
 			ULONG(data.Count),
 			0,
@@ -51,18 +51,18 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeClient::WriteRawData(const Containers:
 	if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
 		Throw(InvalidPipeException(ExceptionPosition));
 
-	IO_STATUS_BLOCK IoStatusBlock = { 0 };
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
 	NTSTATUS status = STATUS_SUCCESS;
 
 	This->ouputLock.ExclusiveLock([&]() InlineLambda
 	{
-		NtFlushBuffersFile(This->pipe, &IoStatusBlock);
+		NtFlushBuffersFile(This->pipe, &ioStatusBlock);
 		status = NtWriteFile( //-V107
 			This->pipe,
 			NULL,
 			NULL,
 			NULL,
-			&IoStatusBlock,
+			&ioStatusBlock,
 			(void*)(const Byte*)data,
 			ULONG(data.Count), 
 			0,
@@ -99,6 +99,68 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeClient::WaitClosing() const
 
 #pragma region Named pipe server
 
+Handle Seed::Core::IO::IPC::Pipes::NamedPipeServer::CreateServerPipeHandle()
+{
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
+	OBJECT_ATTRIBUTES objectAttributes = { 0 };
+	UNICODE_STRING usPipeName = { 0 };
+	LARGE_INTEGER waitTime = { 0 };
+
+	String realPipeName = String(L"\\??\\pipe\\") + This->name;
+
+	RtlInitUnicodeStringEx(&usPipeName, (PWSTR)(ConstCharStr)realPipeName);
+
+	InitializeObjectAttributes(&objectAttributes,
+		&usPipeName,
+		OBJ_CASE_INSENSITIVE,
+		NULL,
+		NULL);
+
+	waitTime.QuadPart = -500000;
+
+	HANDLE hPipe = NULL;
+
+	ULONG pipeMode = 0, inBuffSize = 0, outBuffSize = 0;
+	switch (This->mode)
+	{
+	case PipeMode::In:
+		pipeMode = GENERIC_READ;
+		inBuffSize = 2048; outBuffSize = 0;
+		break;
+	case PipeMode::Out:
+		pipeMode = GENERIC_WRITE;
+		inBuffSize = 0; outBuffSize = 2048;
+		break;
+	case PipeMode::Both:
+		pipeMode = GENERIC_READ | GENERIC_WRITE;
+		inBuffSize = outBuffSize = 2048;
+		break;
+	default:
+		Throw(InvalidPipeException(ExceptionPosition));
+	}
+
+	NTSTATUS status = NtCreateNamedPipeFile(
+		&hPipe,
+		pipeMode | SYNCHRONIZE | PIPE_WAIT | ((This->instances.Count > 0) ? FILE_CREATE_PIPE_INSTANCE : NULL),
+		&objectAttributes,
+		&ioStatusBlock,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		FILE_OPEN_IF,
+		FILE_SYNCHRONOUS_IO_ALERT,
+		TRUE,
+		TRUE,
+		FALSE,
+		This->maxInstanceCount,
+		inBuffSize,
+		outBuffSize,
+		&waitTime);
+
+	if (!NT_SUCCESS(status))
+		Throw(NullPointException(ExceptionPosition));
+
+	return hPipe;
+}
+
 void Seed::Core::IO::IPC::Pipes::NamedPipeServer::Dispose()
 {
 	this->DestroyPipe();
@@ -106,43 +168,55 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServer::Dispose()
 
 Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance Seed::Core::IO::IPC::Pipes::NamedPipeServer::Connect()
 {
-	if (This == nullptr || This->pipeHandle == nullptr)
+	if (This == nullptr)
 		Throw(NullPointException(ExceptionPosition));
 
-	IO_STATUS_BLOCK IoStatusBlock = { 0 };
+	Handle pipeHandle = nullptr;
 
-	NTSTATUS Status = NtFsControlFile(This->pipeHandle,
-		NULL,
-		NULL,
-		NULL,
-		&IoStatusBlock,
-		FSCTL_PIPE_LISTEN,
-		NULL,
-		NULL,
-		NULL,
-		NULL);
+	try {
 
-	NtFlushBuffersFile(This->pipeHandle, &IoStatusBlock);
+		IO_STATUS_BLOCK IoStatusBlock = { 0 };
+
+		NTSTATUS Status = NtFsControlFile(pipeHandle,
+			NULL,
+			NULL,
+			NULL,
+			&IoStatusBlock,
+			FSCTL_PIPE_LISTEN,
+			NULL,
+			NULL,
+			NULL,
+			NULL);
+
+		NtFlushBuffersFile(pipeHandle, &IoStatusBlock);
 
 
-	auto it =
-		This->Instances.AddLast(
-			NamedPipeServerInstance(
-				new NamedPipeServerInstance::Data(
-					This->pipeHandle,
-					This->mode)
-			)
-		);
+		auto it =
+			This->instances.AddLast(
+				NamedPipeServerInstance(
+					new NamedPipeServerInstance::Data(
+						String(This->name),
+						pipeHandle,
+						This->mode)
+				)
+			);
 
-	it->This->ThisInstanceLink = it;
-	return *it;
+		it->This->ThisInstanceLink = it;
+		return *it;
+	}
+	catch (...) {
+		if (pipeHandle != nullptr)
+			NtClose(pipeHandle);
+
+		ReThrow;
+	}
 }
 
 void Seed::Core::IO::IPC::Pipes::NamedPipeServer::CloseAllInstance()
 {
 	if (this->This != nullptr)
 	{
-		this->This->Instances
+		this->This->instances
 			.CopyTo<Containers::List>()
 			.ForEach([&](NamedPipeServerInstance& item) InlineLambda{
 				item.Close();
@@ -156,9 +230,6 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServer::DestroyPipe()
 	if (this->This != nullptr)
 	{
 		this->CloseAllInstance();
-
-		NtClose(this->This->pipeHandle);
-		This->pipeHandle = nullptr;
 	}
 }
 
@@ -179,7 +250,7 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::ReadRaw(Containers::Bl
 
 	NTSTATUS status = STATUS_SUCCESS;
 
-	IO_STATUS_BLOCK IoStatusBlock = { 0 };
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
 
 	This->inputLock.ExclusiveLock([&]() InlineLambda
 		{
@@ -188,7 +259,7 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::ReadRaw(Containers::Bl
 				NULL,
 				NULL,
 				NULL,
-				&IoStatusBlock,
+				&ioStatusBlock,
 				(void*)(const Byte*)data,
 				ULONG(data.Count),
 				0,
@@ -209,18 +280,18 @@ void Seed::Core::IO::IPC::Pipes::NamedPipeServerInstance::WriteRawData(const Con
 	if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
 		Throw(InvalidPipeException(ExceptionPosition));
 
-	IO_STATUS_BLOCK IoStatusBlock = { 0 };
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
 	NTSTATUS status = STATUS_SUCCESS;
 
 	This->ouputLock.ExclusiveLock([&]() InlineLambda
 		{
-			NtFlushBuffersFile(This->pipe, &IoStatusBlock);
+			NtFlushBuffersFile(This->pipe, &ioStatusBlock);
 			status = NtWriteFile( //-V107
 				This->pipe,
 				NULL,
 				NULL,
 				NULL,
-				&IoStatusBlock,
+				&ioStatusBlock,
 				(void*)(const Byte*)data,
 				ULONG(data.Count),
 				0,
@@ -263,70 +334,13 @@ NamedPipeServer Seed::IO::IPC::Pipes::CreatePipe(
 	UInt8 MaxInstanceCount, 
 	PipeMode mode)
 {
-	IO_STATUS_BLOCK IoStatusBlock = { 0 };
-	OBJECT_ATTRIBUTES ObjectAttributes = { 0 };
-	UNICODE_STRING usPipeName = { 0 };
-	LARGE_INTEGER WaitTime = { 0 };
-
-	String realPipeName = String(L"\\??\\pipe\\") + name;
-
-	RtlInitUnicodeStringEx(&usPipeName, (PWSTR)(ConstCharStr)realPipeName);
-
-	InitializeObjectAttributes(&ObjectAttributes,
-		&usPipeName,
-		OBJ_CASE_INSENSITIVE,
-		NULL,
-		NULL);
-
-	WaitTime.QuadPart = -500000;
-
-	HANDLE Pipe = NULL;
-
-	ULONG PipeMode = 0, InBuffSize = 0, OutBuffSize = 0;
-	switch (mode)
-	{
-	case PipeMode::In:
-		PipeMode = GENERIC_READ;
-		InBuffSize = 2048; OutBuffSize = 0;
-		break;
-	case PipeMode::Out:
-		PipeMode = GENERIC_WRITE;
-		InBuffSize = 0; OutBuffSize = 2048;
-		break;
-	case PipeMode::Both:
-		PipeMode = GENERIC_READ | GENERIC_WRITE;
-		InBuffSize = OutBuffSize = 2048;
-		break;
-	default:
-		Throw(InvalidPipeException(ExceptionPosition));
-	}
-
-	NTSTATUS status = NtCreateNamedPipeFile(
-		&Pipe,
-		PipeMode | SYNCHRONIZE | PIPE_WAIT,
-		&ObjectAttributes,
-		&IoStatusBlock,
-		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		FILE_OPEN_IF,
-		FILE_SYNCHRONOUS_IO_ALERT,
-		TRUE,
-		TRUE,
-		FALSE,
-		MaxInstanceCount,
-		InBuffSize,
-		OutBuffSize,
-		&WaitTime);
-
-	if (!NT_SUCCESS(status))
-		Throw(NullPointException(ExceptionPosition));
-
-	return NamedPipeServer(new NamedPipeServer::Data(Pipe, mode, MaxInstanceCount, realPipeName));
+	return NamedPipeServer(new NamedPipeServer::Data(mode, MaxInstanceCount, name));
 }
 
-Seed::Core::IO::IPC::Pipes::NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectPipe(const String& name, PipeMode mode)
+NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectPipe(const String& name, PipeMode mode)
 {
-	IO_STATUS_BLOCK IoStatusBlock = { 0 };
-	OBJECT_ATTRIBUTES ObjectAttributes = { 0 };
+	IO_STATUS_BLOCK ioStatusBlock = { 0 };
+	OBJECT_ATTRIBUTES objectAttributes = { 0 };
 	UNICODE_STRING usPipeName = { 0 };
 
 	String realPipeName = L"\\??\\pipe\\";
@@ -334,7 +348,7 @@ Seed::Core::IO::IPC::Pipes::NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectP
 
 	RtlInitUnicodeStringEx(&usPipeName, (PWSTR)(ConstCharStr)realPipeName);
 
-	InitializeObjectAttributes(&ObjectAttributes,
+	InitializeObjectAttributes(&objectAttributes,
 		&usPipeName,
 		OBJ_CASE_INSENSITIVE,
 		NULL,
@@ -342,17 +356,17 @@ Seed::Core::IO::IPC::Pipes::NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectP
 
 	HANDLE pipe = NULL;
 
-	ULONG PipeMode = 0;
+	ULONG pipeMode = 0;
 	switch (mode)
 	{
 	case PipeMode::In:
-		PipeMode = GENERIC_READ;
+		pipeMode = GENERIC_READ;
 		break;
 	case PipeMode::Out:
-		PipeMode = GENERIC_WRITE;
+		pipeMode = GENERIC_WRITE;
 		break;
 	case PipeMode::Both:
-		PipeMode = GENERIC_READ | GENERIC_WRITE;
+		pipeMode = GENERIC_READ | GENERIC_WRITE;
 		break;
 	default:
 		Throw(InvalidPipeException(ExceptionPosition));
@@ -360,9 +374,9 @@ Seed::Core::IO::IPC::Pipes::NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectP
 
 	NTSTATUS status = NtCreateFile(
 		&pipe,
-		PipeMode | SYNCHRONIZE | PIPE_WAIT,
-		&ObjectAttributes,
-		&IoStatusBlock,
+		pipeMode | SYNCHRONIZE | PIPE_WAIT,
+		&objectAttributes,
+		&ioStatusBlock,
 		NULL,
 		NULL,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
