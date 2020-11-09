@@ -82,7 +82,7 @@ namespace Seed {
 				/// Вертає true якщо об'єкт валідний
 				/// </summary>
 				/// <returns>true якщо об'єкт валідний</returns>
-				virtual bool IsValid() { return This->hFile != nullptr; }
+				virtual bool GetIsValid() const { return This->hFile != nullptr; }
 			public:
 				/// <summary>
 				/// Ініціалізація асинхроної операції читання
@@ -92,7 +92,7 @@ namespace Seed {
 				/// <param name="onFinishReadAction">Колбек який викличеться після завершеня читання</param>
 				/// <returns>Об'єкт I/O операції</returns>
 				virtual IOTask AsyncRead(TDataType&& data, SizeT position, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) override {
-					if (!IsValid())
+					if (!IsValid)
 						Throw(InvalidHandleUsage(ExceptionPosition));
 
 					if (!(This->mode.Read))
@@ -140,7 +140,7 @@ namespace Seed {
 				/// <returns>Об'єкт I/O операції</returns>
 				/// <returns></returns>
 				virtual IOTask AsyncWrite(const TDataType&& data, SizeT position, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) override {
-					if (!IsValid())
+					if (!IsValid)
 						Throw(InvalidHandleUsage(ExceptionPosition));
 
 					if (!(This->mode.Write || This->mode.WriteThrought))
@@ -183,7 +183,7 @@ namespace Seed {
 				/// Видаляє об'єкт файла
 				/// </summary>
 				void DeleteFile()&& {
-					if (!IsValid())
+					if (!IsValid)
 						Throw(InvalidHandleUsage(ExceptionPosition));
 
 					This->DeleteFile();
@@ -195,6 +195,33 @@ namespace Seed {
 
 					This->Dispose();
 				}
+			public:
+				/// <summary>
+				/// Вертає nt ім'я файла
+				/// </summary>
+				/// <returns>Рядок з nt іменем файла</returns>
+				const String& GetFileName() const { return This->ntFileName; }
+
+				/// <summary>
+				/// Вертає режим відкритя файла
+				/// </summary>
+				/// <returns>Режим відкритя файла</returns>
+				File::OpeningMode GetOpenMode() const { return This->mode; }
+			public:
+				/// <summary>
+				/// NT ім'я файла
+				/// </summary>
+				String Property(GetFileName) FileName;
+
+				/// <summary>
+				/// Режим відкритя файла
+				/// </summary>
+				File::OpeningMode Property(GetOpenMode) OpenMode;
+
+				/// <summary>
+				/// true якщо об'єкт валідний
+				/// </summary>
+				Boolean Property(GetIsValid) IsValid;
 			public:
 				RefCountClass(BaseAsyncFile, This);
 			};

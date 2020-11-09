@@ -54,6 +54,18 @@ namespace Seed
                     class StringLeftResize final : public TestClass<StringLeftResize>{
                         virtual bool Excecute() override;
                     };
+
+                    class StringInt32Hex final : public TestClass<StringInt32Hex> {
+                        virtual bool Excecute() override;
+                    };
+
+                    class StringUInt32Hex final : public TestClass<StringUInt32Hex> {
+                        virtual bool Excecute() override;
+                    };
+
+                    class StringBlobHex final : public TestClass<StringBlobHex> {
+                        virtual bool Excecute() override;
+                    };
 				}
 			}
 		}

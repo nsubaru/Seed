@@ -173,7 +173,7 @@ Handle Seed::Core::IO::IPC::Pipes::NamedPipeServer::CreateServerPipeHandle(bool 
 		&waitTime);
 
 	if (!NT_SUCCESS(status))
-		Throw(NullPointException(ExceptionPosition));
+		Throw(NtException(ExceptionPosition, status));
 
 	return hPipe;
 }
@@ -188,13 +188,13 @@ NamedPipeServerInstance Seed::Core::IO::IPC::Pipes::NamedPipeServer::Connect(Boo
 	if (This == nullptr)
 		Throw(NullPointException(ExceptionPosition));
 
-	Handle pipeHandle = nullptr;
+	Handle pipeHandle = CreateServerPipeHandle(isNoCache);
 
 	try {
 
 		IO_STATUS_BLOCK IoStatusBlock = { 0 };
 
-		NTSTATUS Status = NtFsControlFile(pipeHandle,
+		NTSTATUS status = NtFsControlFile(pipeHandle,
 			NULL,
 			NULL,
 			NULL,
@@ -205,22 +205,21 @@ NamedPipeServerInstance Seed::Core::IO::IPC::Pipes::NamedPipeServer::Connect(Boo
 			NULL,
 			NULL);
 
-		NtFlushBuffersFile(pipeHandle, &IoStatusBlock);
+		if (!NT_SUCCESS(status))
+			Throw(NtException(ExceptionPosition, status));
 
+		auto pipe = NamedPipeServerInstance(
+			new NamedPipeServerInstance::Data(
+				String(This->name),
+				isNoCache,
+				pipeHandle,
+				This->mode)
+		);
 
-		auto it =
-			This->instances.AddLast(
-				NamedPipeServerInstance(
-					new NamedPipeServerInstance::Data(
-						String(This->name),
-						isNoCache,
-						pipeHandle,
-						This->mode)
-				)
-			);
+		auto it = This->instances.AddLast(pipe);
 
-		it->This->ThisInstanceLink = it;
-		return *it;
+		pipe.This->ThisInstanceLink = it;
+		return pipe;
 	}
 	catch (...) {
 		if (pipeHandle != nullptr)

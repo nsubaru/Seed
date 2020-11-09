@@ -274,7 +274,7 @@ namespace Seed {
 					RefCountT count;
 					RefCountT RefCount;
 
-					ForceInline RootNode() noexcept :node(nullptr), count(0), RefCount(1) {};
+					ForceInline RootNode() :node(nullptr), count(0), RefCount(1) {};
 				};
 			private:
 				//Кореневий елемент

@@ -238,9 +238,7 @@ namespace Seed {
 						/// Очікує і приєднюється до клієнту вертаюче екземпляр з'єднання
 						/// </summary>
 						/// <returns>Екземпляр з'єднання каналу з другою стороною</returns>
-						NamedPipeServerInstance Connect() {
-							return this->Connect(This->isNoCache);
-						}
+						NamedPipeServerInstance Connect();
 
 						/// <summary>
 						/// Очікує і приєднюється до клієнту вертаюче екземпляр з'єднання
@@ -343,6 +341,7 @@ namespace Seed {
 								pipe(pipe),
 								isNoCache(isNoCache),
 								mode(mode),
+								pipeName(MoveRValue(pipeName)),
 								RefCount(1),
 								inputLock(),
 								ouputLock(),
@@ -437,6 +436,11 @@ namespace Seed {
 					public:
 						friend NamedPipeServerInstance NamedPipeServer::Connect(bool isNoCache);
 					};
+
+					ForceInline NamedPipeServerInstance Seed::Core::IO::IPC::Pipes::NamedPipeServer::Connect()
+					{
+						return this->Connect(This->isNoCache);
+					}
 
 					/// <summary>
 					/// Створення сервера каналів

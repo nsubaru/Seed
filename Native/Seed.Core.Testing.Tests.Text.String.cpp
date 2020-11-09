@@ -323,3 +323,30 @@ bool Seed::Core::Testing::Test::Text::StringLeftResize::Excecute()
 
 	return true;
 }
+
+bool Seed::Core::Testing::Test::Text::StringInt32Hex::Excecute()
+{
+	Int32 value = 0xabcdef12;
+
+	Asserts::AssertEqual(String::Int32asHex(value), L"0xabcdef12");
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Text::StringUInt32Hex::Excecute()
+{
+	UInt64 value = 0xabcdef1234567891;
+
+	Asserts::AssertEqual(String::UInt64asHex(value), L"0xabcdef1234567891");
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Text::StringBlobHex::Excecute()
+{
+	auto value = Core::Containers::Blob{ 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0 };
+
+	Asserts::AssertEqual(String::binaryToHex(value), L"123456789abcdef0");
+
+	return true;
+}

@@ -34,11 +34,11 @@ namespace Seed {
 				virtual DeprecatedCall("Низькорівнева робота з пам'ятю") void* AllignedFree(void* MemBlk, DataSizeT AllocationReq) final;
 
 				///<summary>Кількість виділених блоків даних</summary>
-				virtual SizeT CurrentMemBlkCount() noexcept final;
+				virtual SizeT CurrentMemBlkCount() final;
 				///<summary>Розмір виділеної пам'яті в байтах</summary>
-				virtual DataSizeT CurrentAllocatedMemory() noexcept final;
+				virtual DataSizeT CurrentAllocatedMemory() final;
 				///<summary>Фактичнй розмір виділеної пам'яті в байтах</summary>
-				virtual DataSizeT CurrentHeapUsage() noexcept final;
+				virtual DataSizeT CurrentHeapUsage() final;
 
 				ExceptionHeap& operator=(const ExceptionHeap&) = delete;
 			};
@@ -871,7 +871,7 @@ namespace Seed {
 				///<param name = 'RequiredIndex'>Індекс елемента який пробували отримати</param>
 				///<param name = 'MaxAllowedIndex'>Максимальний допустимий індекс</param>
 				ForceInline IndexOutOfRange(const ConstAString& File, const ConstAString& FunctName, SizeT Line, SizeT RequiredIndex, SizeT MaxAllowedIndex)
-					noexcept : Exception(File, FunctName, Line, L"Вихід за межі"),
+					: Exception(File, FunctName, Line, L"Вихід за межі"),
 					Index(RequiredIndex), MaxIndex(MaxAllowedIndex)
 				{}
 
@@ -926,7 +926,7 @@ namespace Seed {
 				///<param name = 'RequireType'>Інформація про очікуваний тип</param>
 				///<param name = 'ActuallyType'>Інформація про фактичний тип</param>
 				ForceInline InvalidTypeException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, const TypeInfo& RequiredType, const TypeInfo& ActuallyType)
-					noexcept : Exception(File, FunctName, Line, L"Не вірний тип"),
+					: Exception(File, FunctName, Line, L"Не вірний тип"),
 					requiredType(RequiredType), actuallyType(ActuallyType)
 				{
 				}
@@ -1041,7 +1041,7 @@ namespace Seed {
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				ForceInline InteruptException(const ConstAString & File, const ConstAString & FunctName, SizeT Line)
-					noexcept : Exception(File, FunctName, Line, L"Операція перервана")
+					: Exception(File, FunctName, Line, L"Операція перервана")
 				{};
 
 				///<summary>Вертає місце генерації помилки</summary>
@@ -1203,7 +1203,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'StatusCode'>Код помилки</param>
 				NtException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, Int32 StatusCode)
-					noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
+					: Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 				{}
 			public:
 				/// <summary>
@@ -1258,7 +1258,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'maxSize'>Максимальний допустимий розмір стеку</param>
 				FullStackException(const ConstAString& File, const ConstAString& FuncName, SizeT Line, SizeT maxSize)
-					noexcept : Exception(File, FuncName, Line, L"Перевищено максимальний розмір стеку"), maxSize(maxSize)
+					: Exception(File, FuncName, Line, L"Перевищено максимальний розмір стеку"), maxSize(maxSize)
 				{}
 
 				/// <summary>
@@ -1309,7 +1309,7 @@ namespace Seed {
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				EmptyStackException(const ConstAString& File, const ConstAString& FuncName, SizeT Line)
-					noexcept : Exception(File, FuncName, Line, L"Спроба вийняти елементи з пустого стеку.")
+					: Exception(File, FuncName, Line, L"Спроба вийняти елементи з пустого стеку.")
 				{}
 
 				///<summary>Текстове представлення інформації про помилку</summary>
@@ -1351,7 +1351,7 @@ namespace Seed {
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				///<param name = 'maxSize'>Максимальний допустимий розмір черги</param>
 				FullQueueException(const ConstAString& File, const ConstAString& FuncName, SizeT Line, SizeT maxSize)
-					noexcept : Exception(File, FuncName, Line, L"Перевищено максимальний розмір черги"), maxSize(maxSize)
+					: Exception(File, FuncName, Line, L"Перевищено максимальний розмір черги"), maxSize(maxSize)
 				{}
 
 				/// <summary>
@@ -1402,7 +1402,7 @@ namespace Seed {
 				///<param name = 'FunctName'>Ім'я функції</param>
 				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				EmptyQueueException(const ConstAString& File, const ConstAString& FuncName, SizeT Line)
-					noexcept : Exception(File, FuncName, Line, L"Спроба вийняти елементи з пустої черги.")
+					: Exception(File, FuncName, Line, L"Спроба вийняти елементи з пустої черги.")
 				{}
 
 				///<summary>Текстове представлення інформації про помилку</summary>

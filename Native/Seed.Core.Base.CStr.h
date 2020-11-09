@@ -15,7 +15,7 @@ namespace Seed {
         	/// </summary>
         	/// <param name="cStr">Рядкова зміна</param>
         	/// <returns>Кількість елементів в рядковому масиві</returns>
-            __forceinline constexpr SizeT Size(const CharStr cStr) noexcept {
+            __forceinline constexpr SizeT Size(const CharStr cStr) {
                 SizeT i = 0;
                 while (cStr[i] != '\0')
                 {
@@ -29,7 +29,7 @@ namespace Seed {
         	/// </summary>
         	/// <param name="cStr">Рядкова зміна</param>
         	/// <returns>Кількість елементів в рядковому масиві</returns>
-            __forceinline constexpr SizeT Size(const Char* cStr) noexcept {
+            __forceinline constexpr SizeT Size(const Char* cStr) {
                 SizeT i = 0;
                 while (cStr[i] != '\0')
                 {
@@ -44,7 +44,7 @@ namespace Seed {
         	/// </summary>
         	/// <param name="cStr">Рядкова зміна</param>
         	/// <returns>Кількість елементів в рядковому масиві</returns>
-            __forceinline constexpr SizeT Size(const AChar* cStr) noexcept {
+            __forceinline constexpr SizeT Size(const AChar* cStr) {
                 SizeT i = 0;
                 while (cStr[i] != '\0')
                 {
@@ -59,7 +59,7 @@ namespace Seed {
         	/// <param name="source">Рядкова зміна з якої копіюється</param>
         	/// <param name="dest">Рядкова зміна в яку копіюється</param>
             __declspec(deprecated("Без гарантій щодо виходу за межі"))
-                __forceinline void Copy(CharStr source, CharStr dest) noexcept {
+                __forceinline void Copy(CharStr source, CharStr dest) {
                 while ((*dest++ = *source++)); //-V2507
             }
 
@@ -69,7 +69,7 @@ namespace Seed {
         	/// <param name="source">Рядкова зміна з якої копіюється</param>
         	/// <param name="dest">Рядкова зміна в яку копіюється</param>
             __declspec(deprecated("Без гарантій щодо виходу за межі"))
-                __forceinline void Copy(const Char* source, CharStr dest) noexcept {
+                __forceinline void Copy(const Char* source, CharStr dest) {
                 while ((*dest++ = *source++)); //-V2507
             }
 
@@ -79,7 +79,7 @@ namespace Seed {
         	/// <param name="source">Рядкова зміна з якої копіюється</param>
         	/// <param name="dest">Рядкова зміна в яку копіюється</param>
             __declspec(deprecated("Без гарантій щодо виходу за межі"))
-                __forceinline void Copy(const AChar* source, ACharStr dest) noexcept {
+                __forceinline void Copy(const AChar* source, ACharStr dest) {
                 while ((*dest++ = *source++));
             }
 

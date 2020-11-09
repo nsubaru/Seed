@@ -69,8 +69,8 @@ namespace Seed {
 				/// <summary>
 				/// Очікування з таймаутом
 				/// </summary>
-				/// <param name="timeOunt">Таймаут</param>
-				void Wait(Time::TimeSpan timeOunt) const;
+				/// <param name="timeOut">Таймаут</param>
+				void Wait(Time::TimeSpan timeOut) const;
 			public:
 				/// <summary>
 				/// Подає імпульс на подію

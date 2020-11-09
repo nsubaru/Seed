@@ -165,7 +165,7 @@ namespace Seed {
 						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
 						/// <returns>Об'єкт задачі I/O</returns>
 						virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) {
-							if (!IsValid())
+							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
 							if (This->mode != PipeMode::In && This->mode != PipeMode::Both)
@@ -214,7 +214,7 @@ namespace Seed {
 						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
 						/// <returns>Об'єкт задачі I/O</returns>
 						virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) {
-							if (!IsValid())
+							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
 							if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
@@ -260,13 +260,51 @@ namespace Seed {
 						/// Перевірка чи об'єкт коректний
 						/// </summary>
 						/// <returns>true якщо об'єкт допускає I/O операції</returns>
-						virtual bool IsValid() {
+						virtual bool GetIsValid() const {
 							return This->hPipe != nullptr;
 						}
 					public:
 						virtual void CloseConnection() { This->CloseConnection(); }
 						virtual void WaitClosing() const { This->WaitClosing(); }
 						virtual void WaitClosing(Time::TimeSpan timeout) const { This->WaitClosing(timeout); }
+					public:
+						/// <summary>
+						/// Вертає ім'я каналу
+						/// </summary>
+						/// <returns>Рядок з іменем каналу</returns>
+						const String& GetName() const { return This->pipeName; }
+
+						/// <summary>
+						/// Режим каналу
+						/// </summary>
+						/// <returns>Поточний режим каналу</returns>
+						PipeMode GetSupportedMode() const { return This->mode; }
+
+						/// <summary>
+						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
+						Boolean GetIsNoCache() const { return This->isNoCache; }
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						Boolean Property(GetIsValid) IsValid;
+
+						/// <summary>
+						/// Ім'я каналу
+						/// </summary>
+						String Property(GetName) Name;
+
+						/// <summary>
+						/// Режим роботи каналу
+						/// </summary>
+						PipeMode Property(GetSupportedMode) SupportedMode;
+
+						/// <summary>
+						/// Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
 						virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const {
 							return *This->poolTask;
@@ -314,9 +352,61 @@ namespace Seed {
 							Dispose();
 						}
 
-						SizeT InstanceCount() { return This == nullptr ? 0 : This->instances.Count; }
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						/// <returns>Логічне значення, true, якщо канал робочий</returns>
+						bool GetIsValid() const { return This->IsValid(); }
 
-						bool IsValid() const { return This->IsValid(); }
+						/// <summary>
+						/// Вертає кількість активних з'єднаннь
+						/// </summary>
+						/// <returns>Число яке вказує кількість активних з'єднаннь</returns>
+						SizeT GetInstanceCount() const { return This == nullptr ? 0 : This->instances.Count; }
+
+						/// <summary>
+						/// Вертає ім'я каналу
+						/// </summary>
+						/// <returns>Рядок з іменем каналу</returns>
+						const String& GetName() const { return This->pipeName; }
+
+						/// <summary>
+						/// Режим каналу
+						/// </summary>
+						/// <returns>Поточний режим каналу</returns>
+						PipeMode GetSupportedMode() const { return This->mode; }
+
+						/// <summary>
+						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
+						Boolean GetIsNoCache() const { return This->isNoCache; }
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						Boolean Property(GetIsValid) IsValid;
+
+						/// <summary>
+						/// Кількість активних з'єднань
+						/// </summary>
+						SizeT Property(GetInstanceCount) InstanceCount;
+
+						/// <summary>
+						/// Ім'я каналу
+						/// </summary>
+						String Property(GetName) Name;
+
+						/// <summary>
+						/// Режим роботи каналу
+						/// </summary>
+						PipeMode Property(GetSupportedMode) SupportedMode;
+
+						/// <summary>
+						/// Логічне значення яке вказує чи підтримує автоскидання буферів після кожної операції
+						/// </summary>
+						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
 						RefCountClass(AsyncNamedPipeServer, This)
 					public:
@@ -355,7 +445,7 @@ namespace Seed {
 						}
 					protected:
 						virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TDataType>>> onFinishConnectAction) {
-							if (IsValid())
+							if (IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
 							IRPBase* irp = nullptr;
@@ -398,7 +488,7 @@ namespace Seed {
 						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
 						/// <returns>Об'єкт задачі I/O</returns>
 						virtual IOTask AsyncRead(TDataType&& data, SmartPtr<IFinishReadCallback<TDataType>> onFinishReadAction) {
-							if (!IsValid())
+							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
 							if (This->mode != PipeMode::In && This->mode != PipeMode::Both)
@@ -447,7 +537,7 @@ namespace Seed {
 						/// <param name="onFinishReadAction">Колбек який викличеться по результату операції</param>
 						/// <returns>Об'єкт задачі I/O</returns>
 						virtual IOTask AsyncWrite(const TDataType&& data, SmartPtr<IFinishWriteCallback<TDataType>> onFinishWriteAction) {
-							if (!IsValid())
+							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
 							if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
@@ -490,12 +580,51 @@ namespace Seed {
 						}
 					public:
 						/// <summary>
-						/// Перевірка чи об'єкт коректний
+						/// Вказує чи канал робочий
 						/// </summary>
-						/// <returns>true якщо об'єкт допускає I/O операції</returns>
-						virtual bool IsValid() {
-
+						/// <returns>Логічне значення, true, якщо канал робочий</returns>
+						virtual bool GetIsValid() const {
+							return This->IsValid();
 						}
+
+						/// <summary>
+						/// Вертає ім'я каналу
+						/// </summary>
+						/// <returns>Рядок з іменем каналу</returns>
+						const String& GetName() const { return This->pipeName; }
+
+						/// <summary>
+						/// Режим каналу
+						/// </summary>
+						/// <returns>Поточний режим каналу</returns>
+						PipeMode GetSupportedMode() const { return This->mode; }
+
+						/// <summary>
+						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
+						Boolean GetIsNoCache() const { return This->isNoCache; }
+
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						Boolean Property(GetIsValid) IsValid;
+
+						/// <summary>
+						/// Ім'я каналу
+						/// </summary>
+						String Property(GetName) Name;
+
+						/// <summary>
+						/// Режим роботи каналу
+						/// </summary>
+						PipeMode Property(GetSupportedMode) SupportedMode;
+
+						/// <summary>
+						/// Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
 						virtual void CloseConnection() { This->CloseConnection(); }
 						virtual void WaitClosing() const { This->WaitClosing(); }
@@ -504,8 +633,6 @@ namespace Seed {
 						virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const {
 							return *This->poolTask;
 						}
-					public:
-						virtual void CloseConnection();
 					public:
 						RefCountClass(AsyncNamedPipeServerInstance, This)
 					public:

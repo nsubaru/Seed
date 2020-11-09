@@ -22,7 +22,7 @@ Seed::Core::Threading::Threadables::ThreadableRef Seed::Core::Threading::Threada
 	HANDLE hThread = nullptr;
 	NtDuplicateObject(NtCurrentProcess(), NtCurrentThread(), NtCurrentProcess(), &hThread, GENERIC_ALL, 0, 0);
 	auto threadable = new ThreadableUnifiedThreadPoolIoTaskV2(task, event, hThread, Threading::GetTID(), instance);
-	return RegisterIThreadable(MoveRValue(threadable), &threadable->This->state);
+	return RegisterIThreadable(MoveRValue(threadable), &threadable->This->state, &threadable->This->secondState);
 }
 
 void Seed::Core::Threading::Threadables::UnRegisterPoolIoThreadable(ThreadableRef&& ref)
@@ -109,6 +109,10 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTa
 		case EThreadabledStates::Paused:
 		{
 			NtSuspendThread(This->hThread, NULL);
+
+			This->secondState = EThreadabledStates::Interupted;
+			Swap(This->state, This->secondState);
+
 			CONTEXT ctx = { 0 };
 			ctx.ContextFlags = CONTEXT_ALL;
 			NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
@@ -120,9 +124,13 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolIoTa
 			DWORD64 ret_point = ctx.Rip;
 			ctx.Rip = (DWORD64)(PDWORD64)InteruptThread;
 			status = ZwSetContextThread(This->hThread, &ctx);
-			NtAlertResumeThread(This->hThread, NULL);
+
+			NtResumeThread(This->hThread, NULL);
 			if (!NT_SUCCESS(status))
 				Throw(NtException(ExceptionPosition, status));
+
+			//We must call this after resume for resume thread if it wait for something
+			NtAlertThread(This->hThread);
 		}
 		default:
 			break;

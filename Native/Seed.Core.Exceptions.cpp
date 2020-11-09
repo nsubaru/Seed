@@ -192,17 +192,17 @@ SeedKernelCall void* Seed::Core::Memory::ExceptionHeap::AllignedFree(void* MemBl
 	else return MemBlk;
 }
 
-SizeT Seed::Core::Memory::ExceptionHeap::CurrentMemBlkCount() noexcept
+SizeT Seed::Core::Memory::ExceptionHeap::CurrentMemBlkCount()
 {
 	return ExceptionsHeap.AllocatedMemBlksCount;
 }
 
-Seed::Core::Memory::DataSizeT Seed::Core::Memory::ExceptionHeap::CurrentAllocatedMemory() noexcept
+Seed::Core::Memory::DataSizeT Seed::Core::Memory::ExceptionHeap::CurrentAllocatedMemory()
 {
 	return DataSizeT(ExceptionsHeap.AllocatedMemory);
 }
 
-Seed::Core::Memory::DataSizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsage() noexcept
+Seed::Core::Memory::DataSizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsage()
 {
 	return DataSizeT(ExceptionsHeap.CurrentHeapSize);
 }

@@ -22,7 +22,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline GenericFileException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName, ConstString&& ErrorName)
-						noexcept : fileName(fileName), Exception(File, FunctName, Line, ErrorName) {}
+						: fileName(fileName), Exception(File, FunctName, Line, ErrorName) {}
 
 					virtual ExceptionString toString() const override {
 						return ExceptionString::Combine({
@@ -56,7 +56,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline FileExistException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файл вже інсує") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файл вже інсує") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки
@@ -81,7 +81,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline FileNotExistException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файл не знайдено") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файл не знайдено") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки
@@ -106,7 +106,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline FileBusyException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файл зайннятий") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файл зайннятий") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки
@@ -131,7 +131,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline DirectoryIsNotFileException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Не можливо відкрити директорію як файл") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Не можливо відкрити директорію як файл") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки
@@ -156,7 +156,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline FileIsCoruptedException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файд пошкоджений, потрібна перевірка файлової системи") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Файд пошкоджений, потрібна перевірка файлової системи") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки
@@ -181,7 +181,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline FileModeNoSupportedByOperationException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Операція недоступна в поточному режимі роботи з файлом") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Операція недоступна в поточному режимі роботи з файлом") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки
@@ -206,7 +206,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline CantReadMoreDataThanInExistInFileException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Не можливо зчитати з файла більше ніж ньому є") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Не можливо зчитати з файла більше ніж ньому є") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки
@@ -229,7 +229,7 @@ namespace Seed
 				public:
 					//Генерація помилки
 					ForceInline CantWriteDataAfterEofException(ConstAString File, ConstAString FunctName, SizeT Line, ExceptionString&& fileName)
-						noexcept : GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Не можливо записати у файл поза його кінцем") {}
+						: GenericFileException(File, FunctName, Line, MoveRValue(fileName), L"Не можливо записати у файл поза його кінцем") {}
 
 					/// <summary>
 					/// Вертає копію об'єкта помилки

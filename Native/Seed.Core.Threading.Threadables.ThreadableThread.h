@@ -14,7 +14,10 @@ namespace Seed {
 				protected:
 					ThreadableThread(const Thread& thread) : thread(thread) {}
 				protected:
-					friend ThreadableRef RegisterThreadThreadable(const Thread& thread, volatile EThreadabledStates* State);
+					friend ThreadableRef RegisterThreadThreadable(
+						const Thread& thread, 
+						volatile EThreadabledStates* state,
+						volatile EThreadabledStates* secondState);
 					friend void UnRegisterThreadThreadable(ThreadableRef&& ref);
 				public:
 					/// <summary>

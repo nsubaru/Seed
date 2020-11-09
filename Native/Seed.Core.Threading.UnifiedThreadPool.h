@@ -1223,7 +1223,7 @@ namespace Seed {
 				/// Перевірка чи об'єкт коректний
 				/// </summary>
 				/// <returns>true якщо об'єкт допускає I/O операції</returns>
-				virtual bool IsValid() = 0;
+				virtual bool GetIsValid() const = 0;
 			public:
 				/// <summary>
 				/// Деструктор
@@ -1258,7 +1258,7 @@ namespace Seed {
 				/// Перевірка чи об'єкт коректний
 				/// </summary>
 				/// <returns>true якщо об'єкт допускає I/O операції</returns>
-				virtual bool IsValid() = 0;
+				virtual bool GetIsValid() const  = 0;
 			public:
 				/// <summary>
 				/// Деструктор
@@ -1270,7 +1270,7 @@ namespace Seed {
 			class IBaseConnectableAsyncIO : virtual public IAsyncIOBase {
 				virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<TAsyncObject>> onFinishConnectAction) = 0;
 			public:
-				virtual bool IsValid() = 0;
+				virtual bool GetIsValid() const = 0;
 			public:
 				virtual ~IBaseConnectableAsyncIO() = 0;
 			};
@@ -1304,7 +1304,7 @@ namespace Seed {
 				/// Перевірка чи об'єкт коректний
 				/// </summary>
 				/// <returns>true якщо об'єкт допускає I/O операції</returns>
-				virtual bool IsValid() = 0;
+				virtual bool GetIsValid() const = 0;
 			public:
 				virtual ~IBasePositionAsyncIO() = 0 {};
 			};

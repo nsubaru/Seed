@@ -39,7 +39,7 @@ namespace Seed {
             }
         public:
             ///<summary>Пустий конструктор</summary>
-            constexpr ForceInline BaseString() noexcept : str(nullptr), CurrentSize(0), ReservedSize(0) {};
+            constexpr ForceInline BaseString() : str(nullptr), CurrentSize(0), ReservedSize(0) {};
 
             ///<summary>Конструктор з готової літерала рядка</summary>
             ///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>
@@ -258,7 +258,7 @@ namespace Seed {
             }
             ///<summary>Оптимізований конструктор</summary>
             ///<param name = "from">RValue силка на оригинал</param>
-            ForceInline BaseString(BaseString&& from) noexcept {
+            ForceInline BaseString(BaseString&& from) {
                 this->str = from.str; from.str = nullptr;
                 this->CurrentSize = from.CurrentSize; from.CurrentSize = 0;
                 this->ReservedSize = from.ReservedSize; from.ReservedSize = 0;
@@ -285,7 +285,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки рівні</returns>
             template<SizeT Size>
-            ForceInline Boolean operator==(StaticTextRef<Size> second) const noexcept {
+            ForceInline Boolean operator==(StaticTextRef<Size> second) const {
                 return (*this <=> second) == 0;
             }
 
@@ -294,7 +294,7 @@ namespace Seed {
             ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
             ///<returns><c>True</c> якщо рядки не рівні</returns>
             template<SizeT Size>
-            ForceInline Boolean operator!=(StaticTextRef<Size> second) const noexcept {
+            ForceInline Boolean operator!=(StaticTextRef<Size> second) const {
                 return !this->operator==<Size>(second);
             }
 
@@ -463,7 +463,7 @@ namespace Seed {
             ///<returns>Посилання на поточну зміну</returns>
             ///<remarks>Викликається деструктор для поточного рядка.
             ///Копіються поля з оригинала. І накінець поля в оригинала обнулюються</remarks>
-            ForceInline BaseString& operator=(BaseString&& orig) noexcept {
+            ForceInline BaseString& operator=(BaseString&& orig) {
                 if (orig.str == this->str) return *this;
                 this->~BaseString();
                 this->str = orig.str; orig.str = nullptr;
@@ -1010,7 +1010,7 @@ namespace Seed {
 
             ///<summary>Оператор конвертації до символьного масиву</summary>
             ///<returns>Константний рядок</returns>
-            ForceInline explicit operator const ConstCharStr() const noexcept { return str; }
+            ForceInline explicit operator const ConstCharStr() const { return str; }
 
             ///<summary>Вертає поточну довжина рядку</summary>
             ForceInline SizeT GetLenght() const { return (CurrentSize > 0) ? CurrentSize - 1 : 0; }

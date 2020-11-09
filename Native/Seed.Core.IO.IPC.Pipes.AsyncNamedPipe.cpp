@@ -69,7 +69,7 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::InitAsyncRea
 		irp,
 		(IO_STATUS_BLOCK*)ioStatusBlk,
 		buffer,
-		size,
+		(ULONG)size,
 		0,
 		NULL
 	);
@@ -93,7 +93,7 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::InitAsyncWri
 		NULL,
 		(IO_STATUS_BLOCK*)ioStatusBlk,
 		buffer,
-		size,
+		(ULONG)size,
 		0,
 		NULL
 	);
@@ -139,7 +139,7 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::WaitClosing(
 	if (this->hPipe == nullptr)
 		Throw(NullPointException(ExceptionPosition));
 
-	LARGE_INTEGER ntTimeout = { .QuadPart = -(timeout.Ticks) };
+	LARGE_INTEGER ntTimeout = { .QuadPart = -((Int64)timeout.Ticks) };
 
 	NtWaitForSingleObject(hPipe, TRUE, &ntTimeout);
 }
@@ -259,7 +259,7 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Init
 		irp,
 		(IO_STATUS_BLOCK*)ioStatusBlk,
 		buffer,
-		size,
+		(ULONG)size,
 		0,
 		NULL
 	);
@@ -283,7 +283,7 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Init
 		NULL,
 		(IO_STATUS_BLOCK*)ioStatusBlk,
 		buffer,
-		size,
+		(ULONG)size,
 		0,
 		NULL
 	);
@@ -330,7 +330,7 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Wait
 	if (this->hPipe == nullptr)
 		Throw(NullPointException(ExceptionPosition));
 
-	LARGE_INTEGER ntTimeout = { .QuadPart = -(timeout.Ticks) };
+	LARGE_INTEGER ntTimeout = { .QuadPart = -((Int64)timeout.Ticks) };
 
 	NtWaitForSingleObject(hPipe, TRUE, &ntTimeout);
 }
