@@ -145,6 +145,11 @@ namespace Seed {
 						Details::BaseAsyncNamedPipeClient* This;
 					protected:
 						virtual void Dispose() override {
+							if (This->poolTask != nullptr) {
+								UnRegisterNtIoObjectInThreadPool(*This->poolTask);
+								delete This->poolTask;
+								This->poolTask = nullptr;
+							}
 							This->Dispose();
 						}
 					protected:
@@ -314,119 +319,26 @@ namespace Seed {
 						friend AsyncNamedPipeClient<UDataType> AsyncConnectPipe(
 							const Threading::UnifiedThreadPool& ownerPool, 
 							const String& name, 
-							PipeMode mode = PipeMode::Both, 
-							Boolean isNoCache = true);
+							PipeMode mode, 
+							Boolean isNoCache);
 					public:
 						RefCountClass(AsyncNamedPipeClient, This)
 					};
 
-					template<typename TBufferType>
-					class AsyncNamedPipeServerInstance;
-
-					template<typename TBufferType>
-					class AsyncNamedPipeServer final : IDisposable {
-					private:
-						Details::BaseAsyncNamedPipeServer* This;
-					protected:
-						virtual void Dispose() override {
-							This->Dispose();
-						}
-					protected:
-						AsyncNamedPipeServer(String pipeName, PipeMode mode, Boolean isNoCache, UInt8 maxConnectionCount)
-						: This(new Details::BaseAsyncNamedPipeServer(MoveRValue(pipeName), mode, isNoCache, maxConnectionCount)) {}
-					public:
-						IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TBufferType>>> onFinishConnectAction) {
-							//create pipe object
-							auto pipe = AsyncNamedPipeServerInstance<TBufferType>(This->CreateServerPipeHandle(), This->pipeName, This->mode, This->isNoCache);
-							//store it in list and save ref in object
-							pipe.SetInstaceRef(This->instances.AddLast(new AsyncNamedPipeServerInstance(pipe)));
-							//call pipe async connect
-							return pipe.AsyncConnect(onFinishConnectAction);
-						}
-
-						void CloseAllInstances() {
-							This->CloseAllInstances();
-						}
-
-						void DestroyPipe() {
-							Dispose();
-						}
-
-					public:
-						/// <summary>
-						/// Вказує чи канал робочий
-						/// </summary>
-						/// <returns>Логічне значення, true, якщо канал робочий</returns>
-						bool GetIsValid() const { return This->IsValid(); }
-
-						/// <summary>
-						/// Вертає кількість активних з'єднаннь
-						/// </summary>
-						/// <returns>Число яке вказує кількість активних з'єднаннь</returns>
-						SizeT GetInstanceCount() const { return This == nullptr ? 0 : This->instances.Count; }
-
-						/// <summary>
-						/// Вертає ім'я каналу
-						/// </summary>
-						/// <returns>Рядок з іменем каналу</returns>
-						const String& GetName() const { return This->pipeName; }
-
-						/// <summary>
-						/// Режим каналу
-						/// </summary>
-						/// <returns>Поточний режим каналу</returns>
-						PipeMode GetSupportedMode() const { return This->mode; }
-
-						/// <summary>
-						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
-						/// </summary>
-						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
-						Boolean GetIsNoCache() const { return This->isNoCache; }
-					public:
-						/// <summary>
-						/// Вказує чи канал робочий
-						/// </summary>
-						Boolean Property(GetIsValid) IsValid;
-
-						/// <summary>
-						/// Кількість активних з'єднань
-						/// </summary>
-						SizeT Property(GetInstanceCount) InstanceCount;
-
-						/// <summary>
-						/// Ім'я каналу
-						/// </summary>
-						String Property(GetName) Name;
-
-						/// <summary>
-						/// Режим роботи каналу
-						/// </summary>
-						PipeMode Property(GetSupportedMode) SupportedMode;
-
-						/// <summary>
-						/// Логічне значення яке вказує чи підтримує автоскидання буферів після кожної операції
-						/// </summary>
-						Boolean Property(GetIsNoCache) IsNoCache;
-					public:
-						RefCountClass(AsyncNamedPipeServer, This)
-					public:
-						template<typename UBufferType>
-						friend AsyncNamedPipeServer<UBufferType> CreateAsyncPipe(
-							const String& name, 
-							UInt32 maxInstanceCount, 
-							PipeMode mode = PipeMode::Both, 
-							Boolean isNoCache = true);
-					};
-
 					template<typename TDataType>
-					class AsyncNamedPipeServerInstance final : 
+					class AsyncNamedPipeServerInstance final :
 						public IAsyncNamedPipe<TDataType>,
-						public IAsyncNamedPipeServerInstance, 
+						public IAsyncNamedPipeServerInstance,
 						public IBaseConnectableAsyncIO<AsyncNamedPipeServerInstance<TDataType>> {
 					private:
 						Details::BaseAsyncNamedPipeServerInstance* This;
 					protected:
 						virtual void Dispose() override {
+							if (This->poolTask != nullptr) {
+								UnRegisterNtIoObjectInThreadPool(*This->poolTask);
+								delete This->poolTask;
+								This->poolTask = nullptr;
+							}
 							This->Dispose();
 						}
 					protected:
@@ -434,9 +346,11 @@ namespace Seed {
 							return This->hPipe;
 						}
 					protected:
-						AsyncNamedPipeServerInstance(Handle hPipe, const String& name, PipeMode mode, Boolean isNoCache)
+						AsyncNamedPipeServerInstance(Handle hPipe, const String& name, PipeMode mode, Boolean isNoCache, const Threading::UnifiedThreadPool& threadPool)
 							: This(new Details::BaseAsyncNamedPipeServerInstance(String(name), hPipe, mode, isNoCache))
-						{}
+						{
+							This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(threadPool, This->hPipe));
+						}
 					protected:
 						void SetInstaceRef(Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef) {
 							This->serverRef = serverRef;
@@ -445,7 +359,7 @@ namespace Seed {
 						}
 					protected:
 						virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TDataType>>> onFinishConnectAction) {
-							if (IsValid)
+							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
 							IRPBase* irp = nullptr;
@@ -501,8 +415,8 @@ namespace Seed {
 								SizeT size = data.Count;
 								//create irp packet
 								irp = new ReadIRP<TDataType>(
-									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)), 
-									onFinishReadAction, 
+									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)),
+									onFinishReadAction,
 									MoveRValue(data));
 								//create task object
 								auto task = GetIOTaskFromIRPBase(irp);
@@ -551,7 +465,7 @@ namespace Seed {
 								//create irp packet
 								irp = new WriteIRP<TDataType>(
 									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)),
-									onFinishWriteAction, 
+									onFinishWriteAction,
 									MoveRValue(data));
 								//create task object
 								auto task = GetIOTaskFromIRPBase(irp);
@@ -640,8 +554,102 @@ namespace Seed {
 						friend class AsyncNamedPipeServer;
 					};
 
-
 					template<typename TBufferType>
+					class AsyncNamedPipeServer final : IDisposable {
+					private:
+						Details::BaseAsyncNamedPipeServer* This;
+					protected:
+						virtual void Dispose() override {
+							This->Dispose();
+						}
+					protected:
+						AsyncNamedPipeServer(String&& pipeName, PipeMode mode, Boolean isNoCache, UInt8 maxConnectionCount)
+						: This(new Details::BaseAsyncNamedPipeServer(MoveRValue(pipeName), mode, isNoCache, maxConnectionCount)) {}
+					public:
+						IOTask AsyncConnect(const Threading::UnifiedThreadPool& ownerPool, SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TBufferType>>> onFinishConnectAction) {
+							//create pipe object
+							auto pipe = AsyncNamedPipeServerInstance<TBufferType>(This->CreateServerPipeHandle(), This->pipeName, This->mode, This->isNoCache, ownerPool);
+							//store it in list and save ref in object
+							pipe.SetInstaceRef(This->instances.AddLast(new AsyncNamedPipeServerInstance(pipe)));
+							//call pipe async connect
+							return pipe.AsyncConnect(onFinishConnectAction);
+						}
+
+						void CloseAllInstances() {
+							This->CloseAllInstances();
+						}
+
+						void DestroyPipe() {
+							Dispose();
+						}
+
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						/// <returns>Логічне значення, true, якщо канал робочий</returns>
+						bool GetIsValid() const { return This->IsValid(); }
+
+						/// <summary>
+						/// Вертає кількість активних з'єднаннь
+						/// </summary>
+						/// <returns>Число яке вказує кількість активних з'єднаннь</returns>
+						SizeT GetInstanceCount() const { return This == nullptr ? 0 : This->instances.Count; }
+
+						/// <summary>
+						/// Вертає ім'я каналу
+						/// </summary>
+						/// <returns>Рядок з іменем каналу</returns>
+						const String& GetName() const { return This->pipeName; }
+
+						/// <summary>
+						/// Режим каналу
+						/// </summary>
+						/// <returns>Поточний режим каналу</returns>
+						PipeMode GetSupportedMode() const { return This->mode; }
+
+						/// <summary>
+						/// Вказує чи даному екземпляру виконувати передачу даних без буферизації
+						/// </summary>
+						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
+						Boolean GetIsNoCache() const { return This->isNoCache; }
+					public:
+						/// <summary>
+						/// Вказує чи канал робочий
+						/// </summary>
+						Boolean Property(GetIsValid) IsValid;
+
+						/// <summary>
+						/// Кількість активних з'єднань
+						/// </summary>
+						SizeT Property(GetInstanceCount) InstanceCount;
+
+						/// <summary>
+						/// Ім'я каналу
+						/// </summary>
+						String Property(GetName) Name;
+
+						/// <summary>
+						/// Режим роботи каналу
+						/// </summary>
+						PipeMode Property(GetSupportedMode) SupportedMode;
+
+						/// <summary>
+						/// Логічне значення яке вказує чи підтримує автоскидання буферів після кожної операції
+						/// </summary>
+						Boolean Property(GetIsNoCache) IsNoCache;
+					public:
+						RefCountClass(AsyncNamedPipeServer, This)
+					public:
+						template<typename UBufferType>
+						friend AsyncNamedPipeServer<UBufferType> CreateAsyncPipe(
+							const String& name, 
+							UInt8 maxInstanceCount,
+							PipeMode mode, 
+							Boolean isNoCache);
+					};
+
+					template<typename TBufferType = Containers::Blob>
 					AsyncNamedPipeClient<TBufferType> AsyncConnectPipe(
 						const Threading::UnifiedThreadPool& ownerPool, 
 						const String& name, 
@@ -651,14 +659,14 @@ namespace Seed {
 						return AsyncNamedPipeClient<TBufferType>(String(name), mode, isNoCache, ownerPool);
 					}
 
-					template<typename TBufferType>
+					template<typename TBufferType = Containers::Blob>
 					AsyncNamedPipeServer<TBufferType> CreateAsyncPipe(
 						const String& name, 
-						UInt32 maxInstanceCount, 
+						UInt8 maxInstanceCount = Math::Max<UInt8>(),
 						PipeMode mode = PipeMode::Both,
 						Boolean isNoCache = true)
 					{
-						return AsyncNamedPipeServer(String(name), mode, maxInstanceCount);
+						return AsyncNamedPipeServer<TBufferType>(String(name), mode, isNoCache, maxInstanceCount);
 					}
 				}
 			}

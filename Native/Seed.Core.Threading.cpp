@@ -1401,10 +1401,25 @@ namespace Seed {
 				return irp->event;
 			}
 
-			void Seed::Core::IO::MarkIrpCompleted(IRPBase* irp)
+			void MarkIrpCompleted(IRPBase* irp)
 			{
 				irp->isCompleted = true;
 				_ReadWriteBarrier();
+			}
+
+			void Incref(IRPBase*& irp)
+			{
+				irp->RefCount++;
+			}
+
+			void Deref(IRPBase*& irp)
+			{
+				if (--irp->RefCount == 0) {
+					irp->Dispose();
+					delete irp;
+				}
+
+				irp = nullptr;
 			}
 		}
 
@@ -1491,8 +1506,10 @@ VOID NTAPI IoThreadPoolCallback(
 			);
 
 			MarkIrpCompleted(irp);
+			_ReadWriteBarrier();
+			SynchronizeEvent(GetIrpCompleteEvent(irp)).Set();
 
-			delete irp;
+			Deref(irp);
 		}
 		catch (Exception& ex) {
 			toCoreLog(L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:", ex);

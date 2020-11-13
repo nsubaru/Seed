@@ -41,7 +41,7 @@ Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::BaseAsyncNamedPip
 
 	NTSTATUS status = NtCreateFile(
 		&this->hPipe,
-		PipeMode | SYNCHRONIZE | PIPE_WAIT,
+		PipeMode | PIPE_WAIT,
 		&ObjectAttributes,
 		&IoStatusBlock,
 		NULL,
@@ -85,12 +85,11 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::InitAsyncWri
 	IO_STATUS_BLOCK IoStatusBlock = { 0 };
 	NTSTATUS status = STATUS_SUCCESS;
 
-	NtFlushBuffersFile(hPipe, &IoStatusBlock);
 	status = NtWriteFile(
 		hPipe,
 		NULL,
 		NULL,
-		NULL,
+		irp,
 		(IO_STATUS_BLOCK*)ioStatusBlk,
 		buffer,
 		(ULONG)size,
@@ -195,15 +194,15 @@ Seed::Core::Handle Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServer
 
 	NTSTATUS status = NtCreateNamedPipeFile(
 		&hPipe,
-		pipeMode | SYNCHRONIZE | PIPE_WAIT | ((instances.Count > 0) ? FILE_CREATE_PIPE_INSTANCE : NULL),
+		pipeMode | PIPE_WAIT | ((instances.Count > 0) ? FILE_CREATE_PIPE_INSTANCE : NULL),
 		&ObjectAttributes,
 		&IoStatusBlock,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		FILE_OPEN_IF,
+		((instances.Count > 0) ? FILE_CREATE : NULL) | FILE_OPEN_IF,
 		(isNoCache ? FILE_WRITE_THROUGH : NULL),
 		TRUE,
 		TRUE,
-		TRUE,
+		FALSE,
 		maxConnectionCount,
 		InBuffSize,
 		OutBuffSize,
@@ -275,12 +274,11 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::Init
 	IO_STATUS_BLOCK IoStatusBlock = { 0 };
 	NTSTATUS status = STATUS_SUCCESS;
 
-	NtFlushBuffersFile(hPipe, &IoStatusBlock);
 	status = NtWriteFile(
 		hPipe,
 		NULL,
 		NULL,
-		NULL,
+		irp,
 		(IO_STATUS_BLOCK*)ioStatusBlk,
 		buffer,
 		(ULONG)size,
