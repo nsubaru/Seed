@@ -9,10 +9,19 @@ namespace Seed {
 		namespace IO {
 			namespace IPC {
 				namespace Pipes {
+					/// <summary>
+					/// Інтерфейс серверного з'єднання іменованого каналу
+					/// </summary>
 					class IAsyncNamedPipeServerInstance {
 					public:
+						/// <summary>
+						/// Закриття з'єднання
+						/// </summary>
 						virtual void CloseConnection() = 0;
 					public:
+						/// <summary>
+						/// Деструктор
+						/// </summary>
 						virtual ~IAsyncNamedPipeServerInstance() = 0 {}
 					};
 
@@ -126,6 +135,10 @@ namespace Seed {
 						};
 					}
 
+					/// <summary>
+					/// Інтерфейс асинхроного каналу
+					/// </summary>
+					/// <typeparam name="TBufferType"></typeparam>
 					template<typename TBufferType>
 					class IAsyncNamedPipe : public IO::IBaseAsyncIO<TBufferType> {
 					public:
@@ -139,6 +152,10 @@ namespace Seed {
 						virtual ~IAsyncNamedPipe() = 0 {};
 					};
 
+					/// <summary>
+					/// Клієнтський асинхроний канал
+					/// </summary>
+					/// <typeparam name="TDataType">Тип блоку даних</typeparam>
 					template<typename TDataType>
 					class AsyncNamedPipeClient final : public IAsyncNamedPipe<TDataType> {
 					private:
@@ -173,39 +190,41 @@ namespace Seed {
 							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
+							// verify pipe data transfer mode
 							if (This->mode != PipeMode::In && This->mode != PipeMode::Both)
 								Throw(InvalidPipeException(ExceptionPosition));
 
 							IRPBase* irp = nullptr;
 							try {
-								//Get buffer and its size
-								void* buffer = (void*)(const Byte*)data;
-								SizeT size = data.Count;
-								//create irp packet
+								// Get buffer and its size
+								void* buffer = (void*)(const TDataType::DataType*)data;
+								SizeT size = data.Count * sizeof(typename TDataType::DataType);
+								// create irp packet
 								irp = new ReadIRP<TDataType>(
 									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeClient(*this)),
 									onFinishReadAction, 
 									MoveRValue(data));
-								//create task object
+								// create task object
 								auto task = GetIOTaskFromIRPBase(irp);
 
 								try {
-									//notify about arrived io operation
+									// notify about arrived io operation
 									NotifyIoOperation(*This->poolTask);
-									//Perfome os specific read operations
+									// Perfome os specific read operations
 									This->InitAsyncRead(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
-									//If read failed cancel notification
+									// If read failed cancel notification
 									CancelNotifyIoOperation(*This->poolTask);
-									//and rethrow exception as we don't how handle it
+									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
 
-								//return task object
+								// return task object
 								return task;
 							}
 							catch (...) {
+								// destroy irp object as it allocated manualy from heap
 								if (irp != nullptr)
 									delete irp;
 								ReThrow;
@@ -222,39 +241,41 @@ namespace Seed {
 							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
+							// verify pipe data transfer mode
 							if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
 								Throw(InvalidPipeException(ExceptionPosition));
 
 							IRPBase* irp = nullptr;
 							try {
-								//Get buffer and its size
-								void* buffer = (void*)(const Byte*)data;
-								SizeT size = data.Count;
-								//create irp packet
+								// Get buffer and its size
+								void* buffer = (void*)(const TDataType::DataType*)data;
+								SizeT size = data.Count * sizeof(typename TDataType::DataType);
+								// create irp packet
 								irp = new WriteIRP<TDataType>(
 									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeClient(*this)),
 									onFinishWriteAction, 
 									MoveRValue(data));
-								//create task object
+								// create task object
 								auto task = GetIOTaskFromIRPBase(irp);
 
 								try {
-									//notify about arrived io operation
+									// notify about arrived io operation
 									NotifyIoOperation(*This->poolTask);
 									//Perfome os specific read operations
 									This->InitAsyncWrite(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
-									//If read failed cancel notification
+									// If read failed cancel notification
 									CancelNotifyIoOperation(*This->poolTask);
-									//and rethrow exception as we don't how handle it
+									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
 
-								//return task object
+								// return task object
 								return task;
 							}
 							catch (...) {
+								// destroy irp object as it allocated manualy from heap
 								if (irp != nullptr)
 									delete irp;
 								ReThrow;
@@ -269,9 +290,28 @@ namespace Seed {
 							return This->hPipe != nullptr;
 						}
 					public:
+						/// <summary>
+						/// Закритя з'єднання
+						/// </summary>
 						virtual void CloseConnection() { This->CloseConnection(); }
+
+						/// <summary>
+						/// Очікування закриття з'єднання
+						/// </summary>
 						virtual void WaitClosing() const { This->WaitClosing(); }
+
+						/// <summary>
+						/// Очікування закриття з'єднання з максимальним допустимими часом очікування 
+						/// </summary>
+						/// <param name="timeout">Максимальний допустимий час очікування</param>
 						virtual void WaitClosing(Time::TimeSpan timeout) const { This->WaitClosing(timeout); }
+					public:
+						/// <summary>
+						/// Очікує зчитування даних з другої сторони в синхроному режимі
+						/// </summary>
+						void Flush() {
+							This->Flush();
+						}
 					public:
 						/// <summary>
 						/// Вертає ім'я каналу
@@ -311,6 +351,10 @@ namespace Seed {
 						/// </summary>
 						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
+						/// <summary>
+						/// Вертає посилання на задачу в пулі яка опрацьовує операції даного каналу
+						/// </summary>
+						/// <returns>Об'єкт операцій I/O в пулі потоків</returns>
 						virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const {
 							return *This->poolTask;
 						}
@@ -325,6 +369,10 @@ namespace Seed {
 						RefCountClass(AsyncNamedPipeClient, This)
 					};
 
+					/// <summary>
+					/// Екземпляр серверного каналу
+					/// </summary>
+					/// <typeparam name="TDataType">Тип блоку даних</typeparam>
 					template<typename TDataType>
 					class AsyncNamedPipeServerInstance final :
 						public IAsyncNamedPipe<TDataType>,
@@ -349,12 +397,13 @@ namespace Seed {
 						AsyncNamedPipeServerInstance(Handle hPipe, const String& name, PipeMode mode, Boolean isNoCache, const Threading::UnifiedThreadPool& threadPool)
 							: This(new Details::BaseAsyncNamedPipeServerInstance(String(name), hPipe, mode, isNoCache))
 						{
+							// Register I/O object in thread pool
 							This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(threadPool, This->hPipe));
 						}
 					protected:
 						void SetInstaceRef(Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef) {
 							This->serverRef = serverRef;
-							//Must as serverRef container ref to this object in server pipe
+							// Must as serverRef container ref to this object in server pipe
 							--This->RefCount;
 						}
 					protected:
@@ -364,31 +413,32 @@ namespace Seed {
 
 							IRPBase* irp = nullptr;
 							try {
-								//create irp packet
+								// create irp packet
 								irp = new ConnectIRP<AsyncNamedPipeServerInstance>(
 									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)),
 									onFinishConnectAction,
 									AsyncNamedPipeServerInstance(*this));
-								//create task object
+								// create task object
 								auto task = GetIOTaskFromIRPBase(irp);
 
 								try {
-									//notify about arrived io operation
+									// notify about arrived io operation
 									NotifyIoOperation(*This->poolTask);
-									//Perfome os specific connect operations
+									// Perfome os specific connect operations
 									This->InitAsyncConnect(MoveRValue(irp), GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
-									//If connect failed cancel notification
+									// If connect failed cancel notification
 									CancelNotifyIoOperation(*This->poolTask);
-									//and rethrow exception as we don't how handle it
+									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
 
-								//return task object
+								// return task object
 								return task;
 							}
 							catch (...) {
+								// destroy irp object as it allocated manualy from heap
 								if (irp != nullptr)
 									delete irp;
 								ReThrow;
@@ -405,39 +455,41 @@ namespace Seed {
 							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
+							// verify pipe data transfer mode
 							if (This->mode != PipeMode::In && This->mode != PipeMode::Both)
 								Throw(InvalidPipeException(ExceptionPosition));
 
 							IRPBase* irp = nullptr;
 							try {
-								//Get buffer and its size
-								void* buffer = (void*)(const Byte*)data;
-								SizeT size = data.Count;
-								//create irp packet
+								// Get buffer and its size
+								void* buffer = (void*)(const TDataType::DataType*)data;
+								SizeT size = data.Count * sizeof(typename TDataType::DataType);
+								// create irp packet
 								irp = new ReadIRP<TDataType>(
 									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)),
 									onFinishReadAction,
 									MoveRValue(data));
-								//create task object
+								// create task object
 								auto task = GetIOTaskFromIRPBase(irp);
 
 								try {
-									//notify about arrived io operation
+									// notify about arrived io operation
 									NotifyIoOperation(*This->poolTask);
-									//Perfome os specific read operations
+									// Perfome os specific read operations
 									This->InitAsyncRead(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
-									//If read failed cancel notification
+									// If read failed cancel notification
 									CancelNotifyIoOperation(*This->poolTask);
-									//and rethrow exception as we don't how handle it
+									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
 
-								//return task object
+								// return task object
 								return task;
 							}
 							catch (...) {
+								// destroy irp object as it allocated manualy from heap
 								if (irp != nullptr)
 									delete irp;
 								ReThrow;
@@ -454,43 +506,52 @@ namespace Seed {
 							if (!IsValid)
 								Throw(InvalidHandleUsage(ExceptionPosition));
 
+							// verify pipe data transfer mode
 							if (This->mode != PipeMode::Out && This->mode != PipeMode::Both)
 								Throw(InvalidPipeException(ExceptionPosition));
 
 							IRPBase* irp = nullptr;
 							try {
-								//Get buffer and its size
-								void* buffer = (void*)(const Byte*)data;
-								SizeT size = data.Count;
-								//create irp packet
+								// Get buffer and its size
+								void* buffer = (void*)(const TDataType::DataType*)data;
+								SizeT size = data.Count * sizeof(typename TDataType::DataType);
+								// create irp packet
 								irp = new WriteIRP<TDataType>(
 									SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncNamedPipeServerInstance(*this)),
 									onFinishWriteAction,
 									MoveRValue(data));
-								//create task object
+								// create task object
 								auto task = GetIOTaskFromIRPBase(irp);
 
 								try {
-									//notify about arrived io operation
+									// notify about arrived io operation
 									NotifyIoOperation(*This->poolTask);
-									//Perfome os specific read operations
+									// Perfome os specific read operations
 									This->InitAsyncWrite(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
-									//If read failed cancel notification
+									// If read failed cancel notification
 									CancelNotifyIoOperation(*This->poolTask);
-									//and rethrow exception as we don't how handle it
+									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
 
-								//return task object
+								// return task object
 								return task;
 							}
 							catch (...) {
+								// destroy irp object as it allocated manualy from heap
 								if (irp != nullptr)
 									delete irp;
 								ReThrow;
 							}
+						}
+					public:
+						/// <summary>
+						/// Очікує зчитування даних з другої сторони в синхроному режимі
+						/// </summary>
+						void Flush() {
+							This->Flush();
 						}
 					public:
 						/// <summary>
@@ -518,7 +579,6 @@ namespace Seed {
 						/// </summary>
 						/// <returns>Логічне значення яке вказує чи даному екземпляру виконувати передачу даних без буферизації</returns>
 						Boolean GetIsNoCache() const { return This->isNoCache; }
-
 					public:
 						/// <summary>
 						/// Вказує чи канал робочий
@@ -540,10 +600,26 @@ namespace Seed {
 						/// </summary>
 						Boolean Property(GetIsNoCache) IsNoCache;
 					public:
+						/// <summary>
+						/// Закритя з'єднання
+						/// </summary>
 						virtual void CloseConnection() { This->CloseConnection(); }
+
+						/// <summary>
+						/// Очікування закриття з'єднання
+						/// </summary>
 						virtual void WaitClosing() const { This->WaitClosing(); }
+
+						/// <summary>
+						/// Очікування закриття з'єднання з максимальним допустимими часом очікування 
+						/// </summary>
+						/// <param name="timeout">Максимальний допустимий час очікування</param>
 						virtual void WaitClosing(Time::TimeSpan timeout) const { This->WaitClosing(timeout); }
 					public:
+						/// <summary>
+						/// Вертає посилання на задачу в пулі яка опрацьовує операції даного каналу
+						/// </summary>
+						/// <returns>Об'єкт операцій I/O в пулі потоків</returns>
 						virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const {
 							return *This->poolTask;
 						}
@@ -554,6 +630,10 @@ namespace Seed {
 						friend class AsyncNamedPipeServer;
 					};
 
+					/// <summary>
+					/// Сервер іменованих каналів
+					/// </summary>
+					/// <typeparam name="TBufferType">Тип буфера даних</typeparam>
 					template<typename TBufferType>
 					class AsyncNamedPipeServer final : IDisposable {
 					private:
@@ -566,6 +646,12 @@ namespace Seed {
 						AsyncNamedPipeServer(String&& pipeName, PipeMode mode, Boolean isNoCache, UInt8 maxConnectionCount)
 						: This(new Details::BaseAsyncNamedPipeServer(MoveRValue(pipeName), mode, isNoCache, maxConnectionCount)) {}
 					public:
+						/// <summary>
+						/// Асинхроне очікування нового клієнта
+						/// </summary>
+						/// <param name="ownerPool">Пул який буде обробляти I/O запити</param>
+						/// <param name="onFinishConnectAction">Дія яка буде викликана при приєднанні нового клієнта</param>
+						/// <returns>Об'єкт асинхроної операції</returns>
 						IOTask AsyncConnect(const Threading::UnifiedThreadPool& ownerPool, SmartPtr<IFinishConnectCallback<AsyncNamedPipeServerInstance<TBufferType>>> onFinishConnectAction) {
 							//create pipe object
 							auto pipe = AsyncNamedPipeServerInstance<TBufferType>(This->CreateServerPipeHandle(), This->pipeName, This->mode, This->isNoCache, ownerPool);
@@ -575,14 +661,19 @@ namespace Seed {
 							return pipe.AsyncConnect(onFinishConnectAction);
 						}
 
+						/// <summary>
+						/// Закриває всі активні з'єднання з клієнтами
+						/// </summary>
 						void CloseAllInstances() {
 							This->CloseAllInstances();
 						}
 
+						/// <summary>
+						/// Знищує канал разом з усіма активними з'єднаннями
+						/// </summary>
 						void DestroyPipe() {
 							Dispose();
 						}
-
 					public:
 						/// <summary>
 						/// Вказує чи канал робочий
@@ -649,6 +740,15 @@ namespace Seed {
 							Boolean isNoCache);
 					};
 
+					/// <summary>
+					/// Асинхроне з'єдання з іменованим каналом
+					/// </summary>
+					/// <typeparam name="TBufferType">Тип буфера даних</typeparam>
+					/// <param name="ownerPool">Пул який буде опрацьовувати I/O операції</param>
+					/// <param name="name">Ім'я каналу</param>
+					/// <param name="mode">Режим передачі даних</param>
+					/// <param name="isNoCache">Якщо true то використовується безбуферний режим роботи</param>
+					/// <returns>Об'єкт іменованого каналу</returns>
 					template<typename TBufferType = Containers::Blob>
 					AsyncNamedPipeClient<TBufferType> AsyncConnectPipe(
 						const Threading::UnifiedThreadPool& ownerPool, 
@@ -659,6 +759,15 @@ namespace Seed {
 						return AsyncNamedPipeClient<TBufferType>(String(name), mode, isNoCache, ownerPool);
 					}
 
+					/// <summary>
+					/// Створення сервера іменованих каналів
+					/// </summary>
+					/// <typeparam name="TBufferType">Буфер даних</typeparam>
+					/// <param name="name">Ім'я каналу</param>
+					/// <param name="maxInstanceCount">Максимальна кількість клієнтів</param>
+					/// <param name="mode">Режим передачі даних</param>
+					/// <param name="isNoCache">Якщо true то використовується безбуферний режим роботи</param>
+					/// <returns>Об'єкт сервера іменованих каналів</returns>
 					template<typename TBufferType = Containers::Blob>
 					AsyncNamedPipeServer<TBufferType> CreateAsyncPipe(
 						const String& name, 

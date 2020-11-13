@@ -14,6 +14,7 @@ void Seed::Core::IO::FS::Details::BaseAsyncFile::Dispose()
 Seed::Core::IO::FS::Details::BaseAsyncFile::BaseAsyncFile(String&& path, File::OpeningMode mode, File::OpenDisposition policy, bool ShareWithOs)
 	: policy(policy), mode(mode), ShareWithOs(ShareWithOs), hFile(nullptr), ntFileName(), RefCount(1)
 {
+	// check is NT file path format, if not than try convert to NT path format
 	if (!IsNtAdressFormat(path))
 		ntFileName = GetNtFileName(path);
 	else
@@ -29,6 +30,7 @@ Seed::Core::IO::FS::Details::BaseAsyncFile::BaseAsyncFile(String&& path, File::O
 	ULONG ShareMode = 0;
 	ULONG Attributes = FILE_NON_DIRECTORY_FILE;
 
+	// configure file opening and share mode
 	if (mode.Read)
 	{
 		FileMode |= GENERIC_READ;
@@ -48,6 +50,7 @@ Seed::Core::IO::FS::Details::BaseAsyncFile::BaseAsyncFile(String&& path, File::O
 		FileMode |= DELETE;
 	}
 
+	// configure file opening policy
 	switch (policy)
 	{
 	case Seed::Core::IO::FS::File::OpenDisposition::Superseed:
@@ -73,6 +76,8 @@ Seed::Core::IO::FS::Details::BaseAsyncFile::BaseAsyncFile(String&& path, File::O
 	}
 
 	IO_STATUS_BLOCK ioblk = { 0 };
+
+	//call NT service function
 	NTSTATUS status = NtCreateFile(
 		&hFile,
 		FileMode,
@@ -86,6 +91,7 @@ Seed::Core::IO::FS::Details::BaseAsyncFile::BaseAsyncFile(String&& path, File::O
 		NULL,
 		NULL);
 
+	// process nt service return status code
 	if (!NT_SUCCESS(status)) {
 		switch (status)
 		{
@@ -110,7 +116,18 @@ void Seed::Core::IO::FS::Details::BaseAsyncFile::InitAsyncRead(IRPBase*&& irp, v
 {
 	LARGE_INTEGER offset = { 0 };
 	offset.QuadPart = position;
-	NTSTATUS status = NtReadFile(this->hFile, nullptr, nullptr, irp, (PIO_STATUS_BLOCK)ioStatusBlk, buffer, (ULONG)size, &offset, NULL);
+
+	NTSTATUS status = NtReadFile(
+		this->hFile, 
+		NULL,
+		NULL,
+		irp, 
+		(PIO_STATUS_BLOCK)ioStatusBlk, 
+		buffer, 
+		(ULONG)size, 
+		&offset, 
+		NULL);
+
 	if (!NT_SUCCESS(status))
 		Throw(NtException(ExceptionPosition, status));
 }
@@ -119,7 +136,18 @@ void Seed::Core::IO::FS::Details::BaseAsyncFile::InitAsyncWrite(IRPBase*&& irp, 
 {
 	LARGE_INTEGER offset = { 0 };
 	offset.QuadPart = position;
-	NTSTATUS status = NtWriteFile(this->hFile, nullptr, nullptr, irp, (PIO_STATUS_BLOCK)ioStatusBlk, buffer, (ULONG)size, &offset, NULL);
+
+	NTSTATUS status = NtWriteFile(
+		this->hFile, 
+		NULL,
+		NULL,
+		irp, 
+		(PIO_STATUS_BLOCK)ioStatusBlk, 
+		buffer, 
+		(ULONG)size, 
+		&offset,
+		NULL);
+
 	if (!NT_SUCCESS(status))
 		Throw(NtException(ExceptionPosition, status));
 }
@@ -135,6 +163,7 @@ void Seed::Core::IO::FS::Details::BaseAsyncFile::DeleteFile()
 
 	FILE_DISPOSITION_INFORMATION dispositionInformation{ TRUE };
 	
+	// set deleting on file handl closing
 	status = NtSetInformationFile(
 		hFile,
 		&ioblk,

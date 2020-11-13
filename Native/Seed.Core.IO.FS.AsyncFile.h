@@ -100,24 +100,24 @@ namespace Seed {
 
 					IRPBase* irp = nullptr;
 					try {
-						//Get buffer and its size
-						void* buffer = (void*)(const Byte*)data;
-						SizeT size = data.Count;
-						//create irp packet
+						// Get buffer and its size
+						void* buffer = (void*)(const TDataType::DataType*)data;
+						SizeT size = data.Count * sizeof(typename TDataType::DataType);
+						// create irp packet
 						irp = new ReadIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishReadAction, MoveRValue(data));
-						//create task object
+						// create task object
 						auto task = GetIOTaskFromIRPBase(irp);
 
 						try {
-							//notify about arrived io operation
+							// notify about arrived io operation
 							NotifyIoOperation(*This->poolTask);
-							//Perfome os specific read operations
+							// Perfome os specific read operations
 							This->InitAsyncRead(MoveRValue(irp), buffer, position, size, GetReservedPlaceInIrp(irp));
 						}
 						catch (...) {
-							//If read failed cancel notification
+							// If read failed cancel notification
 							CancelNotifyIoOperation(*This->poolTask);
-							//and rethrow exception as we don't how handle it
+							// and rethrow exception as we don't how handle it
 							ReThrow;
 						}
 
@@ -125,6 +125,7 @@ namespace Seed {
 						return task;
 					}
 					catch (...) {
+						// destroy irp object as it allocated manualy from heap
 						if (irp != nullptr)
 							delete irp;
 						ReThrow;
@@ -148,31 +149,32 @@ namespace Seed {
 
 					IRPBase* irp = nullptr;
 					try {
-						//Get buffer and its size
-						void* buffer = (void*)(const Byte*)data;
-						SizeT size = data.Count;
-						//create irp packet
+						// Get buffer and its size
+						void* buffer = (void*)(const TDataType::DataType*)data;
+						SizeT size = data.Count * sizeof(typename TDataType::DataType);
+						// create irp packet
 						irp = new WriteIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishWriteAction, MoveRValue(data));
-						//create task object
+						// create task object
 						auto task = GetIOTaskFromIRPBase(irp);
 						
 						try {
-							//notify about arrived io operation
+							// notify about arrived io operation
 							NotifyIoOperation(*This->poolTask);
-							//Perfome os specific read operations
+							// Perfome os specific read operations
 							This->InitAsyncWrite(MoveRValue(irp), buffer, position, size, GetReservedPlaceInIrp(irp));
 						}
 						catch (...) {
-							//If read failed cancel notification
+							// If read failed cancel notification
 							CancelNotifyIoOperation(*This->poolTask);
-							//and rethrow exception as we don't how handle it
+							// and rethrow exception as we don't how handle it
 							ReThrow;
 						}
 
-						//return task object
+						// return task object
 						return task;
 					}
 					catch (...) {
+						// destroy irp object as it allocated manualy from heap
 						if (irp != nullptr)
 							delete irp;
 						ReThrow;

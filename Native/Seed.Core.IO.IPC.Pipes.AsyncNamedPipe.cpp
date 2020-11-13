@@ -39,6 +39,7 @@ Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::BaseAsyncNamedPip
 		Throw(InvalidPipeException(ExceptionPosition));
 	}
 
+	//call NT service function
 	NTSTATUS status = NtCreateFile(
 		&this->hPipe,
 		PipeMode | PIPE_WAIT,
@@ -53,7 +54,7 @@ Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeClient::BaseAsyncNamedPip
 		0);
 
 	if (!NT_SUCCESS(status))
-		Throw(NullPointException(ExceptionPosition));
+		Throw(NtException(ExceptionPosition, status));
 
 	realPipeName.LeftResize(realPipeName.Lenght - 9);
 }
@@ -192,16 +193,21 @@ Seed::Core::Handle Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServer
 		Throw(InvalidPipeException(ExceptionPosition));
 	}
 
+	// call NT service function
 	NTSTATUS status = NtCreateNamedPipeFile(
 		&hPipe,
-		pipeMode | PIPE_WAIT | ((instances.Count > 0) ? FILE_CREATE_PIPE_INSTANCE : NULL),
+		// check is it new pipe or only new instance of exist pipe and set flags
+		pipeMode | PIPE_WAIT | ((instances.Count > 0) ? FILE_CREATE_PIPE_INSTANCE : NULL), 
 		&ObjectAttributes,
 		&IoStatusBlock,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		// if pipe new than create i else open
 		((instances.Count > 0) ? FILE_CREATE : NULL) | FILE_OPEN_IF,
 		(isNoCache ? FILE_WRITE_THROUGH : NULL),
 		TRUE,
 		TRUE,
+		// completition mode is same as PIPE_NOWAIT, 
+		// in this mode pipe operation complete imediatly and return state as error code
 		FALSE,
 		maxConnectionCount,
 		InBuffSize,
@@ -209,13 +215,15 @@ Seed::Core::Handle Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServer
 		&WaitTime);
 
 	if (!NT_SUCCESS(status))
-		Throw(NullPointException(ExceptionPosition));
+		Throw(NtException(ExceptionPosition, status));
 
 	return hPipe;
 }
 
 void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServer::CloseAllInstances()
 {
+	// we copy list for non-blocking removing as 
+	// closing instance also remove it from list of instances
 	instances.CopyTo<Containers::List>().RemoveAll([](auto&& instance) { instance->CloseConnection(); });
 }
 
@@ -230,6 +238,7 @@ void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServer::Dispose()
 
 void Seed::Core::IO::IPC::Pipes::Details::BaseAsyncNamedPipeServerInstance::InitAsyncConnect(IRPBase*&& irp, void* ioStatusBlk)
 {
+	// use IOCTL for async waiting to client
 	NTSTATUS status = NtFsControlFile(hPipe,
 		NULL,
 		NULL,

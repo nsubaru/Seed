@@ -79,12 +79,25 @@ namespace Seed {
 				ForceInline virtual ~IFinishWriteCallback() = 0 {}
 			};
 
+			/// <summary>
+			/// Інтерфейс колбеку підключення
+			/// </summary>
+			/// <typeparam name="TAsyncObject">Тип об'єкт підключення</typeparam>
 			template<typename TAsyncObject>
 			class IFinishConnectCallback : public virtual IExceptionCallback {
 			public:
+				static_assert(TypeTraits::IsBasedOnV<IAsyncIOBase, TAsyncObject>);
+			public:
+				/// <summary>
+				/// Викликається після успішного підключення 
+				/// </summary>
+				/// <param name="connectionObject">Об'єкт підлючення</param>
 				virtual void OnConnectFinish(TAsyncObject&& connectionObject) = 0;
 			public:
-				virtual ~IFinishConnectCallback() = 0 {}
+				/// <summary>
+				/// Деструктор
+				/// </summary>
+				ForceInline virtual ~IFinishConnectCallback() = 0 {}
 			};
 		}
 
@@ -1203,18 +1216,25 @@ namespace Seed {
 			protected:
 				friend class IRPBase;
 			protected:
+				// registering I/O object in thread pool
 				Seed::Core::Threading::UnifiedThreadPoolIoTask RegisterNtIoObjectInThreadPool(const Threading::UnifiedThreadPool& pool, Handle hFileObj);
 
+				// remove registration I/O object in thread pool
 				void UnRegisterNtIoObjectInThreadPool(Seed::Core::Threading::UnifiedThreadPoolIoTask task);
 
+				// return ptr to IO_STATUS_BLOCK
 				void* GetReservedPlaceInIrp(IRPBase* irp);
 
+				// create IOTask from IRP object incrementing IRP ref
 				IOTask GetIOTaskFromIRPBase(IRPBase* irp);
 
+				// send notify to thread pool
 				void NotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo);
-
+				
+				// cancel notification of thread pool
 				void CancelNotifyIoOperation(const Threading::UnifiedThreadPoolIoTask& ptpIo);
 			protected:
+				// receive NT object handle
 				virtual Handle GetHandle() = 0;
 			protected:
 				virtual const Seed::Core::Threading::UnifiedThreadPoolIoTask& GetIoPoolTask() const = 0;
@@ -1237,6 +1257,9 @@ namespace Seed {
 			/// <typeparam name="TDataType">Тип об'єкта пакета(блоку) даних</typeparam>
 			template<typename TDataType> requires TypeTraits::Collection::IsArray<TDataType>
 			class IBaseAsyncIO : virtual public IAsyncIOBase {
+			public:
+				static_assert(TypeTraits::Collection::IsArray<TDataType>);
+				static_assert(TypeTraits::IsPodV<typename TDataType::DataType>);
 			public:
 				/// <summary>
 				/// Ініціалізація асинхроної операції читання
@@ -1266,12 +1289,29 @@ namespace Seed {
 				virtual ~IBaseAsyncIO() = 0 {};
 			};
 
-			template<typename TAsyncObject> //requires TypeTraits::IsBasedOnV<IAsyncIOBase, TAsyncObject>
+			/// <summary>
+			/// Інтерфейс об'єкта асинхроного підключення
+			/// </summary>
+			/// <typeparam name="TAsyncObject">Тип об'єкта підключення</typeparam>
+			template<typename TAsyncObject>
 			class IBaseConnectableAsyncIO : virtual public IAsyncIOBase {
+			public:
+				/// <summary>
+				/// Асинхроне підключення
+				/// </summary>
+				/// <param name="onFinishConnectAction">Дія яка викличентья при успішному підключенні</param>
+				/// <returns>Об'єкт асинхроної I/O задачі</returns>
 				virtual IOTask AsyncConnect(SmartPtr<IFinishConnectCallback<TAsyncObject>> onFinishConnectAction) = 0;
 			public:
+				/// <summary>
+				/// Перевірка чи об'єкт коректний
+				/// </summary>
+				/// <returns>true якщо об'єкт допускає I/O операції</returns>
 				virtual bool GetIsValid() const = 0;
 			public:
+				/// <summary>
+				/// Деструктор
+				/// </summary>
 				virtual ~IBaseConnectableAsyncIO() = 0 {};
 			};
 
@@ -1281,6 +1321,9 @@ namespace Seed {
 			/// <typeparam name="TDataType">Тип буфера даних</typeparam>
 			template<typename TDataType> requires TypeTraits::Collection::IsArray<TDataType>
 			class IBasePositionAsyncIO : virtual public IAsyncIOBase {
+			public:
+				static_assert(TypeTraits::Collection::IsArray<TDataType>);
+				static_assert(TypeTraits::IsPodV<typename TDataType::DataType>);
 			public:
 				/// <summary>
 				/// Ініціаліщація операції асихроного читання
@@ -1335,6 +1378,7 @@ namespace Seed {
 					Connect
 				};
 			private:
+				// IO_STATUS_BLOCK
 				Byte Reserverd[16 + sizeof(SizeT)];
 
 				Threading::SynchronizeEvent event;
@@ -1519,8 +1563,6 @@ namespace Seed {
 						finishReadCallback->OnError(errorCode);
 					}
 				}
-			protected:
-				ForceInline virtual IRPBase* Clone() const { return new ReadIRP(*this); }
 			public:
 				/// <summary>
 				/// Деструктор
@@ -1591,8 +1633,6 @@ namespace Seed {
 						finishWriteCallback->OnError(errorCode);
 					}
 				}
-			protected:
-				ForceInline virtual IRPBase* Clone() const { return new WriteIRP(*this); }
 			public:
 				/// <summary>
 				/// Деструктор
@@ -1663,8 +1703,6 @@ namespace Seed {
 						finishConnectCallback->OnError(errorCode);
 					}
 				}
-			protected:
-				ForceInline virtual IRPBase* Clone() const { return new ConnectIRP(*this); }
 			public:
 				/// <summary>
 				/// Деструктор
