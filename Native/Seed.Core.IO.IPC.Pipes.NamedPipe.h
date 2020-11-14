@@ -7,34 +7,6 @@ namespace Seed {
 			namespace IPC {
 				namespace Pipes {
 					/// <summary>
-					/// Режими роботи коналу 
-					/// </summary>
-					enum class PipeMode : UInt8 {
-						/// <summary>
-						/// Тільки читання
-						/// </summary>
-						In = 0b01, 
-						/// <summary>
-						/// Тільки запис
-						/// </summary>
-						Out = 0b10, 
-						/// <summary>
-						/// Читання і запис
-						/// </summary>
-						Both = 0b011
-					};
-
-					/// <summary>
-					/// Оператор об'єдання режимів роботи каналу
-					/// </summary>
-					/// <param name="right">Правий операнд</param>
-					/// <param name="left">Лівий операнд</param>
-					/// <returns>Об'єднаний режим</returns>
-					constexpr PipeMode operator|(PipeMode right, PipeMode left) {
-						return static_cast<PipeMode>(static_cast<UInt8>(right) | static_cast<UInt8>(left));
-					}
-
-					/// <summary>
 					/// Інтерфейс каналу
 					/// </summary>
 					class INamedPipe : protected IDisposable {
