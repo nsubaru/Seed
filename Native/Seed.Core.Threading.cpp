@@ -69,13 +69,13 @@ ID Seed::Core::Threading::GetTID()
 
 void Seed::Core::Threading::Sleep(Time::DateTime time, Boolean IsRelative) //-V813
 {
-	LARGE_INTEGER delay;
+	LARGE_INTEGER delay = { 0 };
 	delay.QuadPart = (IsRelative) ? time.RelativeTime : time.TimeFromStartEpoch;
 	NtDelayExecution(TRUE, &delay);
 }
 
 void SetName(const String& NewName, Handle hThread) {
-	THREAD_NAME_INFORMATION name;
+	THREAD_NAME_INFORMATION name = { 0 };
 	RtlInitUnicodeString(&name.ThreadName, (PWSTR)(ConstCharStr)const_cast<String&>(NewName));
 	NtSetInformationThread(
 		hThread,
@@ -104,7 +104,7 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			namespace Threadables {
-				extern ThreadableRef RegisterThreadThreadable(const Thread& thread, volatile EThreadabledStates* State);
+				extern ThreadableRef RegisterThreadThreadable(const Thread& thread, volatile EThreadabledStates* state, volatile EThreadabledStates* secondState);
 				extern void UnRegisterThreadThreadable(ThreadableRef&& ref);
 
 				extern ThreadableRef RegisterPoolIoThreadable(const UnifiedThreadPoolIoTask& task, const SynchronizeEvent& event, ImplSpecificT instance);
@@ -121,7 +121,7 @@ namespace Seed {
 }
 
 template<typename EntryPointT>
-static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile EThreadabledStates* State) noexcept {
+static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile EThreadabledStates* volatile state, volatile EThreadabledStates* volatile secondState) noexcept {
 	using namespace Seed;
 
 	NTSTATUS status = STATUS_SUCCESS;
@@ -130,11 +130,12 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile ET
 
 	try {
 		try {
-			ref = Threadables::RegisterThreadThreadable(*thread, State);
+			ref = Threadables::RegisterThreadThreadable(*thread, state, secondState);
+			GetAbortEvent(thread)->Set();
 			entryPoint();
 		}
 		catch (Exceptions::InteruptException&) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
+			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" був перерваний");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception & ex) {
@@ -181,9 +182,19 @@ namespace Seed {
 				return thread->This->delegate;
 			}
 
-			volatile EThreadabledStates* GetActiveState(Thread* thread)
+			volatile EThreadabledStates* volatile GetActiveState(Thread* thread)
 			{
 				return &thread->This->State;
+			}
+
+			volatile EThreadabledStates* volatile GetSecondState(Thread* thread)
+			{
+				return &thread->This->SecondState;
+			}
+
+			SynchronizeEvent* GetAbortEvent(Thread* thread)
+			{
+				return thread->This->AbortEvent;
 			}
 		}
 	}
@@ -191,7 +202,7 @@ namespace Seed {
 
 NTSTATUS __cdecl threadStartRoutineDynEntryPoint(PVOID args) noexcept {
 	Thread* This = (Thread*)args;
-	return EntryPoint(Seed::Core::Threading::ThreadEntryPoint(This), This, GetActiveState(This));
+	return EntryPoint(Seed::Core::Threading::ThreadEntryPoint(This), This, GetActiveState(This), GetSecondState(This));
 }
 namespace Seed
 {
@@ -216,7 +227,7 @@ namespace Seed
 				//update main thread name
 				MainThread->RefreshName();
 				//execute managed entry point
-				EntryPoint(MainThread->This->delegate, MainThread, &MainThread->This->State);
+				EntryPoint(MainThread->This->delegate, MainThread, &MainThread->This->State, &MainThread->This->SecondState);
 				//Interupt and wait for interupting each exist theradable
 				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread) InlineLambda
 				{
@@ -310,11 +321,17 @@ namespace Seed
 
 				LARGE_INTEGER delay = { 0 };
 				delay.QuadPart = Math::Max<Int64>();
-				if (This->State == EThreadabledStates::Starting ||
+
+				if ((
+					This->State == EThreadabledStates::Starting ||
 					This->State == EThreadabledStates::Executing ||
 					This->State == EThreadabledStates::ExceptionProcessing ||
-					This->State == EThreadabledStates::Paused)
+					This->State == EThreadabledStates::Interupted ||
+					This->State == EThreadabledStates::Paused) && This->hThread != NULL)
+				{
 					NtWaitForSingleObject(This->hThread, TRUE, &delay);
+				}
+
 				return *this;
 			}
 
@@ -323,7 +340,7 @@ namespace Seed
 				_ReadWriteBarrier();
 
 				LARGE_INTEGER delay = { 0 };
-				delay.QuadPart = timeOut.Ticks;
+				delay.QuadPart = -((Int64)timeOut.Ticks);
 				if (This->State == EThreadabledStates::Starting ||
 					This->State == EThreadabledStates::Executing ||
 					This->State == EThreadabledStates::ExceptionProcessing ||
@@ -351,7 +368,7 @@ namespace Seed
 				_ReadWriteBarrier();
 
 				LARGE_INTEGER delay = { 0 };
-				delay.QuadPart = timeOut.Ticks;
+				delay.QuadPart = -((Int64)timeOut.Ticks);
 				if (This->State == EThreadabledStates::Starting ||
 					This->State == EThreadabledStates::Executing ||
 					This->State == EThreadabledStates::ExceptionProcessing ||
@@ -378,6 +395,10 @@ namespace Seed
 					case EThreadabledStates::Paused:
 					{
 						NtSuspendThread(This->hThread, NULL);
+						
+						This->SecondState = EThreadabledStates::Interupted;
+						Swap(This->State, This->SecondState);
+
 						CONTEXT ctx;
 						ctx.ContextFlags = CONTEXT_ALL;
 						NTSTATUS status = ZwGetContextThread(This->hThread, &ctx);
@@ -389,9 +410,13 @@ namespace Seed
 						DWORD64 ret_point = ctx.Rip;
 						ctx.Rip = (DWORD64) (PDWORD64) InteruptThread;
 						status = ZwSetContextThread(This->hThread, &ctx);
-						NtAlertResumeThread(This->hThread, NULL);
+
+						NtResumeThread(This->hThread, NULL);
 						if (!NT_SUCCESS(status))
 							Throw(NtException(ExceptionPosition, status));
+
+						//We must call this after resume for resume thread if it wait for something
+						NtAlertThread(This->hThread);
 					}
 					default:
 						break;
@@ -538,10 +563,10 @@ namespace Seed
 				NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 			}
 
-			void SynchronizeEvent::Wait(Time::TimeSpan timeOunt) const
+			void SynchronizeEvent::Wait(Time::TimeSpan timeOut) const
 			{
 				LARGE_INTEGER delay = { 0 };
-				delay.QuadPart = timeOunt.Ticks;
+				delay.QuadPart = -((Int64)timeOut.Ticks);
 				NtWaitForSingleObject(this->data->handle, TRUE, &delay);
 			}
 
@@ -627,8 +652,9 @@ VOID NTAPI UnifiedThreadPoolJobsCleanupCallback(
 	_Inout_opt_ PVOID CleanupContext
 ) {
 	volatile EThreadabledStates state = EThreadabledStates::Unknown;
+	volatile EThreadabledStates secondState = EThreadabledStates::Unknown;
 
-	ConfigureTls(nullptr, &state);
+	ConfigureTls(nullptr, &state, &secondState);
 
 	try {
 		try {
@@ -651,7 +677,10 @@ VOID NTAPI UnifiedThreadPoolTasksCleanupCallback(
 	_Inout_opt_ PVOID ObjectContext,
 	_Inout_opt_ PVOID CleanupContext
 ) {
-	ConfigureTls(nullptr, nullptr);
+	volatile EThreadabledStates state = EThreadabledStates::Unknown;
+	volatile EThreadabledStates secondState = EThreadabledStates::Unknown;
+
+	ConfigureTls(nullptr, &state, &secondState);
 	try {
 		try {
 			if (ObjectContext == NULL)
@@ -1108,7 +1137,7 @@ const UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join() 
 UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join(Time::TimeSpan timeOut)
 {
 	LARGE_INTEGER delay = { 0 };
-	delay.QuadPart = timeOut.Ticks;
+	delay.QuadPart = -((Int64)timeOut.Ticks);
 	NtWaitForSingleObject(This->hEvent, TRUE, &delay);
 	return *this;
 }
@@ -1116,7 +1145,7 @@ UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join(Time::Ti
 const UnifiedThreadPoolJob& Seed::Core::Threading::UnifiedThreadPoolJob::Join(Time::TimeSpan timeOut) const
 {
 	LARGE_INTEGER delay = { 0 };
-	delay.QuadPart = timeOut.Ticks;
+	delay.QuadPart = -((Int64)timeOut.Ticks);
 	NtWaitForSingleObject(This->hEvent, TRUE, &delay);
 	return *this;
 }
@@ -1252,6 +1281,7 @@ VOID NTAPI UnifiedTaskShedulerTaskCallback(
 		return;
 
 	volatile EThreadabledStates state = EThreadabledStates::Unknown;
+	volatile EThreadabledStates secondState = EThreadabledStates::Unknown;
 
 	UnifiedThreadPoolScheduledTask* thread = (UnifiedThreadPoolScheduledTask*)Context;
 
@@ -1272,14 +1302,14 @@ VOID NTAPI UnifiedTaskShedulerTaskCallback(
 					}
 				)) {
 					//Init min tls
-					ConfigureTls(nullptr, &state);
+					ConfigureTls(nullptr, &state, &secondState);
 
 					delete thread;
 				}
 			}
 			else {
 				//Init min tls
-				ConfigureTls(nullptr, &state);
+				ConfigureTls(nullptr, &state, &secondState);
 
 				delete thread;
 			}
@@ -1371,10 +1401,25 @@ namespace Seed {
 				return irp->event;
 			}
 
-			void Seed::Core::IO::MarkIrpCompleted(IRPBase* irp)
+			void MarkIrpCompleted(IRPBase* irp)
 			{
 				irp->isCompleted = true;
 				_ReadWriteBarrier();
+			}
+
+			void Incref(IRPBase*& irp)
+			{
+				irp->RefCount++;
+			}
+
+			void Deref(IRPBase*& irp)
+			{
+				if (--irp->RefCount == 0) {
+					irp->Dispose();
+					delete irp;
+				}
+
+				irp = nullptr;
 			}
 		}
 
@@ -1461,8 +1506,10 @@ VOID NTAPI IoThreadPoolCallback(
 			);
 
 			MarkIrpCompleted(irp);
+			_ReadWriteBarrier();
+			SynchronizeEvent(GetIrpCompleteEvent(irp)).Set();
 
-			delete irp;
+			Deref(irp);
 		}
 		catch (Exception& ex) {
 			toCoreLog(L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:", ex);

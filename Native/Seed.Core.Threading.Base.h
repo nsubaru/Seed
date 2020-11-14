@@ -251,7 +251,7 @@ namespace Seed {
 				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				/// <param name = 'TID'>Id не існуючого потоку</param>
 				ForceInline InvalidThread(const ConstAString& File, const ConstAString& FunctName, SizeT Line, ID TID)
-					noexcept : Exception(File, FunctName, Line, L"Не можна працювати з незареєстрованим в рантаймі потоком"), tid(TID)
+					: Exception(File, FunctName, Line, L"Не можна працювати з незареєстрованим в рантаймі потоком"), tid(TID)
 				{};
 
 				/// <summary>
@@ -337,7 +337,7 @@ namespace Seed {
 				/// <param name = 'FunctName'>Ім'я функції</param>
 				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				ForceInline InvalidThreadObj(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-					noexcept : Exception(File, FunctName, Line, L"Не валідний об'єкт потоку")
+					: Exception(File, FunctName, Line, L"Не валідний об'єкт потоку")
 				{};
 
 				/// <summary>
@@ -411,7 +411,7 @@ namespace Seed {
 				/// <param name = 'FunctName'>Ім'я функції</param>
 				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				ForceInline ThreadableAlredyStarted(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-					noexcept : Exception(File, FunctName, Line, L"Запуск запущеного об'єкта")
+					: Exception(File, FunctName, Line, L"Запуск запущеного об'єкта")
 				{};
 
 				/// <summary>
@@ -485,7 +485,7 @@ namespace Seed {
 				/// <param name = 'FunctName'>Ім'я функції</param>
 				/// <param name = 'Line'>Номер рядка де була згенерована помилка</param>
 				ForceInline DeadlockExpected(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-					noexcept : Exception(File, FunctName, Line, L"Взаємне блокування")
+					: Exception(File, FunctName, Line, L"Взаємне блокування")
 				{};
 
 				/// <summary>

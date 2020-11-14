@@ -20,7 +20,7 @@ protected:
 public:
     FinishWriteCallback() : This(new Data()) {}
 public:
-    virtual void OnWriteFinish(SizeT byteTransfered, const Core::Containers::Blob&& data) volatile {
+    virtual void OnWriteFinish(SizeT byteTransfered, const Core::Containers::Blob&& data) {
         This->lock.ExclusiveLock([&, data = MoveRValue(data)]() mutable {
             This->data = MoveRValue(const_cast<Core::Containers::Blob&&>(data));
         });
@@ -68,7 +68,7 @@ protected:
 public:
     FinishReadCallback() : This(new Data()) {}
 public:
-    virtual void OnFinishRead(SizeT byteTransfered, Core::Containers::Blob&& data) volatile {
+    virtual void OnFinishRead(SizeT byteTransfered, Core::Containers::Blob&& data) {
         This->lock.ExclusiveLock([&, data = MoveRValue(data)]() mutable {
             This->data = MoveRValue(data);
         });

@@ -18,18 +18,23 @@ namespace Seed {
 
 			inline __declspec(thread) struct TLS {
 				IThreadable* Threadable = 0;
-				volatile EThreadabledStates SecondState;
-				volatile EThreadabledStates* State;
+				volatile EThreadabledStates* volatile SecondState;
+				volatile EThreadabledStates* volatile State;
 				TlsExceptionData ExceptionInfo;
 			} TLSData = { 0 };
 
 			InternalApiCall ForceInline TLS* GetTLS() { return &TLSData; }
 
-			InternalApiCall ForceInline void ConfigureTls(IThreadable* Threadable, volatile EThreadabledStates* State) {
+			InternalApiCall ForceInline void ConfigureTls(
+				IThreadable* threadable, 
+				volatile EThreadabledStates* volatile state,
+				volatile EThreadabledStates* volatile secondState
+			) {
 				TLS* thisTLS = GetTLS();
 				Memory::MemBlkFill(thisTLS, sizeof(TLS), 0);
-				thisTLS->State = State;
-				thisTLS->Threadable = Threadable;
+				thisTLS->State = state;
+				thisTLS->SecondState = secondState;
+				thisTLS->Threadable = threadable;
 				thisTLS->ExceptionInfo = TlsExceptionData();
 			}
 

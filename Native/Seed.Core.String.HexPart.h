@@ -220,27 +220,27 @@ namespace Seed
                         //2 Hex digits (4x2 bits)
                         const struct {
                             //Secon hex (4 bits)
-                            Byte bit0 : 4;
+                            Byte LowPart : 4;
                             //First hex (4 bits)
-                            Byte bit1 : 4;
+                            Byte HighPart : 4;
                         } *Hex;
-                    } conv;
+                    } conv = { 0 };
+
                     if (binaryData.Count % 2 != 0)
                         Internals::Exceptions::ThrowInvalidFormatException(__FILE__, __FUNCSIG__, __LINE__);
-                    auto CurrentSize = binaryData.Count * 2 + 1;
-                    auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    CharStr ret = (CharStr)TBaseString::operator new[](ReservedSize * sizeof(Char));
+
+                    auto str = TBaseString::CreateFilledString(binaryData.Count * 2);
+
                     SizeT i1 = 0, i2 = 0;
-                    ret[(binaryData.Count * 2) - 1] = L'\0';
-                    ret[binaryData.Count * 2] = L'\0';
                     for (i1; i1 < binaryData.Count; i1++) {
                         conv.binary = reinterpret_cast<const Byte*>(&binaryData[i1]);
-                        ret[i2] = HexNumbers[conv.Hex->bit0];
+
+                        str.str[i2] = HexNumbers[conv.Hex->HighPart];
                         i2++;
-                        ret[i2] = HexNumbers[conv.Hex->bit1];
+                        str.str[i2] = HexNumbers[conv.Hex->LowPart];
                         i2++;
                     }
-                    TBaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
+
                     return str;
                 }
 
@@ -249,29 +249,21 @@ namespace Seed
                 ///<returns>Рядкове представлення бінарних даних</returns>
                 static TBaseString UInt64asHex(UInt64 Value) {
                     union ConvertT {
-                        SizeT Variable;
+                        UInt64 Variable;
                         struct {
                             Byte LowPart : 4;
                             Byte HighPart : 4;
                         }
-                        Code[sizeof(SizeT)];
-                    } Converter {};
+                        Code[sizeof(UInt64)];
+                    } converter{ .Variable = Value };
 
-                    constexpr Char mask[] = L"0x0000000000000000";
-                    constexpr auto CurrentSize = (sizeof(mask) / 2);
+                    TBaseString str(L"0x0000000000000000");
 
-                    Converter.Variable = Value;
-                    
-                    auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    CharStr ret = (CharStr)TBaseString::operator new[](ReservedSize * sizeof(Char));
-                    Memory::Copy(mask, ret, sizeof(mask));
-                
-                    Int32 len = CurrentSize - 1;
-                    for (--len; len >= 0; Value >>= 4, --len) {
-                        ret[len] = HexNumbers[Value & 0xf];
+                    for (int i = 0; i < sizeof(Value) * 2; i += 2) {
+                        str.str[i + 3] = HexNumbers[converter.Code[(sizeof(Value) - 1) - (i / 2)].LowPart];
+                        str.str[i + 2] = HexNumbers[converter.Code[(sizeof(Value) - 1) - (i / 2)].HighPart];
                     }
 
-                    TBaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
                     return str;
                 }
 
@@ -280,29 +272,21 @@ namespace Seed
                 ///<returns>Рядкове представлення бінарних даних</returns>
                 static TBaseString Int32asHex(Int32 Value) {
                     union ConvertT {
-                        SizeT Variable;
+                        Int32 Variable;
                         struct {
                             Byte LowPart : 4;
                             Byte HighPart : 4;
                         }
                         Code[sizeof(Int32)];
-                    } Converter {};
+                    } converter{ .Variable = Value };
 
-                    constexpr Char mask[] = L"0x00000000";
-                    constexpr auto CurrentSize = (sizeof(mask) / 2);
+                    TBaseString str(L"0x00000000");
 
-                    Converter.Variable = Value;
-                    
-                    auto ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    CharStr ret = (CharStr)TBaseString::operator new[](ReservedSize * sizeof(Char));
-                    Memory::Copy(mask, ret, sizeof(mask));
-
-                    Int32 len = CurrentSize - 1;
-                    for (--len; len >= 0; Value >>= 4, --len) {
-                        ret[len] = HexNumbers[Value & 0xf];
+                    for (int i = 0; i < sizeof(Value) * 2; i += 2) {
+                        str.str[i + 3] = HexNumbers[converter.Code[(sizeof(Value) - 1) - (i / 2)].LowPart];
+                        str.str[i + 2] = HexNumbers[converter.Code[(sizeof(Value) - 1) - (i / 2)].HighPart];
                     }
 
-                    TBaseString str(MoveRValue(ret), CurrentSize, ReservedSize);
                     return str;
                 }
 			protected:

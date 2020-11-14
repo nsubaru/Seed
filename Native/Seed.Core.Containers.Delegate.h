@@ -19,7 +19,7 @@ namespace Seed {
                 ///<param name = 'FunctName'>Ім'я функції</param>
                 ///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
                 ForceInline CantGetResultNotInvokedFunction(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-                    noexcept : Exception(File, FunctName, Line, L"Не можливо отримати результат не виконаної функції")
+                    : Exception(File, FunctName, Line, L"Не можливо отримати результат не виконаної функції")
                 {}
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
@@ -40,7 +40,7 @@ namespace Seed {
                 ///<param name = 'FunctName'>Ім'я функції</param>
                 ///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
                 ForceInline TryReStartDelegate(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-                    noexcept : Exception(File, FunctName, Line, L"Неможливо повторно запустити делегат на виконання")
+                    : Exception(File, FunctName, Line, L"Неможливо повторно запустити делегат на виконання")
                 {}
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
@@ -61,7 +61,7 @@ namespace Seed {
                 ///<param name = 'FunctName'>Ім'я функції</param>
                 ///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
                 ForceInline AlredyExecute(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-                    noexcept : Exception(File, FunctName, Line, L"Неможливо отримати результат делегат в процесі його виконання")
+                    : Exception(File, FunctName, Line, L"Неможливо отримати результат делегат в процесі його виконання")
                 {}
 
                 ///<summary>Текстове представлення інформації про помилки помилки</summary>
@@ -101,7 +101,7 @@ namespace Seed {
             /// Вертає true якщо функція запущена. Реалізація в TemplateFunctionT
             /// </summary>
             /// <returns>Вертає true якщо функція запущена</returns>
-            virtual bool IsStarted() const noexcept = 0;
+            virtual bool IsStarted() const = 0;
 
             /// <summary>
             /// Вертає true якщо функція завершила свою роботу.
@@ -110,7 +110,7 @@ namespace Seed {
             /// Реалізація в TemplateFunctionT
             /// </summary>
             /// <returns>Вертає true якщо функція завершила роботу</returns>
-            virtual bool IsEnded() const noexcept = 0;
+            virtual bool IsEnded() const = 0;
 
             /// <summary>
             /// Вертає true якщо функція запущена
@@ -214,12 +214,12 @@ public:
     ForceInline TemplateFunctionT(TF&& f, TArgs&&... args) : f(Seed::Core::ForwardReference<TF>(f)), result(nullptr), args(Seed::Core::ForwardReference<TArgs>(args)...)
     {}
     //Вертає true якщо функція запущена була
-    ForceInline virtual bool IsStarted() const noexcept override final
+    ForceInline virtual bool IsStarted() const override final
     {
         return isStarted;
     }
     //Вертає true якщо функція завершилась
-    ForceInline virtual bool IsEnded() const noexcept override final
+    ForceInline virtual bool IsEnded() const override final
     {
         return isEnded;
     }

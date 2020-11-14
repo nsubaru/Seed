@@ -1,15 +1,3 @@
 #pragma once
-#include "Seed.Core.Stage1.h"
-
-namespace Seed 
-{
-	inline namespace Core 
-	{
-		namespace IO 
-		{
-			namespace IPC 
-			{
-			}
-		}
-	}
-}
+#include "Seed.Core.IO.IPC.Base.h"
+#include "Seed.Core.IO.IPC.Pipes.h"

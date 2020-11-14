@@ -16,7 +16,7 @@
 
 typedef TypeDescriptor _RTTITypeDescriptor;
 
-static bool TypeidsEqual(const _RTTITypeDescriptor* const lhs, const _RTTITypeDescriptor* const rhs) noexcept try
+static bool TypeidsEqual(const _RTTITypeDescriptor* const lhs, const _RTTITypeDescriptor* const rhs) try
 {
 	return lhs == rhs || !Seed::CStr::Compare(lhs->name, rhs->name); //-V509
 }

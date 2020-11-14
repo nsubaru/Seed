@@ -17,7 +17,7 @@ public:
 	TestException& operator=(TestException&& from) { this->~TestException(); this->TestException::TestException(MoveRValue(from)); return *this; }
 public:
 	TestException(const ConstAString& File, const ConstAString& FunctName, SizeT Line, Int32 StatusCode)
-		noexcept : Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
+		: Exception(File, FunctName, Line, L"Помилка системного виклику NT"), statusCode(StatusCode)
 	{}
 public:
 	Int32 GetCode() const { return statusCode; }

@@ -54,9 +54,17 @@ namespace Seed {
 				Data* This = nullptr;
 			private:
 				friend void RegisterThread(Thread* thread);
+
 				friend void UnRegisterThread(Thread* thread);
+
 				friend volatile Delegate& ThreadEntryPoint(Thread* thread);
-				friend volatile EThreadabledStates* GetActiveState(Thread* thread);
+
+				friend volatile EThreadabledStates* volatile GetActiveState(Thread* thread);
+				
+				friend volatile EThreadabledStates* volatile GetSecondState(Thread* thread);
+
+				friend SynchronizeEvent* GetAbortEvent(Thread* thread);
+
 				friend bool MainThread(Delegate&& delegate);
 
 				friend void KillThread(Thread& target, UInt32 statusCode);

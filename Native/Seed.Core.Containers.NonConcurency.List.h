@@ -384,7 +384,7 @@ namespace Seed {
 #pragma endregion
 #pragma region List element manipulations
 					///<summary>Видалення значення ітератора, ітератор отримує значення наступного елемента</summary>
-					Iterator Remove()
+					Iterator Remove(bool isReciveNextItInstead = true)
 					{
 						if (this->This == nullptr)
 							Internals::Exceptions::ThrowEndNodeNotDeferencable(__FILE__, __FUNCSIG__, __LINE__);
@@ -398,6 +398,7 @@ namespace Seed {
 						else
 						{
 							__assume(this->This->father != nullptr); //-V547
+
 							if (this->This->next == nullptr && this->This->prev == nullptr)
 							{
 								this->This->father->root = this->This->father->last = nullptr;
@@ -421,22 +422,33 @@ namespace Seed {
 
 							--((This)->father->size);
 
+
 							if (--this->This->RefCount == 1)
 							{
 								auto newThis = this->This->next;
 								delete this->This;
-								this->This = newThis;
-								if (this->This != nullptr)
-									++this->This->RefCount;
+								if (isReciveNextItInstead) {
+									this->This = newThis;
+									if (this->This != nullptr)
+										++this->This->RefCount;
+								}
+								else {
+									this->This = nullptr;
+								}
 							}
 							else
 							{
 								auto newThis = this->This->next;
 								this->This->next = nullptr;
 								this->This->prev = nullptr;
-								this->This = newThis;
-								if (this->This != nullptr)
-									++this->This->RefCount;
+								if (isReciveNextItInstead) {
+									this->This = newThis;
+									if (this->This != nullptr)
+										++this->This->RefCount;
+								}
+								else {
+									this->This = nullptr;
+								}
 							}
 						}
 						return *this;

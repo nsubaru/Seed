@@ -9,12 +9,14 @@ using namespace Seed;
 using namespace Seed::Threading;
 using namespace Seed::Threading::Threadables;
 
-ThreadableRef Seed::Core::Threading::Threadables::RegisterThreadThreadable(const Thread& thread, volatile EThreadabledStates* state)
+ThreadableRef Seed::Core::Threading::Threadables::RegisterThreadThreadable(const Thread& thread,
+	volatile EThreadabledStates* state,
+	volatile EThreadabledStates* secondState)
 {
     auto threadable = new ThreadableThread(thread);
 	*state = EThreadabledStates::Executing;
 	_ReadWriteBarrier();
-	return RegisterIThreadable(MoveRValue(threadable), state);
+	return RegisterIThreadable(MoveRValue(threadable), state, secondState);
 }
 
 void Seed::Core::Threading::Threadables::UnRegisterThreadThreadable(ThreadableRef&& ref)

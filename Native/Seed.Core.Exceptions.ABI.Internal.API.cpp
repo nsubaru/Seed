@@ -558,9 +558,9 @@ EXCEPTION_DISPOSITION InternalCxxFrameHandler(
     auto tryBlockMap = TryBlockMap4(pFuncInfo, pDC->ImageBase);
     
     // Set threadable state
-    if (Seed::Core::Threading::GetTLS()->State != nullptr) {
-        Seed::Core::Threading::GetTLS()->SecondState = Seed::Core::Threading::EThreadabledStates::ExceptionProcessing;
-        Seed::Swap(Seed::Core::Threading::GetTLS()->SecondState, *Seed::Core::Threading::GetTLS()->State);
+    if (Seed::Core::Threading::GetTLS()->State != nullptr || Seed::Core::Threading::GetTLS()->SecondState != nullptr) {
+        *Seed::Core::Threading::GetTLS()->SecondState = Seed::Core::Threading::EThreadabledStates::ExceptionProcessing;
+        Seed::Swap(*Seed::Core::Threading::GetTLS()->SecondState, *Seed::Core::Threading::GetTLS()->State);
     }
 
     if (tryBlockMap.getNumTryBlocks() != 0
@@ -1756,9 +1756,8 @@ void * CxxCallCatchBlock(
         // In that case, the _CatchStateInParent should not be set until we get into the except.
         __except (ExFilterRethrowFH4(exception_info(), pThisException, HandlerSearchState, &rethrow))
         {
-            if (Seed::Core::Threading::GetTLS()->State != nullptr) {
-                Seed::Core::Threading::GetTLS()->SecondState = Seed::Core::Threading::EThreadabledStates::ExceptionProcessing;
-                Seed::Swap(Seed::Core::Threading::GetTLS()->SecondState, *Seed::Core::Threading::GetTLS()->State);
+            if (Seed::Core::Threading::GetTLS()->State != nullptr || Seed::Core::Threading::GetTLS()->SecondState != nullptr) {
+                Seed::Swap(*Seed::Core::Threading::GetTLS()->SecondState, *Seed::Core::Threading::GetTLS()->State);
             }
 
             //Restore state
@@ -1810,9 +1809,8 @@ void * CxxCallCatchBlock(
     GetThreadExceptionData()->_CatchStateInParent = INVALID_CATCH_SPECIFIC_STATE;
     GetThreadExceptionData()->_curexception = nullptr;
 
-    if (Seed::Core::Threading::GetTLS()->State != nullptr) {
-        Seed::Core::Threading::GetTLS()->SecondState = Seed::Core::Threading::EThreadabledStates::ExceptionProcessing;
-        Seed::Swap(Seed::Core::Threading::GetTLS()->SecondState, *Seed::Core::Threading::GetTLS()->State);
+    if (Seed::Core::Threading::GetTLS()->State != nullptr || Seed::Core::Threading::GetTLS()->SecondState != nullptr) {
+        Seed::Swap(*Seed::Core::Threading::GetTLS()->SecondState, *Seed::Core::Threading::GetTLS()->State);
     }
 
     return continuationAddress;

@@ -5,7 +5,10 @@ namespace Seed {
 	inline namespace Core {
 		namespace Threading {
 			namespace Threadables {
-				ThreadableRef RegisterIThreadable(IThreadable*&& threadable, volatile EThreadabledStates* State);
+				ThreadableRef RegisterIThreadable(
+					IThreadable*&& threadable,
+					volatile EThreadabledStates* volatile state,
+					volatile EThreadabledStates* volatile secondState);
 				void UnRegisterIThreadable(ThreadableRef&& ref);
 			}
 		}
