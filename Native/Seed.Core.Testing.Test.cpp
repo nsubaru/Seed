@@ -3,6 +3,7 @@
 
 #include "Seed.Core.Testing.Test.h"
 #include "Seed.Core.Testing.Register.h"
+#include "Seed.Core.Logger.StaticLogger.Managed.h"
 
 using namespace Seed;
 using namespace Seed::Core;
@@ -40,7 +41,10 @@ namespace Seed
 			TestPackResult TestRegister::RunAllTest(Boolean isLogging) {
 				Containers::List<TestResult> results;
 
-				if(isLogging) toCoreLog(L"Запуск тестів...");
+				if(isLogging) 
+					Logger::StaticLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+						Logger::ELoggerLevel::Verbose,
+						L"Запуск тестів...");
 
 				Time::DateTime startTime = Time::DateTime::GetCurrentSystemTimeData();
 
@@ -75,7 +79,9 @@ namespace Seed
 								msg += String::toString(testDurration.Ticks);
 								msg += L" tiks";
 								msg += L", тест пройдено";
-								toCoreLog(msg);
+								Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+									Logger::ELoggerLevel::Verbose,
+									msg);
 							}
 
 							results += {record.Key.TypeName, TestResult::EStatus::Success, "", testDurration};
@@ -93,7 +99,9 @@ namespace Seed
 								msg += String::toString(testDurration.Ticks);
 								msg += L" tiks";
 								msg += L", тест скасовано";
-								toCoreLog(msg);
+								Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+									Logger::ELoggerLevel::Verbose,
+									msg);
 							}
 
 							results += {record.Key.TypeName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
@@ -116,7 +124,9 @@ namespace Seed
 							msg += L", тест не пройдено, спрацював ассерт: ";
 							msg += ex.AssertMessage;
 
-							toCoreLog(msg);
+							Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+								Logger::ELoggerLevel::Warning,
+								msg);
 							msg.Resize(0);
 						}
 
@@ -136,7 +146,9 @@ namespace Seed
 							msg += L", тест не пройдено, виникло виключення: ";
 							msg += ex.toString();
 
-							toCoreLog(msg);
+							Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+								Logger::ELoggerLevel::Warning,
+								msg);
 							msg.Resize(0);
 						}
 
@@ -155,7 +167,9 @@ namespace Seed
 							msg += L" tiks";
 							msg += L", тест не пройдено, виникло невідоме виключення";
 
-							toCoreLog(msg);
+							Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+								Logger::ELoggerLevel::Error,
+								msg);
 							msg.Resize(0);
 						}
 						results += {record.Key.TypeName, TestResult::EStatus::Exception, L"Uknown", testDurration};

@@ -42,7 +42,7 @@ namespace Seed
 					virtual void Dispose();
 
 				private:
-					String SetLogLevelName(String& msg, Logger::ELoggerLevel logLevel) {
+					void SetLogLevelName(String& msg, Logger::ELoggerLevel logLevel) {
 						if (logLevel == Logger::ELoggerLevel::Critical)
 							msg += L"Critical";
 						else if (logLevel == Logger::ELoggerLevel::Verbose)

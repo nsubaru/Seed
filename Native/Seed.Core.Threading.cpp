@@ -10,8 +10,7 @@
 #include "Seed.Core.Threading.Threadables.h"
 #include "Seed.Core.Threading.SystemThreadPool.h"
 
-#include "Seed.Core.CoreLog.h"
-#include "Seed.Core.CoreLog.Managed.h"
+#include "Seed.Core.Logger.StaticLogger.Managed.h"
 
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"
@@ -135,16 +134,22 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile ET
 			entryPoint();
 		}
 		catch (Exceptions::InteruptException&) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" був перерваний");
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Verbose,
+				L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" був перерваний");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception & ex) {
-			toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
 			status = STATUS_UNHANDLED_EXCEPTION;
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Error,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -155,12 +160,16 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, Thread* thread, volatile ET
 	}
 	catch (Exception& ex)
 	{
-		toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
+		Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Error,
+			L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
 		status = STATUS_UNHANDLED_EXCEPTION;
 	}
 	catch (...)
 	{
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Error,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;
@@ -231,7 +240,9 @@ namespace Seed
 				//Interupt and wait for interupting each exist theradable
 				AllActiveThreadable->ForEach([] (SmartPtr<IThreadable>& thread) InlineLambda
 				{
-					toCoreLog(L"Помилка: Потік з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
+					Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+						Logger::ELoggerLevel::Critical,
+						L"Помилка: Потік з ID: " + String::toString(thread->GetID()) + L" та з міткою: \"" + thread->GetName() + L"\" примусово зупиняється внаслідок завершення ядра");
 					thread->Interupt()
 						.Join(CurrentSettings().Threading.Thread.StopKernelThreadsTimeout);
 				});
@@ -303,7 +314,8 @@ namespace Seed
 				this->This->TID = reinterpret_cast<SizeT>(id.UniqueThread);
 
 				if (CurrentSettings().Threading.Thread.ThreadCreatingLogging) {
-					toCoreLog(
+					Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+						Logger::ELoggerLevel::Verbose,
 						String::Combine({ L"Запуск потоку з ім'ям \"", 
 							this->GetName(), 
 							L"\" з ID ", 
@@ -663,11 +675,15 @@ VOID NTAPI UnifiedThreadPoolJobsCleanupCallback(
 			delete jobObj;
 		}
 		catch (Exception& ex) {
-			toCoreLog(L"Виникла помилка при знищенні об'єкта задачі в пулі, деталі: ", ex);
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"Виникла помилка при знищенні об'єкта задачі в пулі, деталі: " + ex.toString());
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Невідома помилка при знищенні об'єкта задачі в пулі");
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Невідома помилка при знищенні об'єкта задачі в пулі");
 	}
 
 	DestroyTls();
@@ -692,11 +708,15 @@ VOID NTAPI UnifiedThreadPoolTasksCleanupCallback(
 			delete This;
 		}
 		catch (Exception& ex) {
-			toCoreLog(L"Виникла помилка при знищенні об'єкта задачі в пулі, деталі: ", ex);
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"Виникла помилка при знищенні об'єкта задачі в пулі, деталі: " + ex.toString());
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Невідома помилка при знищенні об'єкта задачі в пулі");
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Невідома помилка при знищенні об'єкта задачі в пулі");
 	}
 	DestroyTls();
 }
@@ -993,16 +1013,23 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolJob* threa
 			entryPoint();
 		}
 		catch (Exceptions::InteruptException&) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Warning,
+				L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
+
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception& ex) {
-			toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
 			status = STATUS_UNHANDLED_EXCEPTION;
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -1013,12 +1040,16 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolJob* threa
 	}
 	catch (Exception& ex)
 	{
-		toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
+		Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
 		status = STATUS_UNHANDLED_EXCEPTION;
 	}
 	catch (...)
 	{
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;
@@ -1212,16 +1243,22 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolScheduledT
 			entryPoint();
 		}
 		catch (Exceptions::InteruptException&) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Warning,
+				L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L"був перерваний");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception& ex) {
-			toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
 			status = STATUS_UNHANDLED_EXCEPTION;
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -1231,12 +1268,16 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, UnifiedThreadPoolScheduledT
 	}
 	catch (Exception& ex)
 	{
-		toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
+		Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
 		status = STATUS_UNHANDLED_EXCEPTION;
 	}
 	catch (...)
 	{
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;
@@ -1315,11 +1356,15 @@ VOID NTAPI UnifiedTaskShedulerTaskCallback(
 			}
 		}
 		catch (Exception& ex) {
-			toCoreLog(L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:", ex);
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:" + ex.toString());
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Виникла невідома помилка при обробці асинхроної операції в пулі потоків");
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Виникла невідома помилка при обробці асинхроної операції в пулі потоків");
 	}
 
 	//Destroy tls only if it created before deleting job obj
@@ -1454,16 +1499,22 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, const UnifiedThreadPoolIoTa
 			entryPoint();
 		}
 		catch (Exceptions::InteruptException&) {
-			toCoreLog(L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" був призупинений");
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Warning,
+				L"Потік з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" був призупинений");
 			status = STATUS_THREAD_IS_TERMINATING;
 		}
 		catch (Exceptions::Exception& ex) {
-			toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" виникла помилка " + ex.toString());
 			status = STATUS_UNHANDLED_EXCEPTION;
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 
@@ -1473,12 +1524,16 @@ static NTSTATUS EntryPoint(EntryPointT&& entryPoint, const UnifiedThreadPoolIoTa
 	}
 	catch (Exception& ex)
 	{
-		toCoreLog(L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
+		Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"В потоці з іменем " + GetThisThreadable()->GetName() + L" та id " + String::toString(GetThisThreadable()->GetID()) + L" при виключені, виникла помилка " + ex.toString());
 		status = STATUS_UNHANDLED_EXCEPTION;
 	}
 	catch (...)
 	{
-		toCoreLog(L"Непередбачувана помилка в " __FUNCSIG__);
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Непередбачувана помилка в " __FUNCSIG__);
 		status = STATUS_INTERNAL_ERROR;
 	}
 	return status;
@@ -1512,11 +1567,15 @@ VOID NTAPI IoThreadPoolCallback(
 			Deref(irp);
 		}
 		catch (Exception& ex) {
-			toCoreLog(L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:", ex);
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+				Logger::ELoggerLevel::Error,
+				L"Виникла помилка при обробці асинхроної операці в пулі потоків, деталі:" + ex.toString());
 		}
 	}
 	catch (...) {
-		toCoreLog(L"Виникла невідома помилка при обробці асинхроної операції в пулі потоків");
+		Logger::StaticLogger<Logger::EStaticSubsystems::ThreadingAPI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Виникла невідома помилка при обробці асинхроної операції в пулі потоків");
 	}
 }
 

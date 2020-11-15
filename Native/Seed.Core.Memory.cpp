@@ -10,8 +10,7 @@
 
 #include "Seed.Core.Exceptions.h"
 
-#include "Seed.Core.CoreLog.h"
-#include "Seed.Core.CoreLog.Managed.h"
+#include "Seed.Core.Logger.StaticLogger.Managed.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
@@ -71,7 +70,9 @@ void LogAllocating(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)
 	str += L" байт з кучі ";
 	str += HeapName;
 	str += L".";
-	toCoreLog(str);
+	Logger::StaticManagedLogger<Logger::EStaticSubsystems::MemoryAPI>::toLog(
+		Logger::ELoggerLevel::Verbose,
+		str);
 }
 
 template<SizeT HeapNameSize>
@@ -85,7 +86,9 @@ void LogFree(SizeT MemBlkSize, SizeT MemBlkIndex, const wchar_t(&HeapName)[HeapN
 	str += L" байт з кучі ";
 	str += HeapName;
 	str += L".";
-	toCoreLog(str);
+	Logger::StaticManagedLogger<Logger::EStaticSubsystems::MemoryAPI>::toLog(
+		Logger::ELoggerLevel::Verbose,
+		str);
 }
 #pragma endregion
 
@@ -121,7 +124,9 @@ Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 void Seed::Core::Memory::Heap::Stop() noexcept
 {
 	if (HeapData.AllocatedMemBlksCount > 0)
-		toCoreLog(L"Попередження: виявлено утічку пам'яті в стандартній кучі");
+		Logger::StaticLogger<Logger::EStaticSubsystems::MemoryAPI>::toLog(
+			Logger::ELoggerLevel::Warning,
+			L"Попередження: виявлено утічку пам'яті в стандартній кучі");
 	RtlDestroyHeap(HeapData.HeapHandle);
 }
 
@@ -325,7 +330,9 @@ Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 void Seed::Core::Memory::SensitiveDataHeap::Stop() noexcept
 {
 	if (SecureHeapData.AllocatedMemBlksCount > 0)
-		toCoreLog(L"Попередження: виявлено утічку пам'яті в захищеній кучі");
+		Logger::StaticLogger<Logger::EStaticSubsystems::MemoryAPI>::toLog(
+			Logger::ELoggerLevel::Verbose,
+			L"Попередження: виявлено утічку пам'яті в захищеній кучі");
 	RtlDestroyHeap(SecureHeapData.HeapHandle);
 }
 
@@ -603,7 +610,9 @@ Seed::Boolean Seed::Core::Memory::Init()
 {
 	Memory::Heap::Init();
 	Memory::SensitiveDataHeap::Init();
-	toCoreLog(L"Підсистема оперативної пам'яті ініціалізована");
+	Logger::StaticLogger<Logger::EStaticSubsystems::MemoryAPI>::toLog(
+		Logger::ELoggerLevel::Verbose,
+		L"Підсистема оперативної пам'яті ініціалізована");
 	return true;
 }
 
@@ -611,7 +620,9 @@ void Seed::Core::Memory::Stop()
 {
 	Memory::SensitiveDataHeap::Stop();
 	Memory::Heap::Stop();
-	toCoreLog(L"Підсистема оперативної пам'яті зупинена успішно");
+	Logger::StaticLogger<Logger::EStaticSubsystems::MemoryAPI>::toLog(
+		Logger::ELoggerLevel::Verbose,
+		L"Підсистема оперативної пам'яті зупинена успішно");
 }
 
 Seed::Boolean Seed::Core::Init::MemoryManagment() noexcept {

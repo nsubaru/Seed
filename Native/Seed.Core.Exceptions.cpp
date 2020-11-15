@@ -2,8 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "Seed.Core.Exceptions.h"
-#include "Seed.Core.CoreLog.h"
-#include "Seed.Core.CoreLog.Managed.h"
+#include "Seed.Core.Logger.StaticLogger.Managed.h"
 #include "Seed.Core.Init.h"
 #include "Seed.Core.Stop.h"
 
@@ -238,11 +237,17 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 			Throw(Seed::Exceptions::DivideByZero(ExceptionPosition));
 	#if !(PreReleaseMode || DebugMode)
 		case STATUS_BREAKPOINT:
-			Seed::toCoreLog(L"Критична помилка: Відбувається відлагодження");
+			Logger::StaticLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+				Logger::ELoggerLevel::Critical,
+				L"Критична помилка: Відбувається відлагодження");
+
 			break;
 	#endif
 		case STATUS_HEAP_CORRUPTION:
-			Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
+			Logger::StaticLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+				Logger::ELoggerLevel::Critical,
+				L"Критична помилка: Куча пам'яті пошкоджена");
+
 	#if (PreReleaseMode || DebugMode)
 			if(NtCurrentPeb()->BeingDebugged == TRUE)
 				__debugbreak();
@@ -251,7 +256,10 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 			break;
 		case STATUS_ACCESS_VIOLATION:
 		{
-			Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+			Logger::StaticLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+				Logger::ELoggerLevel::Critical,
+				L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+
 	#if (PreReleaseMode || DebugMode)
 			if(NtCurrentPeb()->BeingDebugged == TRUE)
 				__debugbreak();
@@ -280,7 +288,10 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 			Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
 			str +=
 				Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
-			Seed::toCoreLog(str);
+			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+				Logger::ELoggerLevel::Critical,
+				str);
+
 	#if (PreReleaseMode || DebugMode)
 			if(NtCurrentPeb()->BeingDebugged == TRUE)
 				__debugbreak();
@@ -298,7 +309,13 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 ) {
     using SafeString = BaseString<Memory::ExceptionHeap>;
     Exception::ExeptionLocation location{ File,Function,Line };
-    toCoreLog(SafeString(L"Аварійне завершення ядра. Причина ") + SafeString(Reason) + SafeString(L". Розташування виклику: ") + location.toString());
+	Logger::StaticManagedLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+		Logger::ELoggerLevel::Critical,
+		L"Аварійне завершення ядра. Причина " + 
+		SafeString(Reason) + 
+		SafeString(L". Розташування виклику: ") + 
+		location.toString());
+
     NtTerminateProcess(NtCurrentProcess(), STATUS_INTERNAL_ERROR);
 }
 
@@ -461,11 +478,17 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 		Throw(Seed::Exceptions::DivideByZero(ExceptionPosition));
 #if !(PreReleaseMode || DebugMode)
 	case STATUS_BREAKPOINT:
-		Seed::toCoreLog(L"Критична помилка: Відбувається відлагодження");
+		Logger::StaticLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Критична помилка: Відбувається відлагодження");
+
 		break;
 #endif
 	case STATUS_HEAP_CORRUPTION:
-		Seed::toCoreLog(L"Критична помилка: Куча пам'яті пошкоджена");
+		Logger::StaticLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Критична помилка: Куча пам'яті пошкоджена");
+
 #if (PreReleaseMode || DebugMode)
 		if(NtCurrentPeb()->BeingDebugged == TRUE)
 			__debugbreak();
@@ -474,7 +497,10 @@ LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
 		break;
 	case STATUS_ACCESS_VIOLATION:
 	{
-		Seed::toCoreLog(L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+		Logger::StaticLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
+			Logger::ELoggerLevel::Critical,
+			L"Критична помилка: Спроба використати не існуючу ділянку пам'яті");
+
 #if (PreReleaseMode || DebugMode)
 		if(NtCurrentPeb()->BeingDebugged == TRUE)
 			__debugbreak();

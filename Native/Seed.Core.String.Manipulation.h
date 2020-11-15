@@ -362,7 +362,7 @@ namespace Seed
                 Containers::BaseList<THeap, TBaseString> Split(const TBaseString Delim, SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
                     const TBaseString* This = static_cast<const TBaseString*>(this);
 
-                    if(Delim.Lenght == 0)
+                    if(Delim.FullLenght == 0)
                         return  Containers::BaseList<THeap, TBaseString>({ *This });
 
                     if (This->str == nullptr)
@@ -371,7 +371,7 @@ namespace Seed
                     if (This->CurrentSize == 0)
                         return Containers::BaseList<THeap, TBaseString>();
 
-                    if(This->CurrentSize <= Delim.Size)
+                    if(This->CurrentSize <= Delim.FullLenght)
                         return Containers::BaseList<THeap, TBaseString>();
 
                     if (EndPos > This->Lenght) 

@@ -2,6 +2,7 @@
 #include "Seed.Core.Logger.StaticLogger.h"
 
 #include "Seed.Core.String.h"
+#include "Seed.Core.CoreLog.Managed.h"
 
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
@@ -56,7 +57,7 @@ namespace Seed {
 					UChar buffer[MaxLogMessage];
 					CStr::Copy((UChar*)header.Raw(), buffer);
 					
-					if (Msg.Lenght > MaxLogMessage - (header.Count * sizeof(UChar))) {
+					if (msg.Lenght > MaxLogMessage - (header.Count * sizeof(UChar))) {
 						auto str = msg.Clone().Resize(((MaxLogMessage - 1) - (header.Count * sizeof(UChar))) - 3);
 						str += "...";
 

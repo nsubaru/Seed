@@ -71,7 +71,9 @@ namespace Seed {
 
 					CStr::Copy((UChar*)header.Raw(), buffer);
 
-					if constexpr (Lenght * sizeof(UChar) >= 4095 - (header.Count * sizeof(UChar))) {
+					constexpr SizeT headerSize = ((header.Count - 1) * sizeof(UChar));
+
+					if constexpr (Lenght * sizeof(UChar) >= 4095 - headerSize) {
 						Memory::Copy(
 							(UChar*)Msg, 
 							buffer + (header.Count * sizeof(UChar)), 
@@ -83,10 +85,10 @@ namespace Seed {
 						buffer[MaxLogMessage - 1] = L'\0';
 					}
 					else {
-						CStr::Copy((UChar*)Msg, buffer + (header.Count * sizeof(UChar)));
+						CStr::Copy((UChar*)Msg, buffer + headerSize);
 					}
 
-					toCoreLog(buffer, (header.Count * sizeof(UChar) + Lenght));
+					toCoreLog(buffer, headerSize + (sizeof(UChar) * Lenght));
 				}
 			};
 		}

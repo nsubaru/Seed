@@ -262,7 +262,7 @@ namespace Seed {
 			SizeT GetCharStrSize() {
 				switch (data->DataType) {
 				case Data::DataTypes::String:
-					return data->Text.Size;
+					return data->Text.Size.Bytes;
 				case Data::DataTypes::ParentToken:
 					return data->ParentToken.RawTextSize;
 				}
