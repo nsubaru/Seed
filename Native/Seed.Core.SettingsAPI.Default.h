@@ -103,6 +103,17 @@ namespace Seed {
 							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout = Time::TimeSpan(60 * Time::SecondInNtTime);
 						}
 					}
+					{
+						//Логер ядра
+#ifdef PreReleaseMode
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::BootLoaderAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+#elif DebugMode
+
+#else //Release
+
+#endif
+					}
 
 					//Поточна версія ядра
 					DefaultSettings.SettingsVersion = CurrentSettings::GetCurrentKernelVersion();

@@ -2,6 +2,10 @@
 
 #include "Seed.Core.Testing.Tests.IO.FS.AsyncFile.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 using namespace Seed;
 
 class FinishWriteCallback : public Core::IO::IFinishWriteCallback<Core::Containers::Blob> {
@@ -369,3 +373,5 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::TwoWritesAsyncFile::Excecute(
 
     return true;
 }
+
+#pragma warning(pop)

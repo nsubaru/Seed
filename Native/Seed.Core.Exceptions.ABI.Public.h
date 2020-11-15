@@ -1,8 +1,5 @@
 #pragma once
-#include "Seed.Core.ConstString.h"
-
 #include "Seed.Core.Exceptions.ABI.Base.h"
-
 
 //Implement in public Exception subsystem API use in private ABI
 __declspec(noreturn)

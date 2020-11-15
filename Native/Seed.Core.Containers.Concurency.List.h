@@ -5,7 +5,13 @@
 #include "Seed.Core.Memory.h"
 #include "Seed.Core.Threading.LockPrimitives.h"
 #include "Seed.Core.ConstString.h"
-#include "Seed.Core.Containers.Internals.h"
+#include "Seed.Core.Containers.Internals.h"\
+
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#pragma warning(disable: 4595)
+#pragma warning(disable: 28182)
+#pragma warning(disable: 4172)
 
 namespace Seed {
 	inline namespace Core {
@@ -739,8 +745,6 @@ namespace Seed {
 
 					if (OtherList.This->RefCount == 1) {
 					//Ignore OtherList.This->root == null as if it true than OtherList.This->size == 0
-#pragma warning(push)
-#pragma warning(disable: 28182)
 						return this->This->lock.ExclusiveLock([&]() -> BaseConcurencyList& InlineLambda {
 							__assume(OtherList.This->root != nullptr);
 							auto item = OtherList.This->root;
@@ -758,7 +762,6 @@ namespace Seed {
 							OtherList.This->size = 0;
 							return *this;
 							});
-#pragma warning(pop)
 					}
 					else {
 						return *this += OtherList;
@@ -1120,8 +1123,6 @@ namespace Seed {
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
                 friend class LINQ::IAssociableCollection;
 			protected:
-#pragma warning(push)
-#pragma warning(disable: 4172)
 				template<typename TLambda>
 				BaseConcurencyList& ForEachImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
@@ -1837,7 +1838,6 @@ namespace Seed {
 						return selectedCount;
 						});
 				}
-#pragma warning(pop)
 			};
 
 #pragma endregion
@@ -1892,3 +1892,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

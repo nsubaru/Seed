@@ -105,24 +105,24 @@ namespace Seed
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return
-									CTTI::Details::CreateTypeStr(L"[") +
+									Core::Details::CreateTypeStr(L"[") +
 									FieldMetaData.FieldName +
-									CTTI::Details::CreateTypeStr(L"-") +
+									Core::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>() +
-									CTTI::Details::CreateTypeStr(L"]")
+									Core::Details::CreateTypeStr(L"]")
 									+
 									TypeHintFieldsImp<I + 1>();
 							else
 								return
-									CTTI::Details::CreateTypeStr(L"[") +
+									Core::Details::CreateTypeStr(L"[") +
 									FieldMetaData.FieldName +
-									CTTI::Details::CreateTypeStr(L"-") +
+									Core::Details::CreateTypeStr(L"-") +
 									CTTI::TypeName<Type>() +
-									CTTI::Details::CreateTypeStr(L"]");
+									Core::Details::CreateTypeStr(L"]");
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr(L"");
+							return Core::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -142,7 +142,7 @@ namespace Seed
 						}
 						else
 						{
-							return CTTI::Details::CreateTypeStr(L"");
+							return Core::Details::CreateTypeStr(L"");
 						}
 					}
 
@@ -169,24 +169,24 @@ namespace Seed
 
 					ForceInline static constexpr auto ConstexprSize() {
 						return
-							CTTI::Details::CreateTypeStr(L"0");
+							Core::Details::CreateTypeStr(L"0");
 					}
 
 					ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr(L"{") +
+                            Core::Details::CreateTypeStr(L"{") +
                             CTTI::TypeName<TStruct>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TStruct>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::ToCharStr<sizeof(TStruct)>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<TStruct>::TypeClass)>() +
+                            Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::ToCharStr<sizeof(TStruct)>() +
+                            Core::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-                            CTTI::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"|") +
                             TypeMetaDataFieldsImp() +
-                            CTTI::Details::CreateTypeStr(L"}");
+                            Core::Details::CreateTypeStr(L"}");
                     }
 
 					template<SizeT I = 0>

@@ -4,6 +4,11 @@
 #include "Seed.Core.Containers.API.LINQ.h"
 #include "Seed.Core.ConstString.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -1121,3 +1126,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

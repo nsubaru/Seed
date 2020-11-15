@@ -309,4 +309,4 @@ Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
 //extern "C" __declspec(allocate("INIT$XLB")) PIMAGE_TLS_CALLBACK g_pAddressOfTLSCallback = TLSCallback;
 //#pragma comment(linker, "/include:g_pAddressOfTLSCallback")
 //
-//#pragma warning(pop)
+#pragma warning(pop)

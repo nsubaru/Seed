@@ -5,6 +5,10 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 using namespace Seed;
 using namespace Seed::Threading;
 using namespace Seed::Threading::Threadables;
@@ -24,3 +28,5 @@ void Seed::Core::Threading::Threadables::UnRegisterThreadThreadable(ThreadableRe
 	UnRegisterIThreadable(MoveRValue(ref));
 	_ReadWriteBarrier();
 }
+
+#pragma warning(pop)

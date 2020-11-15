@@ -5,6 +5,10 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 #pragma runtime_checks("", off)
 #pragma check_stack(off)
 extern __declspec(noreturn, noinline, safebuffers) void InteruptThread();
@@ -135,3 +139,5 @@ IThreadable& Seed::Core::Threading::Threadables::ThreadableUnifiedThreadPoolJobV
 	}
 	return *this;
 }
+
+#pragma warning(pop)

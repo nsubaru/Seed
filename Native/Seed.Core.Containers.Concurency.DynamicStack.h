@@ -7,6 +7,9 @@
 #include "Seed.Core.Threading.LockPrimitives.h"
 #include "Seed.Core.Containers.API.LINQ.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4172)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -219,8 +222,6 @@ namespace Seed {
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
                 friend class LINQ::IAssociableCollection;
 			protected:
-#pragma warning(push)
-#pragma warning(disable: 4172)
 				template<typename Lambda>
 				BaseConcurencyDynamicStack& ForEachImpl(Lambda&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&>) {
@@ -519,3 +520,4 @@ namespace Seed {
 	}
 }
 
+#pragma warning(pop)

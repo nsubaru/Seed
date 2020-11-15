@@ -137,3 +137,5 @@ __forceinline constexpr Seed::SizeT operator "" Sz(const unsigned long long size
 }
 
 #define interface __interface
+
+#pragma warning(pop)

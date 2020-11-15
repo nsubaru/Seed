@@ -698,10 +698,10 @@ namespace Seed
 						(void) object;
 					};
 
-					static constexpr auto CtorArgsTypeName = Seed::Core::CTTI::Details::CreateTypeStr(L"`invalid`");
+					static constexpr auto CtorArgsTypeName = Seed::Core::Details::CreateTypeStr(L"`invalid`");
 
 					static String ArgsMetaData() {
-						return Seed::Core::CTTI::Details::CreateTypeStr(L"`Can not construct`");
+						return Seed::Core::Details::CreateTypeStr(L"`Can not construct`");
 					}
 				};
 
@@ -1585,8 +1585,8 @@ namespace Seed
 		Class, 																					\
 		decltype(&Class::Method), 																\
 		&Class::Method, 																		\
-		decltype(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))							\
-	>(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))										
+		decltype(Seed::Core::Details::CreateTypeStr(L"" #Method))							\
+	>(Seed::Core::Details::CreateTypeStr(L"" #Method))										
 
 
 /// <summary>
@@ -1602,8 +1602,8 @@ namespace Seed
 		Class, 																					\
 		RetType(Class::*)(__VA_ARGS__), 														\
 		&Class::Method, 																		\
-		decltype(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))							\
-	>(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Method))											
+		decltype(Seed::Core::Details::CreateTypeStr(L"" #Method))							\
+	>(Seed::Core::Details::CreateTypeStr(L"" #Method))											
 
 /// <summary>
 /// Опис властивості
@@ -1617,11 +1617,11 @@ namespace Seed
 #define	ObjectProperty(Class, Name, Getter, ...) 												\
 	Seed::Core::Reflection::Details::PropertyDescriptor< 										\
 		Class, 																					\
-		decltype(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Name)), 							\
+		decltype(Seed::Core::Details::CreateTypeStr(L"" #Name)), 							\
 		decltype(&Class::Getter), 																\
 		&Class::Getter, 																		\
 		decltype(ObjectMethodsDefs(__VA_ARGS__))												\
-	>(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Name), ObjectMethodsDefs(__VA_ARGS__))			
+	>(Seed::Core::Details::CreateTypeStr(L"" #Name), ObjectMethodsDefs(__VA_ARGS__))			
 						
 /// <summary>
 /// Опис констора та деструктора

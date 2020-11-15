@@ -11,6 +11,12 @@
 
 #include "Seed.Core.Threading.TLS.GlobalTLSBlock.h"
 
+#include "Seed.Core.Exceptions.ABI.SEH.h"
+#include "Seed.Core.Exceptions.ABI.Defines.h"
+#include "Seed.Core.Exceptions.ABI.Types.h"
+
+#include "Seed.Core.Exceptions.ABI.Public.h"
+
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
@@ -207,14 +213,10 @@ Seed::Core::Memory::DataSizeT Seed::Core::Memory::ExceptionHeap::CurrentHeapUsag
 	return DataSizeT(ExceptionsHeap.CurrentHeapSize);
 }
 
-#pragma warning(pop)
-
 inline ID Seed::Core::Exceptions::Exception::GetTargetThreadID()
 {
 	return reinterpret_cast<ID>(NtCurrentThreadId());
 }
-
-#include "Seed.Core.Exceptions.ABI.Public.h"
 
 __declspec(noreturn)
 void ThrowBadException()
@@ -300,12 +302,6 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
     NtTerminateProcess(NtCurrentProcess(), STATUS_INTERNAL_ERROR);
 }
 
-#include "Seed.Core.Exceptions.ABI.SEH.h"
-#include "Seed.Core.Exceptions.ABI.Defines.h"
-#include "Seed.Core.Exceptions.ABI.Types.h"
-
-#pragma warning(push)
-#pragma warning(disable: 4996)
 
 int ArrayUnwindFilter(EXCEPTION_POINTERS* pExPtrs)
 {
@@ -441,7 +437,6 @@ namespace Seed {
 		}
 	}
 }
-
 
 void StoreInnerException(Exception* outerException, Exception* innnerException) {
 	auto place = GetInnerExceptionObjectPtr(outerException);

@@ -6,21 +6,6 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-//#if !defined(__MAVERICK__) && ((__BYTE_ORDER == __BIG_ENDIAN) || \
-//    (!defined(__VFP_FP__) && (defined(__arm__) || defined(__thumb__))))
-//
-//typedef union
-//{
-//	double value;
-//	struct
-//	{
-//		u_int32_t msw;
-//		u_int32_t lsw;
-//	} parts;
-//} ieee_double_shape_type;
-//
-//#else
-
 typedef union
 {
 	double value;
@@ -31,7 +16,6 @@ typedef union
 	} parts;
 } ieee_double_shape_type;
 
-//#endif
 
 /* Set the more significant 32 bits of a double from an int.  */
 

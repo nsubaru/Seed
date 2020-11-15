@@ -7,6 +7,12 @@
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Containers.API.LINQ.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
+#pragma warning(disable: 4172)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -356,9 +362,6 @@ namespace Seed {
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
                 friend class LINQ::IAssociableCollection;
 			protected:
-#pragma warning(push)
-#pragma warning(disable: 4172)
-
 				template<typename TLambda>
 				BaseConcurencyDynamicQueue& ForEachImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, T&> ||
@@ -727,3 +730,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

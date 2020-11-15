@@ -5,6 +5,11 @@
 #include "Seed.Core.ConstString.h"
 #include "Seed.Core.Containers.Internals.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4172)
+#pragma warning(disable: 6386)
+#pragma warning(disable: 4996)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -75,9 +80,6 @@ namespace Seed {
                 template<typename THeap, typename T, typename Enable>
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 			protected:
-#pragma warning(push)
-#pragma warning(disable: 4172)
-
 				template<typename LambdaT>
 				BaseFixedArray& ForEachImpl(LambdaT&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<LambdaT, void, T&>) {
@@ -269,10 +271,7 @@ namespace Seed {
 					}
 					return *this;
 				}
-#pragma warning(pop)
 			public:
-#pragma warning(push)
-#pragma warning(disable: 6386)
 				/// <summary>
 				/// Пустий конструктор ініціалізовує масив стандартним значенням
 				/// </summary>
@@ -295,7 +294,6 @@ namespace Seed {
 						}
 					}
 				}
-#pragma warning(pop)
 			public:
 				/// <summary>
 				/// Оператор доступу до елементів масиву
@@ -329,8 +327,6 @@ namespace Seed {
 					}
 				}
 
-#pragma warning(push)
-#pragma warning(disable : 4996)
 				/// <summary>
 				/// Клонує об'єкт масиву
 				/// </summary>
@@ -348,7 +344,6 @@ namespace Seed {
 					}
 					return result;
 				}
-#pragma warning(pop)
 				
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
@@ -386,3 +381,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

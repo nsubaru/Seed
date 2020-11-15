@@ -7,6 +7,10 @@
 #include "Seed.Core.Threading.DataFlowControler.h"
 #include "Seed.Core.SettingsAPI.h"
 
+#pragma warning(push)
+//Visual Studio bug, next and prev init as this
+#pragma warning(disable: 26495)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -53,9 +57,6 @@ namespace Seed {
 					ForceInline bool hasParent() { return parent; }
 
 					//Конструктори
-#pragma warning(push)
-//Visual Studio bug, next and prev init as this
-#pragma warning(disable: 26495)
 					ForceInline Node(Pair&& data) :
 						data(MoveRValue(data)),
 						prev(this),
@@ -95,7 +96,6 @@ namespace Seed {
 						child(nullptr),
 						parent(nullptr)
 					{}
-#pragma warning(pop)
 				};
 			private:
 				struct Tree : public Memory::Allocator<THeap> {
@@ -831,3 +831,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

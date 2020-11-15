@@ -213,7 +213,7 @@ namespace Seed {
             /// <param name="item">Compile time рядок</param>
             /// <typeparam name="N">Кільість символів</typeparam>
             template<SizeT N>
-            ForceInline BaseString(const CTTI::Details::ConstexprArray<Char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
+            ForceInline BaseString(const Seed::Core::Details::ConstexprArray<Char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (N == 0)
                 {
                     return;

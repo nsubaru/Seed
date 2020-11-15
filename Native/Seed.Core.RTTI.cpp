@@ -5,8 +5,9 @@
 
 #include "Seed.Core.Exceptions.h"
 
-#define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.RTTI.Internals.h"
+
+#define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
 #pragma warning(push)

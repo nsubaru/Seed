@@ -209,9 +209,9 @@ namespace Seed
                     constexpr auto BracketSize = sizeof(L'{') + sizeof(L'}');
                     constexpr auto DelimiterSize = sizeof(L'|');
                     constexpr auto ETypeValueMaxSize =
-                        CTTI::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<CTTI::EType>::UnderlyingTypeMetaData::Max>().Count;
+                        Core::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<CTTI::EType>::UnderlyingTypeMetaData::Max>().Count;
                     constexpr auto SizeTValueMaxSize = 
-                        CTTI::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<SizeT>::Max>().Count;
+                        Core::Details::ToCharStr<CTTI::TypeTraits::CTTITypeMetaData<SizeT>::Max>().Count;
                     
                     auto fullSize = BracketSize +
                         (TypeName.Lenght * sizeof(GetTypeNameCharacterTypeSize)) + DelimiterSize +

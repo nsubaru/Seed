@@ -1,6 +1,10 @@
 #pragma once
 #include "Seed.Core.Reflection.Base.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 namespace Seed
 {
 	inline namespace Core
@@ -77,11 +81,11 @@ namespace Seed
 				public:
 					virtual RTTI::RTTITypeRecord GetValueType() const {
 						if constexpr (Tuple::Count == 1) {
-							static auto type = TypeRecord<typename Tuple::ItemType<0>>();
+							static auto type = ::TypeRecord<typename Tuple::ItemType<0>>();
 							return type;
 						}
 						else {
-							static auto type = TypeRecord<Tuple>();
+							static auto type = ::TypeRecord<Tuple>();
 							return type;
 						}
 					}
@@ -316,3 +320,5 @@ namespace Seed
 		}
 	}
 }
+
+#pragma warning(pop)

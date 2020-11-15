@@ -6,6 +6,10 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 using namespace Seed;
 
 Containers::List<IO::FS::FSObjectInformation> IO::FS::QueryFilesInDirectory(const String& Directory) {
@@ -618,3 +622,5 @@ void IO::FS::File::Delete()&& {
 	if (!NT_SUCCESS(status))
 		Throw(GenericFileException(ExceptionPosition, This->name, L"Can't close file"));
 }
+
+#pragma warning(pop)

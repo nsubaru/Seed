@@ -2,7 +2,6 @@
 #include "Seed.Core.Exceptions.ABI.Base.h"
 #include "Seed.Core.Exceptions.ABI.Defines.h"
 
-
 typedef void (__cdecl* unexpected_handler )();
 typedef void (__cdecl* unexpected_function)();
 

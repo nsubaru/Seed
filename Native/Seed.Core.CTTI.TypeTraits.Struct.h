@@ -119,9 +119,9 @@ namespace Seed
     Seed::Core::CTTI::TypeTraits::Details::FieldTypeData<\
         Struct, \
         decltype(Struct::Name), \
-        decltype(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Name)), \
+        decltype(Seed::Core::Details::CreateTypeStr(L"" #Name)), \
         StructOffsetOfMember(Struct, Name) \
-    >(Seed::Core::CTTI::Details::CreateTypeStr(L"" #Name))
+    >(Seed::Core::Details::CreateTypeStr(L"" #Name))
 
 #define DefStructMetaDataObj(Struct, ...) \
     Seed::Core::CTTI::TypeTraits::Details::MakeCustomStruct<Struct>(__VA_ARGS__)
