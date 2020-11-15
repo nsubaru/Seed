@@ -10,11 +10,21 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Logger {
+			/// <summary>
+			/// Статичний логгер
+			/// </summary>
 			template<EStaticSubsystems TSubsystem>
 			class StaticLogger {
+
 			public:
 				static constexpr SizeT MaxLogMessage = CurrentSettings::SettingsData::KernelLoggerT::MaxKernelLogMsgSize.Bytes;
+
 			public:
+				/// <summary>
+				/// Записати повідомлення в логи
+				/// </summary>
+				/// <param name="logLevel">Тип повідомлення</param>
+				/// <param name="Msg">Повідомлення</param>
 				template<SizeT Lenght>
 				static void toLog(ELoggerLevel logLevel, StaticTextRef<Lenght> Msg) {
 					if (CurrentSettings().KernelLoggerConfiguration.StaticLoggerLevel[TSubsystem] & logLevel) {
@@ -40,6 +50,7 @@ namespace Seed {
 						}
 					}
 				}
+
 			protected:
 				template<ELoggerLevel TLogLevel>
 				constexpr static auto GenerateLogTextHeader() {
@@ -50,6 +61,7 @@ namespace Seed {
 						Logger::GetStaticSubsystemName<TSubsystem>() +
 						Details::CreateTypeStr(L"] ");
 				}
+
 			protected:
 				template<ELoggerLevel TLogLevel, SizeT Lenght>
 				static void toLogWithLevel(StaticTextRef<Lenght> Msg) {

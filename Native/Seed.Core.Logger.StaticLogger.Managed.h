@@ -10,9 +10,18 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Logger {
+			/// <summary>
+			/// Розширений статичний логгер
+			/// </summary>
 			template<EStaticSubsystems TSubsystem>
 			class StaticManagedLogger : public StaticLogger<TSubsystem> {
+
 			public:
+				/// <summary>
+				/// Записати повідомлення в логи
+				/// </summary>
+				/// <param name="logLevel">Тип повідомлення</param>
+				/// <param name="msg">Повідомлення</param>
 				template<typename THeap>
 				static void toLog(ELoggerLevel logLevel, const BaseString<THeap>& msg) {
 					if (CurrentSettings().KernelLoggerConfiguration.StaticLoggerLevel[TSubsystem] & logLevel) {
@@ -38,6 +47,7 @@ namespace Seed {
 						}
 					}
 				}
+
 			protected:
 				template<ELoggerLevel TLogLevel, typename THeap>
 				static void toLogWithLevel(const BaseString<THeap>& msg) {
