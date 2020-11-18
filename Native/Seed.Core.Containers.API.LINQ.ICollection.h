@@ -207,6 +207,7 @@ namespace Seed {
 							Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
 					NewCollection<U> CopyTo(TLambda&& lambda) const {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							ThisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda {
@@ -352,6 +353,7 @@ namespace Seed {
 							Concepts::IsBasedOn<ICollectionGenericBase, NewCollection<T>>
 					NewCollection<U> MoveTo(TLambda&& lambda) {
 						auto ThisCollectionRef = static_cast<const ThisCollection&>(*this);
+
 						if constexpr (NewCollection<U>::IsDynamic == false) {
 							NewCollection<U> Instance = NewCollection<U>(ThisCollectionRef.Count);
 							SizeT Index = 0;
@@ -386,6 +388,149 @@ namespace Seed {
 								});
 							}
 							return Instance;
+						}
+					}
+				public:
+					/// <summary>
+					/// Копіює елементи до фіксованої колекції
+					/// </summary>
+					/// <typeparam name="TNewCollection">Фіксована колекція в яку скопіюються елементи</typeparam>
+					/// <param name="ignoreSizeMismatch">Вказує чи ігнорувати різницю кількості елементів</param>
+					/// <returns>Нову фіксовану колекцію яка містить копію елементів</returns>
+					template<typename TNewFixedCollection,
+						TypeTraits::EnableIfTV<
+						TypeTraits::LogicConst<
+						TypeTraits::IsBasedOnV<IFixedCollectionGenericBase, TNewFixedCollection>&&
+						TypeTraits::IsSameV<typename TNewFixedCollection::DataType, typename TLinq<TCollection<THeap, T>, THeap, T, TIsDynamic, true, TIsConcurencySuport>::DataType>
+						>,
+						bool
+					> = true>
+						TNewFixedCollection CopyToFixed(const Boolean ignoreSizeMismatch = false) {
+						auto thisCollectionRef = static_cast<const TCollection<THeap, T>&>(*this);
+						if (ignoreSizeMismatch)
+						{
+							if (TNewFixedCollection::FixedSize == thisCollectionRef.Count || TNewFixedCollection::FixedSize > thisCollectionRef.Count)
+							{
+								TNewFixedCollection instance;
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda{
+										if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
+										{
+											instance.UnsafeSet(item.Clone(), index);
+										}
+										else
+										{
+											instance.UnsafeSet(T(item), index);
+										}
+									});
+								return instance;
+							}
+							else
+							{
+								TNewFixedCollection instance;
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda{
+									if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
+									{
+										instance.UnsafeSet(item.Clone(), index);
+									}
+									else
+									{
+										instance.UnsafeSet(T(item), index);
+									}
+									}, TNewFixedCollection::FixedSize);
+								return instance;
+							}
+						}
+						else
+						{
+							if (TNewFixedCollection::FixedSize != thisCollectionRef.Count)
+								Internals::Exceptions::ThrowIndexOutOfRange(__FILE__,
+									__FUNCSIG__,
+									__LINE__,
+									thisCollectionRef.Count,
+									TNewFixedCollection::FixedSize);
+							else
+							{
+								TNewFixedCollection instance;
+								thisCollectionRef.ForEach([&] (const T& item, SizeT index) {
+									instance.UnsafeSet(item, index);
+									});
+								return instance;
+							}
+						}
+					}
+
+					/// <summary>
+					/// Копіює елементи до фіксованої колекції
+					/// </summary>
+					/// <typeparam name="TNewCollection">Фіксована колекція в яку скопіюються елементи</typeparam>
+					/// <param name="ignoreSizeMismatch">Вказує чи ігнорувати різницю кількості елементів</param>
+					/// <returns>Нову фіксовану колекцію яка містить копію елементів</returns>
+					template<typename TNewFixedCollection,
+						TypeTraits::EnableIfTV<
+						TypeTraits::LogicConst<
+						TypeTraits::IsBasedOnV<IFixedCollectionGenericBase, TNewFixedCollection>&&
+						TypeTraits::IsSameV<typename TNewFixedCollection::DataType, typename TLinq<TCollection<THeap, T>, THeap, T, TIsDynamic, true, TIsConcurencySuport>::DataType>
+						>,
+						bool
+					> = true>
+						TNewFixedCollection CopyToFixed(Boolean ignoreSizeMismatch = false) const {
+						auto thisCollectionRef = static_cast<const TCollection<THeap, T>&>(*this);
+						if (ignoreSizeMismatch)
+						{
+							if (TNewFixedCollection::FixedSize == thisCollectionRef.Count || TNewFixedCollection::FixedSize > thisCollectionRef.Count)
+							{
+								TNewFixedCollection instance;
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda{
+									if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
+									{
+										instance.UnsafeSet(item.Clone(), index);
+									}
+									else
+									{
+										instance.UnsafeSet(T(item), index);
+									}
+									});
+								return instance;
+							}
+							else
+							{
+								TNewFixedCollection instance;
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda{
+									if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
+									{
+										instance.UnsafeSet(item.Clone(), index);
+									}
+									else
+									{
+										instance.UnsafeSet(T(item), index);
+									}
+									}, TNewFixedCollection::FixedSize);
+								return instance;
+							}
+						}
+						else
+						{
+							if (TNewFixedCollection::FixedSize != thisCollectionRef.Count)
+								Internals::Exceptions::ThrowIndexOutOfRange(__FILE__,
+									__FUNCSIG__,
+									__LINE__,
+									thisCollectionRef.Count,
+									TNewFixedCollection::FixedSize);
+							else
+							{
+								TNewFixedCollection instance;
+								thisCollectionRef.ForEach([&](const T& item, SizeT index) InlineLambda{
+									if constexpr (TypeTraits::IsMemberFunctionPointerV<decltype(&T::Clone)>)
+									{
+										instance.UnsafeSet(item.Clone(), index);
+									}
+									else
+									{
+										instance.UnsafeSet(T(item), index);
+									}
+									});
+								return instance;
+							}
 						}
 					}
 				public:

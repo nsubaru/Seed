@@ -18,6 +18,8 @@ namespace Seed {
 				public Memory::Allocator<THeap>,
 				public IClonable<BaseFixedArray<THeap, TSize, T>>
 			{
+			public: 
+				using RawArray = T(&)[TSize];
 			private:
 				struct Data : public Memory::Allocator<THeap> {
 					Seed::RefCountT RefCount;
@@ -74,6 +76,8 @@ namespace Seed {
 				friend class LINQ::ICollectionBase;
                 template<typename THeap, typename T, typename Enable>
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
+				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
+				friend class LINQ::IFixedCollection;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -295,6 +299,17 @@ namespace Seed {
 						}
 					}
 				}
+
+				/// <summary>
+				/// Конструктор з статичного масиву який копіюється
+				/// </summary>
+				/// <param name="arr">Статичний масив</param>
+				ForceInline constexpr BaseFixedArray(const T(&arr)[TSize]) : This(new Data) {
+					for (SizeT i = 0; i < TSize; i++)
+					{
+						This->array[i] = arr[i];
+					}
+				}
 #pragma warning(pop)
 			public:
 				/// <summary>
@@ -349,12 +364,49 @@ namespace Seed {
 					return result;
 				}
 #pragma warning(pop)
+
+				operator const RawArray () const {
+					return This->array;
+				}
 				
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
 			public:
+				template<typename THeap, typename T, SizeT TSize1, SizeT TSize2>
+				friend BaseFixedArray<THeap, TSize1 + TSize2, T> Combine(
+					const BaseFixedArray<THeap, TSize1, T>& first,
+					const BaseFixedArray<THeap, TSize2, T>& second
+				);
+			public:
 				RefCountClass(BaseFixedArray, This)
 			};
+
+			template<typename THeap, typename T, SizeT TSize1, SizeT TSize2>
+			BaseFixedArray<THeap, TSize1 + TSize2, T> Combine(
+				const BaseFixedArray<THeap, TSize1, T>& first,
+				const BaseFixedArray<THeap, TSize2, T>& second
+			) {
+				BaseFixedArray<THeap, TSize1 + TSize2, T> result;
+
+				if constexpr (TypeTraits::IsPodV<T>)
+				{
+					Memory::Copy(first.This->array, result.This->array, TSize1 * sizeof(T));
+					Memory::Copy(second.This->array, result.This->array + TSize1 * sizeof(T), TSize2 * sizeof(T));
+				}
+				else
+				{
+					for (SizeT i = 0; i < TSize1; i++)
+					{
+						result.This->array[i] = first.This->array[i];
+					}
+					for (SizeT i = 0; i < TSize2; i++)
+					{
+						result.This->array[TSize1 + i] = second.This->array[i];
+					}
+				}
+
+				return result;
+			}
 
 			/// <summary>
 			/// Масив з фіксованою кількістю елементів

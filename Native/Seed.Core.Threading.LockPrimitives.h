@@ -27,7 +27,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T> requires Concepts::IsInvockable<T>
-				ForceInline decltype(auto) ExclusiveLock(T& Funct)
+				ForceInline auto ExclusiveLock(T&& Funct) -> decltype(Funct())
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
@@ -68,7 +68,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T> requires Concepts::IsInvockable<T>
-				ForceInline decltype(auto) ShareLock(T&& Funct)
+				ForceInline auto ShareLock(T&& Funct) -> decltype(Funct())
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{

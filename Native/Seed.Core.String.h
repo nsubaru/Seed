@@ -670,20 +670,20 @@ namespace Seed {
             ///<param name = "Text">Рядковий літерал</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             BaseString operator+(const ConstString& Text) const {
-                if (Text.Size < 2)
+                if (Text.Lenght < 2)
                     return *this;
 
                 BaseString retData;
-                SizeT NewSize = this->Lenght + Text.Size;
+                SizeT NewSize = this->Lenght + Text.Lenght;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                 retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
 
                 if (this->str != nullptr) {
                     Memory::Copy(this->str, retData.str, this->Lenght * sizeof(Char));
-                    Memory::Copy(Text.Str, retData.str + this->Lenght, Text.Size * sizeof(Char));
+                    Memory::Copy(Text.Str, retData.str + this->Lenght, Text.Lenght * sizeof(Char));
                 }
                 else {
-                    Memory::Copy(Text.Str, retData.str, Text.Size * sizeof(Char));
+                    Memory::Copy(Text.Str, retData.str, Text.Lenght * sizeof(Char));
                 }
 
                 retData.CurrentSize = NewSize;
@@ -697,7 +697,7 @@ namespace Seed {
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             ForceInline friend BaseString operator+(const ConstString& Text, const BaseString& Right) {
-                if (Text.Size < 2)
+                if (Text.Lenght < 2)
                     return Right;
                 BaseString retData(Text);
                 retData += Right;
@@ -708,21 +708,27 @@ namespace Seed {
             ///<param name = "Text">Рядковий літерал</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             BaseString operator+(const ConstAString& Text) const {
-                if (Text.Size < 2)
+                if (Text.Lenght < 2)
                     return *this;
                 BaseString retData;
-                SizeT NewSize = this->Lenght + Text.Size;
+
+                SizeT NewSize = this->Lenght + Text.Lenght;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
+
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); 
+                retData.ReservedSize = NewFullSize;
+
                 if (this->str != nullptr)
                     Memory::Copy(this->str, retData.str, (this->Lenght) * sizeof(Char));
+
                 CharStr tempStr = retData.str + this->CurrentSize;
+
                 ACharStr second = (ACharStr)Text.Str;
                 {
                     while (*tempStr++ = *second++);
                 }
+
                 retData.CurrentSize = NewSize;
-                retData.ReservedSize = NewFullSize;
                 return retData;
             }
 
@@ -731,10 +737,12 @@ namespace Seed {
             ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
             ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
             ForceInline friend BaseString operator+(const ConstAString& Text, const BaseString& Right) {
-                if (Text.Size < 2)
+                if (Text.Lenght < 2)
                     return Right;
+
                 BaseString retData(Text);
                 retData += Right;
+
                 return retData;
             }
 #pragma endregion

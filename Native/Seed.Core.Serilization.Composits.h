@@ -158,7 +158,7 @@ namespace Seed
 						
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = typename decltype(FieldMetaData)::Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count){
 								BaseSerlizationHandler<THeap, Type>::SerilizeImpl(
@@ -187,7 +187,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = typename decltype(FieldMetaData)::Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count){
 								BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(
@@ -214,7 +214,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = typename decltype(FieldMetaData)::Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return 
@@ -238,7 +238,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = typename decltype(FieldMetaData)::Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return
@@ -268,7 +268,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = typename decltype(FieldMetaData)::Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return BaseSerlizationHandler<THeap, Type>::TypeMetaData()

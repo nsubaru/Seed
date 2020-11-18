@@ -46,9 +46,8 @@ namespace Seed
                 constexpr T& get() const noexcept { return *_ptr; }
 
                 template<class ...ArgTypes>
-                constexpr auto
-                    operator() (ArgTypes&&... args) const {
-                    return decltype(auto);
+                constexpr auto operator() (ArgTypes&&... args) const {
+                    return decltype(auto) {};
                 }
 
 

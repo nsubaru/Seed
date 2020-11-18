@@ -20,7 +20,7 @@ namespace Seed {
                             true
                         > {
                             static constexpr auto FieldMetaData = StructCttiShema<T>::FieldMetaDataGetter();
-                            static constexpr auto Fields = typename FieldMetaData.DataFields;
+                            static constexpr auto Fields = FieldMetaData.DataFields;
 
                             ForceInline static constexpr decltype(auto) ToTuple(const T& data) {
                                 return FieldMetaData.ToTuple(data);

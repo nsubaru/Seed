@@ -142,7 +142,7 @@ namespace Seed {
 		private:
 			template<typename Lambda>
 			static decltype(auto) GetCurrentSettingData(Lambda&& lambda) {
-				return GetSettingsLock().ShareLock([&] ()
+				return GetSettingsLock().ShareLock([&, lambda = MoveRValue(lambda)] ()
 				{
 					return lambda(GetCurrentSettingDataRaw());
 				});
@@ -150,7 +150,7 @@ namespace Seed {
 
 			template<typename Lambda>
 			static void SetCurrentSettingData(Lambda&& lambda) {
-				GetSettingsLock().ExclusiveLock([&] ()
+				GetSettingsLock().ExclusiveLock([&, lambda = MoveRValue(lambda)] () -> void
 				{
 					lambda(SetCurrentSettingDataRaw());
 				});

@@ -82,6 +82,8 @@ namespace Seed {
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
                 friend class LINQ::IAssociableCollection;
+				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
+				friend class LINQ::IFixedCollection;
 			protected:
 #pragma warning(push)
 #pragma warning(disable: 4172)
@@ -249,7 +251,7 @@ namespace Seed {
 					U result = Value;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						val = lambda(result, This->array[i]);
+						result = lambda(result, This->array[i]);
 					}
 					return MoveRValue(result);
 				}

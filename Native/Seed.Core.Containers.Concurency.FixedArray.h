@@ -20,6 +20,8 @@ namespace Seed {
 				public Memory::Allocator<THeap>,
 				public IClonable<BaseConcurencyFixedArray<THeap, TSize, T>>
 				{
+			public:
+				using RawArray = T(&)[TSize];
 			private:
 				struct Data : public Memory::Allocator<THeap> {
 					Seed::RefCountT RefCount;
@@ -333,6 +335,17 @@ namespace Seed {
 						}
 					}
 				}
+
+				/// <summary>
+				/// Конструктор з статичного масиву який копіюється
+				/// </summary>
+				/// <param name="arr">Статичний масив</param>
+				ForceInline constexpr BaseConcurencyFixedArray(const T(&arr)[TSize]) : This(new Data) {
+					for (SizeT i = 0; i < TSize; i++)
+					{
+						This->array[i] = arr[i];
+					}
+				}
 #pragma warning(pop)
 			public:
 				/// <summary>
@@ -394,6 +407,10 @@ namespace Seed {
 #pragma warning(pop)
 				template<typename U>
 				friend void Seed::Core::Swap(U& A, U& B);
+			public:
+				operator const RawArray() const {
+					return This->array;
+				}
 			public:
 				RefCountClass(BaseConcurencyFixedArray, This)
 			};

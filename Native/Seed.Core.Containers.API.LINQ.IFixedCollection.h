@@ -4,7 +4,8 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
-			namespace LINQ {
+			namespace LINQ
+			{
 				/// <summary>
 				/// Абстракція фіксованої колекції
 				/// </summary>
@@ -15,8 +16,7 @@ namespace Seed {
 				/// <typeparam name="TIsConcurencySuport">Флаг підтримки багатопотоковості колекції</typeparam>
 				template<template<typename, SizeT, typename> typename TCollection, typename THeap, typename T, SizeT TSize, Boolean TIsConcurencySuport>
 				class IFixedCollection :
-					public IFixedCollectionBase<TCollection, THeap, T, TSize, TIsConcurencySuport>
-				{
+					public IFixedCollectionBase<TCollection, THeap, T, TSize, TIsConcurencySuport> {
 				private:
 					using ThisCollection = TCollection<THeap, TSize, T>;
 				public:
@@ -24,7 +24,7 @@ namespace Seed {
 					ForceInline NewCollection<TSize, T> CopyToFixed() {
 						NewCollection<TSize, T> newCollection;
 						ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
-						thisCollection.ForEach([&](const T& Value, SizeT Index) InlineLambda {
+						thisCollection.ForEach([&](const T& Value, SizeT Index) InlineLambda{
 							newCollection.UnsafeSet(Value, Index);
 							});
 						return newCollection;
@@ -34,12 +34,61 @@ namespace Seed {
 					ForceInline NewCollection<TSize, T> CopyToFixed() const {
 						NewCollection<TSize, T> newCollection;
 						const ThisCollection& thisCollection = static_cast<const ThisCollection&>(*this);
-						thisCollection.ForEach([&](const T& Value, SizeT Index) InlineLambda {
+						thisCollection.ForEach([&](const T& Value, SizeT Index) InlineLambda{
 							newCollection.UnsafeSet(Value, Index);
 							});
 						return newCollection;
 					}
+				public:
+					template<template<SizeT, typename> typename NewCollection, typename TLambda>
+					requires (
+						Concepts::IsInvockableReturnSameAs<T, TLambda, const T&> || 
+						Concepts::IsInvockableReturnSameAs<T, TLambda, const T&, SizeT>)
+					ForceInline NewCollection<TSize, T> CopyToFixed(TLambda&& lambda) {
 
+						NewCollection<TSize, T> newCollection;
+						ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
+
+						thisCollection.ForEach([&](const T& Value, SizeT Index) InlineLambda {
+
+							if constexpr (TypeTraits::IsInvockableWithResult<T, TLambda, const T&>)
+							{
+								newCollection.UnsafeSet(lambda(Value), Index);
+							}
+							else
+							{
+								newCollection.UnsafeSet(lambda(Value, Index), Index);
+							}
+							
+							});
+
+						return newCollection;
+					}
+
+					template<template<SizeT, typename> typename NewCollection, typename TLambda> 
+					requires (
+						Concepts::IsInvockableReturnSameAs<TLambda, T, const T&> ||
+						Concepts::IsInvockableReturnSameAs<TLambda, T, const T&, SizeT>)
+					ForceInline NewCollection<TSize, T> CopyToFixed(TLambda&& lambda) const {
+						NewCollection<TSize, T> newCollection;
+						const ThisCollection& thisCollection = static_cast<const ThisCollection&>(*this);
+						
+						thisCollection.ForEach([&](const T& Value, SizeT Index) InlineLambda{
+
+							if constexpr (TypeTraits::IsInvockableWithResult<T, TLambda, const T&>)
+							{
+								newCollection.UnsafeSet(lambda(Value), Index);
+							}
+							else
+							{
+								newCollection.UnsafeSet(lambda(Value, Index), Index);
+							}
+
+						});
+
+						return newCollection;
+					}
+				public:
 					template<template<SizeT, typename> typename NewCollection>
 					ForceInline NewCollection<TSize, T> MoveToFixed() {
 						NewCollection<TSize, T> newCollection;
@@ -69,7 +118,128 @@ namespace Seed {
                                                                         TSize,
                                                                         TNewSize);
 						}
-					} //-V591
+					}
+				public:
+					template<template <typename> typename TNewCollection> requires Concepts::IsBasedOn<ICollectionGenericBase, TNewCollection<T>>
+					TNewCollection<T> CopyTo() {
+						auto thisCollectionRef = static_cast<const ThisCollection&>(*this);
+						
+						if constexpr (TNewCollection<T>::IsDynamic == false)
+						{
+							TNewCollection<T> Instance = TNewCollection<T>(thisCollectionRef.Count);
+
+							thisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda{
+								Instance.UnsafeSet(Item, Index);
+							});
+
+							return Instance;
+						}
+						else
+						{
+							TNewCollection<T> Instance = TNewCollection<T>();
+
+							thisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda
+							{
+								Instance.UnsafeAdd(Item);
+							});
+
+							return Instance;
+						}
+					}
+
+					template<template <typename> typename TNewCollection, typename TLambda> 
+					requires Concepts::IsBasedOn<ICollectionBase, TNewCollection<T>> && 
+						(TypeTraits::IsInvockable<TLambda, const T&> || TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
+					auto CopyTo(TLambda&& lambda) {
+							auto thisCollectionRef = static_cast<const ThisCollection&>(*this);
+							
+							using U = typename TypeTraits::ConditionV<
+								TypeTraits::IsInvockable<TLambda, const T&>,
+								TypeTraits::InvockableResult<TLambda, const T&>,
+								TypeTraits::InvockableResult<TLambda, const T&, SizeT>>;
+
+							if constexpr (TNewCollection<U>::IsDynamic == false)
+							{
+								TNewCollection<U> Instance = TNewCollection<U>(thisCollectionRef.Count);
+
+								thisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda{
+									Instance.UnsafeSet(lambda(Item), Index);
+									});
+
+								return Instance;
+							}
+							else
+							{
+								TNewCollection<U> Instance = TNewCollection<U>();
+
+								thisCollectionRef.ForEach([&](const T& Item) InlineLambda
+									{
+										Instance.UnsafeAdd(lambda(Item));
+									});
+
+								return Instance;
+							}
+						}
+				public:
+					template<template <typename> typename TNewCollection> requires Concepts::IsBasedOn<ICollectionGenericBase, TNewCollection<T>>
+						TNewCollection<T> CopyTo() const {
+							auto thisCollectionRef = static_cast<const ThisCollection&>(*this);
+
+							if constexpr (TNewCollection<T>::IsDynamic == false)
+							{
+								TNewCollection<T> Instance = TNewCollection<T>(thisCollectionRef.Count);
+								thisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda{
+									Instance.UnsafeSet(lambda(Item), Index);
+									});
+
+								return Instance;
+							}
+							else
+							{
+								TNewCollection<T> Instance = TNewCollection<T>();
+
+								thisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda
+									{
+										Instance.UnsafeAdd(lambda(Item));
+									});
+
+								return Instance;
+							}
+						}
+
+						template<template <typename> typename TNewCollection, typename TLambda>
+						requires Concepts::IsBasedOn<ICollectionBase, TNewCollection<T>> &&
+							(TypeTraits::IsInvockable<TLambda, const T&> || TypeTraits::IsInvockable<TLambda, const T&, SizeT>)
+						auto CopyTo(TLambda&& lambda) const {
+							auto thisCollectionRef = static_cast<const ThisCollection&>(*this);
+
+							using U = typename TypeTraits::ConditionV<
+								TypeTraits::IsInvockable<TLambda, const T&>,
+								TypeTraits::InvockableResult<TLambda, const T&>,
+								TypeTraits::InvockableResult<TLambda, const T&, SizeT>>;
+
+							if constexpr (TNewCollection<U>::IsDynamic == false)
+							{
+								TNewCollection<U> Instance = TNewCollection<U>(thisCollectionRef.Count);
+
+								thisCollectionRef.ForEach([&](const T& Item, SizeT Index) InlineLambda{
+									Instance.UnsafeSet(lambda(Item), Index);
+									});
+
+								return Instance;
+							}
+							else
+							{
+								TNewCollection<U> Instance = TNewCollection<U>();
+
+								thisCollectionRef.ForEach([&](const T& Item) InlineLambda
+									{
+										Instance.UnsafeAdd(lambda(Item));
+									});
+
+								return Instance;
+							}
+						}
 				public:
 					template<typename Lambda,
 						TypeTraits::EnableIfTV<

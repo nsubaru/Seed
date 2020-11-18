@@ -39,7 +39,7 @@ namespace Seed {
 				{
 					return Number * ((Number < 0) * (-1i64) + (Number > 0)); //-V2517
 				}
-				static_assert(100L == ConstexprAbs(-100L) && 100L == ConstexprAbs(100L), "Модуль числа Int64 не коректно працює");
+				static_assert(100L == ConstexprAbs((Int64)-100L) && 100L == ConstexprAbs((Int64)100L), "Модуль числа Int64 не коректно працює");
 
 				ForceInline constexpr Seed::Float ConstexprAbs(Seed::Float Number)
 				{
