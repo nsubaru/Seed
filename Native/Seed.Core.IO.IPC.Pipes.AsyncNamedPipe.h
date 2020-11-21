@@ -163,7 +163,7 @@ namespace Seed {
 					protected:
 						virtual void Dispose() override {
 							if (This->poolTask != nullptr) {
-								UnRegisterNtIoObjectInThreadPool(*This->poolTask);
+								this->UnRegisterNtIoObjectInThreadPool(*This->poolTask);
 								delete This->poolTask;
 								This->poolTask = nullptr;
 							}
@@ -177,7 +177,7 @@ namespace Seed {
 						AsyncNamedPipeClient(String&& pipeName, PipeMode mode, Boolean isNoCache, const Threading::UnifiedThreadPool& ownerPool)
 							: This(new Details::BaseAsyncNamedPipeClient(MoveRValue(pipeName), mode, isNoCache)
 						) {
-							This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(ownerPool, This->hPipe));
+							This->poolTask = new Threading::UnifiedThreadPoolIoTask(this->RegisterNtIoObjectInThreadPool(ownerPool, This->hPipe));
 						}
 					public:
 						/// <summary>
@@ -205,17 +205,17 @@ namespace Seed {
 									onFinishReadAction, 
 									MoveRValue(data));
 								// create task object
-								auto task = GetIOTaskFromIRPBase(irp);
+								auto task = this->GetIOTaskFromIRPBase(irp);
 
 								try {
 									// notify about arrived io operation
-									NotifyIoOperation(*This->poolTask);
+									this->NotifyIoOperation(*This->poolTask);
 									// Perfome os specific read operations
-									This->InitAsyncRead(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+									This->InitAsyncRead(MoveRValue(irp), buffer, size, this->GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
 									// If read failed cancel notification
-									CancelNotifyIoOperation(*This->poolTask);
+									this->CancelNotifyIoOperation(*This->poolTask);
 									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
@@ -256,17 +256,17 @@ namespace Seed {
 									onFinishWriteAction, 
 									MoveRValue(data));
 								// create task object
-								auto task = GetIOTaskFromIRPBase(irp);
+								auto task = this->GetIOTaskFromIRPBase(irp);
 
 								try {
 									// notify about arrived io operation
-									NotifyIoOperation(*This->poolTask);
+									this->NotifyIoOperation(*This->poolTask);
 									//Perfome os specific read operations
-									This->InitAsyncWrite(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+									This->InitAsyncWrite(MoveRValue(irp), buffer, size, this->GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
 									// If read failed cancel notification
-									CancelNotifyIoOperation(*This->poolTask);
+									this->CancelNotifyIoOperation(*This->poolTask);
 									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
@@ -383,7 +383,7 @@ namespace Seed {
 					protected:
 						virtual void Dispose() override {
 							if (This->poolTask != nullptr) {
-								UnRegisterNtIoObjectInThreadPool(*This->poolTask);
+								this->UnRegisterNtIoObjectInThreadPool(*This->poolTask);
 								delete This->poolTask;
 								This->poolTask = nullptr;
 							}
@@ -398,7 +398,7 @@ namespace Seed {
 							: This(new Details::BaseAsyncNamedPipeServerInstance(String(name), hPipe, mode, isNoCache))
 						{
 							// Register I/O object in thread pool
-							This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(threadPool, This->hPipe));
+							This->poolTask = new Threading::UnifiedThreadPoolIoTask(this->RegisterNtIoObjectInThreadPool(threadPool, This->hPipe));
 						}
 					protected:
 						void SetInstaceRef(Containers::ConcurencyList<SmartPtr<IAsyncNamedPipeServerInstance>>::Iterator serverRef) {
@@ -419,17 +419,17 @@ namespace Seed {
 									onFinishConnectAction,
 									AsyncNamedPipeServerInstance(*this));
 								// create task object
-								auto task = GetIOTaskFromIRPBase(irp);
+								auto task = this->GetIOTaskFromIRPBase(irp);
 
 								try {
 									// notify about arrived io operation
-									NotifyIoOperation(*This->poolTask);
+									this->NotifyIoOperation(*This->poolTask);
 									// Perfome os specific connect operations
-									This->InitAsyncConnect(MoveRValue(irp), GetReservedPlaceInIrp(irp));
+									This->InitAsyncConnect(MoveRValue(irp), this->GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
 									// If connect failed cancel notification
-									CancelNotifyIoOperation(*This->poolTask);
+									this->CancelNotifyIoOperation(*This->poolTask);
 									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
@@ -470,17 +470,17 @@ namespace Seed {
 									onFinishReadAction,
 									MoveRValue(data));
 								// create task object
-								auto task = GetIOTaskFromIRPBase(irp);
+								auto task = this->GetIOTaskFromIRPBase(irp);
 
 								try {
 									// notify about arrived io operation
-									NotifyIoOperation(*This->poolTask);
+									this->NotifyIoOperation(*This->poolTask);
 									// Perfome os specific read operations
-									This->InitAsyncRead(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+									This->InitAsyncRead(MoveRValue(irp), buffer, size, this->GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
 									// If read failed cancel notification
-									CancelNotifyIoOperation(*This->poolTask);
+									this->CancelNotifyIoOperation(*This->poolTask);
 									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}
@@ -521,17 +521,17 @@ namespace Seed {
 									onFinishWriteAction,
 									MoveRValue(data));
 								// create task object
-								auto task = GetIOTaskFromIRPBase(irp);
+								auto task = this->GetIOTaskFromIRPBase(irp);
 
 								try {
 									// notify about arrived io operation
-									NotifyIoOperation(*This->poolTask);
+									this->NotifyIoOperation(*This->poolTask);
 									// Perfome os specific read operations
-									This->InitAsyncWrite(MoveRValue(irp), buffer, size, GetReservedPlaceInIrp(irp));
+									This->InitAsyncWrite(MoveRValue(irp), buffer, size, this->GetReservedPlaceInIrp(irp));
 								}
 								catch (...) {
 									// If read failed cancel notification
-									CancelNotifyIoOperation(*This->poolTask);
+									this->CancelNotifyIoOperation(*This->poolTask);
 									// and rethrow exception as we don't how handle it
 									ReThrow;
 								}

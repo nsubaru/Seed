@@ -195,7 +195,7 @@ public:
                 args.CallWithArgsFromTuple(f);
             }
             //NOTE: Знищення аргументів(якщо цього не робити то модливі циклічні силки в деяких випадках)
-            args.~Tuple<TArgs...>();
+            args.~V2Tuple<TArgs...>();
         }
         catch ([[maybe_unused]] Seed::InteruptException&) { //-V2010
             isEnded = true;

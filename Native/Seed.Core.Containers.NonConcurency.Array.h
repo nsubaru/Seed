@@ -249,7 +249,7 @@ namespace Seed {
 					U result = Value;
 					for (SizeT i = 0; i < This->count; i++)
 					{
-						val = lambda(result, This->array[i]);
+						result = lambda(result, This->array[i]);
 					}
 					return MoveRValue(result);
 				}
