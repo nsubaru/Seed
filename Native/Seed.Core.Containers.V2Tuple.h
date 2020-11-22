@@ -128,6 +128,10 @@ namespace Seed
 				};
 			}
 
+			/// <summary>
+			/// Кортеж
+			/// </summary>
+			/// <typeparam name="...TTypes">Типи кортежу</typeparam>
 			template<typename ... TTypes>
 			class V2Tuple : LINQ::ITupleGenericBase {
 			private:
@@ -135,54 +139,109 @@ namespace Seed
 			private:
 				TV2Leafs leafs;
 			public:
+				/// <summary>
+				/// Кількість елементів
+				/// </summary>
 				static constexpr SizeT Count = TV2Leafs::Count;
 			public:
+				/// <summary>
+				/// Пустий конструктор
+				/// </summary>
 				constexpr V2Tuple() requires (Concepts::IsDefaultConstructible<TTypes> && ...) : leafs() {}
 			public:
+				/// <summary>
+				/// Конструктор з елементів
+				/// </summary>
 				constexpr V2Tuple(TTypes... data) : leafs(ForwardReference<TTypes>(data)...) {}
 			public:
+				/// <summary>
+				/// Копіювальний конструктор
+				/// </summary>
 				constexpr V2Tuple(const V2Tuple& tuple) : leafs(tuple.leafs) {}
+
+				/// <summary>
+				/// Конструктор переміщення
+				/// </summary>
 				constexpr V2Tuple(V2Tuple&& tuple) : leafs(MoveRValue(tuple.leafs)) {}
 			public:
+				/// <summary>
+				/// Оператор копіювання
+				/// </summary>
+				/// <param name="tuple">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
 				constexpr V2Tuple& operator=(const V2Tuple& tuple) {
 					this->~V2Tuple();
 					this->V2Tuple::V2Tuple(tuple);
 					return *this;
 				}
 
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="tuple">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
 				constexpr V2Tuple& operator=(V2Tuple&& tuple) {
 					this->~V2Tuple();
 					this->V2Tuple::V2Tuple(MoveRValue(tuple));
 					return *this;
 				}
 			public:
+				/// <summary>
+				/// Вертає елемент по індексу
+				/// </summary>
+				/// <typeparam name="Idx"> Індекс елементу від нуля</typeparam>
+				/// <returns> Копію елемента</returns>
 				template<SizeT Idx> 
 					requires (sizeof...(TTypes) > Idx)
 				constexpr decltype(auto) GetByIdx() {
 					return leafs.GetByIdx<Idx>();
 				}
 
+				/// <summary>
+				/// Вертає елемент по індексу
+				/// </summary>
+				/// <typeparam name="Idx"> Індекс елементу від нуля</typeparam>
+				/// <returns> Копію елемента</returns>
 				template<SizeT Idx>
 					requires (sizeof...(TTypes) > Idx)
 				constexpr decltype(auto) GetByIdx() const {
 					return leafs.GetByIdx<Idx>();
 				}
 
+				/// <summary>
+				/// Вертає посилання на елемент по індексу
+				/// </summary>
+				/// <typeparam name="Idx"> Індекс елементу від нуля</typeparam>
+				/// <returns> Посилання на елемента</returns>
 				template<SizeT Idx>
 					requires (sizeof...(TTypes) > Idx)
 				constexpr decltype(auto) GetByIdxAsRef() const {
 					return leafs.GetByIdxAsRef<Idx>();
 				}
 
+				/// <summary>
+				/// Вертає посилання на елемент по індексу
+				/// </summary>
+				/// <typeparam name="Idx"> Індекс елементу від нуля</typeparam>
+				/// <returns> Посилання на елемента</returns>
 				template<SizeT Idx>
 					requires (sizeof...(TTypes) > Idx)
 				constexpr decltype(auto) GetByIdxAsRef() {
 					return leafs.GetByIdxAsRef<Idx>();
 				}
 			public:
+				/// <summary>
+				/// Тип елемента по ідексу
+				/// </summary>
 				template<SizeT Idx>
 				using ItemType = typename TV2Leafs::template TypeByIdx<Idx>;
 			public:
+				/// <summary>
+				/// Викликає функтор f з аргументами з кортежу
+				/// </summary>
+				/// <param name = "f"> Функтор який потрібно викликати </param>
+				/// <typeparam name="F"> Тип функтора</typeparam>
+				/// <returns> Результат функтора якщо він є </returns>
 				template<typename F>
 				constexpr decltype(auto) CallWithArgsFromTuple(F&& f) const {
 					using TExecutor = typename Details::Executor<F, V2Tuple<TTypes...>, typename TypeTraits::Indexer<sizeof...(TTypes)>::template Type>;
@@ -197,6 +256,12 @@ namespace Seed
 					}
 				}
 
+				/// <summary>
+				/// Викликає функтор f з аргументами з кортежу
+				/// </summary>
+				/// <param name = "f"> Функтор який потрібно викликати </param>
+				/// <typeparam name="F"> Тип функтора</typeparam>
+				/// <returns> Результат функтора якщо він є </returns>
 				template<typename F>
 				constexpr decltype(auto) CallWithArgsFromTuple(F&& f) {
 					using TExecutor = typename Details::Executor<
@@ -214,6 +279,12 @@ namespace Seed
 					}
 				}
 			public:
+				/// <summary>
+				/// Конвертує кортеж в інший кортеє використовуючи лямбду конвертор
+				/// </summary>
+				/// <typeparam name="TLambda">Тип лямбди конвертора</typeparam>
+				/// <param name="lambda">Лямбда конвертор</param>
+				/// <returns>Новий кортеж з копією елементів</returns>
                 template<typename TLambda>
                 ForceInline constexpr decltype(auto) ConvertTo(TLambda&& lambda) const {
 					using Convertor = typename Details::Convertor<
@@ -224,6 +295,12 @@ namespace Seed
 					return Convertor::Convert(MoveRValue(lambda), *this);
                 }
 
+				/// <summary>
+				/// Конвертує кортеж в інший кортеє використовуючи лямбду конвертор
+				/// </summary>
+				/// <typeparam name="TLambda">Тип лямбди конвертора</typeparam>
+				/// <param name="lambda">Лямбда конвертор</param>
+				/// <returns>Новий кортеж з копією елементів</returns>
 				template<typename TLambda>
 				ForceInline constexpr decltype(auto) ConvertTo(TLambda&& lambda) {
 					using Convertor = typename Details::Convertor<
@@ -235,32 +312,92 @@ namespace Seed
 				}
 			};
 
+			/// <summary>
+			/// Пустий кортеж
+			/// </summary>
 			template<>
 			class V2Tuple<> : LINQ::ITupleGenericBase {
 			public:
+				/// <summary>
+				/// Пустий конструктор
+				/// </summary>
 				constexpr V2Tuple() {}
-				constexpr V2Tuple(const V2Tuple&) = default;
-				constexpr V2Tuple(V2Tuple&&) = default;
+
+				/// <summary>
+				/// Конструктор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				constexpr V2Tuple(const V2Tuple& orig) = default;
+
+				/// <summary>
+				/// Конструктор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				constexpr V2Tuple(V2Tuple&& orig) = default;
 			public:
-				constexpr V2Tuple& operator=(const V2Tuple&) = default;
-				constexpr V2Tuple& operator=(V2Tuple&&) = default;
+				/// <summary>
+				/// Оператор копіювання
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				constexpr V2Tuple& operator=(const V2Tuple& orig) = default;
+
+				/// <summary>
+				/// Оператор переміщення
+				/// </summary>
+				/// <param name="orig">Оригинал</param>
+				/// <returns>Посилання на поточний об'єкт</returns>
+				constexpr V2Tuple& operator=(V2Tuple&& orig) = default;
 			public:
+				/// <summary>
+				/// Кількість елементів
+				/// </summary>
 				static constexpr SizeT Count = 0;
 			public:
+				/// <summary>
+				/// Викликає функтор f з аргументами з кортежу
+				/// </summary>
+				/// <param name = "f"> Функтор який потрібно викликати </param>
+				/// <typeparam name="F"> Тип функтора</typeparam>
+				/// <returns> Результат функтора якщо він є </returns>
 				template<typename F>
 				constexpr decltype(auto) CallWithArgsFromTuple(F&& f) {
-					return f();
+					if constexpr (TypeTraits::IsSameV<TypeTraits::InvockableResult<F>, void>)
+					{
+						f();
+					}
+					else
+					{
+						return f();
+					}
 				}
 
+				/// <summary>
+				/// Викликає функтор f з аргументами з кортежу
+				/// </summary>
+				/// <param name = "f"> Функтор який потрібно викликати </param>
+				/// <typeparam name="F"> Тип функтора</typeparam>
+				/// <returns> Результат функтора якщо він є </returns>
 				template<typename F>
 				constexpr decltype(auto) CallWithArgsFromTuple(F&& f) const {
-					return f();
+					if constexpr (TypeTraits::IsSameV<TypeTraits::InvockableResult<F>, void>)
+					{
+						f();
+					}
+					else
+					{
+						return f();
+					}
 				}
 			};
 
 			template<typename ... TTypes>
 			V2Tuple(TTypes... data)->V2Tuple<TTypes...>;
 
+			/// <summary>
+			/// Аліас кортежу
+			/// </summary>
+			/// <typeparam name="...TTypes">Типи кортежу</typeparam>
 			template<typename ... TTypes>
 			using Tuple = V2Tuple<TTypes...>;
 		}
