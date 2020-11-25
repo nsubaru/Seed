@@ -372,7 +372,7 @@ namespace Seed
                     if (This->CurrentSize == 0)
                         return Containers::BaseList<THeap, TBaseString>();
 
-                    if(This->CurrentSize <= Delim.Size)
+                    if(This->CurrentSize <= Delim.Lenght)
                         return Containers::BaseList<THeap, TBaseString>();
 
                     if (EndPos > This->Lenght) 

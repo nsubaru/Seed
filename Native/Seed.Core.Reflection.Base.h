@@ -32,7 +32,7 @@ namespace Seed
 				InvlaidDynamicFunctionArgs(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
 					:Exception(File, FunctName, Line, L"Неможливо викликати динамічну функцію з даним набором аргументів") {}
 
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
+				///<summary>Текстове представлення інформації про помилку</summary>
 				virtual ExceptionString toString() const override final {
 					return ExceptionString::Combine({
 						ExceptionString(exceptionName), ExceptionString(L". "),

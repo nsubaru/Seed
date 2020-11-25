@@ -543,7 +543,7 @@ namespace Seed {
             /// <param name="str1">Другий рядок</param>
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             ForceInline StrongOrdering operator<=>(const ConstAString& right) const {
-                auto countedSize = Min(this->Size, right.Lenght);
+                auto countedSize = Min(this->Lenght, right.Lenght);
 
                 for (SizeT i = 0; i < countedSize; i++)
                 {
@@ -556,7 +556,7 @@ namespace Seed {
                     }
                 }
 
-                return (this->Size <=> right.Lenght);
+                return (this->Lenght <=> right.Lenght);
             }
 
             /// <summary>
@@ -566,7 +566,7 @@ namespace Seed {
             /// <returns>ПОрядок першого рядка відносно другого</returns>
             template<SizeT TextLenght>
             ForceInline StrongOrdering operator<=>(StaticATextRef<TextLenght> right) const {
-                auto countedSize = Min(this->Size, TextLenght);
+                auto countedSize = Min(this->Lenght, TextLenght);
 
                 for (SizeT i = 0; i < countedSize; i++)
                 {
@@ -579,7 +579,7 @@ namespace Seed {
                     }
                 }
 
-                return this->Size <=> TextLenght;
+                return this->Lenght <=> TextLenght;
             }
 #pragma endregion
 #pragma region Add operators
@@ -786,7 +786,7 @@ namespace Seed {
                 CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
                 if (this->str != nullptr) {
                     Memory::Copy(this->str, buf, (this->Lenght) * sizeof(Char));
-                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->Lenght, (second.Size) * sizeof(Char));
+                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->Lenght, second.Size.Bytes);
                 }
                 else {
                     Memory::Copy(second.operator const Seed::ConstCharStr(), buf, second.Lenght * sizeof(Char));
@@ -1027,7 +1027,7 @@ namespace Seed {
             /// <summary>
             /// Поточна довжина рядка з нуль-термінатором
             /// </summary>
-            SizeT Property(GetFullLenght) Size;
+            SizeT Property(GetFullLenght) FullLenght;
 
             ///<summary>Вертає істину якщо рядок пустий</summary>
             ForceInline Boolean GetIsEmpty() const { return GetFullLenght() == 0; }

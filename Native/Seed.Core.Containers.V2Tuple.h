@@ -28,12 +28,12 @@ namespace Seed
 				struct V2Leaf {
 					T value;
 
-					constexpr V2Leaf() requires (Concepts::IsDefaultConstructible<T>) : value() {}
+					ForceInline constexpr V2Leaf() requires (Concepts::IsDefaultConstructible<T>) : value() {}
 
-					constexpr V2Leaf(T&& value) : value(ForwardReference<T&&>(value)) {}
+					ForceInline constexpr V2Leaf(T&& value) : value(ForwardReference<T&&>(value)) {}
 
-					constexpr V2Leaf(const V2Leaf& leaf) : value(leaf.value) {}
-					constexpr V2Leaf(V2Leaf&& leaf) : value(ForwardReference<T&&>(leaf.value)) {}
+					ForceInline constexpr V2Leaf(const V2Leaf& leaf) : value(leaf.value) {}
+					ForceInline constexpr V2Leaf(V2Leaf&& leaf) : value(ForwardReference<T&&>(leaf.value)) {}
 				};
 
 				template<typename TIndexer, typename ...TTypes>
@@ -56,25 +56,25 @@ namespace Seed
 
 					template<SizeT Idx> 
 						requires (sizeof...(TTypes) > Idx)
-					constexpr typename TypeByIdx<Idx> GetByIdx() {
+					ForceInline constexpr typename TypeByIdx<Idx> GetByIdx() {
 						return static_cast<V2Leaf<Idx, typename TypeGetter<Idx, TTypes...>::Type>&>(*this).value;
 					}
 
 					template<SizeT Idx> 
 						requires (sizeof...(TTypes) > Idx)
-					constexpr typename TypeByIdx<Idx> GetByIdx() const {
+					ForceInline constexpr typename TypeByIdx<Idx> GetByIdx() const {
 						return static_cast<const V2Leaf<Idx, typename TypeGetter<Idx, TTypes...>::Type>&>(*this).value;
 					}
 
 					template<SizeT Idx>
 						requires (sizeof...(TTypes) > Idx)
-					constexpr typename TypeTraits::AddLvalueReferenceV<TypeTraits::AddConstV<TypeByIdx<Idx>>> GetByIdxAsRef() const {
+					ForceInline constexpr typename TypeTraits::AddLvalueReferenceV<TypeTraits::AddConstV<TypeByIdx<Idx>>> GetByIdxAsRef() const {
 						return static_cast<const V2Leaf<Idx, typename TypeGetter<Idx, TTypes...>::Type>&>(*this).value;
 					}
 
 					template<SizeT Idx>
 						requires (sizeof...(TTypes) > Idx)
-					constexpr typename TypeTraits::AddLvalueReferenceV<TypeByIdx<Idx>> GetByIdxAsRef() {
+					ForceInline constexpr typename TypeTraits::AddLvalueReferenceV<TypeByIdx<Idx>> GetByIdxAsRef() {
 						return static_cast<V2Leaf<Idx, typename TypeGetter<Idx, TTypes...>::Type>&>(*this).value;
 					}
 				};
@@ -90,7 +90,7 @@ namespace Seed
 
 				template<typename F, typename ... TTypes, SizeT ... Idxs>
 				struct Executor<F, V2Tuple<TTypes...>, typename TypeTraits::Indexator<Idxs...>> {
-					constexpr static decltype(auto) Execute(F&& f, const V2Tuple<TTypes...>& tuple) {
+					ForceInline constexpr static decltype(auto) Execute(F&& f, const V2Tuple<TTypes...>& tuple) {
 						if constexpr (TypeTraits::IsSameV<TypeTraits::InvockableResult<F, TTypes...>, void>)
 						{
 							f(tuple.GetByIdx<(sizeof...(TTypes) - 1) - Idxs>()...);
@@ -101,7 +101,7 @@ namespace Seed
 						}
 					}
 
-					constexpr static decltype(auto) Execute(F&& f, V2Tuple<TTypes...>& tuple) {
+					ForceInline constexpr static decltype(auto) Execute(F&& f, V2Tuple<TTypes...>& tuple) {
 						if constexpr (TypeTraits::IsSameV<TypeTraits::InvockableResult<F, TTypes...>, void>)
 						{
 							f(tuple.GetByIdx<(sizeof...(TTypes) - 1) - Idxs>()...);
@@ -118,11 +118,11 @@ namespace Seed
 
 				template<typename F, typename ... TTypes, SizeT ... Idxs>
 				struct Convertor<F, V2Tuple<TTypes...>, typename TypeTraits::Indexator<Idxs...>> {
-					constexpr static decltype(auto) Convert(F&& f, V2Tuple<TTypes...>& tuple) {
+					ForceInline constexpr static decltype(auto) Convert(F&& f, V2Tuple<TTypes...>& tuple) {
 						return V2Tuple<decltype(f(tuple.GetByIdx<Idxs>()))...>(f(tuple.GetByIdx<Idxs>())...);
 					}
 
-					constexpr static decltype(auto) Convert(F&& f, const V2Tuple<TTypes...>& tuple) {
+					ForceInline constexpr static decltype(auto) Convert(F&& f, const V2Tuple<TTypes...>& tuple) {
 						return V2Tuple<decltype(f(tuple.GetByIdx<Idxs>()))...>(f(tuple.GetByIdx<Idxs>())...);
 					}
 				};
@@ -147,29 +147,31 @@ namespace Seed
 				/// <summary>
 				/// Пустий конструктор
 				/// </summary>
-				constexpr V2Tuple() requires (Concepts::IsDefaultConstructible<TTypes> && ...) : leafs() {}
+				ForceInline constexpr V2Tuple() requires (Concepts::IsDefaultConstructible<TTypes> && ...) : leafs() {}
 			public:
 				/// <summary>
 				/// Конструктор з елементів
 				/// </summary>
-				constexpr V2Tuple(TTypes... data) : leafs(ForwardReference<TTypes>(data)...) {}
+				ForceInline constexpr V2Tuple(TTypes... data) : leafs(ForwardReference<TTypes>(data)...) {}
 			public:
 				/// <summary>
 				/// Копіювальний конструктор
 				/// </summary>
-				constexpr V2Tuple(const V2Tuple& tuple) : leafs(tuple.leafs) {}
+				/// <param name="tuple">Оригінал</param>
+				ForceInline constexpr V2Tuple(const V2Tuple& tuple) : leafs(tuple.leafs) {}
 
 				/// <summary>
 				/// Конструктор переміщення
 				/// </summary>
-				constexpr V2Tuple(V2Tuple&& tuple) : leafs(MoveRValue(tuple.leafs)) {}
+				/// <param name="tuple">Оригінал</param>
+				ForceInline constexpr V2Tuple(V2Tuple&& tuple) : leafs(MoveRValue(tuple.leafs)) {}
 			public:
 				/// <summary>
 				/// Оператор копіювання
 				/// </summary>
-				/// <param name="tuple">Оригинал</param>
+				/// <param name="tuple">Оригінал</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				constexpr V2Tuple& operator=(const V2Tuple& tuple) {
+				ForceInline constexpr V2Tuple& operator=(const V2Tuple& tuple) {
 					this->~V2Tuple();
 					this->V2Tuple::V2Tuple(tuple);
 					return *this;
@@ -178,9 +180,9 @@ namespace Seed
 				/// <summary>
 				/// Оператор переміщення
 				/// </summary>
-				/// <param name="tuple">Оригинал</param>
+				/// <param name="tuple">Оригінал</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
-				constexpr V2Tuple& operator=(V2Tuple&& tuple) {
+				ForceInline constexpr V2Tuple& operator=(V2Tuple&& tuple) {
 					this->~V2Tuple();
 					this->V2Tuple::V2Tuple(MoveRValue(tuple));
 					return *this;
@@ -193,7 +195,7 @@ namespace Seed
 				/// <returns> Копію елемента</returns>
 				template<SizeT Idx> 
 					requires (sizeof...(TTypes) > Idx)
-				constexpr decltype(auto) GetByIdx() {
+				ForceInline constexpr decltype(auto) GetByIdx() {
 					return leafs.GetByIdx<Idx>();
 				}
 
@@ -204,7 +206,7 @@ namespace Seed
 				/// <returns> Копію елемента</returns>
 				template<SizeT Idx>
 					requires (sizeof...(TTypes) > Idx)
-				constexpr decltype(auto) GetByIdx() const {
+				ForceInline constexpr decltype(auto) GetByIdx() const {
 					return leafs.GetByIdx<Idx>();
 				}
 
@@ -212,10 +214,10 @@ namespace Seed
 				/// Вертає посилання на елемент по індексу
 				/// </summary>
 				/// <typeparam name="Idx"> Індекс елементу від нуля</typeparam>
-				/// <returns> Посилання на елемента</returns>
+				/// <returns> Посилання на елемент</returns>
 				template<SizeT Idx>
 					requires (sizeof...(TTypes) > Idx)
-				constexpr decltype(auto) GetByIdxAsRef() const {
+				ForceInline constexpr decltype(auto) GetByIdxAsRef() const {
 					return leafs.GetByIdxAsRef<Idx>();
 				}
 
@@ -223,10 +225,10 @@ namespace Seed
 				/// Вертає посилання на елемент по індексу
 				/// </summary>
 				/// <typeparam name="Idx"> Індекс елементу від нуля</typeparam>
-				/// <returns> Посилання на елемента</returns>
+				/// <returns> Константне посилання на елемент</returns>
 				template<SizeT Idx>
 					requires (sizeof...(TTypes) > Idx)
-				constexpr decltype(auto) GetByIdxAsRef() {
+				ForceInline constexpr decltype(auto) GetByIdxAsRef() {
 					return leafs.GetByIdxAsRef<Idx>();
 				}
 			public:
@@ -243,7 +245,7 @@ namespace Seed
 				/// <typeparam name="F"> Тип функтора</typeparam>
 				/// <returns> Результат функтора якщо він є </returns>
 				template<typename F>
-				constexpr decltype(auto) CallWithArgsFromTuple(F&& f) const {
+				ForceInline constexpr decltype(auto) CallWithArgsFromTuple(F&& f) const {
 					using TExecutor = typename Details::Executor<F, V2Tuple<TTypes...>, typename TypeTraits::Indexer<sizeof...(TTypes)>::template Type>;
 
 					if constexpr (TypeTraits::IsSameV<TypeTraits::InvockableResult<F, TTypes...>, void>)
@@ -263,7 +265,7 @@ namespace Seed
 				/// <typeparam name="F"> Тип функтора</typeparam>
 				/// <returns> Результат функтора якщо він є </returns>
 				template<typename F>
-				constexpr decltype(auto) CallWithArgsFromTuple(F&& f) {
+				ForceInline constexpr decltype(auto) CallWithArgsFromTuple(F&& f) {
 					using TExecutor = typename Details::Executor<
 						F, 
 						V2Tuple<TTypes...>, 
@@ -280,7 +282,7 @@ namespace Seed
 				}
 			public:
 				/// <summary>
-				/// Конвертує кортеж в інший кортеє використовуючи лямбду конвертор
+				/// Конвертує кортеж в інший кортеж використовуючи лямбду конвертор
 				/// </summary>
 				/// <typeparam name="TLambda">Тип лямбди конвертора</typeparam>
 				/// <param name="lambda">Лямбда конвертор</param>
@@ -296,7 +298,7 @@ namespace Seed
                 }
 
 				/// <summary>
-				/// Конвертує кортеж в інший кортеє використовуючи лямбду конвертор
+				/// Конвертує кортеж в інший кортеж використовуючи лямбду конвертор
 				/// </summary>
 				/// <typeparam name="TLambda">Тип лямбди конвертора</typeparam>
 				/// <param name="lambda">Лямбда конвертор</param>
@@ -326,26 +328,26 @@ namespace Seed
 				/// <summary>
 				/// Конструктор копіювання
 				/// </summary>
-				/// <param name="orig">Оригинал</param>
+				/// <param name="orig">Оригінал</param>
 				constexpr V2Tuple(const V2Tuple& orig) = default;
 
 				/// <summary>
 				/// Конструктор переміщення
 				/// </summary>
-				/// <param name="orig">Оригинал</param>
+				/// <param name="orig">Оригінал</param>
 				constexpr V2Tuple(V2Tuple&& orig) = default;
 			public:
 				/// <summary>
 				/// Оператор копіювання
 				/// </summary>
-				/// <param name="orig">Оригинал</param>
+				/// <param name="orig">Оригінал</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
 				constexpr V2Tuple& operator=(const V2Tuple& orig) = default;
 
 				/// <summary>
 				/// Оператор переміщення
 				/// </summary>
-				/// <param name="orig">Оригинал</param>
+				/// <param name="orig">Оригінал</param>
 				/// <returns>Посилання на поточний об'єкт</returns>
 				constexpr V2Tuple& operator=(V2Tuple&& orig) = default;
 			public:

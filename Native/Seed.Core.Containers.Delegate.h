@@ -174,6 +174,10 @@ protected:
             }
         }
     }
+private:
+    ForceInline void DestroyArgs(Seed::Containers::Tuple<TArgs...>&& argsTupple) {
+        (void) argsTupple;
+    }
 public:
     //Виконанує функцію, записує що функція запустилась і завершилась,
     //і якщо результат функції на void то і результат запам'ятовує
@@ -194,14 +198,14 @@ public:
             {
                 args.CallWithArgsFromTuple(f);
             }
-            //NOTE: Знищення аргументів(якщо цього не робити то модливі циклічні силки в деяких випадках)
-            args.~V2Tuple<TArgs...>();
+            //NOTE: Знищення аргументів(якщо цього не робити то можливі циклічні силки в деяких випадках)
+            DestroyArgs(Seed::MoveRValue(args));
         }
-        catch ([[maybe_unused]] Seed::InteruptException&) { //-V2010
+        catch ([[maybe_unused]] Seed::InteruptException&) {
             isEnded = true;
             ReThrow;
         }
-        //Якщо зловили якись ексепшн то важаєм що функція завершила свою роботу
+        //Якщо зловили якийсь ексепшн то важаєм що функція завершила свою роботу
         catch ([[maybe_unused]] Seed::Exception&)
         {
             isEnded = true;
@@ -235,9 +239,6 @@ public:
             }
     }
 };
-//
-//template<typename TF, typename ... TArgs>
-//TemplateFunctionT(TF&& f, TArgs&&... args)->TemplateFunctionT<TF&&, Seed::TypeTraits::SpecialDecayT<TArgs>...>;
 
 namespace Seed {
     inline namespace Core {
@@ -246,8 +247,7 @@ namespace Seed {
         /// тим самим дозволяючи її відкладено виконати,
         /// навіть в іншому потоці, apc якогось потоку чи пулі потоків
         /// </summary>
-        class Delegate final : protected IDisposable
-        {
+        class Delegate final : protected IDisposable {
         private:
             //Внутрішня структура в які дані делегата
             struct delegate
