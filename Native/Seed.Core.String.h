@@ -786,7 +786,7 @@ namespace Seed {
                 CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
                 if (this->str != nullptr) {
                     Memory::Copy(this->str, buf, (this->Lenght) * sizeof(Char));
-                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->Lenght, second.Size.Bytes);
+                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->Lenght, second.Lenght);
                 }
                 else {
                     Memory::Copy(second.operator const Seed::ConstCharStr(), buf, second.Lenght * sizeof(Char));
