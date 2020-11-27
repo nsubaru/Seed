@@ -48,7 +48,7 @@ namespace Seed
                 template<class ...ArgTypes>
                 constexpr auto
                     operator() (ArgTypes&&... args) const {
-                    return decltype(auto);
+                    return decltype(auto){};
                 }
 
 

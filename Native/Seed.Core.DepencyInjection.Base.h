@@ -447,10 +447,12 @@ namespace Seed
 					static constexpr auto InterfaceGetter = [] (void* obj) -> void*
 					{
 						return static_cast<TServiceInterface*>(reinterpret_cast<TService*>(obj));
-					}
+					};
 
 					if (rttiRecord.GetRTTITypeInfo().TypeId() != typeid(TService))
+					{
 						Throw(DIRegisterService(ExceptionPosition, CTTI::TypeName<TService>(), typeid(TService)));
+					}
 
 					auto serviceRecord = SmartPtr<ServiceRecord>{ new ServiceRecord(
 						InjectorCtor,

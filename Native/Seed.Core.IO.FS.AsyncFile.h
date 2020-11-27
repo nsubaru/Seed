@@ -61,12 +61,12 @@ namespace Seed {
 				BaseAsyncFile(const Threading::UnifiedThreadPool& ownerPool, String&& path, File::OpeningMode mode, File::OpenDisposition policy, bool ShareWithOs) :
 					This(new Details::BaseAsyncFile(MoveRValue(path), mode, policy, ShareWithOs)
 				) {
-					This->poolTask = new Threading::UnifiedThreadPoolIoTask(RegisterNtIoObjectInThreadPool(ownerPool, This->hFile));
+					This->poolTask = new Threading::UnifiedThreadPoolIoTask(this->RegisterNtIoObjectInThreadPool(ownerPool, This->hFile));
 				}
 			protected:
 				virtual void Dispose() {
 					if (This->poolTask != nullptr) {
-						UnRegisterNtIoObjectInThreadPool(*This->poolTask);
+						this->UnRegisterNtIoObjectInThreadPool(*This->poolTask);
 						delete This->poolTask;
 						This->poolTask = nullptr;
 					}
@@ -104,19 +104,22 @@ namespace Seed {
 						void* buffer = (void*)(const TDataType::DataType*)data;
 						SizeT size = data.Count * sizeof(typename TDataType::DataType);
 						// create irp packet
-						irp = new ReadIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishReadAction, MoveRValue(data));
+						irp = new ReadIRP<TDataType>(
+							SmartPtr<IAsyncIOBase>(static_cast<IAsyncIOBase*&&>(new BaseAsyncFile(*this))),
+							onFinishReadAction, 
+							MoveRValue(data));
 						// create task object
-						auto task = GetIOTaskFromIRPBase(irp);
+						auto task = this->GetIOTaskFromIRPBase(irp);
 
 						try {
 							// notify about arrived io operation
-							NotifyIoOperation(*This->poolTask);
+							this->NotifyIoOperation(*This->poolTask);
 							// Perfome os specific read operations
-							This->InitAsyncRead(MoveRValue(irp), buffer, position, size, GetReservedPlaceInIrp(irp));
+							This->InitAsyncRead(MoveRValue(irp), buffer, position, size, this->GetReservedPlaceInIrp(irp));
 						}
 						catch (...) {
 							// If read failed cancel notification
-							CancelNotifyIoOperation(*This->poolTask);
+							this->CancelNotifyIoOperation(*This->poolTask);
 							// and rethrow exception as we don't how handle it
 							ReThrow;
 						}
@@ -153,19 +156,22 @@ namespace Seed {
 						void* buffer = (void*)(const TDataType::DataType*)data;
 						SizeT size = data.Count * sizeof(typename TDataType::DataType);
 						// create irp packet
-						irp = new WriteIRP<TDataType>(SmartPtr<IAsyncIOBase>((IAsyncIOBase*&&)new AsyncFile(*this)), onFinishWriteAction, MoveRValue(data));
+						irp = new WriteIRP<TDataType>(
+							SmartPtr<IAsyncIOBase>(static_cast<IAsyncIOBase*&&>(new BaseAsyncFile(*this))),
+							onFinishWriteAction, 
+							MoveRValue(data));
 						// create task object
-						auto task = GetIOTaskFromIRPBase(irp);
+						auto task = this->GetIOTaskFromIRPBase(irp);
 						
 						try {
 							// notify about arrived io operation
-							NotifyIoOperation(*This->poolTask);
+							this->NotifyIoOperation(*This->poolTask);
 							// Perfome os specific read operations
-							This->InitAsyncWrite(MoveRValue(irp), buffer, position, size, GetReservedPlaceInIrp(irp));
+							This->InitAsyncWrite(MoveRValue(irp), buffer, position, size, this->GetReservedPlaceInIrp(irp));
 						}
 						catch (...) {
 							// If read failed cancel notification
-							CancelNotifyIoOperation(*This->poolTask);
+							this->CancelNotifyIoOperation(*This->poolTask);
 							// and rethrow exception as we don't how handle it
 							ReThrow;
 						}
@@ -190,7 +196,7 @@ namespace Seed {
 
 					This->DeleteFile();
 
-					UnRegisterNtIoObjectInThreadPool(*This->poolTask);
+					this->UnRegisterNtIoObjectInThreadPool(*This->poolTask);
 					
 					delete This->poolTask;
 					This->poolTask = nullptr;

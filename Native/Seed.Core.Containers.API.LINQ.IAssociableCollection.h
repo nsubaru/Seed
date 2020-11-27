@@ -913,7 +913,7 @@ namespace Seed {
 
 						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
 
-						This.ForEach([&maxItem, lambda = MoveRValue(lambda)](const T& item){
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)](const TPair& item){
 							if (lambda(maxItem) < lambda(item))
 								maxItem = item;
 						});
@@ -932,7 +932,7 @@ namespace Seed {
 
 						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
 
-						This.ForEach([&maxItem] (const T& item){
+						This.ForEach([&maxItem] (const TPair& item){
 							if (maxItem > item)
 								maxItem = item;
 						});
@@ -952,7 +952,7 @@ namespace Seed {
 						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
 						auto maxItem = lambda(This.First([] ([[maybe_unused]] const auto&) { return true; }));
 
-						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const T& item){
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const TPair& item){
 							auto itemValue = lambda(item);
 							if (maxItem > itemValue)
 								maxItem = itemValue;
@@ -973,7 +973,7 @@ namespace Seed {
 						const ThisCollection& This = static_cast<const ThisCollection&>(*this);
 						auto maxItem = This.First([] ([[maybe_unused]] const auto&) { return true; });
 
-						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const T& item) {
+						This.ForEach([&maxItem, lambda = MoveRValue(lambda)] (const TPair& item) {
 							if (lambda(maxItem) > lambda(item))
 								maxItem = item;
 						});

@@ -126,7 +126,7 @@ namespace Seed {
 			__declspec(noinline) extern "C" NTSTATUS NTAPI EntryPoint2(_In_ PVOID ThreadParameter) {
 				BtlrdInPlaceUpdateData* btlrdInPlaceUpdateData = (BtlrdInPlaceUpdateData*)ThreadParameter;
 				UNICODE_STRING str = { 0 };
-				RtlInitUnicodeString(&str, L"ntdll.dll");
+				RtlInitUnicodeString(&str, (PWSTR)L"ntdll.dll");
 				HANDLE ntdll = nullptr;
 				LdrLoadDll(NULL, NULL, &str, &ntdll);
 				Seed::Core::Btlrd::BtldEntryPoint2(ntdll, &LdrGetProcedureAddress, btlrdInPlaceUpdateData);

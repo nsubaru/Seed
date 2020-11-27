@@ -43,7 +43,7 @@ Boolean Seed::Core::Init::Exceptions() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto cfg = CurrentSettings().MemoryManager.ExceptionHeap;
+	const auto& cfg = CurrentSettings().MemoryManager.ExceptionHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
@@ -229,7 +229,7 @@ decltype(typeid(int)) GetBadExceptionTypeId()
 
 void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 {
-    switch (exCode) {
+    switch ((NTSTATUS)exCode) {
 		case STATUS_INTEGER_OVERFLOW:
 			Throw(Seed::Exceptions::IntegerOverflowException(ExceptionPosition));
 		case STATUS_INTEGER_DIVIDE_BY_ZERO:
@@ -456,9 +456,9 @@ void StoreInnerException(Exception* outerException, Exception* innnerException) 
 #pragma region VEH handler
 
 LONG NTAPI FirstVehHandler(_EXCEPTION_POINTERS* ExceptionInfo) {
-	switch (ExceptionInfo->ExceptionRecord->ExceptionCode)
+	switch ((NTSTATUS)ExceptionInfo->ExceptionRecord->ExceptionCode)
 	{
-	case EH_EXCEPTION_NUMBER:
+	case (NTSTATUS)EH_EXCEPTION_NUMBER:
 		return EXCEPTION_CONTINUE_SEARCH;
 	case STATUS_INTEGER_OVERFLOW:
 		Throw(Seed::Exceptions::IntegerOverflowException(ExceptionPosition));

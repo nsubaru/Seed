@@ -182,7 +182,7 @@ namespace Seed {
 				public:
 					DefaultHeapT() {} //-V730
 				public:
-					Memory::DataSizeT GetStartSize() {
+					Memory::DataSizeT GetStartSize() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.DefaultHeap.StartSize;
@@ -195,7 +195,7 @@ namespace Seed {
 						});
 					}
 
-					Memory::DataSizeT GetMaxSize() {
+					Memory::DataSizeT GetMaxSize() const {
 						return GetCurrentSettingData([&] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.DefaultHeap.MaxSize;
@@ -208,7 +208,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapFreeCheck() {
+					Boolean GetHeapFreeCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_FREE_CHECK == 0x1;
@@ -221,7 +221,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapTailCheck() {
+					Boolean GetHeapTailCheck() const {
 						return GetCurrentSettingData([] (auto data) InlineLambda
 						{
 							return data.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_TAIL_CHECK == 0x1;
@@ -234,7 +234,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapArgsCheck() {
+					Boolean GetHeapArgsCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.DefaultHeap.AdditionalÑhecks.HEAP_ARGS_CHECK == 0x1;
@@ -247,7 +247,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapValidationChecks() {
+					Boolean GetHeapValidationChecks() const {
 						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL == 0x1;
@@ -260,7 +260,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapAllocsLogging() {
+					Boolean GetHeapAllocsLogging() const {
 						return GetCurrentSettingData([] (auto& data)
 						{
 							return data.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree;
@@ -308,7 +308,7 @@ namespace Seed {
 				public:
 					SensitiveDataHeapT() {} //-V730
 				public:
-					Memory::DataSizeT GetStartSize() {
+					Memory::DataSizeT GetStartSize() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.StartSize;
@@ -321,7 +321,7 @@ namespace Seed {
 						});
 					}
 
-					Memory::DataSizeT GetMaxSize() {
+					Memory::DataSizeT GetMaxSize() const  {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.MaxSize;
@@ -334,7 +334,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapFreeCheck() {
+					Boolean GetHeapFreeCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_FREE_CHECK == 0x1;
@@ -347,7 +347,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapTailCheck() {
+					Boolean GetHeapTailCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_TAIL_CHECK == 0x1;
@@ -360,7 +360,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapArgsCheck() {
+					Boolean GetHeapArgsCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.SensitiveDataHeap.AdditionalÑhecks.HEAP_ARGS_CHECK == 0x1;
@@ -373,7 +373,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapValidationChecks() {
+					Boolean GetHeapValidationChecks() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL == 0x1;
@@ -386,7 +386,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapAllocsLogging() {
+					Boolean GetHeapAllocsLogging() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.IsLogingAllAllocationAndFree;
@@ -435,7 +435,7 @@ namespace Seed {
 				public:
 					ExceptionHeapT() {} //-V730
 				public:
-					Memory::DataSizeT GetStartSize() {
+					Memory::DataSizeT GetStartSize() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.StartSize;
@@ -448,7 +448,7 @@ namespace Seed {
 						});
 					}
 
-					Memory::DataSizeT GetMaxSize() {
+					Memory::DataSizeT GetMaxSize() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.MaxSize;
@@ -461,7 +461,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapFreeCheck() {
+					Boolean GetHeapFreeCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_FREE_CHECK == 0x1;
@@ -474,7 +474,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapTailCheck() {
+					Boolean GetHeapTailCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_TAIL_CHECK == 0x1;
@@ -487,7 +487,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapArgsCheck() {
+					Boolean GetHeapArgsCheck() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_ARGS_CHECK == 0x1;
@@ -500,7 +500,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetHeapValidationChecks() {
+					Boolean GetHeapValidationChecks() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.MainMemoryManager.ExceptionHeap.AdditionalÑhecks.HEAP_VALIDATE_ALL == 0x1;
@@ -540,16 +540,16 @@ namespace Seed {
 			public:
 				MemoryManagerT() {};
 
-				DefaultHeapT GetDefaultHeap() { return DefaultHeapT(); }
+				DefaultHeapT GetDefaultHeap() const { return DefaultHeapT(); }
 				void SetDefaultHeap(DefaultHeapT) {}
 
-				SensitiveDataHeapT GetSensitiveDataHeap() { return SensitiveDataHeapT(); }
+				SensitiveDataHeapT GetSensitiveDataHeap() const { return SensitiveDataHeapT(); }
 				void SetSensitiveDataHeap(SensitiveDataHeapT) {}
 
-				ExceptionHeapT GetExceptionHeap() { return ExceptionHeapT(); }
+				ExceptionHeapT GetExceptionHeap() const { return ExceptionHeapT(); }
 				void SetExceptionHeap(ExceptionHeapT) {}
 
-				SizeT GetStringReserveSize() {
+				SizeT GetStringReserveSize() const {
 					return GetCurrentSettingData([] (auto& data) InlineLambda
 					{
 						return data.MainMemoryManager.StringReserveSize;
@@ -562,7 +562,7 @@ namespace Seed {
 					});
 				}
 
-				SizeT GetDefaultPriorityQueueMaxSize() {
+				SizeT GetDefaultPriorityQueueMaxSize() const {
 					return GetCurrentSettingData([] (auto& data) InlineLambda
 					{
 						return data.MainMemoryManager.DefaultPriorityQueueMaxSize;
@@ -575,7 +575,7 @@ namespace Seed {
 					});
 				}
 
-				SizeT GetStackReserveSize() {
+				SizeT GetStackReserveSize() const {
 					return GetCurrentSettingData([] (auto& data) InlineLambda
 					{
 						return data.MainMemoryManager.DynamicStackReserveSize;
@@ -588,7 +588,7 @@ namespace Seed {
 					});
 				}
 
-				SizeT GetQueueReserveSize() {
+				SizeT GetQueueReserveSize() const {
 					return GetCurrentSettingData([] (auto& data) InlineLambda
 					{
 						return data.MainMemoryManager.DynamicQueueReserveSize;
@@ -601,7 +601,7 @@ namespace Seed {
 					});
 				}
 
-				SizeT GetDynamicCircularBufferStartSize() {
+				SizeT GetDynamicCircularBufferStartSize() const {
 					return GetCurrentSettingData([] (auto& data) InlineLambda
 					{
 						return data.MainMemoryManager.DynamicCircularBufferStartSize;
@@ -653,7 +653,7 @@ namespace Seed {
 				public:
 					ThreadCfg() {}
 
-					Memory::DataSizeT GetStackStartSize() {
+					Memory::DataSizeT GetStackStartSize() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.Threading.Thread.StackStartSize;
@@ -666,7 +666,7 @@ namespace Seed {
 						});
 					}
 
-					Memory::DataSizeT GetStackMaxSize() {
+					Memory::DataSizeT GetStackMaxSize() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.Threading.Thread.StackMaxSize;
@@ -679,7 +679,7 @@ namespace Seed {
 						});
 					}
 
-					Time::TimeSpan GetStopKernelThreadsTimeout() {
+					Time::TimeSpan GetStopKernelThreadsTimeout() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.Threading.Thread.StopKernelThreadsTimeout;
@@ -692,7 +692,7 @@ namespace Seed {
 						});
 					}
 
-					Boolean GetThreadCreatingLogging() {
+					Boolean GetThreadCreatingLogging() const {
 						return GetCurrentSettingData([](auto& data) InlineLambda
 						{
 							return data.Threading.Thread.ThreadCreatingLogging;
@@ -726,7 +726,7 @@ namespace Seed {
 			public:
 				ThreadingCfgT() {}
 
-				ThreadCfg GetThread() { return ThreadCfg(); }
+				ThreadCfg GetThread() const { return ThreadCfg(); }
 				void SetThread(ThreadCfg) {}
 			public:
 				/// <summary>
@@ -741,7 +741,7 @@ namespace Seed {
 				public:
 					TaskShedulerCfgT() {} //-V730
 
-					Time::TimeSpan GetDefaultTimerProximity() {
+					Time::TimeSpan GetDefaultTimerProximity() const {
 						return GetCurrentSettingData([] (auto& data) InlineLambda
 						{
 							return data.KernelServicesConfig.TaskSheduler.DefaultTimerProximity;
@@ -768,7 +768,7 @@ namespace Seed {
 					/// <summary>
 					/// Òàéìàóò ì³æ çàïóñêàìè òåñò³â
 					/// </summary>
-					Time::TimeSpan GetSelfTestingRetryTimeout() {
+					Time::TimeSpan GetSelfTestingRetryTimeout() const {
 						return GetCurrentSettingData([](auto& CurrentSettingsData) InlineLambda
 						{
 							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout;
@@ -778,7 +778,7 @@ namespace Seed {
 					/// <summary>
 					/// Ê³ëüê³ñòü çáåðåæåííèõ çàïèñ³â ïðî òåñòóâàííÿ
 					/// </summary>
-					UInt32 GetSavedTestsCount() {
+					UInt32 GetSavedTestsCount() const {
 						return GetCurrentSettingData([](auto& CurrentSettingsData) InlineLambda
 						{
 							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount;
@@ -798,7 +798,7 @@ namespace Seed {
 					/// <summary>
 					/// Ê³ëüê³ñòü çáåðåæåííèõ çàïèñ³â ïðî òåñòóâàííÿ
 					/// </summary>
-					void GetSavedTestsCount(UInt32 newValue) {
+					void GetSavedTestsCount(UInt32 newValue) const {
 						SetCurrentSettingData([&](auto& CurrentSettingsData) InlineLambda
 						{
 							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.SavedTestsCount = newValue;
@@ -808,7 +808,7 @@ namespace Seed {
 					/// <summary>
 					/// Âêàçóº ÷è ïîòð³áíî çàïèñóâàòè â ëîãè ³íôîðìàö³þ ïðî ïðîãðåññ âèêîíàííÿ òåñò³â ïðè òåñòóâàí³
 					/// </summary>
-					Boolean GetIsLogTestProcessing() {
+					Boolean GetIsLogTestProcessing() const {
 						return GetCurrentSettingData([](auto& CurrentSettingsData) InlineLambda
 						{
 							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.IsLogTestProcessing;
@@ -818,7 +818,7 @@ namespace Seed {
 					/// <summary>
 					/// Âêàçóº ÷è ïîòð³áíî çàïèñóâàòè â ëîãè ³íôîðìàö³þ ïðî ïðîãðåññ âèêîíàííÿ òåñò³â ïðè òåñòóâàí³
 					/// </summary>
-					void GetIsLogTestProcessing(Boolean newValue) {
+					void GetIsLogTestProcessing(Boolean newValue) const {
 						SetCurrentSettingData([&](auto& CurrentSettingsData) InlineLambda
 						{
 							return CurrentSettingsData.KernelServicesConfig.AutomaticTestingServiceCfg.IsLogTestProcessing = newValue;
@@ -841,10 +841,10 @@ namespace Seed {
 					Boolean Property(GetIsLogTestProcessing, GetIsLogTestProcessing) IsLogTestProcessing;
 				};
 			public:
-				TaskShedulerCfgT GetTaskSheduler() { return TaskShedulerCfgT(); }
+				TaskShedulerCfgT GetTaskSheduler() const { return TaskShedulerCfgT(); }
 				void SetTaskSheduler(TaskShedulerCfgT) {}
 
-				AutomaticTestingSerivceCfgT GetAutomaticTestingSerivceCfg() { return AutomaticTestingSerivceCfgT(); }
+				AutomaticTestingSerivceCfgT GetAutomaticTestingSerivceCfg() const { return AutomaticTestingSerivceCfgT(); }
 				void SetAutomaticTestingSerivceCfg(AutomaticTestingSerivceCfgT) {}
 			public:
 				/// <summary>
@@ -863,11 +863,11 @@ namespace Seed {
 			public:
 				VirtualSettingDataT() {} //-V730
 
-				KernelExcecutableLocationT GetKernelExcecutableLocation() {
+				KernelExcecutableLocationT GetKernelExcecutableLocation() const {
 					return GetVirtualSettingDataRaw().KernelExecutableLocation;
 				}
 
-				UInt64 GetCpuCoresCount() {
+				UInt64 GetCpuCoresCount() const {
 					return GetVirtualSettingDataRaw().CpuCoresCount;
 				}
 			public:
@@ -885,31 +885,31 @@ namespace Seed {
 			public:
 				StaticSettingsDataT() {} //-V730
 
-				constexpr Settings::StaticSettingsData::TShutdownEventName GetShutdownEventName() {
+				constexpr Settings::StaticSettingsData::TShutdownEventName GetShutdownEventName() const {
 					return Settings::StaticSettingsData::ShutdownEventName;
 				}
 
-				constexpr Settings::StaticSettingsData::TReloadEventName GetReloadEventName() {
+				constexpr Settings::StaticSettingsData::TReloadEventName GetReloadEventName() const {
 					return Settings::StaticSettingsData::ReloadEventName;
 				}
 
-				constexpr Settings::StaticSettingsData::TKernelNamespaceName GetKernelNamespaceName() {
+				constexpr Settings::StaticSettingsData::TKernelNamespaceName GetKernelNamespaceName() const {
 					return Settings::StaticSettingsData::KernelNamespaceName;
 				}
 
-				constexpr Settings::StaticSettingsData::TKernelExcecutableNamespaceName GetKernelExcecutableNamespaceName() {
+				constexpr Settings::StaticSettingsData::TKernelExcecutableNamespaceName GetKernelExcecutableNamespaceName() const {
 					return Settings::StaticSettingsData::KernelExcecutableNamespaceName;
 				}
 
-				constexpr Settings::StaticSettingsData::THostCommitLowEventName GetHostCommitLowEventName() {
+				constexpr Settings::StaticSettingsData::THostCommitLowEventName GetHostCommitLowEventName() const {
 					return Settings::StaticSettingsData::HostCommitLowEventName;
 				}
 
-				constexpr Settings::StaticSettingsData::TSettingsChangeEventName GetSettingsChangeEventName() {
+				constexpr Settings::StaticSettingsData::TSettingsChangeEventName GetSettingsChangeEventName() const {
 					return Settings::StaticSettingsData::SettingsChangeEventName;
 				}
 
-				constexpr Settings::StaticSettingsData::TOnLogWriteEventName GetOnLogWriteEventName() {
+				constexpr Settings::StaticSettingsData::TOnLogWriteEventName GetOnLogWriteEventName() const {
 					return Settings::StaticSettingsData::OnLogWriteEventName;
 				}
 			public:
@@ -941,23 +941,23 @@ namespace Seed {
 			public:
 				constexpr ObjectNamespaceConfigurationT() {} //-V730
 
-				constexpr Settings::ObjectManagerConfigurations::TRootPath GetRootPath() {
+				constexpr Settings::ObjectManagerConfigurations::TRootPath GetRootPath() const {
 					return Settings::ObjectManagerConfigurations::RootPath;
 				}
 
-				constexpr Settings::ObjectManagerConfigurations::TKernelPathName GetKernelPathName() {
+				constexpr Settings::ObjectManagerConfigurations::TKernelPathName GetKernelPathName() const {
 					return Settings::ObjectManagerConfigurations::KernelPathName;
 				}
 
-				constexpr Settings::ObjectManagerConfigurations::THostPathName GetHostPathName() {
+				constexpr Settings::ObjectManagerConfigurations::THostPathName GetHostPathName() const {
 					return Settings::ObjectManagerConfigurations::HostPathName;
 				}
 
-				constexpr Settings::ObjectManagerConfigurations::TRemotePathName GetRemotePathName() {
+				constexpr Settings::ObjectManagerConfigurations::TRemotePathName GetRemotePathName() const {
 					return Settings::ObjectManagerConfigurations::RemotePathName;
 				}
 
-				constexpr UInt64 GetToManyRedirectsTreshold() {
+				constexpr UInt64 GetToManyRedirectsTreshold() const {
 					return Settings::ObjectManagerConfigurations::ToManyRedirectsTreshold;
 				}
 			public:
@@ -990,19 +990,19 @@ namespace Seed {
 			public:
 				constexpr PartitionManagerConfigurationT() {} //-V730
 
-				constexpr Settings::PartitionManagerConfiguration::THostPartitionPath GetHostPartitionPath() {
+				constexpr Settings::PartitionManagerConfiguration::THostPartitionPath GetHostPartitionPath() const {
 					return Settings::PartitionManagerConfiguration::HostPartitionPath;
 				}
 
-				constexpr Settings::PartitionManagerConfiguration::THostPartitionSymLink GetHostPartitionSymLink() {
+				constexpr Settings::PartitionManagerConfiguration::THostPartitionSymLink GetHostPartitionSymLink() const {
 					return Settings::PartitionManagerConfiguration::HostPartitionSymLink;
 				}
 
-				constexpr Settings::PartitionManagerConfiguration::TKernelFsPathSymLink GetKernelFsPathSymLink() {
+				constexpr Settings::PartitionManagerConfiguration::TKernelFsPathSymLink GetKernelFsPathSymLink() const {
 					return Settings::PartitionManagerConfiguration::KernelFsPathSymLink;
 				}
 
-				constexpr Settings::PartitionManagerConfiguration::TKernelPartitionSymLink GetKernelPartitionSymLink() {
+				constexpr Settings::PartitionManagerConfiguration::TKernelPartitionSymLink GetKernelPartitionSymLink() const {
 					return Settings::PartitionManagerConfiguration::KernelPartitionSymLink;
 				}
 			public:
@@ -1026,28 +1026,28 @@ namespace Seed {
 		public:
 			constexpr CurrentSettings() {};
 
-			StaticSettingsDataT GetStaticSettingsData() { return StaticSettingsDataT(); }
+			StaticSettingsDataT GetStaticSettingsData() const { return StaticSettingsDataT(); }
 			void SetStaticSettingsData(StaticSettingsDataT) {}
 
-			constexpr ObjectNamespaceConfigurationT GetObjectNamespaceConfiguration() { return ObjectNamespaceConfigurationT(); }
+			constexpr ObjectNamespaceConfigurationT GetObjectNamespaceConfiguration() const { return ObjectNamespaceConfigurationT(); }
 			constexpr void SetObjectNamespaceConfiguration(ObjectNamespaceConfigurationT) {}
 
-			VirtualSettingDataT GetVirtualSettingData() { return VirtualSettingDataT(); }
+			VirtualSettingDataT GetVirtualSettingData() const { return VirtualSettingDataT(); }
 			void SetVirtualSettingDataT(VirtualSettingDataT) {}
 
-			MemoryManagerT GetMemoryManager() { return MemoryManagerT(); }
+			MemoryManagerT GetMemoryManager() const { return MemoryManagerT(); }
 			void SetMemoryManager(MemoryManagerT) {}
 
-			KernelServicesConfigT GetKernelServicesConfig() { return KernelServicesConfigT(); }
+			KernelServicesConfigT GetKernelServicesConfig() const { return KernelServicesConfigT(); }
 			void SetKernelServicesConfig(KernelServicesConfigT) {}
 
-			ThreadingCfgT GetThreadinfConfig() { return ThreadingCfgT(); }
+			ThreadingCfgT GetThreadinfConfig() const { return ThreadingCfgT(); }
 			void SetThreadinfConfig(ThreadingCfgT) {}
 
-			constexpr PartitionManagerConfigurationT GetPartitionManagerConfiguration() { return PartitionManagerConfigurationT(); }
+			constexpr PartitionManagerConfigurationT GetPartitionManagerConfiguration() const { return PartitionManagerConfigurationT(); }
 			constexpr void SetPartitionManagerConfiguration(PartitionManagerConfigurationT) {}
 
-			KernelVersionT GetSettingsKernelVersion() {
+			KernelVersionT GetSettingsKernelVersion() const {
 				return GetCurrentSettingData([] (auto data) InlineLambda
 				{
 					return data.SettingsVersion;
