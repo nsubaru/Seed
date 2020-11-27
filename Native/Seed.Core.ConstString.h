@@ -83,6 +83,8 @@ namespace Seed {
 					Seed::SizeT Line,
 					const Seed::ConstString& ArgName,
 					const Seed::ConstString& Description);
+
+				InternalApiCall __declspec(noreturn) void __ReThrow();
 			}
 		}
 
@@ -124,7 +126,7 @@ namespace Seed {
 			}
 
 			///<summary>Вертає розмір константного ASCII рядка</summary>
-			constexpr SizeT GetLenght() const { return this->size; }
+			constexpr SizeT GetLenght() const { return (this->size == 0) ? 0 : this->size - 1; }
 
 			///<summary>Розмір константного ASCII рядка</summary>
 			SizeT Property(GetLenght) Lenght;
@@ -174,7 +176,7 @@ namespace Seed {
 			}
 
 			///<summary>Вертає розмір константного рядка</summary>
-			constexpr SizeT GetLenght() const { return this->size; }
+			constexpr SizeT GetLenght() const { return (this->size == 0) ? 0 : this->size - 1; }
 
 			///<summary>Розмір константного рядка</summary>
 			SizeT Property(GetLenght) Lenght;

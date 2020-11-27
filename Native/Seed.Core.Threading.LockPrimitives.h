@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "Seed.Core.Base.h"
 #include "Seed.Core.Threading.Internal.h"
 
@@ -9,7 +9,7 @@
 namespace Seed {
 	inline namespace Core {
 		namespace Threading {
-			///<summary>Примітив синхронізації який дозволяє одночасне читання і есклюзивний запис</summary>
+			///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
 			class SeedKernelCall SRWLock final
 			{
 			private:
@@ -23,11 +23,11 @@ namespace Seed {
 				{
 					Internals::InitSRWLock(&lock);
 				}
-				///<summary>Виконує <see cref="Funct"/> з еклюзивним блокуванням</summary>
-				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
-				///<returns>Те ж що і Funct</returns>
+				///<summary>пїЅпїЅпїЅпїЅпїЅпїЅ <see cref="Funct"/> пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+				///<param name="Funct">пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+				///<returns>пїЅпїЅ пїЅ пїЅпїЅ пїЅ Funct</returns>
 				template<typename T> requires Concepts::IsInvockable<T>
-				ForceInline auto ExclusiveLock(T&& Funct) -> decltype(Funct())
+				ForceInline decltype(auto) ExclusiveLock(T&& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{
@@ -64,9 +64,9 @@ namespace Seed {
 						}
 					}
 				}
-				///<summary>Виконує <see cref="Funct"/> з cпільни блокуванням</summary>
-				///<param name="Funct">Функція або лямбда яка виконається в спільному блокуванні</param>
-				///<returns>Те ж що і Funct</returns>
+				///<summary>пїЅпїЅпїЅпїЅпїЅпїЅ <see cref="Funct"/> пїЅ cпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+				///<param name="Funct">пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+				///<returns>пїЅпїЅ пїЅ пїЅпїЅ пїЅ Funct</returns>
 				template<typename T> requires Concepts::IsInvockable<T>
 				ForceInline auto ShareLock(T&& Funct) -> decltype(Funct())
 				{

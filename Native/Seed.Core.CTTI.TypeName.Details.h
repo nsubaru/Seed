@@ -338,7 +338,7 @@ namespace Seed {
 
                 template <Seed::SizeT N>
                 ForceInline constexpr auto CreateTypeStr (Char const (& str)[N])
-                 { return mFSh(str, typename Seed::TypeTraits::Indexer<N-1>::Type{}).Reverse(); }
+                 { return mFSh(str, typename Seed::TypeTraits::Indexer<N-1>::template Type{}).Reverse(); }
             }
         }
     }

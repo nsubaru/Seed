@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "Seed.Core.String.Manipulation.h"
 #include "Seed.Core.String.LinqApi.h"
 #include "Seed.Core.String.Convertors.h"
@@ -22,64 +22,62 @@ namespace Seed {
             public Details::THexStringPart<THeap, BaseString>
             {
         private:
-            ///<summary>Покажчик на рядковий масив</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
             CharStr str;
-            ///<summary>Поточна кількість символів</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
             SizeT CurrentSize;
-            ///<summary>Розмір буфера</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
             SizeT ReservedSize;
             
-            ///<summary>Конструктор переміщення для покажчика з розміром тексту і фактичним розміром масиву символів</summary>
-            ///<params name = "rawPtr">Покажчик який буде використано як масив символів в нового рядка</params>
-            ///<params name = "CurrentSize">Кількість символів з нуль-термінатором</params>
-            ///<params name = "ReservedSize">Фактичний розмір масиву символів</params>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<params name = "rawPtr">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</params>
+            ///<params name = "CurrentSize">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</params>
+            ///<params name = "ReservedSize">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</params>
             ForceInline BaseString(CharStr&& rawPtr, SizeT CurrentSize, SizeT ReservedSize)
                 :str(rawPtr), CurrentSize(CurrentSize), ReservedSize(ReservedSize) {
                 rawPtr = nullptr;
             }
         public:
-            ///<summary>Пустий конструктор</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
             constexpr ForceInline BaseString() : str(nullptr), CurrentSize(0), ReservedSize(0) {};
 
-            ///<summary>Конструктор з готової літерала рядка</summary>
-            ///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>
-            ///<param name = "Text">Літерал рядка</param>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Size">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Text">ЛіпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
             template<SizeT Size>
             ForceInline BaseString(StaticTextRef<Size> Text) : BaseString() {
-                if constexpr (Size < 2)
+                if constexpr (!(Size < 2))
                 {
-                    this->str = nullptr;
-                    this->CurrentSize = this->ReservedSize = 0;
-                }
-                else {
-                    CurrentSize = Size;
-                    ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
-                    Memory::Copy(Text, this->str, Size * sizeof(Char));
+                    this->CurrentSize = Size;
+                    this->ReservedSize = this->CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+                    this->str = (CharStr)BaseString::operator new[](this->ReservedSize * sizeof(Char));
+                    Memory::Copy(Text, this->str, this->CurrentSize * sizeof(Char));
                 }
             }
 
-            ///<summary>Конструктор з готової літерала ASCII рядка</summary>
-            ///<param name = "Size">Розмір рядка включно з нуль-термінатором</param>
-            ///<param name = "Text">Літерал рядка</param>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Size">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Text">ЛіпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
             template<SizeT Size>
             inline BaseString(StaticATextRef<Size> Text) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (!(Size < 2))
                 {
-                    CurrentSize = Size;
-                    ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
+                    this->CurrentSize = Size;
+                    this->ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+                    this->str = (CharStr)BaseString::operator new[](this->ReservedSize * sizeof(Char));
+                    
                     CharStr temp_str = this->str;
-                    ACharStr text = (ACharStr)Text;
+                    ACharStr text = (ACharStr) Text;
                     {
                         while (*temp_str++ = *text++);
                     }
-                    this->str[CurrentSize] = L'\0';
+                    
+                    this->str[this->CurrentSize] = L'\0';
                 }
             }
 
-            ///<summary>Конструктор з готової константного рядка</summary>
-            ///<param name = "Text">Літерал рядка</param>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">ЛіпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
             ForceInline BaseString(const ConstString& Text) {
                 if (Text.Lenght < 2)
                 {
@@ -87,15 +85,15 @@ namespace Seed {
                     this->CurrentSize = this->ReservedSize = 0;
                 }
                 else {
-                    CurrentSize = Text.Lenght;
+                    CurrentSize = Text.Lenght + 1;
                     ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                     Memory::Copy(Text.Str, this->str, Text.Lenght * sizeof(Char));
                 }
             }
 
-            ///<summary>Конструктор з готової константного ASCII рядка</summary>
-            ///<param name = "str">Константний рядок</param>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "str">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
             BaseString(const ConstAString& cstr) {
                 if (cstr.Lenght < 2)
                 {
@@ -103,7 +101,7 @@ namespace Seed {
                     this->CurrentSize = this->ReservedSize = 0;
                 }
                 else {
-                    CurrentSize = cstr.Lenght;
+                    CurrentSize = cstr.Lenght + 1;
                     ReservedSize = CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
                     this->str = (CharStr)BaseString::operator new[](ReservedSize * sizeof(Char));
                     CharStr temp_str = this->str;
@@ -115,10 +113,10 @@ namespace Seed {
                 }
             }
 
-            ///<summary>Конструктор з готового масиву букв який закінчується нуль-термінатором
-            ///<para>Суто для внутрішнього використання</para></summary>
-            ///<param name = "Text">Масив букв</param>
-            ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            ///<para>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</para></summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</param>
+            ///<exception cref = "Seed::Exceptions::StringToLong">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ</exception>
             InternalApiCall BaseString(Char* text) {
                 SizeT size = CStr::Size(text);
                 if (size == 0) {
@@ -137,10 +135,10 @@ namespace Seed {
                 this->str[size] = L'\0';
             }
 
-            ///<summary>Конструктор з готового масиву букв який закінчується нуль-термінатором
-            ///<para>Суто для внутрішнього використання</para></summary>
-            ///<param name = "Text">Масив букв</param>
-            ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            ///<para>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</para></summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</param>
+            ///<exception cref = "Seed::Exceptions::StringToLong">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ</exception>
             InternalApiCall BaseString(AChar* text) {
                 SizeT size = CStr::Size(text);
                 if (size == 0) {
@@ -159,11 +157,11 @@ namespace Seed {
                 this->str[size] = L'\0';
             }
 
-            ///<summary>Конструктор з готового масиву букв який закінчується нуль-термінатором
-            ///<para>Суто для внутрішнього використання</para></summary>
-            ///<param name = "Text">Масив букв</param>
-            ///<param name = "Size">Кількість символів разом з нуль-термінатором</summary>
-            ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            ///<para>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</para></summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<exception cref = "Seed::Exceptions::StringToLong">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ</exception>
             ForceInline InternalApiCall BaseString(const AChar* text, SizeT textSize) {
                 if (textSize == 0) {
                     this->str = nullptr;
@@ -181,9 +179,9 @@ namespace Seed {
                 this->str[textSize] = L'\0';
             }
 
-            ///<summary>Конструктор з масиву символів і його розміру. Копіює вміст і дописую нуль-термінатор</summary>
-            ///<params name = "rawText">Масив символів</params>
-            ///<params name = "Size">Кількість символів</params>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<params name = "rawText">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</params>
+            ///<params name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</params>
             ForceInline InternalApiCall BaseString(const CharStr rawText, SizeT Size) :
                 CurrentSize(Size + 1),
                 ReservedSize(Size + 1 + CurrentSettings().MemoryManager.StringReserveSize),
@@ -193,9 +191,9 @@ namespace Seed {
                 this->str[Size] = L'\0';
             }
 
-            ///<summary>Конструктор з стартовим резервованим розміром</summary>
-            ///<param name = "StartSize">Стартовий розмір в кількості символів без нуль-термінатора</param>
-            ///<exception cref = "Seed::Exceptions::StringToLong">Генерує при завеликій кількості символів в масиві</exception>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "StartSize">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<exception cref = "Seed::Exceptions::StringToLong">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ</exception>
             ForceInline explicit BaseString(Memory::DataSizeT StartSize) {
                 if (StartSize.Bytes == Math::Max<SizeT>())
                     Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize.Bytes);
@@ -208,10 +206,10 @@ namespace Seed {
             }
 
             /// <summary>
-            /// Конструктор з compile time рядка
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ compile time пїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="item">Compile time рядок</param>
-            /// <typeparam name="N">Кільість символів</typeparam>
+            /// <param name="item">Compile time пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <typeparam name="N">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</typeparam>
             template<SizeT N>
             ForceInline BaseString(const CTTI::Details::ConstexprArray<Char, N>& item) : CurrentSize(0), ReservedSize(0), str(nullptr) {
                 if constexpr (N == 0)
@@ -241,9 +239,9 @@ namespace Seed {
                 }
             }
 
-            ///<summary>Копіювальний конструктор</summary>
-            ///<remarks>Виділить пам'ять лише при потребі</remarks>
-            ///<param name = "from">Оригинал рядка</param>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<remarks>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</remarks>
+            ///<param name = "from">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
             ForceInline BaseString(const BaseString& from) {
                 if (from.str != nullptr) {
                     this->CurrentSize = from.CurrentSize;
@@ -256,8 +254,8 @@ namespace Seed {
                     this->str = nullptr;
                 }
             }
-            ///<summary>Оптимізований конструктор</summary>
-            ///<param name = "from">RValue силка на оригинал</param>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "from">RValue пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
             ForceInline BaseString(BaseString&& from) {
                 this->str = from.str; from.str = nullptr;
                 this->CurrentSize = from.CurrentSize; from.CurrentSize = 0;
@@ -265,165 +263,165 @@ namespace Seed {
             }
 #pragma region Comparing
 #pragma region With Strings
-            ///<summary>Оператор рівності</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline Boolean operator==(const BaseString& second) const {
                 return (*this <=> second) == 0;
             }
 
-            ///<summary>Оператор нерівності</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline Boolean operator!=(const BaseString& second) const {
                 return !this->operator==(second);
             }
 #pragma endregion
 #pragma region With Char
-            ///<summary>Оператор рівності з рядковим літералом</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline Boolean operator==(StaticTextRef<Size> second) const {
                 return (*this <=> second) == 0;
             }
 
-            ///<summary>Оператор нерівності з рядковим літералом</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline Boolean operator!=(StaticTextRef<Size> second) const {
                 return !this->operator==<Size>(second);
             }
 
-            ///<summary>Оператор рівності з рядковим літералом</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline friend Boolean operator==(StaticTextRef<Size> second, const BaseString& first) {
                 return first.operator==<Size>(second);
             }
 
-            ///<summary>Оператор нерівності з рядковим літералом</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline friend Boolean operator!=(StaticTextRef<Size> second, const BaseString& first) {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
 #pragma region With ASCII char
-            ///<summary>Оператор рівності з рядковим літералом ASCII символів</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline Boolean operator==(StaticATextRef<Size> second) const {
                 return (*this <=> second) == 0;
             }
 
-            ///<summary>Оператор нерівності з рядковим літералом ASCII символів</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline Boolean operator!=(StaticATextRef<Size> second) const {
                 return !this->operator==<Size>(second);
             }
 
-            ///<summary>Оператор рівності з рядковим літералом ASCII символів</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline friend Boolean operator==(StaticATextRef<Size> second, const BaseString& first) {
                 return first.operator==<Size>(second);
             }
 
-            ///<summary>Оператор нерівності з рядковим літералом ASCII символів</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Рядкови літерад</param>
-            ///<param name = "Size">Кількість символів в літералі разом з нуль-термінатором</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline friend Boolean operator!=(StaticATextRef<Size> second, const BaseString& first) {
                 return first.operator!=<Size>(second);
             }
 #pragma endregion
 #pragma region With ConstString
-            ///<summary>Оператор рівності з константним рядком</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline Boolean operator==(const ConstString& second) const {
                 return (*this <=> second) == 0;
             }
 
-            ///<summary>Оператор нерівності з константним рядком</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline Boolean operator!=(const ConstString& second) const {
                 return !this->operator==(second);
             }
 
-            ///<summary>Оператор рівності з константним рядком</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Константий рядок</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline friend Boolean operator==(const ConstString& second, const BaseString& first) {
                 return first.operator==(second);
             }
 
-            ///<summary>Оператор нерівності з константним рядком</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Константий рядок</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline friend Boolean operator!=(const ConstString& second, const BaseString& first) {
                 return first.operator!=(second);
             }
 #pragma endregion
 #pragma region With ASCII ConstString
-            ///<summary>Оператор рівності з константним рядком ASCII символів</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline Boolean operator==(const ConstAString& second) const {
                 return (*this <=> second) == 0;
             }
 
-            ///<summary>Оператор нерівності з константним рядком ASCII символів</summary>
-            ///<param name = "second">Правий аргумент оператора</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline Boolean operator!=(const ConstAString& second) const {
                 return !this->operator==(second);
             }
 
-            ///<summary>Оператор рівності з константним рядком ASCII символів</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Константний рядок</param>
-            ///<returns><c>True</c> якщо рядки рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline friend Boolean operator==(const ConstAString& second, const BaseString& first) {
                 return first.operator==(second);
             }
 
-            ///<summary>Оператор нерівності з константним рядком ASCII символів</summary>
-            ///<param name = "first">Правий аргумент оператора</param>
-            ///<param name = "second">Лівий аргумент оператора. Константний рядок</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "first">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "second">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             ForceInline friend Boolean operator!=(const ConstAString& second, const BaseString& first) {
                 return first.operator!=(second);
             }
 #pragma endregion
 #pragma region With String which have other allocator
-            ///<summary>Оператор рівності з рядком алокованим в іншій кучі</summary>
-            ///<param name = "OtherString">Константне посилання на рядкову зміну</param>
-            ///<returns><c>True</c> якщо рядки не рівні</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "OtherString">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</param>
+            ///<returns><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ</returns>
             template<typename OtherBase>
             ForceInline Boolean operator==(const BaseString<OtherBase>& OtherString) const {
                 return (*this <=> OtherString) == 0;
@@ -436,11 +434,11 @@ namespace Seed {
 #pragma endregion
 #pragma endregion
 #pragma region Copy operators
-            ///<summary>Оператор присвоєння. Копіює текст в поточну рядкову зміну</summary>
-            ///<param name = "orig">Оригинал тексту</param>
-            ///<returns>Посилання на поточну зміну</returns>
-            ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
-            ///Текст просто копіюється по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "orig">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</returns>
+            ///<remarks>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+            ///пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ.</remarks>
             BaseString& operator=(const BaseString& orig) {
                 if (this->str == orig.str) return *this;
                 if (this->ReservedSize >= orig.CurrentSize) {
@@ -458,11 +456,11 @@ namespace Seed {
                 return *this;
             }
 
-            ///<summary>Оператор оптимізованого присвоєння</summary>
-            ///<param name = "orig">RValue силка на оригинал</param>
-            ///<returns>Посилання на поточну зміну</returns>
-            ///<remarks>Викликається деструктор для поточного рядка.
-            ///Копіються поля з оригинала. І накінець поля в оригинала обнулюються</remarks>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "orig">RValue пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</returns>
+            ///<remarks>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
+            ///пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</remarks>
             ForceInline BaseString& operator=(BaseString&& orig) {
                 if (orig.str == this->str) return *this;
                 this->~BaseString();
@@ -475,10 +473,10 @@ namespace Seed {
 #pragma region Comparing
 
             /// <summary>
-            /// Універсальний оператор порівняння
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="str1">Другий рядок</param>
-            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            /// <param name="str1">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<typename TOtherHeap>
             ForceInline StrongOrdering operator<=>(const BaseString<TOtherHeap>& right) const {
                 auto res = Internals::CompareString(this->str, right.str, this->Lenght, right.Lenght);
@@ -491,10 +489,10 @@ namespace Seed {
             }
 
             /// <summary>
-            /// Універсальний оператор порівняння
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="str1">Другий рядок</param>
-            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            /// <param name="str1">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<> 
             ForceInline StrongOrdering operator<=>(const BaseString<THeap>& right) const {
                 auto res = Internals::CompareString(this->str, right.str, this->Lenght, right.Lenght);
@@ -507,10 +505,10 @@ namespace Seed {
             }
 
             /// <summary>
-            /// Універсальний оператор порівняння
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="str1">Другий рядок</param>
-            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            /// <param name="str1">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<SizeT TextLenght>
             ForceInline StrongOrdering operator<=>(StaticTextRef<TextLenght> right) const {
                 auto res = Internals::CompareString(this->str, (Char*)right, this->Lenght, TextLenght - 1);
@@ -523,12 +521,12 @@ namespace Seed {
             }
 
             /// <summary>
-            /// Універсальний оператор порівняння
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="str1">Другий рядок</param>
-            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            /// <param name="str1">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             ForceInline StrongOrdering operator<=>(const ConstString& right) const {
-                auto res = Internals::CompareString(this->str, (Char*)right.Str, this->Lenght, right.GetLenght() - 1);
+                auto res = Internals::CompareString(this->str, (Char*)right.Str, this->Lenght, right.Lenght);
                 if (res == 0)
                     return StrongOrdering::equal;
                 else if (res > 0)
@@ -538,12 +536,12 @@ namespace Seed {
             }
 
             /// <summary>
-            /// Універсальний оператор порівняння
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="str1">Другий рядок</param>
-            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            /// <param name="str1">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             ForceInline StrongOrdering operator<=>(const ConstAString& right) const {
-                auto countedSize = Min(this->Size, right.Lenght);
+                auto countedSize = Min(this->Lenght, right.Lenght);
 
                 for (SizeT i = 0; i < countedSize; i++)
                 {
@@ -556,17 +554,17 @@ namespace Seed {
                     }
                 }
 
-                return (this->Size <=> right.Lenght);
+                return (this->Lenght <=> right.Lenght);
             }
 
             /// <summary>
-            /// Універсальний оператор порівняння
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="str1">Другий рядок</param>
-            /// <returns>ПОрядок першого рядка відносно другого</returns>
+            /// <param name="str1">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<SizeT TextLenght>
             ForceInline StrongOrdering operator<=>(StaticATextRef<TextLenght> right) const {
-                auto countedSize = Min(this->Size, TextLenght);
+                auto countedSize = Min(this->Lenght, TextLenght - 1);
 
                 for (SizeT i = 0; i < countedSize; i++)
                 {
@@ -579,23 +577,25 @@ namespace Seed {
                     }
                 }
 
-                return this->Size <=> TextLenght;
+                return this->Lenght <=> TextLenght - 1;
             }
 #pragma endregion
 #pragma region Add operators
 #pragma region Literals
-            ///<summary>Оператор додавання рядкового літералу</summary>
-            ///<param name = "Text">Рядковий літерал</param>
-            ///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline BaseString operator+(StaticTextRef<Size> Text) const {
                 if constexpr (Size < 2)
                     return *this;
+
                 BaseString retData;
-                SizeT NewSize = this->Lenght + Size;
-                SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
+                retData.CurrentSize = this->Lenght + Size;
+                retData.ReservedSize = retData.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* retData.ReservedSize);
+
                 if (this->str != nullptr) {
                     Memory::Copy(this->str, retData.str, this->Lenght * sizeof(Char));
                     Memory::Copy(Text, retData.str + this->Lenght, Size * sizeof(Char));
@@ -603,39 +603,40 @@ namespace Seed {
                 else {
                     Memory::Copy(Text, retData.str, Size * sizeof(Char));
                 }
-                retData.CurrentSize = NewSize;
-                retData.ReservedSize = NewFullSize;
+
                 retData.str[retData.CurrentSize - 1] = L'\0';
                 return retData;
             }
 
-            ///<summary>Оператор додавання рядкового літералу</summary>
-            ///<param name = "Text">Рядковий літерал</param>
-            ///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
-            ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Right">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline friend BaseString operator+(StaticTextRef<Size> Text, const BaseString& Right) {
                 if constexpr (Size < 2)
                     return Right;
+
                 BaseString retData(Text);
                 retData += Right;
+
                 return retData;
             }
 
-            ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
-            ///<param name = "Text">Рядковий літерал</param>
-            ///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<SizeT Size>
             BaseString operator+(StaticATextRef<Size> Text) const {
                 if constexpr (Size < 2)
                     return *this;
 
                 BaseString retData;
-                SizeT NewSize = this->Lenght + Size;
-                SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
+                retData.CurrentSize = this->Lenght + Size;
+                retData.ReservedSize = retData.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char) * retData.ReservedSize); 
 
                 if (this->str != nullptr)
                     Memory::Copy(this->str, retData.str, this->Lenght * sizeof(Char));
@@ -646,16 +647,14 @@ namespace Seed {
                     while (*tempStr++ = *second++);
                 }
 
-                retData.CurrentSize = NewSize;
-                retData.ReservedSize = NewFullSize;
                 return retData;
             }
 
-            ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
-            ///<param name = "Text">Рядковий літерал ASCII символів</param>
-            ///<param name = "Size">Кількість символів включно з нуль-термінатором</param>
-            ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Size">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Right">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<SizeT Size>
             ForceInline friend BaseString operator+(StaticATextRef<Size> Text, const BaseString& Right) {
                 if constexpr (Size < 2)
@@ -666,15 +665,15 @@ namespace Seed {
             }
 #pragma endregion
 #pragma region Const String
-            ///<summary>Оператор додавання рядкового літералу</summary>
-            ///<param name = "Text">Рядковий літерал</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             BaseString operator+(const ConstString& Text) const {
-                if (Text.Lenght < 2)
+                if (Text.Lenght < 1)
                     return *this;
 
                 BaseString retData;
-                SizeT NewSize = this->Lenght + Text.Lenght;
+                SizeT NewSize = this->Lenght + Text.Lenght + 1;
                 SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                 retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize);
 
@@ -692,10 +691,10 @@ namespace Seed {
                 return retData;
             }
 
-            ///<summary>Оператор додавання рядкового літералу</summary>
-            ///<param name = "Text">Рядковий літерал</param>
-            ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Right">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             ForceInline friend BaseString operator+(const ConstString& Text, const BaseString& Right) {
                 if (Text.Lenght < 2)
                     return Right;
@@ -704,19 +703,17 @@ namespace Seed {
                 return retData;
             }
 
-            ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
-            ///<param name = "Text">Рядковий літерал</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             BaseString operator+(const ConstAString& Text) const {
-                if (Text.Lenght < 2)
+                if (Text.Lenght < 1)
                     return *this;
+
                 BaseString retData;
-
-                SizeT NewSize = this->Lenght + Text.Lenght;
-                SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-
-                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); 
-                retData.ReservedSize = NewFullSize;
+                retData.CurrentSize = this->Lenght + Text.Lenght + 1;
+                retData.ReservedSize = retData.CurrentSize + CurrentSettings().MemoryManager.StringReserveSize;
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* retData.ReservedSize);
 
                 if (this->str != nullptr)
                     Memory::Copy(this->str, retData.str, (this->Lenght) * sizeof(Char));
@@ -728,14 +725,13 @@ namespace Seed {
                     while (*tempStr++ = *second++);
                 }
 
-                retData.CurrentSize = NewSize;
                 return retData;
             }
 
-            ///<summary>Оператор додавання рядкового літерала ASCII символів</summary>
-            ///<param name = "Text">Рядковий літерал ASCII символів</param>
-            ///<param name = "Right">Правий елемент, він буде доданий до кінця лівого</param>
-            ///<returns>Новий рядок який є сумою поточного і рядкового літерала</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ASCII пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "Right">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             ForceInline friend BaseString operator+(const ConstAString& Text, const BaseString& Right) {
                 if (Text.Lenght < 2)
                     return Right;
@@ -746,91 +742,102 @@ namespace Seed {
                 return retData;
             }
 #pragma endregion
-            ///<summary>Оператор сумування двох рядків</summary>
-            ///<param name = "second">Правий рядковий об'єкт</param>
-            ///<returns>Суму рядкових зміних</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ'пїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
             BaseString<THeap> operator+(const BaseString& second) const {
                 if (this->CurrentSize == 0)
                     return second;
-                SizeT NewSize = this->CurrentSize;
+
+                SizeT NewSize = this->Lenght;
                 if (second.CurrentSize != 0)
-                    NewSize += second.CurrentSize - 1;
+                    NewSize += second.Lenght + 1;
                 else
                     return *this;
 
-                SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                 BaseString retData;
-                CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* NewFullSize); //-V2005
+                retData.CurrentSize = NewSize;
+                retData.ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
+                retData.str = (CharStr)BaseString::operator new[](sizeof(Char)* retData.ReservedSize);
+
                 if (this->str != nullptr) {
-                    Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
-                    Memory::Copy(second.str, buf + this->Lenght, second.CurrentSize * sizeof(Char));
+                    Memory::Copy(this->str, retData.str, this->Lenght * sizeof(Char));
+                    Memory::Copy(second.str, retData.str + this->Lenght, second.CurrentSize * sizeof(Char));
                 }
                 else {
-                    Memory::Copy(second.str, buf, second.CurrentSize * sizeof(Char));
+                    Memory::Copy(second.str, retData.str, second.CurrentSize * sizeof(Char));
                 }
 
-                retData.str = buf;
-                retData.CurrentSize = NewSize;
-                retData.ReservedSize = NewFullSize;
                 retData.str[retData.CurrentSize - 1] = L'\0';
                 return retData;
             }
 
-            ///<summary>Оператор сумування двох рядків з різними алокаторами</summary>
-            ///<param name = "second">Правий рядковий об'єкт</param>
-            ///<returns>Суму рядкових зміних з алокатором лівого елемента</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ'пїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
             template<typename OtherBase>
             BaseString<THeap> operator+(const BaseString<OtherBase>& second) const {
                 if (this->CurrentSize == 0)
                     return second;
-                SizeT NewSize = this->CurrentSize;
+                SizeT NewSize = this->Lenght;
                 if (second.Lenght != 0)
-                    NewSize += second.Lenght - 1;
+                    NewSize += second.Lenght + 1;
                 else
                     return *this;
 
-                SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                 BaseString retData;
-                CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
+                retData.CurrentSize = NewSize;
+                retData.ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
+                retData.str = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* retData.ReservedSize);
+
                 if (this->str != nullptr) {
-                    Memory::Copy(this->str, buf, (this->Lenght) * sizeof(Char));
-                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf + this->Lenght, (second.Size) * sizeof(Char));
+                    Memory::Copy(this->str, retData.str, (this->Lenght) * sizeof(Char));
+                    Memory::Copy(second.operator const Seed::ConstCharStr(), retData.str + this->Lenght, second.Size.Bytes);
                 }
                 else {
-                    Memory::Copy(second.operator const Seed::ConstCharStr(), buf, second.Lenght * sizeof(Char));
+                    Memory::Copy(second.operator const Seed::ConstCharStr(), retData.str, second.Lenght * sizeof(Char));
                 }
 
-                retData.str = buf;
-                retData.CurrentSize = NewSize;
-                retData.ReservedSize = NewFullSize;
                 retData.str[retData.CurrentSize - 1] = L'\0';
                 return retData;
             }
 
-            ///<summary>Оператор контактенації масиву букв до поточного рядка</summary>
-            ///<param name = "Text">Рядковий літерал який допишеться в кінець поточного рядка</param>
-            ///<param name = "StrSize">Кількість символів в рядковому літералі</param>
-            ///<returns>Силку на лівий аргумент який є сумою двох рядків</returns>
-            ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
-            ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "StrSize">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
+            ///<remarks>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+            ///пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ.</remarks>
             template<SizeT StrSize>
             BaseString<THeap>& operator+=(StaticTextRef<StrSize> Text) {
                 SizeT NewSize = this->Lenght + StrSize;
                 if (NewSize > ReservedSize) {
-                    SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
-                    if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
-                        Memory::Copy(Text, buf + this->Lenght, StrSize * sizeof(Char));
+                    CharStr buf = nullptr;
+
+                    try
+                    {
+                        SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
+                        buf = (CharStr) BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
+                        if (this->str != nullptr)
+                        {
+                            Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
+                            Memory::Copy(Text, buf + this->Lenght, StrSize * sizeof(Char));
+                        }
+                        else
+                        {
+                            Memory::Copy(Text, buf, StrSize * sizeof(Char));
+                        }
+                        BaseString::operator delete[](this->str);
+                        this->str = buf;
+                        CurrentSize = NewSize;
+                        this->str[CurrentSize - 1] = L'\0';
+                        ReservedSize = NewFullSize;
                     }
-                    else {
-                        Memory::Copy(Text, buf, StrSize * sizeof(Char));
+                    catch (...)
+                    {
+                        BaseString<THeap>::operator delete[] (buf);
+                        Internals::Exceptions::__ReThrow();
                     }
-                    BaseString::operator delete[](this->str);
-                    this->str = buf;
-                    CurrentSize = NewSize;
-                    this->str[CurrentSize - 1] = L'\0';
-                    ReservedSize = NewFullSize;
                 }
                 else {
                     Memory::Copy(Text, this->str + this->Lenght, StrSize * sizeof(Char));
@@ -840,28 +847,40 @@ namespace Seed {
                 return *this;
             }
 
-            ///<summary>Оператор контактенації символу до поточного рядка</summary>
-            ///<param name = "Text">Символьний літерал який допишеться в кінець поточного рядка</param>
-            ///<returns>Силку на лівий аргумент який є сумою двох рядків</returns>
-            ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
-            ///Символ просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
+            ///<remarks>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+            ///пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ.</remarks>
             BaseString<THeap>& operator+=(Char Text) {
                 SizeT NewSize = this->Lenght + 2;
-                if (NewSize > ReservedSize) {
-                    SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
-                    if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
-                        buf[this->Lenght] = Text;
+                if (NewSize > ReservedSize)
+                {
+                    CharStr buf = nullptr;
+                    try
+                    {
+                        SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
+                        buf = (CharStr) BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize);
+                        if (this->str != nullptr)
+                        {
+                            Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
+                            buf[this->Lenght] = Text;
+                        }
+                        else
+                        {
+                            buf[0] = Text;
+                        }
+                        BaseString::operator delete[](this->str);
+                        this->str = buf;
+                        CurrentSize = NewSize;
+                        this->str[CurrentSize - 1] = L'\0';
+                        ReservedSize = NewFullSize;
                     }
-                    else {
-                        buf[0] = Text;
+                    catch (...)
+                    {
+                        BaseString<THeap>::operator delete[](buf);
+                        Internals::Exceptions::__ReThrow();
                     }
-                    BaseString::operator delete[](this->str);
-                    this->str = buf;
-                    CurrentSize = NewSize;
-                    this->str[CurrentSize - 1] = L'\0';
-                    ReservedSize = NewFullSize;
                 }
                 else {
                     this->str[this->Lenght] = Text;
@@ -871,30 +890,41 @@ namespace Seed {
                 return *this;
             }
 
-            ///<summary>Оператор контактенації масиву букв до поточного рядка</summary>
-            ///<param name = "Text">Рядковий літерал який допишеться в кінець поточного рядка</param>
-            ///<param name = "StrSize">Кількість символів в рядковому літералі</param>
-            ///<returns>Силку на лівий аргумент який є сумою двох рядків</returns>
-            ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
-            ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Text">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<param name = "StrSize">КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
+            ///<remarks>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+            ///пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ.</remarks>
             template<SizeT StrSize>
             BaseString<THeap>& operator+=(StaticATextRef<StrSize> Text) {
                 SizeT NewSize = this->Lenght + StrSize;
-                if (NewSize > ReservedSize) {
-                    SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
-                    CharStr buf = (CharStr)BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
-                    if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
-                    }
-                    CharStr tempStr = this->str + this->CurrentSize;
-                    ACharStr second = (ACharStr)Text;
+                if (NewSize > ReservedSize)
+                {
+                    CharStr buf = nullptr;
+                    try
                     {
-                        while (*tempStr++ = *second++);
+                        SizeT NewFullSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
+                        buf = (CharStr) BaseString<THeap>::operator new[](sizeof(Char)* NewFullSize); //-V2005
+                        if (this->str != nullptr)
+                        {
+                            Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
+                        }
+                        CharStr tempStr = this->str + this->CurrentSize;
+                        ACharStr second = (ACharStr) Text;
+                        {
+                            while (*tempStr++ = *second++);
+                        }
+                        BaseString::operator delete[](this->str);
+                        this->str = buf;
+                        CurrentSize += StrSize;
+                        ReservedSize = NewFullSize;
                     }
-                    BaseString::operator delete[](this->str);
-                    this->str = buf;
-                    CurrentSize += StrSize;
-                    ReservedSize = NewFullSize;
+                    catch (...)
+                    {
+                        BaseString<THeap>::operator delete[](buf);
+                        Internals::Exceptions::__ReThrow();
+                    }
                 }
                 else {
                     CharStr tempStr = this->str + this->Lenght;
@@ -907,18 +937,18 @@ namespace Seed {
                 return *this;
             }
 
-            ///<summary>Оператор контактенації рядка до поточного рядка</summary>
-            ///<param name = "second">Рядок який допише до поточного</param>
-            ///<returns>Силку на лівий аргумент який є сумою двох рядків</returns>
-            ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
-            ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "second">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
+            ///<remarks>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+            ///пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ.</remarks>
             BaseString& operator+=(const BaseString& second) {
                 if (second.Lenght == 0)
                     return *this;
 
                 SizeT NewSize = this->Lenght + second.Lenght + 1;
                 if (NewSize < this->ReservedSize) {
-                    Memory::Copy(second.str, this->str + this->Lenght, second.CurrentSize * sizeof(Char));
+                    Memory::Copy(second.str, this->str + this->Lenght, second.Size.Bytes);
                     this->CurrentSize = NewSize;
                     this->str[this->CurrentSize - 1] = L'\0';
                     return *this;
@@ -927,11 +957,11 @@ namespace Seed {
                     ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;
                     CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* ReservedSize);
                     if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, this->Lenght * sizeof(Char));
-                        Memory::Copy(second.str, buf + this->Lenght, second.CurrentSize * sizeof(Char));
+                        Memory::Copy(this->str, buf, this->Size.Bytes);
+                        Memory::Copy(second.str, buf + this->Lenght, second.Size.Bytes);
                     }
                     else {
-                        Memory::Copy(second.str, buf, second.CurrentSize * sizeof(Char));
+                        Memory::Copy(second.str, buf, second.Size.Bytes);
                     }
                     BaseString::operator delete[](this->str);
                     this->str = buf;
@@ -939,12 +969,12 @@ namespace Seed {
                 }
                 return *this;
             }
-            ///<summary>Оператор контактенації рядка до поточного рядка</summary>
-            ///<param name = "orig">Рядок з іншим алокатором</summary>
-            ///<param name = "OtherBase">Алокатор правого рядка</param>
-            ///<returns>Силку на лівий аргумент який є сумою двох рядків</returns>
-            ///<remarks>Якщо текст вміщається в масив в поточній змінній то виділення пам'яті не відбувається.
-            ///Текст просто  дописуєтья по байтово. Якщо не вміщається то відбувається виділення пам'яті.</remarks>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "orig">пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "OtherBase">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
+            ///<remarks>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+            ///пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ'пїЅпїЅ.</remarks>
             template<typename OtherBase>
             BaseString& operator+=(const BaseString<OtherBase>& orig) {
                 if (orig.Lenght == 0)
@@ -959,15 +989,15 @@ namespace Seed {
                 }
                 else {
                     ReservedSize = NewSize + CurrentSettings().MemoryManager.StringReserveSize;;
-                    CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* ReservedSize); //-V2005
+                    CharStr buf = (CharStr)BaseString::operator new[](sizeof(Char)* ReservedSize);
                     if (this->str != nullptr) {
-                        Memory::Copy(this->str, buf, (this->Lenght) * sizeof(Char));
-                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf + this->Lenght, orig.Lenght * sizeof(Char));
+                        Memory::Copy(this->str, buf, this->Size.Bytes);
+                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf + this->Lenght, orig.Size.Bytes);
                     }
                     else {
-                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf, orig.Lenght * sizeof(Char));
+                        Memory::Copy(orig.operator const Seed::ConstCharStr(), buf, orig.Size.Bytes);
                     }
-                    BaseString::operator delete[](this->str); //-V2005
+                    BaseString::operator delete[](this->str);
                     this->str = buf;
                     this->CurrentSize = NewSize;
                     this->str[this->CurrentSize - 1] = L'\0';
@@ -975,18 +1005,18 @@ namespace Seed {
                 return *this;
             }
 
-            ///<summary>Оператор доступу до символів рядка</summary>
-            ///<param name = "Index">Індекс елемента з нуля до нуль-термінатора не включно</param>
-            ///<returns>Силка на елемент рядка</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "Index">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
             ForceInline Char& operator[](SizeT index) {
                 if (index < CurrentSize)
                     return str[index];
                 else
                     Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, index, CurrentSize);
             }
-            ///<summary>Констатний оператор доступу до символів рядка
-            ///<param name = "Index">Індекс елемента з нуля до нуль-термінатора не включно</param>
-            ///<returns>Константна силка на елемент рядка</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+            ///<param name = "Index">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
             ForceInline const Char& operator[](SizeT index) const {
                 if (index < CurrentSize)
                     return str[index];
@@ -994,9 +1024,9 @@ namespace Seed {
                     Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, index, CurrentSize);
             }
 
-            ///<summary>Вертає чи строка починається з строки ExpectedString</summary>
-            ///<param name = "ExpectedString">Рядок з якого має починатись поточний рядок</param>
-            ///<results><c>True</c> якщо рядок поточний рядок починається ExpectedString</results>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ExpectedString</summary>
+            ///<param name = "ExpectedString">пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<results><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ExpectedString</results>
             ForceInline bool IsStartWith(const BaseString& ExpectedString) const {
                 if (this->CurrentSize < ExpectedString.CurrentSize) return false;
                 for (SizeT i = 0; i < ExpectedString.CurrentSize; i++)
@@ -1004,9 +1034,9 @@ namespace Seed {
                 return true;
             }
 
-            ///<summary>Вертає чи строка починається з строки ExpectedString</summary>
-            ///<param name = "ExpectedString">Рядок з якого має починатись поточний рядок</param>
-            ///<results><c>True</c> якщо рядок поточний рядок починається ExpectedString</results>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ExpectedString</summary>
+            ///<param name = "ExpectedString">пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            ///<results><c>True</c> пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ExpectedString</results>
             template<SizeT ExpectedStringSize>
             ForceInline bool IsStartWith(StaticTextRef<ExpectedStringSize> ExpectedString) const {
                 if (this->CurrentSize < ExpectedStringSize) return false;
@@ -1016,54 +1046,54 @@ namespace Seed {
                 return true;
             }
 
-            ///<summary>Оператор конвертації до символьного масиву</summary>
-            ///<returns>Константний рядок</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
             ForceInline explicit operator const ConstCharStr() const { return str; }
 
-            ///<summary>Вертає поточну довжина рядку</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
             ForceInline SizeT GetLenght() const { return (CurrentSize > 0) ? CurrentSize - 1 : 0; }
-            ///<summary>Поточна довжина рядка</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
             SizeT Property(GetLenght) Lenght;
 
             /// <summary>
-            /// Вертає поточну довжину рядка з нуль-термінатором
+            /// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
             ForceInline SizeT GetFullLenght() const {
                 return CurrentSize;
             }
 
             /// <summary>
-            /// Поточна довжина рядка з нуль-термінатором
+            /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            SizeT Property(GetFullLenght) Size;
+            SizeT Property(GetFullLenght) FullLenght;
 
-            ///<summary>Вертає істину якщо рядок пустий</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
             ForceInline Boolean GetIsEmpty() const { return GetFullLenght() == 0; }
-            ///<summary>Вертає істину якщо рядок пустий</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</summary>
             Boolean Property(GetIsEmpty) IsEmpty;
 
             /// <summary>
-            /// Розмір даних
+            /// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <returns>Розмір даних</returns>
+            /// <returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
             Memory::DataSizeT GetSize() const { return Memory::DataSizeT(CurrentSize * sizeof(Char)); }
             /// <summary>
-            /// Вертає розмір буфера рядка
+            /// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             /// </summary>
             Memory::DataSizeT GetBufferSize() const { return Memory::DataSizeT(ReservedSize * sizeof(Char)); }
 
             /// <summary>
-            /// Розмір буфера рядка
+            /// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             /// </summary>
             Memory::DataSizeT Property(GetSize) Size;
 
             /// <summary>
-            /// Розмір буфера
+            /// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
             Memory::DataSizeT Property(GetBufferSize) BufferSize;
 
-            ///<summary>Конвертація в масив байт. Якщо рядок пустий верне пустий масив</summary>
-            ///<returns>Масив байт який є копією вмісту рядка</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<returns>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпієпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
             operator Containers::BaseArray<THeap, Byte>() const {
                 if (this->str == nullptr || this->CurrentSize == 0)
                     return Containers::BaseArray<THeap, Byte>();
@@ -1073,10 +1103,10 @@ namespace Seed {
             }
 
             /// <summary>
-            /// Провіря чи поточна рядкова змінна містить текст з заданої
+            /// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             /// </summary>
-            /// <param name="item">Задана змінна</param>
-            /// <returns>true якщо тескт з item міститься в поточній змінній</returns>
+            /// <param name="item">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
+            /// <returns>true пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ item пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</returns>
             bool Containe(const BaseString& item) const {
                 if (item.Lenght == this->Lenght && this->Lenght == 0)
                     return true;
@@ -1112,9 +1142,9 @@ namespace Seed {
                 return false;
             }
 
-            ///<summary>Конвертор для строк з різним алокатором</summary>
-            ///<param name = "NewBase">Новий алокатор</summary>
-            ///<returns>Копія рядка алокована алокатором NewBase</returns>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<param name = "NewBase">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
+            ///<returns>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ NewBase</returns>
             template<typename NewBase>
             ForceInline operator BaseString<NewBase>() const {
                 return BaseString<NewBase>((const CharStr)(ConstCharStr)*this);
@@ -1124,16 +1154,16 @@ namespace Seed {
                 return BaseString(*this);
             }
 
-            ///<summary>Оптимізований обмін рядками a і b</summary>
-            ///<params name "a">Правий рядок</params>
-            ///<params name "b">Лівий рядок</params>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ a пїЅ b</summary>
+            ///<params name "a">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</params>
+            ///<params name "b">ЛіпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</params>
             friend void Swap(BaseString& a, BaseString& b) {
                 Seed::Swap(a.str, b.str);
                 Seed::Swap(a.CurrentSize, b.CurrentSize);
                 Seed::Swap(a.ReservedSize, b.ReservedSize);
             }
 
-            ///<summary>Деструктор</summary>
+            ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
             ForceInline virtual ~BaseString() override {
                 if (str == nullptr) return;
                 BaseString::operator delete[](str);
@@ -1159,16 +1189,16 @@ namespace Seed {
             friend class Details::THexStringPart;
         };
 
-        ///<summary>Тип кінця рядка</summary>
+        ///<summary>пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
         namespace { typedef const Char(&EndLineT)[3]; }
-        ///<summary>Позначка переходу на новий рядок, використовується CRLF режим</summary>
+        ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CRLF пїЅпїЅпїЅпїЅпїЅ</summary>
         constexpr ForceInline EndLineT NextLine() {
             return L"\r\n";
         }
 
-        ///<summary>Простий рядок</summary>
+        ///<summary>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</summary>
         namespace { using String = BaseString<Memory::Heap>; }
-        ///<summary>Рядок для збереження конфіденційної інформації</summary>
+        ///<summary>пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</summary>
         namespace { using SensitiveString = BaseString<Memory::SensitiveDataHeap>; }
 
         namespace TypeTraits {

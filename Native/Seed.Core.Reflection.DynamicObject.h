@@ -77,7 +77,7 @@ namespace Seed
 				public:
 					virtual RTTI::RTTITypeRecord GetValueType() const {
 						if constexpr (Tuple::Count == 1) {
-							static auto type = TypeRecord<typename Tuple::ItemType<0>>();
+							static auto type = TypeRecord<typename Tuple::template ItemType<0>>();
 							return type;
 						}
 						else {
@@ -100,7 +100,7 @@ namespace Seed
 							Throw(NotImplementedException(ExceptionPosition));
 						}
 						else {
-							return typeid(typename Tuple::ItemType<0>);
+							return typeid(typename Tuple::template ItemType<0>);
 						}
 					}
 
@@ -213,7 +213,7 @@ namespace Seed
 				/// Вертає схему типу для серелізатора
 				/// </summary>
 				/// <returns>Об'єкт схеми типу</returns>
-				const Serilization::TypeMetaDataRecord GetTypeShema() const { return data->impl->GetTypeShema(); }
+				Serilization::TypeMetaDataRecord GetTypeShema() const { return data->impl->GetTypeShema(); }
 
 				/// <summary>
 				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 

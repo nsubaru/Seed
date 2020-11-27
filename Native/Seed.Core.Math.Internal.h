@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "Seed.Core.Base.h"
 
 namespace Seed {
@@ -21,25 +21,25 @@ namespace Seed {
 				{
 					return Number * ((Number < 0) * (-1i8) + (Number > 0)); //-V2517
 				}
-				static_assert((Int8)100 == ConstexprAbs((Int8)-100) && (Int8)100 == ConstexprAbs((Int8)100), "Модуль числа Int32 не коректно працює"); //-V2533
+				static_assert((Int8)100 == ConstexprAbs((Int8)-100) && (Int8)100 == ConstexprAbs((Int8)100), "РњРѕРґСѓР»СЊ С‡РёСЃР»Р° Int8 РЅРµ РєРѕСЂРµРєС‚РЅРѕ РїСЂР°С†СЋС”"); //-V2533
 
 				ForceInline constexpr Seed::Int16 ConstexprAbs(Seed::Int16 Number)
 				{
 					return Number * ((Number < 0) * (-1i16) + (Number > 0)); //-V2517
 				}
-				static_assert((Int16)100 == ConstexprAbs((Int16)-100) && (Int16)100 == ConstexprAbs((Int16)100), "Модуль числа Int32 не коректно працює"); //-V2533
+				static_assert((Int16)100 == ConstexprAbs((Int16)-100) && (Int16)100 == ConstexprAbs((Int16)100), "РњРѕРґСѓР»СЊ С‡РёСЃР»Р° Int16 РЅРµ РєРѕСЂРµРєС‚РЅРѕ РїСЂР°С†СЋС”"); //-V2533
 
 				ForceInline constexpr Seed::Int32 ConstexprAbs(Seed::Int32 Number)
 				{
 					return Number * ((Number < 0) * (-1) + (Number > 0));
 				}
-				static_assert(100 == ConstexprAbs(-100) && 100 == ConstexprAbs(100), "Модуль числа Int32 не коректно працює");
+				static_assert(100 == ConstexprAbs(-100) && 100 == ConstexprAbs(100), "РњРѕРґСѓР»СЊ С‡РёСЃР»Р° Int32 РЅРµ РєРѕСЂРµРєС‚РЅРѕ РїСЂР°С†СЋС”");
 
 				ForceInline constexpr Seed::Int64 ConstexprAbs(Seed::Int64 Number)
 				{
 					return Number * ((Number < 0) * (-1i64) + (Number > 0)); //-V2517
 				}
-				static_assert(100L == ConstexprAbs((Int64)-100L) && 100L == ConstexprAbs((Int64)100L), "Модуль числа Int64 не коректно працює");
+				static_assert(100L == ConstexprAbs((Int64) -100L) && 100L == ConstexprAbs((Int64) 100L), "РњРѕРґСѓР»СЊ С‡РёСЃР»Р° Int64 РЅРµ РєРѕСЂРµРєС‚РЅРѕ РїСЂР°С†СЋС”");
 
 				ForceInline constexpr Seed::Float ConstexprAbs(Seed::Float Number)
 				{
@@ -245,7 +245,7 @@ namespace Seed {
 
 				ForceInline Seed::Boolean RuntimeSign(Seed::Float val)
 				{
-					static_assert(sizeof(Float) == sizeof(Int32), "Розміри Float і Int32 різні");
+					static_assert(sizeof(Float) == sizeof(Int32), "Р РѕР·РјС–СЂРё С‚РёРїС–РІ Float С– Int32 РјР°СЋС‚СЊ Р±СѓС‚Рё СЂС–РІРЅС–");
 					union
 					{
 						Int32* I;
@@ -257,7 +257,7 @@ namespace Seed {
 
 				ForceInline Seed::Boolean RuntimeSign(Seed::Double val)
 				{
-					static_assert(sizeof(Double) == sizeof(Int64), "Розміри Float і Int32 різні");
+					static_assert(sizeof(Double) == sizeof(Int64), "Р РѕР·РјС–СЂРё С‚РёРїС–РІ Double С– Int64 РјР°СЋС‚СЊ Р±СѓС‚Рё СЂС–РІРЅС–");
 					union
 					{
 						Int64* I;
