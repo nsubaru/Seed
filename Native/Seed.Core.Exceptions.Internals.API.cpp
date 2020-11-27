@@ -55,3 +55,7 @@ __declspec(noreturn) void Seed::Core::Internals::Exceptions::ThrowInvalidArgumen
 	Throw(InvalidArgumentException(File, Function, Line, ArgName, Description));
 }
 
+__declspec(noreturn) void Seed::Core::Internals::Exceptions::__ReThrow() {
+	ReThrow;
+}
+

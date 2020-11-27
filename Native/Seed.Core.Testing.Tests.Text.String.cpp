@@ -14,145 +14,6 @@ bool Seed::Core::Testing::Test::Text::StringCtor::Excecute() {
 	return str1.Lenght == 0 && str2.Lenght == 3 && str3.Lenght == 3 && str4.Lenght == 3 && str5.Lenght == 3 && str6.Lenght == 3;
 }
 
-bool Seed::Core::Testing::Test::Text::StringComparing::Excecute() {
-	String str1;
-	String str2;
-	String str3 = "123";
-	String str4 = L"123";
-	SensitiveString str5 = "123";
-	ConstAString str6 = "123";
-	ConstString str7 = L"123";
-	String str8 = L"1234";
-	SensitiveString str9 = "1234";
-	ConstString str10 = L"1234";
-	ConstAString str11 = "1234";
-
-	bool EmptyStringEquals = str1 == str2;
-	bool EmptyStringNotEqualNonEmpty = str1 != str3;
-	bool EmptyStringNotNotEqualNonEmpty = !(str1 == str3);
-
-	bool StringSelfEqual = str1 == str1 && str3 == str3; //-V501
-	bool StringSelfNotNotEqual = !(str1 != str1) && !(str3 != str3); //-V501
-	
-	bool StringEqualOtherWithSameData = str3 == str4;
-	bool StringNotNotEqualOtherWithSameData = !(str3 != str4);
-	bool StringNotEqualOtherWithOtherData = !(str4 == str8);
-	bool StringNotNotEqualOtherWithOtherData = str4 != str8;
-
-	bool StringEqualOtherHeapStringWithSameData = str4 == str5 && str5 == str4; //-V501
-	bool StringNotNotEqualOtherHeapStringWithSameData = !(str4 != str5) && !(str5 != str4); //-V501
-	bool StringNotEqualOtherHeapStringWithOtherData = !(str4 == str9);
-	bool StringNotNotEauqlOtherHeapStringWithOtherData = str4 != str9;
-
-	bool StringEqualConstStringWithSameData = str4 == str7 && str7 == str4; //-V501
-	bool StringNotNotEqualConstStringWithSameData = !(str4 != str7) && !(str7 != str4); //-V501
-	bool StringNotEqualConstStringWithOtherData = !(str4 == str10);
-	bool StringNotNotEqualConstStringWithOtherData = str4 != str10;
-
-	bool StringEqualConstAStringWithSameData = str4 == str6 && str6 == str4; //-V501
-	bool StringNotNotEqualConstAStringWithSameData = !(str4 != str6) && !(str6 != str4); //-V501
-	bool StringNotEqualConstAStringWithOtherData = !(str4 == str11);
-	bool StringNotNotEqualConstAStringWithOtherData = str4 != str11;
-
-	bool StringEqualLiteralWithSameData = L"123" == str4 && str4 == L"123"; //-V501
-	bool StringNotNotEqualLiteralWithSameData = !(L"123" != str4) && !(str4 != L"123"); //-V501
-
-	bool StringEqualAsciiLiteralWithSameData = "123" == str4 && str4 == "123"; //-V501
-	bool StringNotNotEqualAsciiLiteralWithSameData = !("123" != str4) && !(str4 != "123"); //-V501
-
-	bool EmptyStringTestResult = 
-		EmptyStringEquals && 
-		EmptyStringNotEqualNonEmpty && 
-		EmptyStringNotNotEqualNonEmpty;
-	bool SelfStringTestResult = 
-		StringSelfEqual && 
-		StringSelfNotNotEqual;
-	bool StringWithSameHeapTestResult = 
-		StringEqualOtherWithSameData && 
-		StringNotNotEqualOtherWithSameData && 
-		StringNotEqualOtherWithOtherData && 
-		StringNotNotEqualOtherWithOtherData;
-	bool StringWithOtherHeapTestResult =
-		StringEqualOtherHeapStringWithSameData &&
-		StringNotNotEqualOtherHeapStringWithSameData &&
-		StringNotEqualOtherHeapStringWithOtherData &&
-		StringNotNotEauqlOtherHeapStringWithOtherData;
-	bool StringWithConstStrinTestResult =
-		StringEqualConstStringWithSameData &&
-		StringNotNotEqualConstStringWithSameData &&
-		StringNotEqualConstStringWithOtherData &&
-		StringNotNotEqualConstStringWithOtherData;
-	bool StringWithConstAStrinTestResult =
-		StringEqualConstAStringWithSameData &&
-		StringNotNotEqualConstAStringWithSameData &&
-		StringNotEqualConstAStringWithOtherData &&
-		StringNotNotEqualConstAStringWithOtherData;
-	bool StringWithLiteralTestResult =
-		StringEqualLiteralWithSameData &&
-		StringNotNotEqualLiteralWithSameData;
-	bool StringWithAciiLiteralTestResult =
-		StringEqualAsciiLiteralWithSameData &&
-		StringNotNotEqualAsciiLiteralWithSameData;
-
-	return
-		EmptyStringTestResult &&
-		SelfStringTestResult &&
-		StringWithSameHeapTestResult &&
-		StringWithOtherHeapTestResult &&
-		StringWithConstStrinTestResult &&
-		StringWithConstAStrinTestResult &&
-		StringWithLiteralTestResult &&
-		StringWithAciiLiteralTestResult;
-}
-
-bool Seed::Core::Testing::Test::Text::StringOrdering::Excecute() {
-	String str1;
-	String str2;
-	String str3 = "123";
-	String str4 = L"123";
-	SensitiveString str5 = "123";
-	ConstAString str6 = "123";
-	ConstString str7 = L"123";
-	String str8 = L"1234";
-	SensitiveString str9 = "1234";
-	ConstString str10 = L"1234";
-	ConstAString str11 = "1234";
-
-	bool ComparingEmptyStrings = !(str1 > str2) && !(str1 < str2) && str1 <= str2 && str1 >= str2;
-	bool ComparingWithEmptyString = str2 < str3 && !(str2 > str3) && str2 <= str3 && !(str3 <= str2);
-	bool ComparingSameDataStrings = !(str3 < str4) && !(str3 > str4) && str3 <= str4 && str3 >= str4;
-	bool ComparingWithSelf = !(str3 < str3) && !(str3 > str3) && str3 <= str3 && str3 >= str3; //-V501
-	bool ComparingWithOtherHeapString = !(str4 < str5) && !(str4 > str5) && str4 <= str5 && str4 >= str5;
-	bool ComparingWithConstString = !(str4 < str7) && !(str4 > str7) && str4 <= str7 && str4 >= str7;
-	bool ComparingWithConstAString = !(str4 < str6) && !(str4 > str6) && str4 <= str6 && str4 >= str6;
-	bool ComparingWithLiteral = !(str4 < L"123") && !(str4 > L"123") && str4 <= L"123" && str4 >= L"123";
-	bool ComparingWithAsciiLiteral = !(str4 < "123") && !(str4 > "123") && str4 <= "123" && str4 >= "123";
-
-	bool ComparingWithLowerString = str4 < str8 && str8 > str4 && str4 <= str8 && str8 >= str4; //-V501
-	bool ComparingWithLowerOtherHeapString = str4 < str9 && str9 > str4 && str4 <= str9 && str9 >= str4; //-V501
-	bool ComparingWithLowerConstString = str4 < str10 && String(str10) > str4 && str4 <= str10 && String(str10) >= str4;
-	bool ComparingWithLowerConstAString = str4 < str11 && String(str11) > str4 && str4 <= str11 && String(str11) >= str4;
-	bool ComparingWithLowerLiteral = str4 < L"1234" && String(L"1234") > str4 && str4 <= L"1234" && String(L"1234") >= str4;
-	bool CompatingWithLowerAciiLiteral = str4 < "1234" && String("1234") > str4 && str4 <= "1234" && String("1234") >= str4;
-
-	return
-		ComparingEmptyStrings &&
-		ComparingWithEmptyString &&
-		ComparingSameDataStrings &&
-		ComparingWithSelf &&
-		ComparingWithOtherHeapString &&
-		ComparingWithConstString &&
-		ComparingWithConstAString &&
-		ComparingWithLiteral &&
-		ComparingWithAsciiLiteral &&
-		ComparingWithLowerString &&
-		ComparingWithLowerOtherHeapString &&
-		ComparingWithLowerConstString &&
-		ComparingWithLowerConstAString &&
-		ComparingWithLowerLiteral &&
-		CompatingWithLowerAciiLiteral;
-}
-
 bool Seed::Core::Testing::Test::Text::StringContactanation::Excecute() {
 	String str1;
 	String str2;
@@ -347,6 +208,244 @@ bool Seed::Core::Testing::Test::Text::StringBlobHex::Excecute()
 	auto value = Core::Containers::Blob{ 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0 };
 
 	Asserts::AssertEqual(String::binaryToHex(value), L"123456789abcdef0");
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::EmptyStringEquals::Excecute() {
+	String str1;
+	String str2;
+	String str3 = "123";
+
+	Asserts::AssertTrue(str1 == str2);
+	Asserts::AssertTrue(str1 != str3);
+	Asserts::AssertTrue(!(str1 == str3));
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::SelfStringTestResult::Excecute() {
+	String str1;
+	String str2 = "123";
+
+	Asserts::AssertTrue(str1 == str1 && str2 == str2);
+	Asserts::AssertTrue(!(str1 != str1) && !(str2 != str2));
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::StringWithSameHeapTestResult::Excecute() {
+	String str1 = "123";
+	String str2 = L"123";
+	String str3 = L"1234";
+
+	Asserts::AssertTrue(str1 == str2);
+	Asserts::AssertTrue(!(str1 != str2));
+	Asserts::AssertTrue(!(str2 == str3));
+	Asserts::AssertTrue(str2 != str3);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::StringWithOtherHeapTestResult::Excecute() {
+	String str1 = L"123";
+	SensitiveString str2 = "123";
+	SensitiveString str3 = "1234";
+
+	Asserts::AssertTrue(str1 == str2 && str2 == str1);
+	Asserts::AssertTrue(!(str1 != str2) && !(str2 != str1));
+	Asserts::AssertTrue(!(str1 == str3));
+	Asserts::AssertTrue(str1 != str3);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::StringWithConstStringTestResult::Excecute() {
+	String str1 = L"123";
+	ConstString str2 = L"123";
+	ConstString str3 = L"1234";
+
+	Asserts::AssertTrue(str1 == str2 && str2 == str1);
+	Asserts::AssertTrue(!(str1 != str2) && !(str2 != str1));
+	Asserts::AssertTrue(!(str1 == str3));
+	Asserts::AssertTrue(str1 != str3);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::StringWithConstAStringTestResult::Excecute() {
+	String str1 = L"123";
+	ConstAString str2 = "123";
+	ConstAString str3 = "1234";
+
+	Asserts::AssertTrue(str1 == str2 && str2 == str1);
+	Asserts::AssertTrue(!(str1 != str2) && !(str2 != str1));
+	Asserts::AssertTrue(!(str1 == str3));
+	Asserts::AssertTrue(str1 != str3);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::StringWithLiteralTestResult::Excecute() {
+	String str1 = L"123";
+
+	Asserts::AssertTrue(L"123" == str1 && str1 == L"123");
+	Asserts::AssertTrue(!(L"123" != str1) && !(str1 != L"123"));
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Comparing::StringWithAciiLiteralTestResult::Excecute() {
+	String str1 = L"123";
+
+	Asserts::AssertTrue("123" == str1 && str1 == "123");
+	Asserts::AssertTrue(!("123" != str1) && !(str1 != "123"));
+
+	return true;
+}
+
+
+bool Seed::Core::Testing::Test::Ordering::ComparingEmptyStrings::Excecute() {
+	String str1;
+	String str2;
+
+	Asserts::AssertTrue(!(str1 > str2) && !(str1 < str2) && str1 <= str2 && str1 >= str2);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithEmptyString::Excecute() {
+	String str1;
+	String str2 = "123";
+
+	Asserts::AssertTrue(str1 < str2 && !(str1 > str2) && str1 <= str2 && !(str2 <= str1));
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingSameDataStrings::Excecute() {
+	String str1 = "123";
+	String str2 = L"123";
+
+	Asserts::AssertTrue(!(str1 < str2) && !(str1 > str2) && str1 <= str2 && str1 >= str2);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithSelf::Excecute() {
+	String str1 = "123";
+
+	Asserts::AssertTrue(!(str1 < str1) && !(str1 > str1) && str1 <= str1 && str1 >= str1);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithOtherHeapString::Excecute() {
+	String str1 = L"123";
+	SensitiveString str2 = "123";
+
+	Asserts::AssertTrue(!(str1 < str2) && !(str1 > str2) && str1 <= str2 && str1 >= str2);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithConstString::Excecute() {
+	String str1 = L"123";
+	ConstString str2 = L"123";
+
+	Asserts::AssertTrue(!(str1 < str2) && !(str1 > str2) && str1 <= str2 && str1 >= str2);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithConstAString::Excecute() {
+	String str1 = L"123";
+	ConstAString str2 = "123";
+
+	Asserts::AssertTrue(!(str1 < str2));
+	Asserts::AssertTrue(!(str1 > str2));
+	Asserts::AssertTrue(str1 <= str2);
+	Asserts::AssertTrue(str1 >= str2);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithLiteral::Excecute() {
+	String str1 = L"123";
+
+	Asserts::AssertTrue(!(str1 < L"123") && !(str1 > L"123") && str1 <= L"123" && str1 >= L"123");
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithAsciiLiteral::Excecute() {
+	String str1 = L"123";
+
+	Asserts::AssertTrue(!(str1 < "123") && !(str1 > "123") && str1 <= "123" && str1 >= "123");
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithLowerString::Excecute() {
+	String str1 = L"123";
+	String str2 = L"1234";
+
+	Asserts::AssertTrue(str1 < str2&& str2 > str1 && str1 <= str2 && str2 >= str1);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithLowerOtherHeapString::Excecute() {
+	String str1 = L"123";
+	SensitiveString str2 = "1234";
+
+	Asserts::AssertTrue(str1 < str2&& str2 > str1 && str1 <= str2 && str2 >= str1);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithLowerConstString::Excecute() {
+	String str1 = L"123";
+	ConstString str2 = L"1234";
+
+	Asserts::AssertTrue(str1 < str2);
+	Asserts::AssertTrue(String(str2) > str1);
+	Asserts::AssertTrue(str1 <= str2);
+	Asserts::AssertTrue(String(str2) >= str1);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithLowerConstAString::Excecute() {
+	String str1 = L"123";
+	ConstAString str2 = "1234";
+
+	Asserts::AssertTrue(str1 < str2);
+	Asserts::AssertTrue(String(str2) > str1);
+	Asserts::AssertTrue(str1 <= str2);
+	Asserts::AssertTrue(String(str2) >= str1);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::ComparingWithLowerLiteral::Excecute() {
+	String str1 = L"123";
+
+	Asserts::AssertTrue(str1 < L"1234");
+	Asserts::AssertTrue(String(L"1234") > str1);
+	Asserts::AssertTrue(str1 <= L"1234");
+	Asserts::AssertTrue(String(L"1234") >= str1);
+
+	return true;
+}
+
+bool Seed::Core::Testing::Test::Ordering::CompatingWithLowerAciiLiteral::Excecute() {
+	String str1 = L"123";
+
+	Asserts::AssertTrue(str1 < "1234");
+	Asserts::AssertTrue(String("1234") > str1);
+	Asserts::AssertTrue(str1 <= "1234");
+	Asserts::AssertTrue(String("1234") >= str1);
 
 	return true;
 }
