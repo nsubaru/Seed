@@ -545,7 +545,7 @@ namespace Seed
                 /// <param name="dateSpan">ќб'Їкт в≥др≥зку дат</param>
                 ForceInline static TBaseString toString(Seed::Core::Time::DateSpan dateSpan) {
                     Char buffer[22] = { 0 };
-                    auto value = static_cast<Time::DateTime>(time);
+                    auto value = static_cast<Time::DateTime>(dateSpan);
                     Internals::ConvertDateTimeToStringImpl(value, buffer);
                     return buffer;
                 }

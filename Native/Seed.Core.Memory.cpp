@@ -97,7 +97,7 @@ Seed::Boolean Seed::Core::Memory::Heap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto& cfg = CurrentSettings().MemoryManager.DefaultHeap;
+	const auto& cfg = CurrentSettings().MemoryManager.DefaultHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;
@@ -303,7 +303,7 @@ Seed::Boolean Seed::Core::Memory::SensitiveDataHeap::Init() noexcept
 {
 	ULONG Flags = HEAP_GROWABLE;
 
-	auto& cfg = CurrentSettings().MemoryManager.SensitiveDataHeap;
+	const auto& cfg = CurrentSettings().MemoryManager.SensitiveDataHeap;
 
 	if (cfg.HeapArgsCheck)
 		Flags |= FLG_HEAP_VALIDATE_PARAMETERS;

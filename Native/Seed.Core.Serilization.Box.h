@@ -71,7 +71,7 @@ namespace Seed
                             sizeof(T),
                             0,
                             TypeHint(),
-                            { BaseSerlizationHandler<THeap, ItemType>::GetTypeMetaDataRecord() }
+                            { BaseSerlizationHandler<THeap, T>::GetTypeMetaDataRecord() }
                         );
                     }
                 };
@@ -132,7 +132,7 @@ namespace Seed
                             sizeof(T),
                             0,
                             TypeHint(),
-                            { BaseSerlizationHandler<THeap, ItemType>::GetTypeMetaDataRecord() }
+                            { BaseSerlizationHandler<THeap, T>::GetTypeMetaDataRecord() }
                         );
                     }
                 };

@@ -27,7 +27,7 @@ namespace Seed {
 				///<param name="Funct">Функція або лямбда яка виконається в ексклюзивному блокуванні</param>
 				///<returns>Те ж що і Funct</returns>
 				template<typename T> requires Concepts::IsInvockable<T>
-				ForceInline decltype(auto) ExclusiveLock(T& Funct)
+				ForceInline decltype(auto) ExclusiveLock(T&& Funct)
 				{
 					if constexpr (TypeTraits::IsSameT<decltype(Funct()), void>())
 					{

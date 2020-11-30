@@ -59,7 +59,7 @@ namespace Seed {
 						Logger::GetLogLevelName<TLogLevel>() +
 						Details::CreateTypeStr(L" -> ") +
 						Logger::GetStaticSubsystemName<TSubsystem>() +
-						Details::CreateTypeStr(L"] ");
+						Details::CreateTypeStr(L"]  \0");
 				}
 
 			protected:

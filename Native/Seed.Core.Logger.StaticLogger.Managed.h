@@ -50,15 +50,26 @@ namespace Seed {
 				}
 
 			protected:
+				template<ELoggerLevel TLogLevel>
+				constexpr static auto GenerateManagedLogTextHeader() {
+					return
+						Details::CreateTypeStr(L"[") +
+						Logger::GetLogLevelName<TLogLevel>() +
+						Details::CreateTypeStr(L" -> ") +
+						Logger::GetStaticSubsystemName<TSubsystem>() +
+						Details::CreateTypeStr(L"]  \0");
+				}
+
+			protected:
 				template<ELoggerLevel TLogLevel, typename THeap>
 				static void toLogWithLevel(const BaseString<THeap>& msg) {
-					constexpr decltype(auto) header = GenerateLogTextHeader<TLogLevel>();
+					constexpr decltype(auto) header = GenerateManagedLogTextHeader<TLogLevel>();
 
-					UChar buffer[MaxLogMessage];
+					UChar buffer[StaticLogger<TSubsystem>::MaxLogMessage]{};
 					CStr::Copy((UChar*)header.Raw(), buffer);
 					
-					if (msg.Lenght > MaxLogMessage - (header.Count * sizeof(UChar))) {
-						auto str = msg.Clone().Resize(((MaxLogMessage - 1) - (header.Count * sizeof(UChar))) - 3);
+					if (msg.Lenght > StaticLogger<TSubsystem>::MaxLogMessage - (header.Count * sizeof(UChar))) {
+						auto str = msg.Clone().Resize(((StaticLogger<TSubsystem>::MaxLogMessage - 1) - (header.Count * sizeof(UChar))) - 3);
 						str += "...";
 
 						CStr::Copy((UChar*)(const ConstCharStr)str, buffer + (header.Count * sizeof(UChar)));

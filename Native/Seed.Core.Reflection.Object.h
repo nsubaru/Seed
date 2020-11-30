@@ -9,41 +9,6 @@ namespace Seed
 	{
 		namespace Reflection
 		{
-			///<summary>Неможливо викликати динамічну функцію з даним набором аргументів</summary>
-			class InvlaidDynamicFunctionArgs : public Exception {
-			public:
-				InvlaidDynamicFunctionArgs(const InvlaidDynamicFunctionArgs& orig) : Exception(orig) {}
-				InvlaidDynamicFunctionArgs(InvlaidDynamicFunctionArgs&& from) : Exception(MoveRValue(from)) {}
-				InvlaidDynamicFunctionArgs& operator=(const InvlaidDynamicFunctionArgs& from) { this->~InvlaidDynamicFunctionArgs(); this->InvlaidDynamicFunctionArgs::InvlaidDynamicFunctionArgs(from); return *this; }
-				InvlaidDynamicFunctionArgs& operator=(InvlaidDynamicFunctionArgs&& from) { this->~InvlaidDynamicFunctionArgs(); this->InvlaidDynamicFunctionArgs::InvlaidDynamicFunctionArgs(MoveRValue(from)); return *this; }
-			public:
-				///<summary>Конструктор помилки</summary>
-				///<param name = 'File'>Файл в якому згенерована помилка</param>
-				///<param name = 'FunctName'>Ім'я функції</param>
-				///<param name = 'Line'>Номер рядка де була згенерована помилка</param>
-				InvlaidDynamicFunctionArgs(const ConstAString& File, const ConstAString& FunctName, SizeT Line)
-					:Exception(File, FunctName, Line, L"Неможливо викликати динамічну функцію з даним набором аргументів") {}
-
-				///<summary>Текстове представлення інформації про помилки помилки</summary>
-				virtual ExceptionString toString() const override final {
-					return ExceptionString::Combine({
-						ExceptionString(exceptionName), ExceptionString(L". "),
-						location.toString(), 
-						(innerException == nullptr) ? ExceptionString(L".") : (L". Також є вкладена помилка: " + InnerException->toString())
-					});
-				}
-
-				/// <summary>
-				/// Вертає копію об'єкта помилки
-				/// </summary>
-				/// <returns>Розумний покажчик на об'єкт помилки</returns>
-				virtual ExceptionHolderType Clone() const override {
-					return ExceptionHolderType(new InvlaidDynamicFunctionArgs(*this));
-				}
-
-				virtual ~InvlaidDynamicFunctionArgs() {}
-			};
-
 			namespace Details
 			{
 				template<typename ... TArgs>
@@ -77,13 +42,13 @@ namespace Seed
 						}
 						else
 						{
-							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>>();
 						}
 					}
 				private:
 					template<SizeT TIdx>
 					ForceInline static auto GetArgByIdxFromDelegate(const Containers::Array<DynamicObject>& args) {
-						return args[(ArgsType::Count - 1) - TIdx].GetValue<typename ArgsType::ItemType<(ArgsType::Count - 1) - TIdx>>().GetByIdx<0>();
+						return args[(sizeof...(TArgs) - 1) - TIdx].GetValue<typename ArgsType::template ItemType<(sizeof...(TArgs) - 1) - TIdx>>().GetByIdx<0>();
 					}
 
 					template<typename T>
@@ -105,7 +70,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(const_cast<void*&>(pMethod));
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -135,7 +100,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -218,14 +183,14 @@ namespace Seed
 						}
 						else
 						{
-							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>>();
 						}
 					}
 
 				private:
 					template<SizeT TIdx>
 					ForceInline static auto GetArgByIdxFromDelegate(const Containers::Array<DynamicObject>& args) {
-						return args[(ArgsType::Count - 1) - TIdx].GetValue<typename ArgsType::ItemType<(ArgsType::Count - 1) - TIdx>>().GetByIdx<0>();
+						return args[(sizeof...(TArgs) - 1) - TIdx].GetValue<typename ArgsType::template ItemType<(sizeof...(TArgs) - 1) - TIdx>>().GetByIdx<0>();
 					}
 
 					template<typename T>
@@ -247,7 +212,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -277,7 +242,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -360,14 +325,14 @@ namespace Seed
 						}
 						else
 						{
-							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>>();
 						}
 					}
 
 				private:
 					template<SizeT TIdx>
 					ForceInline static auto GetArgByIdxFromDelegate(const Containers::Array<DynamicObject>& args) {
-						return args[(ArgsType::Count - 1) - TIdx].GetValue<typename ArgsType::ItemType<(ArgsType::Count - 1) - TIdx>>().GetByIdx<0>();
+						return args[(sizeof...(TArgs) - 1) - TIdx].GetValue<typename ArgsType::template ItemType<(sizeof...(TArgs) - 1) - TIdx>>().GetByIdx<0>();
 					}
 
 					template<typename T>
@@ -389,7 +354,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -419,7 +384,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -502,14 +467,14 @@ namespace Seed
 						}
 						else
 						{
-							return Serilization::MetaDataGen<Containers::Tuple<TRet>>();
+							return Serilization::MetaDataGen<Containers::Tuple<TypeTraits::RemoveCVRefV<TRet>>>();
 						}
 					}
 
 				private:
 					template<SizeT TIdx>
 					ForceInline static auto GetArgByIdxFromDelegate(const Containers::Array<DynamicObject>& args) {
-						return args[(ArgsType::Count - 1) - TIdx].GetValue<typename ArgsType::ItemType<(ArgsType::Count - 1) - TIdx>>().GetByIdx<0>();
+						return args[(sizeof...(TArgs) - 1) - TIdx].GetValue<typename ArgsType::template ItemType<(sizeof...(TArgs) - 1) - TIdx>>().GetByIdx<0>();
 					}
 
 					template<typename T>
@@ -531,7 +496,7 @@ namespace Seed
 						if constexpr (IsFunctionWithoutArgs<TArgs...>)
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -561,7 +526,7 @@ namespace Seed
 						else
 						{
 							MethodType method = reinterpret_cast<MethodType const&>(pMethod);
-							TTargetClass& pThis = This.GetValue<TTargetClass>().GetByIdx<0>();
+							TTargetClass& pThis = const_cast<TTargetClass&>(This.GetValue<TTargetClass>().GetByIdx<0>());
 
 							if constexpr (TypeTraits::IsSameV<TRet, void>)
 							{
@@ -627,7 +592,7 @@ namespace Seed
 				private:
 					template<SizeT TIdx>
 					ForceInline static auto GetArgByIdxFromDelegate(const Containers::Array<DynamicObject>& args) {
-						return args[(Containers::Tuple<TArgs...>::Count - 1) - TIdx].GetValue<typename Containers::Tuple<TArgs...>::ItemType<(Containers::Tuple<TArgs...>::Count - 1) - TIdx>>().GetByIdx<0>();
+						return args[(sizeof...(TArgs) - 1) - TIdx].GetValue<typename Containers::V2Tuple<TArgs...>::template ItemType<(sizeof...(TArgs) - 1) - TIdx>>().GetByIdx<0>();
 					}
 
 					template<typename T>
@@ -765,7 +730,7 @@ namespace Seed
 								TypeTraits::IsSameV<
 								typename TypeTraits::RemoveCV<
 								TypeTraits::RemoveRefV<
-								typename TSetterMethods::ItemType<0>::Args::ItemType<0>
+								typename TSetterMethods::template ItemType<0>::Args::template ItemType<0>
 								>
 								>,
 								typename MethodCallDescriptor<TTargetClass, TGet>::Ret

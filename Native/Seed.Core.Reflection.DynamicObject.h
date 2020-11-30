@@ -12,7 +12,7 @@ namespace Seed
 		namespace Reflection
 		{
 			/// <summary>
-			/// Динамічний об'єкт, містить у собі кортеж з типів, доступ отримати можна якщо відомий тип
+			/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ'пїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 			/// </summary>
 			class DynamicObject final : IDisposable{
 			public:
@@ -81,7 +81,7 @@ namespace Seed
 				public:
 					virtual RTTI::RTTITypeRecord GetValueType() const {
 						if constexpr (Tuple::Count == 1) {
-							static auto type = ::TypeRecord<typename Tuple::ItemType<0>>();
+							static auto type = TypeRecord<typename Tuple::template ItemType<0>>();
 							return type;
 						}
 						else {
@@ -104,7 +104,7 @@ namespace Seed
 							Throw(NotImplementedException(ExceptionPosition));
 						}
 						else {
-							return typeid(typename Tuple::ItemType<0>);
+							return typeid(typename Tuple::template ItemType<0>);
 						}
 					}
 
@@ -143,87 +143,87 @@ namespace Seed
 				}
 			public:
 				/// <summary>
-				/// Пустий конструктор ініціалізовує пустий кортеж 
+				/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
 				/// </summary>
 				DynamicObject() : data(new Data(new DynamicImpl(Containers::Tuple<>()))) {}
 				/// <summary>
-				/// Конструктор з даних
+				/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <param name="data">Кортеж даних</param>
+				/// <param name="data">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
 				template<typename ... TTypes> requires (!(sizeof...(TTypes) == 1 && (Concepts::IsSame<DynamicObject, TypeTraits::RemoveCVRefV<TTypes>> && ...)))
 				DynamicObject(const TTypes&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(data)))) {}
 				/// <summary>
-				/// Конструктор з даних
+				/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <param name="data">Кортеж даних</param>
+				/// <param name="data">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</param>
 				template<typename ... TTypes> requires (!(sizeof...(TTypes) == 1 && (Concepts::IsSame<DynamicObject, TypeTraits::RemoveCVRefV<TTypes>> && ...)))
 				DynamicObject(TTypes&&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(ForwardReference<TTypes>(data)...)))){}
 				/// <summary>
-				/// Конструктор з кортежу
+				/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <param name="tuple">Кортеж значень</param>
+				/// <param name="tuple">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
 				template<typename ... TTypes>
 				DynamicObject(const Containers::Tuple<TTypes...>& tuple) : data(new Data(new DynamicImpl(tuple))) {}
 				/// <summary>
-				/// Конструктор переміщення з кортежу
+				/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <param name="tuple">Кортеж значень</param>
+				/// <param name="tuple">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
 				template<typename ... TTypes>
 				DynamicObject(Containers::Tuple<TTypes...>&& tuple) : data(new Data(new DynamicImpl(MoveRValue(tuple)))) {}
 
 				/// <summary>
-				/// Вертає тип кортежу який містить на даний тип об'єкт
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ'пїЅпїЅпїЅ
 				/// </summary>
-				/// <returns>Опис типу</returns>
+				/// <returns>пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</returns>
 				RTTI::RTTITypeRecord GetValueType() const { return data->impl->GetValueType(); }
 
 				/// <summary>
-				/// Вертає рядкове представлення імені типу
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <returns>Рядкове представлення імені типу</returns>
+				/// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</returns>
 				const String& GetTypeName() const { return data->impl->GetTypeName(); }
 
 				/// <summary>
-				/// Вертає рядкове представлення cxx імені типу
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cxx пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <returns>Рядкове представлення cxx імені типу</returns>
+				/// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cxx пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</returns>
 				const String& GetCxxTypeName() const { return data->impl->GetCxxTypeName(); }
 
 				/// <summary>
-				/// Вертає рядкове представлення схеми типу для серелізатора
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <returns>Рядкове представлення схеми типів</returns>
+				/// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</returns>
 				const String& GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }
 
 				/// <summary>
-				/// Вертає cxx rtti опис типу кортежа
+				/// пїЅпїЅпїЅпїЅпїЅ cxx rtti пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				/// <returns></returns>
 				const TypeInfo& GetImplementationTypeInfo() const { return data->impl->GetImplementationTypeInfo(); }
 
 				/// <summary>
-				/// Вертає cxx rtti опис типу першого елементам кортежу при умові що кортеж містить лише один елемент
+				/// пїЅпїЅпїЅпїЅпїЅ cxx rtti пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				/// <returns></returns>
 				const TypeInfo& GetImplementationItem1TypeInfo() const { return data->impl->GetImplementationItem1TypeInfo(); }
 
 				/// <summary>
-				/// Вертає кільксть елементва в кортежі
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				/// <returns></returns>
 				SizeT GetItemsCount() const { return data->impl->GetItemsCount(); }
 
 				/// <summary>
-				/// Вертає схему типу для серелізатора
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
-				/// <returns>Об'єкт схеми типу</returns>
-				const Serilization::TypeMetaDataRecord GetTypeShema() const { return data->impl->GetTypeShema(); }
+				/// <returns>пїЅпїЅ'пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</returns>
+				Serilization::TypeMetaDataRecord GetTypeShema() const { return data->impl->GetTypeShema(); }
 
 				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Посилання на кортеж</returns>
+				/// <exception cref="Seed::Exceptions::NullPointException">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</exception>
+				/// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</returns>
 				template<typename ... TTypes>
 				Containers::Tuple<TTypes...>& GetValue() {
 					if(typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo()){
@@ -236,10 +236,10 @@ namespace Seed
 				}
 
 				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Незмінне посилання на кортеж</returns>
+				/// <exception cref="Seed::Exceptions::NullPointException">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</exception>
+				/// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</returns>
 				template<typename ... TTypes>
 				const Containers::Tuple<TTypes...>& GetValue() const {
 					if(typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo()){
@@ -252,10 +252,10 @@ namespace Seed
 				}
 
 				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Посилання на кортеж</returns>
+				/// <exception cref="Seed::Exceptions::NullPointException">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</exception>
+				/// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</returns>
 				template<typename TTuple> requires Concepts::Tuple<TTuple>
 				TTuple GetTuple() {
 					
@@ -269,10 +269,10 @@ namespace Seed
 				}
 
 				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Незмінне посилання на кортеж</returns>
+				/// <exception cref="Seed::Exceptions::NullPointException">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</exception>
+				/// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ</returns>
 				template<typename TTuple> requires Concepts::Tuple<TTuple>
 				const TTuple GetTuple() const {
 					
@@ -286,32 +286,32 @@ namespace Seed
 				}
 			public:
 				/// <summary>
-				/// Опис типу який містить кортеж
+				/// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				RTTI::RTTITypeRecord Property(GetValueType) ValueType;
 
 				/// <summary>
-				/// Ім'я типу який містить кортеж
+				/// пїЅпїЅ'пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				String Property(GetTypeName) TypeName;
 
 				/// <summary>
-				/// Ім'я cxx типу який містить кортеж
+				/// пїЅпїЅ'пїЅ cxx пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				String Property(GetCxxTypeName) CxxTypeName;
 
 				/// <summary>
-				/// Схема серелізації
+				/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				Serilization::TypeMetaDataRecord Property(GetTypeShema) TypeShema;
 
 				/// <summary>
-				/// Рядкове представлення схеми серелізації
+				/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				String Property(GetSerilizationMetadata) SerilizationMetadata;
 
 				/// <summary>
-				/// Кільксть елементва в кортежі
+				/// КіпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				/// </summary>
 				SizeT Property(GetItemsCount) ItemsCount;
 

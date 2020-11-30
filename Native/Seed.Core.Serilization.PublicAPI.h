@@ -69,7 +69,7 @@ namespace Seed
 
             template<typename T>
             ForceInline SizeT SerilizedDataSize(const T& object, UnusedData const TypesRegistry& registry) {
-                return Details::BaseSerlizationHandler<THeap, T>::DataSize(Object, registry);
+                return Details::BaseSerlizationHandler<Memory::Heap, T>::DataSize(object, registry);
             }
 
             template<typename THeap, typename T>

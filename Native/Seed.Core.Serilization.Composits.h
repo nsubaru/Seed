@@ -22,8 +22,8 @@ namespace Seed
 						if constexpr(Index == sizeof...(TTypes))
 							return;
 						else{
-							using Type = typename Tuple::ItemType<Index>;
-							BaseSerlizationHandler<THeap, Type>::SerilizeImpl(data.GetByIdx<Index>(), rawStream, offset, registry);
+							using Type = typename Tuple::template ItemType<Index>;
+							BaseSerlizationHandler<THeap, Type>::SerilizeImpl(data.GetByIdxAsRef<Index>(), rawStream, offset, registry);
 							SerilizeTupleItem<Index + 1>(data, rawStream, offset, registry);
 						}
 					}
@@ -33,8 +33,8 @@ namespace Seed
 						if constexpr(Index == sizeof...(TTypes))
 							return;
 						else{
-							using Type = typename Tuple::ItemType<Index>;
-							BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(data.GetByIdx<Index>(), rawStream, offset, registry);
+							using Type = typename Tuple::template ItemType<Index>;
+							BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(data.GetByIdxAsRef<Index>(), rawStream, offset, registry);
 							DeserelizeTupleItem<Index + 1>(data, rawStream, offset, registry);
 						}
 					}
@@ -44,8 +44,8 @@ namespace Seed
 						if constexpr(Index == sizeof...(TTypes))
 							return 0;
 						else{
-							using Type = typename Tuple::ItemType<Index>;
-							return BaseSerlizationHandler<THeap, Type>::DataSize(data.GetByIdx<Index>(), registry)
+							using Type = typename Tuple::template ItemType<Index>;
+							return BaseSerlizationHandler<THeap, Type>::DataSize(data.GetByIdxAsRef<Index>(), registry)
 								+
 							DataSizeTuppleItem<Index + 1>(data, registry);
 						}
@@ -53,10 +53,14 @@ namespace Seed
 
 					template<SizeT Index = 0>
 					constexpr ForceInline static auto TypeMetaDataTuppleItem(){
-						if constexpr(Index == sizeof...(TTypes))
+						if constexpr (Index == sizeof...(TTypes))
+						{
 							return Core::Details::CreateTypeStr(L"");
-						else{
-							using Type = typename Tuple::ItemType<Index>;
+						}
+						else
+						{
+							using Type = typename Tuple::template ItemType<Index>;
+
 							return BaseSerlizationHandler<THeap, Type>::TypeMetaData()
 								+
 							TypeMetaDataTuppleItem<Index + 1>();
@@ -110,7 +114,7 @@ namespace Seed
 					ForceInline static Containers::BaseList<THeap, BaseTypeMetaDataRecord<THeap>> GetFieldsTypeMetaDataRecord() {
 						if constexpr (Index < sizeof...(TTypes))
 						{
-							using Type = typename Tuple::ItemType<Index>;
+							using Type = typename Tuple::template ItemType<Index>;
 
 							if constexpr (Index + 1 < sizeof...(TTypes))
 								return
@@ -158,7 +162,7 @@ namespace Seed
 						
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = decltype(FieldMetaData)::template Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count){
 								BaseSerlizationHandler<THeap, Type>::SerilizeImpl(
@@ -187,7 +191,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = decltype(FieldMetaData)::template Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count){
 								BaseSerlizationHandler<THeap, Type>::DeserelizeImpl(
@@ -214,7 +218,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = decltype(FieldMetaData)::template Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return 
@@ -238,7 +242,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = decltype(FieldMetaData)::template Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return
@@ -268,7 +272,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = decltype(FieldMetaData)::template Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return BaseSerlizationHandler<THeap, Type>::TypeMetaData()
@@ -334,7 +338,7 @@ namespace Seed
 						if constexpr (I < StructFieldsMetaData.Count)
 						{
 							auto FieldMetaData = StructFieldsMetaData.GetByIdx<I>();
-							using Type = decltype(FieldMetaData)::Type;
+							using Type = decltype(FieldMetaData)::template Type;
 
 							if constexpr (I + 1 < StructFieldsMetaData.Count)
 								return

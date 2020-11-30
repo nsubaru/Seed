@@ -9,14 +9,6 @@ namespace Seed
 	{
 		namespace Reflection
 		{
-			using NonSerelizableType = Serilization::NonSerelizableType;
-
-			template<typename THeap>
-			using BaseTypeMetaDataRecord = Serilization::BaseTypeMetaDataRecord<THeap>;
-
-			using TypeMetaDataRecord = Serilization::TypeMetaDataRecord;
-			using SensitiveTypeMetaDataRecord = Serilization::SensitiveTypeMetaDataRecord;
-
 			/// <summary>
 			/// Запис про тип даних(який підтримує серелізацію)
 			/// </summary>
@@ -159,7 +151,7 @@ namespace Seed
 							if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable && 
 								(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass != CTTI::EType::Tuple))
 							{
-								return DynamicObject(Containers::Tuple<T>());
+								return DynamicObject(Containers::Tuple<T>(T{}));
 							} 
 							else if constexpr (CTTI::TypeTraits::CTTITypeMetaData<T>::IsSerilizable)
 							{

@@ -128,7 +128,7 @@ namespace Seed {
                 template<SizeT NewSize>
                 ForceInline constexpr ConstexprArray<T, NewSize> Resize() const {
                     ConstexprArray<T, NewSize> ret;
-                    constexpr SizeT CopySize = Min(Size, NewSize);
+                    constexpr SizeT CopySize = Size < NewSize ? Size : NewSize;
                     for (SizeT i = 0; i < CopySize; i++)
                         ret[i] = arr[i];
                     return ret;
@@ -331,7 +331,7 @@ namespace Seed {
             template <Seed::SizeT N>
             ForceInline constexpr auto CreateTypeStr(Char const (&str)[N])
             {
-                return MFSh(str, Seed::TypeTraits::Indexer<N - 1>::Type{}).Reverse();
+                return MFSh(str, typename Seed::TypeTraits::Indexer<N - 1>::template Type{}).Reverse();
             }
 
             constexpr SizeT TypeStringSize = 2048;

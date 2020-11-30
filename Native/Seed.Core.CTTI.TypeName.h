@@ -405,7 +405,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedArray<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -417,7 +417,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedArray<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -442,7 +442,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedQueue<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -454,7 +454,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedQueue<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -466,7 +466,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedQueue<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -479,7 +479,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::FixedStack<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -491,7 +491,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedStack<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -503,7 +503,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedStack<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -515,7 +515,7 @@ namespace Seed {
 					ForceInline static constexpr auto TypeName() {
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedStack<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -530,7 +530,7 @@ namespace Seed {
 					{
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::BitMapT<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
@@ -544,7 +544,7 @@ namespace Seed {
 					{
 						return
 							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveBitMapT<") +
-							Seed::Core::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::ToCharStr<TSize>() +
 							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
 							Seed::Core::Details::CreateTypeStr(L">");
