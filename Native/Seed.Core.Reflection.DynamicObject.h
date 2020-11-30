@@ -1,6 +1,10 @@
 #pragma once
 #include "Seed.Core.Reflection.Base.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 namespace Seed
 {
 	inline namespace Core
@@ -8,9 +12,9 @@ namespace Seed
 		namespace Reflection
 		{
 			/// <summary>
-			/// Динамічний об'єкт, містить у собі кортеж з типів, доступ отримати можна якщо відомий тип
+			/// Р”РёРЅР°РјС–С‡РЅРёР№ РѕР±'С”РєС‚, РјС–СЃС‚РёС‚СЊ Сѓ СЃРѕР±С– РєРѕСЂС‚РµР¶ Р· С‚РёРїС–РІ, РґРѕСЃС‚СѓРї РѕС‚СЂРёРјР°С‚Рё РјРѕР¶РЅР° СЏРєС‰Рѕ РІС–РґРѕРјРёР№ С‚РёРї
 			/// </summary>
-			class DynamicObject final : IDisposable{
+			class DynamicObject final : IDisposable {
 			public:
 				template<typename THeap, typename T, typename TEnable>
 				friend struct Serilization::Details::BaseSerlizationHandler;
@@ -31,7 +35,7 @@ namespace Seed
 
 					virtual const Serilization::TypeMetaDataRecord GetTypeShema() const = 0;
 				public:
-					virtual ~IDynamicImpl() =0 {}
+					virtual ~IDynamicImpl() = 0 {}
 				};
 
 				template<typename ... TTypes>
@@ -48,40 +52,42 @@ namespace Seed
 					Lazy<String> serelizableMetaData;
 					Lazy<Serilization::TypeMetaDataRecord> typeShema;
 				public:
-					DynamicImpl() : 
-						tuple(), 
+					DynamicImpl() :
+						tuple(),
 						typeName(ArrowFunct(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName)),
 						cxxTypeName(ArrowFunct(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName)),
 						serelizableMetaData(ArrowFunct(Serilization::MetaDataGen<Tuple>())),
-						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>()))
-					{}
+						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>())) {
+					}
 
-					DynamicImpl(const Tuple & tuple) : 
+					DynamicImpl(const Tuple& tuple) :
 						tuple(tuple),
-						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
+						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName),
 						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
 						serelizableMetaData(Serilization::MetaDataGen<Tuple>()),
-						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>()))
-					{}
+						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>())) {
+					}
 
-					DynamicImpl(Tuple && tuple) : 
+					DynamicImpl(Tuple&& tuple) :
 						tuple(MoveRValue(tuple)),
-						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName), 
+						typeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::TypeName),
 						cxxTypeName(CTTI::TypeTraits::CTTITypeMetaData<Tuple>::CXXTypeName),
 						serelizableMetaData(Serilization::MetaDataGen<Tuple>()),
-						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>()))
-					{}
+						typeShema(ArrowFunct(Serilization::GetTypeRecordForType<Tuple>())) {
+					}
 
 					Tuple& GetValue() { return tuple; }
 					const Tuple& GetValue() const { return tuple; }
 				public:
 					virtual RTTI::RTTITypeRecord GetValueType() const {
-						if constexpr (Tuple::Count == 1) {
-							static auto type = TypeRecord<typename Tuple::template ItemType<0>>();
+						if constexpr (Tuple::Count == 1)
+						{
+							static auto type = ::TypeRecord<typename Tuple::template ItemType<0>>();
 							return type;
 						}
-						else {
-							static auto type = TypeRecord<Tuple>();
+						else
+						{
+							static auto type = ::TypeRecord<Tuple>();
 							return type;
 						}
 					}
@@ -91,15 +97,17 @@ namespace Seed
 
 					virtual const String& GetSerilizationMetadata() const { return *serelizableMetaData; }
 
-					virtual const TypeInfo& GetImplementationTypeInfo() const { 
+					virtual const TypeInfo& GetImplementationTypeInfo() const {
 						return typeid(Tuple);
 					}
 
-					virtual const TypeInfo& GetImplementationItem1TypeInfo() const { 
-						if constexpr (Tuple::Count == 0) {
+					virtual const TypeInfo& GetImplementationItem1TypeInfo() const {
+						if constexpr (Tuple::Count == 0)
+						{
 							Throw(NotImplementedException(ExceptionPosition));
 						}
-						else {
+						else
+						{
 							return typeid(typename Tuple::template ItemType<0>);
 						}
 					}
@@ -116,8 +124,7 @@ namespace Seed
 
 				template<typename ... TTypes>
 				struct TupleGetter<Containers::Tuple<TTypes...>> {
-					constexpr static auto Getter = [] (IDynamicImpl* impl) -> Containers::Tuple<TTypes...>
-					{
+					constexpr static auto Getter = [] (IDynamicImpl* impl) -> Containers::Tuple<TTypes...> {
 						auto valueHolder = dynamic_cast<DynamicImpl<TTypes...>*>(impl);
 						if (valueHolder == nullptr)
 							Throw(NullPointException(__FILE__, "TupleGetter<Containers::Tuple<TTypes...>>::Getter", __LINE__));
@@ -125,11 +132,11 @@ namespace Seed
 					};
 				};
 			private:
-				struct Data{
+				struct Data {
 					IDynamicImpl* impl;
 					RefCountT RefCount;
 
-					Data(IDynamicImpl*&& impl): impl(impl), RefCount(1) {}
+					Data(IDynamicImpl*&& impl) : impl(impl), RefCount(1) {}
 				};
 			private:
 				Data* data;
@@ -139,90 +146,91 @@ namespace Seed
 				}
 			public:
 				/// <summary>
-				/// Пустий конструктор ініціалізовує пустий кортеж 
+				/// РџСѓСЃС‚РёР№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ С–РЅС–С†С–Р°Р»С–Р·РѕРІСѓС” РїСѓСЃС‚РёР№ РєРѕСЂС‚РµР¶ 
 				/// </summary>
 				DynamicObject() : data(new Data(new DynamicImpl(Containers::Tuple<>()))) {}
 				/// <summary>
-				/// Конструктор з даних
+				/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Р· РґР°РЅРёС…
 				/// </summary>
-				/// <param name="data">Кортеж даних</param>
+				/// <param name="data">РљРѕСЂС‚РµР¶ РґР°РЅРёС…</param>
 				template<typename ... TTypes> requires (!(sizeof...(TTypes) == 1 && (Concepts::IsSame<DynamicObject, TypeTraits::RemoveCVRefV<TTypes>> && ...)))
-				DynamicObject(const TTypes&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(data)))) {}
+					DynamicObject(const TTypes&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(data)))) {}
 				/// <summary>
-				/// Конструктор з даних
+				/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Р· РґР°РЅРёС…
 				/// </summary>
-				/// <param name="data">Кортеж даних</param>
+				/// <param name="data">РљРѕСЂС‚РµР¶ РґР°РЅРёС…</param>
 				template<typename ... TTypes> requires (!(sizeof...(TTypes) == 1 && (Concepts::IsSame<DynamicObject, TypeTraits::RemoveCVRefV<TTypes>> && ...)))
-				DynamicObject(TTypes&&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(ForwardReference<TTypes>(data)...)))){}
+					DynamicObject(TTypes&&... data) : data(new Data(new DynamicImpl(Containers::Tuple<TTypes...>(ForwardReference<TTypes>(data)...)))) {}
 				/// <summary>
-				/// Конструктор з кортежу
+				/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Р· РєРѕСЂС‚РµР¶Сѓ
 				/// </summary>
-				/// <param name="tuple">Кортеж значень</param>
+				/// <param name="tuple">РљРѕСЂС‚РµР¶ Р·РЅР°С‡РµРЅСЊ</param>
 				template<typename ... TTypes>
 				DynamicObject(const Containers::Tuple<TTypes...>& tuple) : data(new Data(new DynamicImpl(tuple))) {}
 				/// <summary>
-				/// Конструктор переміщення з кортежу
+				/// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРµСЂРµРјС–С‰РµРЅРЅСЏ Р· РєРѕСЂС‚РµР¶Сѓ
 				/// </summary>
-				/// <param name="tuple">Кортеж значень</param>
+				/// <param name="tuple">РљРѕСЂС‚РµР¶ Р·РЅР°С‡РµРЅСЊ</param>
 				template<typename ... TTypes>
 				DynamicObject(Containers::Tuple<TTypes...>&& tuple) : data(new Data(new DynamicImpl(MoveRValue(tuple)))) {}
 
 				/// <summary>
-				/// Вертає тип кортежу який містить на даний тип об'єкт
+				/// Р’РµСЂС‚Р°С” С‚РёРї РєРѕСЂС‚РµР¶Сѓ СЏРєРёР№ РјС–СЃС‚РёС‚СЊ РЅР° РґР°РЅРёР№ С‚РёРї РѕР±'С”РєС‚
 				/// </summary>
-				/// <returns>Опис типу</returns>
+				/// <returns>РћРїРёСЃ С‚РёРїСѓ</returns>
 				RTTI::RTTITypeRecord GetValueType() const { return data->impl->GetValueType(); }
 
 				/// <summary>
-				/// Вертає рядкове представлення імені типу
+				/// Р’РµСЂС‚Р°С” СЂСЏРґРєРѕРІРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅСЏ С–РјРµРЅС– С‚РёРїСѓ
 				/// </summary>
-				/// <returns>Рядкове представлення імені типу</returns>
+				/// <returns>Р СЏРґРєРѕРІРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅСЏ С–РјРµРЅС– С‚РёРїСѓ</returns>
 				const String& GetTypeName() const { return data->impl->GetTypeName(); }
 
 				/// <summary>
-				/// Вертає рядкове представлення cxx імені типу
+				/// Р’РµСЂС‚Р°С” СЂСЏРґРєРѕРІРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅСЏ cxx С–РјРµРЅС– С‚РёРїСѓ
 				/// </summary>
-				/// <returns>Рядкове представлення cxx імені типу</returns>
+				/// <returns>Р СЏРґРєРѕРІРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅСЏ cxx С–РјРµРЅС– С‚РёРїСѓ</returns>
 				const String& GetCxxTypeName() const { return data->impl->GetCxxTypeName(); }
 
 				/// <summary>
-				/// Вертає рядкове представлення схеми типу для серелізатора
+				/// Р’РµСЂС‚Р°С” СЂСЏРґРєРѕРІРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅСЏ СЃС…РµРјРё С‚РёРїСѓ РґР»СЏ СЃРµСЂРµР»С–Р·Р°С‚РѕСЂР°
 				/// </summary>
-				/// <returns>Рядкове представлення схеми типів</returns>
+				/// <returns>Р СЏРґРєРѕРІРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅСЏ СЃС…РµРјРё С‚РёРїС–РІ</returns>
 				const String& GetSerilizationMetadata() const { return data->impl->GetSerilizationMetadata(); }
 
 				/// <summary>
-				/// Вертає cxx rtti опис типу кортежа
+				/// Р’РµСЂС‚Р°С” cxx rtti РѕРїРёСЃ С‚РёРїСѓ РєРѕСЂС‚РµР¶Р°
 				/// </summary>
 				/// <returns></returns>
 				const TypeInfo& GetImplementationTypeInfo() const { return data->impl->GetImplementationTypeInfo(); }
 
 				/// <summary>
-				/// Вертає cxx rtti опис типу першого елементам кортежу при умові що кортеж містить лише один елемент
+				/// Р’РµСЂС‚Р°С” cxx rtti РѕРїРёСЃ С‚РёРїСѓ РїРµСЂС€РѕРіРѕ РµР»РµРјРµРЅС‚Р°Рј РєРѕСЂС‚РµР¶Сѓ РїСЂРё СѓРјРѕРІС– С‰Рѕ РєРѕСЂС‚РµР¶ РјС–СЃС‚РёС‚СЊ Р»РёС€Рµ РѕРґРёРЅ РµР»РµРјРµРЅС‚
 				/// </summary>
 				/// <returns></returns>
 				const TypeInfo& GetImplementationItem1TypeInfo() const { return data->impl->GetImplementationItem1TypeInfo(); }
 
 				/// <summary>
-				/// Вертає кільксть елементва в кортежі
+				/// Р’РµСЂС‚Р°С” РєС–Р»СЊРєСЃС‚СЊ РµР»РµРјРµРЅС‚РІР° РІ РєРѕСЂС‚РµР¶С–
 				/// </summary>
 				/// <returns></returns>
 				SizeT GetItemsCount() const { return data->impl->GetItemsCount(); }
 
 				/// <summary>
-				/// Вертає схему типу для серелізатора
+				/// Р’РµСЂС‚Р°С” СЃС…РµРјСѓ С‚РёРїСѓ РґР»СЏ СЃРµСЂРµР»С–Р·Р°С‚РѕСЂР°
 				/// </summary>
-				/// <returns>Об'єкт схеми типу</returns>
+				/// <returns>РћР±'С”РєС‚ СЃС…РµРјРё С‚РёРїСѓ</returns>
 				Serilization::TypeMetaDataRecord GetTypeShema() const { return data->impl->GetTypeShema(); }
 
 				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// Р’РµСЂС‚Р°С” РІРјС–СЃС‚ СЏРєС‰Рѕ С‚РёРї РєРѕСЂРµРєС‚РЅРёР№, РІ С–РЅС€РѕРјСѓ РІРёРїР°РґРєСѓ РіРµРЅРµСЂСѓС” РїРѕРјРёР»РєСѓ 
 				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Посилання на кортеж</returns>
+				/// <exception cref="Seed::Exceptions::NullPointException">РЇРєС‰Рѕ С‚РёРї РЅРµ РєРѕСЂРµРєС‚РЅРёР№</exception>
+				/// <returns>РџРѕСЃРёР»Р°РЅРЅСЏ РЅР° РєРѕСЂС‚РµР¶</returns>
 				template<typename ... TTypes>
 				Containers::Tuple<TTypes...>& GetValue() {
-					if(typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo()){
+					if (typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo())
+					{
 						return dynamic_cast<DynamicImpl<TTypes...>*>(data->impl)->GetValue(); //-V522
 					}
 					else
@@ -232,13 +240,14 @@ namespace Seed
 				}
 
 				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// Р’РµСЂС‚Р°С” РІРјС–СЃС‚ СЏРєС‰Рѕ С‚РёРї РєРѕСЂРµРєС‚РЅРёР№, РІ С–РЅС€РѕРјСѓ РІРёРїР°РґРєСѓ РіРµРЅРµСЂСѓС” РїРѕРјРёР»РєСѓ 
 				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Незмінне посилання на кортеж</returns>
+				/// <exception cref="Seed::Exceptions::NullPointException">РЇРєС‰Рѕ С‚РёРї РЅРµ РєРѕСЂРµРєС‚РЅРёР№</exception>
+				/// <returns>РќРµР·РјС–РЅРЅРµ РїРѕСЃРёР»Р°РЅРЅСЏ РЅР° РєРѕСЂС‚РµР¶</returns>
 				template<typename ... TTypes>
 				const Containers::Tuple<TTypes...>& GetValue() const {
-					if(typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo()){
+					if (typeid(Containers::Tuple<TTypes...>) == GetImplementationTypeInfo())
+					{
 						return dynamic_cast<DynamicImpl<TTypes...>*>(data->impl)->GetValue(); //-V522
 					}
 					else
@@ -248,66 +257,68 @@ namespace Seed
 				}
 
 				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
+				/// Р’РµСЂС‚Р°С” РІРјС–СЃС‚ СЏРєС‰Рѕ С‚РёРї РєРѕСЂРµРєС‚РЅРёР№, РІ С–РЅС€РѕРјСѓ РІРёРїР°РґРєСѓ РіРµРЅРµСЂСѓС” РїРѕРјРёР»РєСѓ 
 				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Посилання на кортеж</returns>
+				/// <exception cref="Seed::Exceptions::NullPointException">РЇРєС‰Рѕ С‚РёРї РЅРµ РєРѕСЂРµРєС‚РЅРёР№</exception>
+				/// <returns>РџРѕСЃРёР»Р°РЅРЅСЏ РЅР° РєРѕСЂС‚РµР¶</returns>
 				template<typename TTuple> requires Concepts::Tuple<TTuple>
-				TTuple GetTuple() {
-					
-					if(typeid(TTuple) == GetImplementationTypeInfo()){
-						return TupleGetter<TTuple>::Getter(data->impl);
-					}
-					else
-					{
-						Throw(NullPointException(ExceptionPosition));
-					}
-				}
+					TTuple GetTuple() {
 
-				/// <summary>
-				/// Вертає вміст якщо тип коректний, в іншому випадку генерує помилку 
-				/// </summary>
-				/// <exception cref="Seed::Exceptions::NullPointException">Якщо тип не коректний</exception>
-				/// <returns>Незмінне посилання на кортеж</returns>
-				template<typename TTuple> requires Concepts::Tuple<TTuple>
-				const TTuple GetTuple() const {
-					
-					if(typeid(TTuple) == GetImplementationTypeInfo()){
-						return TupleGetter<TTuple>::Getter(data->impl);
+						if (typeid(TTuple) == GetImplementationTypeInfo())
+						{
+							return TupleGetter<TTuple>::Getter(data->impl);
+						}
+						else
+						{
+							Throw(NullPointException(ExceptionPosition));
+						}
 					}
-					else
-					{
-						Throw(NullPointException(ExceptionPosition));
-					}
-				}
+
+					/// <summary>
+					/// Р’РµСЂС‚Р°С” РІРјС–СЃС‚ СЏРєС‰Рѕ С‚РёРї РєРѕСЂРµРєС‚РЅРёР№, РІ С–РЅС€РѕРјСѓ РІРёРїР°РґРєСѓ РіРµРЅРµСЂСѓС” РїРѕРјРёР»РєСѓ 
+					/// </summary>
+					/// <exception cref="Seed::Exceptions::NullPointException">РЇРєС‰Рѕ С‚РёРї РЅРµ РєРѕСЂРµРєС‚РЅРёР№</exception>
+					/// <returns>РќРµР·РјС–РЅРЅРµ РїРѕСЃРёР»Р°РЅРЅСЏ РЅР° РєРѕСЂС‚РµР¶</returns>
+					template<typename TTuple> requires Concepts::Tuple<TTuple>
+						const TTuple GetTuple() const {
+
+							if (typeid(TTuple) == GetImplementationTypeInfo())
+							{
+								return TupleGetter<TTuple>::Getter(data->impl);
+							}
+							else
+							{
+								Throw(NullPointException(ExceptionPosition));
+							}
+						}
 			public:
 				/// <summary>
-				/// Опис типу який містить кортеж
+				/// РћРїРёСЃ С‚РёРїСѓ СЏРєРёР№ РјС–СЃС‚РёС‚СЊ РєРѕСЂС‚РµР¶
 				/// </summary>
 				RTTI::RTTITypeRecord Property(GetValueType) ValueType;
 
 				/// <summary>
-				/// Ім'я типу який містить кортеж
+				/// Р†Рј'СЏ С‚РёРїСѓ СЏРєРёР№ РјС–СЃС‚РёС‚СЊ РєРѕСЂС‚РµР¶
 				/// </summary>
 				String Property(GetTypeName) TypeName;
 
 				/// <summary>
-				/// Ім'я cxx типу який містить кортеж
+				/// Р†Рј'СЏ cxx С‚РёРїСѓ СЏРєРёР№ РјС–СЃС‚РёС‚СЊ РєРѕСЂС‚РµР¶
 				/// </summary>
 				String Property(GetCxxTypeName) CxxTypeName;
 
 				/// <summary>
-				/// Схема серелізації
+				/// РЎС…РµРјР° СЃРµСЂРµР»С–Р·Р°С†С–С—
 				/// </summary>
 				Serilization::TypeMetaDataRecord Property(GetTypeShema) TypeShema;
 
 				/// <summary>
-				/// Рядкове представлення схеми серелізації
+				/// Р СЏРґРєРѕРІРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅСЏ СЃС…РµРјРё СЃРµСЂРµР»С–Р·Р°С†С–С—
 				/// </summary>
 				String Property(GetSerilizationMetadata) SerilizationMetadata;
 
 				/// <summary>
-				/// Кільксть елементва в кортежі
+				/// РљС–Р»СЊРєСЃС‚СЊ РµР»РµРјРµРЅС‚РІР° РІ РєРѕСЂС‚РµР¶С–
 				/// </summary>
 				SizeT Property(GetItemsCount) ItemsCount;
 
@@ -316,3 +327,5 @@ namespace Seed
 		}
 	}
 }
+
+#pragma warning(pop)

@@ -5,6 +5,9 @@
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Containers.API.LINQ.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4172)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -166,8 +169,6 @@ namespace Seed {
                 template<typename THeap, typename T, typename Enable>
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 			protected:
-#pragma warning(push)
-#pragma warning(disable: 4172)
 				template<typename Lambda>
 				BaseFixedQueue& ForEachImpl(Lambda&& lambda) {
 					if constexpr (TypeTraits::IsLambdaConvertibleV<Lambda, void, T&> ||
@@ -449,3 +450,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

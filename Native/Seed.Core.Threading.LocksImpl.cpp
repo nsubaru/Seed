@@ -5,6 +5,9 @@
 #include "Seed.Core.Threading.LockPrimitives.h"
 #include "Seed.Core.Threading.Internal.h"
 
+#define SEED_RT_ALLOW_INTERNAL_NT_API
+#include "Seed.Core.Base.NTAPI.h"
+
 #pragma warning(push)
 #pragma warning(disable : 4996)
 
@@ -15,9 +18,6 @@ Seed::Core::Threading::DataFlowControler::DataFlowControler() :
 	Internals::InitCondVal(&concumer);
 }
 
-
-#define SEED_RT_ALLOW_INTERNAL_NT_API
-#include "Seed.Core.Base.NTAPI.h"
 
 void Seed::Core::Threading::Internals::InitSRWLock(void* PSRWLock) {
 	RtlInitializeSRWLock(reinterpret_cast<PRTL_SRWLOCK>(PSRWLock));

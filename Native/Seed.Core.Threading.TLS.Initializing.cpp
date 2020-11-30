@@ -1,10 +1,14 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
-#include "Seed.Core.Base.Definitions.h"
+#include "Seed.Core.Base.h"
 
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
+
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
 
 typedef void (__cdecl* _PVFV)(void);
 
@@ -129,8 +133,10 @@ void __cdecl __dyn_tls_on_demand_init() noexcept
 #pragma warning(push)
 //This internal implementation file which can use internal API functions
 #pragma warning(disable: 4996)
-extern DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(size_t Size);
+extern DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapAllocate(Seed::SizeT Size);
 extern DeprecatedCall("Низькорівнева робота з пам'ятю") void* InternalHeapFree(void* MemBlk);
+
+#pragma warning(pop)
 
 typedef void (__stdcall *_tls_callback_type)(void *, unsigned long, void *);
 
@@ -329,4 +335,3 @@ extern const IMAGE_TLS_DIRECTORY64 _tls_used =
 } // extern "C"
 
 #pragma warning(pop)
-

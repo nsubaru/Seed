@@ -5,6 +5,13 @@
 #include "Seed.Core.Exceptions.h"
 #include "Seed.Core.Containers.API.LINQ.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
+#pragma warning(disable: 4172)
+
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -332,8 +339,6 @@ namespace Seed {
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
                 friend class LINQ::IAssociableCollection;
-#pragma warning(push)
-#pragma warning(disable: 4172)
 
 				template<typename TLambda>
 				BaseDynamicQueue& ForEachImpl(TLambda&& lambda) {
@@ -645,3 +650,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

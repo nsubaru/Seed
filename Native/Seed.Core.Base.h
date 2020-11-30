@@ -15,6 +15,7 @@
 #include "Seed.Core.Base.Concepts.h"
 #include "Seed.Core.Base.IClonable.h"
 #include "Seed.Core.Base.UUID.h"
+#include "Seed.Core.Base.TypeName.h"
 #include "Seed.Core.Base.Internals.h"
 
 #pragma warning(disable: 26439)

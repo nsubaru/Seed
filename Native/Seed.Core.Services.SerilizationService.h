@@ -86,12 +86,12 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::CreateTypeStr(L"N/A");
+                            Core::Details::CreateTypeStr(L"N/A");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
                         return
-                            CTTI::Details::ToCharStr<sizeof(T)>();
+                            Core::Details::ToCharStr<sizeof(T)>();
                     }
 
                     ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -119,19 +119,19 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr(L"{") +
+                            Core::Details::CreateTypeStr(L"{") +
                             CTTI::TypeName<T>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::ToCharStr<sizeof(T)>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::ToCharStr<sizeof(T)>() +
+                            Core::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-							CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::CreateTypeStr(L"") +
-                            CTTI::Details::CreateTypeStr(L"}");
+							Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"") +
+                            Core::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {
@@ -196,12 +196,12 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeHint() {
                         return
-                            CTTI::Details::CreateTypeStr(L"N/A");
+                            Core::Details::CreateTypeStr(L"N/A");
                     }
 
                     ForceInline static constexpr auto ConstexprSize() {
                         return
-                            CTTI::Details::ToCharStr<sizeof(T)>();
+                            Core::Details::ToCharStr<sizeof(T)>();
                     }
 
                     ForceInline static void DeserelizeImpl(T& data, const Byte* rawStream, SizeT& offset, UnusedData const TypesRegistry& registry) {
@@ -229,19 +229,19 @@ namespace Seed
 
                     ForceInline static constexpr auto TypeMetaData() {
                         return
-                            CTTI::Details::CreateTypeStr(L"{") +
+                            Core::Details::CreateTypeStr(L"{") +
                             CTTI::TypeName<T>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::ToCharStr<sizeof(T)>() +
-                            CTTI::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::ToCharStr<static_cast<SizeT>(CTTI::TypeTraits::CTTITypeMetaData<T>::TypeClass)>() +
+                            Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::ToCharStr<sizeof(T)>() +
+                            Core::Details::CreateTypeStr(L"|") +
                             ConstexprSize() +
-                            CTTI::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"|") +
                             TypeHint() +
-							CTTI::Details::CreateTypeStr(L"|") +
-                            CTTI::Details::CreateTypeStr(L"") +
-                            CTTI::Details::CreateTypeStr(L"}");
+							Core::Details::CreateTypeStr(L"|") +
+                            Core::Details::CreateTypeStr(L"") +
+                            Core::Details::CreateTypeStr(L"}");
                     }
 
 					ForceInline static BaseTypeMetaDataRecord<THeap> GetTypeMetaDataRecord() {

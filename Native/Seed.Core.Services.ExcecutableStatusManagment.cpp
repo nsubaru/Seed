@@ -8,7 +8,6 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-
 void Seed::Core::Services::ExcecutableStatusManagmentService::ReloadKernel() {
 	Btlrd::SetFastReboot();
 	data->waitableReloadEvent.Set();

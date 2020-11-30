@@ -1,4 +1,9 @@
 #pragma once
+
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 /// <summary>
 /// Не рекомендована функція
 /// </summary>
@@ -22,12 +27,12 @@ namespace {
 }
 
 ///<summary>Сигнатура деструктора статичних змінних</summary>
-InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
+extern int __cdecl __RegisterStaticDtors(PF pf);
 
 #pragma warning(push)
 #pragma warning(disable: 4075)
 
-#pragma init_seg(".INIT$m", RegisterStaticDtors)
+#pragma init_seg(".INIT$m", __RegisterStaticDtors)
 
 #pragma comment(linker, "/MERGE:.INIT=.xdata") 
 #define __INIT__
@@ -262,3 +267,5 @@ InternalApiCall extern int __cdecl RegisterStaticDtors(PF pf);
     __ArrowFunctWithClosure2,                      \
     __ArrowFunctWithClosure1)                      \
     (__VA_ARGS__))
+
+#pragma warning(pop)

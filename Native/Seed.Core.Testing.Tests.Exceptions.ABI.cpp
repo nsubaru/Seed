@@ -98,9 +98,14 @@ class TestDtorException {
 public:
 	String text;
 	__declspec(noinline) TestDtorException(String&& text) : text(MoveRValue(text)) {}
+#pragma warning(push)
+//For testing purpose warning about throwing exception in dtor supresed
+#pragma warning(disable: 4722)
+
 	__declspec(noinline) ~TestDtorException() {
 		Throw(TestException(ExceptionPosition, 8));
 	}
+#pragma warning(pop)
 };
 
 static __declspec(noinline) bool ThrowDtorGenInnerExceptionFunct() {

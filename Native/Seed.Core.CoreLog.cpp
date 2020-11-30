@@ -293,20 +293,4 @@ Seed::Containers::List<Seed::String> Seed::Services::CoreLogger::ReadLog() {
 	}
 }
 
-//#pragma comment(linker, "/include:_tls_used")
-//#pragma section("INIT$XLB", read)
-//
-//void NTAPI TLSCallback(PVOID DllHandle, DWORD Reason, PVOID Reserved)
-//{
-//	UNREFERENCED_PARAMETER(Reserved);
-//
-//	if (LogFile.handle != nullptr)
-//	{
-//		Seed::toCoreLog(L"TLS callback called");
-//	}
-//}
-//
-//extern "C" __declspec(allocate("INIT$XLB")) PIMAGE_TLS_CALLBACK g_pAddressOfTLSCallback = TLSCallback;
-//#pragma comment(linker, "/include:g_pAddressOfTLSCallback")
-//
-//#pragma warning(pop)
+#pragma warning(pop)

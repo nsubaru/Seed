@@ -312,7 +312,7 @@ namespace Seed {
 		}
 	}
 }
-
+#pragma warning(push)
 #pragma warning(disable: 4455)
 #pragma warning(disable: 4114)
 /// <summary>

@@ -10,7 +10,6 @@
 #include "Seed.Core.Containers.NonConcurency.Array.h"
 #include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.Containers.NonConcurency.Map.h"
-#include "Seed.Core.CTTI.TypeName.Details.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4996)

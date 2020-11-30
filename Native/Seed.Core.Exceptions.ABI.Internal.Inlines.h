@@ -1,7 +1,6 @@
 #pragma once
 #include "Seed.Core.Exceptions.ABI.Internal.Types.h"
 
-
 // Constants for decompression.
 inline constexpr Seed::Int8 s_negLengthTab[16] =
 {

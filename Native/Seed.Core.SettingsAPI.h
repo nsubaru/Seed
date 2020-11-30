@@ -1,4 +1,5 @@
 #pragma once
+#include "Seed.Core.Logger.Base.h"
 #include "Seed.Core.Memory.DataSize.h"
 #include "Seed.Core.SettingsAPI.ConstSettings.h"
 #include "Seed.Core.Time.Base.h"
@@ -110,12 +111,23 @@ namespace Seed {
 					AutomaticTestingServiceCfgT AutomaticTestingServiceCfg;
 				};
 
+				/// <summary>
+				/// Налаштування логера ядра
+				/// </summary>
+				struct KernelLoggerT {
+					inline static constexpr auto MaxKernelLogMsgSize = 4Kb;
+
+					Logger::LoggerLevel CurrentStaticLogger[(Seed::SizeT)Logger::EStaticSubsystems::InvalidSubsystem];
+				};
+
 				///<summary>Налаштування менеджера пам'яті</summary>
 				MemoryManager MainMemoryManager;
 				///<summary>Налаштування багатопотоковості</summary>
 				ThreadingCfg Threading;
 				///<summary>Налаштування сервісів ядра</summary>
 				KernelServicesConfigT KernelServicesConfig;
+
+				KernelLoggerT KernelLogger;
 
 				/// <summary>
 				/// Структура опису версії ядра
@@ -983,6 +995,30 @@ namespace Seed {
 				SizeT Property(GetToManyRedirectsTreshold) ToManyRedirectsTreshold;
 			};
 
+			class KernelLoggerConfigurationT final {
+			public:
+				constexpr KernelLoggerConfigurationT() {} //-V730
+				Logger::LoggerLevel GetLoggerLevelForStaticSubsystem(Logger::EStaticSubsystems staticSubsystem) {
+					return GetCurrentSettingData([&](auto& data) InlineLambda
+						{
+							if (staticSubsystem < Logger::EStaticSubsystems::InvalidSubsystem)
+								return data.KernelLogger.CurrentStaticLogger[(SizeT)staticSubsystem];
+							else
+								return Logger::LoggerLevel();
+						});
+				}
+
+				void SetLoggerLevelForStaticSubsystem(Logger::EStaticSubsystems staticSubsystem, Logger::LoggerLevel newLoggerLevel) {
+					SetCurrentSettingData([&](auto& CurrentSettingsData) InlineLambda
+						{
+							if(staticSubsystem < Logger::EStaticSubsystems::InvalidSubsystem)
+								CurrentSettingsData.KernelLogger.CurrentStaticLogger[(SizeT)staticSubsystem] = newLoggerLevel;
+						});
+				}
+			public:
+				Logger::LoggerLevel Property(GetLoggerLevelForStaticSubsystem, SetLoggerLevelForStaticSubsystem) StaticLoggerLevel[];
+			};
+
 			/// <summary>
 			/// Налаштування менеджера розділів на хості ядра
 			/// </summary>
@@ -1044,6 +1080,9 @@ namespace Seed {
 			ThreadingCfgT GetThreadinfConfig() const { return ThreadingCfgT(); }
 			void SetThreadinfConfig(ThreadingCfgT) {}
 
+			KernelLoggerConfigurationT GetKernelLoggerConfiguration() const { return KernelLoggerConfigurationT(); }
+			void SetKernelLoggerConfiguration(KernelLoggerConfigurationT) {}
+
 			constexpr PartitionManagerConfigurationT GetPartitionManagerConfiguration() const { return PartitionManagerConfigurationT(); }
 			constexpr void SetPartitionManagerConfiguration(PartitionManagerConfigurationT) {}
 
@@ -1060,26 +1099,37 @@ namespace Seed {
 			/// Налаштування менеджера пам'яті
 			/// </summary>
 			MemoryManagerT Property(GetMemoryManager, SetMemoryManager) MemoryManager;
+
 			/// <summary>
 			/// Налаштування сервісів ядра
 			/// </summary>
 			KernelServicesConfigT Property(GetKernelServicesConfig, SetKernelServicesConfig) KernelServices;
+
 			/// <summary>
 			/// Рантайм налаштування
 			/// </summary>
 			VirtualSettingDataT Property(GetVirtualSettingData, SetVirtualSettingDataT) VirtualSetting;
+
 			/// <summary>
 			/// Налаштування багатопотоковості
 			/// </summary>
 			ThreadingCfgT Property(GetThreadinfConfig, SetThreadinfConfig) Threading;
+
+			/// <summary>
+			/// Налаштування логера
+			/// </summary>
+			KernelLoggerConfigurationT Property(GetKernelLoggerConfiguration, SetKernelLoggerConfiguration) KernelLoggerConfiguration;
+
 			/// <summary>
 			/// Статичні налаштування ядра
 			/// </summary>
 			StaticSettingsDataT Property(GetStaticSettingsData, SetStaticSettingsData) StaticSettings;
+
 			/// <summary>
 			/// Налаштування менеджера глобальних об'єктів
 			/// </summary>
 			ObjectNamespaceConfigurationT Property(GetObjectNamespaceConfiguration, SetObjectNamespaceConfiguration) ObjectNamespaceConfiguration;
+
 			/// <summary>
 			/// Налаштування менеджера розділіва хоста
 			/// </summary>

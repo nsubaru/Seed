@@ -5,10 +5,10 @@
 
 #include "Seed.Core.Exceptions.ABI.Internal.API.h"
 
-
-
 #pragma warning(push)
 #pragma warning(disable: 4996)
+#pragma warning(disable: 4191)
+#pragma warning(disable: 6255)
 
 __ehstate_t GetMaxState(
         DispatcherContext  *pDC,
@@ -1340,10 +1340,6 @@ void *__AdjustPointer(
 //
 // Open issues:
 //     What happens if the constructor throws?  (or faults?)
-
-#pragma warning(push)
-#pragma warning(disable:4191)
-
 int BuildCatchObjectHelperInternal(
     EHExceptionRecord *pExcept,      // Original exception thrown
     void *pRN,                       // This is a pointer to the object
@@ -1433,8 +1429,6 @@ int BuildCatchObjectHelperInternal(
 
     return retval;
 }
-
-#pragma warning(pop)
 
 int BuildCatchObjectHelper(
     EHExceptionRecord *pExcept,
@@ -2178,10 +2172,9 @@ void ThrowStoredException(void* exception)
         auto typeInfo = (CatchableType *)(ppCatchable);
 
         __assume(typeInfo->sizeOrOffset < (4Kb).Bytes);
-#pragma warning(push)
-#pragma warning(disable: 6255)
+
         GetThreadExceptionData()->_throwObjStorageForStoredException = _alloca((typeInfo->sizeOrOffset == 0) ? (4Kb).Bytes - 1 : typeInfo->sizeOrOffset);
-#pragma warning(pop)
+
         pExceptionBuffer = GetThreadExceptionData()->_throwObjStorageForStoredException;
 
         _CallCopyCtor(

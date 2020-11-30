@@ -5,6 +5,11 @@
 #include "Seed.Core.ConstString.h"
 #include "Seed.Core.Containers.Internals.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4172)
+#pragma warning(disable: 6386)
+#pragma warning(disable: 4996)
+
 namespace Seed {
 	inline namespace Core {
 		namespace Containers {
@@ -83,9 +88,6 @@ namespace Seed {
 				template<template<typename THeap, typename TKey, typename TValue> typename TCollection, typename THeap, typename TKey, typename TValue, typename TPair, bool IsConcurencySuportT>
                 friend class LINQ::IAssociableCollection;
 			protected:
-#pragma warning(push)
-#pragma warning(disable: 4172)
-
 				template<typename TLambda>
 				BaseArray& ForEachImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, const T&> ||
@@ -382,10 +384,7 @@ namespace Seed {
 					this->This->count = 0;
                     return *this;
 				}
-#pragma warning(pop)
 			public:
-#pragma warning(push)
-#pragma warning(disable: 6386)
 				/// <summary>
                 /// Конструктор масиву з нульвою довжиною
                 /// </summary>
@@ -452,7 +451,6 @@ namespace Seed {
                 /// </summary>
                 /// <returns></returns>
 				ForceInline InternalApiCall operator const T* const() const { return This->array; }
-#pragma warning(pop)
 			public:
 				/// <summary>
                 /// Оператор доступу до елементів масиву
@@ -485,8 +483,6 @@ namespace Seed {
                         Internals::Exceptions::ThrowIndexOutOfRange(__FILE__, __FUNCSIG__, __LINE__, Index, This->count);
                     }
 				}
-#pragma warning(push)
-#pragma warning(disable: 4996)
 				/// <summary>
                 /// Зміна розміру
                 /// </summary>
@@ -567,7 +563,6 @@ namespace Seed {
 						throw;
                     }
                 }
-#pragma warning(pop)
 				///<summary>Оптимізований обмін</summary>
 				///<param name = 'A'>Перший елемент</param>
 				///<param name = 'B'>Другий елемент</param>
@@ -917,8 +912,6 @@ namespace Seed {
                 template<typename THeap, typename T, typename Enable>
                 friend struct Seed::Core::Serilization::Details::BaseSerlizationHandler;
 			protected:
-#pragma warning(push)
-#pragma warning(disable: 4172)
 				template<typename TLambda>
 				BaseVList& ForEachImpl(TLambda&& lambda) {
 					if constexpr (TypeTraits::IsInvockable<TLambda, T&> || TypeTraits::IsInvockable<TLambda, const T&>) {
@@ -1254,7 +1247,6 @@ namespace Seed {
 					This->count = 0; This->last = This->root = nullptr;
                     return *this;
 				}
-#pragma warning(pop)
 			public:
 				RefCountClass(BaseVList, This)
 			};
@@ -1297,3 +1289,5 @@ namespace Seed {
 		}
 	}
 }
+
+#pragma warning(pop)

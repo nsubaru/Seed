@@ -3,6 +3,10 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
+#pragma warning(push)
+//This internal implementation file which can use internal API functions
+#pragma warning(disable: 4996)
+
 using namespace Seed;
 using namespace Seed::Core::IO::IPC::Pipes;
 
@@ -421,3 +425,5 @@ NamedPipeClient Seed::Core::IO::IPC::Pipes::ConnectPipe(const String& name, Pipe
 	realPipeName.LeftResize(realPipeName.Lenght - 9);
 	return NamedPipeClient(new NamedPipeClient::Data(pipe, isNoCache, mode, MoveRValue(realPipeName)));
 }
+
+#pragma warning(pop)

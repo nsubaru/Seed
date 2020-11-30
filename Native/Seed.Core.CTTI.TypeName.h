@@ -1,34 +1,33 @@
 #pragma once
 #include "Seed.Core.CTTI.Base.h"
 #include "Seed.Core.Containers.h"
-#include "Seed.Core.CTTI.TypeName.Details.h"
 
 namespace Seed {
 	inline namespace Core {
 		namespace CTTI {
 			namespace TypeNameSpecializations {
-				static constexpr auto CLASS_TYPE_NAME = Details::CreateTypeStr(L"class ");
-				static constexpr auto STRUCT_TYPE_NAME = Details::CreateTypeStr(L"struct ");
-				static constexpr auto ENUM_TYPE_NAME = Details::CreateTypeStr(L"enum ");
+				static constexpr auto CLASS_TYPE_NAME = Core::Details::CreateTypeStr(L"class ");
+				static constexpr auto STRUCT_TYPE_NAME = Core::Details::CreateTypeStr(L"struct ");
+				static constexpr auto ENUM_TYPE_NAME = Core::Details::CreateTypeStr(L"enum ");
 
 
 				template<typename T>
 				struct TClassTypeName {
 					ForceInline static constexpr auto TypeName() {
-						if constexpr (CTTI::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
-							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
-						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(STRUCT_TYPE_NAME))
-							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - STRUCT_TYPE_NAME.Count>();
-						else if constexpr (CTTI::Details::TypeName<T>().IsStartWith(ENUM_TYPE_NAME))
-							return CTTI::Details::TypeName<T>().ResizeLeft<CTTI::Details::TypeName<T>().Count - ENUM_TYPE_NAME.Count>();
+						if constexpr (Seed::Core::Details::TypeName<T>().IsStartWith(CLASS_TYPE_NAME))
+							return Seed::Core::Details::TypeName<T>().ResizeLeft<Seed::Core::Details::TypeName<T>().Count - CLASS_TYPE_NAME.Count>();
+						else if constexpr (Seed::Core::Details::TypeName<T>().IsStartWith(STRUCT_TYPE_NAME))
+							return Seed::Core::Details::TypeName<T>().ResizeLeft<Seed::Core::Details::TypeName<T>().Count - STRUCT_TYPE_NAME.Count>();
+						else if constexpr (Seed::Core::Details::TypeName<T>().IsStartWith(ENUM_TYPE_NAME))
+							return Seed::Core::Details::TypeName<T>().ResizeLeft<Seed::Core::Details::TypeName<T>().Count - ENUM_TYPE_NAME.Count>();
 						else
-							return CTTI::Details::TypeName<T>();
+							return Seed::Core::Details::TypeName<T>();
 					}
 				};
 
-				static constexpr auto SEED_CORE_NAMESPACE_PREFIX = Details::CreateTypeStr(L"Seed::Core::");
+				static constexpr auto SEED_CORE_NAMESPACE_PREFIX = Core::Details::CreateTypeStr(L"Seed::Core::");
 
-				static constexpr auto SEED_NAMESPACE_PREFIX = Details::CreateTypeStr(L"Seed::");
+				static constexpr auto SEED_NAMESPACE_PREFIX = Core::Details::CreateTypeStr(L"Seed::");
 
 				template<typename T>
 				struct TNamespaceTypeName {
@@ -53,7 +52,7 @@ namespace Seed {
 					ForceInline constexpr static auto TypeName()
 					{
 						return TTypeName<T>::TypeName() + 
-							Details::CreateTypeStr(L"*");
+							Seed::Core::Details::CreateTypeStr(L"*");
 					}
 				};
 
@@ -90,7 +89,7 @@ namespace Seed {
 					ForceInline constexpr static auto TypeName()
 					{
 						return TTypeName<T>::TypeName() + 
-							Details::CreateTypeStr(L"&");
+							Seed::Core::Details::CreateTypeStr(L"&");
 					}
 				};
 
@@ -100,7 +99,7 @@ namespace Seed {
 					ForceInline constexpr static auto TypeName()
 					{
 						return TTypeName<T>::TypeName() + 
-							Details::CreateTypeStr(L"&&");
+							Seed::Core::Details::CreateTypeStr(L"&&");
 					}
 				};
 
@@ -110,9 +109,9 @@ namespace Seed {
 					ForceInline constexpr static auto TypeName()
 					{
 						return TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L"[") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L"]");
+							Seed::Core::Details::CreateTypeStr(L"[") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L"]");
 					}
 				};
 #pragma endregion
@@ -122,28 +121,28 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::Int8> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::Int8");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::Int8");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Int16> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::Int16");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::Int16");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Int32> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::Int32");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::Int32");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Int64> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::Int64");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::Int64");
 					}
 				};
 #pragma endregion
@@ -151,28 +150,28 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::UInt8> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::UInt8");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::UInt8");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::UInt16> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::UInt16");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::UInt16");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::UInt32> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::UInt32");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::UInt32");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::UInt64> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::UInt64");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::UInt64");
 					}
 				};
 #pragma endregion
@@ -180,14 +179,14 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::Float> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::Float");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::Float");
 					}
 				};
 
 				template<>
 				struct TTypeName<Seed::Double> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::Double");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::Double");
 					}
 				};
 #pragma endregion
@@ -196,7 +195,7 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::UChar> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::UChar");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::UChar");
 					}
 				};
 #pragma endregion
@@ -204,7 +203,7 @@ namespace Seed {
 				template<>
 				struct TTypeName<Seed::Boolean> {
 					ForceInline static constexpr auto TypeName() {
-						return Details::CreateTypeStr(L"Seed::Boolean");
+						return Seed::Core::Details::CreateTypeStr(L"Seed::Boolean");
 					}
 				};
 #pragma endregion
@@ -215,9 +214,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::Array<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::CreateTypeStr(L"Seed::Containers::Array<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::Array<") +
 							TTypeName<T>::TypeName() +
-							CTTI::Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -225,9 +224,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveArray<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							CTTI::Details::CreateTypeStr(L"Seed::Containers::SensitiveArray<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveArray<") +
 							TTypeName<T>::TypeName() +
-							CTTI::Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -235,9 +234,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyArray<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyArray<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyArray<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -245,9 +244,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveArray<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveArray<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveArray<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -256,9 +255,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::List<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::List<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::List<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -266,9 +265,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveList<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveList<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveList<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -276,9 +275,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyList<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyList<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyList<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -286,9 +285,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveList<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveList<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveList<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -297,9 +296,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::DynamicQueue<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::DynamicQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::DynamicQueue<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -307,9 +306,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveDynamicQueue<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveDynamicQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveDynamicQueue<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -317,9 +316,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyDynamicQueue<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyDynamicQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyDynamicQueue<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -327,9 +326,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveDynamicQueue<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveDynamicQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveDynamicQueue<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -338,9 +337,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::DynamicStack<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::DynamicStack<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::DynamicStack<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -348,9 +347,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveDynamicStack<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveDynamicStack<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveDynamicStack<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -358,9 +357,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyDynamicStack<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyDynamicStack<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyDynamicStack<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -368,9 +367,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveDynamicStack<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveDynamicStack<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveDynamicStack<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -381,11 +380,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::FixedArray<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::FixedArray<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::FixedArray<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -393,11 +392,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyFixedArray<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedArray<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedArray<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -405,11 +404,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveFixedArray<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedArray<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedArray<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -417,11 +416,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveFixedArray<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedArray<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedArray<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -430,11 +429,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::FixedQueue<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::FixedQueue<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::FixedQueue<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -442,11 +441,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyFixedQueue<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedQueue<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedQueue<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -454,11 +453,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveFixedQueue<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedQueue<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedQueue<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -466,11 +465,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveFixedQueue<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedQueue<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedQueue<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -479,11 +478,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::FixedStack<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::FixedStack<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::FixedStack<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -491,11 +490,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyFixedStack<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedStack<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyFixedStack<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -503,11 +502,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveFixedStack<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedStack<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveFixedStack<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -515,11 +514,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveFixedStack<TSize, T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedStack<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveFixedStack<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -530,11 +529,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::BitMapT<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::BitMapT<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -544,11 +543,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveBitMapT<") +
-							CTTI::Details::ToCharStr<TSize>() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveBitMapT<") +
+							Seed::Core::Details::ToCharStr<TSize>() +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -559,9 +558,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::Dictionary<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::Dictionary<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::Dictionary<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -569,9 +568,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencyDictionary<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::ConcurencyContainers::ConcurencyDictionary<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::ConcurencyContainers::ConcurencyDictionary<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -579,9 +578,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::SensitiveDictionary<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveDictionary<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveDictionary<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -589,9 +588,9 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::ConcurencySensitiveDictionary<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::ConcurencyContainers::ConcurencySensitiveDictionary<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::ConcurencyContainers::ConcurencySensitiveDictionary<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -600,11 +599,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::Map<TKey, TValue>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::Map<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::Map<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -614,11 +613,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyMap<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyMap<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -628,11 +627,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveMap<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveMap<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -642,11 +641,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveMap<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitiveMap<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -657,11 +656,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::PriorityQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::PriorityQueue<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -671,11 +670,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencyPriorityQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencyPriorityQueue<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -685,11 +684,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitivePriorityQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitivePriorityQueue<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -699,11 +698,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitivePriorityQueue<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::ConcurencySensitivePriorityQueue<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -713,11 +712,11 @@ namespace Seed {
 				struct TTypeName<Seed::Containers::Pair<TKey, TValue>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Containers::Pair<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::Pair<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -727,11 +726,11 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitivePair<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitivePair<") +
 							TTypeName<TKey>::TypeName() +
-							Details::CreateTypeStr(L", ") +
+							Seed::Core::Details::CreateTypeStr(L", ") +
 							TTypeName<TValue>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -740,9 +739,9 @@ namespace Seed {
 				struct TTypeName<Seed::SmartPtr<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::SmartPtr<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::SmartPtr<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -750,9 +749,9 @@ namespace Seed {
 				struct TTypeName<Seed::SensitiveSmartPtr<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::SensitiveSmartPtr<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::SensitiveSmartPtr<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -761,9 +760,9 @@ namespace Seed {
 				struct TTypeName<Seed::Lazy<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::Lazy<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::Lazy<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 
@@ -771,9 +770,9 @@ namespace Seed {
 				struct TTypeName<Seed::SensitiveLazy<T>> {
 					ForceInline static constexpr auto TypeName() {
 						return
-							Details::CreateTypeStr(L"Seed::SensitiveLazy<") +
+							Seed::Core::Details::CreateTypeStr(L"Seed::SensitiveLazy<") +
 							TTypeName<T>::TypeName() +
-							Details::CreateTypeStr(L">");
+							Seed::Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -784,7 +783,7 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::String");
+							Seed::Core::Details::CreateTypeStr(L"Seed::String");
 					}
 				};
 
@@ -794,7 +793,7 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"Seed::Containers::SensitiveString");
+							Seed::Core::Details::CreateTypeStr(L"Seed::Containers::SensitiveString");
 					}
 				};
 #pragma endregion
@@ -807,7 +806,7 @@ namespace Seed {
                     struct TFieldTypeName {
                         constexpr static auto Name() {
                             return TTypeName<Head>::TypeName() +
-                                Details::CreateTypeStr(L", ") +
+								Seed::Core::Details::CreateTypeStr(L", ") +
                                 TFieldTypeName<Tail...>::Name();
                         }
                     };
@@ -824,13 +823,13 @@ namespace Seed {
 					{
 						if constexpr(sizeof...(Types) ==  0) {
 							return
-								Details::CreateTypeStr(L"Seed::Containers::Tuple<") +
-								Details::CreateTypeStr(L">");
+								Seed::Core::Details::CreateTypeStr(L"Seed::Containers::Tuple<") +
+								Seed::Core::Details::CreateTypeStr(L">");
 						}else{
 							return
-								Details::CreateTypeStr(L"Seed::Containers::Tuple<") +
+								Seed::Core::Details::CreateTypeStr(L"Seed::Containers::Tuple<") +
 								TFieldTypeName<Types...>::Name() +
-								Details::CreateTypeStr(L">");
+								Seed::Core::Details::CreateTypeStr(L">");
 						}
 					}
 				};
@@ -844,7 +843,7 @@ namespace Seed {
 					template<typename THead, typename ... TTypes>
 					struct TSubTypeName {
 						constexpr static auto Name() {
-							return TTypeName<THead>::TypeName() + Details::CreateTypeStr(L", ") + TSubTypeName<TTypes...>::Name();
+							return TTypeName<THead>::TypeName() + Seed::Core::Details::CreateTypeStr(L", ") + TSubTypeName<TTypes...>::Name();
 						}
 					};
 
@@ -861,7 +860,7 @@ namespace Seed {
 							return TNamespaceTypeName<T>::TypeName(); 
 						else
 							return
-								TNamespaceTypeName<T>::TypeName().Resize<TNamespaceTypeName<T>::TypeName().Find('<') + 1>() + TSubTypeName<TTypes...>::Name() + Details::CreateTypeStr(L">");
+								TNamespaceTypeName<T>::TypeName().Resize<TNamespaceTypeName<T>::TypeName().Find('<') + 1>() + TSubTypeName<TTypes...>::Name() + Core::Details::CreateTypeStr(L">");
 					}
 				};
 #pragma endregion
@@ -872,7 +871,7 @@ namespace Seed {
 					constexpr static auto TypeName()
 					{
 						return
-							Details::CreateTypeStr(L"void");
+							Seed::Core::Details::CreateTypeStr(L"void");
 					}
 				};
 #pragma endregion
@@ -887,10 +886,9 @@ namespace Seed {
 			///<summary>Ім'я типу в С++ для компарингу</summary>
 			template<typename T>
 			constexpr auto CXXTypeName() {
-				return CTTI::Details::TypeName<T>();
+				return Seed::Core::Details::TypeName<T>();
 			}
 
-			static constexpr SizeT TypeStringSize = Details::TypeStringSize;
 #pragma endregion
 		}
 	}

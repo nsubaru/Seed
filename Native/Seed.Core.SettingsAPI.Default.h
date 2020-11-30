@@ -103,6 +103,109 @@ namespace Seed {
 							DefaultSettings.KernelServicesConfig.AutomaticTestingServiceCfg.SelfTestingRetryTimeout = Time::TimeSpan(60 * Time::SecondInNtTime);
 						}
 					}
+					{
+						//Логер ядра
+#ifdef PreReleaseMode
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::BootLoaderAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::DepencyInjectionAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::EventsAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ExceptionABI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::InvalidSubsystem]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::IoAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::MemoryAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ObjectNamespaceAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::SerilizationAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::TestingAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ThreadingAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+#elif DebugMode
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::BootLoaderAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::DepencyInjectionAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::EventsAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ExceptionABI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::InvalidSubsystem]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::IoAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::MemoryAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ObjectNamespaceAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::SerilizationAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::TestingAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ThreadingAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+#else //Release
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::BootLoaderAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::DepencyInjectionAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::EventsAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ExceptionABI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::InvalidSubsystem]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::IoAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::MemoryAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ObjectNamespaceAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::SerilizationAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::TestingAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ThreadingAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+#endif
+					}
 
 					//Поточна версія ядра
 					DefaultSettings.SettingsVersion = CurrentSettings::GetCurrentKernelVersion();

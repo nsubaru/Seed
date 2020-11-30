@@ -9,7 +9,6 @@
 #include "Seed.Core.Containers.NonConcurency.Array.h"
 #include "Seed.Core.Containers.NonConcurency.List.h"
 #include "Seed.Core.Containers.NonConcurency.Map.h"
-#include "Seed.Core.CTTI.TypeName.Details.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -363,7 +362,7 @@ namespace Seed
                 Containers::BaseList<THeap, TBaseString> Split(const TBaseString Delim, SizeT StartPos = 0, SizeT EndPos = Math::Max<SizeT>()) const {
                     const TBaseString* This = static_cast<const TBaseString*>(this);
 
-                    if(Delim.Lenght == 0)
+                    if(Delim.FullLenght == 0)
                         return  Containers::BaseList<THeap, TBaseString>({ *This });
 
                     if (This->str == nullptr)
