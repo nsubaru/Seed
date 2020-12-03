@@ -199,7 +199,7 @@ namespace Seed {
                     Internals::Exceptions::ThrowStringToLong(__FILE__, __FUNCSIG__, __LINE__, StartSize.Bytes);
                 if (StartSize.Bytes == 0 || StartSize.Bytes < CurrentSettings().MemoryManager.StringReserveSize)
                     StartSize = Memory::DataSizeT(CurrentSettings().MemoryManager.StringReserveSize);
-                this->ReservedSize = (StartSize.Bytes / 2) + 1;
+                this->ReservedSize = (StartSize.Bytes / sizeof(Char)) + 1;
                 this->CurrentSize = 1;
                 this->str = (CharStr)BaseString::operator new[](ReservedSize * 2);
                 this->str[0] = L'\0';

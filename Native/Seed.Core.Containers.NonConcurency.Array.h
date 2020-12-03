@@ -238,7 +238,7 @@ namespace Seed {
 			protected:
 				template<typename U, typename TLambda>
 				U AggregateImpl(TLambda&& lambda) const {
-					U val = 0;
+					U val = {};
 					for (SizeT i = 0; i < This->count; i++)
 					{
 						val = lambda(val, This->array[i]);
