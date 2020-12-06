@@ -265,7 +265,7 @@ namespace Seed {
                 template<typename U, typename TLambda>
                 U AggregateImpl(TLambda&& lambda) const {
                     return MoveRValue(this->This->lock.ShareLock([&]() InlineLambda {
-                        U result = U();
+                        U result = {};
                         for (SizeT i = 0; i < This->count; i++)
                         {
                             result = lambda(result, This->array[i]);
