@@ -41,10 +41,9 @@ namespace Seed
 			TestPackResult TestRegister::RunAllTest(Boolean isLogging) {
 				Containers::List<TestResult> results;
 
-				if(isLogging) 
-					Logger::StaticLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
-						Logger::ELoggerLevel::Verbose,
-						L"Запуск тестів...");
+				Logger::StaticLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+					Logger::ELoggerLevel::Verbose,
+					L"Запуск тестів...");
 
 				Time::DateTime startTime = Time::DateTime::GetCurrentSystemTimeData();
 
@@ -59,8 +58,6 @@ namespace Seed
 					String msg = String(Memory::DataSizeT(maxTestNameSz) + 100Kb);
 				}
 
-				
-
 				GetAllTests().ForEach([&](TestRecord& record) InlineLambda {
 					Time::TimeSpan testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks;
 					
@@ -70,19 +67,17 @@ namespace Seed
 						{
 							testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
-							if (isLogging) {
-								msg += L"Тест \"";
-								msg += record.Key.TypeName;
-								msg += L"\"";
-								msg.ResizeToFixed(maxTestNameSz);
-								msg += L" тривалість: ";
-								msg += String::toString(testDurration.Ticks);
-								msg += L" tiks";
-								msg += L", тест пройдено";
-								Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
-									Logger::ELoggerLevel::Verbose,
-									msg);
-							}
+							msg += L"Тест \"";
+							msg += record.Key.TypeName;
+							msg += L"\"";
+							msg.ResizeToFixed(maxTestNameSz);
+							msg += L" тривалість: ";
+							msg += String::toString(testDurration.Ticks);
+							msg += L" tiks";
+							msg += L", тест пройдено";
+							Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+								Logger::ELoggerLevel::Verbose,
+								msg);
 
 							results += {record.Key.TypeName, TestResult::EStatus::Success, "", testDurration};
 						}
@@ -90,91 +85,82 @@ namespace Seed
 						{
 							testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
-							if (isLogging) {
-								msg += L"Тест \"";
-								msg += record.Key.TypeName;
-								msg += L"\"";
-								msg.ResizeToFixed(maxTestNameSz);
-								msg += L" тривалість: ";
-								msg += String::toString(testDurration.Ticks);
-								msg += L" tiks";
-								msg += L", тест скасовано";
-								Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
-									Logger::ELoggerLevel::Verbose,
-									msg);
-							}
-
-							results += {record.Key.TypeName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
-						}
-
-						if (isLogging) msg.Resize(0);
-					}
-					catch (Asserts::AssertException & ex)
-					{
-						testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
-
-						if (isLogging) {
 							msg += L"Тест \"";
 							msg += record.Key.TypeName;
 							msg += L"\"";
 							msg.ResizeToFixed(maxTestNameSz);
 							msg += L" тривалість: ";
-							msg += String::toString(testDurration);
+							msg += String::toString(testDurration.Ticks);
 							msg += L" tiks";
-							msg += L", тест не пройдено, спрацював ассерт: ";
-							msg += ex.AssertMessage;
-
+							msg += L", тест скасовано";
 							Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
-								Logger::ELoggerLevel::Warning,
+								Logger::ELoggerLevel::Verbose,
 								msg);
-							msg.Resize(0);
+
+							results += {record.Key.TypeName, TestResult::EStatus::Failure, L"Вернув false", testDurration};
 						}
+
+						msg.Resize(0);
+					}
+					catch (Asserts::AssertException & ex)
+					{
+						testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
+
+						msg += L"Тест \"";
+						msg += record.Key.TypeName;
+						msg += L"\"";
+						msg.ResizeToFixed(maxTestNameSz);
+						msg += L" тривалість: ";
+						msg += String::toString(testDurration);
+						msg += L" tiks";
+						msg += L", тест не пройдено, спрацював ассерт: ";
+						msg += ex.AssertMessage;
+
+						Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+							Logger::ELoggerLevel::Warning,
+							msg);
+						msg.Resize(0);
 
 						results += {record.Key.TypeName, TestResult::EStatus::Failure, ex.toString(), testDurration};
 					}
 					catch (Exception & ex) {
 						testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
-						if (isLogging) {
-							msg += L"Тест \"";
-							msg += record.Key.TypeName;
-							msg += L"\"";
-							msg.ResizeToFixed(maxTestNameSz);
-							msg += L" тривалість: ";
-							msg += String::toString(testDurration);
-							msg += L" tiks";
-							msg += L", тест не пройдено, виникло виключення: ";
-							msg += ex.toString();
+						msg += L"Тест \"";
+						msg += record.Key.TypeName;
+						msg += L"\"";
+						msg.ResizeToFixed(maxTestNameSz);
+						msg += L" тривалість: ";
+						msg += String::toString(testDurration);
+						msg += L" tiks";
+						msg += L", тест не пройдено, виникло виключення: ";
+						msg += ex.toString();
 
-							Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
-								Logger::ELoggerLevel::Warning,
-								msg);
-							msg.Resize(0);
-						}
-
+						Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+							Logger::ELoggerLevel::Warning,
+							msg);
+						msg.Resize(0);
+						
 						results += {record.Key.TypeName, TestResult::EStatus::Exception, ex.toString(), testDurration};
 					}
 					catch (...) {
 						testDurration = Time::DateTime::GetCurrentSystemTimeData().Ticks - testDurration.Ticks;
 
-						if (isLogging) {
-							msg += L"Тест \"";
-							msg += record.Key.TypeName;
-							msg += L"\"";
-							msg.ResizeToFixed(maxTestNameSz);
-							msg += L" тривалість: ";
-							msg += String::toString(testDurration);
-							msg += L" tiks";
-							msg += L", тест не пройдено, виникло невідоме виключення";
+						msg += L"Тест \"";
+						msg += record.Key.TypeName;
+						msg += L"\"";
+						msg.ResizeToFixed(maxTestNameSz);
+						msg += L" тривалість: ";
+						msg += String::toString(testDurration);
+						msg += L" tiks";
+						msg += L", тест не пройдено, виникло невідоме виключення";
 
-							Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
-								Logger::ELoggerLevel::Error,
-								msg);
-							msg.Resize(0);
-						}
-						results += {record.Key.TypeName, TestResult::EStatus::Exception, L"Uknown", testDurration};
-
+						Logger::StaticManagedLogger<Logger::EStaticSubsystems::TestingAPI>::toLog(
+							Logger::ELoggerLevel::Error,
+							msg);
+						msg.Resize(0);
 						
+						results += {record.Key.TypeName, TestResult::EStatus::Exception, L"Uknown", testDurration};
 					}
 					});
 

@@ -167,7 +167,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrow::Excecute
 		}
 	}
 
-	Asserts::AssertTrue(testResult);
+	Asserts::AssertTrue(testResult, ExceptionPosition);
 
 	return true;
 }
@@ -194,7 +194,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowWithTwoCat
 		}
 	}
 
-	Asserts::AssertTrue(testResult);
+	Asserts::AssertTrue(testResult, ExceptionPosition);
 
 	return true;
 }
@@ -216,7 +216,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowCatchAsPar
 		}
 	}
 
-	Asserts::AssertTrue(testResult);
+	Asserts::AssertTrue(testResult, ExceptionPosition);
 
 	return true;
 }
@@ -234,7 +234,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowElipseCatc
 		testResult = true;
 	}
 
-	Asserts::AssertTrue(testResult);
+	Asserts::AssertTrue(testResult, ExceptionPosition);
 
 	return true;
 }
@@ -269,8 +269,8 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::SimpleThrowInnerCatch
 			outerCatch = true;
 	}
 
-	Asserts::AssertTrue(innerCacth);
-	Asserts::AssertTrue(outerCatch);
+	Asserts::AssertTrue(innerCacth, ExceptionPosition);
+	Asserts::AssertTrue(outerCatch, ExceptionPosition);
 
 	return true;
 }
@@ -279,7 +279,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowSubMethod::Excec
 {
 	auto result = ThrowSubMethodFunct();
 
-	Asserts::AssertTrue(result);
+	Asserts::AssertTrue(result, ExceptionPosition);
 
 	return true;
 }
@@ -288,7 +288,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowSubMethodElipse:
 {
 	auto result = ThrowSubMethodElipseFunct();
 
-	Asserts::AssertTrue(result);
+	Asserts::AssertTrue(result, ExceptionPosition);
 
 	return true;
 }
@@ -297,7 +297,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowCatchSubSubMetho
 {
 	auto result = ThrowCatchSubSubMethodFunct();
 
-	Asserts::AssertTrue(result);
+	Asserts::AssertTrue(result, ExceptionPosition);
 
 	return true;
 }
@@ -306,7 +306,7 @@ bool Seed::Core::Testing::Test::Exceptions::Abi::Throwing::ThrowDtorGenInnerExce
 {
 	auto result = ThrowDtorGenInnerExceptionFunct();
 
-	Asserts::AssertTrue(result);
+	Asserts::AssertTrue(result, ExceptionPosition);
 
 	return true;
 }

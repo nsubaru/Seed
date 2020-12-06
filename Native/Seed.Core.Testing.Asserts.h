@@ -124,89 +124,89 @@ namespace Seed
 				virtual ~AssertNotEqualException() {}
 			};
 		public:
-			static void AssertTrue(bool value) {
+			static void AssertTrue(bool value, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (!value)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename TLambda>
 			requires Concepts::IsInvockableWithResult<TLambda, Boolean>
-			static void AssertTrue(TLambda&& lambda) {
+			static void AssertTrue(TLambda&& lambda, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (!lambda())
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveEqual<T, U>
-			static void AssertEqual(T&& a, U&& b) {
+			static void AssertEqual(T&& a, U&& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a != b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveEqual<T, U>
-			static void AssertEqual(const T& a, U&& b) {
+			static void AssertEqual(const T& a, U&& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a != b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveEqual<T, U>
-			static void AssertEqual(T&& a, const U& b) {
+			static void AssertEqual(T&& a, const U& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a != b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveEqual<T, U>
-			static void AssertEqual(const T& a, const U& b) {
+			static void AssertEqual(const T& a, const U& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a != b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveNotEqual<T, U>
-			static void AssertNotEqual(T&& a, U&& b) {
+			static void AssertNotEqual(T&& a, U&& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a == b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveNotEqual<T, U>
-			static void AssertNotEqual(const T& a, U&& b) {
+			static void AssertNotEqual(const T& a, U&& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a != b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveNotEqual<T, U>
-			static void AssertNotEqual(T&& a, const U& b) {
+			static void AssertNotEqual(T&& a, const U& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a != b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
 			template<typename T, typename U>
 			requires Concepts::HaveNotEqual<T, U>
-			static void AssertNotEqual(const T& a, const U& b) {
+			static void AssertNotEqual(const T& a, const U& b, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (a != b)
-					Throw(AssertEqualException(ExceptionPosition));
+					Throw(AssertEqualException(file, functName, line));
 			}
 
-			static void AssertFalse(bool value) {
+			static void AssertFalse(bool value, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (value)
-					Throw(AssertNotEqualException(ExceptionPosition));
+					Throw(AssertNotEqualException(file, functName, line));
 			}
 
 			template<typename TLambda>
 			requires Concepts::IsInvockableWithResult<TLambda, Boolean>
-			static void AssertFalse(TLambda&& lambda) {
+			static void AssertFalse(TLambda&& lambda, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				if (lambda())
-					Throw(AssertNotEqualException(ExceptionPosition));
+					Throw(AssertNotEqualException(file, functName, line));
 			}
 
 			template<typename TException, typename TLambda>
 			requires Concepts::IsInvockable<TLambda> && Concepts::IsBasedOn<Exceptions::Exception, TException>//&& Concepts::IsException<TException>
-			static void AssertThrowException(TLambda&& lambda) {
+			static void AssertThrowException(TLambda&& lambda, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				try
 				{
 					lambda();
@@ -215,19 +215,19 @@ namespace Seed
 				{
 					return;
 				}
-				Throw(AssertNotEqualException(ExceptionPosition));
+				Throw(AssertNotEqualException(file, functName, line));
 			}
 
 			template<typename TException, typename TLambda>
 			requires Concepts::IsInvockable<TLambda> && Concepts::IsBasedOn<Exceptions::Exception, TException>//&& Concepts::IsException<TException>
-				static void AssertNoThrowException(TLambda&& lambda) {
+				static void AssertNoThrowException(TLambda&& lambda, const ConstAString& file, const ConstAString& functName, SizeT line) {
 				try
 				{
 					lambda();
 				}
 				catch ([[maybe_unused]] TException& ex)
 				{
-					Throw(AssertNotEqualException(ExceptionPosition));
+					Throw(AssertNotEqualException(file, functName, line));
 				}
 			}
 		};

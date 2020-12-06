@@ -14,15 +14,15 @@ bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateEmptyUn
         .SetMaxThreadCount(8)
         .CreateThreadPool();
 
-    Asserts::AssertEqual(pool.IORequestCount, 0);
-    Asserts::AssertEqual(pool.JobsCount, 0);
-    Asserts::AssertEqual(pool.ScheduledTaskCount, 0);
+    Asserts::AssertEqual(pool.IORequestCount, 0, ExceptionPosition);
+    Asserts::AssertEqual(pool.JobsCount, 0, ExceptionPosition);
+    Asserts::AssertEqual(pool.ScheduledTaskCount, 0, ExceptionPosition);
 
-    Asserts::AssertEqual(pool.Name, L"Test thread pool");
+    Asserts::AssertEqual(pool.Name, L"Test thread pool", ExceptionPosition);
 
-    Asserts::AssertEqual(pool.JobsPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High);
-    Asserts::AssertEqual(pool.ScheduledTasksPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::Low);
-    Asserts::AssertEqual(pool.IORequestPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High);
+    Asserts::AssertEqual(pool.JobsPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High, ExceptionPosition);
+    Asserts::AssertEqual(pool.ScheduledTasksPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::Low, ExceptionPosition);
+    Asserts::AssertEqual(pool.IORequestPriority, Core::Threading::UnifiedThreadPool::EPoolThreadsPriority::High, ExceptionPosition);
 
     return true;
 }
@@ -62,15 +62,15 @@ bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnified
     job2.Join();
     job3.Join();
 
-    Asserts::AssertEqual(job1.IsAlredyExecuted, true);
-    Asserts::AssertEqual(job2.IsAlredyExecuted, true);
-    Asserts::AssertEqual(job3.IsAlredyExecuted, true);
+    Asserts::AssertEqual(job1.IsAlredyExecuted, true, ExceptionPosition);
+    Asserts::AssertEqual(job2.IsAlredyExecuted, true, ExceptionPosition);
+    Asserts::AssertEqual(job3.IsAlredyExecuted, true, ExceptionPosition);
 
-    Asserts::AssertEqual(jobsResults.Count, 3);
+    Asserts::AssertEqual(jobsResults.Count, 3, ExceptionPosition);
 
-    Asserts::AssertTrue(jobsResults.All(ArrowFunct(x, x == true)));
+    Asserts::AssertTrue(jobsResults.All(ArrowFunct(x, x == true)), ExceptionPosition);
 
-    Asserts::AssertEqual(pool.JobsCount, 0);
+    Asserts::AssertEqual(pool.JobsCount, 0, ExceptionPosition);
 
     return true;
 }
@@ -115,12 +115,12 @@ bool Seed::Core::Testing::Test::MultiThreading::UnifiedThreadPool::CreateUnified
 
     Core::Threading::Sleep(100ms * 4);
 
-    Asserts::AssertEqual(task.ExecutedCount, 3);
-    Asserts::AssertEqual(task.TimerProximity, 10ms);
+    Asserts::AssertEqual(task.ExecutedCount, 3, ExceptionPosition);
+    Asserts::AssertEqual(task.TimerProximity, 10ms, ExceptionPosition);
 
-    Asserts::AssertEqual(jobsResults.Count, 3 * 3);
+    Asserts::AssertEqual(jobsResults.Count, 3 * 3, ExceptionPosition);
 
-    Asserts::AssertTrue(jobsResults.All(ArrowFunct(x, x == true)));
+    Asserts::AssertTrue(jobsResults.All(ArrowFunct(x, x == true)), ExceptionPosition);
 
     return true;
 }

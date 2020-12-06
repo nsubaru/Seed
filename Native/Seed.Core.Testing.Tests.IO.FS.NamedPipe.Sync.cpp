@@ -8,10 +8,10 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Sync::SyncNamedPipeServerCreation
 
     auto pipe = Seed::Core::IO::IPC::Pipes::CreatePipe(pipeName);
 
-    Asserts::AssertEqual(pipe.Name, pipeName);
-    Asserts::AssertEqual(pipe.IsNoCache, true);
-    Asserts::AssertEqual(pipe.SupportedMode, Core::IO::IPC::Pipes::PipeMode::Both);
-    Asserts::AssertEqual(pipe.InstanceCount, 0);
+    Asserts::AssertEqual(pipe.Name, pipeName, ExceptionPosition);
+    Asserts::AssertEqual(pipe.IsNoCache, true, ExceptionPosition);
+    Asserts::AssertEqual(pipe.SupportedMode, Core::IO::IPC::Pipes::PipeMode::Both, ExceptionPosition);
+    Asserts::AssertEqual(pipe.InstanceCount, 0, ExceptionPosition);
 
     return true;
 }
@@ -33,10 +33,10 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Sync::SyncNamedPipeComunication::
 
         pipeInstance.ReadRaw(buffer);
 
-        Asserts::AssertEqual(data.Count, buffer.Count);
+        Asserts::AssertEqual(data.Count, buffer.Count, ExceptionPosition);
         for (SizeT i = 0; i < data.Count; i++)
         {
-            Asserts::AssertEqual(data[i], buffer[i]);
+            Asserts::AssertEqual(data[i], buffer[i], ExceptionPosition);
         }
 
         pipeInstance.WriteRawData(buffer);
@@ -44,8 +44,8 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Sync::SyncNamedPipeComunication::
         pipeInstance.WaitClosing();
         pipeInstance.Close();
 
-        Asserts::AssertFalse(pipeInstance.IsValid);
-        Asserts::AssertEqual(0, pipeServer.InstanceCount);
+        Asserts::AssertFalse(pipeInstance.IsValid, ExceptionPosition);
+        Asserts::AssertEqual(0, pipeServer.InstanceCount, ExceptionPosition);
 
         return true;
         }, event));
@@ -63,15 +63,15 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Sync::SyncNamedPipeComunication::
         pipe.WriteRawData(buffer);
         pipe.ReadRaw(buffer);
 
-        Asserts::AssertEqual(data.Count, buffer.Count);
+        Asserts::AssertEqual(data.Count, buffer.Count, ExceptionPosition);
         for (SizeT i = 0; i < data.Count; i++)
         {
-            Asserts::AssertEqual(data[i], buffer[i]);
+            Asserts::AssertEqual(data[i], buffer[i], ExceptionPosition);
         }
 
         pipe.Close();
 
-        Asserts::AssertFalse(pipe.IsValid);
+        Asserts::AssertFalse(pipe.IsValid, ExceptionPosition);
 
         return true;
         }, event));
@@ -85,8 +85,8 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Sync::SyncNamedPipeComunication::
     serverThread.Interupt();
     clientThread.Interupt();
 
-    Asserts::AssertNoThrowException<InteruptException>([&]() { Asserts::AssertTrue(serverThread.GetThreadResult<bool>()); });
-    Asserts::AssertNoThrowException<InteruptException>([&]() { Asserts::AssertTrue(clientThread.GetThreadResult<bool>()); });
+    Asserts::AssertNoThrowException<InteruptException>([&]() { Asserts::AssertTrue(serverThread.GetThreadResult<bool>(), ExceptionPosition); }, ExceptionPosition);
+    Asserts::AssertNoThrowException<InteruptException>([&]() { Asserts::AssertTrue(clientThread.GetThreadResult<bool>(), ExceptionPosition); }, ExceptionPosition);
 
     return true;
 }

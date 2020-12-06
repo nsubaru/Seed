@@ -18,10 +18,10 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Async::AsyncNamedPipeServerCreati
 
     auto pipe = Seed::Core::IO::IPC::Pipes::CreateAsyncPipe(pipeName);
 
-    Asserts::AssertEqual(pipe.Name, pipeName);
-    Asserts::AssertEqual(pipe.IsNoCache, true);
-    Asserts::AssertEqual(pipe.SupportedMode, Core::IO::IPC::Pipes::PipeMode::Both);
-    Asserts::AssertEqual(pipe.InstanceCount, 0);
+    Asserts::AssertEqual(pipe.Name, pipeName, ExceptionPosition);
+    Asserts::AssertEqual(pipe.IsNoCache, true, ExceptionPosition);
+    Asserts::AssertEqual(pipe.SupportedMode, Core::IO::IPC::Pipes::PipeMode::Both, ExceptionPosition);
+    Asserts::AssertEqual(pipe.InstanceCount, 0, ExceptionPosition);
 
     return true;
 }
@@ -109,9 +109,9 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Async::AsyncNamedPipeComunication
     auto clientPipe = Seed::Core::IO::IPC::Pipes::AsyncConnectPipe(pool, pipeName);
 
     serverConnectionPipeIOTask.WaitComplete(10s);
-    Asserts::AssertTrue(serverConnectionPipeIOTask.IsCompleted);
-    Asserts::AssertEqual(serverConnectCallback.As<ServerConnectCallback>().ErrorCode, 0);
-    Asserts::AssertNotEqual(serverConnectCallback.As<ServerConnectCallback>().ConnectedPipe, nullptr);
+    Asserts::AssertTrue(serverConnectionPipeIOTask.IsCompleted, ExceptionPosition);
+    Asserts::AssertEqual(serverConnectCallback.As<ServerConnectCallback>().ErrorCode, 0, ExceptionPosition);
+    Asserts::AssertNotEqual(serverConnectCallback.As<ServerConnectCallback>().ConnectedPipe, nullptr, ExceptionPosition);
 
     auto fileList = Core::IO::FS::QueryFilesInDirectory(L".\\");
 
@@ -130,17 +130,17 @@ bool Seed::Core::Testing::Test::IO::NamedPipe::Async::AsyncNamedPipeComunication
     serverWriteIOTask.WaitComplete(10s);
     clientReadTaskIO.WaitComplete(10s);
 
-    Asserts::AssertTrue(serverWriteIOTask.IsCompleted);
-    Asserts::AssertTrue(clientReadTaskIO.IsCompleted);
+    Asserts::AssertTrue(serverWriteIOTask.IsCompleted, ExceptionPosition);
+    Asserts::AssertTrue(clientReadTaskIO.IsCompleted, ExceptionPosition);
 
-    Asserts::AssertEqual(serverWriteCallback.As<WriteCallback>().ErrorCode, 0);
-    Asserts::AssertEqual(clientReadCallback.As<ReadCallback>().ErrorCode, 0);
+    Asserts::AssertEqual(serverWriteCallback.As<WriteCallback>().ErrorCode, 0, ExceptionPosition);
+    Asserts::AssertEqual(clientReadCallback.As<ReadCallback>().ErrorCode, 0, ExceptionPosition);
 
-    Asserts::AssertEqual(serverWriteCallback.As<WriteCallback>().Data.Count, clientReadCallback.As<ReadCallback>().Data.Count);
+    Asserts::AssertEqual(serverWriteCallback.As<WriteCallback>().Data.Count, clientReadCallback.As<ReadCallback>().Data.Count, ExceptionPosition);
 
     for (SizeT i = 0; i < serverWriteCallback.As<WriteCallback>().Data.Count; i++)
     {
-        Asserts::AssertEqual(serverWriteCallback.As<WriteCallback>().Data[i], clientReadCallback.As<ReadCallback>().Data[i]);
+        Asserts::AssertEqual(serverWriteCallback.As<WriteCallback>().Data[i], clientReadCallback.As<ReadCallback>().Data[i], ExceptionPosition);
     }
 
     clientPipe.CloseConnection();

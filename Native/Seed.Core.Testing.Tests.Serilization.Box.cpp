@@ -14,7 +14,7 @@ bool Seed::Core::Testing::Test::Serilization::LazySerilization::Excecute() {
     auto serilizedData = Core::Serilization::Serilize(data, registry);
     decltype(data) deserilizedData = Lazy<String>();
     Core::Serilization::Deserilize(serilizedData, deserilizedData, registry);
-    Asserts::AssertEqual(*data, *deserilizedData);
+    Asserts::AssertEqual(*data, *deserilizedData, ExceptionPosition);
 
     return true;
 }
@@ -26,7 +26,7 @@ bool Seed::Core::Testing::Test::Serilization::SmartPtrSerilization::Excecute() {
     auto serilizedData = Core::Serilization::Serilize(data, registry);
     decltype(data) deserilizedData = SmartPtr<String>();
     Core::Serilization::Deserilize(serilizedData, deserilizedData, registry);
-    Asserts::AssertEqual(*data, *deserilizedData);
+    Asserts::AssertEqual(*data, *deserilizedData, ExceptionPosition);
 
     return true;
 }
