@@ -147,7 +147,7 @@ namespace Seed
                 /// <returns>Рядоку який є сумою масиву вхідних рядків</returns>
                 ForceInline static TBaseString Combine(Containers::Array<TBaseString>&& strings) {
                     auto data = TBaseString(
-                        strings.Aggregate<Memory::DataSizeT>(ArrowFunct(x, y, x + y.Size))
+                        strings.Aggregate<Memory::DataSizeT>([] (const auto& x, const auto& y) { return x + y.Size; })
                     );
 
                     strings.ForEach([&](const auto& string) mutable InlineLambda{

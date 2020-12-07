@@ -25,7 +25,7 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 	Asserts::AssertTrue([&] () InlineLambda
 	{
 		return Core::String(Core::Serilization::CTTIMetaDataGen<Data>()).Lenght > 0;
-	});
+	}, ExceptionPosition);
 
 	auto schema = Core::Serilization::MetaDataGen<Data>();
 	auto blob = Core::Serilization::Serilize(data, registry);
@@ -83,7 +83,7 @@ bool Seed::Core::Testing::Test::Serilization::StructSerilization::Excecute() {
 		}
 
 		return true;
-	});
+	}, ExceptionPosition);
 
 	return schema.Lenght != 0;
 }

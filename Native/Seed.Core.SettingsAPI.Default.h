@@ -133,7 +133,10 @@ namespace Seed {
 						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::SerilizationAPI]
 							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
 
-						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::TestingAPI]
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::AutomaticTestingAPI]
+							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ManualTestingAPI]
 							= Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
 
 						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ThreadingAPI]
@@ -166,7 +169,10 @@ namespace Seed {
 						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::SerilizationAPI]
 							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
 
-						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::TestingAPI]
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::AutomaticTestingAPI]
+							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ManualTestingAPI]
 							= Logger::ELoggerLevel::Debug | Logger::ELoggerLevel::Verbose | Logger::ELoggerLevel::Warning | Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
 
 						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ThreadingAPI]
@@ -199,7 +205,10 @@ namespace Seed {
 						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::SerilizationAPI]
 							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
 
-						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::TestingAPI]
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ManualTestingAPI]
+							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
+
+						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::AutomaticTestingAPI]
 							= Logger::ELoggerLevel::Error | Logger::ELoggerLevel::Critical;
 
 						DefaultSettings.KernelLogger.CurrentStaticLogger[(SizeT)Logger::EStaticSubsystems::ThreadingAPI]

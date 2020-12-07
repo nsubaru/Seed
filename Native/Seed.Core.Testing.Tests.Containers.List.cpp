@@ -12,7 +12,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::ForEachTes
 	auto list = Core::Containers::List<SizeT>::Generate(ArrowFunct(idx, idx), 10);
 	auto sum = 0Sz;
 	list.ForEach(ArrowFunctWithClosure(x, sum += x));
-	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
+	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9, ExceptionPosition);
 	return true;
 }
 
@@ -22,7 +22,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::RemoveIfTe
 	list.RemoveIf(ArrowFunct(x, x > 5));
 	SizeT sum = 0;
 	for (auto i : list) sum += i;
-	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5);
+	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5, ExceptionPosition);
 	return true;
 }
 
@@ -31,7 +31,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::AgregateSi
 	auto res = list.Aggregate(ArrowFunct(x, y, x + y));
 	auto sum = 0Sz;
 	for (auto i : list) sum += i;
-	Asserts::AssertEqual(res, sum);
+	Asserts::AssertEqual(res, sum, ExceptionPosition);
 	return true;
 }
 
@@ -40,40 +40,40 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::AgregateCo
 	auto res = list.Aggregate<SizeT>(ArrowFunct(x, y, x + y.toInt<SizeT>()));
 	auto sum = 0Sz;
 	for (auto i : list) sum += i.toInt<SizeT>();
-	Asserts::AssertEqual(res, sum);
+	Asserts::AssertEqual(res, sum, ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::AnyEmptyList::Excecute() {
-	Asserts::AssertFalse(Core::Containers::List<SizeT>().Any());
+	Asserts::AssertFalse(Core::Containers::List<SizeT>().Any(), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::AnyWithItemList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Any());
+	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Any(), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::AnyWithConditionList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 5)));
-	Asserts::AssertFalse(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 10)));
+	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 5)), ExceptionPosition);
+	Asserts::AssertFalse(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 10)), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::AllWithConditionList::Excecute() {
 	Asserts::AssertTrue(Core::Containers::List<SizeT>()
 		.Generate(ArrowFunct(i, i), 10)
-		.All(ArrowFunct(x, x >= 0)));
+		.All(ArrowFunct(x, x >= 0)), ExceptionPosition);
 	Asserts::AssertFalse(Core::Containers::List<SizeT>()
 		.Generate(ArrowFunct(i, i), 10)
-		.All(ArrowFunct(x, x < 8)));
+		.All(ArrowFunct(x, x < 8)), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::CloneListWithPods::Excecute() {
 	auto list = Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10);
 	auto clone = list.Clone();
-	Asserts::AssertEqual(list.Count, clone.Count);
+	Asserts::AssertEqual(list.Count, clone.Count, ExceptionPosition);
 	Asserts::AssertTrue([&] () InlineLambda
 	{
 		auto listIt = list.FirstIt;
@@ -86,7 +86,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::CloneListW
 			++listIt; ++cloneIt;
 		}
 		return !(list.IsSameAs(clone));
-	});
+	}, ExceptionPosition);
 	return true;
 }
 
@@ -100,22 +100,22 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::CloneListW
 				10);
 
 	auto clone = list.Clone();
-	Asserts::AssertEqual(list.Count, clone.Count);
-	Asserts::AssertEqual(list.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)), clone.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)));
+	Asserts::AssertEqual(list.Count, clone.Count, ExceptionPosition);
+	Asserts::AssertEqual(list.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)), clone.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)), ExceptionPosition);
 	Asserts::AssertEqual(
 		list.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))),
-		clone.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))));
+		clone.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))), ExceptionPosition);
 
 	return !(list.IsSameAs(clone));
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::FirstConditionList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).First(ArrowFunct(x, x >= 5)) == 5);
+	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).First(ArrowFunct(x, x >= 5)) == 5, ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::LastConditionList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Last(ArrowFunct(x, x <= 5)) == 5);
+	Asserts::AssertTrue(Core::Containers::List<SizeT>().Generate(ArrowFunct(i, i), 10).Last(ArrowFunct(x, x <= 5)) == 5, ExceptionPosition);
 	return true;
 }
 
@@ -133,7 +133,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::NonConcurency::ListIterat
 		}
 
 		return true;
-	});
+	}, ExceptionPosition);
 
 	return true;
 }
@@ -170,7 +170,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::ForEachTestLi
 	auto list = Core::Containers::ConcurencyList<SizeT>::Generate(ArrowFunct(idx, idx), 10);
 	auto sum = 0Sz;
 	list.ForEach(ArrowFunctWithClosure(x, sum += x));
-	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
+	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9, ExceptionPosition);
 	return true;
 }
 
@@ -180,7 +180,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::RemoveIfTestL
 	list.RemoveIf(ArrowFunct(x, x > 5));
 	SizeT sum = 0;
 	for (auto i : list) sum += i;
-	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5);
+	Asserts::AssertEqual(sum, 0 + 1 + 2 + 3 + 4 + 5, ExceptionPosition);
 	return true;
 }
 
@@ -189,7 +189,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::AgregateSimpl
 	auto res = list.Aggregate(ArrowFunct(x, y, x + y));
 	auto sum = 0Sz;
 	for (auto i : list) sum += i;
-	Asserts::AssertEqual(res, sum);
+	Asserts::AssertEqual(res, sum, ExceptionPosition);
 	return true;
 }
 
@@ -198,36 +198,36 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::AgregateConve
 	auto res = list.Aggregate<SizeT>(ArrowFunct(x, y, x + y.toInt<SizeT>()));
 	auto sum = 0Sz;
 	for (auto i : list) sum += i.toInt<SizeT>();
-	Asserts::AssertEqual(res, sum);
+	Asserts::AssertEqual(res, sum, ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::AnyEmptyList::Excecute() {
-	Asserts::AssertFalse(Core::Containers::ConcurencyList<SizeT>().Any());
+	Asserts::AssertFalse(Core::Containers::ConcurencyList<SizeT>().Any(), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::AnyWithItemList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Any());
+	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Any(), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::AnyWithConditionList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 5)));
-	Asserts::AssertFalse(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 10)));
+	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 5)), ExceptionPosition);
+	Asserts::AssertFalse(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Any(ArrowFunct(x, x > 10)), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::AllWithConditionList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).All(ArrowFunct(x, x >= 0)));
-	Asserts::AssertFalse(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).All(ArrowFunct(x, x < 8)));
+	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).All(ArrowFunct(x, x >= 0)), ExceptionPosition);
+	Asserts::AssertFalse(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).All(ArrowFunct(x, x < 8)), ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::CloneListWithPods::Excecute() {
 	auto list = Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10);
 	auto clone = list.Clone();
-	Asserts::AssertEqual(list.Count, clone.Count);
+	Asserts::AssertEqual(list.Count, clone.Count, ExceptionPosition);
 	Asserts::AssertTrue([&] () InlineLambda
 	{
 		auto listIt = list.FirstIt;
@@ -240,7 +240,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::CloneListWith
 			++listIt; ++cloneIt;
 		}
 		return !(list.IsSameAs(clone));
-	});
+	}, ExceptionPosition);
 	return true;
 }
 
@@ -254,22 +254,22 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::CloneListWith
 				10);
 
 	auto clone = list.Clone();
-	Asserts::AssertEqual(list.Count, clone.Count);
-	Asserts::AssertEqual(list.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)), clone.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)));
+	Asserts::AssertEqual(list.Count, clone.Count, ExceptionPosition);
+	Asserts::AssertEqual(list.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)), clone.Aggregate<SizeT>(ArrowFunct(x, y, x + y.Count)), ExceptionPosition);
 	Asserts::AssertEqual(
 		list.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))),
-		clone.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))));
+		clone.Aggregate<String>(ArrowFunct(x, y, x + y.Aggregate(ArrowFunct(x, y, x + y)))), ExceptionPosition);
 
 	return !(list.IsSameAs(clone));
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::FirstConditionList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).First(ArrowFunct(x, x >= 5)) == 5);
+	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).First(ArrowFunct(x, x >= 5)) == 5, ExceptionPosition);
 	return true;
 }
 
 bool Seed::Core::Testing::Test::API::Containers::List::Concurency::LastConditionList::Excecute() {
-	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Last(ArrowFunct(x, x <= 5)) == 5);
+	Asserts::AssertTrue(Core::Containers::ConcurencyList<SizeT>().Generate(ArrowFunct(i, i), 10).Last(ArrowFunct(x, x <= 5)) == 5, ExceptionPosition);
 	return true;
 }
 
@@ -287,7 +287,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::Concurency::ListIterators
 		}
 
 		return true;
-	});
+	}, ExceptionPosition);
 
 	return true;
 }
@@ -330,7 +330,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::MultiThreadConcurency::It
 					int i = 0;
 					for (auto& item : sharedList)
 					{
-						Asserts::AssertEqual(item.toInt(), i);
+						Asserts::AssertEqual(item.toInt(), i, ExceptionPosition);
 						i++;
 					}
 
@@ -342,7 +342,7 @@ bool Seed::Core::Testing::Test::API::Containers::List::MultiThreadConcurency::It
 		.ForEach(ArrowFunct(thread, thread.Join()))
 		.ForEach([&] (Core::Threading::Thread& thread)
 		{
-			Asserts::AssertEqual(thread.GetThreadResult<int>(), sharedList.Count);
+			Asserts::AssertEqual(thread.GetThreadResult<int>(), sharedList.Count, ExceptionPosition);
 		});
 
 	return true;

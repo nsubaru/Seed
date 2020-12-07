@@ -11,7 +11,7 @@ bool Seed::Core::Testing::Test::IO::FS::API::QueryPath::Excecute() {
 		{
 			return object.Name.Containe(L"Seed.CoreLog.log");
 		});
-	});
+	}, ExceptionPosition);
 
 	return true;
 }

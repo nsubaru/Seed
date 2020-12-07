@@ -5,7 +5,7 @@
 bool Seed::Core::Testing::Test::API::Containers::V2Tuple::CreateV2Leafs::Excecute() {
     constexpr auto v1 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, int, float>(1, 1.0);
 
-    Asserts::AssertEqual(v1.Count, 2);
+    Asserts::AssertEqual(v1.Count, 2, ExceptionPosition);
 
     return true;
 }
@@ -14,7 +14,7 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::ConstexprCopyV2Leafs::
     constexpr auto v1 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, int, float>(1, 1.0);
     constexpr auto v2 = v1;
 
-    Asserts::AssertEqual(v1.Count, v2.Count);
+    Asserts::AssertEqual(v1.Count, v2.Count, ExceptionPosition);
 
     return true;
 }
@@ -23,8 +23,8 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::AccessToValuesV2Leafs:
     constexpr auto v1 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, int, float>(1, 1.0);
     constexpr auto v2 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, int, float>(1, 1.0);
 
-    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>());
-    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>());
+    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>(), ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>(), ExceptionPosition);
 
     return true;
 }
@@ -36,8 +36,8 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::AcessToValueRefV2Leafs
     auto v1 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, int&, float&>(a1, a2);
     auto v2 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, int&, float&>(a1, a2);
 
-    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>());
-    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>());
+    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>(), ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>(), ExceptionPosition);
 
     return true;
 }
@@ -49,8 +49,8 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::AcessToValueConstRefV2
     auto v1 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, const int&, const float&>(a1, a2);
     auto v2 = Core::Containers::Details::V2Leafs<TypeTraits::Indexer<2>::Type, const int&, const float&>(a1, a2);
 
-    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>());
-    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>());
+    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>(), ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>(), ExceptionPosition);
 
     return true;
 }
@@ -58,7 +58,7 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::AcessToValueConstRefV2
 bool Seed::Core::Testing::Test::API::Containers::V2Tuple::CreateV2Tuple::Excecute() {
     constexpr auto v1 = Core::Containers::V2Tuple(1, 1.0, 'c');
 
-    Asserts::AssertEqual(v1.Count, 3);
+    Asserts::AssertEqual(v1.Count, 3, ExceptionPosition);
 
     return true;
 }
@@ -67,7 +67,7 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::ConstexprCopyV2Tuple::
     constexpr auto v1 = Core::Containers::V2Tuple(1, 1.0, 'c');
     constexpr auto v2 = v1;
 
-    Asserts::AssertEqual(v1.Count, v2.Count);
+    Asserts::AssertEqual(v1.Count, v2.Count, ExceptionPosition);
 
     return true;
 }
@@ -76,9 +76,9 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::AccessToValuesV2Tuple:
     constexpr auto v1 = Core::Containers::V2Tuple(1, 1.0, 'c');
     constexpr auto v2 = v1;
 
-    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>());
-    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>());
-    Asserts::AssertEqual(v1.GetByIdx<2>(), v2.GetByIdx<2>());
+    Asserts::AssertEqual(v1.GetByIdx<0>(), v2.GetByIdx<0>(), ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<1>(), v2.GetByIdx<1>(), ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<2>(), v2.GetByIdx<2>(), ExceptionPosition);
 
     return true;
 }
@@ -90,9 +90,9 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::AcessToValueRefV2Tuple
 
     auto v1 = Core::Containers::V2Tuple<int&, float&, char&>(a1, a2, a3);
 
-    Asserts::AssertEqual(v1.GetByIdx<0>(), a1);
-    Asserts::AssertEqual(v1.GetByIdx<1>(), a2);
-    Asserts::AssertEqual(v1.GetByIdx<2>(), a3);
+    Asserts::AssertEqual(v1.GetByIdx<0>(), a1, ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<1>(), a2, ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<2>(), a3, ExceptionPosition);
 
     return true;
 }
@@ -104,9 +104,9 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::AcessToValueConstRefV2
 
     auto v1 = Core::Containers::V2Tuple<const int&, const float&, const char&>(a1, a2, a3);
 
-    Asserts::AssertEqual(v1.GetByIdx<0>(), a1);
-    Asserts::AssertEqual(v1.GetByIdx<1>(), a2);
-    Asserts::AssertEqual(v1.GetByIdx<2>(), a3);
+    Asserts::AssertEqual(v1.GetByIdx<0>(), a1, ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<1>(), a2, ExceptionPosition);
+    Asserts::AssertEqual(v1.GetByIdx<2>(), a3, ExceptionPosition);
 
     return true;
 }
@@ -115,7 +115,7 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::ConstexprCallWithV2Tup
     constexpr auto v1 = Core::Containers::V2Tuple(1, 1.0, 'a');
     constexpr auto v2 = v1.CallWithArgsFromTuple([] (int a, double b, char c) constexpr { return (char) (c + (char) a + (char) b); });
 
-    Asserts::AssertEqual(v2, 'c');
+    Asserts::AssertEqual(v2, 'c', ExceptionPosition);
 
     return true;
 }
@@ -125,9 +125,9 @@ bool Seed::Core::Testing::Test::API::Containers::V2Tuple::ConstextprV2TupleExpan
 
     auto [a, b, c] = v1;
 
-    Asserts::AssertEqual(a, v1.GetByIdx<0>());
-    Asserts::AssertEqual(b, v1.GetByIdx<1>());
-    Asserts::AssertEqual(c, v1.GetByIdx<2>());
+    Asserts::AssertEqual(a, v1.GetByIdx<0>(), ExceptionPosition);
+    Asserts::AssertEqual(b, v1.GetByIdx<1>(), ExceptionPosition);
+    Asserts::AssertEqual(c, v1.GetByIdx<2>(), ExceptionPosition);
 
     return true;
 }

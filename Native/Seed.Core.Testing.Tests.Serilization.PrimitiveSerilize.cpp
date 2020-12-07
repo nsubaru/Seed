@@ -73,15 +73,15 @@ bool Seed::Core::Testing::Test::Serilization::DataSizeTSerilization::Excecute()
     decltype(value) deserelizedValue;
     Core::Serilization::Deserilize(stream, deserelizedValue, registry);
 
-    Asserts::AssertEqual(value, deserelizedValue);
+    Asserts::AssertEqual(value, deserelizedValue, ExceptionPosition);
 
     return true;
 }
 
 bool Seed::Core::Testing::Test::Serilization::DataSizeTMetaData::Excecute()
 {
-    Asserts::AssertEqual(CTTI::TypeTraits::CTTITypeMetaData<Memory::DataSizeT>::TypeClass, CTTI::EType::Numeric);
-    Asserts::AssertTrue(CTTI::TypeTraits::CTTITypeMetaData<Memory::DataSizeT>::IsSerilizable);
+    Asserts::AssertEqual(CTTI::TypeTraits::CTTITypeMetaData<Memory::DataSizeT>::TypeClass, CTTI::EType::Numeric, ExceptionPosition);
+    Asserts::AssertTrue(CTTI::TypeTraits::CTTITypeMetaData<Memory::DataSizeT>::IsSerilizable, ExceptionPosition);
 
     return true;
 }

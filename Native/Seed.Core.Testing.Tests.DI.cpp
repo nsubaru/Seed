@@ -221,7 +221,7 @@ bool Seed::Core::Testing::Test::DI::TestSerilizationService::Excecute() {
 
 	Asserts::AssertEqual(
 		dynamic.GetValue<int>().GetByIdx<0>(), 
-		dynamicDeserilized.GetValue<int>().GetByIdx<0>());
+		dynamicDeserilized.GetValue<int>().GetByIdx<0>(), ExceptionPosition);
 
 	return true;
 }

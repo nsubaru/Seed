@@ -12,7 +12,7 @@
 
 bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::ForEachTestArray::Excecute() {
 	auto arr = Core::Containers::Array<SizeT>::Generate(ArrowFunct(i, i), 10);
-	Asserts::AssertTrue(arr.ForEach(ArrowFunct(x, x * 10)).All(ArrowFunct(x, x < 10)));
+	Asserts::AssertTrue(arr.ForEach(ArrowFunct(x, x * 10)).All(ArrowFunct(x, x < 10)), ExceptionPosition);
 	return true;
 }
 
@@ -75,7 +75,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::CloneArra
 		}
 
 		return !orig.IsSameAs(copy);
-	});
+	}, ExceptionPosition);
 
 	return true;
 }
@@ -93,7 +93,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::NonConcurency::CloneArra
 		}
 
 		return !orig.IsSameAs(copy);
-	});
+	}, ExceptionPosition);
 
 	return true;
 }
@@ -202,7 +202,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::CloneArrayWi
 		}
 
 		return !(orig.IsSameAs(copy));
-	});
+	}, ExceptionPosition);
 
 	return true;
 }
@@ -220,7 +220,7 @@ bool Seed::Core::Testing::Test::API::Containers::Array::Concurency::CloneArrayWi
 		}
 
 		return !(orig.IsSameAs(copy));
-	});
+	}, ExceptionPosition);
 
 	return true;
 }

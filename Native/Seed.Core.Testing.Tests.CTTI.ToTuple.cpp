@@ -21,12 +21,12 @@ bool Seed::Core::Testing::Test::CTTI::ToTuple::Excecute() {
 	Asserts::AssertTrue([] () InlineLambda
 	{
 		return Core::CTTI::TypeTraits::CTTITypeMetaData<Data>::TypeClass == Core::CTTI::EType::Struct;
-	});
+	}, ExceptionPosition);
 
 	Asserts::AssertTrue([] () InlineLambda
 	{
 		return Core::CTTI::TypeTraits::CTTITypeMetaData<Data>::IsConvertibleToTuple;
-	});
+	}, ExceptionPosition);
 
 	constexpr auto data = Data{ 1,2,3 };
 

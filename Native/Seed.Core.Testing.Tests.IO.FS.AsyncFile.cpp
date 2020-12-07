@@ -166,8 +166,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::WriteAsyncFile::Excecute()
 
             MoveRValue(asyncFile).DeleteFile();
 
-            Asserts::AssertTrue(callback.IsDataArrived());
-            Asserts::AssertEqual(callback.StatusCode(), 0);
+            Asserts::AssertTrue(callback.IsDataArrived(), ExceptionPosition);
+            Asserts::AssertEqual(callback.StatusCode(), 0, ExceptionPosition);
         }
     }
 
@@ -224,22 +224,22 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadAsyncFile::Excecute()
 
             decltype(fileList) readedFileList;
 
-            Asserts::AssertTrue(readCallback.IsDataArrived());
-            Asserts::AssertEqual(readCallback.StatusCode(), 0);
+            Asserts::AssertTrue(readCallback.IsDataArrived(), ExceptionPosition);
+            Asserts::AssertEqual(readCallback.StatusCode(), 0, ExceptionPosition);
 
             Core::Serilization::Deserilize(readCallback.GetData(), readedFileList, registry);
 
-            Asserts::AssertEqual(fileList.Count, readedFileList.Count);
+            Asserts::AssertEqual(fileList.Count, readedFileList.Count, ExceptionPosition);
 
             auto it1 = fileList.FirstIt;
             auto it2 = readedFileList.FirstIt;
 
             for (SizeT i = 0; i < fileList.Count; i++)
             {
-                Asserts::AssertEqual(it1->Flags, it2->Flags);
-                Asserts::AssertEqual(it1->Name, it2->Name);
-                Asserts::AssertEqual(it1->Size, it2->Size);
-                Asserts::AssertEqual(it1->Type, it2->Type);
+                Asserts::AssertEqual(it1->Flags, it2->Flags, ExceptionPosition);
+                Asserts::AssertEqual(it1->Name, it2->Name, ExceptionPosition);
+                Asserts::AssertEqual(it1->Size, it2->Size, ExceptionPosition);
+                Asserts::AssertEqual(it1->Type, it2->Type, ExceptionPosition);
             }
 
             MoveRValue(asyncFile).DeleteFile();
@@ -297,22 +297,22 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::ReadWriteAsyncFile::Excecute(
 
             decltype(fileList) readedFileList;
 
-            Asserts::AssertTrue(readCallback.IsDataArrived());
-            Asserts::AssertEqual(readCallback.StatusCode(), 0);
+            Asserts::AssertTrue(readCallback.IsDataArrived(), ExceptionPosition);
+            Asserts::AssertEqual(readCallback.StatusCode(), 0, ExceptionPosition);
 
             Core::Serilization::Deserilize(readCallback.GetData(), readedFileList, registry);
 
-            Asserts::AssertEqual(fileList.Count, readedFileList.Count);
+            Asserts::AssertEqual(fileList.Count, readedFileList.Count, ExceptionPosition);
 
             auto it1 = fileList.FirstIt;
             auto it2 = readedFileList.FirstIt;
 
             for (SizeT i = 0; i < fileList.Count; i++)
             {
-                Asserts::AssertEqual(it1->Flags, it2->Flags);
-                Asserts::AssertEqual(it1->Name, it2->Name);
-                Asserts::AssertEqual(it1->Size, it2->Size);
-                Asserts::AssertEqual(it1->Type, it2->Type);
+                Asserts::AssertEqual(it1->Flags, it2->Flags, ExceptionPosition);
+                Asserts::AssertEqual(it1->Name, it2->Name, ExceptionPosition);
+                Asserts::AssertEqual(it1->Size, it2->Size, ExceptionPosition);
+                Asserts::AssertEqual(it1->Type, it2->Type, ExceptionPosition);
             }
 
             MoveRValue(asyncFile).DeleteFile();
@@ -366,8 +366,8 @@ bool Seed::Core::Testing::Test::IO::FS::AsyncFile::TwoWritesAsyncFile::Excecute(
 
             MoveRValue(asyncFile).DeleteFile();
 
-            Asserts::AssertTrue(callback.IsDataArrived());
-            Asserts::AssertEqual(callback.StatusCode(), 0);
+            Asserts::AssertTrue(callback.IsDataArrived(), ExceptionPosition);
+            Asserts::AssertEqual(callback.StatusCode(), 0, ExceptionPosition);
         }
     }
 
