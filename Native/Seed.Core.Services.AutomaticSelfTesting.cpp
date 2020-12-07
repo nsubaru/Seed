@@ -4,7 +4,7 @@ void Seed::Core::Services::AutomatiSelfTestingService::AutomaticTestingTask::She
 {
 	This->testRunLock.ExclusiveLock([&]() {
 		
-		This->testsResults += Testing::TestRegister::RunAllTest(CurrentSettings().KernelServices.AutomaticTestingServiceCfg.IsLogTestProcessing);
+		This->testsResults += Testing::TestRegister::RunAllTest(false);
 
 		if (This->testsResults.Count > CurrentSettings().KernelServices.AutomaticTestingServiceCfg.SavedTestsCount) {
 			This->testsResults.FirstIt.Remove();
@@ -46,10 +46,10 @@ void Seed::Core::Services::AutomatiSelfTestingService::StopTesting()
 	}
 }
 
-Seed::Core::Testing::TestPackResult Seed::Core::Services::AutomatiSelfTestingService::RunTestsNow(Boolean isLogging)
+Seed::Core::Testing::TestPackResult Seed::Core::Services::AutomatiSelfTestingService::RunTestsNow()
 {
 	return This->testRunLock.ExclusiveLock([&]() {
-		return Testing::TestRegister::RunAllTest(isLogging);
+		return Testing::TestRegister::RunAllTest(true);
 	});
 }
 

@@ -129,7 +129,7 @@ namespace Seed
 				/// </summary>
 				/// <param name = "isLogging"> Вказує чи необхідно записувати в логи інформаціб про перебіг тестування </param>
 				/// <returns> Інформацію про результат тестів </returns>
-				Testing::TestPackResult RunTestsNow(Boolean isLogging = false);
+				Testing::TestPackResult RunTestsNow();
 			public:
 				Boolean Property(GetIsTestingExecutes) IsTestingExecutes;
 			public:

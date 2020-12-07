@@ -77,7 +77,31 @@ namespace Seed
 					/// </summary>
 					/// <param name="msgLevel">Тип повідомлення</param>
 					/// <param name="msg">Повідомлення</param>
-					void ToLog(Logger::ELoggerLevel msgLevel,String msg);
+					void ToLog(Logger::ELoggerLevel msgLevel, String&& msg);
+
+					/// <summary>
+					/// Записати повідомлення в логи
+					/// </summary>
+					/// <param name="msgLevel">Тип повідомлення</param>
+					/// <param name="msg">Повідомлення</param>
+					void ToLog(Logger::ELoggerLevel msgLevel, const String& msg);
+
+					/// <summary>
+					/// Записати повідомлення в логи
+					/// </summary>
+					/// <param name="msgLevel">Тип повідомлення</param>
+					/// <param name="msg">Повідомлення</param>
+					template<typename TLambda> requires Concepts::IsInvockable<TLambda>
+					void ToLog(Logger::ELoggerLevel msgLevel, TLambda&& lambda) {
+						if (This->loggingLevel & msgLevel)
+						{
+							auto buffer = String(1Kb);
+							SetMessageHeader(buffer, msgLevel);
+							buffer + L"  ";
+							buffer += lambda();
+							toCoreLog(buffer);
+						}
+					}
 
 				public:
 					RefCountClass(DynamicLogger, This);

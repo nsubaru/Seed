@@ -19,9 +19,20 @@ void Seed::Core::Services::LoggerFactoryService::DynamicLogger::Dispose()
     This->loggerRef.Remove(false);
 }
 
-void Seed::Core::Services::LoggerFactoryService::DynamicLogger::ToLog(Logger::ELoggerLevel msgLevel, String msg)
+void Seed::Core::Services::LoggerFactoryService::DynamicLogger::ToLog(Logger::ELoggerLevel msgLevel, String&& msg)
 {
     if (This->loggingLevel & msgLevel) {
+        auto buffer = String(1Kb);
+        SetMessageHeader(buffer, msgLevel);
+        buffer + L"  ";
+        buffer += msg;
+        toCoreLog(buffer);
+    }
+}
+
+void Seed::Core::Services::LoggerFactoryService::DynamicLogger::ToLog(Logger::ELoggerLevel msgLevel, const String& msg) {
+    if (This->loggingLevel & msgLevel)
+    {
         auto buffer = String(1Kb);
         SetMessageHeader(buffer, msgLevel);
         buffer + L"  ";

@@ -286,8 +286,8 @@ void SehTranslatorFunction(unsigned int exCode, _EXCEPTION_POINTERS * exData)
 		break;
 		default:
 			Seed::BaseString<Seed::Core::Memory::ExceptionHeap> str(L"Критична помилка: Невідома помилка. Код: ");
-			str +=
-				Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
+			str += Seed::BaseString<Seed::Core::Memory::ExceptionHeap>::Int32asHex(exCode);
+
 			Logger::StaticManagedLogger<Logger::EStaticSubsystems::ExceptionABI>::toLog(
 				Logger::ELoggerLevel::Critical,
 				str);
