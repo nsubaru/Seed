@@ -19,6 +19,9 @@ namespace Seed {
 					public IFixedCollectionBase<TCollection, THeap, T, TSize, TIsConcurencySuport> {
 				private:
 					using ThisCollection = TCollection<THeap, TSize, T>;
+
+					template<SizeT USize, typename U>
+					using ThisCollectionWithSize = TCollection<THeap, USize, U>;
 				public:
 					template<template<SizeT, typename> typename NewCollection>
 					ForceInline NewCollection<TSize, T> CopyToFixed() {
@@ -89,7 +92,7 @@ namespace Seed {
 						return newCollection;
 					}
 				public:
-					template<template<SizeT, typename> typename NewCollection>
+					template<SizeT TNewSize, template<SizeT, typename> typename NewCollection = ThisCollectionWithSize>
 					ForceInline NewCollection<TSize, T> MoveToFixed() {
 						NewCollection<TSize, T> newCollection;
 						ThisCollection& thisCollection = static_cast<ThisCollection&>(*this);
@@ -101,7 +104,7 @@ namespace Seed {
 						return newCollection;
 					}
 
-					template<template<SizeT, typename> typename NewCollection, SizeT TNewSize>
+					template<SizeT TNewSize, template<SizeT, typename> typename NewCollection = ThisCollectionWithSize>
 					ForceInline NewCollection<TNewSize, T> CopyToFixed() {
 						if constexpr (TNewSize == TSize) {
 							NewCollection<TNewSize, T> newCollection;

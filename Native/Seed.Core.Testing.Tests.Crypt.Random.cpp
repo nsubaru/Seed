@@ -5,6 +5,6 @@
 
 #include "Seed.Core.Crypt.h"
 
-bool Seed::Core::Testing::Test::Crypt::Random::Excecute() {
+bool Seed::Core::Testing::Test::Crypt::Random::RandomTest::Excecute() {
 	return Seed::Crypt::Random() != Seed::Crypt::Random(); //-V501
 }

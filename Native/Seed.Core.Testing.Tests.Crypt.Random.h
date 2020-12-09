@@ -11,9 +11,12 @@ namespace Seed
             {
                 namespace Crypt
                 {
-                    class Random final : public TestClass<Random> {
-                        virtual bool Excecute() override;
-                    };
+                    namespace Random
+                    {
+                        class RandomTest final : public TestClass<RandomTest> {
+                            virtual bool Excecute() override;
+                        };
+                    }
                 }
             }
         }

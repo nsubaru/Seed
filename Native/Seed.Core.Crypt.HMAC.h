@@ -12,7 +12,7 @@ namespace Seed
 			class HMAC {
 			public:
 				static constexpr SizeT HashSize = THashProvider::HashSize;
-				using THash = THashProvider::THash;
+				using THash = typename THashProvider::THash;
 			private:
 				THashProvider hashProvider;
 				THash key;

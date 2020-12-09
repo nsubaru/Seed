@@ -536,6 +536,67 @@ namespace Seed
                     str.ResizeToFixed(requiredSize, fillerCharacter);
                     return str;
                 }
+
+            public:
+                /// <summary>
+                /// Переводить всі літери в тексті в нижній регістр
+                /// </summary>
+                /// <returns>Посилання на рядок після переведення</returns>
+                TBaseString& ToDowncase() & {
+                    TBaseString* This = static_cast<TBaseString*>(this);
+
+                    for (SizeT i = 0; i < This->Lenght; i++)
+                    {
+                        This->str[i] = CStr::ToDowncase(This->str[i]);
+                    }
+
+                    return *this;
+                }
+
+                /// <summary>
+                /// Переводить всі літери в тексті в нижній регістр
+                /// </summary>
+                /// <returns>Посилання на рядок після переведення</returns>
+                TBaseString&& ToDowncase() && {
+                    TBaseString* This = static_cast<TBaseString*>(this);
+
+                    for (SizeT i = 0; i < This->Lenght; i++)
+                    {
+                        This->str[i] = CStr::ToDowncase(This->str[i]);
+                    }
+
+                    return MoveRValue(*This);
+                }
+
+                /// <summary>
+                /// Переводить всі літери в тексті в верхній регістр
+                /// </summary>
+                /// <returns>Посилання на рядок після переведення</returns>
+                TBaseString& ToUpcase()& {
+                    TBaseString* This = static_cast<TBaseString*>(this);
+
+                    for (SizeT i = 0; i < This->Lenght; i++)
+                    {
+                        This->str[i] = CStr::ToUpcase(This->str[i]);
+                    }
+
+                    return *this;
+                }
+
+                /// <summary>
+                /// Переводить всі літери в тексті в верхній регістр
+                /// </summary>
+                /// <returns>Посилання на рядок після переведення</returns>
+                TBaseString&& ToUpcase()&& {
+                    TBaseString* This = static_cast<TBaseString*>(this);
+
+                    for (SizeT i = 0; i < This->Lenght; i++)
+                    {
+                        This->str[i] = CStr::ToUpcase(This->str[i]);
+                    }
+
+                    return MoveRValue(*This);
+                }
 			protected:
                 ForceInline virtual ~TManipulationStringPart() = 0 {}
 			};

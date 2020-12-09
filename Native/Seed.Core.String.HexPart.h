@@ -212,7 +212,16 @@ namespace Seed
                 ///<summary>Перетворення байтового масиву в строку з 16 бітних символів (0-9a-f)</summary>
                 ///<param name = "binaryData">Масив байтів</param>
                 ///<returns>Рядкове представлення бінарних даних</returns>
-                static TBaseString binaryToHex(const Containers::BaseArray<THeap, Byte>& binaryData) {
+                template<typename UHeap>
+                static TBaseString binaryToHex(Containers::BaseArray<UHeap, Byte>&& binaryData) {
+                    return binaryToHex(static_cast<const Containers::BaseArray<UHeap, Byte>>(binaryData));
+                }
+
+                ///<summary>Перетворення байтового масиву в строку з 16 бітних символів (0-9a-f)</summary>
+                ///<param name = "binaryData">Масив байтів</param>
+                ///<returns>Рядкове представлення бінарних даних</returns>
+                template<typename UHeap>
+                static TBaseString binaryToHex(const Containers::BaseArray<UHeap, Byte>& binaryData) {
                     //Bite <-> 2 hex digits
                     union {
                         //1 Byte (8 bits)

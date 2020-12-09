@@ -310,6 +310,19 @@ namespace Seed {
 						This->array[i] = arr[i];
 					}
 				}
+
+				/// <summary>
+				/// Конструктор з статичного масиву який копіюється з початкового індексу до кінця
+				/// </summary>
+				/// <param name="arr">Статичний масив</param>
+				/// <param name="startPosition">Початкова індекс у статичному масиві</param>
+				template<SizeT USize>
+				ForceInline constexpr BaseFixedArray(const T(&arr)[USize], SizeT startPosition) : This(new Data) {
+					for (SizeT i = 0; i < ((TSize < USize) ? TSize : USize); i++)
+					{
+						This->array[i] = arr[i + startPosition];
+					}
+				}
 #pragma warning(pop)
 			public:
 				/// <summary>
