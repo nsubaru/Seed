@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::Reflection::V2::ReflectedClassRecord">
+    <DisplayString>{{Reflected class record {This->classTypeRecord.data->rttiTypeInfo, na}}}</DisplayString>
+    <Expand>
+      <Item Name="Class">This->classTypeRecord</Item>
+      <Item Name="Constructors">This->constructors</Item>
+      <Item Name="Intefaces">This->interfaces</Item>
+      <Item Name="Properties">This->properties</Item>
+      <Item Name="Methods">This->methods</Item>
+      <!--<Item Name="Destructors">&amp;This->dynamicObjectDestructorCallback</Item>
+      <Item Name="Properties serelizator">&amp;This->classPropertiesSerilizationCallback</Item>-->
+    </Expand>
+  </Type>
+</AutoVisualizer>

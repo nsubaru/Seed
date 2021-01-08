@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::Reflection::V2::ReflectedInterfaceRecord">
+    <DisplayString>{{Class {This->classRecord.data->rttiTypeInfo, na} interface {This->interfaceRecord.data->rttiTypeInfo, na} }}</DisplayString>
+    <Expand>
+      <Item Name="Class">This->classRecord</Item>
+      <Item Name="Interface">This->interfaceRecord</Item>
+      <!--<Item Name="ToInterface">&amp;This->toInterfaceCast</Item>
+      <Item Name="ToClass">&amp;This->fromInterfaceCast</Item>-->
+    </Expand>
+  </Type>
+</AutoVisualizer>

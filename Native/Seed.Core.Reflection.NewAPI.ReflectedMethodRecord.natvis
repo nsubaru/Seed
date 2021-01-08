@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::Reflection::V2::ReflectedMethodRecord">
+    <DisplayString>{{Method: {This->methodName.str, sub}}}</DisplayString>
+    <Expand>
+      <!--<Item Name="MethodCallTuple">&amp;This->dynamicObjectCallback</Item>
+      <Item Name="MethodCallArray">&amp;This->dynamicObjectArrayCallback</Item>
+      <Item Name="MethodResultToString">&amp;This->dynamicObjectToStringCallback</Item>-->
+      <Item Name="IsConst">This->isConst</Item>
+      <Item Name="IsVolatile">This->isVolatile</Item>
+      <Item Name="IsLvalue">This->isLvalue</Item>
+      <Item Name="IsRvalue">This->isRvalue</Item>
+      <Item Name="ClassInfo">This->classRecord</Item>
+      <Item Name="MethodName">This->methodName.str, sub</Item>
+      <Item Name="ReturnTypeRecord">This->returnType</Item>
+      <Item Name="ArgsTypeRecord">This->argsTypes</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
