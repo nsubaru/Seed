@@ -3,7 +3,9 @@
   <Type Name="Seed::Core::RTTI::RTTITypeRecord">
     <DisplayString>{{RTTITypeRecord {data->rttiTypeInfo, na}}}</DisplayString>
     <Expand>
-      <Item Name="TypeId">data->rttiTypeInfo</Item>
+      <Item Name="RttiTypeId">data->rttiTypeInfo</Item>
+      <Item Name="TypeId">data->TypeId</Item>
+      <Item Name="DecayTypeId">data->DecayTypeId</Item>
       <Item Name="Name">data->TypeName</Item>
       <Item Name="CxxName">data->CxxTypeName</Item>
       <Item Name="TypeClass">data->TypeClass</Item>
