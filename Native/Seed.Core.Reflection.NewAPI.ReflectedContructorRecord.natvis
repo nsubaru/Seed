@@ -3,11 +3,8 @@
   <Type Name="Seed::Core::Reflection::V2::ReflectedConstructorRecord">
     <DisplayString>Class constructor</DisplayString>
     <Expand>
-      <Item Name="Class identificator">This->classRecord</Item>
-      <Item Name="Arguments">This->argsTypes</Item>
-      <!--<Item Name="Object constructor">&amp;This->dynamicObjectCtorCallback</Item>
-      <Item Name="Array objects constructor">&amp;This->dynamicObjectArrayCtorCallback</Item>
-      <Item Name="Destructor">&amp;This->dynamicObjectDestructorCallback</Item>-->
+      <Item Name="ClassTypeRecord">This->ClassTypeRecord</Item>
+      <Item Name="Arguments">This->ArgsTypeRecord</Item>
     </Expand>
   </Type>
 </AutoVisualizer>
