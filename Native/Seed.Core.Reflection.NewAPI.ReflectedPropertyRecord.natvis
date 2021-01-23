@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::Reflection::V2::ReflectedPropertyRecord">
+    <DisplayString>{{Property: {This->PropertyName.str, sub}}}</DisplayString>
+    <Expand>
+      <Item Name="Name">This->PropertyName.str, sub</Item>
+      <Item Name="Getter">This->GetterMethodRecord</Item>
+      <Item Name="Setters">This->SettersMethodRecords</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
