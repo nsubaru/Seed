@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Containers::BaseConcurencyList&lt;*, *&gt;">
-    <DisplayString>{{ Lenght={This->size} RefCount={This->RefCount.count} }}</DisplayString>
+    <DisplayString>{{ Lenght={size} }}</DisplayString>
     <Expand>
-      <Item Name="[Reference count]">This->RefCount.count</Item>
-      <Item Name="[Lenght]">This->size</Item>
+      <Item Name="[Lenght]">size</Item>
       <LinkedListItems>
-        <Size>This->size.count</Size>
-        <HeadPointer>This->root</HeadPointer>
+        <Size>size.count</Size>
+        <HeadPointer>root</HeadPointer>
         <NextPointer>next</NextPointer>
         <ValueNode>value</ValueNode>
       </LinkedListItems>
