@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Containers::BaseConcurencyDynamicQueue&lt;*, *&gt;">
-    <DisplayString>{{ Lenght={This->count} RefCount={This->RefCount.count} }}</DisplayString>
+    <DisplayString>{{ Lenght={count} }}</DisplayString>
     <Expand>
-      <!--<Item Name="[Reference count]">This->RefCount.count</Item>
-      <Item Name="[Lenght]">This->count</Item>
-      <Item Name="[Front idx]">This->front</Item>
-      <Item Name="[Rear idx]">This->rear</Item>
-      <Item Name="[Buffer lenght]">This->bufferSize</Item>-->
+      <Item Name="[Lenght]">count</Item>
+      <Item Name="[Front idx]">front</Item>
+      <Item Name="[Rear idx]">rear</Item>
+      <Item Name="[Buffer lenght]">bufferSize</Item>
       <ArrayItems>
-        <Size>This->bufferSize</Size>
-        <ValuePointer>This->queue</ValuePointer>
+        <Size>bufferSize</Size>
+        <ValuePointer>queue</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
