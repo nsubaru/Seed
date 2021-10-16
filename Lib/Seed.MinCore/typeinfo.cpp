@@ -8,7 +8,7 @@
 
 #ifdef _CPPRTTI
 
-size_t type_info::GetHashCode() const noexcept
+size_t type_info::GetHashCode() const
 {
 	unsigned __int64 v2; // [rsp+0h] [rbp-28h]
 	const char* i; // [rsp+8h] [rbp-20h]
@@ -19,7 +19,7 @@ size_t type_info::GetHashCode() const noexcept
 	return (v2 >> 32) ^ v2;
 }
 
-bool type_info::operator==(const type_info& _Other) const noexcept
+bool type_info::operator==(const type_info& _Other) const
 {
 	if (&this->_Data == &_Other._Data)
 		return true;
@@ -27,7 +27,7 @@ bool type_info::operator==(const type_info& _Other) const noexcept
 		return strcmp(this->_Data._DecoratedName, _Other._Data._DecoratedName) == 0;
 }
 
-bool type_info::operator!=(const type_info& _Other) const noexcept
+bool type_info::operator!=(const type_info& _Other) const
 {
 	if (&this->_Data == &_Other._Data)
 		return false;

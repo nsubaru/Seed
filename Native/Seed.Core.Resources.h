@@ -5,7 +5,7 @@
 #define CurrentMajorVersion 0
 #define CurrentMinorVersion 0
 #define CurrentStableBuildNumber 0
-#define CurrentBuildNumber 6474
+#define CurrentBuildNumber 6476
 
 
 // Next default values for new objects

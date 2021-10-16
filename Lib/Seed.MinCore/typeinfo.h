@@ -25,20 +25,20 @@ public:
 	type_info(const type_info&) = delete;
 	type_info& operator=(const type_info&) = delete;
 
-	size_t GetHashCode() const noexcept;
+	size_t GetHashCode() const;
 
 	size_t __declspec(property(get = GetHashCode)) HashCode;
 
-	bool operator==(const type_info& _Other) const noexcept;
+	bool operator==(const type_info& _Other) const;
 
-	bool operator!=(const type_info& _Other) const noexcept;
+	bool operator!=(const type_info& _Other) const;
 
-	constexpr const char* GetCxxName() const noexcept
+	constexpr const char* GetCxxName() const
 	{
 		return _Data._DecoratedName;
 	}
 
-	virtual ~type_info() noexcept {}
+	virtual ~type_info() {}
 
 private:
 
