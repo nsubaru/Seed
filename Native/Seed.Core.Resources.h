@@ -1,4 +1,8 @@
-#define BuildNumber 6099
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by Seed.Core.Resources.rc
+//
+#define BuildNumber 6114
 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
