@@ -1,10 +1,8 @@
 #pragma once
 
-#define SeedKernelCall
-
 #ifdef _CPPRTTI
 
-struct SeedKernelCall __std_type_info_data
+struct __std_type_info_data
 {
 	const char* _UndecoratedName;
 	const char   _DecoratedName[1];
