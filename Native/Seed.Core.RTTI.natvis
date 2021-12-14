@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-  <Type Name="Seed::Core::RTTI::RTTITypeRecord">
+  <Type Name="Seed::Core::RTTI::RttiTypeRecord">
     <DisplayString>{{RTTITypeRecord {data->rttiTypeInfo, na}}}</DisplayString>
     <Expand>
       <Item Name="RttiTypeId">data->rttiTypeInfo</Item>
