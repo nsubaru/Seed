@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-  <Type Name="Seed::Core::Exceptions::Exception::ExeptionLocation">
+  <Type Name="Seed::Core::Exception::ExeptionLocation">
     <DisplayString>{{{FunctName.str, na}:{Line} at {File.str, na} in thread {ThreadID}}}</DisplayString>
     <Expand>
       <Item Name="File">File.str, na</Item>
@@ -9,7 +9,7 @@
       <Item Name="Thread ID">ThreadID</Item>
     </Expand>
   </Type>
-  <Type Name="Seed::Core::Exceptions::Exception" Inheritable="true">
+  <Type Name="Seed::Core::Exception" Inheritable="true">
     <DisplayString>{{Exception: {exceptionName.str, na}}}</DisplayString>
     <Expand>
       <Item Name="Name">exceptionName.str, su</Item>
@@ -17,7 +17,7 @@
       <Item Name="StackTrace">stackTrace</Item>
     </Expand>
   </Type>
-  <Type Name="Seed::Core::Exceptions::Exception::StackTraceRecord">
+  <Type Name="Seed::Core::Exception::StackTraceRecord">
     <DisplayString>{{StackTrace}}</DisplayString>
     <Expand>
       <Item Name="Count">Count</Item>
