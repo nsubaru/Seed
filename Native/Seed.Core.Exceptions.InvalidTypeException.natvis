@@ -4,6 +4,8 @@
 		<DisplayString>{{Exception: {exceptionName.str, na}}}</DisplayString>
 		<Expand>
 			<Item Name="Name">exceptionName.str, su</Item>
+			<Item Name="Required type">requiredType</Item>
+			<Item Name="Actually type">actuallyType</Item>
 			<Synthetic Name="Location">
 				<DisplayString>{location.SourceLocation.FileName.str, sub}:{location.SourceLocation.Line} in thread {location.ThreadID}</DisplayString>
 				<Expand>
