@@ -4,6 +4,12 @@
 		<DisplayString>{{Exception: {exceptionName.str, na}}}</DisplayString>
 		<Expand>
 			<Item Name="Name">exceptionName.str, su</Item>
+			<Synthetic Name="Required type">
+				<DisplayString>{(const void*) &amp;requiredType, na}</DisplayString>
+			</Synthetic>
+			<Synthetic Name="Actually type">
+				<DisplayString>{(const void*) &amp;actuallyType, na}</DisplayString>
+			</Synthetic>
 			<Synthetic Name="Location">
 				<DisplayString>{location.SourceLocation.FileName.str, sub}:{location.SourceLocation.Line} in thread {location.ThreadID}</DisplayString>
 				<Expand>
