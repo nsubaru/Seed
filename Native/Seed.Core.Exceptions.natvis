@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Exception::ExeptionLocation">
-    <DisplayString>{{{FunctName.str, na}:{Line} at {File.str, na} in thread {ThreadID}}}</DisplayString>
+    <DisplayString>{{{SourceLocation.FileName.str, sub}:{SourceLocation.Line} in thread {ThreadID}}}</DisplayString>
     <Expand>
-      <Item Name="File">File.str, na</Item>
-      <Item Name="Function">FunctName.str, na</Item>
-      <Item Name="Line">Line</Item>
+      <Item Name="File">SourceLocation.FileName.str, sub</Item>
+      <Item Name="Line">SourceLocation.Line</Item>
       <Item Name="Thread ID">ThreadID</Item>
     </Expand>
   </Type>
   <Type Name="Seed::Core::Exception" Inheritable="true">
-    <DisplayString>{{Exception: {exceptionName.str, na}}}</DisplayString>
+    <DisplayString>{{Exception: {exceptionName.str, sub}}}</DisplayString>
     <Expand>
-      <Item Name="Name">exceptionName.str, su</Item>
-      <ExpandedItem>location</ExpandedItem>
-      <Item Name="StackTrace">stackTrace</Item>
+      <Item Name="Name">exceptionName.str, sub</Item>
+      <Synthetic Name="Location">
+	    <DisplayString>{location.SourceLocation.FileName.str, sub}:{location.SourceLocation.Line} in thread {location.ThreadID}</DisplayString>
+	    <Expand>
+		    <ExpandedItem>location</ExpandedItem>
+		    <Item Name="StackTrace">stackTrace</Item>
+	    </Expand>
+      </Synthetic>
     </Expand>
   </Type>
   <Type Name="Seed::Core::Exception::StackTraceRecord">
