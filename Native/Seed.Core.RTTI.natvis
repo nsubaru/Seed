@@ -9,7 +9,7 @@
       <Item Name="Name">data->TypeName</Item>
       <Item Name="CxxName">data->CxxTypeName</Item>
       <Item Name="TypeClass">data->TypeClass</Item>
-      <Item Name="IsSerilizeable">data->IsSerilizeable</Item>
+      <Item Name="IsSerializeable">data->IsSerializeable</Item>
     </Expand>
   </Type>
 </AutoVisualizer>
