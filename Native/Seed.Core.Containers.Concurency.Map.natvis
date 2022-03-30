@@ -9,7 +9,7 @@
         <HeadPointer>root</HeadPointer>
         <LeftPointer>left</LeftPointer>
         <RightPointer>right</RightPointer>
-        <ValueNode>root.data</ValueNode>
+        <ValueNode>data</ValueNode>
       </TreeItems> 
     </Expand>
   </Type>
