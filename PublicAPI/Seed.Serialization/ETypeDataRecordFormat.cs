@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Seed.Serialization
 {
-    enum ETypeDataRecordFormat
+    public enum ETypeDataRecordFormat
     {
         Console,
         LongSchema,
