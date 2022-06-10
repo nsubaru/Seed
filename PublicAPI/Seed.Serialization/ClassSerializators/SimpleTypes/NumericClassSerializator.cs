@@ -9,7 +9,7 @@ namespace Seed.Serialization.ClassSerializators
 {
     class NumericClassSerializator : SimpeTypeSerializator
     {
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             switch (thisTypeSerializationTypeRecord.TypeName)
             {
@@ -71,7 +71,6 @@ namespace Seed.Serialization.ClassSerializators
                         data = BitConverter.ToInt64(buffer, 0);
                     }
                     break;
-
                 case "Seed::RefCountT":
                     {
                         byte[] buffer = new byte[sizeof(UInt64)];
@@ -84,7 +83,7 @@ namespace Seed.Serialization.ClassSerializators
             }
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             switch (thisTypeSerializationTypeRecord.TypeName)
             {
@@ -138,7 +137,6 @@ namespace Seed.Serialization.ClassSerializators
                         stream.Write(BitConverter.GetBytes(val), 0, sizeof(UInt64));
                     }
                     break;
-
                 case "Seed::RefCountT":
                     {
                         var val = (UInt64)data;

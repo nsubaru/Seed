@@ -9,7 +9,7 @@ namespace Seed.Serialization.ClassSerializators
 {
     class LogicClassSerializator : SimpeTypeSerializator
     {
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             switch (thisTypeSerializationTypeRecord.TypeName)
             {
@@ -25,7 +25,7 @@ namespace Seed.Serialization.ClassSerializators
             }
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             switch (thisTypeSerializationTypeRecord.TypeName)
             {

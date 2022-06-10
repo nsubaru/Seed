@@ -8,14 +8,14 @@ namespace Seed.Serialization.ClassSerializators
 {
     class StringClassSerialization : DynamicSizeTypes
     {
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             switch (thisTypeSerializationTypeRecord.TypeName)
             {
                 case "Seed::String":
                 case "Seed::SencitiveString":
                     {
-                        var strSize = GetItemsCount(stream, serializationTypeRecords, typeSerelizators) - 1;
+                        var strSize = GetItemsCount(stream, serializationTypeRecords, typeSerializators) - 1;
 
                         byte[] buffer = new byte[sizeof(char) * strSize];
                         stream.Read(buffer, 0, sizeof(char) * (int)strSize);
@@ -28,7 +28,7 @@ namespace Seed.Serialization.ClassSerializators
             }
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             switch (thisTypeSerializationTypeRecord.TypeName)
             {
@@ -36,7 +36,7 @@ namespace Seed.Serialization.ClassSerializators
                 case "Seed::SencitiveString":
                     {
                         var str = (string)data;
-                        WriteItemsCount((ulong)str.Length + 1, stream, serializationTypeRecords, typeSerelizators);
+                        WriteItemsCount((ulong)str.Length + 1, stream, serializationTypeRecords, typeSerializators);
                         stream.Write(Encoding.Unicode.GetBytes(str), 0, str.Length * sizeof(char));
                         stream.Write(Encoding.Unicode.GetBytes(new char[]{'\0' }), 0, 1 * sizeof(char));
                     }
@@ -46,7 +46,7 @@ namespace Seed.Serialization.ClassSerializators
             }
         }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             return typeof(string);
         }

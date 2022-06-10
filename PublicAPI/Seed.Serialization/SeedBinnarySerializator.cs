@@ -17,13 +17,14 @@ namespace Seed.Serialization
     public class SeedBinnarySerializator : IFormatter
     {
         public List<SerializationTypeRecord> SerializationShema { get; private set; } = new List<SerializationTypeRecord>();
+
         Dictionary<ETypes, ITypeSerializator> TypeClassSerializators { get; set;} = new Dictionary<ETypes, ITypeSerializator>();
 
-
         public SerializationBinder Binder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public StreamingContext Context { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ISurrogateSelector SurrogateSelector { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public StreamingContext Context { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public ISurrogateSelector SurrogateSelector { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public SeedBinnarySerializator()
         {
@@ -33,6 +34,7 @@ namespace Seed.Serialization
             LoadMetaDataTypes();
             LoadDynamicDataTypes();
         }
+
         private void LoadTypeSerilizator()
         {
             TypeClassSerializators.Add(ETypes.Logic, new LogicClassSerializator());
@@ -160,7 +162,7 @@ namespace Seed.Serialization
                     ClrType = typeof(DynamicObject),
                     SeedKernelTypeShema = new TypeMetaDataRecord
                     {
-                        TypeName = "Seed::Reflection::DynamicObject",
+                        TypeName = "Seed::RTTI::Dynamic",
                         SizeOfSize = sizeof(UInt64),
                         StaticSize = 0,
                         AdditionalInfo = "",
@@ -208,7 +210,6 @@ namespace Seed.Serialization
 
             return TypeClassSerializators[typeMetaDataRecord.Type].TryResolveTypeByTypeMetaDataRecord(typeMetaDataRecord, TypeClassSerializators);
         }
-
 
         private void TryRegisterTypeAndSubTypesByTypeMetaData(TypeMetaDataRecord typeMetaDataRecord)
         {

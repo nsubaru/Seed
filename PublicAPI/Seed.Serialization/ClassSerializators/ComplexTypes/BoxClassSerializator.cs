@@ -13,9 +13,9 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             Stream stream, 
             TypeMetaDataRecord thisTypeSerializationTypeRecord, 
             List<SerializationTypeRecord> serializationTypeRecords, 
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            T value = DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+            T value = DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
             Lazy<T>data = new Lazy<T>(() => value); 
             return data;
         }
@@ -25,12 +25,12 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             Stream stream,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
             List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            SerializeItem(data.Value, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+            SerializeItem(data.Value, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
         }
 
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
 
             data = this
@@ -39,10 +39,10 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                .MakeGenericMethod(serializationTypeRecords
                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
                        .ClrType)
-               .Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators });
+               .Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             this
                 .GetType()
@@ -50,12 +50,12 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                 .MakeGenericMethod(serializationTypeRecords
                         .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
                         .ClrType)
-                .Invoke(this, new object[] { data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators });
+                .Invoke(this, new object[] { data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
         }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+            var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
 
             if (subType == null)
                 return null;

@@ -8,34 +8,33 @@ namespace Seed.Serialization.ClassSerializators
 {
     abstract class DynamicSizeTypes : ITypeSerializator
     {
-        public abstract void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serelizationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators);
-        public abstract void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serelizationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators);
-        public abstract Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators);
+        public abstract void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators);
+        public abstract void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators);
+        public abstract Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators);
 
         #region Serialization implementation
         public void WriteItemsCount(
             UInt64 count,
             Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            List<SerializationTypeRecord> serializationTypeRecords,
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            typeSerelizators[ETypes.Numeric].Serialize(
+            typeSerializators[ETypes.Numeric].Serialize(
                 count,
-                stream, serelizationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
-                serelizationTypeRecords,
-                typeSerelizators);
+                stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
+                serializationTypeRecords,
+                typeSerializators);
         }
 
         public void SerializeItem<T>(
             T item,
             Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
+            List<SerializationTypeRecord> serializationTypeRecords,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-
-            typeSerelizators[thisTypeSerializationTypeRecord.Type]
-                .Serialize(item, stream, thisTypeSerializationTypeRecord, serelizationTypeRecords, typeSerelizators);
+            typeSerializators[thisTypeSerializationTypeRecord.Type]
+                .Serialize(item, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators);
         }
 
         #endregion
@@ -43,32 +42,32 @@ namespace Seed.Serialization.ClassSerializators
         #region Deserilization implementation
         public UInt64 GetItemsCount(
             Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            List<SerializationTypeRecord> serializationTypeRecords,
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             object data = new object();
             data = (UInt64)0;
 
-            typeSerelizators[ETypes.Numeric].Deserialize(
+            typeSerializators[ETypes.Numeric].Deserialize(
                 ref data,
-                stream, serelizationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
-                serelizationTypeRecords,
-                typeSerelizators);
+                stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
+                serializationTypeRecords,
+                typeSerializators);
 
             return (UInt64)data;
         }
 
         public T DeserializeItem<T>(
             Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
+            List<SerializationTypeRecord> serializationTypeRecords,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             T var = default;
             object data = var;
 
-            typeSerelizators[thisTypeSerializationTypeRecord.Type]
-                .Deserialize(ref data, stream, thisTypeSerializationTypeRecord, serelizationTypeRecords, typeSerelizators);
+            typeSerializators[thisTypeSerializationTypeRecord.Type]
+                .Deserialize(ref data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators);
 
             return (T)data;
         }
@@ -76,10 +75,10 @@ namespace Seed.Serialization.ClassSerializators
 
         #region TypeResolver
 
-        public Type TryResolveSubTypeByTypeMetaDataRecord(TypeMetaDataRecord subTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public Type TryResolveSubTypeByTypeMetaDataRecord(TypeMetaDataRecord subTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            return typeSerelizators[subTypeSerializationTypeRecord.Type]
-                .TryResolveTypeByTypeMetaDataRecord(subTypeSerializationTypeRecord, typeSerelizators);
+            return typeSerializators[subTypeSerializationTypeRecord.Type]
+                .TryResolveTypeByTypeMetaDataRecord(subTypeSerializationTypeRecord, typeSerializators);
         }
 
         #endregion

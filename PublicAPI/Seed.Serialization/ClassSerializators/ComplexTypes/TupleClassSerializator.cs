@@ -30,12 +30,12 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             Stream stream,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
             List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             if (thisTypeSerializationTypeRecord.NestedTypes.Count == 0)
                 return null; ;
 
-            var tupleType = TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord, typeSerelizators);
+            var tupleType = TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord, typeSerializators);
 
             if(tupleType == null)
                 throw new NotImplementedException($"Deserialization of type  '{thisTypeSerializationTypeRecord.TypeName} not implemented");
@@ -44,8 +44,8 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
 
             for (int i = 0; i < thisTypeSerializationTypeRecord.NestedTypes.Count; i++)
             {
-                typeSerelizators[thisTypeSerializationTypeRecord.NestedTypes[i].Type]
-                    .Deserialize(ref items[i], stream, thisTypeSerializationTypeRecord.NestedTypes[i], serializationTypeRecords, typeSerelizators);
+                typeSerializators[thisTypeSerializationTypeRecord.NestedTypes[i].Type]
+                    .Deserialize(ref items[i], stream, thisTypeSerializationTypeRecord.NestedTypes[i], serializationTypeRecords, typeSerializators);
             }
 
 
@@ -57,40 +57,40 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             Stream stream,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
             List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var fields = EnumerateValueTuple(data).ToList();
 
             for (int i = 0; i < thisTypeSerializationTypeRecord.NestedTypes.Count; i++)
             {
-                typeSerelizators[thisTypeSerializationTypeRecord.NestedTypes[i].Type]
-                    .Serialize(fields[i], stream, thisTypeSerializationTypeRecord.NestedTypes[i], serializationTypeRecords, typeSerelizators);
+                typeSerializators[thisTypeSerializationTypeRecord.NestedTypes[i].Type]
+                    .Serialize(fields[i], stream, thisTypeSerializationTypeRecord.NestedTypes[i], serializationTypeRecords, typeSerializators);
             }
         }
 
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            data = DeserializeTupleImpl(stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators);
+            data = DeserializeTupleImpl(stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators);
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            if(data.GetType() != TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord, typeSerelizators))
+            if(data.GetType() != TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord, typeSerializators))
             {
                 throw new NotImplementedException($"Serialization of type  ' { thisTypeSerializationTypeRecord.TypeName} ' and type class ' { thisTypeSerializationTypeRecord.Type} ' not implemented");
             }
 
-            SerializeLazyImpl(data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators);
+            SerializeLazyImpl(data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators);
         }
 
-        private Type[] GetFieldsTypes(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        private Type[] GetFieldsTypes(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var types = new Type[thisTypeSerializationTypeRecord.NestedTypes.Count];
 
             for (int i = 0; i < thisTypeSerializationTypeRecord.NestedTypes.Count; i++)
             {
-                types[i] = typeSerelizators[thisTypeSerializationTypeRecord.NestedTypes[i].Type]
-                    .TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[i], typeSerelizators);
+                types[i] = typeSerializators[thisTypeSerializationTypeRecord.NestedTypes[i].Type]
+                    .TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[i], typeSerializators);
 
                 if (types[i] == null)
                     return null;
@@ -99,9 +99,9 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             return types;
         }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            var types = GetFieldsTypes(thisTypeSerializationTypeRecord, typeSerelizators);
+            var types = GetFieldsTypes(thisTypeSerializationTypeRecord, typeSerializators);
 
             if (types == null)
                 return null;

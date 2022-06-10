@@ -9,12 +9,12 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
 {
     class StructClassSerializator : DynamicSizeTypes
     {
-        private void StructSerelizatorImpl<T>(
+        private void StructSerializatorImpl<T>(
             T data, 
             Stream stream, 
             TypeMetaDataRecord thisTypeSerializationTypeRecord, 
             List<SerializationTypeRecord> serializationTypeRecords, 
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
 
@@ -37,13 +37,13 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                 GetType()
                     .GetMethod("SerializeItem")
                     .MakeGenericMethod(propValue.GetType())
-                    .Invoke(this, new object[] { propValue, stream, serializatorSchema, serializationTypeRecords, typeSerelizators });
+                    .Invoke(this, new object[] { propValue, stream, serializatorSchema, serializationTypeRecords, typeSerializators });
             }
         }
 
 
 
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
 
@@ -71,7 +71,7 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                 var value = GetType()
                     .GetMethod("DeserializeItem")
                     .MakeGenericMethod(propType)
-                    .Invoke(this, new object[] { stream, serializationTypeRecords, serializatorSchema, typeSerelizators });
+                    .Invoke(this, new object[] { stream, serializationTypeRecords, serializatorSchema, typeSerializators });
 
                 data
                     .GetType()
@@ -82,7 +82,7 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             }
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
 
@@ -103,11 +103,11 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                 GetType()
                     .GetMethod("SerializeItem")
                     .MakeGenericMethod(propValue.GetType())
-                    .Invoke(this, new object[] { propValue, stream, serializationTypeRecords, serializatorSchema, typeSerelizators });
+                    .Invoke(this, new object[] { propValue, stream, serializationTypeRecords, serializatorSchema, typeSerializators });
             }
         }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             throw new NotImplementedException();
         }

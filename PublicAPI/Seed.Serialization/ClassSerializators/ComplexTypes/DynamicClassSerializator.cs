@@ -14,9 +14,9 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
            Stream stream,
            TypeMetaDataRecord thisTypeSerializationTypeRecord,
            List<SerializationTypeRecord> serializationTypeRecords,
-           Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+           Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            T value = DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord, typeSerelizators);
+            T value = DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord, typeSerializators);
             return value;
         }
 
@@ -25,20 +25,20 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             Stream stream,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
             List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            SerializeItem(data, stream, serializationTypeRecords, thisTypeSerializationTypeRecord, typeSerelizators);
+            SerializeItem(data, stream, serializationTypeRecords, thisTypeSerializationTypeRecord, typeSerializators);
         }
 
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             object obj = "";
-            typeSerelizators[ETypes.String].Deserialize(
+            typeSerializators[ETypes.String].Deserialize(
                 ref obj,
                 stream,
                 serializationTypeRecords.Where(record => record.SeedKernelTypeName == "Seed::String").First().SeedKernelTypeShema,
                 serializationTypeRecords,
-                typeSerelizators);
+                typeSerializators);
 
             string typeName = obj as string;
 
@@ -48,11 +48,11 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                .GetType()
                .GetMethod("DeserializeDynamic")
                .MakeGenericMethod(typeRecord.ClrType)
-               .Invoke(this, new object[] { stream, typeRecord.SeedKernelTypeShema, serializationTypeRecords, typeSerelizators }));
+               .Invoke(this, new object[] { stream, typeRecord.SeedKernelTypeShema, serializationTypeRecords, typeSerializators }));
 
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var obj = (data as DynamicObject).Value;
 
@@ -60,21 +60,21 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                 .Where(record => record.ClrType == obj.GetType())
                 .First();
 
-            typeSerelizators[ETypes.String].Serialize(
+            typeSerializators[ETypes.String].Serialize(
                 typeRecord.SeedKernelTypeName,
                 stream,
                 serializationTypeRecords.Where(record => record.SeedKernelTypeName == "Seed::String").First().SeedKernelTypeShema,
                 serializationTypeRecords,
-                typeSerelizators);
+                typeSerializators);
 
             this
                 .GetType()
                 .GetMethod("SerializeDynamic")
                 .MakeGenericMethod(typeRecord.ClrType)
-                .Invoke(this, new object[] { obj, stream, typeRecord.SeedKernelTypeShema, serializationTypeRecords, typeSerelizators });
+                .Invoke(this, new object[] { obj, stream, typeRecord.SeedKernelTypeShema, serializationTypeRecords, typeSerializators });
         }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             if (thisTypeSerializationTypeRecord.TypeName == "Seed::Containers::Dynamic" ||
                 thisTypeSerializationTypeRecord.TypeName == "Seed::Reflection::DynamicObject")

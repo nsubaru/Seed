@@ -68,10 +68,10 @@ namespace Seed.Serialization
         /// <returns>String representation of type schema</returns>
         /// <remarks>
         /// Available three formats:
-        ///  - "C" - console forrmat with new lines and tabs
+        ///  - "C" - console format with new lines and tabs
         ///  - "L" - small format with new lines and tabs
         ///  - "S" - small format without new lines and tabs
-        /// Default is "S" format which is good for sending, as containe required informatin
+        /// Default is "S" format which is good for sending, as contain required information
         /// </remarks>
         public string ToString(string format, IFormatProvider formatProvider)
         {
@@ -121,7 +121,7 @@ namespace Seed.Serialization
         {
             StringBuilder result = new StringBuilder();
 
-            var endline = mode == 0 ? Environment.NewLine : string.Empty;
+            var endline = mode != ETypeDataRecordFormat.SmallSchema ? Environment.NewLine : string.Empty;
             
             if(mode == ETypeDataRecordFormat.Console) 
             {

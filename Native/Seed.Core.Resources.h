@@ -2,7 +2,10 @@
 // Microsoft Visual C++ generated include file.
 // Used by Seed.Core.Resources.rc
 //
-#define BuildNumber 7120
+#define CurrentMajorVersion 0
+#define CurrentMinorVersion 0
+#define CurrentStableBuildNumber 0
+#define CurrentBuildNumber 8873
 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS

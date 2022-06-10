@@ -15,13 +15,13 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             Stream stream,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
             List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            WriteItemsCount((ulong)arrayList.Count, stream, serializationTypeRecords, typeSerelizators);
+            WriteItemsCount((ulong)arrayList.Count, stream, serializationTypeRecords, typeSerializators);
 
             foreach (var item in arrayList)
             {
-                SerializeItem(item, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+                SerializeItem(item, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
             }
         }
         #endregion
@@ -31,15 +31,15 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
             Stream stream,
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
             List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+            Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            var count = GetItemsCount(stream, serializationTypeRecords, typeSerelizators);
+            var count = GetItemsCount(stream, serializationTypeRecords, typeSerializators);
 
             var items = new Dictionary<T, U>();
 
             for (UInt64 i = 0; i < count; i++)
             {
-                var item = DeserializeItem<KeyValuePair<T, U>>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+                var item = DeserializeItem<KeyValuePair<T, U>>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
                 items.Add(item.Key, item.Value);
             }
 
@@ -47,7 +47,7 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
         }
         #endregion
 
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var pairShema = thisTypeSerializationTypeRecord.NestedTypes[0];
 
@@ -66,10 +66,10 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                 .GetType()
                 .GetMethod("DeserializeDictionaryImpl")
                 .MakeGenericMethod(new Type[] { keyType, valueType })
-                .Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators });
+                .Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
         }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
             var pairShema = thisTypeSerializationTypeRecord.NestedTypes[0];
 
@@ -88,12 +88,12 @@ namespace Seed.Serialization.ClassSerializators.ComplexTypes
                 .GetType()
                 .GetMethod("SerializeDictionaryImpl")
                 .MakeGenericMethod(new Type[] { keyType, valueType })
-                .Invoke(this, new object[] { data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators });
+                .Invoke(this, new object[] { data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
         }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-            var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+            var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
 
             var pairTypes = subType.GetGenericArguments();
 
