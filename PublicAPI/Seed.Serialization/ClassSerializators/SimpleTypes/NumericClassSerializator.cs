@@ -71,7 +71,6 @@ namespace Seed.Serialization.ClassSerializators
                         data = BitConverter.ToInt64(buffer, 0);
                     }
                     break;
-
                 case "Seed::RefCountT":
                     {
                         byte[] buffer = new byte[sizeof(UInt64)];
@@ -138,7 +137,6 @@ namespace Seed.Serialization.ClassSerializators
                         stream.Write(BitConverter.GetBytes(val), 0, sizeof(UInt64));
                     }
                     break;
-
                 case "Seed::RefCountT":
                     {
                         var val = (UInt64)data;

@@ -33,7 +33,6 @@ namespace Seed.Serialization.ClassSerializators
             TypeMetaDataRecord thisTypeSerializationTypeRecord,
             Dictionary<ETypes, ITypeSerializator> typeSerializators)
         {
-
             typeSerializators[thisTypeSerializationTypeRecord.Type]
                 .Serialize(item, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators);
         }
