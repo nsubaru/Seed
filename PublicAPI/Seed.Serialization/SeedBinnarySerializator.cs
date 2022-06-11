@@ -273,7 +273,6 @@ namespace Seed.Serialization
             {
                 throw new NotSupportedException("Not supported type for deserialization");
             }
-
             
             var obj = new object();
 
