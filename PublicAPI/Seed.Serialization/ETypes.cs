@@ -25,8 +25,11 @@ namespace Seed.Serialization
 		Struct,
 		Object,
 		Dynamic,
-		Interface,
+		Abstract,
+		Function,
+		Union,
 		Pod,
+		Custom,
 		Undefine = byte.MaxValue
     }
 }
