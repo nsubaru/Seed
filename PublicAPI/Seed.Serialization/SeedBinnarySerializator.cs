@@ -30,6 +30,12 @@ public class SeedBinnarySerializator : IFormatter
         LoadMetaDataTypes();
         LoadDynamicDataTypes();
         LoadRttiTypes(rttiSection);
+        LoadFullTypesIds(rttiSection);
+    }
+
+    private void LoadFullTypesIds(RTTISection rttiSection)
+    {
+        SerializationShema.ForEach(x => x.FullTypeId = rttiSection.AllRegisteredTypes.FirstOrDefault(y => y.TypeName == x.SeedKernelTypeName)?.FullTypeId.Id ?? new Guid());
     }
 
     private void LoadRttiTypes(RTTISection rttiSection)
