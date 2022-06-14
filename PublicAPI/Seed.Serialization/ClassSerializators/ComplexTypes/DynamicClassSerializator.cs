@@ -1,5 +1,4 @@
-﻿using Seed.CTTI;
-using Seed.CTTI.MetaData;
+﻿using Seed.CTTI.MetaData;
 
 namespace Seed.CTTI.ClassSerializators.ComplexTypes;
 
