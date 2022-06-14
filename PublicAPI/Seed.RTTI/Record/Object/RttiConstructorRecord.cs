@@ -1,5 +1,8 @@
 ﻿namespace Seed.RTTI.Record.Object;
 
+/// <summary>
+/// A base RTTI constructor record class
+/// </summary>
 public unsafe class RttiConstructorRecord : RttiIterableObject<RttiConstructorRecord>
 {
     internal RttiIterator<RttiConstructorRecord>? it;
@@ -11,6 +14,9 @@ public unsafe class RttiConstructorRecord : RttiIterableObject<RttiConstructorRe
         it = null;
     }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     public RttiConstructorRecord(RttiIterator<RttiConstructorRecord> it)
     {
         this.it = it;
@@ -21,6 +27,10 @@ public unsafe class RttiConstructorRecord : RttiIterableObject<RttiConstructorRe
         return new RttiConstructorRecord(iterator);
     }
 
+    /// <summary>
+    /// Receiving the constructor record with arguments
+    /// </summary>
+    /// <returns>Record with arguments</returns>
     internal RttiCollection<RttiArgumentRecord> GetArguments()
     {
         var collectionBase = (Collection*)((byte*)GetRecord() + GetRecord()->OffsetToArgs);

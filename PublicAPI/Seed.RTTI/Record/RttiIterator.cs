@@ -7,6 +7,11 @@ public interface RttiIterableObject<T> where T : class, RttiIterableObject<T>, n
     internal T CreateInstance(RttiIterator<T> iterator);
 }
 
+/// <summary>
+/// A base iterator class
+/// </summary>
+/// <typeparam name="THeap">Heap type</typeparam>
+/// <typeparam name="T">Item type</typeparam>
 public unsafe class RttiIterator<T> : IEnumerator<T>
     where T : class, RttiIterableObject<T>, new()
 {
@@ -17,6 +22,10 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     internal bool isValidCxxTypeId;
     internal SizeT imageBase;
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="from">Source</param>
     internal RttiIterator(void* item, SizeT idx, SizeT count, SizeT imageBase, bool isValidCxxTypeId)
     {
         this.originalItem = this.item = (ItemBase*)item;

@@ -1,5 +1,8 @@
 ﻿namespace Seed.RTTI.Record.Object;
 
+/// <summary>
+/// A base RTTI interface record class
+/// </summary>
 public unsafe class RttiIntefaceRecord : RttiIterableObject<RttiIntefaceRecord>
 {
     internal RttiIterator<RttiIntefaceRecord>? it;
@@ -11,6 +14,9 @@ public unsafe class RttiIntefaceRecord : RttiIterableObject<RttiIntefaceRecord>
         it = null;
     }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     public RttiIntefaceRecord(RttiIterator<RttiIntefaceRecord> it)
     {
         this.it = it;
@@ -21,10 +27,22 @@ public unsafe class RttiIntefaceRecord : RttiIterableObject<RttiIntefaceRecord>
         return new RttiIntefaceRecord(iterator);
     }
 
+    /// <summary>
+    /// Receiving the interface record with type ID
+    /// </summary>
+    /// <returns>Record with type ID</returns>
     public SizeT TypeId => GetRecord()->TypeId.TypeId + it!.imageBase;
 
+    /// <summary>
+    /// Receiving the interface record with full type ID
+    /// </summary>
+    /// <returns>Record with full type ID</returns>
     public UniversalTypeIdentificator FullTypeId => GetRecord()->TypeId;
 
+    /// <summary>
+    /// Receiving the interface record with type name
+    /// </summary>
+    /// <returns>Record with type name</returns>
     public string TypeName => Marshal.PtrToStringAuto((IntPtr)  GetRecord()->TypeName.Text) ?? string.Empty;
 
     static internal RttiCollection<RttiIntefaceRecord> CreateCollection(Collection* record, bool isValidCxxTypeId, SizeT imageBase)
