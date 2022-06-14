@@ -41,9 +41,10 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     internal string GetCxxTypeName()
     {
         var pTypeName = (TextMetaData*)(
-             ((Byte*)record) +
-             (SizeT)Marshal.OffsetOf<MetaData>("TypeName") + (SizeT)Marshal.OffsetOf<TextMetaData>("Text") +
-             (record->TypeName.Size * sizeof(Char))
+             (((Byte*)record) +
+             (SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64() + 
+             (SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64() +
+             (record->TypeName.Size * sizeof(Char)))
         );
 
         return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
@@ -54,9 +55,10 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     internal string GetSerializationSchema()
     {
         var pTypeName = (TextMetaData*)(
-             ((Byte*)record) +
-             (SizeT)Marshal.OffsetOf<MetaData>("TypeName") + (SizeT)Marshal.OffsetOf<TextMetaData>("Text") +
-             (record->TypeName.Size * sizeof(Char))
+             (((Byte*)record) +
+             ((SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64()) + 
+             ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) +
+             (record->TypeName.Size * sizeof(Char)))
         );
 
         var pSchema = (TextMetaData*)(((Byte*) pTypeName->Text) + (pTypeName->Size * sizeof(Char)));

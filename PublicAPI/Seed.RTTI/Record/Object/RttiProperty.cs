@@ -35,11 +35,11 @@ public unsafe class RttiProperty : RttiIterableObject<RttiProperty>
 
     internal string GetTypeName()
     {
-        var pTypeName = (TextMetaData*)((Byte*)GetRecord()) +
-            (SizeT)Marshal.OffsetOf<PropertyRecord>("PropertyType") +
-            (SizeT)Marshal.OffsetOf<FieldMetaDataRecord>("FieldName") +
-            (SizeT)Marshal.OffsetOf<TextMetaData>("Text") +
-            (GetRecord()->PropertyType.FieldName.Size * sizeof(Char));
+        var pTypeName = (TextMetaData*)(((Byte*)GetRecord()) +
+            ((SizeT)Marshal.OffsetOf<PropertyRecord>("PropertyType").ToInt64()) +
+            ((SizeT)Marshal.OffsetOf<FieldMetaDataRecord>("FieldName").ToInt64()) +
+            ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) +
+            (GetRecord()->PropertyType.FieldName.Size * sizeof(Char)));
 
         return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
     }

@@ -35,10 +35,10 @@ public unsafe class RttiField : RttiIterableObject<RttiField>
 
     internal string GetTypeName()
     {
-        var pTypeName = (TextMetaData*)((Byte*)GetRecord()) +
-            (SizeT)Marshal.OffsetOf<FieldMetaData>("FieldName") +
-            (SizeT)Marshal.OffsetOf<TextMetaData>("Text") +
-            (GetRecord()->FieldName.Size * sizeof(Char));
+        var pTypeName = (TextMetaData*)(((Byte*)GetRecord()) +
+            ((SizeT)Marshal.OffsetOf<FieldMetaData>("FieldName").ToInt64()) +
+            ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) +
+            (GetRecord()->FieldName.Size * sizeof(Char)));
 
         return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
     }
