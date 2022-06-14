@@ -58,11 +58,13 @@ class AssociableCollectionClassSerializator : DynamicSizeTypes
                     .First(item => item.SeedKernelTypeName == valueShema.TypeName)
                     .ClrType;
 
+#pragma warning disable CS8601 // Possible null reference assignment.
         data = this
             .GetType()
-            .GetMethod("DeserializeDictionaryImpl")
-            .MakeGenericMethod(new Type[] { keyType, valueType })
-            .Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
+            !.GetMethod("DeserializeDictionaryImpl")
+            !.MakeGenericMethod(new Type[] { keyType, valueType })
+            !.Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
+#pragma warning restore CS8601 // Possible null reference assignment.
     }
 
     public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
@@ -80,11 +82,13 @@ class AssociableCollectionClassSerializator : DynamicSizeTypes
                     .First(item => item.SeedKernelTypeName == valueShema.TypeName)
                     .ClrType;
 
-        this
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        _ = this
             .GetType()
             .GetMethod("SerializeDictionaryImpl")
             .MakeGenericMethod(new Type[] { keyType, valueType })
             .Invoke(this, new object[] { data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
     }
 
     public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
