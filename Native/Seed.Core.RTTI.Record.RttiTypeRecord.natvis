@@ -6,6 +6,7 @@
 			<Item Name="Name">record->TypeName.Text,sub</Item>
 			<Item Name="TypeClass">record->TypeClass, en</Item>
 			<Item Name="FullTypeId">record->TypeId.Id</Item>
+			<Item Name="TypeClass">data->TypeClass</Item>
 		</Expand>
 	</Type>
 </AutoVisualizer>
