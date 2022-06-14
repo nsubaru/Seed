@@ -1,18 +1,13 @@
-﻿using Seed.Serialization.ClassSerializators;
-using Seed.Serialization.ClassSerializators.ComplexTypes;
-using Seed.Serialization.ClassSerializators.SimpleTypes;
-using Seed.Serialization.MetaData;
-using System;
-using System.Collections.Generic;
+﻿using Seed.CTTI;
+using Seed.CTTI.MetaData;
+using Seed.CTTI.ClassSerializators;
+using Seed.CTTI.ClassSerializators.ComplexTypes;
+using Seed.CTTI.ClassSerializators.SimpleTypes;
 using System.Data;
-using System.Dynamic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
 
-namespace Seed.Serialization
+namespace Seed.CTTI
 {
     public class SeedBinnarySerializator : IFormatter
     {

@@ -1,5 +1,5 @@
 ﻿global using System.Runtime.InteropServices;
-global using Seed.Serialization;
+global using Seed.CTTI;
 
 global using TEmptyCtor = System.IntPtr;
 global using TCopyCtor = System.IntPtr;
