@@ -21,6 +21,7 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     internal SizeT count;
     internal bool isValidCxxTypeId;
     internal SizeT imageBase;
+    internal bool isStartedEnumeration;
 
     /// <summary>
     /// Constructor
@@ -33,6 +34,7 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
         this.count = count;
         this.imageBase = imageBase;
         this.isValidCxxTypeId = isValidCxxTypeId;
+        this.isStartedEnumeration = false;
     }
 
     private T GetObject()
@@ -48,7 +50,14 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     {
         if (item == null || idx == count)
         {
+            item = null;
             return false;
+        }
+
+        if (!isStartedEnumeration)
+        {
+            isStartedEnumeration = true;
+            return true;
         }
 
         idx++;
@@ -70,6 +79,7 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     {
         idx = 0;
         item = originalItem;
+        isStartedEnumeration = false;
     }
 
     public void Dispose() { }
