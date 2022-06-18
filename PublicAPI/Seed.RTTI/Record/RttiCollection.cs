@@ -7,7 +7,7 @@ namespace Seed.RTTI.Record;
 /// </summary>
 /// <typeparam name="THeap">Heap type</typeparam>
 /// <typeparam name="T"></typeparam>
-public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, RttiIterableObject<T>, new()
+public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, IRttiIterableObject<T>, new()
 {
     internal Collection* @base;
     internal SizeT imageBase;
@@ -24,9 +24,9 @@ public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, RttiIter
     }
 
     /// <summary>
-    /// Receiving the beginning of collection
+    /// Receiving the iterator to collection
     /// </summary>
-    /// <returns>Beginning of collection</returns>
+    /// <returns>Iterator to collection</returns>
     public IEnumerator<T> GetEnumerator()
     {
         if (@base != null && @base->Count != 0)
@@ -44,6 +44,10 @@ public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, RttiIter
         }
     }
 
+    /// <summary>
+    /// Receiving the iterator to collection
+    /// </summary>
+    /// <returns>Iterator to collection</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();

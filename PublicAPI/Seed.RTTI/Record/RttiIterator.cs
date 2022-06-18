@@ -2,8 +2,17 @@
 
 namespace Seed.RTTI.Record;
 
-public interface RttiIterableObject<T> where T : class, RttiIterableObject<T>, new()
+/// <summary>
+/// Iterable object for RTTI iterator
+/// </summary>
+/// <typeparam name="T">Item type</typeparam>
+public interface IRttiIterableObject<T> where T : class, IRttiIterableObject<T>, new()
 {
+    /// <summary>
+    /// Create instance from iterator
+    /// </summary>
+    /// <param name="iterator">Object data</param>
+    /// <returns>New instance</returns>
     internal T CreateInstance(RttiIterator<T> iterator);
 }
 
@@ -13,7 +22,7 @@ public interface RttiIterableObject<T> where T : class, RttiIterableObject<T>, n
 /// <typeparam name="THeap">Heap type</typeparam>
 /// <typeparam name="T">Item type</typeparam>
 public unsafe class RttiIterator<T> : IEnumerator<T>
-    where T : class, RttiIterableObject<T>, new()
+    where T : class, IRttiIterableObject<T>, new()
 {
     internal ItemBase* item;
     internal ItemBase* originalItem;
@@ -24,9 +33,13 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     internal bool isStartedEnumeration;
 
     /// <summary>
-    /// Constructor
+    /// Iterator constructor
     /// </summary>
-    /// <param name="from">Source</param>
+    /// <param name="item">Pointer to item value</param>
+    /// <param name="idx">Iterator item odinal number</param>
+    /// <param name="count">Items count in collection</param>
+    /// <param name="imageBase">RTTI section image base</param>
+    /// <param name="isValidCxxTypeId">True, if Cxx type info available</param>
     internal RttiIterator(void* item, SizeT idx, SizeT count, SizeT imageBase, bool isValidCxxTypeId)
     {
         this.originalItem = this.item = (ItemBase*)item;
@@ -37,15 +50,29 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
         this.isStartedEnumeration = false;
     }
 
+    /// <summary>
+    /// Return current item
+    /// </summary>
+    /// <returns>Current item</returns>
     private T GetObject()
     {
         return new T().CreateInstance(this);
     }
 
+    /// <summary>
+    /// Current item
+    /// </summary>
     T IEnumerator<T>.Current { get => GetObject(); }
 
+    /// <summary>
+    /// Current item
+    /// </summary>
     object IEnumerator.Current { get => GetObject(); }
 
+    /// <summary>
+    /// Move iterator to next item
+    /// </summary>
+    /// <returns>True, if iterator moved to next item</returns>
     public bool MoveNext()
     {
         if (item == null || idx == count)
@@ -75,6 +102,9 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
 
     }
 
+    /// <summary>
+    /// Move iterator to first item
+    /// </summary>
     public void Reset()
     {
         idx = 0;

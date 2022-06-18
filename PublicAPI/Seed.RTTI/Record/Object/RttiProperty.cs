@@ -4,12 +4,15 @@
 /// A base RTTI property record class
 /// </summary>
 /// <typeparam name="THeap">Heap type</typeparam>
-public unsafe class RttiProperty : RttiIterableObject<RttiProperty>
+public unsafe class RttiProperty : IRttiIterableObject<RttiProperty>
 {
     internal RttiIterator<RttiProperty>? it;
 
     PropertyRecord* GetRecord() { return (PropertyRecord*)it!.item; }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     public RttiProperty()
     {
         it = null;
@@ -24,45 +27,44 @@ public unsafe class RttiProperty : RttiIterableObject<RttiProperty>
         this.it = it;
     }
 
+    /// <summary>
+    /// Create instance from iterator
+    /// </summary>
+    /// <param name="iterator">Object data</param>
+    /// <returns>New instance</returns>
     public RttiProperty CreateInstance(RttiIterator<RttiProperty> iterator)
     {
         return new RttiProperty(iterator);
     }
 
     /// <summary>
-    /// Receiving the property record with type ID
+    /// Property type ID
     /// </summary>
-    /// <returns>Record with type ID</returns>
     public SizeT TypeId => (SizeT)GetRecord()->PropertyType.TypeId.TypeId + it!.imageBase;
 
     /// <summary>
-    /// Receiving the property record with full type ID
+    /// Property full type ID
     /// </summary>
-    /// <returns>Record with full type ID</returns>
     public UniversalTypeIdentificator FullTypeId => GetRecord()->PropertyType.TypeId;
 
     /// <summary>
-    /// Receiving the property record with type class
+    /// Property type category
     /// </summary>
-    /// <returns>Record with type class</returns>
     public ETypes TypeClass => GetRecord()->PropertyType.TypeClass;
 
     /// <summary>
-    /// Receiving the property record with binary size
+    /// Property type size
     /// </summary>
-    /// <returns>Record with binary size</returns>
     public SizeT BinarySize => GetRecord()->PropertyType.MetaDataForDynamic.BinarySize;
 
     /// <summary>
-    /// Receiving the property record with type modifiers
+    /// Property type CV modificators
     /// </summary>
-    /// <returns>Record with type modifiers</returns>
     public TypeModificator TypeModificators => GetRecord()->PropertyType.TypeModificators;
 
     /// <summary>
-    /// Receiving the property record with name
+    /// Property name
     /// </summary>
-    /// <returns>Property name</returns>
     public string Name => Marshal.PtrToStringAuto((IntPtr) GetRecord()->PropertyType.FieldName.Text) ?? string.Empty;
 
     /// <summary>
@@ -80,6 +82,9 @@ public unsafe class RttiProperty : RttiIterableObject<RttiProperty>
         return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
     }
 
+    /// <summary>
+    /// Property type name
+    /// </summary>
     public string TypeName => GetTypeName();
 
     /// <summary>
@@ -93,6 +98,9 @@ public unsafe class RttiProperty : RttiIterableObject<RttiProperty>
         return RttiMethodRecord.CreateCollection(@base, it!.isValidCxxTypeId, it!.imageBase);
     }
 
+    /// <summary>
+    /// Property getters methods
+    /// </summary>
     public RttiCollection<RttiMethodRecord> Getters => GetGetters();
 
     /// <summary>
@@ -106,6 +114,9 @@ public unsafe class RttiProperty : RttiIterableObject<RttiProperty>
         return RttiMethodRecord.CreateCollection(@base, it!.isValidCxxTypeId, it!.imageBase);
     }
 
+    /// <summary>
+    /// Property setters methods
+    /// </summary>
     public RttiCollection<RttiMethodRecord> Setters => GetSetters();
 
     /// <summary>
@@ -120,8 +131,18 @@ public unsafe class RttiProperty : RttiIterableObject<RttiProperty>
         return gettersRw->Count > 0 && settersRw->Count > 0;
     }
 
+    /// <summary>
+    /// If true property support read and write
+    /// </summary>
     public bool IsRw => GetIsRw();
 
+    /// <summary>
+    /// Create collection of objects
+    /// </summary>
+    /// <param name="record">Collection pointer</param>
+    /// <param name="isValidCxxTypeId">True, if CxxTypeInfo available</param>
+    /// <param name="imageBase">Rtti section base</param>
+    /// <returns>Rtti collection of objects</returns>
     static internal RttiCollection<RttiProperty> CreateCollection(Collection* record, bool isValidCxxTypeId, SizeT imageBase)
     {
         return new RttiCollection<RttiProperty>(record, imageBase, isValidCxxTypeId);

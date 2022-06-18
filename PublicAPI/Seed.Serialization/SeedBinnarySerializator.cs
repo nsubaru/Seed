@@ -6,365 +6,364 @@ using System.Data;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Seed.CTTI
+namespace Seed.CTTI;
+
+public class SeedBinnarySerializator : IFormatter
 {
-    public class SeedBinnarySerializator : IFormatter
+    public List<SerializationTypeRecord> SerializationShema { get; private set; } = new List<SerializationTypeRecord>();
+
+    Dictionary<ETypes, ITypeSerializator> TypeClassSerializators { get; set;} = new Dictionary<ETypes, ITypeSerializator>();
+
+    public SerializationBinder Binder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public StreamingContext Context { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public ISurrogateSelector SurrogateSelector { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public SeedBinnarySerializator()
     {
-        public List<SerializationTypeRecord> SerializationShema { get; private set; } = new List<SerializationTypeRecord>();
+        LoadTypeSerilizator();
+        LoadBuiltInClassInformation();
+        LoadStringTypeInformation();
+        LoadMetaDataTypes();
+        LoadDynamicDataTypes();
+    }
 
-        Dictionary<ETypes, ITypeSerializator> TypeClassSerializators { get; set;} = new Dictionary<ETypes, ITypeSerializator>();
+    private void LoadTypeSerilizator()
+    {
+        TypeClassSerializators.Add(ETypes.Logic, new LogicClassSerializator());
+        TypeClassSerializators.Add(ETypes.Numeric, new NumericClassSerializator());
+        TypeClassSerializators.Add(ETypes.FloatNumeric, new FloatNumericClassSerializator());
+        TypeClassSerializators.Add(ETypes.Character, new CharacterClassSerializator());
+        TypeClassSerializators.Add(ETypes.Collection, new CollectionClassSerializator());
+        TypeClassSerializators.Add(ETypes.String, new StringClassSerialization());
+        TypeClassSerializators.Add(ETypes.Enumeration, new EnumerationClassSerializator());
+        TypeClassSerializators.Add(ETypes.FixedCollection, new FixedCollectionClassSerializator());
+        TypeClassSerializators.Add(ETypes.Pair, new PairClassSerializator());
+        TypeClassSerializators.Add(ETypes.AssociableCollection, new AssociableCollectionClassSerializator());
+        TypeClassSerializators.Add(ETypes.FixedArray, new FixedArraySerializator());
+        TypeClassSerializators.Add(ETypes.Box, new BoxClassSerializator());
+        TypeClassSerializators.Add(ETypes.Tuple, new TupleClassSerializator());
+        TypeClassSerializators.Add(ETypes.MetaData, new MetaDataClassSerialization());
+        TypeClassSerializators.Add(ETypes.Struct, new StructClassSerializator());
+        TypeClassSerializators.Add(ETypes.Object, new StructClassSerializator());
+        TypeClassSerializators.Add(ETypes.Dynamic, new DynamicClassSerializator());
+    }
 
-        public SerializationBinder Binder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public StreamingContext Context { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public ISurrogateSelector SurrogateSelector { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public SeedBinnarySerializator()
-        {
-            LoadTypeSerilizator();
-            LoadBuiltInClassInformation();
-            LoadStringTypeInformation();
-            LoadMetaDataTypes();
-            LoadDynamicDataTypes();
-        }
-
-        private void LoadTypeSerilizator()
-        {
-            TypeClassSerializators.Add(ETypes.Logic, new LogicClassSerializator());
-            TypeClassSerializators.Add(ETypes.Numeric, new NumericClassSerializator());
-            TypeClassSerializators.Add(ETypes.FloatNumeric, new FloatNumericClassSerializator());
-            TypeClassSerializators.Add(ETypes.Character, new CharacterClassSerializator());
-            TypeClassSerializators.Add(ETypes.Collection, new CollectionClassSerializator());
-            TypeClassSerializators.Add(ETypes.String, new StringClassSerialization());
-            TypeClassSerializators.Add(ETypes.Enumeration, new EnumerationClassSerializator());
-            TypeClassSerializators.Add(ETypes.FixedCollection, new FixedCollectionClassSerializator());
-            TypeClassSerializators.Add(ETypes.Pair, new PairClassSerializator());
-            TypeClassSerializators.Add(ETypes.AssociableCollection, new AssociableCollectionClassSerializator());
-            TypeClassSerializators.Add(ETypes.FixedArray, new FixedArraySerializator());
-            TypeClassSerializators.Add(ETypes.Box, new BoxClassSerializator());
-            TypeClassSerializators.Add(ETypes.Tuple, new TupleClassSerializator());
-            TypeClassSerializators.Add(ETypes.MetaData, new MetaDataClassSerialization());
-            TypeClassSerializators.Add(ETypes.Struct, new StructClassSerializator());
-            TypeClassSerializators.Add(ETypes.Object, new StructClassSerializator());
-            TypeClassSerializators.Add(ETypes.Dynamic, new DynamicClassSerializator());
-        }
-
-        private void LoadStringTypeInformation()
-        {
-            SerializationShema.Add(
-                new SerializationTypeRecord
+    private void LoadStringTypeInformation()
+    {
+        SerializationShema.Add(
+            new SerializationTypeRecord
+            {
+                ClrType = typeof(string),
+                SeedKernelTypeShema = new TypeMetaDataRecord
                 {
-                    ClrType = typeof(string),
-                    SeedKernelTypeShema = new TypeMetaDataRecord
+                    TypeName = "Seed::String",
+                    SizeOfSize = sizeof(UInt64) * 3,
+                    StaticSize = 0,
+                    AdditionalInfo = "",
+                    Type = ETypes.String,
+                    NestedTypes = new List<TypeMetaDataRecord>
                     {
-                        TypeName = "Seed::String",
-                        SizeOfSize = sizeof(UInt64) * 3,
-                        StaticSize = 0,
-                        AdditionalInfo = "",
-                        Type = ETypes.String,
-                        NestedTypes = new List<TypeMetaDataRecord>
-                        {
-                            SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::UChar").First().SeedKernelTypeShema
-                        }
+                        SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::UChar").First().SeedKernelTypeShema
                     }
                 }
-            );
+            }
+        );
 
-            SerializationShema.Add(
-                new SerializationTypeRecord
+        SerializationShema.Add(
+            new SerializationTypeRecord
+            {
+                ClrType = typeof(string),
+                SeedKernelTypeShema = new TypeMetaDataRecord
                 {
-                    ClrType = typeof(string),
-                    SeedKernelTypeShema = new TypeMetaDataRecord
+                    TypeName = "Seed::SensitiveString",
+                    SizeOfSize = sizeof(UInt64) * 3,
+                    StaticSize = 0,
+                    AdditionalInfo = "",
+                    Type = ETypes.String,
+                    NestedTypes = new List<TypeMetaDataRecord>
                     {
-                        TypeName = "Seed::SensitiveString",
-                        SizeOfSize = sizeof(UInt64) * 3,
-                        StaticSize = 0,
-                        AdditionalInfo = "",
-                        Type = ETypes.String,
-                        NestedTypes = new List<TypeMetaDataRecord>
-                        {
-                            SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::UChar").First().SeedKernelTypeShema
-                        }
+                        SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::UChar").First().SeedKernelTypeShema
                     }
                 }
-            );
-        }
+            }
+        );
+    }
 
-        void LoadMetaDataTypes()
-        {
-            SerializationShema.Add(
-               new SerializationTypeRecord
+    void LoadMetaDataTypes()
+    {
+        SerializationShema.Add(
+           new SerializationTypeRecord
+           {
+               ClrType = typeof(TypeMetaDataRecord),
+               SeedKernelTypeShema = new TypeMetaDataRecord
                {
-                   ClrType = typeof(TypeMetaDataRecord),
-                   SeedKernelTypeShema = new TypeMetaDataRecord
+                   TypeName = "Seed::Core::Serialization::TypeMetaDataRecord",
+                   SizeOfSize = sizeof(UInt64),
+                   StaticSize = 0,
+                   AdditionalInfo = "",
+                   Type = ETypes.MetaData,
+                   NestedTypes = new List<TypeMetaDataRecord>
                    {
-                       TypeName = "Seed::Core::Serialization::TypeMetaDataRecord",
-                       SizeOfSize = sizeof(UInt64),
-                       StaticSize = 0,
-                       AdditionalInfo = "",
-                       Type = ETypes.MetaData,
-                       NestedTypes = new List<TypeMetaDataRecord>
-                       {
-                            SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::String").First().SeedKernelTypeShema
-                       }
+                        SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::String").First().SeedKernelTypeShema
                    }
                }
-           );
+           }
+       );
 
-           SerializationShema.Add(
-               new SerializationTypeRecord
+       SerializationShema.Add(
+           new SerializationTypeRecord
+           {
+               ClrType = typeof(TypeMetaDataRecord),
+               SeedKernelTypeShema = new TypeMetaDataRecord
                {
-                   ClrType = typeof(TypeMetaDataRecord),
-                   SeedKernelTypeShema = new TypeMetaDataRecord
+                   TypeName = "Seed::Core::Serialization::SensitiveTypeMetaDataRecord",
+                   SizeOfSize = sizeof(UInt64),
+                   StaticSize = 0,
+                   AdditionalInfo = "",
+                   Type = ETypes.MetaData,
+                   NestedTypes = new List<TypeMetaDataRecord>
                    {
-                       TypeName = "Seed::Core::Serialization::SensitiveTypeMetaDataRecord",
-                       SizeOfSize = sizeof(UInt64),
-                       StaticSize = 0,
-                       AdditionalInfo = "",
-                       Type = ETypes.MetaData,
-                       NestedTypes = new List<TypeMetaDataRecord>
-                       {
-                            SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::SensitiveString").First().SeedKernelTypeShema
-                       }
+                        SerializationShema.Where(record => record.SeedKernelTypeName == "Seed::SensitiveString").First().SeedKernelTypeShema
                    }
                }
-           );
-        }
+           }
+       );
+    }
 
-        void LoadDynamicDataTypes()
-        {
-            SerializationShema.Add(
-               new SerializationTypeRecord
+    void LoadDynamicDataTypes()
+    {
+        SerializationShema.Add(
+           new SerializationTypeRecord
+           {
+               ClrType = typeof(DynamicObject),
+               SeedKernelTypeShema = new TypeMetaDataRecord
                {
-                   ClrType = typeof(DynamicObject),
-                   SeedKernelTypeShema = new TypeMetaDataRecord
-                   {
-                       TypeName = "Seed::Containers::Dynamic",
-                       SizeOfSize = sizeof(UInt64),
-                       StaticSize = 0,
-                       AdditionalInfo = "",
-                       Type = ETypes.Dynamic,
-                       NestedTypes = new List<TypeMetaDataRecord>()
-                   }
+                   TypeName = "Seed::Containers::Dynamic",
+                   SizeOfSize = sizeof(UInt64),
+                   StaticSize = 0,
+                   AdditionalInfo = "",
+                   Type = ETypes.Dynamic,
+                   NestedTypes = new List<TypeMetaDataRecord>()
                }
-           );
+           }
+       );
 
-            SerializationShema.Add(
-                new SerializationTypeRecord
+        SerializationShema.Add(
+            new SerializationTypeRecord
+            {
+                ClrType = typeof(DynamicObject),
+                SeedKernelTypeShema = new TypeMetaDataRecord
                 {
-                    ClrType = typeof(DynamicObject),
-                    SeedKernelTypeShema = new TypeMetaDataRecord
-                    {
-                        TypeName = "Seed::RTTI::Dynamic",
-                        SizeOfSize = sizeof(UInt64),
-                        StaticSize = 0,
-                        AdditionalInfo = "",
-                        Type = ETypes.Dynamic,
-                        NestedTypes = new List<TypeMetaDataRecord>()
-                    }
+                    TypeName = "Seed::RTTI::Dynamic",
+                    SizeOfSize = sizeof(UInt64),
+                    StaticSize = 0,
+                    AdditionalInfo = "",
+                    Type = ETypes.Dynamic,
+                    NestedTypes = new List<TypeMetaDataRecord>()
                 }
+            }
+        );
+    }
+
+    private void LoadBuiltInClassInformation() => SerializationShema
+            .AddRange(
+                TypeClassSerializators
+                    .Where(item => item.Value.GetType().BaseType == typeof(SimpeTypeSerializator))
+                    .Select(item => (SimpeTypeSerializator)item.Value)
+                    .SelectMany(item => item.GetSupportedTypes())
             );
+
+    private void SerializeHeader(Stream serializationStream, string typeName)
+    {
+        var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(string));
+
+        TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
+            .Serialize(typeName, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
+    }
+
+    private string DeserializeHeader(Stream serializationStream)
+    {
+        var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(string));
+        var obj = new object();
+        obj = "";
+
+        TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
+            .Deserialize(ref obj, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
+
+        return (string)obj;
+    }
+
+    public Type ResolveGenericTypeByTypeMetaData(TypeMetaDataRecord typeMetaDataRecord)
+    {
+        var schemas = SerializationShema.Where(schema => schema.SeedKernelTypeName == typeMetaDataRecord.TypeName);
+
+        if (schemas.Any())
+            return schemas.First().ClrType;
+
+        return TypeClassSerializators[typeMetaDataRecord.Type].TryResolveTypeByTypeMetaDataRecord(typeMetaDataRecord, TypeClassSerializators);
+    }
+
+    private void TryRegisterTypeAndSubTypesByTypeMetaData(TypeMetaDataRecord typeMetaDataRecord)
+    {
+        var type = ResolveGenericTypeByTypeMetaData(typeMetaDataRecord);
+
+        if (type == null || SerializationShema.Exists(shema => shema.ClrType == type))
+        {
+            return;
         }
 
-        private void LoadBuiltInClassInformation() => SerializationShema
-                .AddRange(
-                    TypeClassSerializators
-                        .Where(item => item.Value.GetType().BaseType == typeof(SimpeTypeSerializator))
-                        .Select(item => (SimpeTypeSerializator)item.Value)
-                        .SelectMany(item => item.GetSupportedTypes())
-                );
-
-        private void SerializeHeader(Stream serializationStream, string typeName)
+        SerializationShema.Add(new SerializationTypeRecord
         {
-            var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(string));
+            ClrType = type,
+            SeedKernelTypeShema = typeMetaDataRecord
+        });
 
-            TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
-                .Serialize(typeName, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
-        }
-
-        private string DeserializeHeader(Stream serializationStream)
+        foreach (var nestedTypeMetaData in typeMetaDataRecord.NestedTypes)
         {
-            var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(string));
-            var obj = new object();
-            obj = "";
+            if (nestedTypeMetaData.NestedTypes == null || nestedTypeMetaData.NestedTypes.Count == 0)
+            {
+                continue;
+            }
 
-            TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
-                .Deserialize(ref obj, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
-
-            return (string)obj;
-        }
-
-        public Type ResolveGenericTypeByTypeMetaData(TypeMetaDataRecord typeMetaDataRecord)
-        {
-            var schemas = SerializationShema.Where(schema => schema.SeedKernelTypeName == typeMetaDataRecord.TypeName);
-
-            if (schemas.Any())
-                return schemas.First().ClrType;
-
-            return TypeClassSerializators[typeMetaDataRecord.Type].TryResolveTypeByTypeMetaDataRecord(typeMetaDataRecord, TypeClassSerializators);
-        }
-
-        private void TryRegisterTypeAndSubTypesByTypeMetaData(TypeMetaDataRecord typeMetaDataRecord)
-        {
-            var type = ResolveGenericTypeByTypeMetaData(typeMetaDataRecord);
+            type = ResolveGenericTypeByTypeMetaData(nestedTypeMetaData);
 
             if (type == null || SerializationShema.Exists(shema => shema.ClrType == type))
             {
-                return;
+                continue;
             }
 
             SerializationShema.Add(new SerializationTypeRecord
             {
                 ClrType = type,
-                SeedKernelTypeShema = typeMetaDataRecord
+                SeedKernelTypeShema = nestedTypeMetaData
             });
 
-            foreach (var nestedTypeMetaData in typeMetaDataRecord.NestedTypes)
-            {
-                if (nestedTypeMetaData.NestedTypes == null || nestedTypeMetaData.NestedTypes.Count == 0)
-                {
-                    continue;
-                }
-
-                type = ResolveGenericTypeByTypeMetaData(nestedTypeMetaData);
-
-                if (type == null || SerializationShema.Exists(shema => shema.ClrType == type))
-                {
-                    continue;
-                }
-
-                SerializationShema.Add(new SerializationTypeRecord
-                {
-                    ClrType = type,
-                    SeedKernelTypeShema = nestedTypeMetaData
-                });
-
-                TryRegisterTypeAndSubTypesByTypeMetaData(nestedTypeMetaData);
-            }
+            TryRegisterTypeAndSubTypesByTypeMetaData(nestedTypeMetaData);
         }
+    }
 
-        public void RegisterType(SerializationTypeRecord serializationTypeRecord)
+    public void RegisterType(SerializationTypeRecord serializationTypeRecord)
+    {
+        if (SerializationShema.Exists(shema => shema.ClrType == serializationTypeRecord.ClrType))
         {
-            if (SerializationShema.Exists(shema => shema.ClrType == serializationTypeRecord.ClrType))
-            {
-                return;
-            }
-
-            TryRegisterTypeAndSubTypesByTypeMetaData(serializationTypeRecord.SeedKernelTypeShema);
-
-            if (!SerializationShema.Exists(shema => shema.ClrType == serializationTypeRecord.ClrType))
-            {
-                SerializationShema.Add(serializationTypeRecord);
-            }
+            return;
         }
 
-        public object Deserialize(Stream serializationStream)
+        TryRegisterTypeAndSubTypesByTypeMetaData(serializationTypeRecord.SeedKernelTypeShema);
+
+        if (!SerializationShema.Exists(shema => shema.ClrType == serializationTypeRecord.ClrType))
         {
-            string typeName = DeserializeHeader(serializationStream);
-
-            if (!SerializationShema.Exists(serilizator => serilizator.SeedKernelTypeName == typeName))
-            {
-                throw new NotSupportedException("Not supported type for deserialization");
-            }
-
-            
-            var obj = new object();
-
-            var typeMetaData = SerializationShema.First(serilizator => serilizator.SeedKernelTypeName == typeName);
-
-            TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
-                .Deserialize(ref obj, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
-
-            return obj;
-            
+            SerializationShema.Add(serializationTypeRecord);
         }
+    }
 
-        public void Serialize(Stream serializationStream, object graph)
+    public object Deserialize(Stream serializationStream)
+    {
+        string typeName = DeserializeHeader(serializationStream);
+
+        if (!SerializationShema.Exists(serilizator => serilizator.SeedKernelTypeName == typeName))
         {
-            if (!SerializationShema.Exists(serilizator => serilizator.ClrType == graph.GetType()))
-            {
-                throw new NotSupportedException("Not supported type for serialization");
-            }
-
-            var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == graph.GetType());
-
-            SerializeHeader(serializationStream, typeMetaData.SeedKernelTypeName);
-
-            TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
-                .Serialize(graph, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
+            throw new NotSupportedException("Not supported type for deserialization");
         }
 
-        public void RegisterType(Type type)
+        
+        var obj = new object();
+
+        var typeMetaData = SerializationShema.First(serilizator => serilizator.SeedKernelTypeName == typeName);
+
+        TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
+            .Deserialize(ref obj, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
+
+        return obj;
+        
+    }
+
+    public void Serialize(Stream serializationStream, object graph)
+    {
+        if (!SerializationShema.Exists(serilizator => serilizator.ClrType == graph.GetType()))
         {
-            if (SerializationShema.Any(schema => schema.ClrType == type))
-                return;
-
-            SeedSerializableAttribute serializableStructAttribute =
-                (SeedSerializableAttribute)Attribute.GetCustomAttribute(type, typeof(SeedSerializableAttribute));
-
-            if (serializableStructAttribute == null)
-            {
-                throw new NotSupportedException($"Type {type.Name} not supported as not containe serializable attribute");
-            }
-
-            var SeedTypeName = serializableStructAttribute.SeedKernelTypeName;
-
-            var fields = type
-                .GetProperties()
-                .Where(prop => prop.GetCustomAttributes().Any(attrb => attrb.GetType() == typeof(SerializableStructFieldAttribute)))
-                .ToList();
-
-            if (!fields.Any())
-                throw new ArgumentException($"Serializable type {type.Name} must have at least one serializable field");
-
-            var structSchema = new List<StructFieldInformation>();
-            var fieldsTypes = new List<Type>();
-
-            foreach (var field in fields)
-            {
-                if (!(field
-                    .GetCustomAttributes()
-                    .Where(attrb => attrb.GetType() == typeof(SerializableStructFieldAttribute))
-                    .FirstOrDefault() is SerializableStructFieldAttribute fieldInfo))
-                    continue;
-
-                structSchema.Add(fieldInfo.FieldInformation);
-                fieldsTypes.Add(field.PropertyType);
-            }
-
-            foreach (var fieldType in fieldsTypes)
-            {
-                RegisterType(fieldType);
-            }
-
-            var fieldTypeRecord = new List<TypeMetaDataRecord>();
-
-            for (int i = 0; i < structSchema.Count; i++)
-            {
-                if (!SerializationShema.Any(schema => schema.SeedKernelTypeName == structSchema[i].FieldTypeName))
-                    throw new ArgumentException($"Unknown field {structSchema[i].FieldName} type {structSchema[i].FieldTypeName}");
-
-                var serializationSchema = SerializationShema.First(schema => schema.SeedKernelTypeName == structSchema[i].FieldTypeName);
-
-                fieldTypeRecord.Add(serializationSchema.SeedKernelTypeShema);
-            }
-
-            var typeRecord = new SerializationTypeRecord
-            {
-                ClrType = type,
-                SeedKernelTypeShema = new TypeMetaDataRecord
-                {
-                    SizeOfSize = 0,
-                    StaticSize = 0,
-                    NestedTypes = fieldTypeRecord,
-                    Type = serializableStructAttribute.TypeClass,
-                    TypeName = serializableStructAttribute.SeedKernelTypeName,
-                    AdditionalInfo = new TypeMetaDataDecoder().EncodeStructFieldSchema(structSchema)
-                }
-            };
-
-            SerializationShema.Add(typeRecord);
+            throw new NotSupportedException("Not supported type for serialization");
         }
+
+        var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == graph.GetType());
+
+        SerializeHeader(serializationStream, typeMetaData.SeedKernelTypeName);
+
+        TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
+            .Serialize(graph, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
+    }
+
+    public void RegisterType(Type type)
+    {
+        if (SerializationShema.Any(schema => schema.ClrType == type))
+            return;
+
+        SeedSerializableAttribute serializableStructAttribute =
+            (SeedSerializableAttribute)Attribute.GetCustomAttribute(type, typeof(SeedSerializableAttribute));
+
+        if (serializableStructAttribute == null)
+        {
+            throw new NotSupportedException($"Type {type.Name} not supported as not containe serializable attribute");
+        }
+
+        var SeedTypeName = serializableStructAttribute.SeedKernelTypeName;
+
+        var fields = type
+            .GetProperties()
+            .Where(prop => prop.GetCustomAttributes().Any(attrb => attrb.GetType() == typeof(SerializableStructFieldAttribute)))
+            .ToList();
+
+        if (!fields.Any())
+            throw new ArgumentException($"Serializable type {type.Name} must have at least one serializable field");
+
+        var structSchema = new List<StructFieldInformation>();
+        var fieldsTypes = new List<Type>();
+
+        foreach (var field in fields)
+        {
+            if (!(field
+                .GetCustomAttributes()
+                .Where(attrb => attrb.GetType() == typeof(SerializableStructFieldAttribute))
+                .FirstOrDefault() is SerializableStructFieldAttribute fieldInfo))
+                continue;
+
+            structSchema.Add(fieldInfo.FieldInformation);
+            fieldsTypes.Add(field.PropertyType);
+        }
+
+        foreach (var fieldType in fieldsTypes)
+        {
+            RegisterType(fieldType);
+        }
+
+        var fieldTypeRecord = new List<TypeMetaDataRecord>();
+
+        for (int i = 0; i < structSchema.Count; i++)
+        {
+            if (!SerializationShema.Any(schema => schema.SeedKernelTypeName == structSchema[i].FieldTypeName))
+                throw new ArgumentException($"Unknown field {structSchema[i].FieldName} type {structSchema[i].FieldTypeName}");
+
+            var serializationSchema = SerializationShema.First(schema => schema.SeedKernelTypeName == structSchema[i].FieldTypeName);
+
+            fieldTypeRecord.Add(serializationSchema.SeedKernelTypeShema);
+        }
+
+        var typeRecord = new SerializationTypeRecord
+        {
+            ClrType = type,
+            SeedKernelTypeShema = new TypeMetaDataRecord
+            {
+                SizeOfSize = 0,
+                StaticSize = 0,
+                NestedTypes = fieldTypeRecord,
+                Type = serializableStructAttribute.TypeClass,
+                TypeName = serializableStructAttribute.SeedKernelTypeName,
+                AdditionalInfo = new TypeMetaDataDecoder().EncodeStructFieldSchema(structSchema)
+            }
+        };
+
+        SerializationShema.Add(typeRecord);
     }
 }

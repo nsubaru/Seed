@@ -12,6 +12,12 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     private SizeT imageBase;
     private bool isValidCxxTypeId;
 
+    /// <summary>
+    /// Constructor from fields
+    /// </summary>
+    /// <param name="record">Pointer to item data</param>
+    /// <param name="imageBase">RTTI section image base</param>
+    /// <param name="isValidCxxTypeId">True, if CxxTypeInfo available</param>
     internal RttiTypeRecord(MetaData* record, ulong imageBase, bool isValidCxxTypeId)
     {
         this.record = record;
@@ -30,51 +36,44 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     }
 
     /// <summary>
-    /// Indicates if the type record is valid
+    /// "True" if the type record is valid
     /// </summary>
-    /// <returns>"True" if the type record is valid</returns>
     public bool IsValid => record != null;
 
     /// <summary>
-    /// Indicates if the C++ type ID is valid
+    /// "True" if the C++ type ID is valid
     /// </summary>
-    /// <returns>"True" if the C++ type ID is valid</returns>
     public bool IsValidCxxTypeId => isValidCxxTypeId;
 
     /// <summary>
-    /// Receiving the type record with type ID
+    /// Type ID
     /// </summary>
-    /// <returns>Record with type ID</returns>
     public ID TypeId => record->TypeId.TypeId + imageBase;
 
     /// <summary>
-    /// Receiving the type record with full type ID
+    /// Full type ID
     /// </summary>
     /// <returns>Record with type ID</returns>
     public UniversalTypeIdentificator FullTypeId => record == null ? new UniversalTypeIdentificator() : record->TypeId;
 
     /// <summary>
-    /// Receiving the type record with type class
+    /// Type category
     /// </summary>
-    /// <returns>Record with type class</returns>
     public ETypes TypeClass => record == null ? ETypes.Undefine : record->TypeClass;
 
     /// <summary>
-    /// Receiving the type record with binary size
+    /// Type size in memory
     /// </summary>
-    /// <returns>Record with binary size</returns>
     public SizeT BinarySize => record->MetaDataForDynamic.BinarySize;
 
     /// <summary>
-    /// Receiving the type record with type modifiers
+    /// Type CV and Ref modificator
     /// </summary>
-    /// <returns>Record with type modifiers</returns>
     public TypeModificator TypeModificators => record->TypeModificators;
 
     /// <summary>
-    /// Receiving the type record with type modifiers
+    /// Type name
     /// </summary>
-    /// <returns>Record with type modifiers</returns>
     public string TypeName => Marshal.PtrToStringAuto((IntPtr) record->TypeName.Text) ?? string.Empty;
 
     /// <summary>
@@ -93,12 +92,15 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
     }
 
+    /// <summary>
+    /// Cxx type name without any formating
+    /// </summary>
     public string CxxTypeName => GetCxxTypeName();
 
     /// <summary>
-		/// Receiving the serialization schema for type record
-		/// </summary>
-		/// <returns>Serialization schema</returns>
+	/// Receiving the serialization schema for type record
+	/// </summary>
+	/// <returns>Serialization schema</returns>
     internal string GetSerializationSchema()
     {
         var pTypeName = (TextMetaData*)(
@@ -113,6 +115,9 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         return Marshal.PtrToStringAuto((IntPtr) pSchema->Text) ?? string.Empty;
     }
 
+    /// <summary>
+    /// Serialization schema if type support serialization
+    /// </summary>
     public string SerializationSchema => GetSerializationSchema();
 
     private SizeT GetCTTIMetaDataOffset()
@@ -201,7 +206,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     }
 
     /// <summary>
-    /// A property for receiving the fields of type record
+    /// Fields of type record
     /// </summary>
     public RttiCollection<RttiField> Fields => GetFields();
 
@@ -352,23 +357,23 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     }
 
     /// <summary>
-    /// A property for receiving the constructors of type record
+    /// Constructors of type record
     /// </summary>
     public RttiCollection<RttiConstructorRecord> Constructors => GetConstructors();
 
     /// <summary>
-    /// A property for receiving the interfaces of type record
+    /// Interfaces of type record
     /// </summary>
     public RttiCollection<RttiIntefaceRecord> Interfaces => GetInterfaces();
 
 
     /// <summary>
-    /// A property for receiving the properties of type record
+    /// Properties of type record
     /// </summary>
     public RttiCollection<RttiProperty> Properties => GetProperties();
 
     /// <summary>
-    /// A property for receiving the methods of type record
+    /// Methods of type record
     /// </summary>
     public RttiCollection<RttiMethodRecord> Methods => GetMethods();
 

@@ -4,12 +4,15 @@
 /// A base RTTI field class
 /// </summary>
 /// <typeparam name="THeap">Heap type</typeparam>
-public unsafe class RttiField : RttiIterableObject<RttiField>
+public unsafe class RttiField : IRttiIterableObject<RttiField>
 {
     internal RttiIterator<RttiField>? it;
 
     FieldMetaData* GetRecord() { return (FieldMetaData*)it!.item; }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     public RttiField()
     {
         it = null;
@@ -24,45 +27,44 @@ public unsafe class RttiField : RttiIterableObject<RttiField>
         this.it = it;
     }
 
+    /// <summary>
+    /// Create instance from iterator
+    /// </summary>
+    /// <param name="iterator">Object data</param>
+    /// <returns>New instance</returns>
     public RttiField CreateInstance(RttiIterator<RttiField> iterator)
     {
         return new RttiField(iterator);
     }
 
     /// <summary>
-    /// Receiving the field record with type ID
+    /// Field type ID
     /// </summary>
-    /// <returns>Record with type ID</returns>
     public SizeT TypeId => (SizeT)GetRecord()->TypeId.TypeId + it!.imageBase;
 
     /// <summary>
-    /// Receiving the field record with full type ID
+    /// Field full type ID
     /// </summary>
-    /// <returns>Record with type ID</returns>
     public UniversalTypeIdentificator FullTypeId => GetRecord()->TypeId;
 
     /// <summary>
-    /// Receiving the field record with type class
+    /// Field type category
     /// </summary>
-    /// <returns>Record with type class</returns>
     public ETypes TypeClass => GetRecord()->TypeClass;
 
     /// <summary>
-    /// Receiving the field record with binary size
+    /// Field type size
     /// </summary>
-    /// <returns>Record with binary size</returns>
     public SizeT BinarySize => GetRecord()->MetaDataForDynamic.BinarySize;
 
     /// <summary>
-    /// Receiving the field record with type modifiers
+    /// Field type CV modificators
     /// </summary>
-    /// <returns>Record with type modifiers</returns>
     public TypeModificator TypeModificators => GetRecord()->TypeModificators;
 
     /// <summary>
-    /// Receiving the record with field name
+    /// Field name, for enum item it is integer value
     /// </summary>
-    /// <returns>Record with field name</returns>
     public string FieldName => Marshal.PtrToStringAuto((IntPtr) GetRecord()->FieldName.Text) ?? string.Empty;
 
     /// <summary>
@@ -79,8 +81,18 @@ public unsafe class RttiField : RttiIterableObject<RttiField>
         return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
     }
 
+    /// <summary>
+    /// Field type, for enum item it is item name
+    /// </summary>
     public string TypeName => GetTypeName();
 
+    /// <summary>
+    /// Create collection of objects
+    /// </summary>
+    /// <param name="record">Collection pointer</param>
+    /// <param name="isValidCxxTypeId">True, if CxxTypeInfo available</param>
+    /// <param name="imageBase">Rtti section base</param>
+    /// <returns>Rtti collection of objects</returns>
     static internal RttiCollection<RttiField> CreateCollection(Collection* record, bool isValidCxxTypeId, SizeT imageBase)
     {
         return new RttiCollection<RttiField>(record, imageBase, isValidCxxTypeId);

@@ -3,7 +3,7 @@
 /// <summary>
 /// A base RTTI interface record class
 /// </summary>
-public unsafe class RttiIntefaceRecord : RttiIterableObject<RttiIntefaceRecord>
+public unsafe class RttiIntefaceRecord : IRttiIterableObject<RttiIntefaceRecord>
 {
     internal RttiIterator<RttiIntefaceRecord>? it;
 
@@ -22,29 +22,38 @@ public unsafe class RttiIntefaceRecord : RttiIterableObject<RttiIntefaceRecord>
         this.it = it;
     }
 
+    /// <summary>
+    /// Create instance from iterator
+    /// </summary>
+    /// <param name="iterator">Object data</param>
+    /// <returns>New instance</returns>
     public RttiIntefaceRecord CreateInstance(RttiIterator<RttiIntefaceRecord> iterator)
     {
         return new RttiIntefaceRecord(iterator);
     }
 
     /// <summary>
-    /// Receiving the interface record with type ID
+    /// Interface type ID
     /// </summary>
-    /// <returns>Record with type ID</returns>
     public SizeT TypeId => GetRecord()->TypeId.TypeId + it!.imageBase;
 
     /// <summary>
-    /// Receiving the interface record with full type ID
+    /// Interface type full ID
     /// </summary>
-    /// <returns>Record with full type ID</returns>
     public UniversalTypeIdentificator FullTypeId => GetRecord()->TypeId;
 
     /// <summary>
-    /// Receiving the interface record with type name
+    /// Interface type name
     /// </summary>
-    /// <returns>Record with type name</returns>
     public string TypeName => Marshal.PtrToStringAuto((IntPtr)  GetRecord()->TypeName.Text) ?? string.Empty;
 
+    /// <summary>
+    /// Create collection of objects
+    /// </summary>
+    /// <param name="record">Collection pointer</param>
+    /// <param name="isValidCxxTypeId">True, if CxxTypeInfo available</param>
+    /// <param name="imageBase">Rtti section base</param>
+    /// <returns>Rtti collection of objects</returns>
     static internal RttiCollection<RttiIntefaceRecord> CreateCollection(Collection* record, bool isValidCxxTypeId, SizeT imageBase)
     {
         return new RttiCollection<RttiIntefaceRecord>(record, imageBase, isValidCxxTypeId);
