@@ -1,5 +1,6 @@
 #pragma once
 #include "Seed.Core.Base.Types.h"
+#include "Seed.Core.Base.Comparing.h"
 
 namespace Seed::Core
 {
@@ -18,5 +19,21 @@ namespace Seed::Core
 		{
 			return L'0' <= ch && ch <= L'9';
 		}
+
+		/// <summary>
+		/// Case insesitive character comparing
+		/// </summary>
+		/// <param name="left">Left operand</param>
+		/// <param name="right">Right operand</param>
+		/// <returns>Comparing result</returns>
+		static StrongOrdering CaseInsesitiveCompare(AChar left, AChar right);
+
+		/// <summary>
+		/// Case insesitive character comparing
+		/// </summary>
+		/// <param name="left">Left operand</param>
+		/// <param name="right">Right operand</param>
+		/// <returns>Comparing result</returns>
+		static StrongOrdering CaseInsesitiveCompare(UChar left, UChar right);
 	};
 }
