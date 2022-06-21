@@ -7,9 +7,10 @@
 [Flags]
 public enum ETypeModificators : byte
 {
-	Const       = 1, 
-	Volatile    = 2,
-	Serilizable = 4
+	Const        = 1, 
+	Volatile     = 2,
+	Serilizable  = 4,
+	TemplateType = 8
 }
 
 [Flags]
