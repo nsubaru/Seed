@@ -9,9 +9,9 @@ class MetaDataClassSerialization : DynamicSizeTypes
     {
         TypeMetaDataRecord serializationTextType = null;
         if (thisTypeSerializationTypeRecord.TypeName == "Seed::Core::Serialization::TypeMetaDataRecord")
-            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::String").SeedKernelTypeShema;
+            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::Core::String").SeedKernelTypeShema;
         else if (thisTypeSerializationTypeRecord.TypeName == "Seed::Core::Serialization::SensitiveTypeMetaDataRecord")
-            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::String").SeedKernelTypeShema;
+            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::Core::String").SeedKernelTypeShema;
         else
             throw new NotImplementedException();
 
@@ -24,9 +24,9 @@ class MetaDataClassSerialization : DynamicSizeTypes
     {
         TypeMetaDataRecord serializationTextType = null;
         if (thisTypeSerializationTypeRecord.TypeName == "Seed::Core::Serialization::TypeMetaDataRecord")
-            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::String").SeedKernelTypeShema;
+            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::Core::String").SeedKernelTypeShema;
         else if (thisTypeSerializationTypeRecord.TypeName == "Seed::Core::Serialization::SensitiveTypeMetaDataRecord")
-            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::SensitiveString").SeedKernelTypeShema;
+            serializationTextType = serializationTypeRecords.First(type => type.SeedKernelTypeName == "Seed::Core::SensitiveString").SeedKernelTypeShema;
         else
             throw new NotImplementedException();
 

@@ -18,7 +18,7 @@ abstract class DynamicSizeTypes : ITypeSerializator
     {
         typeSerializators[ETypes.Numeric].Serialize(
             count,
-            stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
+            stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::Core::UInt64").SeedKernelTypeShema,
             serializationTypeRecords,
             typeSerializators);
     }
@@ -47,7 +47,7 @@ abstract class DynamicSizeTypes : ITypeSerializator
 
         typeSerializators[ETypes.Numeric].Deserialize(
             ref data,
-            stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
+            stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::Core::UInt64").SeedKernelTypeShema,
             serializationTypeRecords,
             typeSerializators);
 

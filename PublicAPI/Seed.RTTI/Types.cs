@@ -94,6 +94,16 @@ public unsafe struct UniversalTypeIdentificator
 
 	[FieldOffset(4)]
 	public ID TypeId;
+
+    public static bool operator==(UniversalTypeIdentificator left, UniversalTypeIdentificator right)
+    {
+		return left.Id == right.Id;
+    }
+
+	public static bool operator !=(UniversalTypeIdentificator left, UniversalTypeIdentificator right)
+	{
+		return left.Id != right.Id;
+	}
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]

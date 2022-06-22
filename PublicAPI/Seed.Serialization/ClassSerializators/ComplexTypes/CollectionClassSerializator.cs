@@ -77,7 +77,7 @@ class CollectionClassSerializator : DynamicSizeTypes
 
     public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
+        if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Core::Containers::List"))
         {
             data = this
                 .GetType()
@@ -101,7 +101,7 @@ class CollectionClassSerializator : DynamicSizeTypes
 
     public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-       if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
+       if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Core::Containers::List"))
        {
             this
                 .GetType()
@@ -125,7 +125,7 @@ class CollectionClassSerializator : DynamicSizeTypes
 
     public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
+        if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Core::Containers::List"))
         {
             var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
 

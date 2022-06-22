@@ -6,11 +6,24 @@ using System.Data;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Seed.RTTI;
+using System.IO;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Seed.CTTI;
 
 public class SeedBinnarySerializator : IFormatter
 {
+    private struct RttyTypeRecord
+    {
+        public string TypeName { get; set; }
+        public string SerializationSchema { get; set; }
+        public Guid FullTypeId { get; set; }
+    }
+
+    private List<RttyTypeRecord> AllTypesList = new List<RttyTypeRecord>();
+
     public List<SerializationTypeRecord> SerializationShema { get; private set; } = new List<SerializationTypeRecord>();
 
     Dictionary<ETypes, ITypeSerializator> TypeClassSerializators { get; set;} = new Dictionary<ETypes, ITypeSerializator>();
@@ -29,17 +42,36 @@ public class SeedBinnarySerializator : IFormatter
         LoadMetaDataTypes();
         LoadDynamicDataTypes();
         LoadRttiTypes(rttiSection);
-        LoadFullTypesIds(rttiSection);
+        LoadFullTypesIds();
     }
 
-    private void LoadFullTypesIds(RTTISection rttiSection)
+    private void LoadFullTypesIds()
     {
-        SerializationShema.ForEach(x => x.FullTypeId = rttiSection.AllRegisteredTypes.FirstOrDefault(y => y.TypeName == x.SeedKernelTypeName)?.FullTypeId.Id ?? new Guid());
+        for (int i = 0; i < SerializationShema.Count; i++)
+        {
+            SerializationShema[i] = new SerializationTypeRecord() {
+                FullTypeId = AllTypesList
+                    .FirstOrDefault(y => y.TypeName == SerializationShema[i].SeedKernelTypeName).FullTypeId,
+                ClrType = SerializationShema[i].ClrType,
+                SeedKernelTypeShema = SerializationShema[i].SeedKernelTypeShema
+            };
+        }
     }
 
     private void LoadRttiTypes(RTTISection rttiSection)
     {
         var decoder = new TypeMetaDataDecoder();
+
+        var types = rttiSection.AllRegisteredTypes
+            .Where(x => x.IsValid)
+            .Select(x => new RttyTypeRecord(){
+                TypeName = x.TypeName,
+                SerializationSchema = x.SerializationSchema,
+                FullTypeId = x.FullTypeId.Id
+            })
+            .ToList();
+
+        AllTypesList.AddRange(types);
 
         var serializableTypes = Assembly.GetExecutingAssembly()
             .GetReferencedAssemblies()
@@ -47,13 +79,13 @@ public class SeedBinnarySerializator : IFormatter
             .Select(x => new { Type = x, Attribute = (Attribute.GetCustomAttribute(x, typeof(SeedSerializableAttribute)) as SeedSerializableAttribute) })
             .ToList();
 
-        var mappedTypes = rttiSection.AllRegisteredTypes
-            .Where(x => x.IsValid)
+        var mappedTypes = AllTypesList
             .Where(x => serializableTypes.Any(y => y.Attribute!.SeedKernelTypeName == x.TypeName))
             .Select(x => new SerializationTypeRecord()
             {
                 SeedKernelTypeShema = decoder.DecodeTypeMetaData(x.SerializationSchema),
-                ClrType = serializableTypes.First(y => y.Attribute!.SeedKernelTypeName == x.TypeName).Type
+                ClrType = serializableTypes.First(y => y.Attribute!.SeedKernelTypeName == x.TypeName).Type,
+                FullTypeId = x.FullTypeId
             })
             .ToList();
 
@@ -187,7 +219,7 @@ public class SeedBinnarySerializator : IFormatter
                 ClrType = typeof(DynamicObject),
                 SeedKernelTypeShema = new TypeMetaDataRecord
                 {
-                    TypeName = "Seed::RTTI::Dynamic",
+                    TypeName = "Seed::Core::RTTI::Dynamic",
                     SizeOfSize = sizeof(UInt64),
                     StaticSize = 0,
                     AdditionalInfo = "",
@@ -206,24 +238,24 @@ public class SeedBinnarySerializator : IFormatter
                     .SelectMany(item => item.GetSupportedTypes())
             );
 
-    private void SerializeHeader(Stream serializationStream, string typeName)
+    private void SerializeHeader(Stream serializationStream, Guid typeId)
     {
-        var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(string));
+        var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(Guid));
 
         TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
-            .Serialize(typeName, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
+            .Serialize(typeId, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
     }
 
-    private string DeserializeHeader(Stream serializationStream)
+    private Guid DeserializeHeader(Stream serializationStream)
     {
-        var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(string));
+        var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == typeof(Guid));
         var obj = new object();
-        obj = "";
+        obj = new Guid();
 
         TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
             .Deserialize(ref obj, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
 
-        return (string)obj;
+        return (Guid)obj;
     }
 
     public Type ResolveGenericTypeByTypeMetaData(TypeMetaDataRecord typeMetaDataRecord)
@@ -248,7 +280,8 @@ public class SeedBinnarySerializator : IFormatter
         SerializationShema.Add(new SerializationTypeRecord
         {
             ClrType = type,
-            SeedKernelTypeShema = typeMetaDataRecord
+            SeedKernelTypeShema = typeMetaDataRecord,
+            FullTypeId = TryGetTypeId(typeMetaDataRecord.TypeName)
         });
 
         foreach (var nestedTypeMetaData in typeMetaDataRecord.NestedTypes)
@@ -268,11 +301,19 @@ public class SeedBinnarySerializator : IFormatter
             SerializationShema.Add(new SerializationTypeRecord
             {
                 ClrType = type,
-                SeedKernelTypeShema = nestedTypeMetaData
+                SeedKernelTypeShema = nestedTypeMetaData,
+                FullTypeId = TryGetTypeId(typeMetaDataRecord.TypeName)
             });
 
             TryRegisterTypeAndSubTypesByTypeMetaData(nestedTypeMetaData);
         }
+    }
+
+    private Guid TryGetTypeId(string SeedKernelName)
+    {
+        var decoder = new TypeMetaDataDecoder();
+
+        return AllTypesList.Where(x => decoder.DecodeTypeMetaData(x.SerializationSchema).TypeName == SeedKernelName).FirstOrDefault().FullTypeId;
     }
 
     public void RegisterType(SerializationTypeRecord serializationTypeRecord)
@@ -286,22 +327,23 @@ public class SeedBinnarySerializator : IFormatter
 
         if (!SerializationShema.Exists(shema => shema.ClrType == serializationTypeRecord.ClrType))
         {
+            serializationTypeRecord.FullTypeId = TryGetTypeId(serializationTypeRecord.SeedKernelTypeName);
             SerializationShema.Add(serializationTypeRecord);
         }
     }
 
     public object Deserialize(Stream serializationStream)
     {
-        string typeName = DeserializeHeader(serializationStream);
+        Guid typeId = DeserializeHeader(serializationStream);
 
-        if (!SerializationShema.Exists(serilizator => serilizator.SeedKernelTypeName == typeName))
+        if (!SerializationShema.Exists(serilizator => serilizator.FullTypeId == typeId))
         {
             throw new NotSupportedException("Not supported type for deserialization");
         }
         
         var obj = new object();
 
-        var typeMetaData = SerializationShema.First(serilizator => serilizator.SeedKernelTypeName == typeName);
+        var typeMetaData = SerializationShema.First(serilizator => serilizator.FullTypeId == typeId);
 
         TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
             .Deserialize(ref obj, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
@@ -319,7 +361,7 @@ public class SeedBinnarySerializator : IFormatter
 
         var typeMetaData = SerializationShema.First(serilizator => serilizator.ClrType == graph.GetType());
 
-        SerializeHeader(serializationStream, typeMetaData.SeedKernelTypeName);
+        SerializeHeader(serializationStream, typeMetaData.FullTypeId);
 
         TypeClassSerializators[typeMetaData.SeedKernelTypeClass]
             .Serialize(graph, serializationStream, typeMetaData.SeedKernelTypeShema, SerializationShema, TypeClassSerializators);
@@ -391,7 +433,7 @@ public class SeedBinnarySerializator : IFormatter
                 Type = serializableStructAttribute.TypeClass,
                 TypeName = serializableStructAttribute.SeedKernelTypeName,
                 AdditionalInfo = new TypeMetaDataDecoder().EncodeStructFieldSchema(structSchema)
-            }
+            },
         };
 
         SerializationShema.Add(typeRecord);

@@ -10,8 +10,8 @@ class StringClassSerialization : DynamicSizeTypes
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::String":
-            case "Seed::SencitiveString":
+            case "Seed::Core::String":
+            case "Seed::Core::SencitiveString":
                 {
                     var strSize = GetItemsCount(stream, serializationTypeRecords, typeSerializators) - 1;
 
@@ -30,12 +30,13 @@ class StringClassSerialization : DynamicSizeTypes
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::String":
-            case "Seed::SencitiveString":
+            case "Seed::Core::String":
+            case "Seed::Core::SencitiveString":
                 {
                     var str = (string)data;
+                    var bytes = Encoding.Unicode.GetBytes(str);
                     WriteItemsCount((ulong)str.Length + 1, stream, serializationTypeRecords, typeSerializators);
-                    stream.Write(Encoding.Unicode.GetBytes(str), 0, str.Length * sizeof(char));
+                    stream.Write(bytes, 0, bytes.Length);
                     stream.Write(Encoding.Unicode.GetBytes(new char[]{'\0' }), 0, 1 * sizeof(char));
                 }
                 break;

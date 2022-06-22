@@ -30,7 +30,7 @@ class DynamicClassSerializator : DynamicSizeTypes
         typeSerializators[ETypes.String].Deserialize(
             ref obj,
             stream,
-            serializationTypeRecords.Where(record => record.SeedKernelTypeName == "Seed::String").First().SeedKernelTypeShema,
+            serializationTypeRecords.Where(record => record.SeedKernelTypeName == "Seed::Core::String").First().SeedKernelTypeShema,
             serializationTypeRecords,
             typeSerializators);
 
@@ -57,7 +57,7 @@ class DynamicClassSerializator : DynamicSizeTypes
         typeSerializators[ETypes.String].Serialize(
             typeRecord.SeedKernelTypeName,
             stream,
-            serializationTypeRecords.Where(record => record.SeedKernelTypeName == "Seed::String").First().SeedKernelTypeShema,
+            serializationTypeRecords.Where(record => record.SeedKernelTypeName == "Seed::Core::String").First().SeedKernelTypeShema,
             serializationTypeRecords,
             typeSerializators);
 
@@ -70,8 +70,8 @@ class DynamicClassSerializator : DynamicSizeTypes
 
     public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        if (thisTypeSerializationTypeRecord.TypeName == "Seed::Containers::Dynamic" ||
-            thisTypeSerializationTypeRecord.TypeName == "Seed::Reflection::DynamicObject")
+        if (thisTypeSerializationTypeRecord.TypeName == "Seed::Core::Containers::Dynamic" ||
+            thisTypeSerializationTypeRecord.TypeName == "Seed::Core::Reflection::DynamicObject")
         {
             return typeof(DynamicObject);
         }

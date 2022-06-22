@@ -9,7 +9,7 @@ class LogicClassSerializator : SimpeTypeSerializator
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::Boolean":
+            case "Seed::Core::Boolean":
                 {
                     byte[] buffer = new byte[sizeof(bool)];
                     stream.Read(buffer, 0, sizeof(bool));
@@ -25,7 +25,7 @@ class LogicClassSerializator : SimpeTypeSerializator
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::Boolean":
+            case "Seed::Core::Boolean":
                 {
                     bool val = (bool)data;
                     stream.Write(BitConverter.GetBytes(val), 0, 1);
@@ -43,7 +43,7 @@ class LogicClassSerializator : SimpeTypeSerializator
             ClrType = typeof(bool),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::Boolean",
+                TypeName = "Seed::Core::Boolean",
                 SizeOfSize = sizeof(double),
                 StaticSize = sizeof(double),
                 AdditionalInfo = "",

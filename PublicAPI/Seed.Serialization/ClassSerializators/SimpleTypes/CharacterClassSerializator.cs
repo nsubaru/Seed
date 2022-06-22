@@ -9,35 +9,35 @@ class CharacterClassSerializator : SimpeTypeSerializator
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::AChar":
+            case "Seed::Core::AChar":
                 {
                     byte[] buffer = new byte[sizeof(byte)];
                     stream.Read(buffer, 0, sizeof(byte));
                     data = buffer[0];
                 }
                 break;
-            case "Seed::UChar":
+            case "Seed::Core::UChar":
                 {
                     byte[] buffer = new byte[sizeof(char)];
                     stream.Read(buffer, 0, sizeof(char));
                     data = BitConverter.ToChar(buffer, 0);
                 }
                 break;
-            case "Seed::U8Char":
+            case "Seed::Core::U8Char":
                 {
                     byte[] buffer = new byte[sizeof(byte)];
                     stream.Read(buffer, 0, sizeof(byte));
                     data = buffer[0];
                 }
                 break;
-            case "Seed::U16Char":
+            case "Seed::Core::U16Char":
                 {
                     byte[] buffer = new byte[sizeof(char)];
                     stream.Read(buffer, 0, sizeof(char));
                     data = BitConverter.ToChar(buffer, 0);
                 }
                 break;
-            case "Seed::U32Char":
+            case "Seed::Core::U32Char":
                 {
                     byte[] buffer = new byte[sizeof(Int32)];
                     stream.Read(buffer, 0, sizeof(Int32));
@@ -53,31 +53,31 @@ class CharacterClassSerializator : SimpeTypeSerializator
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::AChar":
+            case "Seed::Core::AChar":
                 {
                     var val = (byte)data;
                     stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));
                 }
                 break;
-            case "Seed::UChar":
+            case "Seed::Core::UChar":
                 {
                     var val = (char)data;
                     stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));
                 }
                 break;
-            case "Seed::U8Char":
+            case "Seed::Core::U8Char":
                 {
                     var val = (byte)data;
                     stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));
                 }
                 break;
-            case "Seed::U16Char":
+            case "Seed::Core::U16Char":
                 {
                     var val = (char)data;
                     stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));
                 }
                 break;
-            case "Seed::U32Char":
+            case "Seed::Core::U32Char":
                 {
                     var val = (UInt32)data;
                     stream.Write(BitConverter.GetBytes(val), 0, sizeof(int));
@@ -95,7 +95,7 @@ class CharacterClassSerializator : SimpeTypeSerializator
             ClrType = typeof(byte),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::AChar",
+                TypeName = "Seed::Core::AChar",
                 SizeOfSize = sizeof(byte),
                 StaticSize = sizeof(byte),
                 AdditionalInfo = "ASCII",
@@ -108,7 +108,7 @@ class CharacterClassSerializator : SimpeTypeSerializator
             ClrType = typeof(char),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::UChar",
+                TypeName = "Seed::Core::UChar",
                 SizeOfSize = sizeof(char),
                 StaticSize = sizeof(char),
                 AdditionalInfo = "UTF-16",
@@ -121,7 +121,7 @@ class CharacterClassSerializator : SimpeTypeSerializator
             ClrType = typeof(byte),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::U8Char",
+                TypeName = "Seed::Core::U8Char",
                 SizeOfSize = sizeof(byte),
                 StaticSize = sizeof(byte),
                 AdditionalInfo = "UTF-8",
@@ -134,7 +134,7 @@ class CharacterClassSerializator : SimpeTypeSerializator
             ClrType = typeof(char),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::U16Char",
+                TypeName = "Seed::Core::U16Char",
                 SizeOfSize = sizeof(char),
                 StaticSize = sizeof(char),
                 AdditionalInfo = "UTF-16",
@@ -147,7 +147,7 @@ class CharacterClassSerializator : SimpeTypeSerializator
             ClrType = typeof(Int32),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::U32Char",
+                TypeName = "Seed::Core::U32Char",
                 SizeOfSize = sizeof(Int32),
                 StaticSize = sizeof(Int32),
                 AdditionalInfo = "UTF-32",

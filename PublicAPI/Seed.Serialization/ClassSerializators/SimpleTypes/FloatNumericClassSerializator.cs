@@ -9,14 +9,14 @@ class FloatNumericClassSerializator : SimpeTypeSerializator
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::Float":
+            case "Seed::Core::Float":
                 {
                     byte[] buffer = new byte[sizeof(float)];
                     stream.Read(buffer, 0, sizeof(float));
                     data = BitConverter.ToSingle(buffer, 0);
                 }
                 break;
-            case "Seed::Double":
+            case "Seed::Core::Double":
                 {
                     byte[] buffer = new byte[sizeof(double)];
                     stream.Read(buffer, 0, sizeof(double));
@@ -32,13 +32,13 @@ class FloatNumericClassSerializator : SimpeTypeSerializator
     {
         switch (thisTypeSerializationTypeRecord.TypeName)
         {
-            case "Seed::Float":
+            case "Seed::Core::Float":
                 {
                     var val = (float)data;
                     stream.Write(BitConverter.GetBytes(val), 0, sizeof(float));
                 }
                 break;
-            case "Seed::Double":
+            case "Seed::Core::Double":
                 {
                     var val = (double)data;
                     stream.Write(BitConverter.GetBytes(val), 0, sizeof(double));
@@ -56,7 +56,7 @@ class FloatNumericClassSerializator : SimpeTypeSerializator
             ClrType = typeof(float),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::Float",
+                TypeName = "Seed::Core::Float",
                 SizeOfSize = sizeof(float),
                 StaticSize = sizeof(float),
                 AdditionalInfo = "",
@@ -69,7 +69,7 @@ class FloatNumericClassSerializator : SimpeTypeSerializator
             ClrType = typeof(double),
             SeedKernelTypeShema = new TypeMetaDataRecord
             {
-                TypeName = "Seed::Double",
+                TypeName = "Seed::Core::Double",
                 SizeOfSize = sizeof(double),
                 StaticSize = sizeof(double),
                 AdditionalInfo = "",

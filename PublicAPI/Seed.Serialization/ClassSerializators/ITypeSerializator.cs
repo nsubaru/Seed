@@ -1,5 +1,8 @@
 ﻿using Seed.CTTI;
 using Seed.CTTI.MetaData;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Seed.CTTI.ClassSerializators;
 
