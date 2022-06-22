@@ -2,12 +2,20 @@
 
 namespace Seed.RTTI.Record;
 
-public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, RttiIterableObject<T>, new()
+/// <summary>
+/// A base RTTI field class
+/// </summary>
+/// <typeparam name="THeap">Heap type</typeparam>
+/// <typeparam name="T"></typeparam>
+public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, IRttiIterableObject<T>, new()
 {
     internal Collection* @base;
     internal SizeT imageBase;
     internal bool isValidCxxTypeId;
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     internal RttiCollection(Collection* @base, ulong imageBase, bool isValidCxxTypeId)
     {
         this.@base = @base;
@@ -15,6 +23,10 @@ public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, RttiIter
         this.isValidCxxTypeId = isValidCxxTypeId;
     }
 
+    /// <summary>
+    /// Receiving the iterator to collection
+    /// </summary>
+    /// <returns>Iterator to collection</returns>
     public IEnumerator<T> GetEnumerator()
     {
         if (@base != null && @base->Count != 0)
@@ -32,10 +44,18 @@ public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, RttiIter
         }
     }
 
+    /// <summary>
+    /// Receiving the iterator to collection
+    /// </summary>
+    /// <returns>Iterator to collection</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
 
+    /// <summary>
+    /// Recieving the count of collection items
+    /// </summary>
+    /// <returns>Count of collection items</returns>
     public SizeT Count => @base == null ? 0 : @base->Count;
 }

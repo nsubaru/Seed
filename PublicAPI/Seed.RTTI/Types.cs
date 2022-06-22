@@ -1,15 +1,25 @@
 ﻿namespace Seed.RTTI;
 
+//HACK: Enum values is incorect,
+//      because Seed kernel EnumFlags use item index starting from 1 as index of bit
+//      whereas C# [Flags] atributed enum use enum value as bit mask
+
 [Flags]
 public enum ETypeModificators : byte
 {
-	Const, Volatile, Serilizable
+	Const        = 1, 
+	Volatile     = 2,
+	Serilizable  = 4,
+	TemplateType = 8
 }
 
 [Flags]
 public enum ECvRefModificators : SizeT
 {
-	Ref, RValueRef, Const, Volatile
+	Ref       = 1, 
+	RValueRef = 2,
+	Const     = 4, 
+	Volatile  = 8
 }
 
 public enum ECustomTypeSchemaFormat : byte

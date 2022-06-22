@@ -1,13 +1,25 @@
 ﻿using Seed.RTTI.Record;
-using Seed.RTTI.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Seed.RTTI;
 
+/// <summary>
+/// This type contain raw internal rtti section
+/// <remarks>
+/// <para>RTTI section in executable have name .type and have next structure:</para>
+/// <para> .type$a  - Magic number (<c>Seed::Core::RTTI::SectionMagicNumber</c> variable)</para>
+/// <para> .type$b  - Section header (have all neaded information and have type <c>Seed.RTTI.SectionHeaderType</c></para>
+/// <para> .type$fa - Start of pointer subsection (this subsection store pointers to all type records)</para>
+/// <para> .type$fz - End of pointer subsection</para>
+/// <para> .type$va - Start of variable subsection (this subsection store type records of internal type <c>Seed.RTTI.MetaData</c>)</para>
+/// <para> .type$vz - End of variable subsection</para>
+/// <para> .type$z  - End of rtti section</para>
+/// <para> 
+/// For iterating over all rtti records this class iterate over pointer subsection and using adresses of meta data records build RttiTypeRecord 
+/// Before and during iterating this class convert absolut pointers adresses to current one
+/// </para>
+/// </remarks>
+/// </summary>
 public unsafe class RTTISection : IDisposable
 {
     static readonly string MagicNumer = "SEED_RXX_RTTI\0";
@@ -25,6 +37,10 @@ public unsafe class RTTISection : IDisposable
 	private List<RttiTypeRecord> registeredRecords;
     private bool disposedValue;
 
+    /// <summary>
+    /// Load RTTI section from raw blob
+    /// </summary>
+    /// <param name="data">Blob with rtti section</param>
     public RTTISection(byte[] data)
     {
 		rawArrayPtrHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -136,6 +152,11 @@ public unsafe class RTTISection : IDisposable
         this.registeredRecords = records;
     }
 
+    /// <summary>
+    /// Return RttiTypeRecord from current section
+    /// This records have some limitation during that they don't have 
+    /// </summary>
+    /// <returns>Lis of </returns>
     internal List<RttiTypeRecord> GetAllRegisteredTypes()
     {
         if (this.registeredRecords.Count == 0)
@@ -144,8 +165,16 @@ public unsafe class RTTISection : IDisposable
         return this.registeredRecords;
     }
 
+    /// <summary>
+    /// All records stored in this rtti section, 
+    /// not all records valid so ypu should check IsValid before use
+    /// </summary>
     public List<RttiTypeRecord> AllRegisteredTypes => GetAllRegisteredTypes();
 
+    /// <summary>
+    /// Return kernel version with which this section was builded
+    /// </summary>
+    /// <returns>KernelVersion struct</returns>
     internal KernelVersionT GetKernelVersion()
     {
         var @base = this.rawArrayPtr;
@@ -155,5 +184,8 @@ public unsafe class RTTISection : IDisposable
         return header->KernelVersion;
     }
 
+    /// <summary>
+    /// Kernel version with which this section was builded
+    /// </summary>
     public KernelVersionT KernelVersion => GetKernelVersion();
 }
