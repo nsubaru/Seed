@@ -1,49 +1,45 @@
-﻿using Seed.Serialization.MetaData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using Seed.CTTI;
+using Seed.CTTI.MetaData;
 
-namespace Seed.Serialization.ClassSerializators.SimpleTypes
+namespace Seed.CTTI.ClassSerializators.SimpleTypes;
+
+class EnumerationClassSerializator : ITypeSerializator
 {
-    class EnumerationClassSerializator : ITypeSerializator
+    public void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        public void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+        Type type = data.GetType();
+
+        if (type.IsEnum)
         {
-            Type type = data.GetType();
-
-            if (type.IsEnum)
-            {
-                object underlyingData = Convert.ChangeType(data, Enum.GetUnderlyingType(type));
-                typeSerializators[ETypes.Numeric]
-                    .Deserialize(ref underlyingData, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
-                data = Enum.ToObject(type, underlyingData);
-            }
-            else
-            {
-                typeSerializators[ETypes.Numeric]
-                    .Deserialize(ref data, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
-            }
+            object underlyingData = Convert.ChangeType(data, Enum.GetUnderlyingType(type));
+            typeSerializators[ETypes.Numeric]
+                .Deserialize(ref underlyingData, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
+            data = Enum.ToObject(type, underlyingData);
         }
-
-        public void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+        else
         {
-            Type type = data.GetType();
-
-            if (type.IsEnum)
-            {
-                object underlyingData = Convert.ChangeType(data, Enum.GetUnderlyingType(type));
-                typeSerializators[ETypes.Numeric]
-                    .Serialize(underlyingData, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
-            }
-            else
-            {
-                typeSerializators[ETypes.Numeric]
-                    .Serialize(data, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
-            }
+            typeSerializators[ETypes.Numeric]
+                .Deserialize(ref data, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
         }
-
-        public Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators) 
-            => typeSerializators[ETypes.Numeric].TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
     }
+
+    public void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        Type type = data.GetType();
+
+        if (type.IsEnum)
+        {
+            object underlyingData = Convert.ChangeType(data, Enum.GetUnderlyingType(type));
+            typeSerializators[ETypes.Numeric]
+                .Serialize(underlyingData, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
+        }
+        else
+        {
+            typeSerializators[ETypes.Numeric]
+                .Serialize(data, stream, thisTypeSerializationTypeRecord.NestedTypes[0], serializationTypeRecords, typeSerializators);
+        }
+    }
+
+    public Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators) 
+        => typeSerializators[ETypes.Numeric].TryResolveTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
 }
