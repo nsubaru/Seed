@@ -1,87 +1,82 @@
-﻿using Seed.Serialization.MetaData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Seed.CTTI.MetaData;
+using Seed.CTTI;
 
-namespace Seed.Serialization.ClassSerializators
+namespace Seed.CTTI.ClassSerializators;
+
+abstract class DynamicSizeTypes : ITypeSerializator
 {
-    abstract class DynamicSizeTypes : ITypeSerializator
+    public abstract void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators);
+    public abstract void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators);
+    public abstract Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators);
+
+    #region Serialization implementation
+    public void WriteItemsCount(
+        UInt64 count,
+        Stream stream, 
+        List<SerializationTypeRecord> serializationTypeRecords,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        public abstract void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serelizationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators);
-        public abstract void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serelizationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators);
-        public abstract Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators);
-
-        #region Serialization implementation
-        public void WriteItemsCount(
-            UInt64 count,
-            Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            typeSerelizators[ETypes.Numeric].Serialize(
-                count,
-                stream, serelizationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
-                serelizationTypeRecords,
-                typeSerelizators);
-        }
-
-        public void SerializeItem<T>(
-            T item,
-            Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
-            TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-
-            typeSerelizators[thisTypeSerializationTypeRecord.Type]
-                .Serialize(item, stream, thisTypeSerializationTypeRecord, serelizationTypeRecords, typeSerelizators);
-        }
-
-        #endregion
-
-        #region Deserilization implementation
-        public UInt64 GetItemsCount(
-            Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            object data = new object();
-            data = (UInt64)0;
-
-            typeSerelizators[ETypes.Numeric].Deserialize(
-                ref data,
-                stream, serelizationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
-                serelizationTypeRecords,
-                typeSerelizators);
-
-            return (UInt64)data;
-        }
-
-        public T DeserializeItem<T>(
-            Stream stream, 
-            List<SerializationTypeRecord> serelizationTypeRecords,
-            TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            T var = default;
-            object data = var;
-
-            typeSerelizators[thisTypeSerializationTypeRecord.Type]
-                .Deserialize(ref data, stream, thisTypeSerializationTypeRecord, serelizationTypeRecords, typeSerelizators);
-
-            return (T)data;
-        }
-        #endregion
-
-        #region TypeResolver
-
-        public Type TryResolveSubTypeByTypeMetaDataRecord(TypeMetaDataRecord subTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            return typeSerelizators[subTypeSerializationTypeRecord.Type]
-                .TryResolveTypeByTypeMetaDataRecord(subTypeSerializationTypeRecord, typeSerelizators);
-        }
-
-        #endregion
+        typeSerializators[ETypes.Numeric].Serialize(
+            count,
+            stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
+            serializationTypeRecords,
+            typeSerializators);
     }
+
+    public void SerializeItem<T>(
+        T item,
+        Stream stream, 
+        List<SerializationTypeRecord> serializationTypeRecords,
+        TypeMetaDataRecord thisTypeSerializationTypeRecord,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        typeSerializators[thisTypeSerializationTypeRecord.Type]
+            .Serialize(item, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators);
+    }
+
+    #endregion
+
+    #region Deserilization implementation
+    public UInt64 GetItemsCount(
+        Stream stream, 
+        List<SerializationTypeRecord> serializationTypeRecords,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        object data = new object();
+        data = (UInt64)0;
+
+        typeSerializators[ETypes.Numeric].Deserialize(
+            ref data,
+            stream, serializationTypeRecords.First(item => item.SeedKernelTypeName == "Seed::UInt64").SeedKernelTypeShema,
+            serializationTypeRecords,
+            typeSerializators);
+
+        return (UInt64)data;
+    }
+
+    public T DeserializeItem<T>(
+        Stream stream, 
+        List<SerializationTypeRecord> serializationTypeRecords,
+        TypeMetaDataRecord thisTypeSerializationTypeRecord,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        T var = default;
+        object data = var;
+
+        typeSerializators[thisTypeSerializationTypeRecord.Type]
+            .Deserialize(ref data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators);
+
+        return (T)data;
+    }
+    #endregion
+
+    #region TypeResolver
+
+    public Type TryResolveSubTypeByTypeMetaDataRecord(TypeMetaDataRecord subTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        return typeSerializators[subTypeSerializationTypeRecord.Type]
+            .TryResolveTypeByTypeMetaDataRecord(subTypeSerializationTypeRecord, typeSerializators);
+    }
+
+    #endregion
 }

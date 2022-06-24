@@ -1,154 +1,147 @@
-﻿using Seed.Serialization.MetaData;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using Seed.CTTI;
+using Seed.CTTI.MetaData;
 
-namespace Seed.Serialization.ClassSerializators
+namespace Seed.CTTI.ClassSerializators;
+
+class CollectionClassSerializator : DynamicSizeTypes
 {
-    class CollectionClassSerializator : DynamicSizeTypes
+    #region Serialization implementation
+    public void SerializeArrayList<T>(
+        List<T> arrayList,
+        Stream stream, 
+        TypeMetaDataRecord thisTypeSerializationTypeRecord,
+        List<SerializationTypeRecord> serializationTypeRecords,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        #region Serialization implementation
-        public void SerializeArrayList<T>(
-            List<T> arrayList,
-            Stream stream, 
-            TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            WriteItemsCount((ulong)arrayList.Count, stream, serializationTypeRecords, typeSerelizators);
+        WriteItemsCount((ulong)arrayList.Count, stream, serializationTypeRecords, typeSerializators);
 
-            foreach (var item in arrayList)
-            {
-                SerializeItem(item, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
-            }
+        foreach (var item in arrayList)
+        {
+            SerializeItem(item, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
+        }
+    }
+
+    public void SerializeLinkedList<T>(
+        LinkedList<T> arrayList,
+        Stream stream, 
+        TypeMetaDataRecord thisTypeSerializationTypeRecord,
+        List<SerializationTypeRecord> serializationTypeRecords,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        WriteItemsCount((ulong)arrayList.Count, stream, serializationTypeRecords, typeSerializators);
+
+        foreach (var item in arrayList)
+        {
+            SerializeItem(item, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
+        }
+    }
+    #endregion
+
+    #region Deserialization implementation
+    public object DeserializeArrayList<T>(
+        Stream stream, 
+        TypeMetaDataRecord thisTypeSerializationTypeRecord,
+        List<SerializationTypeRecord> serializationTypeRecords,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        var count = GetItemsCount(stream, serializationTypeRecords, typeSerializators);
+        
+        List<T> items = new List<T>();
+
+        for (UInt64 i = 0; i < count; i++)
+        {
+            items.Add(DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators));
         }
 
-        public void SerializeLinkedList<T>(
-            LinkedList<T> arrayList,
-            Stream stream, 
-            TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        return items;
+    }
+
+    public object DeserializeLinkedList<T>(
+        Stream stream, 
+        TypeMetaDataRecord thisTypeSerializationTypeRecord,
+        List<SerializationTypeRecord> serializationTypeRecords,
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        var count = GetItemsCount(stream, serializationTypeRecords, typeSerializators);
+        
+        LinkedList<T> items = new LinkedList<T>();
+
+        for (UInt64 i = 0; i < count; i++)
         {
-            WriteItemsCount((ulong)arrayList.Count, stream, serializationTypeRecords, typeSerelizators);
-
-            foreach (var item in arrayList)
-            {
-                SerializeItem(item, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
-            }
-        }
-        #endregion
-
-        #region Deserialization implementation
-        public object DeserializeArrayList<T>(
-            Stream stream, 
-            TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            var count = GetItemsCount(stream, serializationTypeRecords, typeSerelizators);
-            
-            List<T> items = new List<T>();
-
-            for (UInt64 i = 0; i < count; i++)
-            {
-                items.Add(DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators));
-            }
-
-            return items;
+            items.AddLast(DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators));
         }
 
-        public object DeserializeLinkedList<T>(
-            Stream stream, 
-            TypeMetaDataRecord thisTypeSerializationTypeRecord,
-            List<SerializationTypeRecord> serializationTypeRecords,
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        return items;
+    }
+    #endregion
+
+    public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
         {
-            var count = GetItemsCount(stream, serializationTypeRecords, typeSerelizators);
-            
-            LinkedList<T> items = new LinkedList<T>();
-
-            for (UInt64 i = 0; i < count; i++)
-            {
-                items.AddLast(DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators));
-            }
-
-            return items;
+            data = this
+                .GetType()
+                .GetMethod("DeserializeLinkedList")
+                .MakeGenericMethod(serializationTypeRecords
+                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                        .ClrType)
+                .Invoke(this, new object[]{stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators});
         }
-        #endregion
-
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        else
         {
-            if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
-            {
-                data = this
-                    .GetType()
-                    .GetMethod("DeserializeLinkedList")
-                    .MakeGenericMethod(serializationTypeRecords
-                            .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                            .ClrType)
-                    .Invoke(this, new object[]{stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators});
-            }
-            else
-            {
-                data = this
-                    .GetType()
-                    .GetMethod("DeserializeArrayList")
-                    .MakeGenericMethod(serializationTypeRecords
-                            .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                            .ClrType)
-                    .Invoke(this, new object[]{stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators});
-            }
+            data = this
+                .GetType()
+                .GetMethod("DeserializeArrayList")
+                .MakeGenericMethod(serializationTypeRecords
+                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                        .ClrType)
+                .Invoke(this, new object[]{stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators});
         }
+    }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-           if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
-           {
-                this
-                    .GetType()
-                    .GetMethod("SerializeLinkedList")
-                    .MakeGenericMethod(serializationTypeRecords
-                            .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                            .ClrType)
-                    .Invoke(this, new object[]{data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators});
-            }
-            else
-            {
-               this
-                    .GetType()
-                    .GetMethod("SerializeArrayList")
-                    .MakeGenericMethod(serializationTypeRecords
-                            .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                            .ClrType)
-                    .Invoke(this, new object[]{data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators});
-            }
+    public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+       if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
+       {
+            this
+                .GetType()
+                .GetMethod("SerializeLinkedList")
+                .MakeGenericMethod(serializationTypeRecords
+                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                        .ClrType)
+                .Invoke(this, new object[]{data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators});
         }
-
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        else
         {
-            if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
-            {
-                var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+           this
+                .GetType()
+                .GetMethod("SerializeArrayList")
+                .MakeGenericMethod(serializationTypeRecords
+                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                        .ClrType)
+                .Invoke(this, new object[]{data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators});
+        }
+    }
 
-                if(subType == null)
-                    return null;
+    public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        if (thisTypeSerializationTypeRecord.TypeName.StartsWith("Seed::Containers::List"))
+        {
+            var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
 
-                return typeof(LinkedList<>).MakeGenericType(subType);
-            }
-            else
-            {
-                var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
+            if(subType == null)
+                return null;
 
-                if(subType == null)
-                    return null;
+            return typeof(LinkedList<>).MakeGenericType(subType);
+        }
+        else
+        {
+            var subType = TryResolveSubTypeByTypeMetaDataRecord(thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
 
-                return typeof(List<>).MakeGenericType(subType);
-            }
+            if(subType == null)
+                return null;
+
+            return typeof(List<>).MakeGenericType(subType);
         }
     }
 }

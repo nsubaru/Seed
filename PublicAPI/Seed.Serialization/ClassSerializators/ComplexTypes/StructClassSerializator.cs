@@ -1,115 +1,110 @@
-﻿using Seed.Serialization.MetaData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using Seed.CTTI;
+using Seed.CTTI.MetaData;
 
-namespace Seed.Serialization.ClassSerializators.ComplexTypes
+namespace Seed.CTTI.ClassSerializators.ComplexTypes;
+
+class StructClassSerializator : DynamicSizeTypes
 {
-    class StructClassSerializator : DynamicSizeTypes
+    private void StructSerializatorImpl<T>(
+        T data, 
+        Stream stream, 
+        TypeMetaDataRecord thisTypeSerializationTypeRecord, 
+        List<SerializationTypeRecord> serializationTypeRecords, 
+        Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        private void StructSerelizatorImpl<T>(
-            T data, 
-            Stream stream, 
-            TypeMetaDataRecord thisTypeSerializationTypeRecord, 
-            List<SerializationTypeRecord> serializationTypeRecords, 
-            Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+        var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
+
+        foreach (var fieldSchema in fieldsSchema)
         {
-            var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
+            var propValue = typeof(T)
+                .GetProperties()
+                .Where(prop => prop
+                    .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false)
+                    .Any(attrbs => (attrbs as SerializableStructFieldAttribute)
+                    .FieldInformation.FieldName == fieldSchema.FieldName))
+                .First()
+                .GetValue(data);
 
-            foreach (var fieldSchema in fieldsSchema)
-            {
-                var propValue = typeof(T)
-                    .GetProperties()
-                    .Where(prop => prop
-                        .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false)
-                        .Any(attrbs => (attrbs as SerializableStructFieldAttribute)
-                        .FieldInformation.FieldName == fieldSchema.FieldName))
-                    .First()
-                    .GetValue(data);
+            var serializatorSchema = thisTypeSerializationTypeRecord
+                .NestedTypes
+                .Where(type => type.TypeName == fieldSchema.FieldTypeName)
+                .First();
 
-                var serializatorSchema = thisTypeSerializationTypeRecord
-                    .NestedTypes
-                    .Where(type => type.TypeName == fieldSchema.FieldTypeName)
-                    .First();
-
-                GetType()
-                    .GetMethod("SerializeItem")
-                    .MakeGenericMethod(propValue.GetType())
-                    .Invoke(this, new object[] { propValue, stream, serializatorSchema, serializationTypeRecords, typeSerelizators });
-            }
+            GetType()
+                .GetMethod("SerializeItem")
+                .MakeGenericMethod(propValue.GetType())
+                .Invoke(this, new object[] { propValue, stream, serializatorSchema, serializationTypeRecords, typeSerializators });
         }
+    }
 
 
 
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+    public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
+
+        data = Activator.CreateInstance(serializationTypeRecords
+            .First(record => record.SeedKernelTypeName == thisTypeSerializationTypeRecord.TypeName)
+            .ClrType);
+
+        foreach (var fieldSchema in fieldsSchema)
         {
-            var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
+            var propType = data
+                .GetType()
+                .GetProperties()
+                .Where(prop => prop
+                    .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false)
+                    .Any(attrbs => (attrbs as SerializableStructFieldAttribute)
+                    .FieldInformation.FieldName == fieldSchema.FieldName))
+                .First()
+                .PropertyType;
 
-            data = Activator.CreateInstance(serializationTypeRecords
-                .First(record => record.SeedKernelTypeName == thisTypeSerializationTypeRecord.TypeName)
-                .ClrType);
+            var serializatorSchema = thisTypeSerializationTypeRecord
+                .NestedTypes
+                .Where(type => type.TypeName == fieldSchema.FieldTypeName)
+                .First();
 
-            foreach (var fieldSchema in fieldsSchema)
-            {
-                var propType = data
-                    .GetType()
-                    .GetProperties()
-                    .Where(prop => prop
-                        .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false)
-                        .Any(attrbs => (attrbs as SerializableStructFieldAttribute)
-                        .FieldInformation.FieldName == fieldSchema.FieldName))
-                    .First()
-                    .PropertyType;
+            var value = GetType()
+                .GetMethod("DeserializeItem")
+                .MakeGenericMethod(propType)
+                .Invoke(this, new object[] { stream, serializationTypeRecords, serializatorSchema, typeSerializators });
 
-                var serializatorSchema = thisTypeSerializationTypeRecord
-                    .NestedTypes
-                    .Where(type => type.TypeName == fieldSchema.FieldTypeName)
-                    .First();
-
-                var value = GetType()
-                    .GetMethod("DeserializeItem")
-                    .MakeGenericMethod(propType)
-                    .Invoke(this, new object[] { stream, serializationTypeRecords, serializatorSchema, typeSerelizators });
-
-                data
-                    .GetType()
-                    .GetProperties()
-                    .Where(prop => prop.Name == fieldSchema.FieldName)
-                    .First()
-                    .SetValue(data, value);
-            }
+            data
+                .GetType()
+                .GetProperties()
+                .Where(prop => prop.Name == fieldSchema.FieldName)
+                .First()
+                .SetValue(data, value);
         }
+    }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
+    public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
+
+        foreach (var fieldSchema in fieldsSchema)
         {
-            var fieldsSchema = new TypeMetaDataDecoder().DecodeStructFieldsSchema(thisTypeSerializationTypeRecord.AdditionalInfo);
+            var propValue = data
+                .GetType()
+                .GetProperties()
+                .Where(prop => prop.Name == fieldSchema.FieldName)
+                .First()
+                .GetValue(data);
 
-            foreach (var fieldSchema in fieldsSchema)
-            {
-                var propValue = data
-                    .GetType()
-                    .GetProperties()
-                    .Where(prop => prop.Name == fieldSchema.FieldName)
-                    .First()
-                    .GetValue(data);
+            var serializatorSchema = thisTypeSerializationTypeRecord
+                .NestedTypes
+                .Where(type => type.TypeName == fieldSchema.FieldTypeName)
+                .First();
 
-                var serializatorSchema = thisTypeSerializationTypeRecord
-                    .NestedTypes
-                    .Where(type => type.TypeName == fieldSchema.FieldTypeName)
-                    .First();
-
-                GetType()
-                    .GetMethod("SerializeItem")
-                    .MakeGenericMethod(propValue.GetType())
-                    .Invoke(this, new object[] { propValue, stream, serializationTypeRecords, serializatorSchema, typeSerelizators });
-            }
+            GetType()
+                .GetMethod("SerializeItem")
+                .MakeGenericMethod(propValue.GetType())
+                .Invoke(this, new object[] { propValue, stream, serializationTypeRecords, serializatorSchema, typeSerializators });
         }
+    }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            throw new NotImplementedException();
-        }
+    public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        throw new NotImplementedException();
     }
 }

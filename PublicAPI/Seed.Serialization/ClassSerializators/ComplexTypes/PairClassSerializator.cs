@@ -1,76 +1,71 @@
-﻿using Seed.Serialization.MetaData;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using Seed.CTTI;
+using Seed.CTTI.MetaData;
 
-namespace Seed.Serialization.ClassSerializators.ComplexTypes
+namespace Seed.CTTI.ClassSerializators.ComplexTypes;
+
+class PairClassSerializator : DynamicSizeTypes
 {
-    class PairClassSerializator : DynamicSizeTypes
+    public void SerilizeImpl<T, U>(KeyValuePair<T, U> pair, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
     {
-        public void SerilizeImpl<T, U>(KeyValuePair<T, U> pair, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            SerializeItem<T>(pair.Key, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators);
-            SerializeItem<U>(pair.Value, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[1], typeSerelizators);
-        }
+        SerializeItem<T>(pair.Key, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators);
+        SerializeItem<U>(pair.Value, stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[1], typeSerializators);
+    }
 
-        public object DeserilizeImpl<T, U>(Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            return new KeyValuePair<T, U>
-            (
-                DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerelizators),
-                DeserializeItem<U>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[1], typeSerelizators)
-            );
-            
-        }
+    public object DeserilizeImpl<T, U>(Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        return new KeyValuePair<T, U>
+        (
+            DeserializeItem<T>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[0], typeSerializators),
+            DeserializeItem<U>(stream, serializationTypeRecords, thisTypeSerializationTypeRecord.NestedTypes[1], typeSerializators)
+        );
+        
+    }
 
-        public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            var keyType = serializationTypeRecords
-                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                        .ClrType;
+    public override void Deserialize(ref object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        var keyType = serializationTypeRecords
+                    .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                    .ClrType;
 
-            var valueType = serializationTypeRecords
-                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                        .ClrType;
+        var valueType = serializationTypeRecords
+                    .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                    .ClrType;
 
-            data = this
-                .GetType()
-                .GetMethod("DeserilizeImpl")
-                .MakeGenericMethod(new Type[] { keyType, valueType })
-                .Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators });
-        }
+        data = this
+            .GetType()
+            .GetMethod("DeserilizeImpl")
+            .MakeGenericMethod(new Type[] { keyType, valueType })
+            .Invoke(this, new object[] { stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
+    }
 
-        public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            var keyType = serializationTypeRecords
-                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                        .ClrType;
+    public override void Serialize(object data, Stream stream, TypeMetaDataRecord thisTypeSerializationTypeRecord, List<SerializationTypeRecord> serializationTypeRecords, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        var keyType = serializationTypeRecords
+                    .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                    .ClrType;
 
-            var valueType = serializationTypeRecords
-                        .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
-                        .ClrType;
+        var valueType = serializationTypeRecords
+                    .First(item => item.SeedKernelTypeName == thisTypeSerializationTypeRecord.NestedTypes[0].TypeName)
+                    .ClrType;
 
-            this
-                .GetType()
-                .GetMethod("SerilizeImpl")
-                .MakeGenericMethod(new Type[] { keyType, valueType })
-                .Invoke(this, new object[] { data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerelizators });
-        }
+        this
+            .GetType()
+            .GetMethod("SerilizeImpl")
+            .MakeGenericMethod(new Type[] { keyType, valueType })
+            .Invoke(this, new object[] { data, stream, thisTypeSerializationTypeRecord, serializationTypeRecords, typeSerializators });
+    }
 
-        public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerelizators)
-        {
-            var keyTypeShema = thisTypeSerializationTypeRecord.NestedTypes[0];
-            var valueTypeShema = thisTypeSerializationTypeRecord.NestedTypes[1];
+    public override Type TryResolveTypeByTypeMetaDataRecord(TypeMetaDataRecord thisTypeSerializationTypeRecord, Dictionary<ETypes, ITypeSerializator> typeSerializators)
+    {
+        var keyTypeShema = thisTypeSerializationTypeRecord.NestedTypes[0];
+        var valueTypeShema = thisTypeSerializationTypeRecord.NestedTypes[1];
 
-            var keyType = TryResolveSubTypeByTypeMetaDataRecord(keyTypeShema, typeSerelizators);
-            var valueType = TryResolveSubTypeByTypeMetaDataRecord(valueTypeShema, typeSerelizators);
+        var keyType = TryResolveSubTypeByTypeMetaDataRecord(keyTypeShema, typeSerializators);
+        var valueType = TryResolveSubTypeByTypeMetaDataRecord(valueTypeShema, typeSerializators);
 
-            if (keyType == null || valueType == null)
-                return null;
+        if (keyType == null || valueType == null)
+            return null;
 
-            return typeof(KeyValuePair<,>).MakeGenericType(new Type[]{ keyType, valueType});
-        }
+        return typeof(KeyValuePair<,>).MakeGenericType(new Type[]{ keyType, valueType});
     }
 }
