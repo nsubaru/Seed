@@ -4,6 +4,7 @@ using Seed.RTTI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,48 +19,59 @@ namespace Seed.Serialization
         public ISurrogateSelector? SurrogateSelector { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         #endregion
 
-        private struct RttyTypeRecord
-        {
-            public string TypeName { get; set; }
-            public string SerializationSchema { get; set; }
-            public Guid FullTypeId { get; set; }
-        }
+        SeedSerializatorFactory serializatorFactory;
 
-        private List<RttyTypeRecord> AllTypesList = new List<RttyTypeRecord>();
+        private ISeedSerializator serializator;
+
+        private List<RttyTypeRecord> ValidTypesList = new List<RttyTypeRecord>();
 
         private Dictionary<Guid, ITypeSerializator> TypeSerializators = new Dictionary<Guid, ITypeSerializator>();
 
         SeedTypesSerializator(RTTISection rttiSection)
         {
-            LoadRTTITypes(rttiSection);
+            serializatorFactory = new SeedSerializatorFactory(rttiSection);
+            LoadRTTIAndFindClrTypes(rttiSection);
         }
 
-        private void LoadRTTITypes(RTTISection rttiSection)
+        private void LoadRTTIAndFindClrTypes(RTTISection rttiSection)
         {
-            var decoder = new TypeMetaDataDecoder();
+            foreach (var item in rttiSection.AllRegisteredTypes.Where(x => x.IsValid).ToList())
+            {
+                var ClrType = serializatorFactory.BuildClrType(item, rttiSection);
 
-            var types = rttiSection.AllRegisteredTypes
-                .Where(x => x.IsValid)
-                .Select(x => new RttyTypeRecord()
+                if (ClrType == null)
                 {
-                    TypeName = x.TypeName,
-                    SerializationSchema = x.SerializationSchema,
-                    FullTypeId = x.FullTypeId.Id
-                })
-                .ToList();
+                    continue;
+                }
 
-            AllTypesList.AddRange(types);
+                var typeRecord = new RttyTypeRecord
+                {
+                    TypeName = item.TypeName,
+                    Type = item.TypeClass,
+                    SerializationSchema = item.SerializationSchema,
+                    FullTypeId = item.FullTypeId.Id,
+                    ClrType = ClrType
+                };
+
+                ValidTypesList.Add(typeRecord);
+
+                typeof(SeedSerializatorFactory).GetMethod("AddType")
+                    .MakeGenericMethod(ClrType)
+                    .Invoke(serializatorFactory, new object[] { typeRecord });
+            }
         }
-
 
         public object Deserialize(Stream serializationStream)
         {
-            throw new NotImplementedException();
+            return serializator.Deserialize(serializationStream);
         }
 
         public void Serialize(Stream serializationStream, object graph)
         {
-            throw new NotImplementedException();
+            if (!ValidTypesList.Any(x => x.ClrType == graph.GetType()))
+            {
+                serializator.Serialize(graph, serializationStream);
+            }
         }
     }
 }

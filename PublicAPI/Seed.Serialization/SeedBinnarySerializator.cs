@@ -10,18 +10,12 @@ using System.IO;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Seed.Serialization;
 
 namespace Seed.CTTI;
 
 public class SeedBinnarySerializator : IFormatter
 {
-    private struct RttyTypeRecord
-    {
-        public string TypeName { get; set; }
-        public string SerializationSchema { get; set; }
-        public Guid FullTypeId { get; set; }
-    }
-
     private List<RttyTypeRecord> AllTypesList = new List<RttyTypeRecord>();
 
     public List<SerializationTypeRecord> SerializationShema { get; private set; } = new List<SerializationTypeRecord>();
