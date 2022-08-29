@@ -16,7 +16,7 @@ namespace Seed.CTTI;
 
 public class SeedBinnarySerializator : IFormatter
 {
-    private List<RttyTypeRecord> AllTypesList = new List<RttyTypeRecord>();
+    private List<RttiTypeRecord> AllTypesList = new List<RttiTypeRecord>();
 
     public List<SerializationTypeRecord> SerializationShema { get; private set; } = new List<SerializationTypeRecord>();
 
@@ -58,7 +58,7 @@ public class SeedBinnarySerializator : IFormatter
 
         var types = rttiSection.AllRegisteredTypes
             .Where(x => x.IsValid)
-            .Select(x => new RttyTypeRecord(){
+            .Select(x => new RttiTypeRecord(){
                 TypeName = x.TypeName,
                 SerializationSchema = x.SerializationSchema,
                 FullTypeId = x.FullTypeId.Id
