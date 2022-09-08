@@ -29,7 +29,7 @@ namespace Seed.Serialization
 
         private ISeedSerializator serializator;
 
-        private List<RttiTypeRecord> ValidTypesList = new List<RttiTypeRecord>();
+        private List<TypeRecord> ValidTypesList = new List<TypeRecord>();
 
         private Dictionary<Guid, ITypeSerializator> TypeSerializators = new Dictionary<Guid, ITypeSerializator>();
 
@@ -89,7 +89,7 @@ namespace Seed.Serialization
                     continue;
                 }
 
-                var typeRecord = new RttiTypeRecord
+                var typeRecord = new TypeRecord
                 {
                     TypeName = item.TypeName,
                     Type = item.TypeClass,
