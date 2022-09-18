@@ -72,7 +72,7 @@ public unsafe class RTTISection : IDisposable
         bool direction = ((SizeT) @base) + magicNumberOffset < origHeaderAddr;
 
         SizeT offset =
-            magicNumberOffset < origHeaderAddr
+            (magicNumberOffset + (SizeT)@base) < origHeaderAddr
             ? origHeaderAddr - (((SizeT)@base) + magicNumberOffset)
             : ((((SizeT)@base) + magicNumberOffset) - origHeaderAddr);
 
