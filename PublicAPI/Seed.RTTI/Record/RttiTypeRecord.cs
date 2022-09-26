@@ -474,4 +474,14 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         else
             return this.CxxTypeName.CompareTo(other.CxxTypeName);
     }
+
+    public override bool Equals(object obj)
+    {
+        return obj is RttiTypeRecord otherRecord ? this.FullTypeId.Equals(otherRecord.FullTypeId) : false;
+    }
+
+    public override int GetHashCode()
+    {
+        return FullTypeId.GetHashCode();
+    }
 }
