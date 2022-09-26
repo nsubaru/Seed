@@ -16,13 +16,13 @@ using System.Collections;
 
 namespace Seed.CTTI;
 
-public class SeedBinnarySerializator
+public class SeedBinarySerializator
 {
     RTTISection rttiSection;
     ISeedSerializator seedSerializator;
     Dictionary<RttiTypeRecord, Type> mapingSheme = new Dictionary<RttiTypeRecord, Type>();
 
-    public SeedBinnarySerializator(RTTISection rttiSection)
+    public SeedBinarySerializator(RTTISection rttiSection)
     {
         this.rttiSection = rttiSection;
         SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection);
