@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Seed.Serialization
+namespace Seed.Serialization;
+
+public interface ICustomClassSerelizator
 {
-    public interface ICustomClassSerelizator
-    {
-        Type ClrType { get; set; }
+    Type ClrType { get; set; }
 
-        string TypeName { get; set; }
+    string TypeName { get; set; }
 
-        Guid FullTypeId { get; set; }
+    Guid FullTypeId { get; set; }
 
-        void Serialize(dynamic data, Stream serializationStream);
+    void Serialize(dynamic data, Stream serializationStream);
 
-        object Deserialize(Stream serializationStream);
-    }
+    object Deserialize(Stream serializationStream);
 }

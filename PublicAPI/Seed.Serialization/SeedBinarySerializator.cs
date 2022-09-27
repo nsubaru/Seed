@@ -1,8 +1,4 @@
-﻿using Seed.CTTI.MetaData;
-using Seed.CTTI.ClassSerializators;
-using Seed.CTTI.ClassSerializators.ComplexTypes;
-using Seed.CTTI.ClassSerializators.SimpleTypes;
-using System.Data;
+﻿using System.Data;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Seed.RTTI;
