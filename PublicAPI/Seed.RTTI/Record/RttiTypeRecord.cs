@@ -475,11 +475,20 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
             return this.CxxTypeName.CompareTo(other.CxxTypeName);
     }
 
+    /// <summary>
+    /// Returns true if given object equal to current
+    /// </summary>
+    /// <param name="obj">Object to compare</param>
+    /// <returns>Logic value</returns>
     public override bool Equals(object obj)
     {
         return obj is RttiTypeRecord otherRecord ? this.FullTypeId.Equals(otherRecord.FullTypeId) : false;
     }
 
+    /// <summary>
+    /// Returns hash code
+    /// </summary>
+    /// <returns>Hash code</returns>
     public override int GetHashCode()
     {
         return FullTypeId.GetHashCode();
