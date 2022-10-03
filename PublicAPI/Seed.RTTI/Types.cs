@@ -1,4 +1,6 @@
-﻿namespace Seed.RTTI;
+﻿using System.Data.Common;
+
+namespace Seed.RTTI;
 
 //HACK: Enum values is incorect,
 //      because Seed kernel EnumFlags use item index starting from 1 as index of bit
@@ -104,6 +106,33 @@ public unsafe struct UniversalTypeIdentificator
 
 	[FieldOffset(4)]
 	public ID TypeId;
+
+	public override bool Equals(object? obj)
+	{
+		var item = (UniversalTypeIdentificator?) obj;
+
+		return this == item;
+	}
+
+	public override int GetHashCode()
+	{
+		return base.GetHashCode();
+	}
+
+	public override string ToString()
+	{
+		return this.Id.ToString();
+	}
+
+    static public bool operator ==(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    {
+        return item1?.Id == item2?.Id;
+    }
+
+    static public bool operator !=(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    {
+        return item1?.Id == item2?.Id;
+    }
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
