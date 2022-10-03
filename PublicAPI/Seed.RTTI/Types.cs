@@ -1,5 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
+﻿using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 namespace Seed.RTTI;
 
 //HACK: Enum values is incorect,
@@ -118,31 +118,32 @@ public unsafe struct UniversalTypeIdentificator
     [FieldOffset(4)]
 	public ID TypeId;
 
-    public static bool operator==(UniversalTypeIdentificator left, UniversalTypeIdentificator right)
-    {
-		return left.Id == right.Id;
-    }
-
-	public static bool operator !=(UniversalTypeIdentificator left, UniversalTypeIdentificator right)
+	public override bool Equals(object? obj)
 	{
-		return left.Id != right.Id;
-	}
+		var item = (UniversalTypeIdentificator?) obj;
 
-	public override bool Equals([NotNullWhen(true)] object? obj)
-	{
-		if (obj == null)
-			return false;
-
-		if (obj.GetType() != GetType())
-			return false;
-
-		return ((UniversalTypeIdentificator)obj) == this;
+		return this == item;
 	}
 
 	public override int GetHashCode()
 	{
 		return base.GetHashCode();
 	}
+
+	public override string ToString()
+	{
+		return this.Id.ToString();
+	}
+
+    static public bool operator ==(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    {
+        return item1?.Id == item2?.Id;
+    }
+
+    static public bool operator !=(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    {
+        return item1?.Id == item2?.Id;
+    }
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
