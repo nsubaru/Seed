@@ -1,11 +1,5 @@
-﻿using System.Data;
-using System.Reflection;
-using System.Runtime.Serialization;
+﻿using System.Reflection;
 using Seed.RTTI;
-using System.IO;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using Seed.Serialization;
 using Seed.RTTI.Record;
 using System.Collections;
@@ -14,9 +8,9 @@ namespace Seed.CTTI;
 
 public class SeedBinarySerializator
 {
-    RTTISection rttiSection;
-    ISeedSerializator seedSerializator;
-    Dictionary<RttiTypeRecord, Type> mapingSheme = new Dictionary<RttiTypeRecord, Type>();
+    readonly RTTISection rttiSection;
+    readonly ISeedSerializator seedSerializator;
+    readonly Dictionary<RttiTypeRecord, Type> mapingSheme = new();
 
     public SeedBinarySerializator(RTTISection rttiSection)
     {
@@ -30,7 +24,7 @@ public class SeedBinarySerializator
 
     private void SerializeImpl<T>(Stream serializationStream, T graph)
     {
-        seedSerializator.Serialize(graph, serializationStream);
+        seedSerializator.Serialize(graph!, serializationStream);
     }
 
     private void SerializeArrayImpl<T>(Stream serializationStream, T graph, RttiTypeRecord record)
@@ -40,7 +34,7 @@ public class SeedBinarySerializator
             case ETypes.FixedCollection:
                 {
                     var mirror = graph as IList;
-                    if (mirror.Count != (int)record.ArrayItemsCount)
+                    if (mirror!.Count != (int)record.ArrayItemsCount)
                     {
                         throw new InvalidCastException();
                     }
@@ -49,7 +43,7 @@ public class SeedBinarySerializator
             case ETypes.FixedArray:
                 {
                     var mirror = graph as Array;
-                    if (mirror.Length != (int)record.ArrayItemsCount)
+                    if (mirror!.Length != (int)record.ArrayItemsCount)
                     {
                         throw new InvalidCastException();
                     }
@@ -60,9 +54,9 @@ public class SeedBinarySerializator
         SerializeImpl<T>(serializationStream, graph);
     }
 
-    public void Serialize(Stream serializationStream, object graph, RttiTypeRecord targetType = null)
+    public void Serialize(Stream serializationStream, object graph, RttiTypeRecord? targetType = null)
     {
-        Type type = null;
+        Type? type = null;
         UniversalTypeIdentificator Id = new UniversalTypeIdentificator();
 
         if (targetType != null)
@@ -112,7 +106,7 @@ public class SeedBinarySerializator
     {
         Type type = typeof(T);
 
-        object obj = null;
+        object? obj = null;
 
         if (type == typeof(String))
         {
@@ -120,20 +114,20 @@ public class SeedBinarySerializator
         }
         else if (type == typeof(DynamicObject))
         {
-            UniversalTypeIdentificator Id = new UniversalTypeIdentificator();
-            dynamic ID = Id;
+            UniversalTypeIdentificator Id = new();
+            dynamic dynId = Id;
 
             var streamStartPos = serializationStream.Position;
-            seedSerializator.Deserialize(ref ID, serializationStream);
+            seedSerializator.Deserialize(ref dynId, serializationStream);
             serializationStream.Position = streamStartPos;
 
-            Id = ID;
+            Id = dynId;
             
             if (!mapingSheme.Any(x => x.Key.FullTypeId == Id))
                 throw new InvalidCastException();
 
             Type typePair = mapingSheme.First(x => x.Key.FullTypeId == Id).Value;
-            var innerObj = GetType().GetRuntimeMethods().Where(x => x.Name == "CreateObject")
+            var innerObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(CreateObject))
                             .First()
                             .MakeGenericMethod(typePair)
                             .Invoke(this, new object[] { serializationStream });
@@ -145,7 +139,7 @@ public class SeedBinarySerializator
             object[] args = new object[type.GenericTypeArguments.Length];
             for (int i = 0; i < type.GenericTypeArguments.Length; i++)
             {
-                args[i] = GetType().GetRuntimeMethods().Where(x => x.Name == "CreateObject")
+                args[i] = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(CreateObject))
                             .First()
                             .MakeGenericMethod(type.GenericTypeArguments[i])
                             .Invoke(this, new object[] { serializationStream});
@@ -163,13 +157,8 @@ public class SeedBinarySerializator
 
     private T DeserializeImpl<T>(Stream serializationStream)
     {
-        Type type = typeof(T);
-
-        object beginObj = null;
-
-        beginObj = CreateObject<T>(serializationStream);
-
-        T obj = (T) beginObj;
+        object? beginObj = CreateObject<T>(serializationStream);
+        T obj = (T) beginObj!;
         dynamic data = obj;
         seedSerializator.Deserialize(ref data, serializationStream);
 
@@ -178,7 +167,7 @@ public class SeedBinarySerializator
 
     private T DeserializeArrayImpl<T>(Stream serializationStream, RttiTypeRecord record)
     {
-        object beginObj = null;
+        object? beginObj = null;
 
         switch (record.TypeClass)
         {
@@ -192,8 +181,9 @@ public class SeedBinarySerializator
                 throw new InvalidCastException();
         }
 
-        T obj = (T)beginObj;
+        T obj = (T) beginObj!;
         dynamic data = obj;
+
         seedSerializator.Deserialize(ref data, serializationStream);
 
         switch (record.TypeClass)
@@ -201,7 +191,7 @@ public class SeedBinarySerializator
             case ETypes.FixedCollection:
                 {
                     var mirror = obj as IList;
-                    if (mirror.Count != (int)record.ArrayItemsCount)
+                    if (mirror!.Count != (int)record.ArrayItemsCount)
                     {
                         throw new InvalidCastException();
                     }
@@ -210,7 +200,7 @@ public class SeedBinarySerializator
             case ETypes.FixedArray:
                 {
                     var mirror = obj as Array;
-                    if (mirror.Length != (int)record.ArrayItemsCount)
+                    if (mirror!.Length != (int)record.ArrayItemsCount)
                     {
                         throw new InvalidCastException();
                     }
@@ -221,12 +211,12 @@ public class SeedBinarySerializator
         return data;
     }
 
-    public object Deserialize(Stream serializationStream, RttiTypeRecord targetType = null)
+    public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null)
     {
         if (targetType != null && !mapingSheme.ContainsKey(targetType))
             throw new ArgumentException();
 
-        Type type = null;
+        Type? type = null;
         UniversalTypeIdentificator Id = new UniversalTypeIdentificator();
         dynamic ID = Id;
 
@@ -247,20 +237,20 @@ public class SeedBinarySerializator
             throw new InvalidCastException();
         }
 
-        object retObj = null;
+        object? retObj = null;
 
         var record = rttiSection.AllRegisteredTypes.First(x => x.FullTypeId == Id);
 
         if (record.TypeClass == ETypes.FixedArray || record.TypeClass == ETypes.FixedCollection)
         {
-            retObj = GetType().GetRuntimeMethods().Where(x => x.Name == "DeserializeArrayImpl")
+            retObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(DeserializeArrayImpl))
                 .First()
                 .MakeGenericMethod(type)
                 .Invoke(this, new object[] { serializationStream, record });
         }
         else
         {
-            retObj = GetType().GetRuntimeMethods().Where(x => x.Name == "DeserializeImpl")
+            retObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(DeserializeImpl))
                 .First()
                 .MakeGenericMethod(type)
                 .Invoke(this, new object[] { serializationStream });
