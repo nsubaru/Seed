@@ -1,5 +1,5 @@
 ﻿using System.Data.Common;
-
+using System.Diagnostics.CodeAnalysis;
 namespace Seed.RTTI;
 
 //HACK: Enum values is incorect,
@@ -7,6 +7,7 @@ namespace Seed.RTTI;
 //      whereas C# [Flags] atributed enum use enum value as bit mask
 
 [Flags]
+[SerializableEnum("Seed::Core::RTTI::ETypeModificators")]
 public enum ETypeModificators : byte
 {
 	Const        = 1, 
@@ -16,6 +17,7 @@ public enum ETypeModificators : byte
 }
 
 [Flags]
+[SerializableEnum("Seed::Core::RTTI::ECvRefModificators")]
 public enum ECvRefModificators : SizeT
 {
 	Ref       = 1, 
@@ -24,6 +26,7 @@ public enum ECvRefModificators : SizeT
 	Volatile  = 8
 }
 
+[SerializableEnum("Seed::Core::RTTI::ECustomTypeSchemaFormat")]
 public enum ECustomTypeSchemaFormat : byte
 {
 	None,
@@ -35,19 +38,24 @@ public enum ECustomTypeSchemaFormat : byte
 	Undefined
 }
 
+[SerializableStruct("Seed::Core::Settings::SettingsData::KernelVersion")]
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 public unsafe struct KernelVersionT
 {
-	[FieldOffset(0)]
+    [SerializableStructField("Major", "Seed::Core::UInt16")]
+    [FieldOffset(0)]
 	public UInt16 Major;
 
-	[FieldOffset(4)]
+    [SerializableStructField("Minor", "Seed::Core::UInt16")]
+    [FieldOffset(4)]
 	public UInt16 Minor;
 
-	[FieldOffset(4)]
+    [SerializableStructField("StableBuildNumber", "Seed::Core::UInt16")]
+    [FieldOffset(4)]
 	public UInt16 StableBuildNumber;
 
-	[FieldOffset(6)]
+    [SerializableStructField("BuildNumber", "Seed::Core::UInt16")]
+    [FieldOffset(6)]
 	public UInt16 BuildNumber;
 }
 
@@ -95,16 +103,19 @@ internal unsafe struct MetaDataForDynamicRecord
 	public TToString FToString;
 }
 
+[SerializableStruct("Seed::Core::RTTI::UniversalTypeIdentificator")]
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 public unsafe struct UniversalTypeIdentificator
 {
     [FieldOffset(0)]
 	public UUID Id;
 
+	[SerializableStructField("KernelVersion", "Seed::Core::Settings::SettingsData::KernelVersion")]
 	[FieldOffset(0)]
 	public KernelVersionT KernelVersion;
 
-	[FieldOffset(4)]
+    [SerializableStructField("TypeId", "Seed::Core::UInt64")]
+    [FieldOffset(4)]
 	public ID TypeId;
 
 	public override bool Equals(object? obj)
