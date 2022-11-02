@@ -20,7 +20,7 @@ namespace Seed.RTTI;
 /// </para>
 /// </remarks>
 /// </summary>
-public unsafe class RTTISection : IDisposable
+public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 {
     static readonly string MagicNumer = "SEED_RXX_RTTI\0";
 
@@ -37,12 +37,16 @@ public unsafe class RTTISection : IDisposable
 	private List<RttiTypeRecord> registeredRecords;
     private bool disposedValue;
 
+    internal byte[] data;
+
     /// <summary>
     /// Load RTTI section from raw blob
     /// </summary>
     /// <param name="data">Blob with rtti section</param>
     public RTTISection(byte[] data)
     {
+        this.data = data ?? throw new NullReferenceException();
+
 		rawArrayPtrHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         rawArrayPtr = (Byte*) rawArrayPtrHandle.AddrOfPinnedObject();
         rawArrayLen = (SizeT) data.Length;
@@ -188,4 +192,73 @@ public unsafe class RTTISection : IDisposable
     /// Kernel version with which this section was builded
     /// </summary>
     public KernelVersionT KernelVersion => GetKernelVersion();
+
+    private static unsafe bool Compare(byte[] a, byte[] b)
+    {
+        if (a.Length != b.Length) return false;
+        int len = a.Length;
+
+        unsafe
+        {
+            fixed (byte* ap = a, bp = b)
+            {
+                long* alp = (long*)ap, blp = (long*)bp;
+                for (; len >= 8; len -= 8)
+                {
+                    if (*alp != *blp) return false;
+                    alp++;
+                    blp++;
+                }
+                byte* ap2 = (byte*)alp, bp2 = (byte*)blp;
+                for (; len > 0; len--)
+                {
+                    if (*ap2 != *bp2) return false;
+                    ap2++;
+                    bp2++;
+                }
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Equal to obj
+    /// </summary>
+    /// <param name="obj">Comparable obj</param>
+    /// <returns>true only if data is same</returns>
+    public override bool Equals(object obj)
+    {
+        if (obj == null) return this == null;
+
+        if (obj.GetType() != this.GetType()) return false;
+
+        RTTISection other = (RTTISection) obj;
+
+        if (this.data.Length != other.data.Length) return false;
+
+        return Compare(this.data, other.data);
+    }
+
+    /// <summary>
+    /// Equal to obj
+    /// </summary>
+    /// <param name="other">Comparable section</param>
+    /// <returns>true only if data is same</returns>
+    public bool Equals(RTTISection? other)
+    {
+        if (other == null) return this == null;
+
+        if (this.data.Length != other.data.Length) return false;
+
+        return Compare(this.data, other.data);
+    }
+
+    /// <summary>
+    /// Generate unique hash code using data array
+    /// </summary>
+    /// <returns>Hash code value</returns>
+    public override int GetHashCode()
+    {
+        return 1768953197 + EqualityComparer<byte[]>.Default.GetHashCode(data);
+    }
 }
