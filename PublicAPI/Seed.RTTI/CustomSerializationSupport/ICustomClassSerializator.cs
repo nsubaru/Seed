@@ -1,9 +1,9 @@
 ﻿namespace Seed.Serialization;
 
 /// <summary>
-/// Interface for custom class serelization/deserelization.
+/// Interface for custom class searialization/desearialization.
 /// </summary>
-public interface ICustomClassSerelizator
+public interface ICustomClassSerializator
 {
     /// <summary>
     /// Custom class .Net CLR type
