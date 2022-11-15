@@ -13,12 +13,12 @@ public class RTTISectionSerilizator : ICustomClassSerelizator
 
         serializator.Deserialize(ref data, serializationStream);
 
-        return new RTTISection((data as List<UInt8>).ToArray());
+        return new RTTISection((data as List<UInt8>)!.ToArray());
     }
 
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializator serializator)
     {
-        dynamic rawData = (data as RTTISection).data.ToList();
+        dynamic rawData = (data as RTTISection)!.data.ToList();
 
         serializator.Serialize(rawData, serializationStream);
     }
