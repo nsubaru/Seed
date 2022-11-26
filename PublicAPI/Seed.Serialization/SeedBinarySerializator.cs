@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace Seed.CTTI;
 
-public class SeedBinarySerializator
+public class SeedBinarySerializator : ISeedBinarySerializator
 {
     readonly RTTISection rttiSection;
     readonly ISeedSerializator seedSerializator;
@@ -15,11 +15,16 @@ public class SeedBinarySerializator
     public SeedBinarySerializator(RTTISection rttiSection)
     {
         this.rttiSection = rttiSection;
+
         SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection);
 
         seedSerializator = serializatorFactory.GetSeedSerializator();
 
-        mapingSheme = seedSerializator.GetSupportedTypes().OrderBy(x => x.RttiType.TypeName).OrderBy(x => x.RttiType.TypeClass).ToDictionary(x => x.RttiType, x => x.ClrType);
+        mapingSheme = seedSerializator
+            .GetSupportedTypes()
+            .OrderBy(x => x.RttiType.TypeClass)
+            .OrderBy(x => x.RttiType.TypeName)
+            .ToDictionary(x => x.RttiType, x => x.ClrType);
     }
 
     private void SerializeImpl<T>(Stream serializationStream, T graph)
@@ -34,7 +39,7 @@ public class SeedBinarySerializator
             case ETypes.FixedCollection:
                 {
                     var mirror = graph as IList;
-                    if (mirror!.Count != (int)record.ArrayItemsCount)
+                    if (mirror!.Count > (int)record.ArrayItemsCount)
                     {
                         throw new InvalidCastException();
                     }
@@ -150,6 +155,19 @@ public class SeedBinarySerializator
         else
         { 
             obj = Activator.CreateInstance(typeof(T)); 
+
+            foreach(var field in obj.GetType().GetFields())
+            {
+                // Skip all field except public non static rw
+                if (field.IsStatic || field.IsPrivate && field.IsInitOnly || field.IsLiteral)
+                    continue;
+
+                if (field.FieldType.GetConstructors().Any(x => x.GetParameters().Length == 0) ||
+                    field.FieldType.GetConstructors().Length == 0)
+                {
+                    field.SetValue(obj, Activator.CreateInstance(field.FieldType));
+                }
+            }
         }
 
         return (T)obj;
@@ -167,7 +185,7 @@ public class SeedBinarySerializator
 
     private T DeserializeArrayImpl<T>(Stream serializationStream, RttiTypeRecord record)
     {
-        object? beginObj = null;
+        object? beginObj;
 
         switch (record.TypeClass)
         {
