@@ -15,11 +15,5 @@ global using TDynamicCtorCaller = System.IntPtr;
 global using DynamicConverterFunc = System.IntPtr;
 global using DynamicCallerFunc = System.IntPtr;
 
-global using SizeT = System.UInt64;
-global using Сhar = System.Char;
-global using UUID = System.Guid;
-global using ID = System.UInt64;
-global using RawMemBlk = System.IntPtr;
-
 global using TypeModificator = Seed.RTTI.ETypeModificators;
 global using CvRefModificators = Seed.RTTI.ECvRefModificators;

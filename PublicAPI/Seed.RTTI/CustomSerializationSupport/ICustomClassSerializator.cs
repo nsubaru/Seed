@@ -1,42 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Seed.Serialization;
+﻿namespace Seed.Serialization;
 
 /// <summary>
-/// Interface for custom class serelization/deserelization.
+/// Interface for custom class searialization/desearialization.
 /// </summary>
-public interface ICustomClassSerelizator
+public interface ICustomClassSerializator
 {
     /// <summary>
     /// Custom class .Net CLR type
     /// </summary>
-    Type ClrType { get; set; }
+    Type ClrType { get; }
 
     /// <summary>
     /// Custom class name in the Seed kernel
     /// </summary>
-    string TypeName { get; set; }
-
-    /// <summary>
-    /// Full type Id
-    /// </summary>
-    Guid FullTypeId { get; set; }
+    string TypeName { get; }
 
     /// <summary>
     /// Serializes data into binnary string
     /// </summary>
     /// <param name="data">Data to serialize</param>
     /// <param name="serializationStream">Target stream</param>
-    void Serialize(dynamic data, Stream serializationStream);
+    void Serialize(dynamic data, Stream serializationStream, ISeedSerializator serializator);
 
     /// <summary>
     /// Deserializes data from binnary string
     /// </summary>
     /// <param name="serializationStream">Data stream</param>
     /// <returns>Deserialized object</returns>
-    object Deserialize(Stream serializationStream);
+    object Deserialize(Stream serializationStream, ISeedSerializator serializator);
 }

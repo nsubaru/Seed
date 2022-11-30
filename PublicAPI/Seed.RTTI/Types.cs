@@ -12,7 +12,7 @@ public enum ETypeModificators : byte
 {
 	Const        = 1, 
 	Volatile     = 2,
-	Serilizable  = 4,
+	Serializable  = 4,
 	TemplateType = 8
 }
 
