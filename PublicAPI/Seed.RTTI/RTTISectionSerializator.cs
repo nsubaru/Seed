@@ -2,7 +2,7 @@
 
 namespace Seed.RTTI;
 
-public class RTTISectionSerilizator : ICustomClassSerelizator
+public class RTTISectionSerializator : ICustomClassSerializator
 {
     public Type ClrType => typeof(RTTISection);
     public string TypeName => "Seed::Core::RTTI::RTTISection";
