@@ -152,19 +152,19 @@ internal unsafe struct MetaData
 	[FieldOffset(0)]
 	public SizeT OffsetToCttiMetaData;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(105)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(106)]
 	public TextMetaData TypeName;
 }
 
@@ -226,22 +226,22 @@ internal unsafe struct FieldMetaData
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public SizeT Offset;
 
-	[FieldOffset(41)]
+	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(121)]
+	[FieldOffset(113)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(122)]
+	[FieldOffset(114)]
 	public TextMetaData FieldName;
 }
 
@@ -251,19 +251,19 @@ internal unsafe struct ItemMetaData
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(105)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(106)]
 	public TextMetaData TypeName;
 }
 
@@ -273,22 +273,22 @@ internal unsafe struct ArgumentMetaData
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(105)]
 	public Boolean IsSerializable;
 
-	[FieldOffset(114)]
+	[FieldOffset(106)]
 	public CvRefModificators Flags;
 
-	[FieldOffset(122)]
+	[FieldOffset(114)]
 	public TextMetaData TypeName;
 }
 
@@ -333,19 +333,19 @@ internal unsafe struct InterfaceRecord
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(112)]
+	[FieldOffset(104)]
 	public DynamicConverterFunc DynamicConverterTo;
 
-	[FieldOffset(120)]
+	[FieldOffset(112)]
 	public DynamicConverterFunc DynamicConverterFrom;
 
-	[FieldOffset(128)]
+	[FieldOffset(120)]
 	public TextMetaData TypeName;
 }
 
