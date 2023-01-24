@@ -3,9 +3,9 @@
 // Used by Seed.Core.Resources.rc
 //
 #define CurrentMajorVersion 0
-#define CurrentMinorVersion 0
+#define CurrentMinorVersion 1
 #define CurrentStableBuildNumber 0
-#define CurrentBuildNumber 9043
+#define CurrentBuildNumber 9705
 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS

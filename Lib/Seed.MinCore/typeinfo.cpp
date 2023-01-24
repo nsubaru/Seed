@@ -39,6 +39,9 @@ extern "C"
 __declspec(noreturn)
 void
 __cdecl
-__std_terminate() {}
+__std_terminate() { //-V1082
+	NtTerminateProcess(NtCurrentProcess(), STATUS_INTERNAL_ERROR);
+	__assume(false);
+}
 
 #endif // _CPPRTTI

@@ -1,19 +1,23 @@
-﻿namespace Seed.RTTI;
+﻿using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+namespace Seed.RTTI;
 
 //HACK: Enum values is incorect,
 //      because Seed kernel EnumFlags use item index starting from 1 as index of bit
 //      whereas C# [Flags] atributed enum use enum value as bit mask
 
 [Flags]
+[SerializableEnum("Seed::Core::RTTI::ETypeModificators")]
 public enum ETypeModificators : byte
 {
 	Const        = 1, 
 	Volatile     = 2,
-	Serilizable  = 4,
+	Serializable  = 4,
 	TemplateType = 8
 }
 
 [Flags]
+[SerializableEnum("Seed::Core::RTTI::ECvRefModificators")]
 public enum ECvRefModificators : SizeT
 {
 	Ref       = 1, 
@@ -22,6 +26,7 @@ public enum ECvRefModificators : SizeT
 	Volatile  = 8
 }
 
+[SerializableEnum("Seed::Core::RTTI::ECustomTypeSchemaFormat")]
 public enum ECustomTypeSchemaFormat : byte
 {
 	None,
@@ -33,19 +38,24 @@ public enum ECustomTypeSchemaFormat : byte
 	Undefined
 }
 
+[SerializableStruct("Seed::Core::Settings::SettingsData::KernelVersion")]
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 public unsafe struct KernelVersionT
 {
-	[FieldOffset(0)]
+    [SerializableStructField("Major", "Seed::Core::UInt16")]
+    [FieldOffset(0)]
 	public UInt16 Major;
 
-	[FieldOffset(4)]
+    [SerializableStructField("Minor", "Seed::Core::UInt16")]
+    [FieldOffset(4)]
 	public UInt16 Minor;
 
-	[FieldOffset(4)]
+    [SerializableStructField("StableBuildNumber", "Seed::Core::UInt16")]
+    [FieldOffset(4)]
 	public UInt16 StableBuildNumber;
 
-	[FieldOffset(6)]
+    [SerializableStructField("BuildNumber", "Seed::Core::UInt16")]
+    [FieldOffset(6)]
 	public UInt16 BuildNumber;
 }
 
@@ -93,17 +103,47 @@ internal unsafe struct MetaDataForDynamicRecord
 	public TToString FToString;
 }
 
+[SerializableStruct("Seed::Core::RTTI::UniversalTypeIdentificator")]
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 public unsafe struct UniversalTypeIdentificator
 {
     [FieldOffset(0)]
 	public UUID Id;
 
+	[SerializableStructField("KernelVersion", "Seed::Core::Settings::SettingsData::KernelVersion")]
 	[FieldOffset(0)]
 	public KernelVersionT KernelVersion;
 
-	[FieldOffset(4)]
+    [SerializableStructField("TypeId", "Seed::Core::UInt64")]
+    [FieldOffset(4)]
 	public ID TypeId;
+
+	public override bool Equals(object? obj)
+	{
+		var item = (UniversalTypeIdentificator?) obj;
+
+		return this == item;
+	}
+
+	public override int GetHashCode()
+	{
+		return base.GetHashCode();
+	}
+
+	public override string ToString()
+	{
+		return this.Id.ToString();
+	}
+
+    static public bool operator ==(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    {
+        return item1?.Id == item2?.Id;
+    }
+
+    static public bool operator !=(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    {
+        return item1?.Id == item2?.Id;
+    }
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
@@ -112,19 +152,19 @@ internal unsafe struct MetaData
 	[FieldOffset(0)]
 	public SizeT OffsetToCttiMetaData;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(105)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(106)]
 	public TextMetaData TypeName;
 }
 
@@ -186,22 +226,22 @@ internal unsafe struct FieldMetaData
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public SizeT Offset;
 
-	[FieldOffset(41)]
+	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(121)]
+	[FieldOffset(113)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(122)]
+	[FieldOffset(114)]
 	public TextMetaData FieldName;
 }
 
@@ -211,19 +251,19 @@ internal unsafe struct ItemMetaData
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(105)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(106)]
 	public TextMetaData TypeName;
 }
 
@@ -233,22 +273,22 @@ internal unsafe struct ArgumentMetaData
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(33)]
+	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(105)]
 	public Boolean IsSerializable;
 
-	[FieldOffset(114)]
+	[FieldOffset(106)]
 	public CvRefModificators Flags;
 
-	[FieldOffset(122)]
+	[FieldOffset(114)]
 	public TextMetaData TypeName;
 }
 
@@ -293,19 +333,19 @@ internal unsafe struct InterfaceRecord
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(16)]
+	[FieldOffset(8)]
 	public UniversalTypeIdentificator TypeId;
 
-	[FieldOffset(32)]
+	[FieldOffset(24)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(112)]
+	[FieldOffset(104)]
 	public DynamicConverterFunc DynamicConverterTo;
 
-	[FieldOffset(120)]
+	[FieldOffset(112)]
 	public DynamicConverterFunc DynamicConverterFrom;
 
-	[FieldOffset(128)]
+	[FieldOffset(120)]
 	public TextMetaData TypeName;
 }
 
