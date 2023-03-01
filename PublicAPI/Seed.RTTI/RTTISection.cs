@@ -261,4 +261,36 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     {
         return 1768953197 + EqualityComparer<byte[]>.Default.GetHashCode(data);
     }
+
+    /// <summary>
+    /// Returns the section information
+    /// </summary>
+    /// <returns>Section information</returns>
+    public SectionDetails GetSectionDetails()
+    {
+        var @base = this.rawArrayPtr;
+
+        SectionHeaderType* header = (SectionHeaderType*)(@base + this.headerOffset);
+
+        return new SectionDetails
+        {
+            SectionSize = (SizeT)data.LongLength,
+            SectionHeaderOffset = headerOffset,
+            KernelVersion = header->KernelVersion,
+            OriginHeaderAddr = header->OriginHeaderAddr,
+            FaAddr = header->FaAddr,
+            FzAddr = header->FzAddr,
+            VaAddr = header->VaAddr,
+            VzAddr = header->VzAddr,
+            ImageBase = header->ImageBase,
+            TotalCount = fCount - 1,
+            ValidCount = (SizeT) registeredRecords.LongCount(x => x.IsValid),
+            Offset = offset
+        };
+    }
+
+    /// <summary>
+    /// Section information
+    /// </summary>
+    public SectionDetails SectionDetails => GetSectionDetails();
 }
