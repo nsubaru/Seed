@@ -453,3 +453,30 @@ internal unsafe struct SectionHeaderType
     [FieldOffset(61)]
     public RawMemBlk ImageBase;
 }
+
+public struct SectionDetails
+{
+	public SizeT SectionSize { get; set; }
+
+	public SizeT SectionHeaderOffset { get; set; }
+
+    public KernelVersionT KernelVersion { get; set; }
+
+    public RawMemBlk OriginHeaderAddr { get; set; }
+
+    public RawMemBlk FaAddr { get; set; }
+
+    public RawMemBlk FzAddr { get; set; }
+
+    public RawMemBlk VaAddr { get; set; }
+
+    public RawMemBlk VzAddr { get; set; }
+
+    public RawMemBlk ImageBase { get; set; }
+
+	public SizeT Offset { get; set; }
+
+	public SizeT TotalCount { get; set; }
+
+	public SizeT ValidCount { get; set; }
+}
