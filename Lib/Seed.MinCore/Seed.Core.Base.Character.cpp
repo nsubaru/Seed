@@ -6,7 +6,7 @@
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
-Seed::Core::StrongOrdering Seed::Core::Characters::CaseInsesitiveCompare(Seed::Core::AChar left, Seed::Core::AChar right) {
+Seed::Core::StrongOrdering Seed::Core::Characters::CaseInsensitiveCompare(Seed::Core::AChar left, Seed::Core::AChar right) {
 	AChar s1b[2] = { 0 }, s2b[2] = { 0 };
 	s1b[0] = left; s2b[0] = right;
 
@@ -25,7 +25,7 @@ Seed::Core::StrongOrdering Seed::Core::Characters::CaseInsesitiveCompare(Seed::C
 		return StrongOrdering::less;
 }
 
-Seed::Core::StrongOrdering Seed::Core::Characters::CaseInsesitiveCompare(Seed::Core::UChar left, Seed::Core::UChar right) {
+Seed::Core::StrongOrdering Seed::Core::Characters::CaseInsensitiveCompare(Seed::Core::UChar left, Seed::Core::UChar right) {
 	UChar s1b[2] = { 0 }, s2b[2] = { 0 };
 	s1b[0] = left; s2b[0] = right;
 
