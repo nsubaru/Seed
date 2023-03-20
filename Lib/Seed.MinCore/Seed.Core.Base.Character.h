@@ -26,7 +26,7 @@ namespace Seed::Core
 		/// <param name="left">Left operand</param>
 		/// <param name="right">Right operand</param>
 		/// <returns>Comparing result</returns>
-		static StrongOrdering CaseInsesitiveCompare(AChar left, AChar right);
+		static StrongOrdering CaseInsensitiveCompare(AChar left, AChar right);
 
 		/// <summary>
 		/// Case insesitive character comparing
@@ -34,6 +34,6 @@ namespace Seed::Core
 		/// <param name="left">Left operand</param>
 		/// <param name="right">Right operand</param>
 		/// <returns>Comparing result</returns>
-		static StrongOrdering CaseInsesitiveCompare(UChar left, UChar right);
+		static StrongOrdering CaseInsensitiveCompare(UChar left, UChar right);
 	};
 }
