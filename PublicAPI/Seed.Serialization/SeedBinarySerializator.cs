@@ -291,7 +291,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         return retObj;
     }
 
-    public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null)
+    object ISeedBinarySerializator.Deserialize(Stream serializationStream, RttiTypeRecord? targetType)
     {
         return Deserialize(serializationStream, targetType, null);
     }
