@@ -229,12 +229,12 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         return data;
     }
 
-    public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null)
+    public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null, Type? targetCsType = null)
     {
         if (targetType != null && !mapingSheme.ContainsKey(targetType))
             throw new ArgumentException();
 
-        Type? type = null;
+        Type? type = targetCsType;
         UniversalTypeIdentificator Id = new UniversalTypeIdentificator();
         dynamic ID = Id;
 
@@ -244,11 +244,25 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
         if (targetType == null && mapingSheme.Any(x => x.Key.FullTypeId == Id))
         {
-            type = mapingSheme.First(x => x.Key.FullTypeId == Id).Value;
+            var csType = mapingSheme.First(x => x.Key.FullTypeId == Id).Value;
+
+            if (type != null && type != csType)
+            {
+                throw new InvalidCastException();
+            }
+
+            type = csType;
         }
         else if(targetType != null && mapingSheme.Any(x => x.Key.FullTypeId == Id) && Id == targetType.FullTypeId)
         {
-            type = mapingSheme[targetType];
+            var csType = mapingSheme[targetType];
+
+            if (type != null && type != csType)
+            {
+                throw new InvalidCastException();
+            }
+
+            type = csType;
         }
         else
         {
@@ -275,5 +289,15 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         }
 
         return retObj;
+    }
+
+    public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null)
+    {
+        return Deserialize(serializationStream, targetType, null);
+    }
+
+    public T Deserialize<T>(Stream serializationStream, RttiTypeRecord? targetType = null)
+    {
+        return (T) Deserialize(serializationStream, targetType, typeof(T));
     }
 }

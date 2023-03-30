@@ -66,7 +66,7 @@ internal unsafe struct TextMetaData
 	public SizeT Size;
 
 	[FieldOffset(8)]
-	public fixed Сhar Text[1];
+	public fixed Char Text[1];
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
