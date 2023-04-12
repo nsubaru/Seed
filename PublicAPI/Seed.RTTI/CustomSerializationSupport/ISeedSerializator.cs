@@ -20,6 +20,13 @@ public interface ISeedSerializator
     public void Deserialize(ref dynamic data, Stream serializationStream);
 
     /// <summary>
+    /// Generate type instance by type record
+    /// </summary>
+    /// <param name="typeRecord">Type information</param>
+    /// <returns>Type instance as object</returns>
+    public object CreateObjectByTypeRecord(TypeRecord typeRecord);
+
+    /// <summary>
     /// Returns list of supprted types
     /// </summary>
     /// <returns>List of types</returns>

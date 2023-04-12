@@ -137,7 +137,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
                             .MakeGenericMethod(typePair)
                             .Invoke(this, new object[] { serializationStream });
 
-            obj = new DynamicObject(innerObj);
+            obj = new DynamicObject(innerObj, Id.Id);
         }
         else if (type.BaseType == typeof(ValueTuple).BaseType)
         {
@@ -170,7 +170,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             }
         }
 
-        return (T)obj;
+        return (T) obj;
     }
 
     private T DeserializeImpl<T>(Stream serializationStream)
@@ -235,7 +235,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             throw new ArgumentException();
 
         Type? type = targetCsType;
-        UniversalTypeIdentificator Id = new UniversalTypeIdentificator();
+        var Id = new UniversalTypeIdentificator();
         dynamic ID = Id;
 
         seedSerializator.Deserialize(ref ID, serializationStream);
