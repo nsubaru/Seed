@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
-namespace Seed.RTTI;
+﻿namespace Seed.RTTI;
 
 //HACK: Enum values is incorect,
 //      because Seed kernel EnumFlags use item index starting from 1 as index of bit
@@ -42,19 +40,19 @@ public enum ECustomTypeSchemaFormat : byte
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 public unsafe struct KernelVersionT
 {
-    [SerializableStructField("Major", "Seed::Core::UInt16")]
+    [SerializableStructFieldManual("Major", "Seed::Core::UInt16")]
     [FieldOffset(0)]
 	public UInt16 Major;
 
-    [SerializableStructField("Minor", "Seed::Core::UInt16")]
+    [SerializableStructFieldManual("Minor", "Seed::Core::UInt16")]
     [FieldOffset(4)]
 	public UInt16 Minor;
 
-    [SerializableStructField("StableBuildNumber", "Seed::Core::UInt16")]
+    [SerializableStructFieldManual("StableBuildNumber", "Seed::Core::UInt16")]
     [FieldOffset(4)]
 	public UInt16 StableBuildNumber;
 
-    [SerializableStructField("BuildNumber", "Seed::Core::UInt16")]
+    [SerializableStructFieldManual("BuildNumber", "Seed::Core::UInt16")]
     [FieldOffset(6)]
 	public UInt16 BuildNumber;
 }
@@ -110,11 +108,11 @@ public unsafe struct UniversalTypeIdentificator
     [FieldOffset(0)]
 	public UUID Id;
 
-	[SerializableStructField("KernelVersion", "Seed::Core::Settings::SettingsData::KernelVersion")]
+	[SerializableStructFieldManual("KernelVersion", "Seed::Core::Settings::SettingsData::KernelVersion")]
 	[FieldOffset(0)]
 	public KernelVersionT KernelVersion;
 
-    [SerializableStructField("TypeId", "Seed::Core::UInt64")]
+    [SerializableStructFieldManual("TypeId", "Seed::Core::UInt64")]
     [FieldOffset(4)]
 	public ID TypeId;
 

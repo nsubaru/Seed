@@ -3,6 +3,7 @@ using Seed.RTTI;
 using Seed.Serialization;
 using Seed.RTTI.Record;
 using System.Collections;
+using Microsoft.Extensions.Logging;
 
 namespace Seed.CTTI;
 
@@ -11,15 +12,20 @@ public class SeedBinarySerializator : ISeedBinarySerializator
     readonly RTTISection rttiSection;
     readonly ISeedSerializator seedSerializator;
     readonly Dictionary<RttiTypeRecord, Type> mapingSheme = new();
+    private ILogger<SeedBinarySerializator>? logger;
 
-    public SeedBinarySerializator(RTTISection rttiSection)
+    public SeedBinarySerializator(RTTISection rttiSection, ILogger<SeedBinarySerializator>? logger = null,  ILogger<SeedSerializatorFactory>? seedSerializatorFactory = null)
     {
         this.rttiSection = rttiSection;
+        this.logger = logger;
 
-        SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection);
+        logger?.LogInformation("Create serializator factory");
+        SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection, seedSerializatorFactory);
 
+        logger?.LogInformation("Retrive serializator implementation");
         seedSerializator = serializatorFactory.GetSeedSerializator();
 
+        logger?.LogInformation("Load supported types from serializator implementation");
         mapingSheme = seedSerializator
             .GetSupportedTypes()
             .OrderBy(x => x.RttiType.TypeClass)
@@ -61,6 +67,11 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
     public void Serialize(Stream serializationStream, object graph, RttiTypeRecord? targetType = null)
     {
+        if (graph == null)
+            throw new NullReferenceException();
+
+        logger?.LogInformation("Start serializing Seed type {0} with clr type {1}", targetType?.TypeName ?? "null", graph.GetType().FullName);
+
         Type? type = null;
         UniversalTypeIdentificator Id = new UniversalTypeIdentificator();
 
@@ -68,6 +79,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         {
             if (!mapingSheme.ContainsKey(targetType))
             {
+                logger?.LogError("Serialize failed. Unknown type");
                 throw new ArgumentException();
             }
             else if (mapingSheme.ContainsKey(targetType) && mapingSheme[targetType] == graph.GetType())
@@ -84,27 +96,42 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         }
         else
         {
+            logger?.LogError("Serialize failed. Unknown type");
             throw new InvalidCastException();
         }
+
+        logger?.LogDebug("Call serilizaror implementation for serialize full type id");
 
         seedSerializator.Serialize(Id, serializationStream);
 
         var record = rttiSection.AllRegisteredTypes.First(x => x.FullTypeId == Id);
 
-        if (record.TypeClass == ETypes.FixedArray || record.TypeClass == ETypes.FixedCollection)
+        logger?.LogDebug("Call serilizaror implementation for serialize data");
+
+        try
         {
-            GetType().GetRuntimeMethods().Where(x => x.Name == "SerializeArrayImpl")
-                .First()
-                .MakeGenericMethod(type)
-                .Invoke(this, new object[] { serializationStream, graph, record });
+            if (record.TypeClass == ETypes.FixedArray || record.TypeClass == ETypes.FixedCollection)
+            {
+                GetType().GetRuntimeMethods().Where(x => x.Name == "SerializeArrayImpl")
+                    .First()
+                    .MakeGenericMethod(type)
+                    .Invoke(this, new object[] { serializationStream, graph, record });
+            }
+            else
+            {
+                GetType().GetRuntimeMethods().Where(x => x.Name == "SerializeImpl")
+                    .First()
+                    .MakeGenericMethod(type)
+                    .Invoke(this, new object[] { serializationStream, graph });
+            }
         }
-        else
+        catch(Exception ex)
         {
-            GetType().GetRuntimeMethods().Where(x => x.Name == "SerializeImpl")
-                .First()
-                .MakeGenericMethod(type)
-                .Invoke(this, new object[] { serializationStream, graph });
+            logger?.LogError("Serialization failed with exception: {0}", ex.ToString());
+            throw;
         }
+
+        logger?.LogInformation("Serialization successfully completed");
     }
 
     private T CreateObject<T>(Stream serializationStream)
@@ -231,6 +258,8 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
     public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null, Type? targetCsType = null)
     {
+        logger?.LogInformation("Start deserializing Seed type {0} with clr type {1}", targetType?.TypeName ?? "null", targetCsType?.FullName ?? "null");
+
         if (targetType != null && !mapingSheme.ContainsKey(targetType))
             throw new ArgumentException();
 
@@ -239,8 +268,9 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         dynamic ID = Id;
 
         seedSerializator.Deserialize(ref ID, serializationStream);
-
         Id = ID;
+
+        logger?.LogInformation("Deserialize type full type id: {0}", Id.Id.ToString());
 
         if (targetType == null && mapingSheme.Any(x => x.Key.FullTypeId == Id))
         {
@@ -248,6 +278,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
             if (type != null && type != csType)
             {
+                logger?.LogError("Deserialize failed. Unknown type");
                 throw new InvalidCastException();
             }
 
@@ -259,6 +290,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
             if (type != null && type != csType)
             {
+                logger?.LogError("Deserialize failed. Unknown type");
                 throw new InvalidCastException();
             }
 
@@ -266,27 +298,39 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         }
         else
         {
+            logger?.LogError("Deserialize failed. Unknown type");
             throw new InvalidCastException();
         }
 
         object? retObj = null;
 
-        var record = rttiSection.AllRegisteredTypes.First(x => x.FullTypeId == Id);
+        logger?.LogDebug("Call serilizaror implementation");
 
-        if (record.TypeClass == ETypes.FixedArray || record.TypeClass == ETypes.FixedCollection)
+        var record = rttiSection.AllRegisteredTypes.First(x => x.FullTypeId == Id);
+        try
         {
-            retObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(DeserializeArrayImpl))
-                .First()
-                .MakeGenericMethod(type)
-                .Invoke(this, new object[] { serializationStream, record });
+            if (record.TypeClass == ETypes.FixedArray || record.TypeClass == ETypes.FixedCollection)
+            {
+                retObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(DeserializeArrayImpl))
+                    .First()
+                    .MakeGenericMethod(type)
+                    .Invoke(this, new object[] { serializationStream, record });
+            }
+            else
+            {
+                retObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(DeserializeImpl))
+                    .First()
+                    .MakeGenericMethod(type)
+                    .Invoke(this, new object[] { serializationStream });
+            }
         }
-        else
+        catch (Exception ex)
         {
-            retObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(DeserializeImpl))
-                .First()
-                .MakeGenericMethod(type)
-                .Invoke(this, new object[] { serializationStream });
+            logger?.LogError("Derilization failed. Error: {ex}");
+            throw;
         }
+
+        logger?.LogInformation("Derilization completed succefully");
 
         return retObj;
     }
@@ -300,4 +344,6 @@ public class SeedBinarySerializator : ISeedBinarySerializator
     {
         return (T) Deserialize(serializationStream, targetType, typeof(T));
     }
+
+    public IEnumerable<TypeRecord> SerilizableTypes => seedSerializator.GetSupportedTypes();
 }

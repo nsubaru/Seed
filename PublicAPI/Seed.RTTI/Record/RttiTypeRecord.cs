@@ -6,6 +6,7 @@ namespace Seed.RTTI.Record;
 /// A base RTTI type record class
 /// </summary>
 /// <typeparam name="THeap">Heap type</typeparam>
+[SerializableObject("Seed::Core::RTTI::RttiTypeRecord")]
 public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
 {
     private MetaData* record;

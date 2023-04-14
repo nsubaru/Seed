@@ -1,4 +1,4 @@
-﻿namespace Seed.Serialization;
+﻿namespace Seed.Serialization.CustomSerilizators;
 
 public class DynamicObjectSerializator : ICustomClassSerializator
 {
@@ -8,22 +8,22 @@ public class DynamicObjectSerializator : ICustomClassSerializator
 
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
-        var fullTypeId = new RTTI.UniversalTypeIdentificator() {};
+        var fullTypeId = new RTTI.UniversalTypeIdentificator() { };
         dynamic dynFullTypeId = fullTypeId;
 
         serializator.Deserialize(ref dynFullTypeId, serializationStream);
 
-        var typeRecord = serializator.GetSupportedTypes().First(x => x.FullTypeId == fullTypeId.Id);
+        var typeRecord = serializator.GetSupportedTypes().First(x => x.FullTypeId == dynFullTypeId.Id);
         dynamic obj = serializator.CreateObjectByTypeRecord(typeRecord);
 
         serializator.Deserialize(ref obj, serializationStream);
 
-        return new DynamicObject(obj, fullTypeId.Id);
+        return new DynamicObject(obj, dynFullTypeId.Id);
     }
 
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializator serializator)
     {
-        var dynamicObject = (DynamicObject) data;
+        var dynamicObject = (DynamicObject)data;
         var fullTypeId = new RTTI.UniversalTypeIdentificator() { Id = dynamicObject.FullTypeId };
 
         serializator.Serialize(fullTypeId, serializationStream);

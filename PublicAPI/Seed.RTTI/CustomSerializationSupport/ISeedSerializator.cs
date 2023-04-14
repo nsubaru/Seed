@@ -1,4 +1,6 @@
-﻿namespace Seed.Serialization;
+﻿using Seed.RTTI.Record;
+
+namespace Seed.Serialization;
 
 /// <summary>
 /// Seed serializator interface
@@ -31,4 +33,10 @@ public interface ISeedSerializator
     /// </summary>
     /// <returns>List of types</returns>
     public List<TypeRecord> GetSupportedTypes();
+
+    /// <summary>
+    /// Returns all known RTTI types
+    /// </summary>
+    /// <returns>All known RTTI types</returns>
+    public IEnumerable<RttiTypeRecord> GetAllRttiTypes();
 }
