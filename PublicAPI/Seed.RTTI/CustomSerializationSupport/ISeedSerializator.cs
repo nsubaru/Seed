@@ -1,4 +1,5 @@
-﻿using Seed.RTTI.Record;
+﻿using Microsoft.Extensions.Logging;
+using Seed.RTTI.Record;
 
 namespace Seed.Serialization;
 
@@ -39,4 +40,9 @@ public interface ISeedSerializator
     /// </summary>
     /// <returns>All known RTTI types</returns>
     public IEnumerable<RttiTypeRecord> GetAllRttiTypes();
+
+    /// <summary>
+    /// Serializator logger
+    /// </summary>
+    public ILogger<ISeedSerializator>? Logger { get; }
 }

@@ -6,7 +6,7 @@ namespace Seed.Serialization;
 
 public partial class SeedSerializatorFactory
 {
-    Type? TryGetAsLinqSeedType(RTTI.Record.RttiTypeRecord record, RTTI.RTTISection section)
+    Type? TryGetAsLinqSeedType(RTTI.Record.RttiTypeRecord record)
     {
         switch (record.TemplateTypeName)
         {
@@ -15,7 +15,7 @@ public partial class SeedSerializatorFactory
             case "Seed::Core::Containers::ConcurencyList":
             case "Seed::Core::Containers::ConcurencySensitiveList":
                 {
-                    var innerType = GetTypeWithOffset(0, record, section);
+                    var innerType = GetTypeWithOffset(0, record);
 
                     if (innerType == null)
                         return null;
@@ -28,8 +28,8 @@ public partial class SeedSerializatorFactory
             case "Seed::Core::Containers::Map":
             case "Seed::Core::Containers::ConcurencyMap":
                 {
-                    var innerTypeFirst = GetTypeWithOffset(1, record, section);
-                    var innerTypeSecond = GetTypeWithOffset(2, record, section);
+                    var innerTypeFirst = GetTypeWithOffset(1, record);
+                    var innerTypeSecond = GetTypeWithOffset(2, record);
 
                     if (innerTypeFirst == null || innerTypeSecond == null)
                     {
@@ -70,7 +70,7 @@ public partial class SeedSerializatorFactory
             case "Seed::Core::Containers::ConcurencyFixedQueue":
             case "Seed::Core::Containers::ConcurencySensitiveFixedQueue":
                 {
-                    var innerType = GetTypeWithOffset(0, record, section);
+                    var innerType = GetTypeWithOffset(0, record);
 
                     if (innerType == null)
                         return null;
@@ -80,8 +80,8 @@ public partial class SeedSerializatorFactory
             case "Seed::Core::Containers::Pair":
             case "Seed::Core::Containers::SensitivePair":
                 {
-                    var innerTypeFirst = GetTypeWithOffset(0, record, section);
-                    var innerTypeSecond = GetTypeWithOffset(1, record, section);
+                    var innerTypeFirst = GetTypeWithOffset(0, record);
+                    var innerTypeSecond = GetTypeWithOffset(1, record);
 
                     if (innerTypeFirst == null || innerTypeSecond == null)
                     {

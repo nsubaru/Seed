@@ -14,13 +14,17 @@ public class SeedBinarySerializator : ISeedBinarySerializator
     readonly Dictionary<RttiTypeRecord, Type> mapingSheme = new();
     private ILogger<SeedBinarySerializator>? logger;
 
-    public SeedBinarySerializator(RTTISection rttiSection, ILogger<SeedBinarySerializator>? logger = null,  ILogger<SeedSerializatorFactory>? seedSerializatorFactory = null)
+    public SeedBinarySerializator(
+        RTTISection rttiSection,
+        ILogger<SeedBinarySerializator>? logger = null, 
+        ILogger<SeedSerializatorFactory>? seedSerializatorFactory = null,
+        ILogger<ISeedSerializator>? seedSerializatorImplLogger = null)
     {
         this.rttiSection = rttiSection;
         this.logger = logger;
 
         logger?.LogInformation("Create serializator factory");
-        SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection, seedSerializatorFactory);
+        SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection, seedSerializatorFactory, seedSerializatorImplLogger);
 
         logger?.LogInformation("Retrive serializator implementation");
         seedSerializator = serializatorFactory.GetSeedSerializator();
@@ -114,14 +118,14 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             {
                 GetType().GetRuntimeMethods().Where(x => x.Name == "SerializeArrayImpl")
                     .First()
-                    .MakeGenericMethod(type)
+                    .MakeGenericMethod(type!)
                     .Invoke(this, new object[] { serializationStream, graph, record });
             }
             else
             {
                 GetType().GetRuntimeMethods().Where(x => x.Name == "SerializeImpl")
                     .First()
-                    .MakeGenericMethod(type)
+                    .MakeGenericMethod(type!)
                     .Invoke(this, new object[] { serializationStream, graph });
             }
         }
@@ -164,7 +168,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
                             .MakeGenericMethod(typePair)
                             .Invoke(this, new object[] { serializationStream });
 
-            obj = new DynamicObject(innerObj, Id.Id);
+            obj = new DynamicObject(innerObj!, Id.Id);
         }
         else if (type.BaseType == typeof(ValueTuple).BaseType)
         {
@@ -174,7 +178,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
                 args[i] = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(CreateObject))
                             .First()
                             .MakeGenericMethod(type.GenericTypeArguments[i])
-                            .Invoke(this, new object[] { serializationStream});
+                            .Invoke(this, new object[] { serializationStream})!;
             }
 
             obj = Activator.CreateInstance(type, args);
@@ -183,7 +187,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         { 
             obj = Activator.CreateInstance(typeof(T)); 
 
-            foreach(var field in obj.GetType().GetFields())
+            foreach(var field in obj!.GetType().GetFields())
             {
                 // Skip all field except public non static rw
                 if (field.IsStatic || field.IsPrivate && field.IsInitOnly || field.IsLiteral)
@@ -197,7 +201,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             }
         }
 
-        return (T) obj;
+        return (T) obj!;
     }
 
     private T DeserializeImpl<T>(Stream serializationStream)
@@ -220,7 +224,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
                 beginObj = CreateObject<T>(serializationStream);
                 break;
             case ETypes.FixedArray:
-                beginObj = Array.CreateInstance(typeof(T).GetElementType(), (int)record.ArrayItemsCount);
+                beginObj = Array.CreateInstance(typeof(T).GetElementType()!, (int)record.ArrayItemsCount);
                 break;
             default:
                 throw new InvalidCastException();
@@ -326,13 +330,13 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         }
         catch (Exception ex)
         {
-            logger?.LogError("Derilization failed. Error: {ex}");
+            logger?.LogError($"Deserilization failed. Error: {ex}");
             throw;
         }
 
-        logger?.LogInformation("Derilization completed succefully");
+        logger?.LogInformation("Deserilization completed succefully");
 
-        return retObj;
+        return retObj!;
     }
 
     object ISeedBinarySerializator.Deserialize(Stream serializationStream, RttiTypeRecord? targetType)

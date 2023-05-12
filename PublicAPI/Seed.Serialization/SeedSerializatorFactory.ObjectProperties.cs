@@ -84,7 +84,7 @@ public partial class SeedSerializatorFactory
         var manualFields =
             from field in typeof(T).GetProperties()
             where field.GetCustomAttribute<SerializableStructFieldManualAttribute>() is not null
-            select new { Field = field, FieldInformation = field.GetCustomAttribute<SerializableStructFieldManualAttribute>().FieldInformation };
+            select new { Field = field, FieldInformation = field!.GetCustomAttribute<SerializableStructFieldManualAttribute>()!.FieldInformation! };
 
         var autoFields =
             from field in typeof(T).GetProperties()
@@ -136,7 +136,7 @@ public partial class SeedSerializatorFactory
         var manualFields =
             from field in typeof(T).GetProperties()
             where field.GetCustomAttribute<SerializableStructFieldManualAttribute>() is not null
-            select new { Field = field, FieldInformation = field.GetCustomAttribute<SerializableStructFieldManualAttribute>().FieldInformation };
+            select new { Field = field, FieldInformation = field!.GetCustomAttribute<SerializableStructFieldManualAttribute>()!.FieldInformation! };
 
         var autoFields =
             from field in typeof(T).GetProperties()

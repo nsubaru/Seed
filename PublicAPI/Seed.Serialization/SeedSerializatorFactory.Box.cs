@@ -6,9 +6,9 @@ namespace Seed.Serialization;
 
 public partial class SeedSerializatorFactory
 {
-    Type? GetBoxType(RTTI.Record.RttiTypeRecord record, RTTI.RTTISection section)
+    Type? GetBoxType(RTTI.Record.RttiTypeRecord record)
     {
-        var innerType = GetTypeWithOffset(0, record, section);
+        var innerType = GetTypeWithOffset(0, record);
 
         if (innerType == null)
             return null;

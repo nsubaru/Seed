@@ -73,7 +73,7 @@ public partial class SeedSerializatorFactory
         var manualProperties =
             from prop in typeof(T).GetProperties()
             where prop.GetCustomAttribute<SerializableStructFieldManualAttribute>() is not null
-            select new { Property = prop, FieldInformation = prop.GetCustomAttribute<SerializableStructFieldManualAttribute>().FieldInformation };
+            select new { Property = prop, FieldInformation = prop!.GetCustomAttribute<SerializableStructFieldManualAttribute>()!.FieldInformation! };
 
         var autoProperties =
             from prop in typeof(T).GetProperties()
@@ -111,7 +111,7 @@ public partial class SeedSerializatorFactory
         var manualFields =
             from field in typeof(T).GetFields()
             where field.GetCustomAttribute<SerializableStructFieldManualAttribute>() is not null
-            select new { Field = field, FieldInformation = field.GetCustomAttribute<SerializableStructFieldManualAttribute>().FieldInformation };
+            select new { Field = field, FieldInformation = field!.GetCustomAttribute<SerializableStructFieldManualAttribute>()!.FieldInformation! };
 
         var autoFields =
             from field in typeof(T).GetFields()
@@ -155,7 +155,7 @@ public partial class SeedSerializatorFactory
         var manualProperties =
             from prop in typeof(T).GetProperties()
             where prop.GetCustomAttribute<SerializableStructFieldManualAttribute>() is not null
-            select new { Property = prop, FieldInformation = prop.GetCustomAttribute<SerializableStructFieldManualAttribute>().FieldInformation };
+            select new { Property = prop, FieldInformation = prop!.GetCustomAttribute<SerializableStructFieldManualAttribute>()!.FieldInformation! };
 
         var autoProperties =
             from prop in typeof(T).GetProperties()
@@ -193,7 +193,7 @@ public partial class SeedSerializatorFactory
         var manualFields =
             from field in typeof(T).GetFields()
             where field.GetCustomAttribute<SerializableStructFieldManualAttribute>() is not null
-            select new { Field = field, FieldInformation = field.GetCustomAttribute<SerializableStructFieldManualAttribute>().FieldInformation };
+            select new { Field = field, FieldInformation = field!.GetCustomAttribute<SerializableStructFieldManualAttribute>()!.FieldInformation! };
 
         var autoFields =
             from field in typeof(T).GetFields()

@@ -8,6 +8,11 @@ public partial class SeedSerializatorFactory
 {
     Type? TryGetAsPrimitive(RTTI.Record.RttiTypeRecord record)
     {
+        var res = TryGetAsEnumFlag(record);
+
+        if (res != null)
+            return res;
+
         return record.TypeName switch
         {
             "Seed::Core::Int8" => typeof(System.SByte),
@@ -19,7 +24,7 @@ public partial class SeedSerializatorFactory
             "Seed::Core::UInt32" => typeof(System.UInt32),
             "Seed::Core::UInt64" => typeof(System.UInt64),
             "Seed::Core::SizeT" => typeof(System.UInt64),
-            "Seed::Core::DataSizeT" => typeof(System.UInt64),
+            "Seed::Core::Memory::DataSizeT" => typeof(System.UInt64),
             "Seed::Core::Double" => typeof(System.Double),
             "Seed::Core::Float" => typeof(float),
             "Seed::Core::UUID" => typeof(System.Guid),
@@ -31,13 +36,18 @@ public partial class SeedSerializatorFactory
             "Seed::Core::U32Char" => typeof(System.Int32),
             "Seed::Core::String" => typeof(System.String),
             "Seed::Core::SensitiveString" => typeof(System.Security.SecureString),
-
             _ => null
         };
     }
 
     private void AddSimpleTypeSer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
+        if (typeRecord.RttiType.TypeName.StartsWith("Seed::Core::EnumFlag"))
+        {
+            AddEnumFlagSer<T>(ref code, typeRecord);
+            return;
+        }    
+
         switch (typeRecord.Type)
         {
             case CTTI.ETypes.FloatNumeric:
@@ -59,6 +69,12 @@ public partial class SeedSerializatorFactory
 
     private void AddSimpleTypeDer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
+        if (typeRecord.RttiType.TypeName.StartsWith("Seed::Core::EnumFlag"))
+        {
+            AddEnumFlagDer<T>(ref code, typeRecord);
+            return;
+        }
+
         switch (typeRecord.Type)
         {
             case CTTI.ETypes.FloatNumeric:

@@ -6,12 +6,12 @@ namespace Seed.Serialization;
 
 public partial class SeedSerializatorFactory
 {
-    Type? GetTupleType(RTTI.Record.RttiTypeRecord record, RTTI.RTTISection section)
+    Type? GetTupleType(RTTI.Record.RttiTypeRecord record)
     {
         List<Type> types = new List<Type>();
         foreach (var item in record.Fields)
         {
-            var type = GetTypeWithOffset(types.Count, record, section);
+            var type = GetTypeWithOffset(types.Count, record);
 
             if (type == null) return null;
 
