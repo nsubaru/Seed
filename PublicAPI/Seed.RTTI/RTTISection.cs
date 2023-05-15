@@ -107,12 +107,11 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     {
         if (!disposedValue)
         {
-            if (disposing)
+            if (rawArrayPtrHandle != null)
             {
-                // TODO: dispose managed state (managed objects)
+                rawArrayPtrHandle.Free();
             }
 
-            rawArrayPtrHandle.Free();
             disposedValue = true;
         }
     }
