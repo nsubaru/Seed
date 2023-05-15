@@ -26,7 +26,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         logger?.LogInformation("Create serializator factory");
         SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection, seedSerializatorFactory, seedSerializatorImplLogger);
 
-        logger?.LogInformation("Retrive serializator implementation");
+        logger?.LogInformation("Retrieve serializator implementation");
         seedSerializator = serializatorFactory.GetSeedSerializator();
 
         logger?.LogInformation("Load supported types from serializator implementation");
@@ -104,13 +104,13 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             throw new InvalidCastException();
         }
 
-        logger?.LogDebug("Call serilizaror implementation for serialize full type id");
+        logger?.LogDebug("Call serializator implementation for serialize full type id");
 
         seedSerializator.Serialize(Id, serializationStream);
 
         var record = rttiSection.AllRegisteredTypes.First(x => x.FullTypeId == Id);
 
-        logger?.LogDebug("Call serilizaror implementation for serialize data");
+        logger?.LogDebug("Call serializator implementation for serialize data");
 
         try
         {
@@ -308,7 +308,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
         object? retObj = null;
 
-        logger?.LogDebug("Call serilizaror implementation");
+        logger?.LogDebug("Call serializator implementation");
 
         var record = rttiSection.AllRegisteredTypes.First(x => x.FullTypeId == Id);
         try
