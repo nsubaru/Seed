@@ -494,4 +494,13 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     {
         return FullTypeId.GetHashCode();
     }
+
+    /// <summary>
+    /// Returns TypeName
+    /// </summary>
+    /// <returns>TypeName value</returns>
+    public override string ToString()
+    {
+        return TypeName;
+    }
 }

@@ -65,5 +65,27 @@ public struct EnumFlag<T, U>
 
         return result;
     }
+
+    public override string ToString()
+    {
+        var result = new List<T>();
+        var v = Value;
+        var value = Unsafe.As<T, U>(ref v);
+        var values = (typeof(T).GetEnumValues() as T[]);
+        var underlyingValues = (typeof(T).GetEnumValuesAsUnderlyingType() as U[]);
+
+        if (values == null || underlyingValues == null)
+            throw new InvalidCastException();
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            if (Value.HasFlag(values[i]))
+            {
+                result.Add(values[i]);
+            }
+        }
+
+        return string.Join(", ", result);
+    }
 }
 

@@ -1,4 +1,6 @@
-﻿namespace Seed.RTTI;
+﻿using Seed.Core.Settings;
+
+namespace Seed.RTTI;
 
 //HACK: Enum values is incorect,
 //      because Seed kernel EnumFlags use item index starting from 1 as index of bit
@@ -34,27 +36,6 @@ public enum ECustomTypeSchemaFormat : byte
 	RemoteStructSchema,
 	RemoteObjectSchema,
 	Undefined
-}
-
-[SerializableStruct("Seed::Core::Settings::SettingsData::KernelVersion")]
-[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
-public unsafe struct KernelVersionT
-{
-    [SerializableStructFieldManual("Major", "Seed::Core::UInt16")]
-    [FieldOffset(0)]
-	public UInt16 Major;
-
-    [SerializableStructFieldManual("Minor", "Seed::Core::UInt16")]
-    [FieldOffset(4)]
-	public UInt16 Minor;
-
-    [SerializableStructFieldManual("StableBuildNumber", "Seed::Core::UInt16")]
-    [FieldOffset(4)]
-	public UInt16 StableBuildNumber;
-
-    [SerializableStructFieldManual("BuildNumber", "Seed::Core::UInt16")]
-    [FieldOffset(6)]
-	public UInt16 BuildNumber;
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
