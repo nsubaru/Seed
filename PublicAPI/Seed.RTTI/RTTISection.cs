@@ -40,6 +40,9 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 
     internal byte[]? data;
 
+    /// <summary>
+    /// Empty ctor, create invalid instance
+    /// </summary>
     public RTTISection()
     {
         this.data = null;
