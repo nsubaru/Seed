@@ -21,7 +21,7 @@ namespace Seed::Core
 		}
 
 		/// <summary>
-		/// Case insesitive character comparing
+		/// Case insensitive character comparing
 		/// </summary>
 		/// <param name="left">Left operand</param>
 		/// <param name="right">Right operand</param>
@@ -29,7 +29,7 @@ namespace Seed::Core
 		static StrongOrdering CaseInsensitiveCompare(AChar left, AChar right);
 
 		/// <summary>
-		/// Case insesitive character comparing
+		/// Case insensitive character comparing
 		/// </summary>
 		/// <param name="left">Left operand</param>
 		/// <param name="right">Right operand</param>

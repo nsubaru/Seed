@@ -30,7 +30,7 @@ public partial class SeedSerializatorFactory
                 break;
             case "Seed::Core::U16Char":
                 {
-                    code.AppendLine("var val = (byte)data;");
+                    code.AppendLine("var val = (char)data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));");
                 }
                 break;
