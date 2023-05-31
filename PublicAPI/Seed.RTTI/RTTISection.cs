@@ -16,8 +16,8 @@ namespace Seed.RTTI;
 /// <para> .type$vz - End of variable subsection</para>
 /// <para> .type$z  - End of rtti section</para>
 /// <para> 
-/// For iterating over all rtti records this class iterate over pointer subsection and using adresses of meta data records build RttiTypeRecord 
-/// Before and during iterating this class convert absolut pointers adresses to current one
+/// For iterating over all rtti records this class iterate over pointer subsection and using addresses of meta data records build RttiTypeRecord 
+/// Before and during iterating this class convert absolute pointers addresses to current one
 /// </para>
 /// </remarks>
 /// </summary>
