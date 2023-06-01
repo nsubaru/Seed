@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-  <Type Name="Seed::Core::Exception::ExeptionLocation">
+  <Type Name="Seed::Core::Exception::ExceptionLocation">
     <DisplayString>{{{SourceLocation.FileName.str, sub}:{SourceLocation.Line} in thread {ThreadID}}}</DisplayString>
     <Expand>
       <Item Name="File">SourceLocation.FileName.str, sub</Item>

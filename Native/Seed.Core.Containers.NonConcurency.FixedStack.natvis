@@ -4,7 +4,7 @@
     <DisplayString>{{ Lenght={count} }}</DisplayString>
     <Expand>
       <Item Name="[Lenght]">count</Item>
-      <Item Name="[Buffer lenght]">$T2</Item>
+      <Item Name="[Buffer length]">$T2</Item>
       <ArrayItems>
         <Size>$T2</Size>
         <ValuePointer>stack</ValuePointer>

@@ -6,7 +6,7 @@
       <Item Name="[Lenght]">count</Item>
       <Item Name="[Front idx]">front</Item>
       <Item Name="[Rear idx]">rear</Item>
-      <Item Name="[Buffer lenght]">$T2</Item>
+      <Item Name="[Buffer length]">$T2</Item>
       <ArrayItems>
         <Size>$T2</Size>
         <ValuePointer>queue</ValuePointer>
