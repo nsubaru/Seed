@@ -92,7 +92,7 @@ public struct EnumFlag<T, U>
     }
 
     /// <summary>
-    /// Format enum values as string where each value separated by coma 
+    /// Format enum values as string where each value separated by comma 
     /// </summary>
     /// <returns>Formated string</returns>
     /// <exception cref="InvalidCastException">If enum empty or T type is not enum</exception>
