@@ -6,6 +6,7 @@ namespace Seed.RTTI.Record;
 /// A base RTTI type record class
 /// </summary>
 /// <typeparam name="THeap">Heap type</typeparam>
+[SerializableObject("Seed::Core::RTTI::RttiTypeRecord")]
 public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
 {
     private MetaData* record;
@@ -492,5 +493,14 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     public override int GetHashCode()
     {
         return FullTypeId.GetHashCode();
+    }
+
+    /// <summary>
+    /// Returns TypeName
+    /// </summary>
+    /// <returns>TypeName value</returns>
+    public override string ToString()
+    {
+        return TypeName;
     }
 }

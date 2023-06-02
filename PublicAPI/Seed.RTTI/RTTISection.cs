@@ -1,4 +1,5 @@
-﻿using Seed.RTTI.Record;
+﻿using Seed.Core.Settings;
+using Seed.RTTI.Record;
 using System.Text;
 
 namespace Seed.RTTI;
@@ -15,8 +16,8 @@ namespace Seed.RTTI;
 /// <para> .type$vz - End of variable subsection</para>
 /// <para> .type$z  - End of rtti section</para>
 /// <para> 
-/// For iterating over all rtti records this class iterate over pointer subsection and using adresses of meta data records build RttiTypeRecord 
-/// Before and during iterating this class convert absolut pointers adresses to current one
+/// For iterating over all rtti records this class iterate over pointer subsection and using addresses of meta data records build RttiTypeRecord 
+/// Before and during iterating this class convert absolute pointers addresses to current one
 /// </para>
 /// </remarks>
 /// </summary>
@@ -37,7 +38,22 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 	private List<RttiTypeRecord> registeredRecords;
     private bool disposedValue;
 
-    internal byte[] data;
+    internal byte[]? data;
+
+    /// <summary>
+    /// Empty ctor, create invalid instance
+    /// </summary>
+    public RTTISection()
+    {
+        this.data = null;
+        this.direction = false;
+        this.registeredRecords = new List<RttiTypeRecord>();
+        this.headerOffset = new SizeT();
+        this.fa = null;
+        this.fCount = 0;
+        this.offset = new SizeT();
+        this.disposedValue = false;
+    }
 
     /// <summary>
     /// Load RTTI section from raw blob
@@ -95,12 +111,11 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     {
         if (!disposedValue)
         {
-            if (disposing)
+            if (rawArrayPtrHandle != null)
             {
-                // TODO: dispose managed state (managed objects)
+                rawArrayPtrHandle.Free();
             }
 
-            rawArrayPtrHandle.Free();
             disposedValue = true;
         }
     }
@@ -234,6 +249,10 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 
         RTTISection other = (RTTISection) obj;
 
+        if (this.data == null && other.data == null) return true;
+
+        if (this.data == null || other.data == null) return false;
+
         if (this.data.Length != other.data.Length) return false;
 
         return Compare(this.data, other.data);
@@ -248,6 +267,10 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     {
         if (other == null) return this == null;
 
+        if (this.data == null && other.data == null) return true;
+
+        if (this.data == null || other.data == null) return false;
+
         if (this.data.Length != other.data.Length) return false;
 
         return Compare(this.data, other.data);
@@ -259,6 +282,8 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// <returns>Hash code value</returns>
     public override int GetHashCode()
     {
+        if (data == null) return 0;
+
         return 1768953197 + EqualityComparer<byte[]>.Default.GetHashCode(data);
     }
 
@@ -268,6 +293,9 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// <returns>Section information</returns>
     public SectionDetails GetSectionDetails()
     {
+        if (this.data == null)
+            throw new NullReferenceException();
+
         var @base = this.rawArrayPtr;
 
         SectionHeaderType* header = (SectionHeaderType*)(@base + this.headerOffset);

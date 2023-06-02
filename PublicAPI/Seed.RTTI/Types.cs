@@ -1,5 +1,5 @@
-﻿using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
+﻿using Seed.Core.Settings;
+
 namespace Seed.RTTI;
 
 //HACK: Enum values is incorect,
@@ -38,27 +38,6 @@ public enum ECustomTypeSchemaFormat : byte
 	Undefined
 }
 
-[SerializableStruct("Seed::Core::Settings::SettingsData::KernelVersion")]
-[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
-public unsafe struct KernelVersionT
-{
-    [SerializableStructField("Major", "Seed::Core::UInt16")]
-    [FieldOffset(0)]
-	public UInt16 Major;
-
-    [SerializableStructField("Minor", "Seed::Core::UInt16")]
-    [FieldOffset(4)]
-	public UInt16 Minor;
-
-    [SerializableStructField("StableBuildNumber", "Seed::Core::UInt16")]
-    [FieldOffset(4)]
-	public UInt16 StableBuildNumber;
-
-    [SerializableStructField("BuildNumber", "Seed::Core::UInt16")]
-    [FieldOffset(6)]
-	public UInt16 BuildNumber;
-}
-
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 internal unsafe struct TextMetaData
 {
@@ -66,7 +45,7 @@ internal unsafe struct TextMetaData
 	public SizeT Size;
 
 	[FieldOffset(8)]
-	public fixed Сhar Text[1];
+	public fixed Char Text[1];
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
@@ -110,11 +89,11 @@ public unsafe struct UniversalTypeIdentificator
     [FieldOffset(0)]
 	public UUID Id;
 
-	[SerializableStructField("KernelVersion", "Seed::Core::Settings::SettingsData::KernelVersion")]
+	[SerializableStructFieldManual("KernelVersion", "Seed::Core::Settings::SettingsData::KernelVersion")]
 	[FieldOffset(0)]
 	public KernelVersionT KernelVersion;
 
-    [SerializableStructField("TypeId", "Seed::Core::UInt64")]
+    [SerializableStructFieldManual("TypeId", "Seed::Core::UInt64")]
     [FieldOffset(4)]
 	public ID TypeId;
 

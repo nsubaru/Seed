@@ -36,4 +36,9 @@ public struct TypeRecord
     /// Rtti record of type
     /// </summary>
     public RttiTypeRecord RttiType { get; set; }
+
+    /// <summary>
+    /// If true than object properties type record
+    /// </summary>
+    public Boolean IsObjectProperties { get; set; }
 }

@@ -1,4 +1,7 @@
-﻿namespace Seed.Serialization;
+﻿using Microsoft.Extensions.Logging;
+using Seed.RTTI.Record;
+
+namespace Seed.Serialization;
 
 /// <summary>
 /// Seed serializator interface
@@ -20,8 +23,26 @@ public interface ISeedSerializator
     public void Deserialize(ref dynamic data, Stream serializationStream);
 
     /// <summary>
+    /// Generate type instance by type record
+    /// </summary>
+    /// <param name="typeRecord">Type information</param>
+    /// <returns>Type instance as object</returns>
+    public object CreateObjectByTypeRecord(TypeRecord typeRecord);
+
+    /// <summary>
     /// Returns list of supprted types
     /// </summary>
     /// <returns>List of types</returns>
     public List<TypeRecord> GetSupportedTypes();
+
+    /// <summary>
+    /// Returns all known RTTI types
+    /// </summary>
+    /// <returns>All known RTTI types</returns>
+    public IEnumerable<RttiTypeRecord> GetAllRttiTypes();
+
+    /// <summary>
+    /// Serializator logger
+    /// </summary>
+    public ILogger<ISeedSerializator>? Logger { get; }
 }
