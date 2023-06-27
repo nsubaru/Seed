@@ -40,16 +40,25 @@ namespace Seed::Core
 
 namespace Seed::Core::Concepts
 {
+    /// <summary>
+    /// Checking is type "T" is supports default disposing
+    /// </summary>
     template<typename T>
     concept SimpleDisposable = requires (T & obj) {
         { obj.Dispose() } -> Void;
     };
 
+    /// <summary>
+    /// Checking is type "T" is supports extended disposing
+    /// </summary>
     template<typename T>
     concept ExtendedDisposable = (requires (T & obj) {
         { obj.Dispose() } -> IsSame<bool>;
     } && !SimpleDisposable<T>);
 
+    /// <summary>
+    /// Checking is type "T" is supports any type of disposing
+    /// </summary>
     template<typename T>
     concept IsDisposable = SimpleDisposable<T> || ExtendedDisposable<T>;
 }
