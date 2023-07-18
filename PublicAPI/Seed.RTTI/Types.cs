@@ -82,9 +82,9 @@ internal unsafe struct MetaDataForDynamicRecord
 	public TToString FToString;
 }
 
-[SerializableStruct("Seed::Core::RTTI::UniversalTypeIdentificator")]
+[SerializableStruct("Seed::Core::RTTI::UniversalTypeIdentifier")]
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
-public unsafe struct UniversalTypeIdentificator
+public unsafe struct UniversalTypeIdentifier
 {
     [FieldOffset(0)]
 	public UUID Id;
@@ -99,7 +99,7 @@ public unsafe struct UniversalTypeIdentificator
 
 	public override bool Equals(object? obj)
 	{
-		var item = (UniversalTypeIdentificator?) obj;
+		var item = (UniversalTypeIdentifier?) obj;
 
 		return this == item;
 	}
@@ -114,12 +114,12 @@ public unsafe struct UniversalTypeIdentificator
 		return this.Id.ToString();
 	}
 
-    static public bool operator ==(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    static public bool operator ==(UniversalTypeIdentifier? item1, UniversalTypeIdentifier? item2)
     {
         return item1?.Id == item2?.Id;
     }
 
-    static public bool operator !=(UniversalTypeIdentificator? item1, UniversalTypeIdentificator? item2)
+    static public bool operator !=(UniversalTypeIdentifier? item1, UniversalTypeIdentifier? item2)
     {
         return item1?.Id == item2?.Id;
     }
@@ -132,7 +132,7 @@ internal unsafe struct MetaData
 	public SizeT OffsetToCttiMetaData;
 
 	[FieldOffset(8)]
-	public UniversalTypeIdentificator TypeId;
+	public UniversalTypeIdentifier TypeId;
 
 	[FieldOffset(24)]
 	public ETypes TypeClass;
@@ -181,7 +181,7 @@ internal unsafe struct ItemBase
 internal unsafe struct FieldMetaDataRecord
 {
 	[FieldOffset(0)]
-	public UniversalTypeIdentificator TypeId;
+	public UniversalTypeIdentifier TypeId;
 
 	[FieldOffset(16)]
 	public ETypes TypeClass;
@@ -206,7 +206,7 @@ internal unsafe struct FieldMetaData
 	public SizeT SizeOfItem;
 
 	[FieldOffset(8)]
-	public UniversalTypeIdentificator TypeId;
+	public UniversalTypeIdentifier TypeId;
 
 	[FieldOffset(24)]
 	public ETypes TypeClass;
@@ -231,7 +231,7 @@ internal unsafe struct ItemMetaData
 	public SizeT SizeOfItem;
 
 	[FieldOffset(8)]
-	public UniversalTypeIdentificator TypeId;
+	public UniversalTypeIdentifier TypeId;
 
 	[FieldOffset(24)]
 	public ETypes TypeClass;
@@ -253,7 +253,7 @@ internal unsafe struct ArgumentMetaData
 	public SizeT SizeOfItem;
 
 	[FieldOffset(8)]
-	public UniversalTypeIdentificator TypeId;
+	public UniversalTypeIdentifier TypeId;
 
 	[FieldOffset(24)]
 	public ETypes TypeClass;
@@ -313,7 +313,7 @@ internal unsafe struct InterfaceRecord
 	public SizeT SizeOfItem;
 
 	[FieldOffset(8)]
-	public UniversalTypeIdentificator TypeId;
+	public UniversalTypeIdentifier TypeId;
 
 	[FieldOffset(24)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;

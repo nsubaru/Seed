@@ -12,10 +12,10 @@ public class RttiTypeRecordSerializator : ICustomClassSerializator
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
         serializator.Logger?.Log(LogLevel.Trace, "Start deserializing RttiTypeRecord");
-        dynamic dynData = new UniversalTypeIdentificator();
+        dynamic dynData = new UniversalTypeIdentifier();
         serializator.Deserialize(ref dynData, serializationStream);
-        UniversalTypeIdentificator fullTypeId = dynData;
-        serializator.Logger?.Log(LogLevel.Trace, "Deserializing UniversalTypeIdentificator. Value {fullTypeId}", fullTypeId);
+        UniversalTypeIdentifier fullTypeId = dynData;
+        serializator.Logger?.Log(LogLevel.Trace, "Deserializing UniversalTypeIdentifier. Value {fullTypeId}", fullTypeId);
         var record = serializator.GetAllRttiTypes().FirstOrDefault(x => x.FullTypeId == dynData);
 
         if (record == null)
@@ -35,7 +35,7 @@ public class RttiTypeRecordSerializator : ICustomClassSerializator
         serializator.Logger?.Log(LogLevel.Trace, "Start serializing RttiTypeRecord");
         var obj = data as RttiTypeRecord;
         dynamic dynData = obj!.FullTypeId;
-        serializator.Logger?.Log(LogLevel.Trace, "Serializing RttiTypeRecord as UniversalTypeIdentificator");
+        serializator.Logger?.Log(LogLevel.Trace, "Serializing RttiTypeRecord as UniversalTypeIdentifier");
         serializator.Serialize(dynData, serializationStream);
         serializator.Logger?.Log(LogLevel.Trace, "Serializing RttiTypeRecord completed");
     }

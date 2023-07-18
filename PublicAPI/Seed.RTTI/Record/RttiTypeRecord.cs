@@ -55,7 +55,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// Full type ID
     /// </summary>
     /// <returns>Record with type ID</returns>
-    public UniversalTypeIdentificator FullTypeId => record == null ? new UniversalTypeIdentificator() : record->TypeId;
+    public UniversalTypeIdentifier FullTypeId => record == null ? new UniversalTypeIdentifier() : record->TypeId;
 
     /// <summary>
     /// Type category
@@ -170,47 +170,20 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
 
     private SizeT GetFieldsRecordsOffset()
     {
-        switch (record->TypeClass)
+        return record->TypeClass switch
         {
-            case ETypes.Tuple:
-                return GetItemsCollectionOffset();
-
-            case ETypes.Enumeration:
-                return GetItemsCollectionOffset();
-
-            case ETypes.FixedArray:
-                return GetItemsCollectionOffset();
-
-            case ETypes.Struct:
-                return GetItemsCollectionOffset();
-
-            case ETypes.Union:
-                return GetItemsCollectionOffset();
-
-            case ETypes.Collection:
-                return GetItemsCollectionOffset();
-
-            case ETypes.String:
-            case ETypes.Pointer:
-            case ETypes.Box:
-            case ETypes.Pair:
-                return GetItemsCollectionOffset();
-
-            case ETypes.FixedCollection:
-                return GetItemsCollectionOffset();
-
-            case ETypes.AssociableCollection:
-            case ETypes.Reference:
-                return GetItemsCollectionOffset();
-
-            case ETypes.Custom:
-                return GetCustomCttiTypeStrcutSchemaRttiOffset();
-
-            case ETypes.Object:
-
-            default:
-                return 0;
-        }
+            ETypes.Tuple => GetItemsCollectionOffset(),
+            ETypes.Enumeration => GetItemsCollectionOffset(),
+            ETypes.FixedArray => GetItemsCollectionOffset(),
+            ETypes.Struct => GetItemsCollectionOffset(),
+            ETypes.Union => GetItemsCollectionOffset(),
+            ETypes.Collection => GetItemsCollectionOffset(),
+            ETypes.String or ETypes.Pointer or ETypes.Box or ETypes.Pair => GetItemsCollectionOffset(),
+            ETypes.FixedCollection => GetItemsCollectionOffset(),
+            ETypes.AssociableCollection or ETypes.Reference => GetItemsCollectionOffset(),
+            ETypes.Custom => GetCustomCttiTypeStrcutSchemaRttiOffset(),
+            _ => 0,
+        };
     }
 
     /// <summary>
@@ -483,7 +456,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// <returns>Logic value</returns>
     public override bool Equals(object obj)
     {
-        return obj is RttiTypeRecord otherRecord ? this.FullTypeId.Equals(otherRecord.FullTypeId) : false;
+        return obj is RttiTypeRecord otherRecord && this.FullTypeId.Equals(otherRecord.FullTypeId);
     }
 
     /// <summary>

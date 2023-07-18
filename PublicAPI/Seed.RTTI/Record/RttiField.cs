@@ -45,7 +45,7 @@ public unsafe class RttiField : IRttiIterableObject<RttiField>
     /// <summary>
     /// Field full type ID
     /// </summary>
-    public UniversalTypeIdentificator FullTypeId => GetRecord()->TypeId;
+    public UniversalTypeIdentifier FullTypeId => GetRecord()->TypeId;
 
     /// <summary>
     /// Field type category
