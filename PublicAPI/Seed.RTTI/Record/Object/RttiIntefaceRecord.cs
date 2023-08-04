@@ -40,7 +40,7 @@ public unsafe class RttiIntefaceRecord : IRttiIterableObject<RttiIntefaceRecord>
     /// <summary>
     /// Interface type full ID
     /// </summary>
-    public UniversalTypeIdentificator FullTypeId => GetRecord()->TypeId;
+    public UniversalTypeIdentifier FullTypeId => GetRecord()->TypeId;
 
     /// <summary>
     /// Interface type name

@@ -6,7 +6,7 @@ namespace Seed.Serialization;
 
 public partial class SeedSerializatorFactory
 {
-    private void AddAssociableCollectionSer<T>(ref StringBuilder code, TypeRecord typeRecord)
+    private void AddAssociableCollectionSer<T>(ref StringBuilder code, TypeRecord _)
     {
         code.AppendLine($"SerializeImpl((ulong)data.Count, stream);");
 
@@ -14,7 +14,7 @@ public partial class SeedSerializatorFactory
         code.AppendLine($"SerializeImpl(item, stream);}}");
     }
 
-    private void AddAssociableCollectionDer<T>(ref StringBuilder code, TypeRecord typeRecord)
+    private void AddAssociableCollectionDer<T>(ref StringBuilder code, TypeRecord _)
     {
         code.AppendLine($"UInt64 count = 0;");
         code.AppendLine($"count = DeserializeImpl(count, stream);");

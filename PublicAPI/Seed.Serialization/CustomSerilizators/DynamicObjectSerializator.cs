@@ -6,24 +6,24 @@ namespace Seed.Serialization.CustomSerilizators;
 public class DynamicObjectSerializator : ICustomClassSerializator
 {
     public Type ClrType => typeof(DynamicObject);
-    public UniversalTypeIdentificator VoidFullTypeId;
+    public UniversalTypeIdentifier VoidFullTypeId;
 
     public string TypeName => "Seed::Core::RTTI::Dynamic";
 
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
-        var fullTypeId = new RTTI.UniversalTypeIdentificator() { };
+        var fullTypeId = new RTTI.UniversalTypeIdentifier() { };
         dynamic dynFullTypeId = fullTypeId;
 
         serializator.Deserialize(ref dynFullTypeId, serializationStream);
 
         fullTypeId = dynFullTypeId;
 
-        serializator.Logger?.LogTrace("Deserilize dynamic with UIID: {fullTypeId}", fullTypeId);
+        serializator.Logger?.LogTrace("Deserialize dynamic with UIID: {fullTypeId}", fullTypeId);
 
         var rttiType = serializator.GetAllRttiTypes().First(x => x.FullTypeId == fullTypeId);
 
-        serializator.Logger?.LogTrace("Deserilize dynamic with Seed type: {0}", rttiType.TypeName);
+        serializator.Logger?.LogTrace("Deserialize dynamic with Seed type: {0}", rttiType.TypeName);
 
         if (rttiType.TypeName == "void")
         {
@@ -32,7 +32,7 @@ public class DynamicObjectSerializator : ICustomClassSerializator
 
         var typeRecord = serializator.GetSupportedTypes().First(x => x.FullTypeId == fullTypeId.Id);
 
-        serializator.Logger?.LogTrace("Deserilize dynamic with C# type: {0}", typeRecord.ClrType.FullName);
+        serializator.Logger?.LogTrace("Deserialize dynamic with C# type: {0}", typeRecord.ClrType.FullName);
 
         dynamic obj = serializator.CreateObjectByTypeRecord(typeRecord);
 
@@ -51,7 +51,7 @@ public class DynamicObjectSerializator : ICustomClassSerializator
         }
 
         var fullTypeId = dynamicObject.IsValid 
-            ? new RTTI.UniversalTypeIdentificator() { Id = dynamicObject.FullTypeId }
+            ? new RTTI.UniversalTypeIdentifier() { Id = dynamicObject.FullTypeId }
             : VoidFullTypeId;
 
         serializator.Logger?.LogTrace("Serilize dynamic with UIID: {fullTypeId}", fullTypeId);

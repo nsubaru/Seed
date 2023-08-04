@@ -8,17 +8,12 @@ public partial class SeedSerializatorFactory
 {
     Type? GetMetaDataType(RTTI.Record.RttiTypeRecord record)
     {
-        switch (record.TypeName)
+        return record.TypeName switch
         {
-            case "Seed::Core::RTTI::RTTISection":
-                return typeof(RTTI.RTTISection);
-            case "Seed::Core::Serialization::TypeMetaDataRecord":
-            case "Seed::Core::Serialization::SensitiveTypeMetaDataRecord":
-                return typeof(Seed.CTTI.MetaData.TypeMetaDataRecord);
-
-            default:
-                return null;
-        }
+            "Seed::Core::RTTI::RTTISection" => typeof(RTTI.RTTISection),
+            "Seed::Core::Serialization::TypeMetaDataRecord" or "Seed::Core::Serialization::SensitiveTypeMetaDataRecord" => typeof(Seed.CTTI.MetaData.TypeMetaDataRecord),
+            _ => null,
+        };
     }
 
     private void AddMetaDataSer<T>(ref StringBuilder code, TypeRecord typeRecord)

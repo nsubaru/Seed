@@ -48,7 +48,7 @@ public unsafe class RttiArgumentRecord : IRttiIterableObject<RttiArgumentRecord>
     /// Receiving the argument record with full type ID
     /// </summary>
     /// <returns>Record with full type ID</returns>
-    public UniversalTypeIdentificator FullTypeId => GetRecord()->TypeId;
+    public UniversalTypeIdentifier FullTypeId => GetRecord()->TypeId;
 
     /// <summary>
     /// Receiving the argument record with type name

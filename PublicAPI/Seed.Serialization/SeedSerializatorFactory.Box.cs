@@ -16,12 +16,12 @@ public partial class SeedSerializatorFactory
         return typeof(Lazy<>).MakeGenericType(innerType);
     }
 
-    private void AddBoxSer<T>(ref StringBuilder code, TypeRecord typeRecord)
+    private void AddBoxSer<T>(ref StringBuilder code, TypeRecord _)
     {
         code.AppendLine($"SerializeImpl(data.Value, stream);");
     }
 
-    private void AddBoxDer<T>(ref StringBuilder code, TypeRecord typeRecord)
+    private void AddBoxDer<T>(ref StringBuilder code, TypeRecord _)
     {
         code.AppendLine($"{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())} value = data.Value;");
         code.AppendLine($"value = DeserializeImpl(value, stream);");

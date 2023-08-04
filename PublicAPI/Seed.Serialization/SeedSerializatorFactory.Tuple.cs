@@ -20,7 +20,7 @@ public partial class SeedSerializatorFactory
 
         var tp = typeof(ValueTuple)
             .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-            .First(mth => mth.Name == "Create" && mth.GetParameters().Count() == types.Count)
+            .First(mth => mth.Name == "Create" && mth.GetParameters().Length == types.Count)
             .ReturnType
             .GetGenericTypeDefinition();
 
@@ -34,13 +34,14 @@ public partial class SeedSerializatorFactory
         switch (typeRecord.TypeName)
         {
             case "Seed::Core::Containers::Tuple":
+            {
+                foreach (var field in typeof(T).GetFields().Select(x => x.Name))
                 {
-                    foreach (var field in typeof(T).GetFields().Select(x => x.Name))
-                    {
-                        code.AppendLine($"this.SerializeImpl(data.{field}, stream); ");
-                    }
+                    code.AppendLine($"this.SerializeImpl(data.{field}, stream); ");
                 }
                 break;
+            }
+
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeRecord.TypeName} ' and type class ' {typeRecord.TypeName} ' not implemented");
         }

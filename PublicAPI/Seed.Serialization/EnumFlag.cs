@@ -55,7 +55,7 @@ public struct EnumFlag<T, U>
 
             if ((value & (U.One << f)) == U.Zero)
             {
-                res = res | (1 << f);
+                res |= (1 << f);
             }
         }
 
@@ -75,7 +75,7 @@ public struct EnumFlag<T, U>
         if (values == null || underlyingValues == null)
             throw new InvalidCastException();
 
-        U result = default(U);
+        U result = default;
 
         for (int i = 0; i < values.Length; i++)
         {

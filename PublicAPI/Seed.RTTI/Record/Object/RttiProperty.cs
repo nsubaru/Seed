@@ -45,7 +45,7 @@ public unsafe class RttiProperty : IRttiIterableObject<RttiProperty>
     /// <summary>
     /// Property full type ID
     /// </summary>
-    public UniversalTypeIdentificator FullTypeId => GetRecord()->PropertyType.TypeId;
+    public UniversalTypeIdentifier FullTypeId => GetRecord()->PropertyType.TypeId;
 
     /// <summary>
     /// Property type category
