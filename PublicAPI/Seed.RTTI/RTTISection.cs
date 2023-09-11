@@ -111,7 +111,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     {
         if (!disposedValue)
         {
-            if (rawArrayPtrHandle != null)
+            if (rawArrayPtrHandle != null && rawArrayPtrHandle.IsAllocated)
             {
                 rawArrayPtrHandle.Free();
             }
