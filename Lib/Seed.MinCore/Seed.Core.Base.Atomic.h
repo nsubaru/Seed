@@ -18,13 +18,13 @@ namespace Seed::Core
     template<typename T> requires (Concepts::IsInteger<T> ||  Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
     struct ReadOnlyAtomic final {
     private:
-        volatile T value;
+        alignas(8) mutable volatile T value;
 
     public:
         /// <summary>
         /// Empty ctor, create RO atomic with default value
         /// </summary>
-        constexpr ReadOnlyAtomic() : value() {}
+        constexpr ReadOnlyAtomic() : value{} {}
 
         /// <summary>
         /// Copy ctor from RW atomic
@@ -43,7 +43,7 @@ namespace Seed::Core
         /// </summary>
         /// <param name="src">Src object value will be copied</param>
         constexpr ReadOnlyAtomic(const ReadOnlyAtomic& src) : value() {
-            Interlocked::Store(value, Interlocked::Load(const_cast<volatile T&>(src.value)));
+            Interlocked::Store(value, Interlocked::Load(src.value));
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Seed::Core
         /// </summary>
         /// <param name="str">Src object value will be copied</param>
         constexpr ReadOnlyAtomic(ReadOnlyAtomic&& src) : value() {
-            Interlocked::Store(value, Interlocked::Load(const_cast<volatile T&>(src.value)));
+            Interlocked::Store(value, Interlocked::Load(src.value));
         }
 
     public:
@@ -102,7 +102,7 @@ namespace Seed::Core
             }
             else 
             {
-                return Interlocked::Load(const_cast<volatile T&>(value));
+                return Interlocked::Load(value);
             }
         }
 
@@ -203,8 +203,8 @@ namespace Seed::Core
         /// <param name="val">Source value</param>
         /// <returns>Reference to current object</returns>
         constexpr Atomic& operator=(T&& val) {
-            return *this;
             Store(MoveRValue(val));
+            return *this;
         }
 
     public:
@@ -396,12 +396,12 @@ namespace Seed::Core
 
     template<typename T> requires (Concepts::IsInteger<T> || Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
     constexpr inline ReadOnlyAtomic<T>::ReadOnlyAtomic(const Atomic<T>& src) : value() {
-        Interlocked::Store(value, Interlocked::Load(const_cast<volatile T&>(src.value.value)));
+        Interlocked::Store(value, Interlocked::Load(src.value.value));
     }
 
     template<typename T> requires (Concepts::IsInteger<T> || Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
     constexpr inline ReadOnlyAtomic<T>::ReadOnlyAtomic(Atomic<T>&& src) : value() {
-        Interlocked::Store(value, Interlocked::Load(const_cast<volatile T&>(src.value.value)));
+        Interlocked::Store(value, Interlocked::Load(src.value.value));
     }
 }
 
