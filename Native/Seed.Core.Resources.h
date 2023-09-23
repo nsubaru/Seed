@@ -5,7 +5,7 @@
 #define CurrentMajorVersion 1
 #define CurrentMinorVersion 1
 #define CurrentStableBuildNumber 0
-#define CurrentBuildNumber 10873
+#define CurrentBuildNumber 10878
 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
