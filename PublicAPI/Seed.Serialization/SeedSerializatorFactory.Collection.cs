@@ -47,6 +47,7 @@ public partial class SeedSerializatorFactory
     {
         code.AppendLine($"var count = (UInt64)0;");
         code.AppendLine($"count = DeserializeImpl(count, stream);");
+        code.AppendLine($"if (data == null) data = CreateObject<{GetFriendlyTypeName(typeof(T))}>();");
 
         switch (typeRecord.TypeName)
         {
