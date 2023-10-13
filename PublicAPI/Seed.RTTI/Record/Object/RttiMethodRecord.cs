@@ -42,10 +42,16 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
     /// <returns>Method arguments</returns>
     internal RttiCollection<RttiArgumentRecord> GetArguments()
     {
-        var collectionBase = (Collection*)((byte*)GetRecord() + GetRecord()->MethodArgsOffset);
-        return RttiArgumentRecord.CreateCollection(collectionBase, it!.isValidCxxTypeId, it!.imageBase);
+        if (GetRecord() != null)
+        {
+            var collectionBase = (Collection*)((byte*)GetRecord() + GetRecord()->MethodArgsOffset);
+            return RttiArgumentRecord.CreateCollection(collectionBase, it!.isValidCxxTypeId, it!.imageBase);
+        }
+        else
+        {
+            return RttiArgumentRecord.CreateCollection(null, false, 0);
+        }
     }
-
 
     /// <summary>
     /// Method CV modificators
