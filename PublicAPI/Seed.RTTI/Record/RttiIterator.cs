@@ -56,7 +56,7 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     /// <returns>Current item</returns>
     private T GetObject()
     {
-        return new T().CreateInstance(this);
+        return new T().CreateInstance(this.Clone());
     }
 
     /// <summary>
@@ -110,6 +110,15 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
         idx = 0;
         item = originalItem;
         isStartedEnumeration = false;
+    }
+
+    /// <summary>
+    /// Clone current instance
+    /// </summary>
+    /// <returns>Cloned object</returns>
+    public RttiIterator<T> Clone()
+    {
+        return new RttiIterator<T>(this.item, this.idx, this.count, this.imageBase, this.isValidCxxTypeId);
     }
 
     public void Dispose() { }
