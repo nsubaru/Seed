@@ -42,10 +42,16 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
     /// <returns>Method arguments</returns>
     internal RttiCollection<RttiArgumentRecord> GetArguments()
     {
-        var collectionBase = (Collection*)((byte*)GetRecord() + GetRecord()->MethodArgsOffset);
-        return RttiArgumentRecord.CreateCollection(collectionBase, it!.isValidCxxTypeId, it!.imageBase);
+        if (GetRecord() != null)
+        {
+            var collectionBase = (Collection*)((byte*)GetRecord() + GetRecord()->MethodArgsOffset);
+            return RttiArgumentRecord.CreateCollection(collectionBase, it!.isValidCxxTypeId, it!.imageBase);
+        }
+        else
+        {
+            return RttiArgumentRecord.CreateCollection(null, false, 0);
+        }
     }
-
 
     /// <summary>
     /// Method CV modificators
@@ -53,10 +59,14 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
     public CvRefModificators MethodCVRefModificators => GetRecord()->MethodCVRefModificators;
 
     /// <summary>
-    /// Receiving the method name
+    /// Method name
     /// </summary>
-    /// <returns>Method name</returns>
     public string Name => Marshal.PtrToStringAuto((IntPtr)  GetRecord()->MethodName.Text) ?? string.Empty;
+
+    /// <summary>
+    /// Method ID
+    /// </summary>
+    public ID Id => it?.idx ?? ID.MaxValue;
 
     /// <summary>
     /// Method arguments
