@@ -46,6 +46,11 @@ namespace Seed::Core
 			}
 		}
 
+		/// <summary>
+		/// Reverses the bytes order for UInt32
+		/// </summary>
+		/// <param name="value">Given set of bytes</param>
+		/// <returns>Reversed set of bytes</returns>
 		constexpr static UInt32 ReverseByteOrder(UInt32 value)
 		{
 			if (TypeTraits::IsCompileTimeEvaluating())
@@ -70,6 +75,11 @@ namespace Seed::Core
 			}
 		}
 
+		/// <summary>
+		/// Reverses the bytes order for Int16
+		/// </summary>
+		/// <param name="value">Given set of bytes</param>
+		/// <returns>Reversed set of bytes</returns>
 		constexpr static Int16 ReverseByteOrder(Int16 value)
 		{
 			if (TypeTraits::IsCompileTimeEvaluating())
@@ -94,6 +104,11 @@ namespace Seed::Core
 			}
 		}
 
+		/// <summary>
+		/// Reverses the bytes order for UInt16
+		/// </summary>
+		/// <param name="value">Given set of bytes</param>
+		/// <returns>Reversed set of bytes</returns>
 		constexpr static UInt16 ReverseByteOrder(UInt16 value)
 		{
 			if (TypeTraits::IsCompileTimeEvaluating())
@@ -118,6 +133,11 @@ namespace Seed::Core
 			}
 		}
 
+		/// <summary>
+		/// Reverses the bytes order for Int64
+		/// </summary>
+		/// <param name="value">Given set of bytes</param>
+		/// <returns>Reversed set of bytes</returns>
 		constexpr static Int64 ReverseByteOrder(Int64 value)
 		{
 			if (TypeTraits::IsCompileTimeEvaluating())
@@ -142,6 +162,11 @@ namespace Seed::Core
 			}
 		}
 
+		/// <summary>
+		/// Reverses the bytes order for UInt64
+		/// </summary>
+		/// <param name="value">Given set of bytes</param>
+		/// <returns>Reversed set of bytes</returns>
 		constexpr static UInt64 ReverseByteOrder(UInt64 value)
 		{
 			if (TypeTraits::IsCompileTimeEvaluating())
@@ -166,6 +191,11 @@ namespace Seed::Core
 			}
 		}
 
+		/// <summary>
+		/// Reverses the bytes order for template type
+		/// </summary>
+		/// <param name="value">Given set of bytes</param>
+		/// <returns>Reversed set of bytes</returns>
 		template<typename T> 
 		requires TypeTraits::HasTriviaCtor<T>
 		constexpr static T ReverseByteOrder(T value)
