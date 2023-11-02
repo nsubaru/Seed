@@ -4,6 +4,8 @@ using Seed.Serialization;
 using Seed.RTTI.Record;
 using System.Collections;
 using Microsoft.Extensions.Logging;
+using System.Runtime.CompilerServices;
+using System.Diagnostics.Contracts;
 
 namespace Seed.CTTI;
 
@@ -190,10 +192,12 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             obj = Activator.CreateInstance(type, args);
         }
         else
-        { 
-            obj = Activator.CreateInstance(typeof(T)); 
+        {
+            obj = !typeof(T).GetConstructors().Any(x => x.GetParameters().Length == 0)
+                ? (T)RuntimeHelpers.GetUninitializedObject(typeof(T))
+                : Activator.CreateInstance(typeof(T));
 
-            foreach(var field in obj!.GetType().GetFields())
+            foreach (var field in obj!.GetType().GetFields())
             {
                 // Skip all field except public non static rw
                 if (field.IsStatic || field.IsPrivate && field.IsInitOnly || field.IsLiteral)
@@ -217,6 +221,18 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         object? beginObj = CreateObject<T>(serializationStream);
         T obj = (T) beginObj!;
         dynamic data = obj;
+        seedSerializator.Deserialize(ref data, serializationStream);
+
+        return data;
+    }
+
+    private T DeserializeCustomImpl<T>(Stream serializationStream)
+    {
+        T beginObj = CreateObject<T>(serializationStream);
+
+        Contract.Assume(beginObj != null);
+
+        dynamic data = beginObj;
         seedSerializator.Deserialize(ref data, serializationStream);
 
         return data;
@@ -322,6 +338,13 @@ public class SeedBinarySerializator : ISeedBinarySerializator
                     .First()
                     .MakeGenericMethod(type)
                     .Invoke(this, new object[] { serializationStream, record });
+            }
+            else if (record.TypeClass == ETypes.Custom)
+            {
+                retObj = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(DeserializeCustomImpl))
+                    .First()
+                    .MakeGenericMethod(type)
+                    .Invoke(this, new object[] { serializationStream });
             }
             else
             {

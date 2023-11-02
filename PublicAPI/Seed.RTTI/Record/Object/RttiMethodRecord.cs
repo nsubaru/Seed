@@ -59,10 +59,14 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
     public CvRefModificators MethodCVRefModificators => GetRecord()->MethodCVRefModificators;
 
     /// <summary>
-    /// Receiving the method name
+    /// Method name
     /// </summary>
-    /// <returns>Method name</returns>
     public string Name => Marshal.PtrToStringAuto((IntPtr)  GetRecord()->MethodName.Text) ?? string.Empty;
+
+    /// <summary>
+    /// Method ID
+    /// </summary>
+    public ID Id => it?.idx ?? ID.MaxValue;
 
     /// <summary>
     /// Method arguments
