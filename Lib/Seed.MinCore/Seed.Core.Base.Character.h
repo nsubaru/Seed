@@ -21,6 +21,36 @@ namespace Seed::Core
 		}
 
 		/// <summary>
+		/// Indicates whether the variable is a latin letter
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if latin letter</returns>
+		static bool IsLatinLetter(Char ch)
+		{
+			return IsUpperLatinLetter(ch) || IsLowerLatinLetter(ch);
+		}
+
+		/// <summary>
+		/// Indicates whether the variable is a uppercase latin letter
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if uppercase latin letter</returns>
+		static bool IsUpperLatinLetter(Char ch)
+		{
+			return (L'A' <= ch && ch <= L'Z') ;
+		}
+
+		/// <summary>
+		/// Indicates whether the variable is a lowercase latin letter
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if lowercase latin letter</returns>
+		static bool IsLowerLatinLetter(Char ch)
+		{
+			return (L'a' <= ch && ch <= L'z');
+		}
+
+		/// <summary>
 		/// Case insensitive character comparing
 		/// </summary>
 		/// <param name="left">Left operand</param>
