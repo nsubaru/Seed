@@ -6,16 +6,29 @@
 #include "Seed.Core.Base.EnumFlags.h"
 #include "Seed.Core.Base.Comparing.h"
 
+namespace Seed::Core::Concepts
+{
+    /// <summary>
+    /// Valida atomic types
+    /// </summary>
+    template<typename T>
+    concept AtomicType = 
+        Concepts::IsInteger<T> || 
+        Concepts::IsEnum<T> || 
+        TypeTraits::IsEnumFlagsV<T> || 
+        TypeTraits::IsBoolean<T>;
+}
+
 namespace Seed::Core 
 {
-    template<typename T> requires (Concepts::IsInteger<T> || Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
+    template<Concepts::AtomicType T>
     struct Atomic;
 
     /// <summary>
     /// Read only atomic primitive with interlocked read operation
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    template<typename T> requires (Concepts::IsInteger<T> ||  Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
+    template<Concepts::AtomicType T>
     struct ReadOnlyAtomic final {
     private:
         alignas(8) mutable volatile T value;
@@ -49,7 +62,7 @@ namespace Seed::Core
         /// <summary>
         /// Move ctor from RO atomic
         /// </summary>
-        /// <param name="str">Src object value will be copied</param>
+        /// <param name="src">Src object value will be copied</param>
         constexpr ReadOnlyAtomic(ReadOnlyAtomic&& src) : value() {
             Interlocked::Store(value, Interlocked::Load(src.value));
         }
@@ -119,15 +132,18 @@ namespace Seed::Core
         constexpr ~ReadOnlyAtomic() { value.~T(); }
 
     public:
-        template<typename U> requires (Concepts::IsInteger<U> || Concepts::IsEnum<U> || TypeTraits::IsEnumFlagsV<U>)
+        template<Concepts::AtomicType U>
         friend struct Atomic;
+
+        template<typename U>
+        friend U CompareAndSwap(Atomic<U>& destination, U exchange, U comperand);
     };
 
     /// <summary>
     /// Atomic read write value
     /// </summary>
     /// <typeparam name="T">Target type</typeparam>
-    template<typename T> requires (Concepts::IsInteger<T> || Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
+    template<Concepts::AtomicType T>
     struct Atomic final {
     private:
         ReadOnlyAtomic<T> value;
@@ -265,7 +281,7 @@ namespace Seed::Core
         }
 
     public:
-        /// <summary>S
+        /// <summary>
         /// Atomically read current value
         /// </summary>
         /// <returns>Current value</returns>
@@ -340,14 +356,15 @@ namespace Seed::Core
         constexpr ~Atomic() {}
 
     public:
-        template<typename U> requires (Concepts::IsInteger<U> || Concepts::IsEnum<U> || TypeTraits::IsEnumFlagsV<U>)
+        template<Concepts::AtomicType U>
         friend struct ReadOnlyAtomic;
 
     public:
         template<typename U>
         friend constexpr void Swap(U& l, U& r);
 
-        friend constexpr T CompareAndSwap(Atomic<T>& destination, T exchange, T comperand);
+        template<typename U>
+        friend U CompareAndSwap(Atomic<U>& destination, U exchange, U comperand);
     };
 
     /// <summary>
@@ -358,21 +375,10 @@ namespace Seed::Core
     /// <param name="exchange">New value which will be set if value equal with comperand</param>
     /// <param name="comperand">Comparable value</param>
     /// <returns>Previous value</returns>
-    template<typename T> requires (Concepts::IsInteger<T> || Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
-    constexpr T CompareAndSwap(Atomic<T>& destination, T exchange, T comperand) {
-        if (TypeTraits::IsCompileTimeEvaluating())
-        {
-            T initialValue = destination.value.value;
-            if (destination.value.value == comperand)
-            {
-                Swap(destination.value, exchange);
-            }
-            return initialValue;
-        }
-        else 
-        {
-            return Interlocked::CompareAndSwap(destination.value.value, exchange, comperand);
-        }
+    template<typename T>
+    T CompareAndSwap(Atomic<T>& destination, T exchange, T comperand)
+    {
+        return Interlocked::CompareAndSwap(destination.value.value, exchange, comperand);
     }
 
     /// <summary>
@@ -381,7 +387,7 @@ namespace Seed::Core
     /// <typeparam name="T">Atomic target type value</typeparam>
     /// <param name="l">Left operand</param>
     /// <param name="r">Right operand</param>
-    template<typename T>
+    template<Concepts::AtomicType T>
     constexpr void Swap(Atomic<T>& l, Atomic<T>& r)
     {
         if (TypeTraits::IsCompileTimeEvaluating()) 
@@ -394,12 +400,12 @@ namespace Seed::Core
         }
     }
 
-    template<typename T> requires (Concepts::IsInteger<T> || Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
+    template<Concepts::AtomicType T>
     constexpr inline ReadOnlyAtomic<T>::ReadOnlyAtomic(const Atomic<T>& src) : value() {
         Interlocked::Store(value, Interlocked::Load(src.value.value));
     }
 
-    template<typename T> requires (Concepts::IsInteger<T> || Concepts::IsEnum<T> || TypeTraits::IsEnumFlagsV<T>)
+    template<Concepts::AtomicType T>
     constexpr inline ReadOnlyAtomic<T>::ReadOnlyAtomic(Atomic<T>&& src) : value() {
         Interlocked::Store(value, Interlocked::Load(src.value.value));
     }
