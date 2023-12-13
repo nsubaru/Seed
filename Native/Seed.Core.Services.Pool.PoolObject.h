@@ -53,6 +53,8 @@ namespace Seed::Core::Services::Pool
 						This->fatherRef->Push(*this);
 
 						This->RefCount--;
+
+						This = nullptr;
 					}
 				}
 				else

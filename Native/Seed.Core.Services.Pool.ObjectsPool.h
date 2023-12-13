@@ -35,6 +35,7 @@ namespace Seed::Core::Services::Pool
 		virtual void Dispose() override {
 			This->RefCount = Math::Max<SizeT>();
 			This->it.Remove(false);
+			This->pool->RemoveAll();
 		};
 
 		ObjectsPool(String&& name, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount, SizeT startSize) :
