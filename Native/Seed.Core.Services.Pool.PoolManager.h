@@ -19,7 +19,9 @@ namespace Seed::Core::Services::Pool
 
 			RefCountT RefCount;
 
-			Data(Services::EventService eventService) : eventService(eventService), lowCommitConditionEvenHandlerId(0), activePools(), RefCount(1) {}
+			Data(Services::EventService eventService) 
+				: eventService(eventService), lowCommitConditionEvenHandlerId(0), activePools(), RefCount(1) 
+			{}
 		};
 
 		Data* This;
@@ -115,7 +117,7 @@ namespace Seed::Core::Services::Pool
 					.MaxCount = item.MaxPoolObjectCount,
 					.CurrentCount = item.AvailablePoolObjectCount
 				};
-				});
+			});
 		}
 
 	public:

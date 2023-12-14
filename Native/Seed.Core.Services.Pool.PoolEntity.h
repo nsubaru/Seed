@@ -28,8 +28,12 @@ namespace Seed::Core::Services::Pool
 
 			RefCountT RefCount;
 
-			Data(SmartPtr<Containers::Blob>&& dataContainer, FatherRefType&& fatherRef, EnumFlags<EPoolObjectFlags> flags) : data(MoveRValue(dataContainer)), flags(flags), fatherRef(MoveRValue(fatherRef)), RefCount(1) {
-			}
+			Data(SmartPtr<Containers::Blob>&& dataContainer, FatherRefType&& fatherRef, EnumFlags<EPoolObjectFlags> flags) : 
+				data(MoveRValue(dataContainer)), 
+				flags(flags), 
+				fatherRef(MoveRValue(fatherRef)), 
+				RefCount(1) 
+			{}
 		};
 
 		Data* This;
@@ -96,22 +100,44 @@ namespace Seed::Core::Services::Pool
 			return This->data.operator->();
 		}
 
+		/// <summary>
+		/// Denomination operator
+		/// </summary>
+		/// <returns>A reference to an object</returns>
 		ForceInline Containers::Blob& operator*() {
 			return This->data.operator*();
 		}
 
+		/// <summary>
+		/// The access operator to fields/methods
+		/// </summary>
+		/// <returns>A pointer to an object</returns>
 		ForceInline const Containers::Blob* operator->() const {
 			return This->data.operator->();
 		}
 
+		/// <summary>
+		/// Denomination operator
+		/// </summary>
+		/// <returns>A reference to an object</returns>
 		ForceInline const Containers::Blob& operator*() const {
 			return This->data.operator*();
 		}
 
+		/// <summary>
+		/// An access operator to array elements
+		/// </summary>
+		/// <param name="Index">Element number</param>
+		/// <returns>A reference to element</returns>
 		Byte& operator[](SizeT idx) {
 			return (*This->data)[idx];
 		}
 
+		/// <summary>
+		/// An access operator to array elements
+		/// </summary>
+		/// <param name="Index">Element number</param>
+		/// <returns>A reference to element</returns>
 		const Byte& operator[](SizeT idx) const {
 			return (*This->data)[idx];
 		}
