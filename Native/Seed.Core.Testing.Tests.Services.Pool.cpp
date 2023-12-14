@@ -8,7 +8,7 @@ namespace Seed::Core::Testing::Test::Services::Pool
 {
 	bool PoolStartTest::Execute() {
 		auto service = Core::Services::GetGlobalIOC()
-			.Resolve<Core::Services::Pool::PoolBuilder>();
+			.Resolve<Core::Services::Pool::PoolManager>();
 
 		auto pool = service.CreatePool(L"Test pool", 5, 1);
 
@@ -19,7 +19,7 @@ namespace Seed::Core::Testing::Test::Services::Pool
 
 	bool PoolCreateDestTest::Execute() {
 		auto service = Core::Services::GetGlobalIOC()
-			.Resolve<Core::Services::Pool::PoolBuilder>();
+			.Resolve<Core::Services::Pool::PoolManager>();
 
 		auto pool = service.CreatePool(L"Test pool", 5, 1);
 
@@ -46,7 +46,7 @@ namespace Seed::Core::Testing::Test::Services::Pool
 
 	bool PoolCustomTest::Execute() {
 		auto service = Core::Services::GetGlobalIOC()
-			.Resolve<Core::Services::Pool::PoolBuilder>();
+			.Resolve<Core::Services::Pool::PoolManager>();
 
 		auto pool = service.CreatePool(L"Test pool", 5, 1);
 		auto poolObj = pool.GetOrCreate();
@@ -60,7 +60,7 @@ namespace Seed::Core::Testing::Test::Services::Pool
 
 	bool PoolOverflowTest::Execute() {
 		auto service = Core::Services::GetGlobalIOC()
-			.Resolve<Core::Services::Pool::PoolBuilder>();
+			.Resolve<Core::Services::Pool::PoolManager>();
 
 		auto pool = service.CreatePool(L"Test pool", 5, 1);
 
@@ -75,7 +75,7 @@ namespace Seed::Core::Testing::Test::Services::Pool
 
 	bool PoolFlushTest::Execute() {
 		auto service = Core::Services::GetGlobalIOC()
-			.Resolve<Core::Services::Pool::PoolBuilder>();
+			.Resolve<Core::Services::Pool::PoolManager>();
 
 		auto pool = service.CreatePool(L"Test pool", 5, 2);
 
@@ -98,7 +98,7 @@ namespace Seed::Core::Testing::Test::Services::Pool
 
 	bool PoolExtendTest::Execute() {
 		auto service = Core::Services::GetGlobalIOC()
-			.Resolve<Core::Services::Pool::PoolBuilder>();
+			.Resolve<Core::Services::Pool::PoolManager>();
 
 		auto pool = service.CreatePool(L"Test pool", 5, 1);
 
@@ -113,7 +113,7 @@ namespace Seed::Core::Testing::Test::Services::Pool
 
 	bool PoolShrinkTest::Execute() {
 		auto service = Core::Services::GetGlobalIOC()
-			.Resolve<Core::Services::Pool::PoolBuilder>();
+			.Resolve<Core::Services::Pool::PoolManager>();
 
 		auto pool = service.CreatePool(L"Test pool", 5, 5, 1);
 

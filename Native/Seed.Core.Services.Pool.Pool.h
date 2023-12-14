@@ -1,15 +1,15 @@
 #pragma once
 #include "Seed.Core.Services.Pool.Base.h"
-#include "Seed.Core.Services.Pool.PoolObject.h"
+#include "Seed.Core.Services.Pool.PoolEntity.h"
 
 namespace Seed::Core::Services::Pool
 {
 	/// <summary>
-	/// Pool objects manager
+	/// Pool objects container
 	/// </summary>
-	class ObjectsPool final : public IDisposable {
+	class Pool final : public IDisposable {
 	private:
-		using ContainerType = Containers::ConcurencyDynamicStack<PoolObject>;
+		using ContainerType = Containers::ConcurencyDynamicStack<PoolEntity>;
 
 		struct Data {
 			String poolName;
@@ -17,7 +17,7 @@ namespace Seed::Core::Services::Pool
 			SmartPtr<ContainerType> pool;
 			SizeT maxPoolObjectSize;
 
-			Containers::ConcurencyList<ObjectsPool>::Iterator it;
+			Containers::ConcurencyList<Pool>::Iterator it;
 			RefCountT RefCount;
 
 			Data(String&& name, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount) :
@@ -38,11 +38,11 @@ namespace Seed::Core::Services::Pool
 			This->pool->RemoveAll();
 		};
 
-		ObjectsPool(String&& name, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount, SizeT startSize) :
+		Pool(String&& name, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount, SizeT startSize) :
 			This(new Data(MoveRValue(name), maxPoolObjectSize, maxPoolObjectCount)) {
 			for (SizeT i = 0; i < startSize; i++)
 			{
-				This->pool->Push(PoolObject(new Containers::Blob(maxPoolObjectSize), This->pool.AsWeak(), {}));
+				This->pool->Push(PoolEntity(new Containers::Blob(maxPoolObjectSize), This->pool.AsWeak(), {}));
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace Seed::Core::Services::Pool
 		/// Returns ready to use available or created pool object.
 		/// </summary>
 		/// <returns>Pool object</returns>
-		PoolObject GetOrCreate() {
+		PoolEntity GetOrCreate() {
 			if (This->pool->Count != 0)
 			{
 				auto retObj = This->pool->Pop();
@@ -60,7 +60,7 @@ namespace Seed::Core::Services::Pool
 			}
 			else
 			{
-				return PoolObject(new Containers::Blob(This->maxPoolObjectSize), This->pool.AsWeak(), EPoolObjectFlags::InUse);
+				return PoolEntity(new Containers::Blob(This->maxPoolObjectSize), This->pool.AsWeak(), EPoolObjectFlags::InUse);
 			}
 		}
 
@@ -69,10 +69,10 @@ namespace Seed::Core::Services::Pool
 		/// </summary>
 		/// <param name="minRequiredSize">Object minimal buffer size</param>
 		/// <returns>Pool object</returns>
-		PoolObject GetOrCreate(SizeT minRequiredSize) {
+		PoolEntity GetOrCreate(SizeT minRequiredSize) {
 			if (minRequiredSize > This->maxPoolObjectSize)
 			{
-				return PoolObject(new Containers::Blob(minRequiredSize), This->pool.AsWeak(), EPoolObjectFlags::Custom | EPoolObjectFlags::InUse);
+				return PoolEntity(new Containers::Blob(minRequiredSize), This->pool.AsWeak(), EPoolObjectFlags::Custom | EPoolObjectFlags::InUse);
 			}
 
 			return GetOrCreate();
@@ -160,9 +160,9 @@ namespace Seed::Core::Services::Pool
 		const String Property(GetPoolManagerName) PoolManagerName;
 
 	public:
-		friend class PoolBuilder;
+		friend class PoolManager;
 
 	public:
-		RefCountClass(ObjectsPool, This)
+		RefCountClass(Pool, This)
 	};
 }

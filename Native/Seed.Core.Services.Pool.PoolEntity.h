@@ -14,11 +14,11 @@ namespace Seed::Core::Services::Pool
 	};
 
 	/// <summary>
-	/// Pool object
+	/// Pool entity
 	/// </summary>
-	class PoolObject final : public IExtendedDisposable {
+	class PoolEntity final : public IExtendedDisposable {
 	private:
-		using FatherRefType = WeakPtr<Containers::ConcurencyDynamicStack<PoolObject>>;
+		using FatherRefType = WeakPtr<Containers::ConcurencyDynamicStack<PoolEntity>>;
 
 		struct Data {
 			SmartPtr<Containers::Blob> data;
@@ -70,14 +70,22 @@ namespace Seed::Core::Services::Pool
 			}
 		}
 
-		PoolObject(SmartPtr<Containers::Blob>&& dataContainer, FatherRefType&& fatherRef, EnumFlags<EPoolObjectFlags> flags) : This(new Data(MoveRValue(dataContainer), MoveRValue(fatherRef), flags)) {
-		}
+		PoolEntity(
+			SmartPtr<Containers::Blob>&& dataContainer, 
+			FatherRefType&& fatherRef, 
+			EnumFlags<EPoolObjectFlags> flags
+		) : This(new Data(
+				MoveRValue(dataContainer), 
+				MoveRValue(fatherRef), 
+				flags)
+			)
+		{}
 
 	public:
 		/// <summary>
 		/// Do not use this shit. For internal use only.
 		/// </summary>
-		explicit PoolObject() : This(nullptr) {
+		explicit PoolEntity() : This(nullptr) {
 		}
 
 		/// <summary>
@@ -123,9 +131,9 @@ namespace Seed::Core::Services::Pool
 		SizeT Property(GetMaxSize) MaxSize;
 
 	public:
-		friend class ObjectsPool;
+		friend class Pool;
 
 	public:
-		RefCountClass(PoolObject, This)
+		RefCountClass(PoolEntity, This)
 	};
 }

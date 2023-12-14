@@ -1,6 +1,6 @@
 #pragma once
 #include "Seed.Core.Services.Pool.Base.h"
-#include "Seed.Core.Services.Pool.ObjectsPool.h"
+#include "Seed.Core.Services.Pool.Pool.h"
 
 #include "Seed.Core.Services.EventService.h"
 #include "Seed.Core.Services.BootupServicesManager.h"
@@ -10,12 +10,12 @@ namespace Seed::Core::Services::Pool
 	/// <summary>
 	/// Pool builder service
 	/// </summary>
-	class PoolBuilder final : public IDisposable, IBootUpService<PoolBuilder, Services::EventService> {
+	class PoolManager final : public IDisposable, IBootUpService<PoolManager, Services::EventService> {
 		struct Data {
 			Services::EventService eventService;
 			ID lowCommitConditionEvenHandlerId;
 
-			Containers::ConcurencyList<ObjectsPool> activePools;
+			Containers::ConcurencyList<Pool> activePools;
 
 			RefCountT RefCount;
 
@@ -31,7 +31,7 @@ namespace Seed::Core::Services::Pool
 				.UnRegisterCallback(This->lowCommitConditionEvenHandlerId);
 		}
 
-		PoolBuilder(Data* This) : This(This) {
+		PoolManager(Data* This) : This(This) {
 			++This->RefCount;
 		}
 
@@ -49,7 +49,7 @@ namespace Seed::Core::Services::Pool
 			}
 
 			virtual void onEvent(Events::GlobalEventTarget target, Events::EventState eventOnCallState, RTTI::Dynamic dynamic) override {
-				This->activePools.ForEach([] (ObjectsPool& pool) { pool.FlushPool(); });
+				This->activePools.ForEach([] (Pool& pool) { pool.FlushPool(); });
 			}
 
 		public:
@@ -61,7 +61,7 @@ namespace Seed::Core::Services::Pool
 		/// <summary>
 		/// Service constructor
 		/// </summary>
-		PoolBuilder(Services::EventService eventService) : This(new Data(eventService)) {
+		PoolManager(Services::EventService eventService) : This(new Data(eventService)) {
 			This->lowCommitConditionEvenHandlerId = eventService
 				.GetEventByName(CurrentSettings().StaticSettings.HostCommitLowEventName)
 				.RegisterCallback(new LowCommitConditionEventTarget(This));
@@ -75,13 +75,13 @@ namespace Seed::Core::Services::Pool
 		/// <param name="maxPoolObjectSize">Maximum pool object buffer size</param>
 		/// <param name="maxPoolObjectCount">Maximum pool object buffer count</param>
 		/// <returns>New pool</returns>
-		ObjectsPool CreatePool(String&& poolName, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount, SizeT startSize = 0) {
+		Pool CreatePool(String&& poolName, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount, SizeT startSize = 0) {
 			if (maxPoolObjectCount == 0)
 			{
 				Throw(InvalidArgumentException(SourcePosition, L"maxPoolObjectSize", L"Size can't be null"));
 			}
 
-			auto retObj = ObjectsPool(MoveRValue(poolName), maxPoolObjectSize, maxPoolObjectCount, startSize ? startSize : maxPoolObjectCount);
+			auto retObj = Pool(MoveRValue(poolName), maxPoolObjectSize, maxPoolObjectCount, startSize ? startSize : maxPoolObjectCount);
 
 			retObj.This->it = This->activePools.AddLast(retObj);
 			retObj.This->RefCount--;
@@ -108,7 +108,7 @@ namespace Seed::Core::Services::Pool
 		/// </summary>
 		/// <returns>Pool statistics</returns>
 		Containers::Array<PoolStatistics> GetStats() {
-			return This->activePools.CopyTo<Containers::Array>([] (const ObjectsPool& item) {
+			return This->activePools.CopyTo<Containers::Array>([] (const Pool& item) {
 				return PoolStatistics{
 					.Name = item.PoolManagerName,
 					.MaxSize = item.MaxPoolObjectSize,
@@ -119,6 +119,6 @@ namespace Seed::Core::Services::Pool
 		}
 
 	public:
-		RefCountClass(PoolBuilder, This)
+		RefCountClass(PoolManager, This)
 	};
 }
