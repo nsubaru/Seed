@@ -151,7 +151,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         SizeT j = 0;
         for (SizeT i = 0; i < count; i++, j++)
         {
-            while((SizeT) (start + j) == 0)
+            while(*(start + j) == 0)
             {
                 j++;
             }
