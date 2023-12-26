@@ -212,3 +212,42 @@ inline Seed::Core::Threading::BaseTask<Seed::Core::Containers::BaseConcurencyLis
 		__assume(0);
 	}
 }
+
+template<class THeap, typename T>
+template<typename TLambda>
+inline Seed::Core::Threading::BaseTask<void, void> Seed::Core::Containers::BaseConcurencyList<THeap, T>::RemoveAllAsyncImpl(TLambda&& lambda)
+{
+	return this->lock.ExclusiveLockAsync([&]() -> Threading::BaseTask<void, void> InlineLambda
+	{
+		SizeT idx = 0;
+		while (this->root != nullptr)
+		{
+			elem* node = this->root;
+			this->root = this->root->next;
+			node->next = nullptr;
+			node->father = nullptr;
+			node->prev = nullptr;
+
+			if (Concepts::IsAsyncInvocable<TLambda, T&&, SizeT>)
+			{
+				co_await lambda(MoveRValue(node->value), idx);
+			}
+			else
+			{
+				co_await lambda(MoveRValue(node->value));
+			}
+
+			if (--node->RefCount == 0)
+			{
+				delete node;
+				continue;
+			}
+
+			idx++;
+		}
+
+		this->root = this->last = nullptr;
+		this->size = 0;
+		return *this;
+	});
+}
