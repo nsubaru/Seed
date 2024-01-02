@@ -1,38 +1,259 @@
 #pragma once
 #include "Seed.Core.Threading.Containers.NonConcurency.Base.h"
 
-template<class THeap, typename T>
-template<typename TLambda>
-inline Seed::Core::Threading::BaseTask<void, void> Seed::Core::Containers::BaseList<THeap, T>::RemoveAllAsyncImpl(TLambda&& lambda)
+namespace Seed::Core
 {
-	SizeT idx = 0;
-
-	elem* node;
-	while (this->root != nullptr)
+#pragma region ForEachAsyncImpl
+	template<class THeap, typename T>
+	template<typename TLambda>
+	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda)
 	{
-		node = this->root;
-		this->root = root->next;
-		node->next = nullptr;
-		node->father = nullptr;
-		node->prev = nullptr;
-
-		if constexpr (Concepts::IsAsyncInvocable<TLambda, T&&, SizeT>)
+		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
+				TypeTraits::IsAsyncInvocable<TLambda, T&>)
 		{
-			co_await lambda(MoveRValue(node->value), idx); idx++;
+			auto node = this->root;
+			while (node != nullptr)
+			{
+				co_await lambda(node->value);
+				node = node->next;
+			}
+			co_return;
+		}
+		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+							TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>)
+		{
+			auto node = this->root;
+			SizeT index = 0;
+			while (node != nullptr)
+			{
+				co_await lambda(node->value, index);
+				node = node->next;
+				index++;
+			}
+			co_return;
 		}
 		else
 		{
-			co_await lambda(MoveRValue(node->value));
+			static_assert(
+				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
+				TypeTraits::IsAsyncInvocable<TLambda, T&> ||
+				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+				TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>);
 		}
-
-		if (--node->RefCount == 0)
-		{
-			delete node;
-		}
-
-		--this->size;
 	}
 
-	this->root = this->last = nullptr;
-	this->size = 0;
+	template<class THeap, typename T>
+	template<typename TLambda>
+	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda) const
+	{
+		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&>)
+		{
+			auto node = this->root;
+			while (node != nullptr)
+			{
+				co_await lambda(node->value);
+				node = node->next;
+			}
+			co_return;
+		}
+		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>)
+		{
+			auto node = this->root;
+			SizeT index = 0;
+			while (node != nullptr)
+			{
+				co_await lambda(node->value, index);
+				node = node->next;
+				index++;
+			}
+			co_return;
+		}
+		else
+		{
+			static_assert(
+				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
+				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>
+				);
+		}
+	}
+
+	template<class THeap, typename T>
+	template<typename TLambda>
+	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count)
+	{
+		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
+									TypeTraits::IsAsyncInvocable<TLambda, T&>)
+		{
+			if (count > this->size)
+			{
+				auto node = this->root;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value);
+					node = node->next;
+				}
+				co_return;
+			}
+			else
+			{
+				SizeT i = 0;
+				auto node = this->root;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value);
+					node = node->next;
+					i++;
+					if (i == count)
+						co_return;
+				}
+				co_return;
+			}
+		}
+		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+							TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>)
+		{
+			if (count > this->size)
+			{
+				auto node = this->root;
+				SizeT index = 0;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value, index);
+					node = node->next;
+					index++;
+				}
+				co_return;
+			}
+			else
+			{
+				SizeT index = 0;
+				auto node = this->root;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value, index);
+					node = node->next;
+					index++;
+					if (index == count)
+						co_return;
+				}
+				co_return;
+			}
+		}
+		else
+		{
+			static_assert(
+				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
+				TypeTraits::IsAsyncInvocable<TLambda, T&> ||
+				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+				TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>);
+		}
+	}
+
+	template<class THeap, typename T>
+	template<typename TLambda>
+	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count) const
+	{
+		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&>)
+		{
+			if (count > this->size)
+			{
+				auto node = this->root;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value);
+					node = node->next;
+				}
+				co_return;
+			}
+			else
+			{
+				SizeT i = 0;
+				auto node = this->root;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value);
+					node = node->next;
+					i++;
+					if (i == count)
+						co_return;
+				}
+				co_return;
+			}
+		}
+		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>)
+		{
+			if (count > this->size)
+			{
+				auto node = this->root;
+				SizeT index = 0;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value, index);
+					node = node->next;
+					index++;
+				}
+				co_return;
+			}
+			else
+			{
+				SizeT index = 0;
+				auto node = this->root;
+				while (node != nullptr)
+				{
+					co_await lambda(node->value, index);
+					node = node->next;
+					index++;
+					if (index == count)
+						co_return;
+				}
+				co_return;
+			}
+		}
+		else
+		{
+			static_assert(
+				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
+				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>
+				);
+		}
+	}
+#pragma endregion
+
+#pragma region RemoveAll
+	template<class THeap, typename T>
+	template<typename TLambda>
+	inline Threading::BaseTask<void, void> Containers::BaseList<THeap, T>::RemoveAllAsyncImpl(TLambda&& lambda)
+	{
+		SizeT idx = 0;
+
+		elem* node;
+		while (this->root != nullptr)
+		{
+			node = this->root;
+			this->root = root->next;
+			node->next = nullptr;
+			node->father = nullptr;
+			node->prev = nullptr;
+
+			if constexpr (Concepts::IsAsyncInvocable<TLambda, T&&, SizeT>)
+			{
+				co_await lambda(MoveRValue(node->value), idx); idx++;
+			}
+			else
+			{
+				co_await lambda(MoveRValue(node->value));
+			}
+
+			if (--node->RefCount == 0)
+			{
+				delete node;
+			}
+
+			--this->size;
+		}
+
+		this->root = this->last = nullptr;
+		this->size = 0;
+	}
+#pragma endregion
 }
