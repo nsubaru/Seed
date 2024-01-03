@@ -71,7 +71,7 @@ namespace Seed::Core
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
-	Threading::BaseTask<void, void> Containers::BaseFixedArray<THeap, TSize, T>::RemoveAllAsyncImpl(TLambda&& lambda)
+	inline Threading::BaseTask<void, void> Containers::BaseFixedArray<THeap, TSize, T>::RemoveAllAsyncImpl(TLambda&& lambda)
 	{
 		for (SizeT i = 0; i < TSize; i++)
 		{
