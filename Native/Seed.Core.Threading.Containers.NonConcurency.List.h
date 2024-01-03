@@ -8,8 +8,8 @@ namespace Seed::Core
 	template<typename TLambda>
 	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda)
 	{
-		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
-				TypeTraits::IsAsyncInvocable<TLambda, T&>)
+		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&> ||
+				Concepts::IsAsyncInvocable<TLambda, T&>)
 		{
 			auto node = this->root;
 			while (node != nullptr)
@@ -19,8 +19,8 @@ namespace Seed::Core
 			}
 			co_return;
 		}
-		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
-							TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>)
+		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+							Concepts::IsAsyncInvocable<TLambda, T&, SizeT>)
 		{
 			auto node = this->root;
 			SizeT index = 0;
@@ -35,10 +35,10 @@ namespace Seed::Core
 		else
 		{
 			static_assert(
-				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
-				TypeTraits::IsAsyncInvocable<TLambda, T&> ||
-				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
-				TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>);
+				Concepts::IsAsyncInvocable<TLambda, const T&> ||
+				Concepts::IsAsyncInvocable<TLambda, T&> ||
+				Concepts::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+				Concepts::IsAsyncInvocable<TLambda, T&, SizeT>);
 		}
 	}
 
@@ -46,7 +46,7 @@ namespace Seed::Core
 	template<typename TLambda>
 	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda) const
 	{
-		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&>)
+		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&>)
 		{
 			auto node = this->root;
 			while (node != nullptr)
@@ -56,7 +56,7 @@ namespace Seed::Core
 			}
 			co_return;
 		}
-		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>)
+		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&, SizeT>)
 		{
 			auto node = this->root;
 			SizeT index = 0;
@@ -71,8 +71,8 @@ namespace Seed::Core
 		else
 		{
 			static_assert(
-				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
-				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>
+				Concepts::IsAsyncInvocable<TLambda, const T&> ||
+				Concepts::IsAsyncInvocable<TLambda, const T&, SizeT>
 				);
 		}
 	}
@@ -81,8 +81,8 @@ namespace Seed::Core
 	template<typename TLambda>
 	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count)
 	{
-		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
-									TypeTraits::IsAsyncInvocable<TLambda, T&>)
+		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&> ||
+									Concepts::IsAsyncInvocable<TLambda, T&>)
 		{
 			if (count > this->size)
 			{
@@ -109,8 +109,8 @@ namespace Seed::Core
 				co_return;
 			}
 		}
-		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
-							TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>)
+		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+							Concepts::IsAsyncInvocable<TLambda, T&, SizeT>)
 		{
 			if (count > this->size)
 			{
@@ -142,10 +142,10 @@ namespace Seed::Core
 		else
 		{
 			static_assert(
-				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
-				TypeTraits::IsAsyncInvocable<TLambda, T&> ||
-				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT> ||
-				TypeTraits::IsAsyncInvocable<TLambda, T&, SizeT>);
+				Concepts::IsAsyncInvocable<TLambda, const T&> ||
+				Concepts::IsAsyncInvocable<TLambda, T&> ||
+				Concepts::IsAsyncInvocable<TLambda, const T&, SizeT> ||
+				Concepts::IsAsyncInvocable<TLambda, T&, SizeT>);
 		}
 	}
 
@@ -153,7 +153,7 @@ namespace Seed::Core
 	template<typename TLambda>
 	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count) const
 	{
-		if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&>)
+		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&>)
 		{
 			if (count > this->size)
 			{
@@ -180,7 +180,7 @@ namespace Seed::Core
 				co_return;
 			}
 		}
-		else if constexpr (TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>)
+		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&, SizeT>)
 		{
 			if (count > this->size)
 			{
@@ -212,8 +212,8 @@ namespace Seed::Core
 		else
 		{
 			static_assert(
-				TypeTraits::IsAsyncInvocable<TLambda, const T&> ||
-				TypeTraits::IsAsyncInvocable<TLambda, const T&, SizeT>
+				Concepts::IsAsyncInvocable<TLambda, const T&> ||
+				Concepts::IsAsyncInvocable<TLambda, const T&, SizeT>
 				);
 		}
 	}
