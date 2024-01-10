@@ -33,7 +33,7 @@ Seed::Core::IO::FS::Directory::Directory(String&& path, OpeningMode mode, OpenDi
 	ULONG FileMode = 0;
 	ULONG Disposition = 0;
 	ULONG ShareMode = 0;
-	ULONG Attributes = FILE_NON_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_ALERT;
+	ULONG Attributes = FILE_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_ALERT;
 
 	if (mode & EOpeningMode::Read)
 	{
@@ -86,7 +86,7 @@ Seed::Core::IO::FS::Directory::Directory(String&& path, OpeningMode mode, OpenDi
 		&attrb,
 		&ioblk,
 		NULL,
-		FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY,
+		FILE_ATTRIBUTE_DIRECTORY,
 		ShareMode,
 		Disposition,
 		Attributes,

@@ -6,7 +6,7 @@ namespace Seed::Core
 #pragma region ForEachAsyncImpl
 	template<class THeap, typename T>
 	template<typename TLambda>
-	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda)
+	inline Threading::Task<void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda)
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&> ||
 				Concepts::IsAsyncInvocable<TLambda, T&>)
@@ -44,7 +44,7 @@ namespace Seed::Core
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda) const
+	inline Threading::Task<void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda) const
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&>)
 		{
@@ -79,7 +79,7 @@ namespace Seed::Core
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count)
+	inline Threading::Task<void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count)
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&> ||
 									Concepts::IsAsyncInvocable<TLambda, T&>)
@@ -151,7 +151,7 @@ namespace Seed::Core
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	inline Threading::BaseTask<Containers::BaseList<THeap, T>, void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count) const
+	inline Threading::Task<void> Containers::BaseList<THeap, T>::ForEachAsyncImpl(TLambda&& lambda, SizeT count) const
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&>)
 		{

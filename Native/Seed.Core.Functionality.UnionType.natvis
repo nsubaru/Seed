@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Seed::Core::Functionality::UnionType&lt;&gt;">
+	</Type>
+
+	<Type Name="Seed::Core::Functionality::UnionType&lt;*&gt;">
+		<Expand>
+			<Item Condition="typeIdx == 0" Name="Item">*($T1*) object</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="Seed::Core::Functionality::UnionType&lt;*, *&gt;">
+		<Expand>
+			<Item Condition="typeIdx == 0" Name="Item">*($T1*) object</Item>
+			<Item Condition="typeIdx == 1" Name="Item">*($T1*) object</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="Seed::Core::Functionality::UnionType&lt;*, *, *&gt;">
+		<Expand>
+			<Item Condition="typeIdx == 0" Name="Item">*($T1*) object</Item>
+			<Item Condition="typeIdx == 1" Name="Item">*($T2*) object</Item>
+			<Item Condition="typeIdx == 2" Name="Item">*($T3*) object</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="Seed::Core::Functionality::UnionType&lt;*, *, *, *&gt;">
+		<Expand>
+			<Item Condition="typeIdx == 0" Name="Item">*($T1*) object</Item>
+			<Item Condition="typeIdx == 1" Name="Item">*($T2*) object</Item>
+			<Item Condition="typeIdx == 2" Name="Item">*($T3*) object</Item>
+			<Item Condition="typeIdx == 3" Name="Item">*($T4*) object</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="Seed::Core::Functionality::UnionType&lt;*, *, *, *, *&gt;">
+		<Expand>
+			<Item Condition="typeIdx == 0" Name="Item">*($T1*) object</Item>
+			<Item Condition="typeIdx == 1" Name="Item">*($T2*) object</Item>
+			<Item Condition="typeIdx == 2" Name="Item">*($T3*) object</Item>
+			<Item Condition="typeIdx == 3" Name="Item">*($T4*) object</Item>
+			<Item Condition="typeIdx == 4" Name="Item">*($T5*) object</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

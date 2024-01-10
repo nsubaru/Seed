@@ -3,7 +3,6 @@
 
 namespace Seed::Core
 {
-#pragma region ForEach
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	inline Threading::BaseTask<void, void> Containers::BaseDynamicStack<THeap, T>::ForEachAsyncImpl(TLambda&& lambda)

@@ -23,7 +23,7 @@ namespace Seed::Core::Containers::LINQ
 			NewCollection<U> instance = NewCollection<U>(thisCollectionRef.Count);
 
 			co_await thisCollectionRef.ForEachAsync([&](const T& item, SizeT index) -> Threading::Task<void> InlineLambda{
-				if constexpr (Concepts::CopyFunctionWithoutIdx<TLambda, T>)
+				if constexpr (Concepts::CopyFunctionWithIdx<TLambda, T>)
 				{
 					instance.UnsafeSet(co_await lambda(item, index), index);
 				}
@@ -39,7 +39,7 @@ namespace Seed::Core::Containers::LINQ
 		{
 			NewCollection<U> instance = NewCollection<U>();
 
-			if constexpr (Concepts::CopyFunctionWithoutIdx<TLambda, T>)
+			if constexpr (Concepts::CopyFunctionWithIdx<TLambda, T>)
 			{
 				co_await thisCollectionRef.ForEach([&](const T& item, SizeT index) -> Threading::Task<void> InlineLambda
 				{
@@ -127,7 +127,7 @@ namespace Seed::Core::Containers::LINQ
 			NewCollection<U> instance = NewCollection<U>(thisCollectionRef.Count);
 
 			SizeT index = 0;
-			thisCollectionRef.RemoveAll([&](T&& item, SizeT index) -> Threading::Task<void> InlineLambda {
+			co_await thisCollectionRef.RemoveAllAsync([&](T&& item, SizeT index) -> Threading::Task<void> InlineLambda {
 				if constexpr (Concepts::AsyncMoveFunctionWithIdx<TLambda, T>)
 				{
 					co_await instance.UnsafeSet(co_await lambda(MoveRValue(item), index), index);
@@ -139,7 +139,7 @@ namespace Seed::Core::Containers::LINQ
 				index++;
 			});
 
-			return instance;
+			co_return instance;
 		}
 		else
 		{
@@ -147,8 +147,8 @@ namespace Seed::Core::Containers::LINQ
 
 			if constexpr (Concepts::AsyncMoveFunctionWithIdx<TLambda, T>)
 			{
-				co_await thisCollectionRef.RemoveAll([&](T&& item, SizeT index) -> Threading::Task<void> InlineLambda{
-					instance.UnsafeSet(co_await lambda(MoveRValue(item), index));
+				co_await thisCollectionRef.RemoveAllAsync([&](T&& item, SizeT index) -> Threading::Task<void> InlineLambda{
+					instance.UnsafeAdd(co_await lambda(MoveRValue(item), index));
 				});
 			}
 			else
@@ -159,7 +159,7 @@ namespace Seed::Core::Containers::LINQ
 				});
 			}
 
-			return instance;
+			co_return instance;
 		}
 	}
 

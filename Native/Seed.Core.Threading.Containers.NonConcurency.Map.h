@@ -266,21 +266,21 @@ namespace Seed::Core
 #pragma region RemoveAll
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	inline Threading::BaseTask<typename Containers::BaseMap<THeap, TKey, TValue>::Node*, void> Containers::BaseMap<THeap, TKey, TValue>::DestroyTreeWithLambdaPairValues(Containers::BaseMap<THeap, TKey, TValue>::Node* root, Lambda& lambda)
+	inline Threading::BaseTask<typename Containers::BaseMap<THeap, TKey, TValue>::Node*, void> Containers::BaseMap<THeap, TKey, TValue>::DestroyTreeWithLambdaPairValuesAsync(Containers::BaseMap<THeap, TKey, TValue>::Node* root, Lambda& lambda)
 	{
 		if (root == nullptr)
 			co_return nullptr;
 
 		if (root->left != nullptr)
 		{
-			root->left = co_await DestroyTreeWithLambdaPairValues(root->left, lambda);
+			root->left = co_await DestroyTreeWithLambdaPairValuesAsync(root->left, lambda);
 		}
 
 		co_await lambda(MoveRValue(root->data));
 
 		if (root->right != nullptr)
 		{
-			root->right = co_await DestroyTreeWithLambdaPairValues(root->right, lambda);
+			root->right = co_await DestroyTreeWithLambdaPairValuesAsync(root->right, lambda);
 		}
 
 		if (!root->RefCount.DecrementAndCheckIsZero())
