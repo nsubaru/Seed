@@ -10,9 +10,13 @@ namespace Seed::Core::IO::FS::Writers
 	/// </summary>
 	/// <typeparam name="T">Writer type</typeparam>
 	template<typename T>
-	interface IWriter
+	VirtualClass IWriter
 	{
-		void Write(const T& record);
+	public:
+		virtual void Write(const T& record) = 0;
+
+	public:
+		virtual ~IWriter() {}
 	};
 
 
@@ -21,9 +25,13 @@ namespace Seed::Core::IO::FS::Writers
 	/// </summary>
 	/// <typeparam name="T">Writer type</typeparam>
 	template<typename T>
-	interface IAsyncWriter
+	VirtualClass IAsyncWriter
 	{
-		Threading::Task<void> AsyncWrite(const T& record);
+	public:
+		virtual Threading::Task<void> AsyncWrite(const T& record) = 0;
+
+	public:
+		virtual ~IAsyncWriter() {}
 	};
 
 	/// <summary>
