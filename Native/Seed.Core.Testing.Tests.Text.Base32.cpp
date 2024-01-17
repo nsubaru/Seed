@@ -103,7 +103,6 @@ bool Seed::Core::Testing::Test::Text::Base32::RFCTest2Base32::Execute()
 }
 
 bool Seed::Core::Testing::Test::Text::Base32::RFCTest3Base32::Execute()
-
 {
 	auto testData = L"MZXW6==="S;
 

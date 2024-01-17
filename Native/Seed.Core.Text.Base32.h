@@ -67,11 +67,11 @@ namespace Seed::Core::Text
                 blocksCount--;
             }
 
-            auto res = Containers::BaseArray<THeap, Byte>(((blocksCount) * 5) + restBytes);
+            auto res = Containers::BaseArray<THeap, Byte>((blocksCount * 5) + restBytes);
             auto dest = (Byte*) res.GetRaw();
             auto src = (CharStr) (ConstCharStr) text;
             
-            auto destLenBits = (((blocksCount) * 5) + restBytes) * 8;
+            auto destLenBits = res.Count * 8;
 
             SizeT outBits = 0;
 
@@ -87,7 +87,7 @@ namespace Seed::Core::Text
 
                 sym = DecodeSymbol(*src);
 
-                if (sym < 0)
+                if (sym == Math::Max<SizeT>())
                 {
                     Throw(InvalidFormatException(SourcePosition));
                 }
@@ -119,7 +119,6 @@ namespace Seed::Core::Text
                     outBits += sbits;
                 }
             }
-
 
             return res;
         }

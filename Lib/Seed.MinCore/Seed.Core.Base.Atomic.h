@@ -266,7 +266,7 @@ namespace Seed::Core
         /// <param name="right">Left operand</param>
         /// <param name="left">Right operand</param>
         /// <returns>Comparing result</returns>
-        constexpr friend auto operator<=>(const T& right, const Atomic<T> left) {
+        constexpr friend auto operator<=>(const T& right, const Atomic<T>& left) {
             return right <=> left.Read();
         }
 
@@ -276,7 +276,7 @@ namespace Seed::Core
         /// <param name="right">Left operand</param>
         /// <param name="left">Right operand</param>
         /// <returns>Equality results</returns>
-        constexpr friend bool operator==(const T& right, const Atomic<T> left) {
+        constexpr friend bool operator==(const T& right, const Atomic<T>& left) {
             return right == left.Read();
         }
 

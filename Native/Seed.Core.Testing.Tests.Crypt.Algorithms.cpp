@@ -58,7 +58,7 @@ bool Seed::Core::Testing::Test::Crypt::Algorithms::HMACSHA1Test2::Execute()
 
 	auto digest = Core::Crypt::Algorithms::HMAC<Core::Crypt::Hash::SHA1Hash>(key).AddBlock(msg).Generate();
 
-	Asserts::AssertEqual(String::binaryToHex(digest.CopyTo<Containers::SensitiveArray>()), L"effcdf6ae5eb2fa2d27416d5f184df9c259a7c79"S.ToDowncase(), SourcePosition);
+	Asserts::AssertEqual(String::binaryToHex(digest.CopyTo<Containers::SensitiveArray>()).ToDowncase(), L"effcdf6ae5eb2fa2d27416d5f184df9c259a7c79"S, SourcePosition);
 
 	return true;
 }
@@ -166,7 +166,7 @@ bool Seed::Core::Testing::Test::Crypt::Algorithms::HMACSHA256Test2::Execute()
 
 	auto digest = Core::Crypt::Algorithms::HMAC<Core::Crypt::Hash::SHA256Hash>(key).AddBlock(msg).Generate();
 
-	Asserts::AssertEqual(String::binaryToHex(digest.CopyTo<Containers::SensitiveArray>()), L"5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"S.ToDowncase(), SourcePosition);
+	Asserts::AssertEqual(String::binaryToHex(digest.CopyTo<Containers::SensitiveArray>()).ToDowncase(), L"5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"S, SourcePosition);
 
 	return true;
 }
