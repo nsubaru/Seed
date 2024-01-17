@@ -51,6 +51,7 @@ namespace Seed::Core::Text
             switch (endPos)
             {
             case Math::Max<SizeT>():
+            case 0:
                 break;
             case 1:
                 if (text.IsEndWith("="))
