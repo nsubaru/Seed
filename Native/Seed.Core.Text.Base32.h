@@ -46,11 +46,19 @@ namespace Seed::Core::Text
             
             SizeT restBytes = 0;
             
-            auto endPos = text.Length - text.Find('=');
+            auto endPos = text.Find('=');
+
+            if (endPos == Math::Max<SizeT>())
+            {
+                endPos = 0;
+            }
+            else
+            {
+                endPos = text.Length - endPos;
+            }
 
             switch (endPos)
             {
-            case Math::Max<SizeT>():
             case 0:
                 break;
             case 1:
