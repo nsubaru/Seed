@@ -45,21 +45,43 @@ namespace Seed::Core::Text
             SizeT blocksCount = text.Length / 8;
             
             SizeT restBytes = 0;
-            if (text.IsEndWith("======"))
+            
+            auto endPos = text.Length - text.Find('=');
+
+            switch (endPos)
             {
-                restBytes = 1;
-            }
-            else if (text.IsEndWith("===="))
-            {
-                restBytes = 2;
-            }
-            else if (text.IsEndWith("==="))
-            {
-                restBytes = 3;
-            }
-            else if (text.IsEndWith("="))
-            {
-                restBytes = 4;
+            case Math::Max<SizeT>():
+                break;
+            case 1:
+                if (text.IsEndWith("="))
+                {
+                    restBytes = 4;
+                    break;
+                }
+                Throw(InvalidFormatException(SourcePosition));
+            case 3:
+                if (text.IsEndWith("==="))
+                {
+                    restBytes = 3;
+                    break;
+                }
+                Throw(InvalidFormatException(SourcePosition));
+            case 4:
+                if (text.IsEndWith("===="))
+                {
+                    restBytes = 2;
+                    break;
+                }
+                Throw(InvalidFormatException(SourcePosition));
+            case 6:
+                if (text.IsEndWith("======"))
+                {
+                    restBytes = 1;
+                    break;
+                }
+                Throw(InvalidFormatException(SourcePosition));
+            default:
+                Throw(InvalidFormatException(SourcePosition));
             }
 
             if (restBytes != 0)
