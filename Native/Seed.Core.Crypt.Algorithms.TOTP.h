@@ -214,14 +214,10 @@ namespace Seed::Core::Crypt::Algorithms
 		/// <returns>Custom TOTP auth key</returns>
 		String CreateCustomTOTPKey(SizeT timeIndex, SizeT passwordSize)
 		{
-			auto msg = Containers::Blob(sizeof(SizeT));
-			Memory::Copy(&timeIndex, (Byte*) msg.GetRaw(), sizeof(SizeT));
-			auto hex = String::UInt64asHex(timeIndex).LeftResize(16);
-
 			//Hash computing
 			auto hashedData =
 				Crypt::Algorithms::HMAC<THashProvider>(This->secretHash)
-				.AddBlock(String::hexToBinary(hex))
+				.AddBlock(String::hexToBinary(String::UInt64asHex(timeIndex).LeftResize(16)))
 				.Generate();
 
 			//Hash truncating

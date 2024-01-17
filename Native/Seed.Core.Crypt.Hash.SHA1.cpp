@@ -129,8 +129,8 @@ Seed::Core::Crypt::Hash::SHA1Hash::THash Seed::Core::Crypt::Hash::SHA1Hash::GetF
 Seed::Core::Crypt::Hash::SHA1Hash::THash Seed::Core::Crypt::Hash::SHA1Hash::GetFixedHash()&
 {
 	// Save current state of hash object
-	Byte oldData[64];
-	UInt32 oldState[5];
+	Byte oldData[64]{};
+	UInt32 oldState[5]{};
 	UInt64 oldBitlen = This->bitlen;
 	UInt64 oldDatalen = This->datalen;
 

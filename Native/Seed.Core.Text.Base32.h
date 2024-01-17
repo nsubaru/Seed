@@ -80,6 +80,11 @@ namespace Seed::Core::Text
                 Byte sym;
                 SizeT sbits, dbits, b;
 
+                if (*src == '=')
+                {
+                    break;
+                }
+
                 if (Characters::IsSpace(*src) || *src == '-')
                 {
                     continue;
