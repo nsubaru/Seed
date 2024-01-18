@@ -21,6 +21,27 @@ namespace Seed::Core
 		}
 
 		/// <summary>
+		/// Indicates whether the variable is a space
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if space</returns>
+		static bool IsSpace(Char ch) {
+			return ch == L' ' ||
+				ch == 0xa0 ||
+				ch == 0x2002 ||
+				ch == 0x2003 ||
+				ch == 0x2004 ||
+				ch == 0x2005 ||
+				ch == 0x2006 ||
+				ch == 0x2007 ||
+				ch == 0x2008 ||
+				ch == 0x2009 ||
+				ch == 0x200A ||
+				ch == 0x200B ||
+				ch == 0x202F;
+		}
+
+		/// <summary>
 		/// Indicates whether the variable is a latin letter
 		/// </summary>
 		/// <param name="ch">Given character</param>

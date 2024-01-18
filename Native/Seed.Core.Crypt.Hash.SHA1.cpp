@@ -1,3 +1,6 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "Seed.Core.Crypt.Hash.SHA1.h"
 
 #define uchar unsigned char // 8-bit byte
@@ -126,8 +129,8 @@ Seed::Core::Crypt::Hash::SHA1Hash::THash Seed::Core::Crypt::Hash::SHA1Hash::GetF
 Seed::Core::Crypt::Hash::SHA1Hash::THash Seed::Core::Crypt::Hash::SHA1Hash::GetFixedHash()&
 {
 	// Save current state of hash object
-	Byte oldData[64];
-	UInt32 oldState[5];
+	Byte oldData[64]{};
+	UInt32 oldState[5]{};
 	UInt64 oldBitlen = This->bitlen;
 	UInt64 oldDatalen = This->datalen;
 
