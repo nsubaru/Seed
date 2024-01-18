@@ -259,7 +259,7 @@ namespace Seed::Core::Crypt::Algorithms
 
 			auto timeIndex = GetCurrentTimeIndex();
 
-			for(SizeT i = timeIndex - 1; i < timeIndex + 1; i++)
+			for(SizeT i = timeIndex - 1; i <= timeIndex + 1; i++)
 			{
 				if (CreateCustomTOTPKey(i, keyLength) == key)
 				{
