@@ -53,10 +53,10 @@ namespace Seed::Core::Services::Pool
 
 					if (This->fatherRef->Count != This->fatherRef->BufferSize)
 					{
-						This->RefCount++;
+						++This->RefCount;
 						This->fatherRef->Push(*this);
 
-						This->RefCount--;
+						--This->RefCount;
 
 						This = nullptr;
 					}
