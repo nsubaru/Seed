@@ -9,6 +9,7 @@
 
 namespace Seed::Core::Containers
 {
+#pragma region Internal storage struct
 	template<class THeap, typename T>
 	BaseList<THeap, T>::~BaseList()
 	{
@@ -85,9 +86,9 @@ namespace Seed::Core::Containers
 		}
 	}
 
+	// Function to do merge sort
 	template<class THeap, typename T>
 	template<bool TSortType, typename TLambda>
-	// Function to do merge sort
 	BaseList<THeap, T>::elem* BaseList<THeap, T>::MergeSort(elem* head, TLambda& lambda)
 	{
 		if (!head || !head->next)
@@ -109,9 +110,9 @@ namespace Seed::Core::Containers
 		}
 	}
 
-	template<class THeap, typename T>
 	// Split a doubly linked list (DLL) into 2 DLLs of half sizes
-	BaseList<THeap, T>::elem* BaseList<THeap, T>::Split(elem* head)
+	template<class THeap, typename T>
+	inline BaseList<THeap, T>::elem* BaseList<THeap, T>::Split(elem* head)
 	{
 		elem* fast = head, * slow = head;
 		while (fast->next && fast->next->next)
@@ -123,6 +124,7 @@ namespace Seed::Core::Containers
 		slow->next = nullptr;
 		return temp;
 	}
+#pragma endregion
 
 #pragma region ConstIterator
 	template<class THeap, typename T>
@@ -134,7 +136,7 @@ namespace Seed::Core::Containers
 #pragma region Operators
 #pragma region Iterator Ariphmetic
 	template<class THeap, typename T>
-	const BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::operator++(int) const
+	const typename BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::operator++(int) const
 	{
 		ConstIterator node(*this);
 		if (This == nullptr)
@@ -156,7 +158,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	const BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::operator--(int) const
+	const typename BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::operator--(int) const
 	{
 		ConstIterator node(*this);
 		if (This == nullptr)
@@ -178,7 +180,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator++()
+	typename BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator++()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -200,7 +202,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator--()
+	typename BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator--()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -369,7 +371,7 @@ namespace Seed::Core::Containers
 #pragma region Operators
 #pragma region Iterator Ariphmetic
 	template<class THeap, typename T>
-	const BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::operator++(int) const
+	const typename BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::operator++(int) const
 	{
 		Iterator node(*this);
 		if (This == nullptr)
@@ -391,7 +393,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	const BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::operator--(int) const
+	const typename BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::operator--(int) const
 	{
 		Iterator node(*this);
 		if (This == nullptr)
@@ -413,7 +415,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator++()
+	typename BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator++()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -435,7 +437,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator--()
+	typename BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator--()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -470,7 +472,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseList<THeap, T>::Iterator::operator ConstIterator() const
+	BaseList<THeap, T>::Iterator::operator BaseList<THeap, T>::ConstIterator() const
 	{
 		return ConstIterator(This);
 	}

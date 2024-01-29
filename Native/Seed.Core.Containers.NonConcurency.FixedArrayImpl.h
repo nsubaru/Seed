@@ -9,6 +9,7 @@
 namespace Seed::Core::Containers
 {
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	inline static void BaseFixedArray<THeap, TSize, T>::QuickSort(T arr[], Int64 low, Int64 high, TLambda& lambda)
 	{
@@ -22,6 +23,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	inline static SizeT BaseFixedArray<THeap, TSize, T>::QuickSortPartition(T arr[], Int64 low, Int64 high, TLambda& lambda)
 	{
@@ -43,6 +45,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::ForEachImpl(TLambda&& lambda)
 	{
@@ -71,6 +74,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline const BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::ForEachImpl(TLambda&& lambda) const
 	{
@@ -99,6 +103,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename U, typename TLambda>
 	ForceInline T BaseFixedArray<THeap, TSize, T>::AggregateImpl(TLambda&& lambda, const U& value) const
 	{
@@ -122,6 +127,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename U, typename TLambda>
 	ForceInline U BaseFixedArray<THeap, TSize, T>::AggregateImpl(TLambda&& lambda, U&& value) const
 	{
@@ -142,6 +148,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline bool BaseFixedArray<THeap, TSize, T>::AnyImpl(TLambda&& lambda) const
 	{
@@ -154,6 +161,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline bool BaseFixedArray<THeap, TSize, T>::AllImpl(TLambda&& lambda) const
 	{
@@ -166,6 +174,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::SortByImpl(bool IsDescending)
 	{
 		if (!IsDescending)
@@ -182,6 +191,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::SortByLambdaImpl(TLambda&& lambda)
 	{
@@ -199,6 +209,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T& BaseFixedArray<THeap, TSize, T>::FirstImpl(TLambda&& lambda)
 	{
@@ -210,6 +221,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T& BaseFixedArray<THeap, TSize, T>::LastImpl(TLambda&& lambda)
 	{
@@ -226,6 +238,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline const T& BaseFixedArray<THeap, TSize, T>::FirstImpl(TLambda&& lambda) const
 	{
@@ -237,6 +250,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline const T& BaseFixedArray<THeap, TSize, T>::LastImpl(TLambda&& lambda) const
 	{
@@ -253,6 +267,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedArray<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, T&& item) const
 	{
@@ -267,6 +282,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedArray<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, T&& item) const
 	{
@@ -286,6 +302,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedArray<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, const T& item) const
 	{
@@ -300,6 +317,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedArray<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, const T& item) const
 	{
@@ -319,6 +337,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda, typename TGetterLambda>
 	ForceInline T BaseFixedArray<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
@@ -333,6 +352,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda, typename TGetterLambda>
 	ForceInline T BaseFixedArray<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
@@ -352,6 +372,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::ReverseImpl()
 	{
 		for (SizeT i = 0; i < TSize / 2; i++)
@@ -362,18 +383,21 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline void BaseFixedArray<THeap, TSize, T>::UnsafeSet(const T& Value, SizeT Index)
 	{
 		array[Index] = Value;
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline void BaseFixedArray<THeap, TSize, T>::UnsafeSet(T&& Value, SizeT Index)
 	{
 		array[Index] = MoveRValue(Value);
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::RemoveAllImpl()
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -384,6 +408,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::RemoveAllImpl(TLambda&& lambda)
 	{
@@ -395,6 +420,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda> requires (Concepts::IsInvocable<TLambda, const T&>)
 	SizeT BaseFixedArray<THeap, TSize, T>::IndexOfImpl(TLambda&& lambda) const
 	{
@@ -408,6 +434,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr BaseFixedArray<THeap, TSize, T>::BaseFixedArray(const BaseFixedArray& original): array()
 	{
 		if (TypeTraits::IsCompileTimeEvaluating())
@@ -431,6 +458,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr BaseFixedArray<THeap, TSize, T>::BaseFixedArray(BaseFixedArray&& original): array()
 	{
 		if (TypeTraits::IsCompileTimeEvaluating())
@@ -454,6 +482,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::operator=(const BaseFixedArray& original)
 	{
 		this->~BaseFixedArray();
@@ -462,6 +491,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr BaseFixedArray<THeap, TSize, T>& BaseFixedArray<THeap, TSize, T>::operator=(BaseFixedArray&& original)
 	{
 		this->~BaseFixedArray();
@@ -470,6 +500,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr BaseFixedArray<THeap, TSize, T>::BaseFixedArray(InitilizerList<T>&& list): array()
 	{
 		if (list.size() != 0)
@@ -484,6 +515,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline constexpr BaseFixedArray<THeap, TSize, T>::BaseFixedArray(const T(&arr)[TSize]): array()
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -493,6 +525,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<SizeT USize>
 	constexpr BaseFixedArray<THeap, TSize, T>::BaseFixedArray(const T(&arr)[USize], SizeT startPosition): array()
 	{
@@ -503,6 +536,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline constexpr T& BaseFixedArray<THeap, TSize, T>::operator[](SizeT Index)
 	{
 		if (Index < TSize)
@@ -516,6 +550,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline constexpr const T& BaseFixedArray<THeap, TSize, T>::operator[](SizeT index) const
 	{
 		if (index < TSize)
@@ -529,6 +564,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr bool BaseFixedArray<THeap, TSize, T>::operator==(const BaseFixedArray& other) const
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -540,6 +576,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr bool BaseFixedArray<THeap, TSize, T>::operator!=(const BaseFixedArray& other) const
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -551,6 +588,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr bool BaseFixedArray<THeap, TSize, T>::operator==(const RawArray& other) const
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -562,6 +600,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr bool operator==(const typename BaseFixedArray<THeap, TSize, T>::RawArray& left, const BaseFixedArray<THeap, TSize, T>& right)
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -573,6 +612,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr bool BaseFixedArray<THeap, TSize, T>::operator!=(const RawArray& other) const
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -584,6 +624,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	constexpr bool operator!=(const typename BaseFixedArray<THeap, TSize, T>::RawArray& left, const BaseFixedArray<THeap, TSize, T>& right)
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -595,6 +636,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename> requires (Concepts::IsClonable<T>)
 	constexpr BaseFixedArray<THeap, TSize, T> BaseFixedArray<THeap, TSize, T>::Clone() const
 	{
@@ -623,6 +665,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda> requires (Concepts::IsInvocableWithResult<TLambda, T, const T&>)
 	constexpr BaseFixedArray<THeap, TSize, T> BaseFixedArray<THeap, TSize, T>::Clone(TLambda&& lambda) const
 	{
@@ -637,6 +680,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedArray<THeap, TSize, T>::operator RawArray () const
 	{
 		return array;

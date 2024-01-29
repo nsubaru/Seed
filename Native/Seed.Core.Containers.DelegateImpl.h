@@ -3,22 +3,22 @@
 
 namespace Seed::Core
 {
-	void Delegate::Dispose()
+	inline void Delegate::Dispose()
     {
         delete This->function; This->function = nullptr;
     }
 
-    Delegate Delegate::Duplicate()
+    inline Delegate Delegate::Duplicate()
     {
         return Delegate(new Data(this->This->function->Duplicate()));
     }
 
-    bool Delegate::operator==(const Delegate& other) const
+    inline bool Delegate::operator==(const Delegate& other) const
     {
         return this->This == other.This;
     }
 
-    auto Delegate::operator<=>(const Delegate& other) const
+    inline auto Delegate::operator<=>(const Delegate& other) const
     {
         return this->This <=> other.This;
     }
@@ -111,8 +111,4 @@ namespace Seed::Core
         this->Init();
         return *this;
     }
-
-
-
-
 }

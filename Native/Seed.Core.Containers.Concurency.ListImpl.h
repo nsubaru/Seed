@@ -33,7 +33,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::Merge(elem* first, elem* second, TLambda& lambda)
+	typename BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::Merge(elem* first, elem* second, TLambda& lambda)
 	{
 		// If first linked list is empty
 		if (!first)
@@ -62,7 +62,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::MergeBy(elem* first, elem* second, TLambda& lambda)
+	typename BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::MergeBy(elem* first, elem* second, TLambda& lambda)
 	{
 		// If first linked list is empty
 		if (!first)
@@ -91,7 +91,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<bool TSortType, typename TLambda>
-	BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::MergeSort(elem* head, TLambda& lambda)
+	typename BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::MergeSort(elem* head, TLambda& lambda)
 	{
 		if (!head || !head->next)
 			return head;
@@ -113,7 +113,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::Split(elem* head)
+	typename BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::Split(elem* head)
 	{
 		elem* fast = head, * slow = head;
 		while (fast->next && fast->next->next)
@@ -128,7 +128,7 @@ namespace Seed::Core::Containers
 
 #pragma region ConstIterator
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(elem* This):This(This)
+	ForceInline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(elem* This) : This(This)
 	{
 		if (This != nullptr) ++This->RefCount;
 	}
@@ -136,7 +136,7 @@ namespace Seed::Core::Containers
 #pragma region Operators
 #pragma region Iterator Ariphmetic
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::operator++(int) const
+	typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::operator++(int) const
 	{
 		ConstIterator node(*this);
 		if (This == nullptr)
@@ -160,7 +160,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::operator--(int) const
+	typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::operator--(int) const
 	{
 		ConstIterator node(*this);
 		if (This == nullptr)
@@ -186,7 +186,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator++()
+	typename BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator++()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -211,7 +211,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator--()
+	typename BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator--()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -303,7 +303,7 @@ namespace Seed::Core::Containers
 
 #pragma region Iterator move
 	template<class THeap, typename T>
-	const BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::Next() const
+	const typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::Next() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -319,7 +319,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	const BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::Prev() const
+	const typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::ConstIterator::Prev() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -390,7 +390,7 @@ namespace Seed::Core::Containers
 #pragma region Operators
 #pragma region Iterator Ariphmetic
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::Iterator::operator++(int) const
+	typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::Iterator::operator++(int) const
 	{
 		Iterator node(*this);
 		if (This == nullptr)
@@ -414,7 +414,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::Iterator::operator--(int) const
+	typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::Iterator::operator--(int) const
 	{
 		Iterator node(*this);
 		if (This == nullptr)
@@ -440,7 +440,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator++()
+	typename BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator++()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -464,7 +464,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator--()
+	typename BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator--()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -551,7 +551,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::Iterator::operator ConstIterator() const
+	BaseConcurencyList<THeap, T>::Iterator::operator typename  BaseConcurencyList<THeap, T>::ConstIterator() const
 	{
 		return ConstIterator(This);
 	}
@@ -949,25 +949,25 @@ namespace Seed::Core::Containers
 
 #pragma region For each support methods
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::begin() const
+	ForceInline typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::begin() const
 	{
 		return GetRoot();
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::end() const
+	ForceInline typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::end() const
 	{
 		return nullptr;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::begin()
+	ForceInline typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::begin()
 	{
 		return GetRoot();
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::end()
+	ForceInline typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::end()
 	{
 		return nullptr;
 	}

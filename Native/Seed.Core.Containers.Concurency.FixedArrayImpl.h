@@ -759,7 +759,7 @@ namespace Seed::Core::Containers
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
-	BaseConcurencyFixedArray<THeap, TSize, T>::operator const RawArray() const
+	BaseConcurencyFixedArray<THeap, TSize, T>::operator const typename BaseConcurencyFixedArray<THeap, TSize, T>::RawArray() const
 	{
 		return const_cast<const RawArray>(this->array);
 	}

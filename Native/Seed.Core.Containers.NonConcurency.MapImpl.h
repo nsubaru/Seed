@@ -15,7 +15,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Find(Node* node, const UKey& key)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Find(Node* node, const UKey& key)
 	{
 		if (node == nullptr)
 			return nullptr;
@@ -30,19 +30,19 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static UInt16 BaseMap<THeap, TKey, TValue>::Height(Node* node)
+	UInt16 BaseMap<THeap, TKey, TValue>::Height(Node* node)
 	{
 		return node ? node->height : 0;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static Int16 BaseMap<THeap, TKey, TValue>::BFactor(Node* node)
+	Int16 BaseMap<THeap, TKey, TValue>::BFactor(Node* node)
 	{
 		return  Height(node->right) - Height(node->left);
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static void BaseMap<THeap, TKey, TValue>::FixHeight(Node* node)
+	void BaseMap<THeap, TKey, TValue>::FixHeight(Node* node)
 	{
 		const UInt16 HLeft = Height(node->left);
 		const UInt16 HRight = Height(node->right);
@@ -51,7 +51,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::RotateRight(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::RotateRight(Node* node)
 	{
 		Node* left = node->left;
 		Node* node_father = node->father;
@@ -72,7 +72,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::RotateLeft(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::RotateLeft(Node* node)
 	{
 		Node* right = node->right;
 		Node* node_father = node->father;
@@ -93,7 +93,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Balance(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Balance(Node* node)
 	{
 		FixHeight(node);
 		if (BFactor(node) == 2)
@@ -112,7 +112,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, const TKey& key, const TValue& value, Node* father)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, const TKey& key, const TValue& value, Node* father)
 	{
 		if (!node) return new Node(key, value, father, this);
 
@@ -127,7 +127,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, TKey&& key, const TValue& value, Node* father)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, TKey&& key, const TValue& value, Node* father)
 	{
 		if (!node) return new Node(MoveRValue(key), value, father, this);
 
@@ -143,7 +143,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, const TKey& key, TValue&& value, Node* father)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, const TKey& key, TValue&& value, Node* father)
 	{
 		if (!node) return new Node(key, MoveRValue(value), father, this);
 
@@ -159,7 +159,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, TKey&& key, TValue&& value, Node* father)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, TKey&& key, TValue&& value, Node* father)
 	{
 		if (!node) return new Node(MoveRValue(key), MoveRValue(value), father, this);
 
@@ -175,7 +175,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, const BasePair<THeap, TKey, TValue>& pair, Node* father)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, const BasePair<THeap, TKey, TValue>& pair, Node* father)
 	{
 		if (!node) return new Node(pair, father, this);
 
@@ -191,7 +191,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, BasePair<THeap, TKey, TValue>&& pair, Node* father)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Insert(Node* node, BasePair<THeap, TKey, TValue>&& pair, Node* father)
 	{
 		if (!node) return new Node(MoveRValue(pair), father, this);
 
@@ -207,19 +207,19 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::FindMin(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::FindMin(Node* node)
 	{
 		return node->left ? FindMin(node->left) : node;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::FindMax(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::FindMax(Node* node)
 	{
 		return node->right ? FindMax(node->right) : node;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::RemoveMin(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::RemoveMin(Node* node)
 	{
 		if (node->left == nullptr)
 			return node->right;
@@ -230,7 +230,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Remove(Node* node, const UKey& key)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Remove(Node* node, const UKey& key)
 	{
 		if (!node) return nullptr;
 
@@ -254,7 +254,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::DestroyTree(Node* root) //-V688
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::DestroyTree(Node* root) //-V688
 	{
 		if (root == nullptr)
 			return nullptr;
@@ -283,7 +283,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::copyTree(Node* node, Node* parent, BaseMap* owner) const
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::copyTree(Node* node, Node* parent, BaseMap* owner) const
 	{
 		Node* newNode = new Node(node->key, node->value, parent, owner);
 		newNode->height = node->height;
@@ -297,7 +297,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::cloneTree(Node* node, Node* parent, BaseMap* owner) const
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::cloneTree(Node* node, Node* parent, BaseMap* owner) const
 	{
 		Node* newNode = new Node(Core::Clone(node->key), Core::Clone(node->value), parent, owner);
 		newNode->height = node->height;
@@ -312,7 +312,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename TLambda>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::cloneTree(Node* node, Node* parent, BaseMap* owner, TLambda&& lambda) const
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::cloneTree(Node* node, Node* parent, BaseMap* owner, TLambda&& lambda) const
 	{
 		Node* newNode = new Node(lambda(node->data), parent, owner);
 		newNode->height = node->height;
@@ -326,7 +326,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Next(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Next(Node* node)
 	{
 		if (node == nullptr)
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
@@ -364,7 +364,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	static BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Prev(Node* node)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::Prev(Node* node)
 	{
 		if (node == nullptr)
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
@@ -403,7 +403,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::moveTree(Node* node, BaseMap* owner)
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::moveTree(Node* node, BaseMap* owner)
 	{
 		if (node->left != nullptr)
 			node->left = moveTree(node->left, owner);
@@ -630,7 +630,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator::operator ConstIterator() const
+	ForceInline BaseMap<THeap, TKey, TValue>::Iterator::operator typename BaseMap<THeap, TKey, TValue>::ConstIterator() const
 	{
 		return ConstIterator(item);
 	}
@@ -879,7 +879,7 @@ namespace Seed::Core::Containers
 #pragma region ForEach Pair
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	static void BaseMap<THeap, TKey, TValue>::ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda)
+	void BaseMap<THeap, TKey, TValue>::ForEachImplWithIndex(Node* node, SizeT& Index, Lambda& lambda)
 	{
 		if (node->left != nullptr)
 			ForEachImplWithIndex(node->left, Index, lambda);
@@ -892,7 +892,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	static void BaseMap<THeap, TKey, TValue>::ForEachImplWithoutIndex(Node* node, Lambda& lambda)
+	void BaseMap<THeap, TKey, TValue>::ForEachImplWithoutIndex(Node* node, Lambda& lambda)
 	{
 		if (node->left != nullptr)
 			ForEachImplWithoutIndex(node->left, lambda);
@@ -971,7 +971,7 @@ namespace Seed::Core::Containers
 #pragma region For Each Key
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	static void BaseMap<THeap, TKey, TValue>::ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda)
+	void BaseMap<THeap, TKey, TValue>::ForEachKeyImplWithIndex(Node* node, SizeT& Index, Lambda& lambda)
 	{
 		if (node->left != nullptr)
 			ForEachKeyImplWithIndex(node->left, Index, lambda);
@@ -984,7 +984,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	static void BaseMap<THeap, TKey, TValue>::ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda)
+	void BaseMap<THeap, TKey, TValue>::ForEachKeyImplWithoutIndex(Node* node, Lambda& lambda)
 	{
 		if (node->left != nullptr)
 			ForEachKeyImplWithoutIndex(node->left, lambda);
@@ -1059,7 +1059,7 @@ namespace Seed::Core::Containers
 #pragma region For Each Value
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	static void BaseMap<THeap, TKey, TValue>::ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda)
+	void BaseMap<THeap, TKey, TValue>::ForEachValueImplWithIndex(Node* node, SizeT& Index, Lambda& lambda)
 	{
 		if (node->left != nullptr)
 			ForEachValueImplWithIndex(node->left, Index, lambda);
@@ -1072,7 +1072,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	static void BaseMap<THeap, TKey, TValue>::ForEachValueImplWithoutIndex(Node* node, Lambda& lambda)
+	void BaseMap<THeap, TKey, TValue>::ForEachValueImplWithoutIndex(Node* node, Lambda& lambda)
 	{
 		if (node->left != nullptr)
 			ForEachValueImplWithoutIndex(node->left, lambda);
@@ -1162,7 +1162,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
-	BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::DestroyTreeWithLambdaPairValues(Node* root, Lambda& lambda) //-V688
+	typename BaseMap<THeap, TKey, TValue>::Node* BaseMap<THeap, TKey, TValue>::DestroyTreeWithLambdaPairValues(Node* root, Lambda& lambda) //-V688
 	{
 		if (root == nullptr)
 			return nullptr;

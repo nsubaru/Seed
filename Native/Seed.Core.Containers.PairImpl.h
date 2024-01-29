@@ -74,18 +74,4 @@ namespace Seed::Core::Containers
     {
         value = MoveRValue(newValue);
     }
-
-    template<typename THeap, typename TKey, typename TValue>
-    template<typename> requires Concepts::IsClonable<TKey>&& Concepts::IsClonable<TValue>
-    ForceInline BasePair<THeap, TKey, TValue> BasePair<THeap, TKey, TValue>::Clone() const
-    {
-        return BasePair(Core::Clone(this->key), Core::Clone(this->value));
-    }
-
-    template<typename THeap, typename TKey, typename TValue>
-    template<typename TLambda> requires Concepts::IsInvocableWithResult<TLambda, BasePair<THeap, TKey, TValue>, const BasePair<THeap, TKey, TValue>&>
-    ForceInline BasePair<THeap, TKey, TValue> BasePair<THeap, TKey, TValue>::Clone(TLambda&& lambda) const
-    {
-        return BasePair(lambda(*this));
-    }
 }

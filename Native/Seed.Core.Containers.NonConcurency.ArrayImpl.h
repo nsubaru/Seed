@@ -709,7 +709,7 @@ namespace Seed::Core::Containers
 
 		if constexpr (TypeTraits::IsStandardLayout<T>)
 		{
-			Memory::Copy(array, this->array, TN * sizeof(T));
+			Memory::Copy((Char*) array, this->array, TN * sizeof(T));
 		}
 		else
 		{

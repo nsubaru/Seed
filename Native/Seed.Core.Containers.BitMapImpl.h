@@ -398,13 +398,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT BitCount, typename T>
-	BaseBitMapT<THeap, BitCount, T>::operator const BitMapDataType() const&
+	BaseBitMapT<THeap, BitCount, T>::operator const typename BaseBitMapT<THeap, BitCount, T>::BitMapDataType() const&
 	{
 		return (const BitMapDataType) bitMap;
 	}
 
 	template<typename THeap, SizeT BitCount, typename T>
-	BaseBitMapT<THeap, BitCount, T>::operator BitMapDataType()&
+	BaseBitMapT<THeap, BitCount, T>::operator typename BaseBitMapT<THeap, BitCount, T>::BitMapDataType()&
 	{
 		return bitMap;
 	}

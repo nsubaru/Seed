@@ -8,6 +8,7 @@
 namespace Seed::Core::Containers
 {
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>::~BaseFixedQueue()
 	{
 		if constexpr (TypeTraits::IsSameV<THeap, Memory::SensitiveDataHeap> &&
@@ -18,18 +19,21 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline T& BaseFixedQueue<THeap, TSize, T>::GetByIdx(SizeT Index)
 	{
 		return queue[(front + Index) % TSize];
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline const T& BaseFixedQueue<THeap, TSize, T>::GetByIdx(SizeT Index) const
 	{
 		return queue[(front + Index) % TSize];
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>::BaseFixedQueue(const BaseFixedQueue& original):
 		front(original.front),
 		rear(original.rear),
@@ -52,6 +56,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>::BaseFixedQueue(BaseFixedQueue&& original):
 		front(original.front),
 		rear(original.rear),
@@ -78,6 +83,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>& BaseFixedQueue<THeap, TSize, T>::operator=(const BaseFixedQueue& original)
 	{
 		this->~BaseFixedQueue();
@@ -86,6 +92,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>& BaseFixedQueue<THeap, TSize, T>::operator=(BaseFixedQueue&& original)
 	{
 		this->~BaseFixedQueue();
@@ -94,6 +101,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>::BaseFixedQueue(InitilizerList<T>&& list): BaseFixedQueue()
 	{
 		if (list.size() != 0)
@@ -113,6 +121,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline void BaseFixedQueue<THeap, TSize, T>::Enqueue(const T& Value)
 	{
 		if (++count > TSize)
@@ -124,6 +133,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline void BaseFixedQueue<THeap, TSize, T>::Enqueue(T&& Value)
 	{
 		if (++count > TSize)
@@ -135,6 +145,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline T BaseFixedQueue<THeap, TSize, T>::Dequeue()
 	{
 		if (count == 0)
@@ -147,6 +158,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline const T& BaseFixedQueue<THeap, TSize, T>::Top()
 	{
 		if (front == rear)
@@ -156,6 +168,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline const T& BaseFixedQueue<THeap, TSize, T>::Top() const
 	{
 		if (front == rear)
@@ -165,12 +178,14 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline SizeT BaseFixedQueue<THeap, TSize, T>::GetCount() const
 	{
 		return count;
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename> requires (Concepts::IsClonable<T>)
 	BaseFixedQueue<THeap, TSize, T> BaseFixedQueue<THeap, TSize, T>::Clone() const {
 			BaseFixedQueue result;
@@ -193,6 +208,7 @@ namespace Seed::Core::Containers
 		}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda> requires (Concepts::IsInvocableWithResult<TLambda, T, const T&>)
 	BaseFixedQueue<THeap, TSize, T> BaseFixedQueue<THeap, TSize, T>::Clone(TLambda&& lambda) const
 	{
@@ -209,6 +225,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	BaseFixedQueue<THeap, TSize, T>& BaseFixedQueue<THeap, TSize, T>::ForEachImpl(TLambda&& lambda)
 	{
@@ -241,6 +258,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	const BaseFixedQueue<THeap, TSize, T>& BaseFixedQueue<THeap, TSize, T>::ForEachImpl(TLambda&& lambda) const
 	{
@@ -269,6 +287,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename U, typename TLambda>
 	U BaseFixedQueue<THeap, TSize, T>::AggregateImpl(TLambda&& lambda, const U& value) const
 	{
@@ -298,6 +317,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename U, typename TLambda>
 	U BaseFixedQueue<THeap, TSize, T>::AggregateImpl(TLambda&& lambda, U&& value) const
 	{
@@ -324,12 +344,14 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline bool BaseFixedQueue<THeap, TSize, T>::AnyImpl() const
 	{
 		return count > 0;
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	bool BaseFixedQueue<THeap, TSize, T>::AnyImpl(TLambda&& lambda) const
 	{
@@ -346,6 +368,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	bool BaseFixedQueue<THeap, TSize, T>::AllImpl(TLambda&& lambda) const
 	{
@@ -362,6 +385,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	T& BaseFixedQueue<THeap, TSize, T>::FirstImpl(TLambda&& lambda)
 	{
@@ -380,6 +404,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	T& BaseFixedQueue<THeap, TSize, T>::LastImpl(TLambda&& lambda)
 	{
@@ -407,6 +432,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	const T& BaseFixedQueue<THeap, TSize, T>::FirstImpl(TLambda&& lambda) const
 	{
@@ -425,6 +451,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	const T& BaseFixedQueue<THeap, TSize, T>::LastImpl(TLambda&& lambda) const
 	{
@@ -452,6 +479,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedQueue<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, T&& element) const
 	{
@@ -470,6 +498,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedQueue<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, T&& element) const
 	{
@@ -497,6 +526,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedQueue<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, const T& element) const
 	{
@@ -515,6 +545,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	ForceInline T BaseFixedQueue<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, const T& element) const
 	{
@@ -542,6 +573,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda, typename TGetterLambda>
 	ForceInline T BaseFixedQueue<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
@@ -560,6 +592,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda, typename TGetterLambda>
 	ForceInline T BaseFixedQueue<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
@@ -587,6 +620,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>& BaseFixedQueue<THeap, TSize, T>::ReverseImpl()
 	{
 		for (SizeT i = 0; i < count / 2; i++)
@@ -597,6 +631,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline void BaseFixedQueue<THeap, TSize, T>::UnsafeSet(T&& Value, SizeT Index)
 	{
 		queue[Index] = MoveRValue(Value);
@@ -605,6 +640,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	ForceInline void BaseFixedQueue<THeap, TSize, T>::UnsafeSet(const T& Value, SizeT Index)
 	{
 		queue[Index] = Value;
@@ -613,6 +649,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedQueue<THeap, TSize, T>& BaseFixedQueue<THeap, TSize, T>::RemoveAllImpl()
 	{
 		if (count == 0)
@@ -627,6 +664,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	template<typename TLambda>
 	BaseFixedQueue<THeap, TSize, T>& BaseFixedQueue<THeap, TSize, T>::RemoveAllImpl(TLambda&& lambda)
 	{
@@ -640,17 +678,6 @@ namespace Seed::Core::Containers
 		this->count = 0;
 		return *this;
 	}
-
-
-
-
-
-
-
-
-
-
-
 }
 
 #pragma warning(pop)

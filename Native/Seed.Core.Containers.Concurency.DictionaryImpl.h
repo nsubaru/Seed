@@ -24,7 +24,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::rotateRight(NodeSym* p)
 	{
 		NodeSym* q = p->left;
@@ -36,7 +36,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::rotateLeft(NodeSym* q)
 	{
 		NodeSym* p = q->right;
@@ -48,7 +48,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::balance(NodeSym* p)
 	{
 		fixHeight(p);
@@ -68,7 +68,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::insert(NodeSym* p, wchar_t key)
 	{
 		if (!p) return new NodeSym(key);
@@ -81,14 +81,14 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::findMin(NodeSym* p)
 	{
 		return p->left ? findMin(p->left) : p;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::removeMin(NodeSym* p)
 	{
 		if (p->left == 0)
@@ -98,7 +98,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::remove(NodeSym* p, Char key)
 	{
 		if (!p) return nullptr;
@@ -122,7 +122,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::find(NodeSym* root, Char key) const
 	{ //-V688
 		if (!root) return nullptr;
@@ -142,7 +142,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::insert(
 		NodeLex* rootLex, //-V688
 		Pair&& data,
@@ -175,7 +175,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename UString>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::find(
 		NodeLex* This, //-V688
 		const UString& data,
@@ -196,7 +196,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::remove_node(NodeLex* This, //-V688
 		const TString& key,
 		bool& removed,
@@ -238,7 +238,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::destroy_node(NodeLex* This)
 	{
 		if (This != nullptr)
@@ -253,7 +253,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::destroy_tree(NodeSym* This)
 	{
 		if (This != nullptr)
@@ -279,7 +279,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::create_lex_copy(NodeSym*& orig) const
 	{
 		NodeSym* copy = new NodeSym(orig->key);
@@ -294,7 +294,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::create_lex_copy(NodeLex*& orig) const
 	{
 		NodeLex* copy = new NodeLex(orig->count);
@@ -336,7 +336,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename> requires Concepts::IsClonable<TString>&& Concepts::IsClonable<TData>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::create_lex_clone_copy(NodeSym* orig) const
 	{
 		NodeSym* copy = new NodeSym(orig->key);
@@ -352,7 +352,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename> requires Concepts::IsClonable<TString>&& Concepts::IsClonable<TData>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::create_lex_clone_copy(NodeLex* orig) const
 	{
 		NodeLex* copy = new NodeLex(orig->count);
@@ -369,7 +369,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::create_lex_clone_copy(NodeSym* orig, TLambda& lambda) const
 	{
 		NodeSym* copy = new NodeSym(orig->key);
@@ -385,7 +385,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::create_lex_clone_copy(NodeLex* orig, TLambda& lambda) const
 	{
 		NodeLex* copy = new NodeLex(orig->count);
@@ -1194,7 +1194,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeLex*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::destroy_node(NodeLex* This, TLambda& lambda)
 	{
 		if (This == nullptr)
@@ -1215,7 +1215,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* 
+	typename BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::NodeSym*
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::destroy_tree(NodeSym* This, TLambda& lambda)
 	{
 		if (This == nullptr)

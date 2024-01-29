@@ -117,11 +117,4 @@ namespace Seed::Core
 	{
 		return This == nullptr || This->ptr == nullptr;
 	}
-
-	template<typename THeap, typename T>
-	void Swap(BaseSmartPtr<THeap, T>& a, BaseSmartPtr<THeap, T>& b)
-	{
-		Swap(a.This, b.This);
-	}
-
 }
