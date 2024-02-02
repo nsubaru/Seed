@@ -45,16 +45,18 @@ namespace Seed::Core::Containers
 		bufferSize = list.size() > CurrentSettings().MemoryManager.QueueReserveSize ? list.size() : CurrentSettings().MemoryManager.QueueReserveSize;
 		queue = new T[bufferSize];
 		auto it = list.begin();
+
 		for (SizeT i = 0; i < actuallyCopied; i++)
 		{
 			queue[i] = MoveRValue(*it); ++it;
 		}
+
 		rear = count = actuallyCopied;
 		front = 0;
 	}
 
 	template<typename THeap, typename T>
-	BaseConcurencyDynamicQueue<THeap, T>::BaseConcurencyDynamicQueue(const BaseConcurencyDynamicQueue& queue):
+	BaseConcurencyDynamicQueue<THeap, T>::BaseConcurencyDynamicQueue(const BaseConcurencyDynamicQueue& original):
 		front(0),
 		rear(0),
 		count(0),
@@ -62,22 +64,31 @@ namespace Seed::Core::Containers
 		bufferSize(0),
 		flowController()
 	{
-		queue.flowController.SharedLock([&] () {
-			this->front = queue.front;
-			this->rear = queue.rear;
-			this->count = queue.count;
-			this->bufferSize = queue.bufferSize;
-
-			if constexpr (TypeTraits::IsStandardLayout<T>)
+		original.flowController.SharedLock([&] () {
+			if (original.bufferSize != 0)
 			{
-				Memory::Copy(queue.queue, this->queue, sizeof(T) * this->bufferSize);
+				this->queue = new T[original.bufferSize];
 			}
 			else
 			{
-				for (SizeT i = 0; i < this->count; i++)
+				return;
+			}
+
+			if (this->count == 0)
+			{
+				return;
+			}
+
+			if constexpr (!TypeTraits::IsStandardLayout<T>)
+			{
+				for (SizeT i = 0; i < count; i++)
 				{
-					this->GetByIdx(i) = queue.GetByIdx(i);
+					this->GetByIdx(i) = original.GetByIdx(i);
 				}
+			}
+			else
+			{
+				Memory::Copy(original.queue, this->queue, sizeof(T) * bufferSize);
 			}
 		});
 	}

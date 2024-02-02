@@ -856,13 +856,31 @@ namespace Seed::Core::Containers
 	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
 	const TValue& BaseConcurencyMap<THeap, TKey, TValue>::operator[](const UKey& key) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda->TValue& {
+		return this->lock.SharedLock([&]() InlineLambda -> const TValue& {
 			auto node = Find(this->root, key);
 
 			if (node == nullptr)
 				Internals::Exceptions::ThrowNotFound(SourcePosition);
 
 			return node->value;
+		});
+	}
+
+	template<typename THeap, typename TKey, typename TValue>
+	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator BaseConcurencyMap<THeap, TKey, TValue>::FindAsIterator(const UKey& key)
+	{
+		return this->lock.SharedLock([&]() InlineLambda{
+			return Iterator(Find(this->root, key));
+		});
+	}
+
+	template<typename THeap, typename TKey, typename TValue>
+	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator BaseConcurencyMap<THeap, TKey, TValue>::FindAsIterator(const UKey& key) const
+	{
+		return this->lock.SharedLock([&]() InlineLambda{
+			return ConstIterator(Find(this->root, key));
 		});
 	}
 

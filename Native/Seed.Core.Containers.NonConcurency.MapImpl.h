@@ -842,6 +842,20 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
+	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
+	inline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::FindAsIterator(const UKey& key)
+	{
+		return Iterator(Find(this->root, key));
+	}
+
+	template<typename THeap, typename TKey, typename TValue>
+	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::FindAsIterator(const UKey& key) const
+	{
+		return ConstIterator(Find(this->root, key));
+	}
+
+	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires Concepts::HaveEqual<TKey, UKey>
 	ForceInline bool BaseMap<THeap, TKey, TValue>::IsExist(const UKey& key) const
 	{

@@ -52,21 +52,30 @@ namespace Seed::Core::Containers
 		queue(nullptr),
 		bufferSize(original.bufferSize)
 	{
-		if (original.count != 0)
+		if (original.bufferSize != 0)
 		{
 			this->queue = new T[original.bufferSize];
+		}
+		else
+		{
+			return;
+		}
 
-			if constexpr (!TypeTraits::IsStandardLayout<T>)
+		if (this->count == 0)
+		{
+			return;
+		}
+
+		if constexpr (!TypeTraits::IsStandardLayout<T>)
+		{
+			for (SizeT i = 0; i < count; i++)
 			{
-				for (SizeT i = 0; i < count; i++)
-				{
-					this->GetByIdx(i) = original.GetByIdx(i);
-				}
+				this->GetByIdx(i) = original.GetByIdx(i);
 			}
-			else
-			{
-				Memory::Copy(original.queue, this->queue, sizeof(T) * bufferSize);
-			}
+		}
+		else
+		{
+			Memory::Copy(original.queue, this->queue, sizeof(T) * bufferSize);
 		}
 	}
 
