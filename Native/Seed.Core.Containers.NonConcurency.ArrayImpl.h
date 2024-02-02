@@ -366,7 +366,8 @@ namespace Seed::Core::Containers
 		if (count == 0)
 			return *this;
 
-		QuickSort<false>(array, 0, count - 1, lambda);
+		auto l = [lambda = MoveRValue(lambda)] (const T& v1, const T& v2) { return !lambda(v1, v2); };
+		QuickSort<false>(array, 0, count - 1, l);
 
 		return *this;
 	}
