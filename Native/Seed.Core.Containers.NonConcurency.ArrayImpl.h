@@ -40,7 +40,7 @@ namespace Seed::Core::Containers
 			}
 			else
 			{
-				if (!(lambda(arr[i]) < lambda(pivot)))
+				if (lambda(arr[i]) < lambda(pivot))
 				{
 					Seed::Core::Swap((T&) arr[pIndex], (T&) arr[i]);
 					pIndex++;
@@ -366,8 +366,7 @@ namespace Seed::Core::Containers
 		if (count == 0)
 			return *this;
 
-		auto l = [lambda = MoveRValue(lambda)] (const T& v1, const T& v2) { return !lambda(v1, v2); };
-		QuickSort<false>(array, 0, count - 1, l);
+		QuickSort<false>(array, 0, count - 1, lambda);
 
 		return *this;
 	}
