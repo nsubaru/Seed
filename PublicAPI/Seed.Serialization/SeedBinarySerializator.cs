@@ -376,4 +376,6 @@ public class SeedBinarySerializator : ISeedBinarySerializator
     }
 
     public IEnumerable<TypeRecord> SerializableTypes => seedSerializator.GetSupportedTypes();
+
+    public TypeRecord GetByClrType(Type type) => SerializableTypes.First(x => x.ClrType == type);
 }

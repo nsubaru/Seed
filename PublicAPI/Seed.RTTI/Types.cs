@@ -340,10 +340,16 @@ internal unsafe struct MethodMetaData
 	[FieldOffset(16)]
 	public CvRefModificators MethodCVRefModificators;
 
-	[FieldOffset(24)]
+    [FieldOffset(24)]
+    public bool IsAsync;
+
+    [FieldOffset(25)]
 	public DynamicCallerFunc DynamicCaller;
 
-	[FieldOffset(32)]
+    [FieldOffset(33)]
+    public DynamicCallerFunc AsyncDynamicCaller;
+
+    [FieldOffset(41)]
 	public TextMetaData MethodName;
 }
 

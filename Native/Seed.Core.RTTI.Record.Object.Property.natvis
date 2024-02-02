@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Seed::Core::RTTI::Record::BaseRttiProperty&lt;*&gt;">
+		<Expand>
+			<Item Condition="it.item != nullptr" Name="Name">((const Seed::Core::RTTI::MetaData::PropertyRecord*) it.item)->PropertyType.FieldName.Text, su</Item>
+			<Item Condition="it.item != nullptr" Name="Type name">((const Seed::Core::RTTI::MetaData::PropertyRecord*) it.item)->PropertyType.FieldName.Text + ((const Seed::Core::RTTI::MetaData::PropertyRecord*) it.item)->PropertyType.FieldName.Size + 4, su</Item>
+			<Item Condition="it.item != nullptr" Name="Full Type ID">((const Seed::Core::RTTI::MetaData::PropertyRecord*) it.item)->PropertyType.TypeId.Id</Item>
+			<Item Condition="it.item != nullptr" Name="Type ID getter address">(void*) (((const Seed::Core::RTTI::MetaData::PropertyRecord*) it.item)->PropertyType.TypeId.TypeId + it.imageBase), na</Item>
+			<Item Condition="it.item != nullptr" Name="Type Class">((const Seed::Core::RTTI::MetaData::PropertyRecord*) it.item)->PropertyType.TypeClass, en</Item>
+			<Item Condition="it.item != nullptr" Name="Unsafe Get address">(void*) (((const Seed::Core::RTTI::MetaData::PropertyRecord*) it.item)->UnsafeGet), na</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

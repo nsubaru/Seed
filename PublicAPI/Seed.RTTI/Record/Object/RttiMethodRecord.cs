@@ -74,6 +74,11 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
     public RttiCollection<RttiArgumentRecord> Arguments => GetArguments();
 
     /// <summary>
+    /// Is method async (return task)
+    /// </summary>
+    public bool IsAsync => GetRecord()->IsAsync;
+
+    /// <summary>
     /// Create collection of objects
     /// </summary>
     /// <param name="record">Collection pointer</param>

@@ -92,16 +92,22 @@ namespace Seed::Core
 
     private:
         /// <summary>
-        /// Ctor from value
+        /// Ctor from volatile value
         /// </summary>
         /// <param name="value">Raw value</param>
-        constexpr ReadOnlyAtomic(const T& value) : value(value) {}
+        constexpr ReadOnlyAtomic(const T& value): value(value) {}
 
         /// <summary>
-        /// Move ctor from value
+        /// Ctor from volatile value
         /// </summary>
         /// <param name="value">Raw value</param>
-        constexpr ReadOnlyAtomic(T&& value) : value(MoveRValue(value)) {}
+        constexpr ReadOnlyAtomic(volatile const T& value) : value(value) {}
+
+        /// <summary>
+        /// Move ctor from volatile value
+        /// </summary>
+        /// <param name="value">Raw value</param>
+        constexpr ReadOnlyAtomic(volatile T&& value) : value(MoveRValue(value)) {}
 
     public:
         /// <summary>
@@ -155,16 +161,22 @@ namespace Seed::Core
         constexpr Atomic() : value() {}
 
         /// <summary>
-        /// Ctor from value
+        /// Ctor from volatile value
         /// </summary>
         /// <param name="value">Raw value</param>
         constexpr Atomic(const T& value) : value(value) {}
 
         /// <summary>
-        /// Ctor from value
+        /// Ctor from volatile value
         /// </summary>
         /// <param name="value">Raw value</param>
-        constexpr Atomic(T&& value) : value(MoveRValue(value)) {}
+        constexpr Atomic(volatile const T& value) : value(value) {}
+
+        /// <summary>
+        /// Ctor from volatile value
+        /// </summary>
+        /// <param name="value">Raw value</param>
+        constexpr Atomic(volatile T&& value) : value(MoveRValue(value)) {}
 
     public:
         /// <summary>
@@ -343,6 +355,39 @@ namespace Seed::Core
             }
 
             return *this;
+        }
+
+    public:
+        /// <summary>
+        /// Atomically increment value
+        /// </summary>
+        /// <returns>Reference to current object</returns>
+        constexpr Atomic operator++(int) requires Concepts::IsInteger<T>
+        {
+            if (TypeTraits::IsCompileTimeEvaluating())
+            {
+                return Atomic(this->value.value++);
+            }
+            else
+            {
+                return Atomic(Interlocked::Increment(this->value.value));
+            }
+        }
+
+        /// <summary>
+        /// Atomically decrement value
+        /// </summary>
+        /// <returns>Reference to current object</returns>
+        constexpr Atomic operator--(int) requires Concepts::IsInteger<T>
+        {
+            if (TypeTraits::IsCompileTimeEvaluating())
+            {
+                return Atomic(this->value.value--);
+            }
+            else
+            {
+                return Atomic(Interlocked::Decrement(this->value.value));
+            }
         }
 
     public:

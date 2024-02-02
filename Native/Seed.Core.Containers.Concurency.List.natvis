@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Containers::BaseConcurencyList&lt;*, *&gt;">
-    <DisplayString>{{ Lenght={size} }}</DisplayString>
+    <DisplayString>{{ Lenght={size.count} }}</DisplayString>
     <Expand>
-      <Item Name="[Lenght]">size</Item>
+      <Item Name="[Lenght]">size.count</Item>
       <LinkedListItems>
         <Size>size.count</Size>
         <HeadPointer>root</HeadPointer>
