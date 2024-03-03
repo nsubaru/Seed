@@ -71,6 +71,7 @@ namespace Seed::Core
 			return (L'a' <= ch && ch <= L'z');
 		}
 
+#ifdef SeedKernel
 		/// <summary>
 		/// Case insensitive character comparing
 		/// </summary>
@@ -86,5 +87,6 @@ namespace Seed::Core
 		/// <param name="right">Right operand</param>
 		/// <returns>Comparing result</returns>
 		static StrongOrdering CaseInsensitiveCompare(UChar left, UChar right);
+#endif // __has_include('ntapi.h')
 	};
 }
