@@ -62,35 +62,6 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	typename BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::MergeBy(elem* first, elem* second, TLambda& lambda)
-	{
-		// If first linked list is empty
-		if (!first)
-			return second;
-
-		// If second linked list is empty
-		if (!second)
-			return first;
-
-		// Pick the smaller value
-		if (lambda(first->value) < lambda(second->value))
-		{
-			first->next = MergeBy(first->next, second, lambda);
-			first->next->prev = first;
-			first->prev = nullptr;
-			return first;
-		}
-		else
-		{
-			second->next = MergeBy(first, second->next, lambda);
-			second->next->prev = second;
-			second->prev = nullptr;
-			return second;
-		}
-	}
-
-	template<class THeap, typename T>
-	template<bool TSortType, typename TLambda>
 	typename BaseConcurencyList<THeap, T>::elem* BaseConcurencyList<THeap, T>::MergeSort(elem* head, TLambda& lambda)
 	{
 		if (!head || !head->next)
@@ -98,18 +69,11 @@ namespace Seed::Core::Containers
 		elem* second = Split(head);
 
 		// Recur for left and right halves
-		head = MergeSort<TSortType>(head, lambda);
-		second = MergeSort<TSortType>(second, lambda);
+		head = MergeSort(head, lambda);
+		second = MergeSort(second, lambda);
 
 		// Merge the two sorted halves
-		if constexpr (TSortType)
-		{
-			return Merge(head, second, lambda);
-		}
-		else
-		{
-			return MergeBy(head, second, lambda);
-		}
+		return Merge(head, second, lambda);
 	}
 
 	template<class THeap, typename T>
@@ -1390,14 +1354,14 @@ namespace Seed::Core::Containers
 				auto l = [] (const T& V1, const T& V2) {
 					return V1 < V2;
 				};
-				this->root = MergeSort<true>(this->root, l);
+				this->root = MergeSort(this->root, l);
 			}
 			else
 			{
 				auto l = [] (const T& V1, const T& V2) {
 					return V1 > V2;
 				};
-				this->root = MergeSort<true>(this->root, l);
+				this->root = MergeSort(this->root, l);
 			}
 
 			this->last = [&] () {
@@ -1419,7 +1383,7 @@ namespace Seed::Core::Containers
 			if (this->size == 0)
 				return *this;
 
-		this->root = MergeSort<true>(this->root, lambda);
+		this->root = MergeSort(this->root, lambda);
 
 		this->last = [&] () {
 			elem* node = this->root;
@@ -1434,14 +1398,23 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::SortByLambdaImpl(TLambda&& lambda)
+	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::SortByLambdaImpl(TLambda&& lambda, bool IsDescending)
 	{
 		return this->lock.ExclusiveLock([&]()->BaseConcurencyList & InlineLambda
 		{
 			if (this->size == 0)
 				return *this;
 
-		this->root = MergeSort<false>(this->root, lambda);
+		if (IsDescending)
+		{
+			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return lambda(l) < lambda(r); };
+			this->root = MergeSort(this->root, l);
+		}
+		else
+		{
+			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return !(lambda(l) < lambda(r)); };
+			this->root = MergeSort(this->root, l);
+		}
 
 		this->last = [&] () {
 			elem* node = this->root;

@@ -9,20 +9,20 @@
 namespace Seed::Core::Containers
 {
 	template<typename THeap, typename T>
-	template<bool TSortType, typename TLambda>
+	template<typename TLambda>
 	inline void BaseArray<THeap, T>::QuickSort(T arr[], Int64 low, Int64 high, TLambda& lambda)
 	{
 		if (low < high)
 		{
-			Int64 pIndex = QuickSortPartition<TSortType>(arr, low, high, lambda);
+			Int64 pIndex = QuickSortPartition(arr, low, high, lambda);
 
-			QuickSort<TSortType>(arr, low, pIndex - 1, lambda);
-			QuickSort<TSortType>(arr, pIndex + 1, high, lambda);
+			QuickSort(arr, low, pIndex - 1, lambda);
+			QuickSort(arr, pIndex + 1, high, lambda);
 		}
 	}
 
 	template<typename THeap, typename T>
-	template<bool TSortType, typename TLambda>
+	template<typename TLambda>
 	inline SizeT BaseArray<THeap, T>::QuickSortPartition(T arr[], Int64 low, Int64 high, TLambda& lambda)
 	{
 		Int64 pIndex = low;
@@ -30,21 +30,10 @@ namespace Seed::Core::Containers
 
 		for (Int64 i = low; i < high; i++)
 		{
-			if constexpr (TSortType)
+			if (!lambda(arr[i], pivot))
 			{
-				if (!lambda(arr[i], pivot))
-				{
-					Seed::Core::Swap((T&) arr[pIndex], (T&) arr[i]);
-					pIndex++;
-				}
-			}
-			else
-			{
-				if (lambda(arr[i]) < lambda(pivot))
-				{
-					Seed::Core::Swap((T&) arr[pIndex], (T&) arr[i]);
-					pIndex++;
-				}
+				Seed::Core::Swap((T&) arr[pIndex], (T&) arr[i]);
+				pIndex++;
 			}
 		}
 
@@ -335,12 +324,12 @@ namespace Seed::Core::Containers
 		if (!IsDescending)
 		{
 			auto l = [] (const T& V1, const T& V2) { return V1 < V2; };
-			QuickSort<true>(array, 0, count - 1, l);
+			QuickSort(array, 0, count - 1, l);
 		}
 		else
 		{
 			auto l = [] (const T& V1, const T& V2) { return V1 > V2; };
-			QuickSort<true>(array, 0, count - 1, l);
+			QuickSort(array, 0, count - 1, l);
 		}
 
 		return *this;
@@ -354,19 +343,28 @@ namespace Seed::Core::Containers
 			return *this;
 
 		auto l = [lambda = MoveRValue(lambda)] (const T& v1, const T& v2) { return !lambda(v1, v2); };
-		QuickSort<true>(array, 0, count - 1, l);
+		QuickSort(array, 0, count - 1, l);
 
 		return *this;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::SortByLambdaImpl(TLambda&& lambda)
+	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::SortByLambdaImpl(TLambda&& lambda, bool IsDescending)
 	{
 		if (count == 0)
 			return *this;
 
-		QuickSort<false>(array, 0, count - 1, lambda);
+		if (IsDescending)
+		{
+			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return lambda(l) < lambda(r); };
+			QuickSort(array, 0, count - 1, l);
+		}
+		else
+		{
+			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return !(lambda(l) < lambda(r)); };
+			QuickSort(array, 0, count - 1, l);
+		}
 
 		return *this;
 	}
