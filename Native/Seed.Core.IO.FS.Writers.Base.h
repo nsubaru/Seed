@@ -14,6 +14,7 @@ namespace Seed::Core::IO::FS::Writers
 	{
 	public:
 		virtual void Write(const T& record) = 0;
+		virtual void SaveChanges() = 0;
 
 	public:
 		virtual ~IWriter() {}
@@ -29,6 +30,7 @@ namespace Seed::Core::IO::FS::Writers
 	{
 	public:
 		virtual Threading::Task<void> AsyncWrite(const T& record) = 0;
+		virtual void SaveChanges() = 0;
 
 	public:
 		virtual ~IAsyncWriter() {}
@@ -135,6 +137,15 @@ namespace Seed::Core::IO::FS::Writers
 
 			return TWriter(MoveRValue(file));
 		}
+
+	public:
+		/// <summary>
+		/// Flush file to disk
+		/// </summary>
+		virtual void SaveChanges() final
+		{
+			file.Flush();
+		}
 	};
 
 	/// <summary>
@@ -180,17 +191,17 @@ namespace Seed::Core::IO::FS::Writers
 		/// <returns><Writer/returns>
 		static Threading::Task<TWriter> CreateAsyncFile(IO::FS::FilePath&& path, bool overrideIfExist = false)
 		{
-			auto file = AsyncFile(MoveRValue(path), EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create);
+			auto file = AsyncFile(MoveRValue(path), EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create, true);
 
 			auto position = 0Sz;
 			if constexpr (TWriter::IsTextMode)
 			{
-				co_await file.AsyncWrite(Utf16Marker, 0);
+				co_await file.AsyncWrite(Containers::Blob(Utf16Marker), 0);
 				position = sizeof(Utf16Marker);
 			}
 
 			auto writer = TWriter(MoveRValue(file));
-			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).This->position = position;
+			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).BaseThis->position = position;
 
 			co_await static_cast<BaseAsyncWriter<T, TWriter>&>(writer).Init();
 
@@ -205,17 +216,17 @@ namespace Seed::Core::IO::FS::Writers
 		/// <returns><Writer/returns>
 		static Threading::Task<TWriter> CreateAsyncFile(const IO::FS::FilePath& path, bool overrideIfExist = false)
 		{
-			auto file = AsyncFile(path, EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create);
+			auto file = AsyncFile(path, EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create, true);
 
 			auto position = 0Sz;
 			if constexpr (TWriter::IsTextMode)
 			{
-				co_await file.AsyncWrite(Utf16Marker, 0);
+				co_await file.AsyncWrite(Containers::Blob(Utf16Marker), 0);
 				position = sizeof(Utf16Marker);
 			}
 
 			auto writer = TWriter(MoveRValue(file));
-			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).This->position = position;
+			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).BaseThis->position = position;
 
 			co_await static_cast<BaseAsyncWriter<T, TWriter>&>(writer).Init();
 
@@ -231,17 +242,17 @@ namespace Seed::Core::IO::FS::Writers
 		/// <returns><Writer/returns>
 		static Threading::Task<TWriter> CreateAsyncFile(String&& path, bool overrideIfExist = false)
 		{
-			auto file = AsyncFile(MoveRValue(path), EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create);
+			auto file = AsyncFile(MoveRValue(path), EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create, true);
 
 			auto position = 0Sz;
 			if constexpr (TWriter::IsTextMode)
 			{
-				co_await file.AsyncWrite(Utf16Marker, 0);
+				co_await file.AsyncWrite(Containers::Blob(Utf16Marker), 0);
 				position = sizeof(Utf16Marker);
 			}
 
 			auto writer = TWriter(MoveRValue(file));
-			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).This->position = position;
+			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).BaseThis->position = position;
 
 			co_await static_cast<BaseAsyncWriter<T, TWriter>&>(writer).Init();
 
@@ -256,17 +267,17 @@ namespace Seed::Core::IO::FS::Writers
 		/// <returns><Writer/returns>
 		static Threading::Task<TWriter> CreateAsyncFile(const String& path, bool overrideIfExist = false)
 		{
-			auto file = AsyncFile(FilePath(path), EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create);
+			auto file = AsyncFile(FilePath(path), EOpeningMode::Write, overrideIfExist ? OpenDisposition::OverwriteIf : OpenDisposition::Create, true);
 
 			auto position = 0Sz;
 			if constexpr (TWriter::IsTextMode)
 			{
-				co_await file.AsyncWrite(Utf16Marker, 0);
+				co_await file.AsyncWrite(Containers::Blob(Utf16Marker), 0);
 				position = sizeof(Utf16Marker);
 			}
 
 			auto writer = TWriter(MoveRValue(file));
-			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).This->position = position;
+			static_cast<BaseAsyncWriter<T, TWriter>&>(writer).BaseThis->position = position;
 
 			co_await static_cast<BaseAsyncWriter<T, TWriter>&>(writer).Init();
 
@@ -286,6 +297,15 @@ namespace Seed::Core::IO::FS::Writers
 
 				co_return result;
 			});
+		}
+
+	public:
+		/// <summary>
+		/// Flush file to disk
+		/// </summary>
+		virtual void SaveChanges() final
+		{
+			BaseThis->file.Flush();
 		}
 
 	public:

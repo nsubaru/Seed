@@ -62,6 +62,20 @@ namespace Seed::Core::IO::FS::Writers
         AsyncTextWriter(const AsyncTextWriter& writer) : BaseAsyncWriter<String, AsyncTextWriter>(writer), This(writer.This) { writer.This->RefCount++; }
         AsyncTextWriter(AsyncTextWriter&& writer) : BaseAsyncWriter<String, AsyncTextWriter>(writer), This(writer.This) { writer.This = nullptr; }
 
+        AsyncTextWriter& operator=(const AsyncTextWriter& writer)
+        {
+            this->~AsyncTextWriter();
+            this->AsyncTextWriter::AsyncTextWriter(writer);
+            return *this;
+        }
+
+        AsyncTextWriter& operator=(AsyncTextWriter&& writer)
+        {
+            this->~AsyncTextWriter();
+            this->AsyncTextWriter::AsyncTextWriter(MoveRValue(writer));
+            return *this;
+        }
+
     public:
         RefCountInheritedClass(AsyncTextWriter); 
     
@@ -126,6 +140,20 @@ namespace Seed::Core::IO::FS::Writers
     public:
         TextWriter(const TextWriter& writer) : BaseWriter<String, TextWriter>(writer), This(writer.This) { writer.This->RefCount++; }
         TextWriter(TextWriter&& writer) : BaseWriter<String, TextWriter>(writer), This(writer.This) { writer.This = nullptr; }
+
+        TextWriter& operator=(const TextWriter& writer)
+        {
+            this->~TextWriter();
+            this->TextWriter::TextWriter(writer);
+            return *this;
+        }
+
+        TextWriter& operator=(TextWriter&& writer)
+        {
+            this->~TextWriter();
+            this->TextWriter::TextWriter(MoveRValue(writer));
+            return *this;
+        }
 
     public:
         RefCountInheritedClass(TextWriter);

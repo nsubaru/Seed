@@ -15,6 +15,9 @@ namespace Seed::Core::IO::FS::Writers
         return !Concepts::IsConvertibleToString<typename U::Type>;
     }) == Math::Max<SizeT>();
 
+    constexpr Char CsvDelimiter = L',';
+    constexpr Char CsvDelimiterWithSpace[] = { CsvDelimiter, L' ', L'\0'};
+
     /// <summary>
     /// Async CSV writer, write each line async
     /// </summary>
@@ -53,7 +56,7 @@ namespace Seed::Core::IO::FS::Writers
 
                     if (CTTI::TypeTraits::CTTITypeMetaData<T>::Fields.Count - 1 > N)
                     {
-                        This->buffer.CombineTo(L", ");
+                        This->buffer.CombineTo(CsvDelimiterWithSpace);
                     }
                 });
 
@@ -86,7 +89,7 @@ namespace Seed::Core::IO::FS::Writers
 
                     if (CTTI::TypeTraits::CTTITypeMetaData<T>::Fields.Count - 1 > N)
                     {
-                        This->buffer.CombineTo(L", ");
+                        This->buffer.CombineTo(CsvDelimiterWithSpace);
                     }
                 });
 
@@ -143,7 +146,7 @@ namespace Seed::Core::IO::FS::Writers
 
                 if (CTTI::TypeTraits::CTTITypeMetaData<T>::Fields.Count - 1 > N)
                 {
-                    This->buffer.CombineTo(L", ");
+                    This->buffer.CombineTo(CsvDelimiterWithSpace);
                 }
             });
 
@@ -174,7 +177,7 @@ namespace Seed::Core::IO::FS::Writers
 
                 if (CTTI::TypeTraits::CTTITypeMetaData<T>::Fields.Count - 1 > N)
                 {
-                    This->buffer.CombineTo(L", ");
+                    This->buffer.CombineTo(CsvDelimiterWithSpace);
                 }
             });
 
