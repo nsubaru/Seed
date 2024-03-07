@@ -33,6 +33,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         seedSerializator = serializatorFactory.GetSeedSerializator();
 
         logger?.LogInformation("Load supported types from serializator implementation");
+
         mapingSheme = seedSerializator
             .GetSupportedTypes()
             .OrderBy(x => x.RttiType.TypeClass)

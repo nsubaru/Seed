@@ -3,6 +3,8 @@
 
 #include "Seed.Core.Base.Character.h"
 
+#ifdef SeedKernel
+
 #define SEED_RT_ALLOW_INTERNAL_NT_API
 #include "Seed.Core.Base.NTAPI.h"
 
@@ -44,3 +46,5 @@ Seed::Core::StrongOrdering Seed::Core::Characters::CaseInsensitiveCompare(Seed::
 	else
 		return StrongOrdering::less;
 }
+
+#endif
