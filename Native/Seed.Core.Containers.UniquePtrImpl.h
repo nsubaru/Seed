@@ -83,8 +83,7 @@ namespace Seed::Core
 				TypeTraits::HasVirtualDtor<T>
 				)
 			{
-				__assume(data != nullptr);
-				delete data; //-V772 //-V599
+				delete data;
 			}
 			else
 			{

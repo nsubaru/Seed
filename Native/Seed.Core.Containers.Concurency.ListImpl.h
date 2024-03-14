@@ -1407,12 +1407,12 @@ namespace Seed::Core::Containers
 
 		if (IsDescending)
 		{
-			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return lambda(l) < lambda(r); };
+			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return !(lambda(l) < lambda(r)); };
 			this->root = MergeSort(this->root, l);
 		}
 		else
 		{
-			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return !(lambda(l) < lambda(r)); };
+			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return lambda(l) < lambda(r); };
 			this->root = MergeSort(this->root, l);
 		}
 
