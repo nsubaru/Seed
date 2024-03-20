@@ -28,4 +28,9 @@ public interface ICustomClassSerializator
     /// <param name="serializationStream">Data stream</param>
     /// <returns>Deserialized object</returns>
     object Deserialize(Stream serializationStream, ISeedSerializator serializator);
+
+    /// <summary>
+    /// Types that require for this type
+    /// </summary>
+    Type[] DependableTypes { get; }
 }

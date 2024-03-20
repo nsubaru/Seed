@@ -10,36 +10,23 @@ namespace Seed::Core::Serialization
     template<typename TLeft, typename TRight> requires IsSerializableBox<Functionality::Either<TLeft, TRight>>
     struct SerializationHandler<Functionality::Either<TLeft, TRight>> {
         /// <summary>
-        /// Serialization implementation template method
-        /// </summary>
-        /// <typeparam name="T1">First type</typeparam>
-        /// <typeparam name="...TRest">Other optional types</typeparam>
-        /// <typeparam name="TI">Number of types counter</typeparam>
-        /// <param name="data">Data</param>
-        /// <param name="rawStream">Raw stream</param>
-        /// <param name="offset">Offset</param>
-        template<SizeT TI, typename T1, typename ... TRest>
-        static void SerializeImplT(const Functionality::Either<TLeft, TRight>& data, Byte* rawStream, SizeT& offset) {
-            if (TI == data.HoldedTypeNumber)
-            {
-                SerializationHandler<T1>::SerializeImpl(data.GetByIdx<TI>(), rawStream, offset);
-            }
-            else if constexpr (sizeof...(TRest) != 0)
-            {
-                SerializeImplT<TI + 1, TRest...>(data, rawStream, offset);
-            }
-        }
-
-        /// <summary>
         /// Serialization implementation method
         /// </summary>
         /// <param name="data">Data</param>
         /// <param name="rawStream">Raw stream</param>
         /// <param name="offset">Offset</param>
-        static void SerializeImpl(const Functionality::Either<TLeft, TRight>& data, Byte* rawStream, SizeT& offset) {
+        static void SerializeImpl(const Functionality::Either<TLeft, TRight>& data, Byte* rawStream, SizeT& offset)
+        {
             SerializationHandler<SizeT>::SerializeImpl(data.HoldedTypeNumber, rawStream, offset);
-            
-            SerializeImplT<0, TLeft, TRight>(data, rawStream, offset);
+
+            if (data.HoldedTypeNumber == 0)
+            {
+                SerializationHandler<TLeft>::SerializeImpl(data.GetAs<TLeft>(), rawStream, offset);
+            }
+            else
+            {
+                SerializationHandler<TRight>::SerializeImpl(data.GetAs<TRight>(), rawStream, offset);
+            }
         }
 
         /// <summary>
@@ -48,31 +35,9 @@ namespace Seed::Core::Serialization
         /// <param name="data">Data</param>
         /// <returns>Data size</returns>
         static constexpr SizeT DataSize(const Functionality::Either<TLeft, TRight>& data) {
-            return sizeof(SizeT) + DataSizeT<0, TLeft, TRight>(data);
-        }
-
-        /// <summary>
-        /// Data size calculation template method
-        /// </summary>
-        /// <typeparam name="T1">First type</typeparam>
-        /// <typeparam name="...TRest">Other optional types</typeparam>
-        /// <typeparam name="TI">Number of types counter</typeparam>
-        /// <param name="data">Data</param>
-        /// <returns>Data size</returns>
-        template<SizeT TI, typename T1, typename ...TRest>
-        static constexpr SizeT DataSizeT(const Functionality::Either<TLeft, TRight>& data) {
-            if (TI == data.HoldedTypeNumber)
-            {
-                return SerializationHandler<T1>::DataSize(data.GetByIdx<TI>());
-            }
-            else if constexpr (sizeof...(TRest) != 0)
-            {
-                return DataSizeT<TI + 1, TRest...>(data);
-            }
-            else
-            {
-                return 0;
-            }
+            return sizeof(SizeT) + data.HoldedTypeNumber == 0
+                ? SerializationHandler<TLeft>::DataSize(data.GetAs<TLeft>())
+                : SerializationHandler<TRight>::DataSize(data.GetAs<TRight>());
         }
 
         /// <summary>
@@ -102,29 +67,6 @@ namespace Seed::Core::Serialization
         }
 
         /// <summary>
-        /// Deserialization implementation template method
-        /// </summary>
-        /// <typeparam name="T1">First type</typeparam>
-        /// <typeparam name="...TRest">Other optional types</typeparam>
-        /// <typeparam name="TI">Number of types counter</typeparam>
-        /// <param name="data">Data</param>
-        /// <param name="rawStream">Raw stream</param>
-        /// <param name="offset">Offset</param>
-        template<SizeT TI, typename T1, typename ... TRest>
-        static void DeserializeImplT(SizeT i, Functionality::Either<TLeft, TRight>& data, const Byte* rawStream, SizeT& offset) {
-            if (i == TI)
-            {
-                T1 v = T1();
-                SerializationHandler<T1>::DeserializeImpl(v, rawStream, offset);
-                data = v;
-            }
-            else if constexpr (sizeof...(TRest) != 0)
-            {
-                DeserializeImplT<TI + 1, TRest...>(i, data, rawStream, offset);
-            }
-        }
-
-        /// <summary>
         /// Deserialization implementation method
         /// </summary>
         /// <param name="data">Data</param>
@@ -134,7 +76,22 @@ namespace Seed::Core::Serialization
             SizeT i = {};
             SerializationHandler<SizeT>::DeserializeImpl(i, rawStream, offset);
             
-            DeserializeImplT<0, TLeft, TRight>(i, data, rawStream, offset);
+            if (i == 0)
+            {
+                TLeft obj = {};
+
+                SerializationHandler<TLeft>::DeserializeImpl(obj, rawStream, offset);
+
+                data = obj;
+            }
+            else
+            {
+                TRight obj = {};
+
+                SerializationHandler<TRight>::DeserializeImpl(obj, rawStream, offset);
+
+                data = obj;
+            }
         }
 
         /// <summary>

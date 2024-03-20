@@ -12,6 +12,8 @@ public class NetworkAddressSerializator : ICustomClassSerializator
 
     public string TypeName => "Seed::Core::IO::Network::NetworkAddress";
 
+    public Type[] DependableTypes => Array.Empty<Type>();
+
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
         UInt16 family = 0, port = 0;

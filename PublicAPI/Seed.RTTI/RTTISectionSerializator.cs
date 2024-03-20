@@ -7,6 +7,8 @@ public class RTTISectionSerializator : ICustomClassSerializator
     public Type ClrType => typeof(RTTISection);
     public string TypeName => "Seed::Core::RTTI::RTTISection";
 
+    public Type[] DependableTypes => new Type[] { typeof(List<UInt8>) };
+
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
         dynamic data = new List<UInt8>();

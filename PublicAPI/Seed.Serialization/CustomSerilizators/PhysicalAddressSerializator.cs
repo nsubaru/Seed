@@ -12,6 +12,8 @@ public class PhysicalAddressSerializator : ICustomClassSerializator
 
     public string TypeName => "Seed::Core::IO::Network::PhysicalAddress";
 
+    public Type[] DependableTypes => new Type[] { typeof(byte[]) };
+
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
         UInt64 size = 0;

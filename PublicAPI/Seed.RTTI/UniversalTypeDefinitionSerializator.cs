@@ -8,6 +8,8 @@ public class UniversalTypeDefinitionSerializator : ICustomClassSerializator
 
     public string TypeName => "Seed::Core::RTTI::UniversalTypeIdentifier";
 
+    public Type[] DependableTypes => new Type[] { typeof(UUID) };
+
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
         dynamic uuid = new UUID();

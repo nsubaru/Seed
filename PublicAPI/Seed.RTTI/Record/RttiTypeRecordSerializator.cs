@@ -9,6 +9,8 @@ public class RttiTypeRecordSerializator : ICustomClassSerializator
 
     public string TypeName => "Seed::Core::RTTI::RttiTypeRecord";
 
+    public Type[] DependableTypes => new Type[] { typeof(UniversalTypeIdentifier) };
+
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
         serializator.Logger?.Log(LogLevel.Trace, "Start deserializing RttiTypeRecord");

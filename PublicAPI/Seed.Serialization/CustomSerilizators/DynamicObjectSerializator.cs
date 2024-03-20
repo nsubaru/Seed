@@ -10,9 +10,11 @@ public class DynamicObjectSerializator : ICustomClassSerializator
 
     public string TypeName => "Seed::Core::RTTI::Dynamic";
 
+    public Type[] DependableTypes => new Type[] { typeof(UniversalTypeIdentifier) };
+
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
-        var fullTypeId = new RTTI.UniversalTypeIdentifier() { };
+        var fullTypeId = new UniversalTypeIdentifier() { };
         dynamic dynFullTypeId = fullTypeId;
 
         serializator.Deserialize(ref dynFullTypeId, serializationStream);
