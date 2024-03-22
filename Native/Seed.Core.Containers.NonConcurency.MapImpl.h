@@ -589,6 +589,23 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
+	ForceInline bool BaseMap<THeap, TKey, TValue>::Iterator::operator==(const Iterator& other)
+	{
+		if (this->item == nullptr && other.item == nullptr)
+			return true;
+		else if (this->item == nullptr || other.item == nullptr)
+			return false;
+		else
+			return this->item->key == other.item->key;
+	}
+
+	template<typename THeap, typename TKey, typename TValue>
+	ForceInline bool BaseMap<THeap, TKey, TValue>::Iterator::operator==(NullptrT)
+	{
+		return this->item == nullptr;
+	}
+
+	template<typename THeap, typename TKey, typename TValue>
 	ForceInline bool BaseMap<THeap, TKey, TValue>::Iterator::operator!=(const Iterator& other)
 	{
 		if (this->item == nullptr && other.item == nullptr)
