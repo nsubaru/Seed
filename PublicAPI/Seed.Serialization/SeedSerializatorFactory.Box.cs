@@ -52,17 +52,16 @@ public partial class SeedSerializatorFactory
         {
             code.AppendLine($"UInt64 idx = 0ul;");
             code.AppendLine($"idx = DeserializeImpl(idx, stream);");
-            code.AppendLine($"idx = DeserializeImpl(idx, stream);");
 
             code.AppendLine($"if (idx == 0) {{");
 
             code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}>();");
-            code.AppendLine($"value = data.Left(DeserializeImpl(value, stream));");
+            code.AppendLine($"data = {GetFriendlyTypeName(typeof(T))}.Left(DeserializeImpl(value, stream));");
 
             code.AppendLine($"}} else {{");
 
             code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().Last())}>();");
-            code.AppendLine($"value = data.Right(DeserializeImpl(value, stream));");
+            code.AppendLine($"data = {GetFriendlyTypeName(typeof(T))}.Right(DeserializeImpl(value, stream));");
 
             code.AppendLine($"}}");
         }

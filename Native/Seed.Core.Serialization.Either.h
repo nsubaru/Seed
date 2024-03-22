@@ -35,9 +35,9 @@ namespace Seed::Core::Serialization
         /// <param name="data">Data</param>
         /// <returns>Data size</returns>
         static constexpr SizeT DataSize(const Functionality::Either<TLeft, TRight>& data) {
-            return sizeof(SizeT) + data.HoldedTypeNumber == 0
+            return sizeof(SizeT) + (data.HoldedTypeNumber == 0
                 ? SerializationHandler<TLeft>::DataSize(data.GetAs<TLeft>())
-                : SerializationHandler<TRight>::DataSize(data.GetAs<TRight>());
+                : SerializationHandler<TRight>::DataSize(data.GetAs<TRight>()));
         }
 
         /// <summary>
