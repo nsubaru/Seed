@@ -7,7 +7,12 @@
 // This internal implementation file which can use internal API functions
 #pragma warning(disable: 4996)
 
-void Seed::Core::IO::FS::Directory::Dispose()
+using namespace Seed;
+using namespace Seed::Core;
+using namespace Seed::Core::IO;
+using namespace Seed::Core::IO::FS;
+
+void Directory::Dispose()
 {
     if (This->hDir != NULL)
     {
@@ -16,7 +21,7 @@ void Seed::Core::IO::FS::Directory::Dispose()
     }
 }
 
-Seed::Core::IO::FS::Directory::Directory(String&& path, OpeningMode mode, OpenDisposition policy, bool ShareWithOs)
+Directory::Directory(String&& path, OpeningMode mode, OpenDisposition policy, bool ShareWithOs)
 {
     String fullPath;
 
