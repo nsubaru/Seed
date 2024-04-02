@@ -1,0 +1,18 @@
+#include "Seed.Core.Exceptions.EmptyStackException.h"
+
+using namespace Seed::Core;
+
+void EmptyStackException::ThrowMe()&&
+{
+	Throw(MoveRValue(*this));
+}
+
+
+ExceptionString EmptyStackException::toString() const
+{
+	return ExceptionString::Combine(
+		exceptionName,
+		location.toString(),
+		(innerException == nullptr) ? L"."C : (L". Also there is a nested exception: " + InnerException->toString())
+	);
+}
