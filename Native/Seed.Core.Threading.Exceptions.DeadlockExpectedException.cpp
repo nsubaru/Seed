@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::Threading::DeadlockExpectedException::ThrowMe()&&
+void Seed::Core::Threading::DeadlockExpectedException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::Threading::DeadlockExpectedException::toString() const

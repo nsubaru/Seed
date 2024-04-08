@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void IntegerOverflowException::ThrowMe()&&
+void IntegerOverflowException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 

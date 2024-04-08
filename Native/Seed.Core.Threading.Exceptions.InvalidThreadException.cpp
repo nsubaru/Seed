@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::Threading::InvalidThreadException::ThrowMe()&&
+void Seed::Core::Threading::InvalidThreadException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::Threading::InvalidThreadException::toString() const

@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void InvalidFormatException::ThrowMe()&&
+void InvalidFormatException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString InvalidFormatException::toString() const

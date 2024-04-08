@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::IO::Network::ConnectionClosedBadException::ThrowMe()&&
+void Seed::Core::IO::Network::ConnectionClosedBadException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::IO::Network::ConnectionClosedBadException::toString() const

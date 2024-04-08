@@ -1,9 +1,9 @@
 #include "Seed.Core.RTTI.Exceptions.DynamicCallInvalidArgumentsCount.h"
 using namespace Seed::Core;
 
-void Seed::Core::RTTI::Exceptions::DynamicCallInvalidArgumentsCountException::ThrowMe()&&
+void Seed::Core::RTTI::Exceptions::DynamicCallInvalidArgumentsCountException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::RTTI::Exceptions::DynamicCallInvalidArgumentsCountException::toString() const

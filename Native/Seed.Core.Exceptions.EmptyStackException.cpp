@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void EmptyStackException::ThrowMe()&&
+void EmptyStackException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 

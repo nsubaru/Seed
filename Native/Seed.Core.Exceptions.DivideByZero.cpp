@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void DivideByZero::ThrowMe()&&
+void DivideByZero::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString DivideByZero::toString() const

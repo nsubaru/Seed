@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void FullStackException::ThrowMe()&&
+void FullStackException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString FullStackException::toString() const

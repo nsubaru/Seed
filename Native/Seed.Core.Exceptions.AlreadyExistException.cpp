@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void AlreadyExistException::ThrowMe()&&
+void AlreadyExistException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString AlreadyExistException::toString() const

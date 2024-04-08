@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void InteruptException::ThrowMe()&&
+void InteruptException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString InteruptException::toString() const

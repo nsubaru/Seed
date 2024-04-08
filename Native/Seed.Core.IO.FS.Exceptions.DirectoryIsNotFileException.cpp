@@ -1,6 +1,6 @@
 #include "Seed.Core.IO.FS.Exceptions.DirectoryIsNotFileException.h"
 
-void Seed::Core::IO::FS::DirectoryIsNotFileException::ThrowMe()&&
+void Seed::Core::IO::FS::DirectoryIsNotFileException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }

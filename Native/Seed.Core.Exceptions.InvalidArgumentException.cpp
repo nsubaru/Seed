@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void InvalidArgumentException::ThrowMe()&&
+void InvalidArgumentException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 

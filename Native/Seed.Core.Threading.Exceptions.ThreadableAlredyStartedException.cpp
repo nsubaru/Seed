@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::Threading::ThreadableAlredyStartedException::ThrowMe()&&
+void Seed::Core::Threading::ThreadableAlredyStartedException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::Threading::ThreadableAlredyStartedException::toString() const

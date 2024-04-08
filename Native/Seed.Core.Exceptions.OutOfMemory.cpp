@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void OutOfMemory::ThrowMe()&&
+void OutOfMemory::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString OutOfMemory::toString() const

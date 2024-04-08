@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void InternalError::ThrowMe()&&
+void InternalError::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString InternalError::toString() const

@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::IO::IPC::Pipes::InvalidPipeModeException::ThrowMe()&&
+void Seed::Core::IO::IPC::Pipes::InvalidPipeModeException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::IO::IPC::Pipes::InvalidPipeModeException::toString() const

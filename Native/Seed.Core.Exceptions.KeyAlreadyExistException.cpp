@@ -1,6 +1,6 @@
 #include "Seed.Core.Exceptions.KeyAlreadyExistException.h"
 
-void Seed::Core::KeyAlreadyExistException::ThrowMe()&&
+void Seed::Core::KeyAlreadyExistException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }

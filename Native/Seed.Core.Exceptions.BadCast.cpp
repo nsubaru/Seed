@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void BadCast::ThrowMe()&&
+void BadCast::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString BadCast::toString() const

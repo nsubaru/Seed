@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void NotFoundException::ThrowMe()&&
+void NotFoundException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString NotFoundException::toString() const

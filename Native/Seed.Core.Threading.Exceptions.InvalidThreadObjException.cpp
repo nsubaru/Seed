@@ -1,9 +1,9 @@
 #include "Seed.Core.Threading.Exceptions.InvalidThreadObjException.h"
 using namespace Seed::Core;
 
-void Seed::Core::Threading::InvalidThreadObjException::ThrowMe()&&
+void Seed::Core::Threading::InvalidThreadObjException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::Threading::InvalidThreadObjException::toString() const

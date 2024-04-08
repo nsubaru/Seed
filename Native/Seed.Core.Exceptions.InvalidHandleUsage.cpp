@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void InvalidHandleUsage::ThrowMe()&&
+void InvalidHandleUsage::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString InvalidHandleUsage::toString() const

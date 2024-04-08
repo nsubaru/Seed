@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void BadException::ThrowMe()&&
+void BadException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString BadException::toString() const

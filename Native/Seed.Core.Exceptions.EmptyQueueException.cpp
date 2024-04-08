@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void EmptyQueueException::ThrowMe()&&
+void EmptyQueueException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString EmptyQueueException::toString() const

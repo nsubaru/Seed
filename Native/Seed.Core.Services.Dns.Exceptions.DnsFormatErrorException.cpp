@@ -1,6 +1,6 @@
 #include "Seed.Core.Services.Dns.Exceptions.DnsFormatErrorException.h"
 
-void Seed::Core::Services::Dns::DnsFormatErrorException::ThrowMe()&&
+void Seed::Core::Services::Dns::DnsFormatErrorException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }

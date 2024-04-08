@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::IO::FS::GenericFileException::ThrowMe()&&
+void Seed::Core::IO::FS::GenericFileException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::IO::FS::GenericFileException::toString() const

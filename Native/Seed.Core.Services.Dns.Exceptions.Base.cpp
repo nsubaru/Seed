@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::Services::Dns::DnsException::ThrowMe()&&
+void Seed::Core::Services::Dns::DnsException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::Services::Dns::DnsException::toString() const

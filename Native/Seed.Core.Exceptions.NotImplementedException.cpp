@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void NotImplementedException::ThrowMe()&&
+void NotImplementedException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString NotImplementedException::toString() const

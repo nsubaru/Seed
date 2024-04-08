@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::IO::Network::IOTimeoutException::ThrowMe()&&
+void Seed::Core::IO::Network::IOTimeoutException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::IO::Network::IOTimeoutException::toString() const

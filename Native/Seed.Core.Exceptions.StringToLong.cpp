@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void StringToLong::ThrowMe()&&
+void StringToLong::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString StringToLong::toString() const

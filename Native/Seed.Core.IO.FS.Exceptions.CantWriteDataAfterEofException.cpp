@@ -1,6 +1,6 @@
 #include "Seed.Core.IO.FS.Exceptions.CantWriteDataAfterEofException.h"
 
-void Seed::Core::IO::FS::CantWriteDataAfterEofException::ThrowMe()&&
+void Seed::Core::IO::FS::CantWriteDataAfterEofException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }

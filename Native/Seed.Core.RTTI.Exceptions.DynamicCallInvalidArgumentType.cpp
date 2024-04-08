@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::RTTI::Exceptions::DynamicCallInvalidArgumentTypeException::ThrowMe()&&
+void Seed::Core::RTTI::Exceptions::DynamicCallInvalidArgumentTypeException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::RTTI::Exceptions::DynamicCallInvalidArgumentTypeException::toString() const

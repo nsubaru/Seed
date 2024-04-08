@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void NtException::ThrowMe()&&
+void NtException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString NtException::toString() const

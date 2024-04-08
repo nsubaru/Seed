@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void EndNodeNotReferenceable::ThrowMe()&&
+void EndNodeNotReferenceable::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString EndNodeNotReferenceable::toString() const

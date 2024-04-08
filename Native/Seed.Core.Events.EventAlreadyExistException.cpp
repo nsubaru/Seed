@@ -1,6 +1,6 @@
 #include "Seed.Core.Events.EventAlreadyExistException.h"
 
-void Seed::Core::EventAlreadyExistException::ThrowMe()&&
+void Seed::Core::EventAlreadyExistException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }

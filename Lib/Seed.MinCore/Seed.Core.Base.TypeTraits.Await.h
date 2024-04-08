@@ -1,3 +1,4 @@
+#pragma once
 #include "Seed.Core.Base.TypeTraits.Base.h"
 
 /// <summary>

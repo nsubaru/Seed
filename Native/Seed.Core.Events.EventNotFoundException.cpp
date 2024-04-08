@@ -1,6 +1,6 @@
 #include "Seed.Core.Events.EventNotFoundException.h"
 
-void Seed::Core::EventNotFoundException::ThrowMe()&&
+void Seed::Core::EventNotFoundException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }

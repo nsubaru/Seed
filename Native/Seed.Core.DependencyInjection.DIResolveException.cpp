@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::DI::DIResolveException::ThrowMe()&&
+void Seed::Core::DI::DIResolveException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::DI::DIResolveException::toString() const

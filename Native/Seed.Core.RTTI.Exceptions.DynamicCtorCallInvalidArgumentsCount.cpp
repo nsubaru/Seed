@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::RTTI::Exceptions::DynamicCtorCallInvalidArgumentsCountException::ThrowMe()&&
+void Seed::Core::RTTI::Exceptions::DynamicCtorCallInvalidArgumentsCountException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::RTTI::Exceptions::DynamicCtorCallInvalidArgumentsCountException::toString() const

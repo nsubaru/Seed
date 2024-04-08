@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::IO::Network::NetworkUnreachableException::ThrowMe()&&
+void Seed::Core::IO::Network::NetworkUnreachableException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::IO::Network::NetworkUnreachableException::toString() const

@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void NullPointException::ThrowMe()&&
+void NullPointException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString NullPointException::toString() const

@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void IndexOutOfRange::ThrowMe()&&
+void IndexOutOfRange::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString IndexOutOfRange::toString() const

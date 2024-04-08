@@ -1,6 +1,6 @@
 #include "Seed.Core.IO.Exceptions.OperationCancelledException.h"
 
-void Seed::Core::IO::OperationCancelledException::ThrowMe()&&
+void Seed::Core::IO::OperationCancelledException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }

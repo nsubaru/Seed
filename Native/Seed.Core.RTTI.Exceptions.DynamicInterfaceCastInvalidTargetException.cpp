@@ -2,9 +2,9 @@
 
 using namespace Seed::Core;
 
-void Seed::Core::RTTI::Exceptions::DynamicInterfaceCastInvalidTargetException::ThrowMe()&&
+void Seed::Core::RTTI::Exceptions::DynamicInterfaceCastInvalidTargetException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
 
 ExceptionString Seed::Core::RTTI::Exceptions::DynamicInterfaceCastInvalidTargetException::toString() const

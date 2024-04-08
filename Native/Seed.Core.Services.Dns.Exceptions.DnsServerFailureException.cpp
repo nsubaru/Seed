@@ -1,6 +1,6 @@
 #include "Seed.Core.Services.Dns.Exceptions.DnsServerFailureException.h"
 
-void Seed::Core::Services::Dns::DnsServerFailureException::ThrowMe()&&
+void Seed::Core::Services::Dns::DnsServerFailureException::ThrowMe()
 {
-	Throw(MoveRValue(*this));
+	Throw(*this);
 }
