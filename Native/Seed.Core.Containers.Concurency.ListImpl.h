@@ -14,19 +14,31 @@ namespace Seed::Core::Containers
 		this->lock.ExclusiveLock([&]() InlineLambda
 		{
 			if (this->size != 0) {
+				ExceptionHolderType ex;
+
 				while (this->root != nullptr)
 				{
 					elem* node = this->root;
 					this->root = this->root->next;
 					if (--node->RefCount == 0)
 					{
-						delete node;
+						try
+						{
+							delete node;
+						}
+						catch (...)
+						{
+							ex = Internals::Exceptions::StoreException(ex);
+						}
+
 						continue;
 					}
 					node->next = nullptr;
 					node->father = nullptr;
 					node->prev = nullptr;
 				}
+
+				Internals::Exceptions::ThrowFromExceptionHolder(ex);
 			}
 		});
 	}
