@@ -13,19 +13,31 @@ namespace Seed::Core::Containers
 	template<class THeap, typename T>
 	BaseList<THeap, T>::~BaseList()
 	{
+		ExceptionHolderType ex;
+
 		while (this->root != nullptr)
 		{
 			elem* node = this->root;
 			this->root = root->next;
 			if (--node->RefCount == 0)
 			{
-				delete node;
+				try
+				{
+					delete node;
+				}
+				catch (...)
+				{
+					ex = Internals::Exceptions::StoreException(ex);
+				}
+
 				continue;
 			}
 			node->next = nullptr;
 			node->father = nullptr;
 			node->prev = nullptr;
 		}
+
+		Internals::Exceptions::ThrowFromExceptionHolder(ex);
 	}
 
 	template<class THeap, typename T>
