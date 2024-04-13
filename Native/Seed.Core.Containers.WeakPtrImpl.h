@@ -23,7 +23,7 @@ namespace Seed::Core
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
 		}
 
-		return *This->ptr;
+		return *(T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
@@ -34,7 +34,7 @@ namespace Seed::Core
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
 		}
 
-		return *This->ptr;
+		return (const T*) *This->ptr;
 	}
 
 	template<typename THeap, typename T>
@@ -45,7 +45,7 @@ namespace Seed::Core
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
 		}
 
-		return This->ptr;
+		return (T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
@@ -56,7 +56,7 @@ namespace Seed::Core
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
 		}
 
-		return This->ptr;
+		return (const T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
@@ -68,7 +68,7 @@ namespace Seed::Core
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
 		}
 
-		return dynamic_cast<const TInterface&>(*This->ptr);
+		return dynamic_cast<const TInterface&>(*(T*) This->ptr);
 	}
 
 	template<typename THeap, typename T>
@@ -80,7 +80,7 @@ namespace Seed::Core
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
 		}
 
-		return dynamic_cast<TInterface&>(*This->ptr);
+		return dynamic_cast<TInterface&>(*(T*) This->ptr);
 	}
 
 	template<typename THeap, typename T>
@@ -91,7 +91,7 @@ namespace Seed::Core
 			Internals::Exceptions::ThrowNullPointException(SourcePosition);
 		}
 
-		return typeid(*This->ptr);
+		return typeid(*(T*) This->ptr);
 	}
 
 	template<typename THeap, typename T>

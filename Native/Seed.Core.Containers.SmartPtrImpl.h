@@ -6,7 +6,7 @@ namespace Seed::Core
 	template<typename THeap, typename T>
 	bool BaseSmartPtr<THeap, T>::Dispose()
 	{
-		delete This->ptr;
+		delete (T*) This->ptr;
 		This->ptr = nullptr;
 
 		return This->WeakRefCount == 0;
@@ -42,39 +42,60 @@ namespace Seed::Core
 	template<typename THeap, typename T>
 	ForceInline T& BaseSmartPtr<THeap, T>::operator*()
 	{
-		return *This->ptr;
+		return *(T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
 	ForceInline const T& BaseSmartPtr<THeap, T>::operator*() const
 	{
-		return *This->ptr;
+		return *(T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
 	ForceInline T* BaseSmartPtr<THeap, T>::operator->()
 	{
-		return This->ptr;
+		return (T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
 	ForceInline const T* BaseSmartPtr<THeap, T>::operator->() const
 	{
-		return This->ptr;
+		return (T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
 	ForceInline const TInterface& BaseSmartPtr<THeap, T>::As() const
 	{
-		return dynamic_cast<const TInterface&>(*This->ptr);
+		return dynamic_cast<const TInterface&>(*(T*) This->ptr);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
 	ForceInline TInterface& BaseSmartPtr<THeap, T>::As()
 	{
-		return dynamic_cast<TInterface&>(*This->ptr);
+		return dynamic_cast<TInterface&>(*(T*) This->ptr);
+	}
+
+	template<typename THeap, typename T>
+	template<typename U> requires Concepts::IsBasedOn<U, T> || Concepts::IsBasedOn<T, U>
+	inline BaseSmartPtr<THeap, U> Seed::Core::BaseSmartPtr<THeap, T>::Cast() &
+	{
+		(void) dynamic_cast<U&>(*(T*) This->ptr);
+
+		return BaseSmartPtr<THeap, U>(This);
+	}
+
+	template<typename THeap, typename T>
+	template<typename U> requires Concepts::IsBasedOn<U, T> || Concepts::IsBasedOn<T, U>
+	inline BaseSmartPtr<THeap, U> Seed::Core::BaseSmartPtr<THeap, T>::Cast() &&
+	{
+		(void) dynamic_cast<U&>(*(T*) This->ptr);
+
+		auto ret = BaseSmartPtr<THeap, U>(nullptr); 
+		Swap(this->This, ret.This);
+
+		return ret;
 	}
 
 	template<typename THeap, typename T>
@@ -91,7 +112,7 @@ namespace Seed::Core
 	template<typename THeap, typename T>
 	ForceInline decltype(auto) BaseSmartPtr<THeap, T>::GetTypeInfo() const
 	{
-		return typeid(*This->ptr);
+		return typeid(*(T*) This->ptr);
 	}
 
 	template<typename THeap, typename T>
