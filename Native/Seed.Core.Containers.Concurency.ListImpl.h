@@ -173,16 +173,18 @@ namespace Seed::Core::Containers
 			// If an element does not have a parent, so the container is already destroyed and there are no adjacent elements
 			if (This->RefCount == 0)
 				delete This;
+
 			This = nullptr;
 		}
 		else
 		{
-			this->This->father->lock.SharedLock([&]() InlineLambda->ConstIterator&
+			this->This->father->lock.SharedLock([&]() InlineLambda
 			{
 				this->This = this->This->next;
 				if (this->This != nullptr) ++This->RefCount;
 			});
 		}
+
 		return *this;
 	}
 
@@ -198,17 +200,17 @@ namespace Seed::Core::Containers
 		{
 			// If an element does not have a parent, so the container is already destroyed and there are no adjacent elements
 			this->This = nullptr;
-			return *this;
 		}
 		else
 		{
-			return this->This->father->lock.SharedLock([&]() InlineLambda->ConstIterator&
+			return this->This->father->lock.SharedLock([&]() InlineLambda
 			{
 				this->This = this->This->prev;
 				if (this->This != nullptr) ++This->RefCount;
-				return *this;
 			});
 		}
+
+		return *this;
 	}
 #pragma endregion
 

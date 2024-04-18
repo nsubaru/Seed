@@ -1,0 +1,52 @@
+#include "Seed.Core.Services.Pool.PoolManager.h"
+
+using namespace Seed;
+using namespace Seed::Core;
+using namespace Seed::Core::Services;
+using namespace Seed::Core::Services::Pool;
+
+void PoolManager::Dispose()
+{
+	This->eventService
+		.GetEventByName(CurrentSettings().StaticSettings.HostCommitLowEventName)
+		.UnRegisterCallback(This->lowCommitConditionEvenHandlerId);
+}
+
+PoolManager::PoolManager(Services::EventService eventService): This(new Data(eventService))
+{
+	This->lowCommitConditionEvenHandlerId = eventService
+		.GetEventByName(CurrentSettings().StaticSettings.HostCommitLowEventName)
+		.RegisterCallback(new LowCommitConditionEventTarget(This));
+}
+
+Services::Pool::Pool PoolManager::CreatePool(String && poolName, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount, SizeT startSize)
+{
+	if (maxPoolObjectCount == 0)
+	{
+		Throw(InvalidArgumentException(SourcePosition, L"maxPoolObjectSize", L"Size can't be null"));
+	}
+
+	auto retObj = Pool(MoveRValue(poolName), maxPoolObjectSize, maxPoolObjectCount, startSize ? startSize : maxPoolObjectCount);
+
+	retObj.This->it = This->activePools.AddLast(retObj);
+	retObj.This->RefCount--;
+
+	return retObj;
+}
+
+Containers::Array<PoolStatistics> Seed::Core::Services::Pool::PoolManager::GetStats()
+{
+	return This->activePools.CopyTo<Containers::Array>([] (const Pool& item) {
+		return PoolStatistics{
+			.Name = item.PoolManagerName,
+			.MaxSize = item.MaxPoolObjectSize,
+			.MaxCount = item.MaxPoolObjectCount,
+			.CurrentCount = item.AvailablePoolObjectCount
+		};
+	});
+}
+
+void PoolManager::LowCommitConditionEventTarget::onEvent(Events::GlobalEventTarget target, Events::EventState eventOnCallState, RTTI::Dynamic dynamic)
+{
+	This->activePools.ForEach([] (Pool& pool) { pool.FlushPool(); });
+}
