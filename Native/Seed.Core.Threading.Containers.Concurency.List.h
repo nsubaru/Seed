@@ -50,27 +50,31 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&>) 
 		{
-			return this->lock.SharedLock([&]() -> Threading::BaseTask<void, void> InlineLambda {
-				auto node = this->root;
-				while (node != nullptr) {
-					co_await lambda(node->value);
-					node = node->next;
-				}
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			while (node != nullptr)
+			{
+				co_await lambda(node->value);
+				node = node->next;
+			}
+
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&, SizeT>) 
 		{
-			return this->lock.SharedLock([&]() -> Threading::BaseTask<void, void> InlineLambda {
-				auto node = this->root;
-				SizeT index = 0;
-				while (node != nullptr) {
-					co_await lambda(node->value, index);
-					node = node->next;
-					index++;
-				}
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			SizeT index = 0;
+			while (node != nullptr)
+			{
+				co_await lambda(node->value, index);
+				node = node->next;
+				index++;
+			}
+
+			co_return;
 		}
 		else 
 		{

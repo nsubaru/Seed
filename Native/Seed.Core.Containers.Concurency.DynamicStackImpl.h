@@ -9,37 +9,39 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename T>
 	BaseConcurencyDynamicStack<THeap, T>::BaseConcurencyDynamicStack(const BaseConcurencyDynamicStack& stack): lock(), bufferSize(0), stack(nullptr)
 	{
-		stack.lock.SharedLock([&] () {
-			this->bufferSize = stack.bufferSize;
-			this->stack = new T[this->bufferSize];
+		auto _ = Threading::SharedScoppedLock(stack.lock);
 
-			if constexpr (TypeTraits::IsStandardLayout<T>)
-			{
-				Memory::Copy(stack.stack, this->stack, sizeof(T) * this->bufferSize);
-			}
-			else
-			{
-				for (SizeT i = 0; i < stack.count; i++)
-				{
-					this->stack[i] = stack.stack[i];
-				}
-			}
+		this->bufferSize = stack.bufferSize;
+		this->stack = new T[this->bufferSize];
 
-			this->count = stack.count;
-		});
+		if constexpr (TypeTraits::IsStandardLayout<T>)
+		{
+			Memory::Copy(stack.stack, this->stack, sizeof(T) * this->bufferSize);
+		}
+		else
+		{
+			for (SizeT i = 0; i < stack.count; i++)
+			{
+				this->stack[i] = stack.stack[i];
+			}
+		}
+
+		this->count = stack.count;
 	}
 
 	template<typename THeap, typename T>
 	BaseConcurencyDynamicStack<THeap, T>::BaseConcurencyDynamicStack(BaseConcurencyDynamicStack&& stack): lock(), bufferSize(0), stack(nullptr)
 	{
-		stack.lock.SharedLock([&] () {
-			this->count = stack.count;
-			stack.count = 0;
-			this->bufferSize = stack.bufferSize;
-			stack.bufferSize = 0;
-			this->stack = stack.stack;
-			stack.stack = nullptr;
-		});
+		auto _ = Threading::SharedScoppedLock(stack.lock);
+
+		this->count = stack.count;
+		stack.count = 0;
+
+		this->bufferSize = stack.bufferSize;
+		stack.bufferSize = 0;
+
+		this->stack = stack.stack;
+		stack.stack = nullptr;
 	}
 
 	template<typename THeap, typename T>
@@ -76,13 +78,15 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	void BaseConcurencyDynamicStack<THeap, T>::Push(const T& item) {
-		return this->lock.ExclusiveLock([&]() mutable InlineLambda {
-			if (this->count == this->bufferSize) {
-				ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
-			}
-			this->stack[this->count] = item;
-			++this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		if (this->count == this->bufferSize)
+		{
+			ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
+		}
+
+		this->stack[this->count] = item;
+		++this->count;
 	}
 
 	template<typename THeap, typename T>
@@ -104,109 +108,110 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename T>
 	void BaseConcurencyDynamicStack<THeap, T>::Push(T&& item)
 	{
-		return this->lock.ExclusiveLock([&, item = MoveRValue(item)]() mutable InlineLambda{
-			if (this->count == this->bufferSize)
-			{
-				ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
-			}
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			this->stack[this->count] = MoveRValue(item);
-			++this->count;
-		});
+		if (this->count == this->bufferSize)
+		{
+			ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
+		}
+
+		this->stack[this->count] = MoveRValue(item);
+		++this->count;
 	}
 
 	template<typename THeap, typename T>
 	T BaseConcurencyDynamicStack<THeap, T>::Pop()
 	{
-		return this->lock.ExclusiveLock([&]() mutable InlineLambda{
-			if (this->count == 0)
-				Throw(EmptyStackException(SourcePosition));
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			--this->count;
-			return MoveRValue(this->stack[this->count]);
-		});
+		if (this->count == 0)
+			Throw(EmptyStackException(SourcePosition));
+
+		--this->count;
+		return MoveRValue(this->stack[this->count]);
 	}
 
 	template<typename THeap, typename T>
 	T BaseConcurencyDynamicStack<THeap, T>::Pop(T&& item)
 	{
-		return this->lock.ExclusiveLock([&]() mutable InlineLambda{
-			if (this->count == 0)
-				return MoveRValue(item);
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			--this->count;
-			return MoveRValue(this->stack[this->count]);
-		});
+		if (this->count == 0)
+			return MoveRValue(item);
+
+		--this->count;
+		return MoveRValue(this->stack[this->count]);
 	}
 
 	template<typename THeap, typename T>
 	T BaseConcurencyDynamicStack<THeap, T>::Pop(const T& item)
 	{
-		return this->lock.ExclusiveLock([&]() mutable InlineLambda{
-			if (this->count == 0)
-				return MoveRValue(item);
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			--this->count;
-			return MoveRValue(this->stack[this->count]);
-		});
+		if (this->count == 0)
+			return MoveRValue(item);
+
+		--this->count;
+		return MoveRValue(this->stack[this->count]);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda> requires Concepts::IsInvocableWithResult<TLambda, T>
 	T BaseConcurencyDynamicStack<THeap, T>::Pop(TLambda&& lambda)
 	{
-		return this->lock.ExclusiveLock([&]() mutable InlineLambda{
-			if (this->count == 0)
-				return lambda();
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			--this->count;
-			return MoveRValue(this->stack[this->count]);
-		});
+		if (this->count == 0)
+			return lambda();
+
+		--this->count;
+		return MoveRValue(this->stack[this->count]);
 	}
 
 	template<typename THeap, typename T>
 	const T& BaseConcurencyDynamicStack<THeap, T>::Top() const
 	{
-		return this->lock.SharedLock([&]() mutable -> const T & InlineLambda{
-			if (this->count == 0)
-				Throw(EmptyStackException(SourcePosition));
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			return this->stack[this->count - 1];
-		});
+		if (this->count == 0)
+			Throw(EmptyStackException(SourcePosition));
+
+		return this->stack[this->count - 1];
 	}
 
 	template<typename THeap, typename T>
 	const T& BaseConcurencyDynamicStack<THeap, T>::Top()
 	{
-		return this->lock.SharedLock([&]() mutable -> const T & InlineLambda{
-			if (this->count == 0)
-				Throw(EmptyStackException(SourcePosition));
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			return this->stack[this->count - 1];
-		});
+		if (this->count == 0)
+			Throw(EmptyStackException(SourcePosition));
+
+		return this->stack[this->count - 1];
 	}
 
 	template<typename THeap, typename T>
 	ForceInline void BaseConcurencyDynamicStack<THeap, T>::ExtendBuffer(SizeT AdditionalSize)
 	{
-		this->lock.ExclusiveLock([&]() mutable InlineLambda{
-			ExtendBufferImpl(AdditionalSize);
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		ExtendBufferImpl(AdditionalSize);
 	}
 
 	template<typename THeap, typename T>
 	void BaseConcurencyDynamicStack<THeap, T>::Shrink()
 	{
-		this->lock.ExclusiveLock([&]() mutable InlineLambda{
-			T * newBuffer = new T[this->count];
-			for (SizeT i = 0; i < this->count; i++)
-			{
-				newBuffer[i] = MoveRValue(this->stack[i]);
-			}
-			delete[] this->stack;
-			this->stack = newBuffer;
-			this->bufferSize = this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		T* newBuffer = new T[this->count];
+		for (SizeT i = 0; i < this->count; i++)
+		{
+			newBuffer[i] = MoveRValue(this->stack[i]);
+		}
+
+		delete[] this->stack;
+		this->stack = newBuffer;
+		this->bufferSize = this->count;
 	}
 
 	template<typename THeap, typename T>
@@ -225,41 +230,43 @@ namespace Seed::Core::Containers
 	template<typename> requires (Concepts::IsClonable<T>)
 	BaseConcurencyDynamicStack<THeap, T> BaseConcurencyDynamicStack<THeap, T>::Clone() const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			BaseConcurencyDynamicStack result(this->count);
-			result.bufferSize = this->bufferSize;
-			result.count = this->count;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if constexpr (Concepts::IsStandardLayout<T>)
+		BaseConcurencyDynamicStack result(this->count);
+		result.bufferSize = this->bufferSize;
+		result.count = this->count;
+
+		if constexpr (Concepts::IsStandardLayout<T>)
+		{
+			Memory::Copy(static_cast<const void*>(this->stack), static_cast<void*>(result.stack), this->count * sizeof(T));
+		}
+		else
+		{
+			for (SizeT i = 0; i < this->count; i++)
 			{
-				Memory::Copy(static_cast<const void*>(this->stack), static_cast<void*>(result.stack), this->count * sizeof(T));
+				result.stack[i] = this->stack[i];
 			}
-			else
-			{
-				for (SizeT i = 0; i < this->count; i++)
-				{
-					result.stack[i] = this->stack[i];
-				}
-			}
-			return result;
-		});
+		}
+
+		return result;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda> requires (Concepts::IsInvocableWithResult<TLambda, T, const T&>)
 	BaseConcurencyDynamicStack<THeap, T> BaseConcurencyDynamicStack<THeap, T>::Clone(TLambda&& lambda) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			BaseConcurencyDynamicStack result(this->count);
-			result.bufferSize = this->bufferSize;
-			result.count = this->count;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < this->count; i++)
-			{
-				result.stack[i] = lambda(this->stack[i]);
-			}
-			return result;
-		});
+		BaseConcurencyDynamicStack result(this->count);
+		result.bufferSize = this->bufferSize;
+		result.count = this->count;
+
+		for (SizeT i = 0; i < this->count; i++)
+		{
+			result.stack[i] = lambda(this->stack[i]);
+		}
+
+		return result;
 	}
 
 	template<typename THeap, typename T>
@@ -283,31 +290,31 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, T&> || TypeTraits::IsInvocable<TLambda, const T&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				for (SizeT i = 0; i < count; i++)
-				{
-					lambda(this->stack[i]);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			for (SizeT i = 0; i < count; i++)
+			{
+				lambda(this->stack[i]);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, T&, SizeT> || TypeTraits::IsInvocable<TLambda, const T&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				for (SizeT i = 0; i < count; i++)
-				{
-					lambda(this->stack[i], i);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			for (SizeT i = 0; i < count; i++)
+			{
+				lambda(this->stack[i], i);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -323,35 +330,35 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, T&> || TypeTraits::IsInvocable<TLambda, const T&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
-
-				for (SizeT i = 0; i < end; i++)
-				{
-					lambda(this->stack[i]);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
+
+			for (SizeT i = 0; i < end; i++)
+			{
+				lambda(this->stack[i]);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, T&, SizeT> || TypeTraits::IsInvocable<TLambda, const T&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
-
-				for (SizeT i = 0; i < end; i++)
-				{
-					lambda(this->stack[i], i);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
+
+			for (SizeT i = 0; i < end; i++)
+			{
+				lambda(this->stack[i], i);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -367,31 +374,31 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const T&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				for (SizeT i = 0; i < count; i++)
-				{
-					lambda(this->stack[i]);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			for (SizeT i = 0; i < count; i++)
+			{
+				lambda(this->stack[i]);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, const T&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				for (SizeT i = 0; i < count; i++)
-				{
-					lambda(this->stack[i], i);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			for (SizeT i = 0; i < count; i++)
+			{
+				lambda(this->stack[i], i);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -407,35 +414,35 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const T&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
-
-				for (SizeT i = 0; i < end; i++)
-				{
-					lambda(this->stack[i]);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
+
+			for (SizeT i = 0; i < end; i++)
+			{
+				lambda(this->stack[i]);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, const T&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDynamicStack & InlineLambda{
-				if (this->count == 0)
-					return *this;
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
-
-				for (SizeT i = 0; i < end; i++)
-				{
-					lambda(this->stack[i], i);
-				}
-
+			if (this->count == 0)
 				return *this;
-			});
+
+			SizeT end = (itemsCount > this->Count) ? this->Count : itemsCount;
+
+			for (SizeT i = 0; i < end; i++)
+			{
+				lambda(this->stack[i], i);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -449,54 +456,54 @@ namespace Seed::Core::Containers
 	template<typename U, typename TLambda>
 	U BaseConcurencyDynamicStack<THeap, T>::AggregateImpl(TLambda&& lambda, const U& value) const
 	{
-		return MoveRValue(this->lock.SharedLock([&]() mutable InlineLambda{
-			U result = value;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if (this->count == 0)
-				return result;
+		U result = value;
 
-			for (SizeT i = 0; i < count; i++)
+		if (this->count == 0)
+			return result;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if constexpr (
+				Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
+				Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
 			{
-				if constexpr (
-					Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
-					Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
-				{
-					result = lambda(result, this->stack[i]);
-				}
-				else
-				{
-					lambda(result, this->stack[i]);
-				}
+				result = lambda(result, this->stack[i]);
 			}
+			else
+			{
+				lambda(result, this->stack[i]);
+			}
+		}
 
-			return MoveRValue(result);
-												}));
+		return MoveRValue(result);
 	}
 
 	template<typename THeap, typename T>
 	template<typename U, typename TLambda>
 	U BaseConcurencyDynamicStack<THeap, T>::AggregateImpl(TLambda&& lambda, U&& value) const
 	{
-		return MoveRValue(this->lock.SharedLock([&, value = MoveRValue(value)]() mutable InlineLambda{
-			if (this->count == 0)
-				return value;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
+		if (this->count == 0)
+			return value;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if constexpr (
+				Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
+				Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
 			{
-				if constexpr (
-					Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
-					Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
-				{
-					value = lambda(value, this->stack[i]);
-				}
-				else
-				{
-					lambda(value, this->stack[i]);
-				}
+				value = lambda(value, this->stack[i]);
 			}
+			else
+			{
+				lambda(value, this->stack[i]);
+			}
+		}
 
-			return MoveRValue(value);
-												}));
+		return MoveRValue(value);
 	}
 
 	template<typename THeap, typename T>
@@ -509,239 +516,241 @@ namespace Seed::Core::Containers
 	template<typename TLambda>
 	bool BaseConcurencyDynamicStack<THeap, T>::AnyImpl(TLambda&& lambda) const
 	{
-		return MoveRValue(this->lock.SharedLock([&]() InlineLambda{
-			if (this->count == 0)
-				return false;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					return true;
-			}
-
+		if (this->count == 0)
 			return false;
-		}));
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				return true;
+		}
+
+		return false;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	bool BaseConcurencyDynamicStack<THeap, T>::AllImpl(TLambda&& lambda) const {
-		return MoveRValue(this->lock.SharedLock([&]() InlineLambda {
-			if (this->count == 0)
-				return false;
-						
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (!lambda(this->stack[i]))
-					return false;
-			}
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			return true;
-		}));
+		if (this->count == 0)
+			return false;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (!lambda(this->stack[i]))
+				return false;
+		}
+
+		return true;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	T& BaseConcurencyDynamicStack<THeap, T>::FirstImpl(TLambda&& lambda) {
-		return this->lock.SharedLock([&]() -> T& InlineLambda {
-			if (this->count == 0)
-				Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					return static_cast<T&>(this->stack[i]);
-			}
-
+		if (this->count == 0)
 			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				return static_cast<T&>(this->stack[i]);
+		}
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	T& BaseConcurencyDynamicStack<THeap, T>::LastImpl(TLambda&& lambda) {
-		return this->lock.SharedLock([&]() -> T& InlineLambda {
-			if (this->count == 0)
-				Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			SizeT index = -1;
-
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					index = i;
-			}
-
-			if (index != -1)
-				return static_cast<T&>(this->stack[index]);
-
+		if (this->count == 0)
 			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+
+		SizeT index = -1;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				index = i;
+		}
+
+		if (index != -1)
+			return static_cast<T&>(this->stack[index]);
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	const T& BaseConcurencyDynamicStack<THeap, T>::FirstImpl(TLambda&& lambda) const {
-		return this->lock.SharedLock([&]() -> const T& InlineLambda {
-			if (this->count == 0)
-				Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					return static_cast<T&>(this->stack[i]);
-			}
-
+		if (this->count == 0)
 			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				return static_cast<T&>(this->stack[i]);
+		}
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	const T& BaseConcurencyDynamicStack<THeap, T>::LastImpl(TLambda&& lambda) const {
-		return this->lock.SharedLock([&]() -> const T& InlineLambda {
-			if (this->count == 0)
-				Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			SizeT index = -1;
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					index = i;
-			}
-
-			if (index != -1)
-				return static_cast<T&>(this->stack[index]);
-
+		if (this->count == 0)
 			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+
+		SizeT index = -1;
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				index = i;
+		}
+
+		if (index != -1)
+			return static_cast<T&>(this->stack[index]);
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	T BaseConcurencyDynamicStack<THeap, T>::FirstOrImpl(TLambda&& lambda, T&& item) const {
-		return this->lock.SharedLock([&, item = MoveRValue(item)]() InlineLambda {
-			if (count == 0)
-				return MoveRValue(item);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					return this->stack[i];
-			}
-
+		if (count == 0)
 			return MoveRValue(item);
-		});
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				return this->stack[i];
+		}
+
+		return MoveRValue(item);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	T BaseConcurencyDynamicStack<THeap, T>::LastOrImpl(TLambda&& lambda, T&& item) const {
-		return this->lock.SharedLock([&, item = MoveRValue(item)]() InlineLambda {
-			if (count == 0)
-				return MoveRValue(item);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			SizeT index = -1;
-
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					index = i;
-			}
-
-			if (index != -1)
-				return this->stack[index];
-
+		if (count == 0)
 			return MoveRValue(item);
-		});
+
+		SizeT index = -1;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				index = i;
+		}
+
+		if (index != -1)
+			return this->stack[index];
+
+		return MoveRValue(item);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	T BaseConcurencyDynamicStack<THeap, T>::FirstOrImpl(TLambda&& lambda, const T& item) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (count == 0)
-				return item;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					return this->stack[i];
-			}
-
+		if (count == 0)
 			return item;
-		});
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				return this->stack[i];
+		}
+
+		return item;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	T BaseConcurencyDynamicStack<THeap, T>::LastOrImpl(TLambda&& lambda, const T& item) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (count == 0)
-				return item;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			SizeT index = -1;
-
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					index = i;
-			}
-
-			if (index != -1)
-				return this->stack[index];
-
+		if (count == 0)
 			return item;
-		});
+
+		SizeT index = -1;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				index = i;
+		}
+
+		if (index != -1)
+			return this->stack[index];
+
+		return item;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda, typename TGetterLambda>
 	T BaseConcurencyDynamicStack<THeap, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (count == 0)
-				return otherLambda();
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					return this->stack[i];
-			}
-
+		if (count == 0)
 			return otherLambda();
-		});
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				return this->stack[i];
+		}
+
+		return otherLambda();
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda, typename TGetterLambda>
 	T BaseConcurencyDynamicStack<THeap, T>::LastOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (count == 0)
-				return otherLambda();
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			SizeT index = -1;
-
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					index = i;
-			}
-
-			if (index != -1)
-				return this->stack[index];
-
+		if (count == 0)
 			return otherLambda();
-		});
+
+		SizeT index = -1;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				index = i;
+		}
+
+		if (index != -1)
+			return this->stack[index];
+
+		return otherLambda();
 	}
 
 	template<typename THeap, typename T>
 	BaseConcurencyDynamicStack<THeap, T>& BaseConcurencyDynamicStack<THeap, T>::ReverseImpl() {
-		return this->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
-			for (SizeT i = 0; i < this->count / 2; i++) {
-				Swap(this->stack[i], this->stack[(this->count - 1) - i]);
-			}
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < this->count / 2; i++)
+		{
+			Swap(this->stack[i], this->stack[(this->count - 1) - i]);
+		}
+
+		return *this;
 	}
 
 	template<typename THeap, typename T>
@@ -760,40 +769,47 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	BaseConcurencyDynamicStack<THeap, T>& BaseConcurencyDynamicStack<THeap, T>::RemoveAllImpl() {
-		return this->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
-			delete[] this->stack; this->stack = nullptr;
-			this->count = this->bufferSize = 0;
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		delete[] this->stack; 
+		this->stack = nullptr;
+		this->count = this->bufferSize = 0;
+
+		return *this;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	BaseConcurencyDynamicStack<THeap, T>& BaseConcurencyDynamicStack<THeap, T>::RemoveAllImpl(TLambda&& lambda) {
-		return this->lock.ExclusiveLock([&]() -> BaseConcurencyDynamicStack& InlineLambda {
-			for (SizeT i = 0; i < this->count; i++) {
-				lambda(MoveRValue(this->stack[i]));
-			}
-			delete[] this->stack; this->stack = nullptr;
-			this->count = this->bufferSize = 0;
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < this->count; i++)
+		{
+			lambda(MoveRValue(this->stack[i]));
+		}
+
+		delete[] this->stack; 
+		this->stack = nullptr;
+		this->count = this->bufferSize = 0;
+
+		return *this;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
 	SizeT BaseConcurencyDynamicStack<THeap, T>::GetCountIfImpl(TLambda&& lambda) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			SizeT selectedCount = 0;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < count; i++)
-			{
-				if (lambda(this->stack[i]))
-					selectedCount++;
-			}
-			return selectedCount;
-		});
+		SizeT selectedCount = 0;
+
+		for (SizeT i = 0; i < count; i++)
+		{
+			if (lambda(this->stack[i]))
+				selectedCount++;
+		}
+
+		return selectedCount;
 	}
 }
 

@@ -292,7 +292,7 @@ namespace Seed::Core::Containers
 			return ConstIterator(nullptr);
 		else
 		{
-			auto _ = Threading::SharedScoppedLock(his->father->lock);
+			auto _ = Threading::SharedScoppedLock(this->father->lock);
 
 			return ConstIterator(This->next);
 		}
@@ -309,7 +309,7 @@ namespace Seed::Core::Containers
 			return ConstIterator(nullptr);
 		else
 		{
-			auto _ = Threading::SharedScoppedLock(his->father->lock);
+			auto _ = Threading::SharedScoppedLock(this->father->lock);
 
 			return ConstIterator(This->prev);
 		}
@@ -643,7 +643,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	BaseConcurencyList<THeap, T>::BaseConcurencyList(BaseConcurencyList&& list) : lock(), root(nullptr), last(nullptr) {
-		auto _ = Threading::ExclusiveScoppedLock(list->lock);
+		auto _ = Threading::ExclusiveScoppedLock(list.lock);
 
 		this->size = list.size;
 		list.size = 0;

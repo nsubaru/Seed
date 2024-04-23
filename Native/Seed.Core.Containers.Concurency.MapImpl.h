@@ -744,7 +744,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	BaseConcurencyMap<THeap, TKey, TValue>::BaseConcurencyMap(BaseConcurencyMap&& map): lock(), root(nullptr)
 	{
-		auto _ = Threading::ExclusiveScoppedLock(map->lock);
+		auto _ = Threading::ExclusiveScoppedLock(map.lock);
 
 		this->count = map.count;
 		this->root = map.root;
