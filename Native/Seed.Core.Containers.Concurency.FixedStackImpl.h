@@ -133,6 +133,7 @@ namespace Seed::Core::Containers
             Throw(EmptyStackException(SourcePosition));
 
         --this->count;
+
         return MoveRValue(this->stack[this->count]);
     }
     
@@ -146,6 +147,7 @@ namespace Seed::Core::Containers
             return MoveRValue(item);
 
         --this->count;
+
         return MoveRValue(this->stack[this->count]);
     }
     
@@ -159,6 +161,7 @@ namespace Seed::Core::Containers
             return MoveRValue(item);
 
         --this->count;
+
         return MoveRValue(this->stack[this->count]);
     }
     
@@ -173,6 +176,7 @@ namespace Seed::Core::Containers
             return lambda();
 
         --this->count;
+
         return MoveRValue(this->stack[this->count]);
     }
     

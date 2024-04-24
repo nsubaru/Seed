@@ -133,6 +133,7 @@ namespace Seed::Core::Containers
 			this->This = this->This->next;
 			if (this->This != nullptr) 
 				++This->RefCount;
+
 			return node;
 		}
 	}
@@ -159,6 +160,7 @@ namespace Seed::Core::Containers
 			this->This = this->This->prev;
 			if (this->This != nullptr) 
 				++This->RefCount;
+
 			return node;
 		}
 	}
@@ -463,7 +465,7 @@ namespace Seed::Core::Containers
 		}
 		else
 		{
-			auto _ = Threading::SharedScoppedLock(this->lock);
+			auto _ = Threading::SharedScoppedLock(this->This->father->lock);
 
 			this->This = this->This->prev;
 			if (this->This != nullptr)
@@ -694,21 +696,23 @@ namespace Seed::Core::Containers
 		if (otherList.size == 0)
 			return *this;
 
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
 		{
-			auto _inner = Threading::SharedScoppedLock(otherList.lock);
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			auto node = otherList.root;
-
-			while (node != nullptr)
 			{
-				this->last->next = new elem(node->value, this, this->last);
-				this->last = this->last->next;
-				node = node->next;
-			}
+				auto _inner = Threading::SharedScoppedLock(otherList.lock);
 
-			this->size = this->size + otherList.size;
+				auto node = otherList.root;
+
+				while (node != nullptr)
+				{
+					this->last->next = new elem(node->value, this, this->last);
+					this->last = this->last->next;
+					node = node->next;
+				}
+
+				this->size = this->size + otherList.size;
+			}
 		}
 
 		return *this;
@@ -724,31 +728,33 @@ namespace Seed::Core::Containers
 			return *this;
 
 		// Ignore otherList.This->root == null as if it true than otherList.This->size == 0
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (this->root == nullptr)
 		{
-			*this = MoveRValue(otherList);
-			return *this;
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+			if (this->root == nullptr)
+			{
+				*this = MoveRValue(otherList);
+				return *this;
+			}
+
+			__assume(otherList.root != nullptr);
+			auto item = otherList.root;
+
+			while (item != nullptr)
+			{
+				item->father = this;
+				item = item->next;
+			}
+
+			otherList.root->prev = this->last;
+
+			this->last->next = otherList.root;
+			this->last = otherList.last;
+			this->size = this->size + otherList.size;
+
+			otherList.root = otherList.last = nullptr;
+			otherList.size = 0;
 		}
-
-		__assume(otherList.root != nullptr);
-		auto item = otherList.root;
-
-		while (item != nullptr)
-		{
-			item->father = this;
-			item = item->next;
-		}
-
-		otherList.root->prev = this->last;
-
-		this->last->next = otherList.root;
-		this->last = otherList.last;
-		this->size = this->size + otherList.size;
-
-		otherList.root = otherList.last = nullptr;
-		otherList.size = 0;
 
 		return *this;
 	}
@@ -883,17 +889,19 @@ namespace Seed::Core::Containers
 	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::AddLast(const T& value)
 	{
 		// Performs in exclusive lock
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (this->root == nullptr)
 		{
-			this->last = this->root = new elem(value, this);
-			this->size = 1;
-			return this->last;
-		}
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-		this->last = this->last->next = new elem(value, this, this->last);
-		++this->size;
+			if (this->root == nullptr)
+			{
+				this->last = this->root = new elem(value, this);
+				this->size = 1;
+				return this->last;
+			}
+
+			this->last = this->last->next = new elem(value, this, this->last);
+			++this->size;
+		}
 
 		return this->last;
 	}
@@ -902,17 +910,19 @@ namespace Seed::Core::Containers
 	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::AddLast(T&& value)
 	{
 		// Performs in exclusive lock
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (this->root == nullptr)
 		{
-			this->last = this->root = new elem(MoveRValue(value), this);
-			this->size = 1;
-			return this->last;
-		}
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-		this->last = this->last->next = new elem(MoveRValue(value), this, this->last);
-		++this->size;
+			if (this->root == nullptr)
+			{
+				this->last = this->root = new elem(MoveRValue(value), this);
+				this->size = 1;
+				return this->last;
+			}
+
+			this->last = this->last->next = new elem(MoveRValue(value), this, this->last);
+			++this->size;
+		}
 
 		return this->last;
 	}
@@ -1339,7 +1349,8 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename U, typename TLambda>
-	T BaseConcurencyList<THeap, T>::AggregateImpl(TLambda&& lambda, const U& value) const {
+	T BaseConcurencyList<THeap, T>::AggregateImpl(TLambda&& lambda, const U& value) const
+	{
 		auto _ = Threading::SharedScoppedLock(this->lock);
 
 		auto node = this->root;
@@ -1369,7 +1380,8 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename U, typename TLambda>
-	U BaseConcurencyList<THeap, T>::AggregateImpl(TLambda&& lambda, U&& value) const {
+	U BaseConcurencyList<THeap, T>::AggregateImpl(TLambda&& lambda, U&& value) const
+	{
 		auto _ = Threading::SharedScoppedLock(this->lock);
 
 		auto node = this->root;
@@ -1445,31 +1457,33 @@ namespace Seed::Core::Containers
 	template<class THeap, typename T>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::SortImpl(bool IsDescending) requires Concepts::IsComparableWith<T, T>
 	{
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (!IsDescending)
 		{
-			auto l = [] (const T& V1, const T& V2) {
-				return V1 < V2;
-			};
-			
-			this->root = MergeSort(this->root, l);
-		}
-		else
-		{
-			auto l = [] (const T& V1, const T& V2) {
-				return V1 > V2;
-			};
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			this->root = MergeSort(this->root, l);
-		}
+			if (!IsDescending)
+			{
+				auto l = [] (const T& V1, const T& V2) {
+					return V1 < V2;
+				};
 
-		this->last = [&] () {
-			elem* node = this->root;
-			while (node->next != nullptr)
-				node = node->next;
-			return node;
-		}();
+				this->root = MergeSort(this->root, l);
+			}
+			else
+			{
+				auto l = [] (const T& V1, const T& V2) {
+					return V1 > V2;
+				};
+
+				this->root = MergeSort(this->root, l);
+			}
+
+			this->last = [&] () {
+				elem* node = this->root;
+				while (node->next != nullptr)
+					node = node->next;
+				return node;
+			}();
+		}
 
 		return *this;
 	}
@@ -1478,19 +1492,21 @@ namespace Seed::Core::Containers
 	template<typename TLambda>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::SortImpl(TLambda&& lambda)
 	{
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+		{
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-		if (this->size == 0)
-			return *this;
+			if (this->size == 0)
+				return *this;
 
-		this->root = MergeSort(this->root, lambda);
+			this->root = MergeSort(this->root, lambda);
 
-		this->last = [&] () {
-			elem* node = this->root;
-			while (node->next != nullptr)
-				node = node->next;
-			return node;
-		}();
+			this->last = [&] () {
+				elem* node = this->root;
+				while (node->next != nullptr)
+					node = node->next;
+				return node;
+			}();
+		}
 
 		return *this;
 	}
@@ -1499,28 +1515,30 @@ namespace Seed::Core::Containers
 	template<typename TLambda>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::SortByLambdaImpl(TLambda&& lambda, bool IsDescending)
 	{
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (this->size == 0)
-			return *this;
-
-		if (IsDescending)
 		{
-			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return !(lambda(l) < lambda(r)); };
-			this->root = MergeSort(this->root, l);
-		}
-		else
-		{
-			auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return lambda(l) < lambda(r); };
-			this->root = MergeSort(this->root, l);
-		}
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-		this->last = [&] () {
-			elem* node = this->root;
-			while (node->next != nullptr)
-				node = node->next;
-			return node;
-		}();
+			if (this->size == 0)
+				return *this;
+
+			if (IsDescending)
+			{
+				auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return !(lambda(l) < lambda(r)); };
+				this->root = MergeSort(this->root, l);
+			}
+			else
+			{
+				auto l = [lambda = MoveRValue(lambda)](const T& l, const T& r) mutable InlineLambda{ return lambda(l) < lambda(r); };
+				this->root = MergeSort(this->root, l);
+			}
+
+			this->last = [&] () {
+				elem* node = this->root;
+				while (node->next != nullptr)
+					node = node->next;
+				return node;
+			}();
+		}
 
 		return *this;
 	}
@@ -1677,7 +1695,8 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	T BaseConcurencyList<THeap, T>::FirstOrImpl(TLambda&& lambda, T&& item) const {
+	T BaseConcurencyList<THeap, T>::FirstOrImpl(TLambda&& lambda, T&& item) const
+	{
 		auto _ = Threading::SharedScoppedLock(this->lock);
 
 		if (size == 0)
@@ -1696,7 +1715,8 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	T BaseConcurencyList<THeap, T>::LastOrImpl(TLambda&& lambda, T&& item) const {
+	T BaseConcurencyList<THeap, T>::LastOrImpl(TLambda&& lambda, T&& item) const
+	{
 		auto _ = Threading::SharedScoppedLock(this->lock);
 
 		if (size == 0)
@@ -1809,37 +1829,42 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::ReverseImpl() & {
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		elem* current = this->root;
-
-		while (current != nullptr)
 		{
-			elem* temp = current->prev;
-			current->prev = current->next;
-			current->next = temp;
-			current = current->prev;
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+			elem* current = this->root;
+
+			while (current != nullptr)
+			{
+				elem* temp = current->prev;
+				current->prev = current->next;
+				current->next = temp;
+				current = current->prev;
+			}
+
+			Seed::Core::Swap<elem>(static_cast<elem*&>(this->root), static_cast<elem*&>(this->last));
 		}
 
-		Seed::Core::Swap<elem>(static_cast<elem*&>(this->root), static_cast<elem*&>(this->last));
 		return *this;
 	}
 
 	template<class THeap, typename T>
 	BaseConcurencyList<THeap, T> BaseConcurencyList<THeap, T>::ReverseImpl() && {
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		elem* current = this->root;
-
-		while (current != nullptr)
 		{
-			elem* temp = current->prev;
-			current->prev = current->next;
-			current->next = temp;
-			current = current->prev;
-		}
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-		Seed::Core::Swap<elem>(static_cast<elem*&>(this->root), static_cast<elem*&>(this->last));
+			elem* current = this->root;
+
+			while (current != nullptr)
+			{
+				elem* temp = current->prev;
+				current->prev = current->next;
+				current->next = temp;
+				current = current->prev;
+			}
+
+			Seed::Core::Swap<elem>(static_cast<elem*&>(this->root), static_cast<elem*&>(this->last));
+		}
 			
 		return MoveRValue(*this);
 	}
@@ -1874,231 +1899,246 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::RemoveAllImpl() {
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		while (this->root != nullptr)
 		{
-			elem* node = this->root;
-			this->root = this->root->next;
-			node->next = nullptr;
-			node->father = nullptr;
-			node->prev = nullptr;
-			if (--node->RefCount == 0)
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+			while (this->root != nullptr)
 			{
-				delete node;
-				continue;
+				elem* node = this->root;
+				this->root = this->root->next;
+				node->next = nullptr;
+				node->father = nullptr;
+				node->prev = nullptr;
+				if (--node->RefCount == 0)
+				{
+					delete node;
+					continue;
+				}
 			}
+
+			this->root = this->last = nullptr;
+			this->size = 0;
 		}
 
-		this->root = this->last = nullptr;
-		this->size = 0;
 		return *this;
 	}
 
 	template<class THeap, typename T>
 	template<typename TLambda>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::RemoveAllImpl(TLambda && lambda) {
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		SizeT idx = 0;
-
-		while (this->root != nullptr)
 		{
-			elem* node = this->root;
-			this->root = this->root->next;
-			node->next = nullptr;
-			node->father = nullptr;
-			node->prev = nullptr;
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			if constexpr (Concepts::IsInvocable<TLambda, T&&, SizeT>)
+			SizeT idx = 0;
+
+			while (this->root != nullptr)
 			{
-				lambda(MoveRValue(node->value), idx);
-			}
-			else
-			{
-				lambda(MoveRValue(node->value));
+				elem* node = this->root;
+				this->root = this->root->next;
+				node->next = nullptr;
+				node->father = nullptr;
+				node->prev = nullptr;
+
+				if constexpr (Concepts::IsInvocable<TLambda, T&&, SizeT>)
+				{
+					lambda(MoveRValue(node->value), idx);
+				}
+				else
+				{
+					lambda(MoveRValue(node->value));
+				}
+
+				if (--node->RefCount == 0)
+				{
+					delete node;
+					continue;
+				}
+
+				idx++;
 			}
 
-			if (--node->RefCount == 0)
-			{
-				delete node;
-				continue;
-			}
-
-			idx++;
+			this->root = this->last = nullptr;
+			this->size = 0;
 		}
 
-		this->root = this->last = nullptr;
-		this->size = 0;
 		return *this;
 	}
 
 	template<class THeap, typename T>
 	template<typename TFilterLambda, typename TLambda>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::RemoveIfFilterAndLambdaWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (this->root == nullptr)
-			return *this;
-
-		elem* it = this->root;
-		elem* tmp;
-		SizeT Index = 0;
-
-		while (it != nullptr)
 		{
-			if (filter(it->value, Index))
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+			if (this->root == nullptr)
+				return *this;
+
+			elem* it = this->root;
+			elem* tmp;
+			SizeT Index = 0;
+
+			while (it != nullptr)
 			{
-				lambda(it->value, Index);
+				if (filter(it->value, Index))
+				{
+					lambda(it->value, Index);
 
-				if (it->next == nullptr && it->prev == nullptr)
-				{
-					this->root = nullptr;
-					this->last = nullptr;
-					tmp = nullptr;
-				}
-				else if (it->next == nullptr)
-				{
-					tmp = nullptr;
-					if (it->prev != nullptr)
-						it->prev->next = nullptr;
-					this->last = it->prev;
-				}
-				else if (it->prev == nullptr)
-				{
-					tmp = it->next;
-					it->next->prev = nullptr;
-					this->root = it->next;
-				}
-				else
-				{
-					tmp = it->next;
-					tmp->prev = it->prev;
-					it->prev->next = tmp;
-				}
-				--it->RefCount;
-				if (it->RefCount == 0)
-				{
-					delete it;
-				}
-				--this->size;
-				it = tmp;
+					if (it->next == nullptr && it->prev == nullptr)
+					{
+						this->root = nullptr;
+						this->last = nullptr;
+						tmp = nullptr;
+					}
+					else if (it->next == nullptr)
+					{
+						tmp = nullptr;
+						if (it->prev != nullptr)
+							it->prev->next = nullptr;
+						this->last = it->prev;
+					}
+					else if (it->prev == nullptr)
+					{
+						tmp = it->next;
+						it->next->prev = nullptr;
+						this->root = it->next;
+					}
+					else
+					{
+						tmp = it->next;
+						tmp->prev = it->prev;
+						it->prev->next = tmp;
+					}
+					--it->RefCount;
+					if (it->RefCount == 0)
+					{
+						delete it;
+					}
+					--this->size;
+					it = tmp;
 
+				}
+				else  it = it->next;
 			}
-			else  it = it->next;
 		}
+
 		return *this;
 	}
 
 	template<class THeap, typename T>
 	template<typename TFilterLambda, typename TLambda>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::RemoveIfFilterWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (this->root == nullptr)
-			return *this;
-
-		elem* it = this->root;
-		elem* tmp;
-		SizeT Index = 0;
-		while (it != nullptr)
 		{
-			if (filter(it->value, Index))
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+			if (this->root == nullptr)
+				return *this;
+
+			elem* it = this->root;
+			elem* tmp;
+			SizeT Index = 0;
+			while (it != nullptr)
 			{
-				lambda(it->value);
+				if (filter(it->value, Index))
+				{
+					lambda(it->value);
 
-				if (it->next == nullptr && it->prev == nullptr)
-				{
-					this->root = nullptr;
-					this->last = nullptr;
-					tmp = nullptr;
-				}
-				else if (it->next == nullptr)
-				{
-					tmp = nullptr;
-					if (it->prev != nullptr)
-						it->prev->next = nullptr;
-					this->last = it->prev;
-				}
-				else if (it->prev == nullptr)
-				{
-					tmp = it->next;
-					it->next->prev = nullptr;
-					this->root = it->next;
-				}
-				else
-				{
-					tmp = it->next;
-					tmp->prev = it->prev;
-					it->prev->next = tmp;
-				}
-				--it->RefCount;
-				if (it->RefCount == 0)
-				{
-					delete it;
-				}
-				--this->size;
-				it = tmp;
+					if (it->next == nullptr && it->prev == nullptr)
+					{
+						this->root = nullptr;
+						this->last = nullptr;
+						tmp = nullptr;
+					}
+					else if (it->next == nullptr)
+					{
+						tmp = nullptr;
+						if (it->prev != nullptr)
+							it->prev->next = nullptr;
+						this->last = it->prev;
+					}
+					else if (it->prev == nullptr)
+					{
+						tmp = it->next;
+						it->next->prev = nullptr;
+						this->root = it->next;
+					}
+					else
+					{
+						tmp = it->next;
+						tmp->prev = it->prev;
+						it->prev->next = tmp;
+					}
+					--it->RefCount;
+					if (it->RefCount == 0)
+					{
+						delete it;
+					}
+					--this->size;
+					it = tmp;
 
+				}
+				else  it = it->next;
 			}
-			else  it = it->next;
 		}
+
 		return *this;
 	}
 
 	template<class THeap, typename T>
 	template<typename TFilterLambda, typename TLambda>
 	BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::RemoveIfLambdaWithIndex(TFilterLambda&& filter, TLambda&& lambda) {
-		auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-		if (this->root == nullptr)
-			return *this;
-
-		elem* it = this->root;
-		elem* tmp;
-		SizeT Index = 0;
-		while (it != nullptr)
 		{
-			if (filter(it->value))
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+			if (this->root == nullptr)
+				return *this;
+
+			elem* it = this->root;
+			elem* tmp;
+			SizeT Index = 0;
+			while (it != nullptr)
 			{
-				lambda(it->value, Index);
+				if (filter(it->value))
+				{
+					lambda(it->value, Index);
 
-				if (it->next == nullptr && it->prev == nullptr)
-				{
-					this->root = nullptr;
-					this->last = nullptr;
-					tmp = nullptr;
-				}
-				else if (it->next == nullptr)
-				{
-					tmp = nullptr;
-					if (it->prev != nullptr)
-						it->prev->next = nullptr;
-					this->last = it->prev;
-				}
-				else if (it->prev == nullptr)
-				{
-					tmp = it->next;
-					it->next->prev = nullptr;
-					this->root = it->next;
-				}
-				else
-				{
-					tmp = it->next;
-					tmp->prev = it->prev;
-					it->prev->next = tmp;
-				}
-				--it->RefCount;
-				if (it->RefCount == 0)
-				{
-					delete it;
-				}
-				--this->size;
-				it = tmp;
+					if (it->next == nullptr && it->prev == nullptr)
+					{
+						this->root = nullptr;
+						this->last = nullptr;
+						tmp = nullptr;
+					}
+					else if (it->next == nullptr)
+					{
+						tmp = nullptr;
+						if (it->prev != nullptr)
+							it->prev->next = nullptr;
+						this->last = it->prev;
+					}
+					else if (it->prev == nullptr)
+					{
+						tmp = it->next;
+						it->next->prev = nullptr;
+						this->root = it->next;
+					}
+					else
+					{
+						tmp = it->next;
+						tmp->prev = it->prev;
+						it->prev->next = tmp;
+					}
+					--it->RefCount;
+					if (it->RefCount == 0)
+					{
+						delete it;
+					}
+					--this->size;
+					it = tmp;
 
+				}
+				else  it = it->next;
 			}
-			else  it = it->next;
 		}
+
 		return *this;
 	}
 

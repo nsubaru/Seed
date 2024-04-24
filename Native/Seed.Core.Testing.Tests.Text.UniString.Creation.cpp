@@ -1,6 +1,7 @@
 #include "Seed.Core.Testing.Tests.Text.UniString.h"
 
 constexpr auto testText = L"Test123";
+constexpr auto testTextA = "Test123";
 
 bool Seed::Core::Testing::Test::UniString::Creation::EmptyUniStringCreation::Execute()
 {
@@ -85,11 +86,11 @@ bool Seed::Core::Testing::Test::UniString::Creation::ConstArrACharUniStringCreat
 	auto uniString = Core::UniString(cArr);
 
 	Asserts::AssertEqual(uniString.Length, cArr.Count, SourcePosition);
-	Asserts::AssertTrue(uniString.IsConstMode, SourcePosition);
+	Asserts::AssertFalse(uniString.IsConstMode, SourcePosition);
 
 	for (SizeT i = 0; i < uniString.Length; i++)
 	{
-		Asserts::AssertEqual(uniString[i], testText[i], SourcePosition);
+		Asserts::AssertEqual(uniString[i], testTextA[i], SourcePosition);
 	}
 
 	return true;
@@ -102,11 +103,11 @@ bool Seed::Core::Testing::Test::UniString::Creation::ConstAStringUniStringCreati
 	auto uniString = Core::UniString(cStr);
 
 	Asserts::AssertEqual(uniString.Length, cStr.Length, SourcePosition);
-	Asserts::AssertTrue(uniString.IsConstMode, SourcePosition);
+	Asserts::AssertFalse(uniString.IsConstMode, SourcePosition);
 
 	for (SizeT i = 0; i < uniString.Length; i++)
 	{
-		Asserts::AssertEqual(uniString[i], testText[i], SourcePosition);
+		Asserts::AssertEqual(uniString[i], testTextA[i], SourcePosition);
 	}
 
 	return true;
@@ -116,12 +117,12 @@ bool Seed::Core::Testing::Test::UniString::Creation::TextARefUniStringCreation::
 {
 	auto uniString = Core::UniString("Test123");
 
-	Asserts::AssertEqual(uniString.Length, sizeof(testText) - 1, SourcePosition);
-	Asserts::AssertTrue(uniString.IsConstMode, SourcePosition);
+	Asserts::AssertEqual(uniString.Length, sizeof(testTextA) - 1, SourcePosition);
+	Asserts::AssertFalse(uniString.IsConstMode, SourcePosition);
 
 	for (SizeT i = 0; i < uniString.Length; i++)
 	{
-		Asserts::AssertEqual(uniString[i], testText[i], SourcePosition);
+		Asserts::AssertEqual(uniString[i], testTextA[i], SourcePosition);
 	}
 
 	return true;
