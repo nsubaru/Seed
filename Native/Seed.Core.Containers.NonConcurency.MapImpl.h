@@ -416,39 +416,39 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(Node* item) : item(item)
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(Node* item) : item(item)
 	{
 		if (item != nullptr) ++item->RefCount;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator++()
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator++()
 	{
 		this->item = Next(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator--()
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator--()
 	{
 		this->item = Prev(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator++(int)
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator++(int)
 	{
 		return ConstIterator(Next(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator--(int)
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator--(int)
 	{
 		return ConstIterator(Prev(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::ConstIterator::operator!=(const ConstIterator& other)
+	inline bool BaseMap<THeap, TKey, TValue>::ConstIterator::operator!=(const ConstIterator& other)
 	{
 		if (this->item == nullptr && other.item == nullptr)
 			return false;
@@ -459,51 +459,51 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::ConstIterator::operator!=(NullptrT)
+	inline bool BaseMap<THeap, TKey, TValue>::ConstIterator::operator!=(NullptrT)
 	{
 		return this->item != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto* const BaseMap<THeap, TKey, TValue>::ConstIterator::operator->()
+	inline const auto* const BaseMap<THeap, TKey, TValue>::ConstIterator::operator->()
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto& BaseMap<THeap, TKey, TValue>::ConstIterator::operator*()
+	inline const auto& BaseMap<THeap, TKey, TValue>::ConstIterator::operator*()
 	{
 		return this->item->data;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const BasePair<THeap, TKey, TValue>* const BaseMap<THeap, TKey, TValue>::ConstIterator::operator->() const
+	inline const BasePair<THeap, TKey, TValue>* const BaseMap<THeap, TKey, TValue>::ConstIterator::operator->() const
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto& BaseMap<THeap, TKey, TValue>::ConstIterator::operator*() const
+	inline const auto& BaseMap<THeap, TKey, TValue>::ConstIterator::operator*() const
 	{
 		return this->item->data;
 	}
 
 #pragma region Ctor, Dtor, copy operators
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(const ConstIterator& iterator): item(iterator.item)
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(const ConstIterator& iterator): item(iterator.item)
 	{
 		if (item != nullptr)
 			++item->RefCount;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(ConstIterator&& iterator): item(iterator.item)
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(ConstIterator&& iterator): item(iterator.item)
 	{
 		iterator.item = nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator=(const ConstIterator& iterator)
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator=(const ConstIterator& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(iterator);
@@ -511,7 +511,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator=(ConstIterator&& iterator)
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator& BaseMap<THeap, TKey, TValue>::ConstIterator::operator=(ConstIterator&& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(MoveRValue(iterator));
@@ -519,7 +519,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator::~ConstIterator()
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator::~ConstIterator()
 	{
 		if (item != nullptr)
 		{
@@ -533,63 +533,63 @@ namespace Seed::Core::Containers
 #pragma endregion
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::GetRoot() const
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::GetRoot() const
 	{
 		return ConstIterator(FindMin(this->root));
 	}
 	
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::GetLast() const
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::GetLast() const
 	{
 		return ConstIterator(FindMax(this->root));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::begin() const
+	inline BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::begin() const
 	{
 		return GetRoot();
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::end() const
+	inline const BaseMap<THeap, TKey, TValue>::ConstIterator BaseMap<THeap, TKey, TValue>::end() const
 	{
 		return ConstIterator(nullptr);
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator::Iterator(Node* item): item(item)
+	inline BaseMap<THeap, TKey, TValue>::Iterator::Iterator(Node* item): item(item)
 	{
 		if (item != nullptr) ++item->RefCount;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator++()
+	inline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator++()
 	{
 		this->item = Next(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator--()
+	inline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator--()
 	{
 		this->item = Prev(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator++(int)
+	inline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator++(int)
 	{
 		return Iterator(Next(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator--(int)
+	inline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator--(int)
 	{
 		return Iterator(Prev(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::Iterator::operator==(const Iterator& other)
+	inline bool BaseMap<THeap, TKey, TValue>::Iterator::operator==(const Iterator& other)
 	{
 		if (this->item == nullptr && other.item == nullptr)
 			return true;
@@ -600,13 +600,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::Iterator::operator==(NullptrT)
+	inline bool BaseMap<THeap, TKey, TValue>::Iterator::operator==(NullptrT)
 	{
 		return this->item == nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::Iterator::operator!=(const Iterator& other)
+	inline bool BaseMap<THeap, TKey, TValue>::Iterator::operator!=(const Iterator& other)
 	{
 		if (this->item == nullptr && other.item == nullptr)
 			return false;
@@ -617,57 +617,57 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::Iterator::operator!=(NullptrT)
+	inline bool BaseMap<THeap, TKey, TValue>::Iterator::operator!=(NullptrT)
 	{
 		return this->item != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline auto* BaseMap<THeap, TKey, TValue>::Iterator::operator->()
+	inline auto* BaseMap<THeap, TKey, TValue>::Iterator::operator->()
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline auto& BaseMap<THeap, TKey, TValue>::Iterator::operator*()
+	inline auto& BaseMap<THeap, TKey, TValue>::Iterator::operator*()
 	{
 		return this->item->data;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const BasePair<THeap, TKey, TValue>* const BaseMap<THeap, TKey, TValue>::Iterator::operator->() const
+	inline const BasePair<THeap, TKey, TValue>* const BaseMap<THeap, TKey, TValue>::Iterator::operator->() const
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto& BaseMap<THeap, TKey, TValue>::Iterator::operator*() const
+	inline const auto& BaseMap<THeap, TKey, TValue>::Iterator::operator*() const
 	{
 		return this->item->data;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator::operator typename BaseMap<THeap, TKey, TValue>::ConstIterator() const
+	inline BaseMap<THeap, TKey, TValue>::Iterator::operator typename BaseMap<THeap, TKey, TValue>::ConstIterator() const
 	{
 		return ConstIterator(item);
 	}
 
 #pragma region Ctor, Dtor, copy operators
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator::Iterator(const Iterator& iterator): item(iterator.item)
+	inline BaseMap<THeap, TKey, TValue>::Iterator::Iterator(const Iterator& iterator): item(iterator.item)
 	{
 		if (item != nullptr)
 			++item->RefCount;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator::Iterator(Iterator&& iterator): item(iterator.item)
+	inline BaseMap<THeap, TKey, TValue>::Iterator::Iterator(Iterator&& iterator): item(iterator.item)
 	{
 		iterator.item = nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator=(const Iterator& iterator)
+	inline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator=(const Iterator& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(iterator);
@@ -675,7 +675,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator=(Iterator&& iterator)
+	inline BaseMap<THeap, TKey, TValue>::Iterator& BaseMap<THeap, TKey, TValue>::Iterator::operator=(Iterator&& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(MoveRValue(iterator));
@@ -683,7 +683,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator::~Iterator()
+	inline BaseMap<THeap, TKey, TValue>::Iterator::~Iterator()
 	{
 		if (item != nullptr)
 		{
@@ -697,25 +697,25 @@ namespace Seed::Core::Containers
 #pragma endregion
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::GetRoot()
+	inline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::GetRoot()
 	{
 		return Iterator(FindMin(this->root));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::GetLast()
+	inline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::GetLast()
 	{
 		return Iterator(FindMax(this->root));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::begin()
+	inline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::begin()
 	{
 		return GetRoot();
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::end()
+	inline BaseMap<THeap, TKey, TValue>::Iterator BaseMap<THeap, TKey, TValue>::end()
 	{
 		return Iterator(nullptr);
 	}
@@ -765,48 +765,48 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline SizeT BaseMap<THeap, TKey, TValue>::GetCount() const
+	inline SizeT BaseMap<THeap, TKey, TValue>::GetCount() const
 	{
 		return this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::Insert(const BasePair<THeap, TKey, TValue>& pair)
+	inline void BaseMap<THeap, TKey, TValue>::Insert(const BasePair<THeap, TKey, TValue>& pair)
 	{
 		this->root = Insert(this->root, pair, nullptr);
 		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::Insert(BasePair<THeap, TKey, TValue>&& pair)
+	inline void BaseMap<THeap, TKey, TValue>::Insert(BasePair<THeap, TKey, TValue>&& pair)
 	{
 		this->root = Insert(this->root, pair, nullptr);
 		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::Insert(const TKey& key, const TValue& value)
+	inline void BaseMap<THeap, TKey, TValue>::Insert(const TKey& key, const TValue& value)
 	{
 		this->root = Insert(this->root, key, value, nullptr);
 		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::Insert(TKey&& key, const TValue& value)
+	inline void BaseMap<THeap, TKey, TValue>::Insert(TKey&& key, const TValue& value)
 	{
 		this->root = Insert(this->root, MoveRValue(key), value, nullptr);
 		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::Insert(const TKey& key, TValue&& value)
+	inline void BaseMap<THeap, TKey, TValue>::Insert(const TKey& key, TValue&& value)
 	{
 		this->root = Insert(this->root, key, MoveRValue(value), nullptr);
 		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::Insert(TKey&& key, TValue&& value)
+	inline void BaseMap<THeap, TKey, TValue>::Insert(TKey&& key, TValue&& value)
 	{
 		this->root = Insert(this->root, MoveRValue(key), MoveRValue(value), nullptr);
 		++this->count;
@@ -814,7 +814,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires Concepts::HaveEqual<TKey, UKey>
-	ForceInline void BaseMap<THeap, TKey, TValue>::Delete(const UKey& key)
+	inline void BaseMap<THeap, TKey, TValue>::Delete(const UKey& key)
 	{
 		--this->count;
 		this->root = Remove(this->root, key);
@@ -836,7 +836,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires Concepts::HaveEqual<TKey, UKey>
-	ForceInline TValue& BaseMap<THeap, TKey, TValue>::operator[](const UKey& key)
+	inline TValue& BaseMap<THeap, TKey, TValue>::operator[](const UKey& key)
 	{
 		Node* node = Find(this->root, key);
 
@@ -848,7 +848,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires Concepts::HaveEqual<TKey, UKey>
-	ForceInline const TValue& BaseMap<THeap, TKey, TValue>::operator[](const UKey& key) const
+	inline const TValue& BaseMap<THeap, TKey, TValue>::operator[](const UKey& key) const
 	{
 		Node* node = Find(this->root, key);
 
@@ -874,20 +874,20 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires Concepts::HaveEqual<TKey, UKey>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::IsExist(const UKey& key) const
+	inline bool BaseMap<THeap, TKey, TValue>::IsExist(const UKey& key) const
 	{
 		return Find(this->root, key) != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires Concepts::HaveEqual<TKey, UKey>
-	ForceInline bool BaseMap<THeap, TKey, TValue>::IsExist(UKey&& key) const
+	inline bool BaseMap<THeap, TKey, TValue>::IsExist(UKey&& key) const
 	{
 		return Find(this->root, key) != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseMap<THeap, TKey, TValue> BaseMap<THeap, TKey, TValue>::Clone() const
+	inline BaseMap<THeap, TKey, TValue> BaseMap<THeap, TKey, TValue>::Clone() const
 	requires (Concepts::IsClonable<TKey>&& Concepts::IsClonable<TValue>)
 	{
 		BaseMap result;
@@ -899,7 +899,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename TLambda>
 	requires (Concepts::IsInvocableWithResult<TLambda, BasePair<THeap, TKey, TValue>, const BasePair<THeap, TKey, TValue>&>)
-	ForceInline BaseMap<THeap, TKey, TValue> BaseMap<THeap, TKey, TValue>::Clone() const
+	inline BaseMap<THeap, TKey, TValue> BaseMap<THeap, TKey, TValue>::Clone() const
 	{
 		BaseMap result;
 		result.count = this->count;
@@ -1179,13 +1179,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair)
+	inline void BaseMap<THeap, TKey, TValue>::UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair)
 	{
 		Insert(MoveRValue(pair));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseMap<THeap, TKey, TValue>::UnsafeAdd(const BasePair<THeap, TKey, TValue>& pair)
+	inline void BaseMap<THeap, TKey, TValue>::UnsafeAdd(const BasePair<THeap, TKey, TValue>& pair)
 	{
 		Insert(pair);
 	}

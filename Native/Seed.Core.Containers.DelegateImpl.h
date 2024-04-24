@@ -23,7 +23,7 @@ namespace Seed::Core
         return this->This <=> other.This;
     }
 
-    ForceInline Boolean Delegate::GetIsStarted() const
+    inline Boolean Delegate::GetIsStarted() const
     {
         if (this->This == nullptr)
         {
@@ -33,7 +33,7 @@ namespace Seed::Core
         return this->This->function->IsStarted();
     }
 
-    ForceInline Boolean Delegate::GetIsEnded() const
+    inline Boolean Delegate::GetIsEnded() const
     {
         if (this->This == nullptr)
         {
@@ -43,7 +43,7 @@ namespace Seed::Core
         return this->This->function->IsEnded();
     }
 
-    ForceInline void Delegate::Init() volatile
+    inline void Delegate::Init() volatile
     {
         if (this->This == nullptr)
         {
@@ -59,7 +59,7 @@ namespace Seed::Core
     }
 
     template<typename T>
-    ForceInline T Delegate::GetResult()
+    inline T Delegate::GetResult()
     {
         if (this->This == nullptr)
         {
@@ -80,7 +80,7 @@ namespace Seed::Core
     }
 
     template<typename T>
-    ForceInline T Delegate::GetResult() volatile
+    inline T Delegate::GetResult() volatile
     {
         if (this->This == nullptr)
         {
@@ -100,13 +100,13 @@ namespace Seed::Core
         return this->This->function->GetResult<T>();
     }
 
-    ForceInline volatile Delegate& Delegate::operator()() volatile
+    inline volatile Delegate& Delegate::operator()() volatile
     {
         this->Init();
         return *this;
     }
 
-    ForceInline Delegate& Delegate::operator()()
+    inline Delegate& Delegate::operator()()
     {
         this->Init();
         return *this;

@@ -24,19 +24,19 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline UInt16 BaseConcurencyMap<THeap, TKey, TValue>::Height(Node* node)
+	inline UInt16 BaseConcurencyMap<THeap, TKey, TValue>::Height(Node* node)
 	{
 		return node ? node->height : 0;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline Int16 BaseConcurencyMap<THeap, TKey, TValue>::BFactor(Node* node)
+	inline Int16 BaseConcurencyMap<THeap, TKey, TValue>::BFactor(Node* node)
 	{
 		return  Height(node->right) - Height(node->left);
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseConcurencyMap<THeap, TKey, TValue>::FixHeight(Node* node)
+	inline void BaseConcurencyMap<THeap, TKey, TValue>::FixHeight(Node* node)
 	{
 		const UInt16 hLeft = Height(node->left);
 		const UInt16 hRight = Height(node->right);
@@ -44,7 +44,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline typename BaseConcurencyMap<THeap, TKey, TValue>::Node* BaseConcurencyMap<THeap, TKey, TValue>::RotateRight(Node* node)
+	inline typename BaseConcurencyMap<THeap, TKey, TValue>::Node* BaseConcurencyMap<THeap, TKey, TValue>::RotateRight(Node* node)
 	{
 		Node* left = node->left;
 		Node* nodeFather = node->father;
@@ -65,7 +65,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline typename BaseConcurencyMap<THeap, TKey, TValue>::Node* BaseConcurencyMap<THeap, TKey, TValue>::RotateLeft(Node* node)
+	inline typename BaseConcurencyMap<THeap, TKey, TValue>::Node* BaseConcurencyMap<THeap, TKey, TValue>::RotateLeft(Node* node)
 	{
 		Node* right = node->right;
 		Node* nodeFather = node->father;
@@ -413,39 +413,39 @@ namespace Seed::Core::Containers
 
 #pragma region ConstIterator
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(Node* item): item(item)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(Node* item): item(item)
 	{
 		if (item != nullptr) ++item->RefCount;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator++()
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator++()
 	{
 		this->item = Next(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator--()
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator--()
 	{
 		this->item = Prev(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator++(int)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator++(int)
 	{
 		return ConstIterator(Next(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator--(int)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator--(int)
 	{
 		return ConstIterator(Prev(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator!=(const ConstIterator& other)
+	inline bool BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator!=(const ConstIterator& other)
 	{
 		if (this->item == nullptr && other.item == nullptr)
 			return false;
@@ -456,51 +456,51 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator!=(NullptrT)
+	inline bool BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator!=(NullptrT)
 	{
 		return this->item != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto* const BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator->()
+	inline const auto* const BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator->()
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator*()
+	inline const auto& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator*()
 	{
 		return this->item->data;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto* const BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator->() const
+	inline const auto* const BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator->() const
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator*() const
+	inline const auto& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator*() const
 	{
 		return this->item->data;
 	}
 
 #pragma region Ctor, Dtor, copy operators
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(const ConstIterator& iterator): item(iterator.item)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(const ConstIterator& iterator): item(iterator.item)
 	{
 		if (item != nullptr)
 			++item->RefCount;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(ConstIterator&& iterator): item(iterator.item)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::ConstIterator(ConstIterator&& iterator): item(iterator.item)
 	{
 		iterator.item = nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator=(const ConstIterator& iterator)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator=(const ConstIterator& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(iterator);
@@ -508,7 +508,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator=(ConstIterator&& iterator)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator& BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::operator=(ConstIterator&& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(MoveRValue(iterator));
@@ -516,7 +516,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::~ConstIterator()
+	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator::~ConstIterator()
 	{
 		if (item != nullptr)
 		{
@@ -562,45 +562,45 @@ namespace Seed::Core::Containers
 
 #pragma region Iterator
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::Iterator(Node* item) : item(item)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::Iterator(Node* item) : item(item)
 	{
 		if (item != nullptr) ++item->RefCount;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator++()
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator++()
 	{
 		this->item = Next(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator--()
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator--()
 	{
 		this->item = Prev(item);
 		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator++(int)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator++(int)
 	{
 		return Iterator(Next(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator--(int)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator--(int)
 	{
 		return Iterator(Prev(item));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator typename BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator() const
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator typename BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator() const
 	{
 		return ConstIterator(item);
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator!=(const Iterator& other)
+	inline bool BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator!=(const Iterator& other)
 	{
 		if (this->item == nullptr && other.item == nullptr)
 			return false;
@@ -611,51 +611,51 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline bool BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator!=(NullptrT)
+	inline bool BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator!=(NullptrT)
 	{
 		return this->item != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline auto* BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator->()
+	inline auto* BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator->()
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline auto& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator*()
+	inline auto& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator*()
 	{
 		return this->item->data;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto* const BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator->() const
+	inline const auto* const BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator->() const
 	{
 		return &this->item->data;
 	};
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline const auto& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator*() const
+	inline const auto& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator*() const
 	{
 		return this->item->data;
 	}
 
 #pragma region Ctor, Dtor, copy operators
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::Iterator(const Iterator& iterator): item(iterator.item)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::Iterator(const Iterator& iterator): item(iterator.item)
 	{
 		if (item != nullptr)
 			++item->RefCount;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::Iterator(Iterator&& iterator): item(iterator.item)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::Iterator(Iterator&& iterator): item(iterator.item)
 	{
 		iterator.item = nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator=(const Iterator& iterator)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator=(const Iterator& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(iterator);
@@ -663,7 +663,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator=(Iterator&& iterator)
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator& BaseConcurencyMap<THeap, TKey, TValue>::Iterator::operator=(Iterator&& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(MoveRValue(iterator));
@@ -671,7 +671,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::~Iterator()
+	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator::~Iterator()
 	{
 		if (item != nullptr)
 		{
@@ -769,7 +769,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline SizeT BaseConcurencyMap<THeap, TKey, TValue>::GetCount() const
+	inline SizeT BaseConcurencyMap<THeap, TKey, TValue>::GetCount() const
 	{
 		return this->count.Value;
 	}
@@ -902,7 +902,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename> requires (Concepts::IsClonable<TKey>&& Concepts::IsClonable<TValue>)
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue> BaseConcurencyMap<THeap, TKey, TValue>::Clone() const
+	inline BaseConcurencyMap<THeap, TKey, TValue> BaseConcurencyMap<THeap, TKey, TValue>::Clone() const
 	{
 		BaseConcurencyMap result;
 		result.count = this->count;
@@ -913,7 +913,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename TLambda>
 	requires (Concepts::IsInvocableWithResult<TLambda, BasePair<THeap, TKey, TValue>, const BasePair<THeap, TKey, TValue>&>)
-	ForceInline BaseConcurencyMap<THeap, TKey, TValue> BaseConcurencyMap<THeap, TKey, TValue>::Clone() const
+	inline BaseConcurencyMap<THeap, TKey, TValue> BaseConcurencyMap<THeap, TKey, TValue>::Clone() const
 	{
 		BaseConcurencyMap result;
 		result.count = this->count;
@@ -1271,13 +1271,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseConcurencyMap<THeap, TKey, TValue>::UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair)
+	inline void BaseConcurencyMap<THeap, TKey, TValue>::UnsafeAdd(BasePair<THeap, TKey, TValue>&& pair)
 	{
 		Insert(MoveRValue(pair));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
-	ForceInline void BaseConcurencyMap<THeap, TKey, TValue>::UnsafeAdd(const BasePair<THeap, TKey, TValue>& pair)
+	inline void BaseConcurencyMap<THeap, TKey, TValue>::UnsafeAdd(const BasePair<THeap, TKey, TValue>& pair)
 	{
 		Insert(pair);
 	}

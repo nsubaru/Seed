@@ -316,7 +316,7 @@ namespace Seed::Core::Containers
     }
 
     template<typename THeap, typename T>
-    ForceInline bool BaseConcurencyArray<THeap, T>::AnyImpl() const
+    inline bool BaseConcurencyArray<THeap, T>::AnyImpl() const
     {
         return count > 0;
     }
@@ -588,17 +588,17 @@ namespace Seed::Core::Containers
     }
 
     template<typename THeap, typename T>
-    ForceInline void BaseConcurencyArray<THeap, T>::UnsafeSet(const T& Value, SizeT Index) {
+    inline void BaseConcurencyArray<THeap, T>::UnsafeSet(const T& Value, SizeT Index) {
         array[Index] = Value;
     }
 
     template<typename THeap, typename T>
-    ForceInline void BaseConcurencyArray<THeap, T>::UnsafeSet(T&& Value, SizeT Index) {
+    inline void BaseConcurencyArray<THeap, T>::UnsafeSet(T&& Value, SizeT Index) {
         array[Index] = MoveRValue(Value);
     }
 
     template<typename THeap, typename T>
-    ForceInline BaseConcurencyArray<THeap, T>& BaseConcurencyArray<THeap, T>::RemoveAllImpl() {
+    inline BaseConcurencyArray<THeap, T>& BaseConcurencyArray<THeap, T>::RemoveAllImpl() {
         return lock.ExclusiveLock([&]() -> BaseConcurencyArray& InlineLambda {
             delete[] this->array; 
             this->array = nullptr;
@@ -707,7 +707,7 @@ namespace Seed::Core::Containers
     }
 
     template<typename THeap, typename T>
-    ForceInline BaseConcurencyArray<THeap, T>::BaseConcurencyArray(SizeT startCount): count(0), array(nullptr), lock()
+    inline BaseConcurencyArray<THeap, T>::BaseConcurencyArray(SizeT startCount): count(0), array(nullptr), lock()
     {
         if (startCount != 0)
         {
@@ -775,13 +775,13 @@ namespace Seed::Core::Containers
     }
 
     template<typename THeap, typename T>
-    ForceInline InternalApiCall BaseConcurencyArray<THeap, T>::operator const T* const() const
+    inline InternalApiCall BaseConcurencyArray<THeap, T>::operator const T* const() const
     {
         return array;
     }
 
     template<typename THeap, typename T>
-    ForceInline T& BaseConcurencyArray<THeap, T>::operator[](SizeT index)&
+    inline T& BaseConcurencyArray<THeap, T>::operator[](SizeT index)&
     {
         return lock.SharedLock([&]()->T & InlineLambda{
             if (index < count)
@@ -796,7 +796,7 @@ namespace Seed::Core::Containers
     }
 
     template<typename THeap, typename T>
-    ForceInline const T& BaseConcurencyArray<THeap, T>::operator[](SizeT index) const&
+    inline const T& BaseConcurencyArray<THeap, T>::operator[](SizeT index) const&
     {
         return lock.SharedLock([&]() -> const T & InlineLambda{
             if (index < count)
@@ -811,7 +811,7 @@ namespace Seed::Core::Containers
     }
 
     template<typename THeap, typename T>
-    ForceInline T BaseConcurencyArray<THeap, T>::operator[](SizeT index)&&
+    inline T BaseConcurencyArray<THeap, T>::operator[](SizeT index)&&
     {
         return lock.SharedLock([&] ()->T InlineLambda {
             if (index < count)
@@ -918,13 +918,13 @@ namespace Seed::Core::Containers
     }
 
     template<typename THeap, typename T>
-    ForceInline SizeT BaseConcurencyArray<THeap, T>::GetCount() const
+    inline SizeT BaseConcurencyArray<THeap, T>::GetCount() const
     {
         return count;
     }
 
     template<typename THeap, typename T>
-    ForceInline const T* const BaseConcurencyArray<THeap, T>::GetRaw() const
+    inline const T* const BaseConcurencyArray<THeap, T>::GetRaw() const
     {
         return array;
     }

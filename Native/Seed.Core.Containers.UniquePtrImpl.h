@@ -19,7 +19,7 @@ namespace Seed::Core
 
 	template<typename THeap, typename T>
 	template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
-	ForceInline BaseUniquePtr<THeap, TInterface> BaseUniquePtr<THeap, T>::As()&&
+	inline BaseUniquePtr<THeap, TInterface> BaseUniquePtr<THeap, T>::As()&&
 	{
 		TInterface* newPtr = nullptr;
 

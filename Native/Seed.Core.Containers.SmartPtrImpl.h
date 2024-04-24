@@ -13,7 +13,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline BaseSmartPtr<THeap, T>::BaseSmartPtr(T*&& ptr)
+	inline BaseSmartPtr<THeap, T>::BaseSmartPtr(T*&& ptr)
 	{
 		if (ptr != nullptr)
 		{
@@ -26,7 +26,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline BaseSmartPtr<THeap, T>::BaseSmartPtr(BaseUniquePtr<THeap, T>&& ptr)
+	inline BaseSmartPtr<THeap, T>::BaseSmartPtr(BaseUniquePtr<THeap, T>&& ptr)
 	{
 		if ((ptr.data) != nullptr)
 		{
@@ -40,39 +40,39 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline T& BaseSmartPtr<THeap, T>::operator*()
+	inline T& BaseSmartPtr<THeap, T>::operator*()
 	{
 		return *(T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline const T& BaseSmartPtr<THeap, T>::operator*() const
+	inline const T& BaseSmartPtr<THeap, T>::operator*() const
 	{
 		return *(T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline T* BaseSmartPtr<THeap, T>::operator->()
+	inline T* BaseSmartPtr<THeap, T>::operator->()
 	{
 		return (T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline const T* BaseSmartPtr<THeap, T>::operator->() const
+	inline const T* BaseSmartPtr<THeap, T>::operator->() const
 	{
 		return (T*) This->ptr;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
-	ForceInline const TInterface& BaseSmartPtr<THeap, T>::As() const
+	inline const TInterface& BaseSmartPtr<THeap, T>::As() const
 	{
 		return dynamic_cast<const TInterface&>(*(T*) This->ptr);
 	}
 
 	template<typename THeap, typename T>
 	template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
-	ForceInline TInterface& BaseSmartPtr<THeap, T>::As()
+	inline TInterface& BaseSmartPtr<THeap, T>::As()
 	{
 		return dynamic_cast<TInterface&>(*(T*) This->ptr);
 	}
@@ -110,31 +110,31 @@ namespace Seed::Core
 	};
 
 	template<typename THeap, typename T>
-	ForceInline decltype(auto) BaseSmartPtr<THeap, T>::GetTypeInfo() const
+	inline decltype(auto) BaseSmartPtr<THeap, T>::GetTypeInfo() const
 	{
 		return typeid(*(T*) This->ptr);
 	}
 
 	template<typename THeap, typename T>
-	ForceInline SizeT BaseSmartPtr<THeap, T>::GetWeakRefCount() const
+	inline SizeT BaseSmartPtr<THeap, T>::GetWeakRefCount() const
 	{
 		return This->WeakRefCount;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline SizeT BaseSmartPtr<THeap, T>::GetRefCount() const
+	inline SizeT BaseSmartPtr<THeap, T>::GetRefCount() const
 	{
 		return This->RefCount;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline bool BaseSmartPtr<THeap, T>::operator==(const std::nullptr_t&) const
+	inline bool BaseSmartPtr<THeap, T>::operator==(const std::nullptr_t&) const
 	{
 		return This == nullptr || This->ptr == nullptr;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline bool BaseSmartPtr<THeap, T>::operator==(std::nullptr_t&&) const
+	inline bool BaseSmartPtr<THeap, T>::operator==(std::nullptr_t&&) const
 	{
 		return This == nullptr || This->ptr == nullptr;
 	}

@@ -5,7 +5,7 @@ namespace Seed::Core::Containers
 {
 	template<typename ... TTypes>
 	template<typename T, SizeT...Idxs>
-	ForceInline constexpr Tuple<TTypes..., T> 
+	inline constexpr Tuple<TTypes..., T> 
 	Tuple<TTypes...>::AddImpl(T&& newItem, UnusedData TypeTraits::TypeTag<TypeTraits::Indexator<Idxs...>>)&&
 	{
 		return { ((TTypes) this->MoveByIdx<(sizeof...(TTypes) - 1) - Idxs>())..., newItem };
@@ -13,7 +13,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<SizeT...Idxs>
-	ForceInline Tuple<TTypes...>::DiscardedTuple<Idxs...> constexpr 
+	inline Tuple<TTypes...>::DiscardedTuple<Idxs...> constexpr 
 	Tuple<TTypes...>::DiscardImpl(UnusedData TypeTraits::TypeTag<TypeTraits::Indexator<Idxs...>>)&&
 	{
 		using TTuple = DiscardedTuple<Idxs...>;
@@ -22,7 +22,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename ... TTypes>
-	ForceInline constexpr Tuple<TTypes...>& Tuple<TTypes...>::operator=(const Tuple& tuple)
+	inline constexpr Tuple<TTypes...>& Tuple<TTypes...>::operator=(const Tuple& tuple)
 	{
 		this->~Tuple();
 		this->Tuple::Tuple(tuple);
@@ -30,7 +30,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename ... TTypes>
-	ForceInline constexpr Tuple<TTypes...>& Tuple<TTypes...>::operator=(Tuple&& tuple)
+	inline constexpr Tuple<TTypes...>& Tuple<TTypes...>::operator=(Tuple&& tuple)
 	{
 		this->~Tuple();
 		this->Tuple::Tuple(MoveRValue(tuple));
@@ -48,7 +48,7 @@ namespace Seed::Core::Containers
 	template<typename ... TTypes>
 	template<SizeT Idx>
 	requires (sizeof...(TTypes) > Idx)
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::MoveByIdx()
+	inline constexpr decltype(auto) Tuple<TTypes...>::MoveByIdx()
 	{
 		return leaves.MoveByIdx<Idx>();
 	}
@@ -56,7 +56,7 @@ namespace Seed::Core::Containers
 	template<typename ... TTypes>
 	template<SizeT Idx>
 	requires (sizeof...(TTypes) > Idx)
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::GetByIdx() const
+	inline constexpr decltype(auto) Tuple<TTypes...>::GetByIdx() const
 	{
 		return leaves.GetByIdx<Idx>();
 	}
@@ -64,7 +64,7 @@ namespace Seed::Core::Containers
 	template<typename ... TTypes>
 	template<SizeT Idx>
 	requires (sizeof...(TTypes) > Idx)
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::GetByIdxAsRef() const
+	inline constexpr decltype(auto) Tuple<TTypes...>::GetByIdxAsRef() const
 	{
 		return leaves.GetByIdxAsRef<Idx>();
 	}
@@ -72,14 +72,14 @@ namespace Seed::Core::Containers
 	template<typename ... TTypes>
 	template<SizeT Idx>
 	requires (sizeof...(TTypes) > Idx)
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::GetByIdxAsRef()
+	inline constexpr decltype(auto) Tuple<TTypes...>::GetByIdxAsRef()
 	{
 		return leaves.GetByIdxAsRef<Idx>();
 	}
 
 	template<typename ... TTypes>
 	template<typename F>
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::CallWithArgsFromTuple(F&& f) const
+	inline constexpr decltype(auto) Tuple<TTypes...>::CallWithArgsFromTuple(F&& f) const
 	{
 		using TExecutor = typename Details::Executor<F, Tuple<TTypes...>, typename TypeTraits::Indexer<sizeof...(TTypes)>::template Type>;
 
@@ -95,7 +95,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename F>
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::CallWithArgsFromTuple(F&& f)
+	inline constexpr decltype(auto) Tuple<TTypes...>::CallWithArgsFromTuple(F&& f)
 	{
 		using TExecutor = typename Details::Executor<
 			F,
@@ -134,7 +134,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::ConvertTo(TLambda&& lambda) const
+	inline constexpr decltype(auto) Tuple<TTypes...>::ConvertTo(TLambda&& lambda) const
 	{
 		using Convertor = typename Details::Convertor<
 			TLambda,
@@ -146,7 +146,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::ConvertTo(TLambda&& lambda)
+	inline constexpr decltype(auto) Tuple<TTypes...>::ConvertTo(TLambda&& lambda)
 	{
 		using Convertor = typename Details::Convertor<
 			TLambda,
@@ -158,7 +158,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr const Tuple<TTypes...>& Tuple<TTypes...>::ForEach(TLambda&& lambda) const&
+	inline constexpr const Tuple<TTypes...>& Tuple<TTypes...>::ForEach(TLambda&& lambda) const&
 	{
 		using ForEach = typename Details::ForEachImpl<
 			TLambda,
@@ -172,7 +172,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr Tuple<TTypes...>& Tuple<TTypes...>::ForEach(TLambda&& lambda)&
+	inline constexpr Tuple<TTypes...>& Tuple<TTypes...>::ForEach(TLambda&& lambda)&
 	{
 		using ForEach = typename Details::ForEachImpl<
 			TLambda,
@@ -186,7 +186,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr Tuple<TTypes...>&& Tuple<TTypes...>::ForEach(TLambda&& lambda)&&
+	inline constexpr Tuple<TTypes...>&& Tuple<TTypes...>::ForEach(TLambda&& lambda)&&
 	{
 		using ForEach = typename Details::ForEachImpl<
 			TLambda,
@@ -200,7 +200,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr decltype(auto) Tuple<TTypes...>::Sum(TLambda&& lambda) const
+	inline constexpr decltype(auto) Tuple<TTypes...>::Sum(TLambda&& lambda) const
 	{
 		using Sum = typename Details::SumImpl<
 			TLambda,
@@ -212,7 +212,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr static decltype(auto) Tuple<TTypes...>::SumType(TLambda&& lambda)
+	inline constexpr static decltype(auto) Tuple<TTypes...>::SumType(TLambda&& lambda)
 	{
 		using Sum = typename Details::SumImpl<
 			TLambda,
@@ -224,7 +224,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline static constexpr void Tuple<TTypes...>::ForEachType(TLambda&& lambda)
+	inline static constexpr void Tuple<TTypes...>::ForEachType(TLambda&& lambda)
 	{
 		using ForEachType = typename Details::ForEachTypeImpl<
 			TLambda,
@@ -236,7 +236,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr static SizeT Tuple<TTypes...>::FirstType(TLambda lambda)
+	inline constexpr static SizeT Tuple<TTypes...>::FirstType(TLambda lambda)
 	{
 		using FirstImpl = typename Details::FirstImpl<
 			TLambda,
@@ -248,7 +248,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr static SizeT Tuple<TTypes...>::FirstType()
+	inline constexpr static SizeT Tuple<TTypes...>::FirstType()
 	{
 		using FirstImpl = typename Details::FirstImpl<
 			TLambda,
@@ -260,7 +260,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename TLambda>
-	ForceInline constexpr SizeT Tuple<TTypes...>::FirstItem(TLambda&& lambda) const
+	inline constexpr SizeT Tuple<TTypes...>::FirstItem(TLambda&& lambda) const
 	{
 		using FirstImpl = typename Details::FirstImpl<
 			TLambda,
@@ -271,7 +271,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename ... TTypes>
-	ForceInline constexpr auto Tuple<TTypes...>::Reverse() const
+	inline constexpr auto Tuple<TTypes...>::Reverse() const
 	{
 		using ReverseImpl = typename Details::ReverseImpl<
 			Tuple<TTypes...>,
@@ -282,7 +282,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename T>
-	ForceInline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(const T& newItem) const&
+	inline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(const T& newItem) const&
 	{
 		using Indexator = typename TypeTraits::Indexer<sizeof...(TTypes)>::template Type;
 		auto tuple = *this;
@@ -291,7 +291,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename T>
-	ForceInline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(T&& newItem) const&
+	inline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(T&& newItem) const&
 	{
 		using Indexator = typename TypeTraits::Indexer<sizeof...(TTypes)>::template Type;
 		auto tuple = *this;
@@ -300,7 +300,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename T>
-	ForceInline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(const T& newItem)&&
+	inline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(const T& newItem)&&
 	{
 		using Indexator = typename TypeTraits::Indexer<sizeof...(TTypes)>::template Type;
 		return MoveRValue(*this).AddImpl<T>(MoveRValue(T(newItem)), TypeTraits::TypeTag<Indexator>{});
@@ -308,7 +308,7 @@ namespace Seed::Core::Containers
 
 	template<typename ... TTypes>
 	template<typename T>
-	ForceInline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(T&& newItem)&&
+	inline constexpr Tuple<TTypes..., T> Tuple<TTypes...>::Add(T&& newItem)&&
 	{
 		using Indexator = typename TypeTraits::Indexer<sizeof...(TTypes)>::template Type;
 		return MoveRValue(*this).AddImpl<T>(MoveRValue(newItem), TypeTraits::TypeTag<Indexator>{});
@@ -382,7 +382,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename F>
-	ForceInline constexpr decltype(auto) Tuple<>::CallWithArgsFromTuple(F&& f)
+	inline constexpr decltype(auto) Tuple<>::CallWithArgsFromTuple(F&& f)
 	{
 		if constexpr (TypeTraits::IsSameV<TypeTraits::InvocableResult<F>, void>)
 		{
@@ -395,7 +395,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename F>
-	ForceInline constexpr decltype(auto) Tuple<>::CallWithArgsFromTuple(F&& f) const
+	inline constexpr decltype(auto) Tuple<>::CallWithArgsFromTuple(F&& f) const
 	{
 		if constexpr (TypeTraits::IsSameV<TypeTraits::InvocableResult<F>, void>)
 		{
@@ -408,24 +408,24 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename TLambda>
-	ForceInline static constexpr void Tuple<>::ForEachType(TLambda&& lambda)
+	inline static constexpr void Tuple<>::ForEachType(TLambda&& lambda)
 	{
 	}
 
 	template<typename TLambda>
-	ForceInline constexpr const Tuple<>& Tuple<>::ForEach(TLambda&& lambda) const&
-	{
-		return *this;
-	}
-
-	template<typename TLambda>
-	ForceInline constexpr Tuple<>& Tuple<>::ForEach(TLambda&& lambda)&
+	inline constexpr const Tuple<>& Tuple<>::ForEach(TLambda&& lambda) const&
 	{
 		return *this;
 	}
 
 	template<typename TLambda>
-	ForceInline constexpr Tuple<>&& Tuple<>::ForEach(TLambda&& lambda)&&
+	inline constexpr Tuple<>& Tuple<>::ForEach(TLambda&& lambda)&
+	{
+		return *this;
+	}
+
+	template<typename TLambda>
+	inline constexpr Tuple<>&& Tuple<>::ForEach(TLambda&& lambda)&&
 	{
 		return MoveRValue(*this);
 	}

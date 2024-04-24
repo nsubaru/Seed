@@ -4,19 +4,19 @@
 namespace Seed::Core::Containers
 {
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline UInt8 BaseDictionary<THeap, TString, TData, CharacterComparator>::height(NodeSym* targetNode)
+	inline UInt8 BaseDictionary<THeap, TString, TData, CharacterComparator>::height(NodeSym* targetNode)
 	{
 		return targetNode ? targetNode->height : 0;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline Int8 BaseDictionary<THeap, TString, TData, CharacterComparator>::bFactor(NodeSym* targetNode)
+	inline Int8 BaseDictionary<THeap, TString, TData, CharacterComparator>::bFactor(NodeSym* targetNode)
 	{
 		return height(targetNode->right) - height(targetNode->left);
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline void BaseDictionary<THeap, TString, TData, CharacterComparator>::fixHeight(NodeSym* targetNode)
+	inline void BaseDictionary<THeap, TString, TData, CharacterComparator>::fixHeight(NodeSym* targetNode)
 	{
 		auto h_left = height(targetNode->left);
 		auto h_right = height(targetNode->right);
@@ -24,7 +24,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline typename BaseDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* BaseDictionary<THeap, TString, TData, CharacterComparator>::rotateRight(NodeSym* p)
+	inline typename BaseDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* BaseDictionary<THeap, TString, TData, CharacterComparator>::rotateRight(NodeSym* p)
 	{
 		NodeSym* q = p->left;
 		p->left = q->right;
@@ -35,7 +35,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline typename BaseDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* BaseDictionary<THeap, TString, TData, CharacterComparator>::rotateLeft(NodeSym* q)
+	inline typename BaseDictionary<THeap, TString, TData, CharacterComparator>::NodeSym* BaseDictionary<THeap, TString, TData, CharacterComparator>::rotateLeft(NodeSym* q)
 	{
 		NodeSym* p = q->right;
 		q->right = p->left;
@@ -525,7 +525,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(const TString& key, const TData& value)
+	inline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(const TString& key, const TData& value)
 	{
 		BasePair<THeap, TString, TData> data{ key, value };
 		this->node = insert(this->node, MoveRValue(data));
@@ -534,7 +534,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(TString&& key, const TData& value)
+	inline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(TString&& key, const TData& value)
 	{
 		BasePair<THeap, TString, TData> data{ MoveRValue(key), value };
 		this->node = insert(this->node, MoveRValue(data));
@@ -543,7 +543,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(const TString& key, TData&& value)
+	inline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(const TString& key, TData&& value)
 	{
 		BasePair<THeap, TString, TData> data{ key, MoveRValue(value) };
 		this->node = insert(this->node, MoveRValue(data));
@@ -552,7 +552,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(TString&& key, TData&& value)
+	inline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(TString&& key, TData&& value)
 	{
 		BasePair<THeap, TString, TData> data{ MoveRValue(key), MoveRValue(value) };
 		this->node = insert(this->node, MoveRValue(data));
@@ -561,7 +561,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(Pair&& data)
+	inline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(Pair&& data)
 	{
 		this->node = insert(this->node, MoveRValue(data));
 		++this->count;
@@ -569,7 +569,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(const Pair& data)
+	inline BaseDictionary<THeap, TString, TData, CharacterComparator>& BaseDictionary<THeap, TString, TData, CharacterComparator>::Insert(const Pair& data)
 	{
 		this->node = insert(this->node, MoveRValue(Pair(data)));
 		++this->count;
@@ -641,7 +641,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key)
+	inline TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key)
 	{
 		return Find(key);
 	}
@@ -653,7 +653,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key)
+	inline TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key)
 	{
 		return Find(key);
 	}
@@ -665,7 +665,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline const TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key) const
+	inline const TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key) const
 	{
 		return Find(key);
 	}
@@ -677,7 +677,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline const TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key) const
+	inline const TData& BaseDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key) const
 	{
 		return Find(key);
 	}
@@ -697,7 +697,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsEmpty() const
+	inline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsEmpty() const
 	{
 		return this->count == 0;
 	}
@@ -709,7 +709,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsExist(const UString& Key) const
+	inline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsExist(const UString& Key) const
 	{
 		if (node == nullptr)
 			return false;
@@ -725,7 +725,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsExist(UString&& Key) const
+	inline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsExist(UString&& Key) const
 	{
 		if (node == nullptr)
 			return false;
@@ -736,7 +736,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<SizeT TN>
-	ForceInline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsExist(StaticTextRef<TN> Key) const
+	inline Boolean BaseDictionary<THeap, TString, TData, CharacterComparator>::IsExist(StaticTextRef<TN> Key) const
 	{
 		return IsExist(ConstString(Key));
 	}
@@ -755,13 +755,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline SizeT BaseDictionary<THeap, TString, TData, CharacterComparator>::GetCount() const
+	inline SizeT BaseDictionary<THeap, TString, TData, CharacterComparator>::GetCount() const
 	{
 		return this->count;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseMap<THeap, TString, TData> BaseDictionary<THeap, TString, TData, CharacterComparator>::ToMap()
+	inline BaseMap<THeap, TString, TData> BaseDictionary<THeap, TString, TData, CharacterComparator>::ToMap()
 	{
 		BaseMap<THeap, TString, TData> retVal;
 		ToMap(this, retVal);
@@ -817,7 +817,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithoutIndex(
+	inline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithoutIndex(
 		const BaseDictionary* const This,
 		TLambda& lambda)
 	{
@@ -857,7 +857,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithIndex(
+	inline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithIndex(
 		const BaseDictionary* const This,
 		TLambda& lambda,
 		SizeT& Index)
@@ -947,7 +947,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithoutIndex(
+	inline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithoutIndex(
 		const BaseDictionary* const This,
 		TLambda& lambda)
 	{
@@ -987,7 +987,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithIndex(
+	inline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithIndex(
 		const BaseDictionary* const This,
 		TLambda& lambda,
 		SizeT& Index)
@@ -1073,7 +1073,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithoutIndex(
+	inline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithoutIndex(
 		const BaseDictionary* const This,
 		TLambda& lambda)
 	{
@@ -1112,7 +1112,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithIndex(
+	inline static void BaseDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithIndex(
 		const BaseDictionary* const This,
 		TLambda& lambda,
 		SizeT& index)
@@ -1193,13 +1193,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline void BaseDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(Pair&& pair)
+	inline void BaseDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(Pair&& pair)
 	{
 		Insert(MoveRValue(pair));
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline void BaseDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(const Pair& pair)
+	inline void BaseDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(const Pair& pair)
 	{
 		Insert(pair);
 	}

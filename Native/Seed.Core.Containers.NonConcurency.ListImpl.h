@@ -104,7 +104,7 @@ namespace Seed::Core::Containers
 
 #pragma region ConstIterator
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator::ConstIterator(elem* This):This(This)
+	inline BaseList<THeap, T>::ConstIterator::ConstIterator(elem* This):This(This)
 	{
 		if (This != nullptr) ++This->RefCount;
 	}
@@ -201,25 +201,25 @@ namespace Seed::Core::Containers
 
 #pragma region Comparing
 	template<class THeap, typename T>
-	ForceInline bool BaseList<THeap, T>::ConstIterator::operator==(const ConstIterator& second) const
+	inline bool BaseList<THeap, T>::ConstIterator::operator==(const ConstIterator& second) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(second.This);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseList<THeap, T>::ConstIterator::operator!=(const ConstIterator& second) const
+	inline bool BaseList<THeap, T>::ConstIterator::operator!=(const ConstIterator& second) const
 	{
 		return reinterpret_cast<SizeT>(This) != reinterpret_cast<SizeT>(second.This);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseList<THeap, T>::ConstIterator::operator==(const NullptrT) const
+	inline bool BaseList<THeap, T>::ConstIterator::operator==(const NullptrT) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(nullptr);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseList<THeap, T>::ConstIterator::operator!=(const NullptrT) const
+	inline bool BaseList<THeap, T>::ConstIterator::operator!=(const NullptrT) const
 	{
 		return This != nullptr;
 	}
@@ -227,7 +227,7 @@ namespace Seed::Core::Containers
 
 #pragma region Data access operators
 	template<class THeap, typename T>
-	ForceInline const T& BaseList<THeap, T>::ConstIterator::operator*()
+	inline const T& BaseList<THeap, T>::ConstIterator::operator*()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -236,7 +236,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T& BaseList<THeap, T>::ConstIterator::operator*() const
+	inline const T& BaseList<THeap, T>::ConstIterator::operator*() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -245,7 +245,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T* const BaseList<THeap, T>::ConstIterator::operator->()
+	inline const T* const BaseList<THeap, T>::ConstIterator::operator->()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -254,7 +254,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T* const BaseList<THeap, T>::ConstIterator::operator->() const
+	inline const T* const BaseList<THeap, T>::ConstIterator::operator->() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -266,7 +266,7 @@ namespace Seed::Core::Containers
 
 #pragma region Iterator move
 	template<class THeap, typename T>
-	ForceInline const BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::Next() const
+	inline const BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::Next() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -279,7 +279,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::Prev() const
+	inline const BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::ConstIterator::Prev() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -294,20 +294,20 @@ namespace Seed::Core::Containers
 
 #pragma region Ctor, Dtor, copy operators
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator::ConstIterator(const ConstIterator& iterator): This(iterator.This)
+	inline BaseList<THeap, T>::ConstIterator::ConstIterator(const ConstIterator& iterator): This(iterator.This)
 	{
 		if (This != nullptr)
 			++This->RefCount;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator::ConstIterator(ConstIterator&& iterator): This(iterator.This)
+	inline BaseList<THeap, T>::ConstIterator::ConstIterator(ConstIterator&& iterator): This(iterator.This)
 	{
 		iterator.This = nullptr;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator=(const ConstIterator& iterator)
+	inline BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator=(const ConstIterator& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(iterator);
@@ -315,7 +315,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator=(ConstIterator&& iterator)
+	inline BaseList<THeap, T>::ConstIterator& BaseList<THeap, T>::ConstIterator::operator=(ConstIterator&& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(MoveRValue(iterator));
@@ -323,7 +323,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator::~ConstIterator()
+	inline BaseList<THeap, T>::ConstIterator::~ConstIterator()
 	{
 		if (This != nullptr)
 		{
@@ -339,7 +339,7 @@ namespace Seed::Core::Containers
 
 #pragma region Iterator
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator::Iterator(elem* This):This(This)
+	inline BaseList<THeap, T>::Iterator::Iterator(elem* This):This(This)
 	{
 		if (This != nullptr) ++This->RefCount;
 	}
@@ -436,13 +436,13 @@ namespace Seed::Core::Containers
 
 #pragma region Comparing
 	template<class THeap, typename T>
-	ForceInline bool BaseList<THeap, T>::Iterator::operator==(const Iterator& second) const
+	inline bool BaseList<THeap, T>::Iterator::operator==(const Iterator& second) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(second.This);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseList<THeap, T>::Iterator::operator==(const Seed::Core::NullptrT) const
+	inline bool BaseList<THeap, T>::Iterator::operator==(const Seed::Core::NullptrT) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(nullptr);
 	}
@@ -456,7 +456,7 @@ namespace Seed::Core::Containers
 
 #pragma region Data access operators
 	template<class THeap, typename T>
-	ForceInline T& BaseList<THeap, T>::Iterator::operator*()
+	inline T& BaseList<THeap, T>::Iterator::operator*()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -465,7 +465,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T& BaseList<THeap, T>::Iterator::operator*() const
+	inline const T& BaseList<THeap, T>::Iterator::operator*() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -474,7 +474,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline T* BaseList<THeap, T>::Iterator::operator->()
+	inline T* BaseList<THeap, T>::Iterator::operator->()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -483,7 +483,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T* BaseList<THeap, T>::Iterator::operator->() const
+	inline const T* BaseList<THeap, T>::Iterator::operator->() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -495,7 +495,7 @@ namespace Seed::Core::Containers
 
 #pragma region Iterator move
 	template<class THeap, typename T>
-	ForceInline const BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Next() const
+	inline const BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Next() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -508,7 +508,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Prev() const
+	inline const BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Prev() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -600,13 +600,13 @@ namespace Seed::Core::Containers
 
 #pragma region Adding element to list by iterator
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Insert(const T& Value)
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Insert(const T& Value)
 	{
 		return AddAfter(Value);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Insert(T&& Value)
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::Iterator::Insert(T&& Value)
 	{
 		return AddAfter(MoveRValue(Value));
 	}
@@ -712,20 +712,20 @@ namespace Seed::Core::Containers
 
 #pragma region Ctor, Dtor, copy operators
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator::Iterator(const Iterator& iterator): This(iterator.This)
+	inline BaseList<THeap, T>::Iterator::Iterator(const Iterator& iterator): This(iterator.This)
 	{
 		if (This != nullptr)
 			++This->RefCount;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator::Iterator(Iterator&& iterator): This(iterator.This)
+	inline BaseList<THeap, T>::Iterator::Iterator(Iterator&& iterator): This(iterator.This)
 	{
 		iterator.This = nullptr;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator=(const Iterator& iterator)
+	inline BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator=(const Iterator& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(iterator);
@@ -733,7 +733,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator=(Iterator&& iterator)
+	inline BaseList<THeap, T>::Iterator& BaseList<THeap, T>::Iterator::operator=(Iterator&& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(MoveRValue(iterator));
@@ -741,7 +741,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator::~Iterator()
+	inline BaseList<THeap, T>::Iterator::~Iterator()
 	{
 		if (This != nullptr)
 		{
@@ -837,13 +837,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>& BaseList<THeap, T>::operator+=(const T& Value)
+	inline BaseList<THeap, T>& BaseList<THeap, T>::operator+=(const T& Value)
 	{
 		this->AddLast(Value); return *this;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>& BaseList<THeap, T>::operator+=(T&& Value)
+	inline BaseList<THeap, T>& BaseList<THeap, T>::operator+=(T&& Value)
 	{
 		this->AddLast(MoveRValue(Value)); return *this;
 	}
@@ -947,13 +947,13 @@ namespace Seed::Core::Containers
 
 #pragma region Item count methods
 	template<class THeap, typename T>
-	ForceInline Boolean BaseList<THeap, T>::IsEmpty() const
+	inline Boolean BaseList<THeap, T>::IsEmpty() const
 	{
 		return this->size == 0;
 	}
 
 	template<class THeap, typename T>
-	ForceInline SizeT BaseList<THeap, T>::GetCount() const
+	inline SizeT BaseList<THeap, T>::GetCount() const
 	{
 		return this->size;
 	}
@@ -962,41 +962,41 @@ namespace Seed::Core::Containers
 #pragma region Iterators
 #pragma region Gettter
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::GetRoot()
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::GetRoot()
 	{
 		if (this->root == nullptr) return GetEnd();
 		return Iterator(this->root);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::GetLast()
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::GetLast()
 	{
 		if (this->last == nullptr) return GetEnd();
 		return Iterator(this->last);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::GetRoot() const
+	inline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::GetRoot() const
 	{
 		if (this->root == nullptr) return GetEnd();
 		return ConstIterator(this->root);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::GetLast() const
+	inline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::GetLast() const
 	{
 		if (this->last == nullptr) return GetEnd();
 		return ConstIterator(this->last);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::GetEnd()
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::GetEnd()
 	{
 		return Iterator(nullptr);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::GetEnd() const
+	inline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::GetEnd() const
 	{
 		return ConstIterator(nullptr);
 	}
@@ -1033,25 +1033,25 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddAfter(Iterator Item, const T& Value)
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddAfter(Iterator Item, const T& Value)
 	{
 		return Item.AddAfter(Value);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddAfter(Iterator Item, T&& Value)
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddAfter(Iterator Item, T&& Value)
 	{
 		return Item.AddAfter(MoveRValue(Value));
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddBefore(Iterator Item, const T& Value)
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddBefore(Iterator Item, const T& Value)
 	{
 		return Item.AddBefore(Value);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddBefore(Iterator Item, T&& Value)
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddBefore(Iterator Item, T&& Value)
 	{
 		return Item.AddBefore(MoveRValue(Value));
 	}
@@ -1060,25 +1060,25 @@ namespace Seed::Core::Containers
 
 #pragma region For each support methods
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::begin() const
+	inline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::begin() const
 	{
 		return GetRoot();
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::end() const
+	inline BaseList<THeap, T>::ConstIterator BaseList<THeap, T>::end() const
 	{
 		return nullptr;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::begin()
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::begin()
 	{
 		return GetRoot();
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseList<THeap, T>::Iterator BaseList<THeap, T>::end()
+	inline BaseList<THeap, T>::Iterator BaseList<THeap, T>::end()
 	{
 		return nullptr;
 	}
@@ -1450,7 +1450,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseList<THeap, T>::AnyImpl() const
+	inline bool BaseList<THeap, T>::AnyImpl() const
 	{
 		return this->size > 0;
 	}
@@ -1692,7 +1692,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseList<THeap, T>::FirstOrImpl(TLambda&& lambda, T&& item) const
+	inline T BaseList<THeap, T>::FirstOrImpl(TLambda&& lambda, T&& item) const
 	{
 		if (size == 0)
 			return MoveRValue(item);
@@ -1709,7 +1709,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseList<THeap, T>::LastOrImpl(TLambda&& lambda, T&& item) const
+	inline T BaseList<THeap, T>::LastOrImpl(TLambda&& lambda, T&& item) const
 	{
 		if (size == 0)
 			return MoveRValue(item);
@@ -1731,7 +1731,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseList<THeap, T>::FirstOrImpl(TLambda&& lambda, const T& item) const
+	inline T BaseList<THeap, T>::FirstOrImpl(TLambda&& lambda, const T& item) const
 	{
 		if (size == 0)
 			return item;
@@ -1748,7 +1748,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseList<THeap, T>::LastOrImpl(TLambda&& lambda, const T& item) const
+	inline T BaseList<THeap, T>::LastOrImpl(TLambda&& lambda, const T& item) const
 	{
 		if (size == 0)
 			return item;
@@ -1770,7 +1770,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda, typename TGetterLambda>
-	ForceInline T BaseList<THeap, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
+	inline T BaseList<THeap, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
 		if (size == 0)
 			return otherLambda();
@@ -1787,7 +1787,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TLambda, typename TGetterLambda>
-	ForceInline T BaseList<THeap, T>::LastOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
+	inline T BaseList<THeap, T>::LastOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
 		if (size == 0)
 			return otherLambda();
@@ -1846,7 +1846,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline void BaseList<THeap, T>::UnsafeAdd(const T& value)
+	inline void BaseList<THeap, T>::UnsafeAdd(const T& value)
 	{
 		if (this->root == nullptr)
 		{
@@ -1861,7 +1861,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline void BaseList<THeap, T>::UnsafeAdd(T&& value)
+	inline void BaseList<THeap, T>::UnsafeAdd(T&& value)
 	{
 		if (this->root == nullptr)
 		{
@@ -2157,7 +2157,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TFilterLambda, typename TLambda>
-	ForceInline BaseList<THeap, T>& BaseList<THeap, T>::RemoveIfImpl(TFilterLambda&& filter, TLambda&& lambda)
+	inline BaseList<THeap, T>& BaseList<THeap, T>::RemoveIfImpl(TFilterLambda&& filter, TLambda&& lambda)
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, T&&> &&
 			TypeTraits::IsInvocableWithResult<TFilterLambda, Boolean, const T&>)

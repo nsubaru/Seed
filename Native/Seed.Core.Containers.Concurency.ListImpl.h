@@ -104,7 +104,7 @@ namespace Seed::Core::Containers
 
 #pragma region ConstIterator
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(elem* This) : This(This)
+	inline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(elem* This) : This(This)
 	{
 		if (This != nullptr) ++This->RefCount;
 	}
@@ -216,25 +216,25 @@ namespace Seed::Core::Containers
 
 #pragma region Comparing
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::ConstIterator::operator==(const ConstIterator& second) const
+	inline bool BaseConcurencyList<THeap, T>::ConstIterator::operator==(const ConstIterator& second) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(second.This);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::ConstIterator::operator!=(const ConstIterator& second) const
+	inline bool BaseConcurencyList<THeap, T>::ConstIterator::operator!=(const ConstIterator& second) const
 	{
 		return reinterpret_cast<SizeT>(This) != reinterpret_cast<SizeT>(second.This);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::ConstIterator::operator==(const Seed::Core::NullptrT) const
+	inline bool BaseConcurencyList<THeap, T>::ConstIterator::operator==(const Seed::Core::NullptrT) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(nullptr);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::ConstIterator::operator!=(const Seed::Core::NullptrT) const
+	inline bool BaseConcurencyList<THeap, T>::ConstIterator::operator!=(const Seed::Core::NullptrT) const
 	{
 		return This != nullptr;
 	}
@@ -242,7 +242,7 @@ namespace Seed::Core::Containers
 
 #pragma region Data access operators
 	template<class THeap, typename T>
-	ForceInline const T& BaseConcurencyList<THeap, T>::ConstIterator::operator*()
+	inline const T& BaseConcurencyList<THeap, T>::ConstIterator::operator*()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -251,7 +251,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T& BaseConcurencyList<THeap, T>::ConstIterator::operator*() const
+	inline const T& BaseConcurencyList<THeap, T>::ConstIterator::operator*() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -260,7 +260,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T* const BaseConcurencyList<THeap, T>::ConstIterator::operator->()
+	inline const T* const BaseConcurencyList<THeap, T>::ConstIterator::operator->()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -269,7 +269,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T* const BaseConcurencyList<THeap, T>::ConstIterator::operator->() const
+	inline const T* const BaseConcurencyList<THeap, T>::ConstIterator::operator->() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -315,20 +315,20 @@ namespace Seed::Core::Containers
 
 #pragma region Ctor, Dtor, copy operators
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(const ConstIterator& iterator): This(iterator.This)
+	inline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(const ConstIterator& iterator): This(iterator.This)
 	{
 		if (This != nullptr)
 			++This->RefCount;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(ConstIterator&& iterator): This(iterator.This)
+	inline BaseConcurencyList<THeap, T>::ConstIterator::ConstIterator(ConstIterator&& iterator): This(iterator.This)
 	{
 		iterator.This = nullptr;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator=(const ConstIterator& iterator)
+	inline BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator=(const ConstIterator& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(iterator);
@@ -336,7 +336,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator=(ConstIterator&& iterator)
+	inline BaseConcurencyList<THeap, T>::ConstIterator& BaseConcurencyList<THeap, T>::ConstIterator::operator=(ConstIterator&& iterator)
 	{
 		this->~ConstIterator();
 		this->ConstIterator::ConstIterator(MoveRValue(iterator));
@@ -344,7 +344,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator::~ConstIterator()
+	inline BaseConcurencyList<THeap, T>::ConstIterator::~ConstIterator()
 	{
 		if (This != nullptr)
 		{
@@ -360,7 +360,7 @@ namespace Seed::Core::Containers
 
 #pragma region Iterator
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator::Iterator(elem* This):This(This)
+	inline BaseConcurencyList<THeap, T>::Iterator::Iterator(elem* This):This(This)
 	{
 		if (This != nullptr) ++This->RefCount;
 	}
@@ -469,25 +469,25 @@ namespace Seed::Core::Containers
 
 #pragma region Comparing
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::Iterator::operator==(const Iterator& second) const
+	inline bool BaseConcurencyList<THeap, T>::Iterator::operator==(const Iterator& second) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(second.This);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::Iterator::operator!=(const Iterator& second) const
+	inline bool BaseConcurencyList<THeap, T>::Iterator::operator!=(const Iterator& second) const
 	{
 		return reinterpret_cast<SizeT>(This) != reinterpret_cast<SizeT>(second.This);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::Iterator::operator==(const Seed::Core::NullptrT) const
+	inline bool BaseConcurencyList<THeap, T>::Iterator::operator==(const Seed::Core::NullptrT) const
 	{
 		return reinterpret_cast<SizeT>(This) == reinterpret_cast<SizeT>(nullptr);
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::Iterator::operator!=(const Seed::Core::NullptrT) const
+	inline bool BaseConcurencyList<THeap, T>::Iterator::operator!=(const Seed::Core::NullptrT) const
 	{
 		return This != nullptr;
 	}
@@ -495,7 +495,7 @@ namespace Seed::Core::Containers
 
 #pragma region Data access operators
 	template<class THeap, typename T>
-	ForceInline T& BaseConcurencyList<THeap, T>::Iterator::operator*()
+	inline T& BaseConcurencyList<THeap, T>::Iterator::operator*()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -503,7 +503,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T& BaseConcurencyList<THeap, T>::Iterator::operator*() const
+	inline const T& BaseConcurencyList<THeap, T>::Iterator::operator*() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -511,7 +511,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline T* BaseConcurencyList<THeap, T>::Iterator::operator->()
+	inline T* BaseConcurencyList<THeap, T>::Iterator::operator->()
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -520,7 +520,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline const T* const BaseConcurencyList<THeap, T>::Iterator::operator->() const
+	inline const T* const BaseConcurencyList<THeap, T>::Iterator::operator->() const
 	{
 		if (This == nullptr)
 			Internals::Exceptions::ThrowEndNodeNotReferenceable(SourcePosition);
@@ -538,20 +538,20 @@ namespace Seed::Core::Containers
 
 #pragma region Ctor, Dtor, copy operators
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator::Iterator(const Iterator& iterator): This(iterator.This)
+	inline BaseConcurencyList<THeap, T>::Iterator::Iterator(const Iterator& iterator): This(iterator.This)
 	{
 		if (This != nullptr)
 			++This->RefCount;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator::Iterator(Iterator&& iterator): This(iterator.This)
+	inline BaseConcurencyList<THeap, T>::Iterator::Iterator(Iterator&& iterator): This(iterator.This)
 	{
 		iterator.This = nullptr;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator=(const Iterator& iterator)
+	inline BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator=(const Iterator& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(iterator);
@@ -559,7 +559,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator=(Iterator&& iterator)
+	inline BaseConcurencyList<THeap, T>::Iterator& BaseConcurencyList<THeap, T>::Iterator::operator=(Iterator&& iterator)
 	{
 		this->~Iterator();
 		this->Iterator::Iterator(MoveRValue(iterator));
@@ -567,7 +567,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator::~Iterator()
+	inline BaseConcurencyList<THeap, T>::Iterator::~Iterator()
 	{
 		if (This != nullptr)
 		{
@@ -668,13 +668,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::operator+=(const T& Value)
+	inline BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::operator+=(const T& Value)
 	{
 		this->AddLast(Value); return *this;
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::operator+=(T&& Value)
+	inline BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::operator+=(T&& Value)
 	{
 		this->AddLast(MoveRValue(Value)); return *this;
 	}
@@ -786,13 +786,13 @@ namespace Seed::Core::Containers
 
 #pragma region Item count methods
 	template<class THeap, typename T>
-	ForceInline Boolean BaseConcurencyList<THeap, T>::IsEmpty() const
+	inline Boolean BaseConcurencyList<THeap, T>::IsEmpty() const
 	{
 		return (this->root == nullptr || this->size == 0);
 	}
 
 	template<class THeap, typename T>
-	ForceInline SizeT BaseConcurencyList<THeap, T>::GetCount() const
+	inline SizeT BaseConcurencyList<THeap, T>::GetCount() const
 	{
 		return IsEmpty() ? 0ull : static_cast<SizeT>(this->size);
 	}
@@ -801,7 +801,7 @@ namespace Seed::Core::Containers
 #pragma region Iterators
 #pragma region Gettter
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::GetRoot()
+	inline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::GetRoot()
 	{
 		if (this->root == nullptr)
 			return GetEnd();
@@ -813,7 +813,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::GetLast()
+	inline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::GetLast()
 	{
 		if (this->root == nullptr)
 			return GetEnd();
@@ -825,7 +825,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::GetRoot() const
+	inline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::GetRoot() const
 	{
 		if (this->root == nullptr)
 			return GetEnd();
@@ -837,7 +837,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::GetLast() const
+	inline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::GetLast() const
 	{
 		if (this->root == nullptr)
 			return GetEnd();
@@ -849,13 +849,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::GetEnd()
+	inline BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::GetEnd()
 	{
 		return Iterator(nullptr);
 	}
 
 	template<class THeap, typename T>
-	ForceInline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::GetEnd() const
+	inline BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::GetEnd() const
 	{
 		return ConstIterator(nullptr);
 	}
@@ -927,25 +927,25 @@ namespace Seed::Core::Containers
 
 #pragma region For each support methods
 	template<class THeap, typename T>
-	ForceInline typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::begin() const
+	inline typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::begin() const
 	{
 		return GetRoot();
 	}
 
 	template<class THeap, typename T>
-	ForceInline typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::end() const
+	inline typename BaseConcurencyList<THeap, T>::ConstIterator BaseConcurencyList<THeap, T>::end() const
 	{
 		return nullptr;
 	}
 
 	template<class THeap, typename T>
-	ForceInline typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::begin()
+	inline typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::begin()
 	{
 		return GetRoot();
 	}
 
 	template<class THeap, typename T>
-	ForceInline typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::end()
+	inline typename BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::end()
 	{
 		return nullptr;
 	}
@@ -1319,7 +1319,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline bool BaseConcurencyList<THeap, T>::AnyImpl() const
+	inline bool BaseConcurencyList<THeap, T>::AnyImpl() const
 	{
 		return this->size > 0;
 	}
@@ -1752,7 +1752,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline void BaseConcurencyList<THeap, T>::UnsafeAdd(const T& value)
+	inline void BaseConcurencyList<THeap, T>::UnsafeAdd(const T& value)
 	{
 		if (this->root == nullptr)
 		{
@@ -1766,7 +1766,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<class THeap, typename T>
-	ForceInline void BaseConcurencyList<THeap, T>::UnsafeAdd(T&& value)
+	inline void BaseConcurencyList<THeap, T>::UnsafeAdd(T&& value)
 	{
 		if (this->root == nullptr)
 		{
@@ -2072,7 +2072,7 @@ namespace Seed::Core::Containers
 
 	template<class THeap, typename T>
 	template<typename TFilterLambda, typename TLambda>
-	ForceInline BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::RemoveIfImpl(TFilterLambda&& filter, TLambda&& lambda) {
+	inline BaseConcurencyList<THeap, T>& BaseConcurencyList<THeap, T>::RemoveIfImpl(TFilterLambda&& filter, TLambda&& lambda) {
 		if constexpr (TypeTraits::IsInvocable<TLambda, T&&>&&
 			TypeTraits::IsInvocableWithResult<TFilterLambda, Boolean, const T&>) 
 		{

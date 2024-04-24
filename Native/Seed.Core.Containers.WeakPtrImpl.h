@@ -16,7 +16,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline T& BaseWeakPtr<THeap, T>::operator*()
+	inline T& BaseWeakPtr<THeap, T>::operator*()
 	{
 		if (This == nullptr || This->ptr == nullptr)
 		{
@@ -27,7 +27,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline const T& BaseWeakPtr<THeap, T>::operator*() const
+	inline const T& BaseWeakPtr<THeap, T>::operator*() const
 	{
 		if (This == nullptr || This->ptr == nullptr)
 		{
@@ -38,7 +38,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline T* BaseWeakPtr<THeap, T>::operator->()
+	inline T* BaseWeakPtr<THeap, T>::operator->()
 	{
 		if (This == nullptr || This->ptr == nullptr)
 		{
@@ -49,7 +49,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline const T* BaseWeakPtr<THeap, T>::operator->() const
+	inline const T* BaseWeakPtr<THeap, T>::operator->() const
 	{
 		if (This == nullptr || This->ptr == nullptr)
 		{
@@ -61,7 +61,7 @@ namespace Seed::Core
 
 	template<typename THeap, typename T>
 	template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
-	ForceInline const TInterface& BaseWeakPtr<THeap, T>::As() const
+	inline const TInterface& BaseWeakPtr<THeap, T>::As() const
 	{
 		if (This == nullptr || This->ptr == nullptr)
 		{
@@ -73,7 +73,7 @@ namespace Seed::Core
 
 	template<typename THeap, typename T>
 	template<typename TInterface> requires Concepts::IsBasedOn<TInterface, T> || Concepts::IsBasedOn<T, TInterface>
-	ForceInline TInterface& BaseWeakPtr<THeap, T>::As()
+	inline TInterface& BaseWeakPtr<THeap, T>::As()
 	{
 		if (This == nullptr || This->ptr == nullptr)
 		{
@@ -84,7 +84,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline decltype(auto) BaseWeakPtr<THeap, T>::GetTypeInfo() const
+	inline decltype(auto) BaseWeakPtr<THeap, T>::GetTypeInfo() const
 	{
 		if (This == nullptr || This->ptr == nullptr)
 		{
@@ -95,7 +95,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline SizeT BaseWeakPtr<THeap, T>::GetWeakRefCount() const
+	inline SizeT BaseWeakPtr<THeap, T>::GetWeakRefCount() const
 	{
 		if (This == nullptr)
 		{
@@ -106,7 +106,7 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline SizeT BaseWeakPtr<THeap, T>::GetRefCount() const
+	inline SizeT BaseWeakPtr<THeap, T>::GetRefCount() const
 	{
 		if (This == nullptr)
 		{
@@ -117,19 +117,19 @@ namespace Seed::Core
 	}
 
 	template<typename THeap, typename T>
-	ForceInline Boolean BaseWeakPtr<THeap, T>::GetHasValue()
+	inline Boolean BaseWeakPtr<THeap, T>::GetHasValue()
 	{
 		return !(This == nullptr || This->RefCount == 0);
 	}
 
 	template<typename THeap, typename T>
-	ForceInline bool BaseWeakPtr<THeap, T>::operator==(const std::nullptr_t&) const
+	inline bool BaseWeakPtr<THeap, T>::operator==(const std::nullptr_t&) const
 	{
 		return This == nullptr || This->ptr == nullptr;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline bool BaseWeakPtr<THeap, T>::operator==(std::nullptr_t&&) const
+	inline bool BaseWeakPtr<THeap, T>::operator==(std::nullptr_t&&) const
 	{
 		return This == nullptr || This->ptr == nullptr;
 	}

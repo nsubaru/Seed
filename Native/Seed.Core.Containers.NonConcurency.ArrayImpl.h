@@ -44,7 +44,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda)
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda)
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, T&> ||
 						TypeTraits::IsInvocable<TLambda, const T&>)
@@ -77,7 +77,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline const BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda) const
+	inline const BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda) const
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const T&>)
 		{
@@ -104,7 +104,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT reqCount)
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT reqCount)
 	{
 		if (reqCount > this->Count)
 			reqCount = this->Count;
@@ -140,7 +140,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline const BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT reqCount) const
+	inline const BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT reqCount) const
 	{
 		if (reqCount > this->Count)
 			reqCount = this->Count;
@@ -170,7 +170,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT reqCount)
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT reqCount)
 	{
 		if (startIndex > this->count)
 			Internals::Exceptions::ThrowIndexOutOfRange(SourcePosition, startIndex, this->count);
@@ -212,7 +212,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline const BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT reqCount) const
+	inline const BaseArray<THeap, T>& BaseArray<THeap, T>::ForEachImpl(TLambda&& lambda, SizeT startIndex, SizeT reqCount) const
 	{
 		if (startIndex > this->count)
 			Internals::Exceptions::ThrowIndexOutOfRange(SourcePosition, startIndex, this->count);
@@ -248,7 +248,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename U, typename TLambda>
-	ForceInline U BaseArray<THeap, T>::AggregateImpl(TLambda&& lambda, const U& value) const
+	inline U BaseArray<THeap, T>::AggregateImpl(TLambda&& lambda, const U& value) const
 	{
 		U result = value;
 		U& data = result;
@@ -270,7 +270,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename U, typename TLambda>
-	ForceInline U BaseArray<THeap, T>::AggregateImpl(TLambda&& lambda, U&& value) const
+	inline U BaseArray<THeap, T>::AggregateImpl(TLambda&& lambda, U&& value) const
 	{
 		for (SizeT i = 0; i < count; i++)
 		{
@@ -289,14 +289,14 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline bool BaseArray<THeap, T>::AnyImpl() const
+	inline bool BaseArray<THeap, T>::AnyImpl() const
 	{
 		return count > 0;
 	}
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline bool BaseArray<THeap, T>::AnyImpl(TLambda&& lambda) const
+	inline bool BaseArray<THeap, T>::AnyImpl(TLambda&& lambda) const
 	{
 		for (SizeT i = 0; i < count; i++)
 		{
@@ -308,7 +308,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline bool BaseArray<THeap, T>::AllImpl(TLambda&& lambda) const
+	inline bool BaseArray<THeap, T>::AllImpl(TLambda&& lambda) const
 	{
 		for (SizeT i = 0; i < count; i++)
 		{
@@ -319,7 +319,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::SortImpl(bool IsDescending)
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::SortImpl(bool IsDescending)
 	{
 		if (!IsDescending)
 		{
@@ -337,7 +337,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::SortImpl(TLambda&& lambda)
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::SortImpl(TLambda&& lambda)
 	{
 		if (count == 0)
 			return *this;
@@ -350,7 +350,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::SortByLambdaImpl(TLambda&& lambda, bool IsDescending)
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::SortByLambdaImpl(TLambda&& lambda, bool IsDescending)
 	{
 		if (count == 0)
 			return *this;
@@ -371,7 +371,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline T& BaseArray<THeap, T>::FirstImpl(TLambda&& lambda)
+	inline T& BaseArray<THeap, T>::FirstImpl(TLambda&& lambda)
 	{
 		for (SizeT i = 0; i < count; i++)
 			if (lambda(array[i]))
@@ -382,7 +382,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline T& BaseArray<THeap, T>::LastImpl(TLambda&& lambda)
+	inline T& BaseArray<THeap, T>::LastImpl(TLambda&& lambda)
 	{
 		SizeT Index = -1;
 		for (SizeT i = 0; i < count; i++)
@@ -397,7 +397,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline const T& BaseArray<THeap, T>::FirstImpl(TLambda&& lambda) const
+	inline const T& BaseArray<THeap, T>::FirstImpl(TLambda&& lambda) const
 	{
 		for (SizeT i = 0; i < count; i++)
 			if (lambda(array[i]))
@@ -408,7 +408,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline const T& BaseArray<THeap, T>::LastImpl(TLambda&& lambda) const
+	inline const T& BaseArray<THeap, T>::LastImpl(TLambda&& lambda) const
 	{
 		SizeT Index = -1;
 		for (SizeT i = 0; i < count; i++)
@@ -423,7 +423,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseArray<THeap, T>::FirstOrImpl(TLambda&& lambda, T&& item) const
+	inline T BaseArray<THeap, T>::FirstOrImpl(TLambda&& lambda, T&& item) const
 	{
 		if (count == 0)
 			return MoveRValue(item);
@@ -437,7 +437,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseArray<THeap, T>::LastOrImpl(TLambda&& lambda, T&& item) const
+	inline T BaseArray<THeap, T>::LastOrImpl(TLambda&& lambda, T&& item) const
 	{
 		if (count == 0)
 			return MoveRValue(item);
@@ -455,7 +455,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseArray<THeap, T>::FirstOrImpl(TLambda&& lambda, const T& item) const
+	inline T BaseArray<THeap, T>::FirstOrImpl(TLambda&& lambda, const T& item) const
 	{
 		if (count == 0)
 			return item;
@@ -469,7 +469,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline T BaseArray<THeap, T>::LastOrImpl(TLambda&& lambda, const T& item) const
+	inline T BaseArray<THeap, T>::LastOrImpl(TLambda&& lambda, const T& item) const
 	{
 		if (count == 0)
 			return item;
@@ -487,7 +487,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda, typename TGetterLambda>
-	ForceInline T BaseArray<THeap, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
+	inline T BaseArray<THeap, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
 		if (count == 0)
 			return otherLambda();
@@ -501,7 +501,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda, typename TGetterLambda>
-	ForceInline T BaseArray<THeap, T>::LastOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
+	inline T BaseArray<THeap, T>::LastOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const
 	{
 		if (count == 0)
 			return otherLambda();
@@ -518,7 +518,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::ReverseImpl()&
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::ReverseImpl()&
 	{
 		for (SizeT i = 0; i < count / 2; i++)
 		{
@@ -529,7 +529,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline BaseArray<THeap, T> BaseArray<THeap, T>::ReverseImpl()&&
+	inline BaseArray<THeap, T> BaseArray<THeap, T>::ReverseImpl()&&
 	{
 		for (SizeT i = 0; i < count / 2; i++)
 		{
@@ -540,19 +540,19 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline void BaseArray<THeap, T>::UnsafeSet(const T& Value, SizeT Index)
+	inline void BaseArray<THeap, T>::UnsafeSet(const T& Value, SizeT Index)
 	{
 		array[Index] = Value;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline void BaseArray<THeap, T>::UnsafeSet(T&& Value, SizeT Index)
+	inline void BaseArray<THeap, T>::UnsafeSet(T&& Value, SizeT Index)
 	{
 		array[Index] = MoveRValue(Value);
 	}
 
 	template<typename THeap, typename T>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::RemoveAllImpl()
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::RemoveAllImpl()
 	{
 		delete[] this->array;
 		this->array = nullptr;
@@ -562,7 +562,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	template<typename TLambda>
-	ForceInline BaseArray<THeap, T>& BaseArray<THeap, T>::RemoveAllImpl(TLambda&& lambda)
+	inline BaseArray<THeap, T>& BaseArray<THeap, T>::RemoveAllImpl(TLambda&& lambda)
 	{
 		if constexpr (Concepts::IsInvocable<TLambda, T&&>)
 		{
@@ -658,7 +658,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline BaseArray<THeap, T>::BaseArray(SizeT startCount): count(0), array(nullptr)
+	inline BaseArray<THeap, T>::BaseArray(SizeT startCount): count(0), array(nullptr)
 	{
 		if (startCount != 0)
 		{
@@ -735,13 +735,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline InternalApiCall BaseArray<THeap, T>::operator const T* const() const
+	inline InternalApiCall BaseArray<THeap, T>::operator const T* const() const
 	{
 		return array;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline T& BaseArray<THeap, T>::operator[](SizeT Index)&
+	inline T& BaseArray<THeap, T>::operator[](SizeT Index)&
 	{
 		if (Index < count)
 		{
@@ -754,7 +754,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline const T& BaseArray<THeap, T>::operator[](SizeT Index) const&
+	inline const T& BaseArray<THeap, T>::operator[](SizeT Index) const&
 	{
 		if (Index < count)
 		{
@@ -767,7 +767,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline T&& BaseArray<THeap, T>::operator[](SizeT Index)&&
+	inline T&& BaseArray<THeap, T>::operator[](SizeT Index)&&
 	{
 		if (Index < count)
 		{
@@ -883,13 +883,13 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
-	ForceInline SizeT BaseArray<THeap, T>::GetCount() const
+	inline SizeT BaseArray<THeap, T>::GetCount() const
 	{
 		return count;
 	}
 
 	template<typename THeap, typename T>
-	ForceInline const T* const BaseArray<THeap, T>::GetRaw() const
+	inline const T* const BaseArray<THeap, T>::GetRaw() const
 	{
 		return array;
 	}
@@ -914,9 +914,17 @@ namespace Seed::Core::Containers
 		}
 		else
 		{
+			
 			for (SizeT i = 0; i < itemCount; i++)
 			{
-				innerArray.array[i] = this->array[startIdx + i].Clone();
+				if constexpr (Concepts::HasCloneMethod<T>)
+				{
+					innerArray.array[i] = this->array[startIdx + i].Clone();
+				}
+				else
+				{
+					innerArray.array[i] = this->array[startIdx + i];
+				}
 			}
 		}
 
@@ -957,25 +965,25 @@ namespace Seed::Core
 namespace Seed::Core::Memory
 {
 	template<Concepts::IsStandardLayout T, SizeT count>
-	ForceInline void Copy(const Containers::Blob& source, T(&destination)[count], SizeT offset)
+	inline void Copy(const Containers::Blob& source, T(&destination)[count], SizeT offset)
 	{
 		Copy(((T*) (const T* const) source) + offset, destination, Min(source.Count - offset, (count * sizeof(T))));
 	}
 
 	template<Concepts::IsStandardLayout T, SizeT count>
-	ForceInline void Copy(T(&source)[count], const Containers::Blob& destination, SizeT offset)
+	inline void Copy(T(&source)[count], const Containers::Blob& destination, SizeT offset)
 	{
 		Copy(source, ((T*) (const T* const) destination) + offset, Min(destination.Count - offset, (count * sizeof(T))));
 	}
 
 	template<Concepts::IsStandardLayout T>
-	ForceInline void Copy(const Containers::Blob& source, T destination, SizeT offset)
+	inline void Copy(const Containers::Blob& source, T destination, SizeT offset)
 	{
 		Copy(((T*) (const T* const) source) + offset, &destination, Min(source.Count - offset, sizeof(T)));
 	}
 
 	template<Concepts::IsStandardLayout T>
-	ForceInline void Copy(T source, Containers::Blob& destination, SizeT offset)
+	inline void Copy(T source, Containers::Blob& destination, SizeT offset)
 	{
 		Copy(source, ((T*) (const T* const) destination) + offset, Min(destination.Count - offset, (sizeof(T))));
 	}

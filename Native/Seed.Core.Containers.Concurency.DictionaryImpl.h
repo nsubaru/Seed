@@ -489,35 +489,35 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(const TString& key, const TData& value)
 	{
 		return Insert({ key, value });
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(TString&& key, const TData& value)
 	{
 		return Insert({ MoveRValue(key), value });
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(const TString& key, TData&& value)
 	{
 		return Insert({ key, MoveRValue(value) });
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(TString&& key, TData&& value)
 	{
 		return Insert({ MoveRValue(key), MoveRValue(value) });
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(Pair&& data)
 	{
 		return this->lock.ExclusiveLock([&, data = MoveRValue(data)]() mutable->BaseConcurencyDictionary & InlineLambda{
@@ -528,7 +528,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(const Pair& data)
 	{
 		return this->lock.ExclusiveLock([&]() mutable->BaseConcurencyDictionary & InlineLambda{
@@ -545,7 +545,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline const TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Find(const UString& Key) const
+	inline const TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Find(const UString& Key) const
 	{
 		return this->lock.SharedLock([&]() -> const TData & InlineLambda{
 			if (Key.Length == 0)
@@ -570,7 +570,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Find(const UString& Key)
+	inline TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Find(const UString& Key)
 	{
 		return this->lock.SharedLock([&]()->TData & InlineLambda{
 			if (Key.Length == 0)
@@ -609,7 +609,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key)
+	inline TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key)
 	{
 		return Find(key);
 	}
@@ -621,7 +621,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key)
+	inline TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key)
 	{
 		return Find(key);
 	}
@@ -633,7 +633,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline const TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key) const
+	inline const TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](const UString& key) const
 	{
 		return Find(key);
 	}
@@ -645,7 +645,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline const TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key) const
+	inline const TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::operator[](UString&& key) const
 	{
 		return Find(key);
 	}
@@ -665,7 +665,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsEmpty() const
+	inline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsEmpty() const
 	{
 		return this->count == 0;
 	}
@@ -677,7 +677,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(const UString& Key) const
+	inline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(const UString& Key) const
 	{
 		return this->lock.SharedLock([&]() -> bool InlineLambda{
 			if (this->node == nullptr) return false;
@@ -694,7 +694,7 @@ namespace Seed::Core::Containers
 			str[0]
 		}->Concepts::IsConvertible<Char>;
 	})
-	ForceInline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(UString&& Key) const
+	inline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(UString&& Key) const
 	{
 		return this->lock.SharedLock([&]() -> bool InlineLambda{
 			if (this->node == nullptr) return false;
@@ -706,7 +706,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<SizeT TN>
-	ForceInline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(StaticTextRef<TN> Key) const
+	inline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(StaticTextRef<TN> Key) const
 	{
 		return IsExist(ConstString(Key));
 	}
@@ -727,7 +727,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline SizeT BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::GetCount() const
+	inline SizeT BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::GetCount() const
 	{
 		return this->count;
 	}
@@ -771,13 +771,13 @@ namespace Seed::Core::Containers
 
 #pragma region LINQ
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(Pair&& pair)
+	inline void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(Pair&& pair)
 	{
 		Insert(MoveRValue(pair));
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(const Pair& pair)
+	inline void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::UnsafeAdd(const Pair& pair)
 	{
 		Insert(pair);
 	}
@@ -785,7 +785,7 @@ namespace Seed::Core::Containers
 #pragma region For Each
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithoutIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithoutIndex(
 		NodeSym* node,
 		TLambda& lambda)
 	{
@@ -809,7 +809,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithoutIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithoutIndex(
 		const BaseConcurencyDictionary* const This,
 		TLambda& lambda)
 	{
@@ -820,7 +820,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithIndex(
 		NodeSym* node,
 		TLambda& lambda,
 		SizeT& Index)
@@ -849,7 +849,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImplWithIndex(
 		const BaseConcurencyDictionary* const This,
 		TLambda& lambda,
 		SizeT& Index)
@@ -861,7 +861,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename LambdaT>
-	ForceInline const BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline const BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImpl(LambdaT&& lambda) const
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const BasePair<THeap, TString, TData>&>)
@@ -889,7 +889,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename LambdaT>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachImpl(LambdaT&& lambda)
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, BasePair<THeap, TString, TData>&> ||
@@ -923,7 +923,7 @@ namespace Seed::Core::Containers
 #pragma region For Each Key
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithoutIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithoutIndex(
 		NodeSym* node,
 		TLambda& lambda)
 	{
@@ -947,7 +947,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithoutIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithoutIndex(
 		const BaseConcurencyDictionary* const This,
 		TLambda& lambda)
 	{
@@ -958,7 +958,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithIndex(
 		NodeSym* node,
 		TLambda& lambda,
 		SizeT& Index)
@@ -987,7 +987,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImplWithIndex(
 		const BaseConcurencyDictionary* const This,
 		TLambda& lambda,
 		SizeT& Index)
@@ -999,7 +999,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename LambdaT>
-	ForceInline const BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline const BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImpl(LambdaT&& lambda) const
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const TString&>)
@@ -1027,7 +1027,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename LambdaT>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachKeyImpl(LambdaT&& lambda)
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const TString&>)
@@ -1057,7 +1057,7 @@ namespace Seed::Core::Containers
 #pragma region For Each Value
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithoutIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithoutIndex(
 		NodeSym* node,
 		TLambda& lambda)
 	{
@@ -1081,7 +1081,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithoutIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithoutIndex(
 		const BaseConcurencyDictionary* const This,
 		TLambda& lambda)
 	{
@@ -1092,7 +1092,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithIndex(
 		NodeSym* node,
 		TLambda& lambda,
 		SizeT& Index)
@@ -1121,7 +1121,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithIndex(
+	inline static void BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImplWithIndex(
 		const BaseConcurencyDictionary* const This,
 		TLambda& lambda,
 		SizeT& index)
@@ -1133,7 +1133,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename LambdaT>
-	ForceInline const BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline const BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImpl(LambdaT&& lambda) const
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const TData&>)
@@ -1161,7 +1161,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename LambdaT>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ForEachValueImpl(LambdaT&& lambda)
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, TData&> ||
@@ -1241,7 +1241,7 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::RemoveAllImpl()
 	{
 		return this->lock.ExclusiveLock([&]()->BaseConcurencyDictionary & InlineLambda{
@@ -1253,7 +1253,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	template<typename TLambda>
-	ForceInline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
+	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::RemoveAllWithImpl(TLambda&& lambda)
 	{
 		return this->lock.SharedLock([&]()->BaseConcurencyDictionary & InlineLambda{
