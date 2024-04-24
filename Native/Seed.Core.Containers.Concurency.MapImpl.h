@@ -329,27 +329,27 @@ namespace Seed::Core::Containers
 
 		if (node->This != nullptr) 
 		{
-			return node->This->lock.SharedLock([&]() InlineLambda {
-				--node->RefCount;
-				if (node->right != nullptr)
-				{
-					Node* ret = FindMin(node->right);
-					++ret->RefCount++;
-					return ret;
-				}
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				Node* father = node->father;
-				while (father != nullptr && node == father->right)
-				{
-					node = father;
-					father = father->father;
-				}
+			--node->RefCount;
+			if (node->right != nullptr)
+			{
+				Node* ret = FindMin(node->right);
+				++ret->RefCount++;
+				return ret;
+			}
 
-				if (father != nullptr)
-					++father->RefCount;
+			Node* father = node->father;
+			while (father != nullptr && node == father->right)
+			{
+				node = father;
+				father = father->father;
+			}
 
-				return father;
-			});
+			if (father != nullptr)
+				++father->RefCount;
+
+			return father;
 		}
 		else 
 		{
@@ -369,26 +369,27 @@ namespace Seed::Core::Containers
 
 		if (node->This != nullptr) 
 		{
-			return node->This->lock.SharedLock([&]() InlineLambda {
-				--node->RefCount;
-				if (node->left != nullptr) {
-					Node* ret = FindMax(node->left);
-					++ret->RefCount;
-					return ret;
-				}
+			auto _ = Threading::SharedScoppedLock(this->lock);
 
-				Node* father = node->father;
-				while (father != nullptr && node == father->left)
-				{
-					node = father;
-					father = father->father;
-				}
+			--node->RefCount;
+			if (node->left != nullptr)
+			{
+				Node* ret = FindMax(node->left);
+				++ret->RefCount;
+				return ret;
+			}
 
-				if (father != nullptr)
-					++father->RefCount;
+			Node* father = node->father;
+			while (father != nullptr && node == father->left)
+			{
+				node = father;
+				father = father->father;
+			}
 
-				return father;
-			});
+			if (father != nullptr)
+				++father->RefCount;
+
+			return father;
 		}
 		else 
 		{
@@ -533,25 +534,25 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	typename BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator BaseConcurencyMap<THeap, TKey, TValue>::GetRoot() const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return ConstIterator(FindMin(this->root));
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return ConstIterator(FindMin(this->root));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	typename BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator BaseConcurencyMap<THeap, TKey, TValue>::GetLast() const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return ConstIterator(FindMax(this->root));
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return ConstIterator(FindMax(this->root));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	typename BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator BaseConcurencyMap<THeap, TKey, TValue>::begin() const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return GetRoot();
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return GetRoot();
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
@@ -688,17 +689,17 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	BaseConcurencyMap<THeap, TKey, TValue>::Iterator BaseConcurencyMap<THeap, TKey, TValue>::GetRoot()
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return Iterator(FindMin(this->root));
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return Iterator(FindMin(this->root));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	BaseConcurencyMap<THeap, TKey, TValue>::Iterator BaseConcurencyMap<THeap, TKey, TValue>::GetLast()
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return Iterator(FindMax(this->root));
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return Iterator(FindMax(this->root));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
@@ -716,10 +717,10 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	BaseConcurencyMap<THeap, TKey, TValue>::~BaseConcurencyMap()
 	{
-		this->lock.ExclusiveLock([&] () {
-			DestroyTree(this->root);
-			this->root = nullptr;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		DestroyTree(this->root);
+		this->root = nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
@@ -734,22 +735,22 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	BaseConcurencyMap<THeap, TKey, TValue>::BaseConcurencyMap(const BaseConcurencyMap& map): lock(), root(nullptr)
 	{
-		map.lock.SharedLock([&] () {
-			this->count = map.count;
-			this->root = copyTree(map.root, nullptr, this);
-		});
+		auto _ = Threading::SharedScoppedLock(map.lock);
+
+		this->count = map.count;
+		this->root = copyTree(map.root, nullptr, this);
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	BaseConcurencyMap<THeap, TKey, TValue>::BaseConcurencyMap(BaseConcurencyMap&& map): lock(), root(nullptr)
 	{
-		map.lock.ExclusiveLock([&] () {
-			this->count = map.count;
-			this->root = map.root;
-			map.root = nullptr;
-			map.count = 0;
-			map.moveTree(this->root, this);
-		});
+		auto _ = Threading::ExclusiveScoppedLock(map.lock);
+
+		this->count = map.count;
+		this->root = map.root;
+		map.root = nullptr;
+		map.count = 0;
+		map.moveTree(this->root, this);
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
@@ -777,127 +778,129 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	void BaseConcurencyMap<THeap, TKey, TValue>::Insert(const BasePair<THeap, TKey, TValue>& pair)
 	{
-		this->lock.ExclusiveLock([&]() InlineLambda{
-			this->root = Insert(this->root, pair, nullptr);
-			++this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+		
+		this->root = Insert(this->root, pair, nullptr);
+		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	void BaseConcurencyMap<THeap, TKey, TValue>::Insert(BasePair<THeap, TKey, TValue>&& pair)
 	{
-		this->lock.ExclusiveLock([&]() InlineLambda{
-			this->root = Insert(this->root, pair, nullptr);
-			++this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->root = Insert(this->root, pair, nullptr);
+		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	void BaseConcurencyMap<THeap, TKey, TValue>::Insert(const TKey& key, const TValue& value)
 	{
-		this->lock.ExclusiveLock([&]() InlineLambda{
-			this->root = Insert(this->root, key, value, nullptr);
-			++this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->root = Insert(this->root, key, value, nullptr);
+		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	void BaseConcurencyMap<THeap, TKey, TValue>::Insert(TKey&& key, const TValue& value)
 	{
-		this->lock.ExclusiveLock([&, key = MoveRValue(key)]() mutable InlineLambda{
-			this->root = Insert(this->root, MoveRValue(key), value, nullptr);
-			++this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->root = Insert(this->root, MoveRValue(key), value, nullptr);
+		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	void BaseConcurencyMap<THeap, TKey, TValue>::Insert(const TKey& key, TValue&& value)
 	{
-		this->lock.ExclusiveLock([&, value = MoveRValue(value)]() mutable InlineLambda{
-			this->root = Insert(this->root, key, MoveRValue(value), nullptr);
-			++this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->root = Insert(this->root, key, MoveRValue(value), nullptr);
+		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	void BaseConcurencyMap<THeap, TKey, TValue>::Insert(TKey&& key, TValue&& value)
 	{
-		this->lock.ExclusiveLock([&, key = MoveRValue(key), value = MoveRValue(value)]() mutable InlineLambda{
-			this->root = Insert(this->root, MoveRValue(key), MoveRValue(value), nullptr);
-			++this->count;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->root = Insert(this->root, MoveRValue(key), MoveRValue(value), nullptr);
+		++this->count;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey, typename V>
 	void BaseConcurencyMap<THeap, TKey, TValue>::Delete(const UKey& key)
 	{
-		this->lock.ExclusiveLock([&]() InlineLambda{
-			--this->count;
-			this->root = Remove(this->root, key);
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		--this->count;
+		this->root = Remove(this->root, key);
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey, typename V>
 	TValue& BaseConcurencyMap<THeap, TKey, TValue>::operator[](const UKey& key)
 	{
-		return this->lock.SharedLock([&]() InlineLambda->TValue& {
-			auto node = Find(this->root, key);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if (node == nullptr)
-				Internals::Exceptions::ThrowNotFound(SourcePosition);
 
-			return node->value;
-		});
+		auto node = Find(this->root, key);
+
+		if (node == nullptr)
+			Internals::Exceptions::ThrowNotFound(SourcePosition);
+
+		return node->value;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
 	const TValue& BaseConcurencyMap<THeap, TKey, TValue>::operator[](const UKey& key) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda -> const TValue& {
-			auto node = Find(this->root, key);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if (node == nullptr)
-				Internals::Exceptions::ThrowNotFound(SourcePosition);
+		auto node = Find(this->root, key);
 
-			return node->value;
-		});
+		if (node == nullptr)
+			Internals::Exceptions::ThrowNotFound(SourcePosition);
+
+		return node->value;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
 	inline BaseConcurencyMap<THeap, TKey, TValue>::Iterator BaseConcurencyMap<THeap, TKey, TValue>::FindAsIterator(const UKey& key)
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return Iterator(Find(this->root, key));
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return Iterator(Find(this->root, key));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey> requires TypeTraits::IsComparableV<TKey, UKey>
 	inline BaseConcurencyMap<THeap, TKey, TValue>::ConstIterator BaseConcurencyMap<THeap, TKey, TValue>::FindAsIterator(const UKey& key) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return ConstIterator(Find(this->root, key));
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return ConstIterator(Find(this->root, key));
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey, typename V>
 	bool BaseConcurencyMap<THeap, TKey, TValue>::IsExist(const UKey& key) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			return Find(this->root, key); }) != nullptr;
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		return Find(this->root, key) != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename UKey, typename V>
 	bool BaseConcurencyMap<THeap, TKey, TValue>::IsExist(UKey&& key) const
 	{
-		return this->lock.SharedLock([&] () {
-			return Find(this->root, key); }) != nullptr;
+		auto _ = Threading::SharedScoppedLock(this->lock);
+		return Find(this->root, key) != nullptr;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
@@ -954,26 +957,27 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const BasePair<THeap, TKey, TValue>&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					ForEachImplWithoutIndex(node, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				ForEachImplWithoutIndex(node, lambda);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					ForEachImplWithIndex(node, index, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				ForEachImplWithIndex(node, index, lambda);
+			}
+			return *this;
 		}
 		else
 		{
@@ -989,27 +993,29 @@ namespace Seed::Core::Containers
 		if constexpr (TypeTraits::IsInvocable<TLambda, BasePair<THeap, TKey, TValue>&> ||
 			TypeTraits::IsInvocable<TLambda, const BasePair<THeap, TKey, TValue>&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					ForEachImplWithoutIndex(node, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				ForEachImplWithoutIndex(node, lambda);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, BasePair<THeap, TKey, TValue>&, SizeT> ||
 			TypeTraits::IsInvocable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					ForEachImplWithIndex(node, index, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				ForEachImplWithIndex(node, index, lambda);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -1054,26 +1060,28 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const TKey&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					ForEachKeyImplWithoutIndex(node, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				ForEachKeyImplWithoutIndex(node, lambda);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, const TKey&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					ForEachKeyImplWithIndex(node, index, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				ForEachKeyImplWithIndex(node, index, lambda);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -1088,26 +1096,28 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const TKey&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					ForEachKeyImplWithoutIndex(node, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				ForEachKeyImplWithoutIndex(node, lambda);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, const TKey&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					ForEachKeyImplWithIndex(node, index, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				ForEachKeyImplWithIndex(node, index, lambda);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -1150,26 +1160,28 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const TValue&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					ForEachValueImplWithoutIndex(node, lambda);
-				}
-				return *this;
-				});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				ForEachValueImplWithoutIndex(node, lambda);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, const TValue&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					ForEachValueImplWithIndex(node, index, lambda);
-				}
-				return *this;
-				});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				ForEachValueImplWithIndex(node, index, lambda);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -1185,27 +1197,29 @@ namespace Seed::Core::Containers
 		if constexpr (TypeTraits::IsInvocable<TLambda, TValue&> ||
 			TypeTraits::IsInvocable<TLambda, const TValue&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					ForEachValueImplWithoutIndex(node, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				ForEachValueImplWithoutIndex(node, lambda);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, TValue&, SizeT> ||
 			TypeTraits::IsInvocable<TLambda, const TValue&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyMap & InlineLambda{
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					ForEachValueImplWithIndex(node, index, lambda);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				ForEachValueImplWithIndex(node, index, lambda);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -1252,22 +1266,23 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TKey, typename TValue>
 	BaseConcurencyMap<THeap, TKey, TValue>& BaseConcurencyMap<THeap, TKey, TValue>::RemoveAllImpl()
 	{
-		return this->lock.ExclusiveLock([&]()->BaseConcurencyMap & InlineLambda{
-			this->root = DestroyTree(this->root);
-			this->count = 0;
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->root = DestroyTree(this->root);
+		this->count = 0;
+		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>
 	template<typename Lambda>
 	BaseConcurencyMap<THeap, TKey, TValue>& BaseConcurencyMap<THeap, TKey, TValue>::RemoveAllWithImpl(Lambda&& lambda)
 	{
-		return this->lock.SharedLock([&]()->BaseConcurencyMap & InlineLambda{
-			this->root = DestroyTreeWithLambdaPairValues(this->root, lambda);
-			this->count = 0;
-			return *this;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		this->root = DestroyTreeWithLambdaPairValues(this->root, lambda);
+		this->count = 0;
+
+		return *this;
 	}
 
 	template<typename THeap, typename TKey, typename TValue>

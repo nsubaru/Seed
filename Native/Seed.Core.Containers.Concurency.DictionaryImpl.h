@@ -435,10 +435,10 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::~BaseConcurencyDictionary()
 	{
-		this->lock.ExclusiveLock([&] () {
-			this->node = destroy_node(this->node);
-			this->count = 0;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->node = destroy_node(this->node);
+		this->count = 0;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -453,21 +453,21 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::BaseConcurencyDictionary(const BaseConcurencyDictionary& dictionary): lock(), node(nullptr)
 	{
-		this->lock.SharedLock([&]() InlineLambda{
-			this->node = create_lex_clone_copy(dictionary.node);
-			this->count = dictionary.count;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		this->node = create_lex_clone_copy(dictionary.node);
+		this->count = dictionary.count;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::BaseConcurencyDictionary(BaseConcurencyDictionary&& dictionary): lock(), node(nullptr)
 	{
-		this->lock.ExclusiveLock([&]() InlineLambda{
-			this->node = MoveRValue(dictionary.node);
-			dictionary.node = nullptr;
-			this->count = MoveRValue(dictionary.count);
-			dictionary.count = 0;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->node = MoveRValue(dictionary.node);
+		dictionary.node = nullptr;
+		this->count = MoveRValue(dictionary.count);
+		dictionary.count = 0;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -520,22 +520,22 @@ namespace Seed::Core::Containers
 	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(Pair&& data)
 	{
-		return this->lock.ExclusiveLock([&, data = MoveRValue(data)]() mutable->BaseConcurencyDictionary & InlineLambda{
-			this->node = insert(this->node, MoveRValue(data));
-			++this->count;
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->node = insert(this->node, MoveRValue(data));
+		++this->count;
+		return *this;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
 	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Insert(const Pair& data)
 	{
-		return this->lock.ExclusiveLock([&]() mutable->BaseConcurencyDictionary & InlineLambda{
-			this->node = insert(this->node, MoveRValue(Pair(data)));
-			++this->count;
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->node = insert(this->node, MoveRValue(Pair(data)));
+		++this->count;
+		return *this;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -547,20 +547,20 @@ namespace Seed::Core::Containers
 	})
 	inline const TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Find(const UString& Key) const
 	{
-		return this->lock.SharedLock([&]() -> const TData & InlineLambda{
-			if (Key.Length == 0)
-				Throw(NullPointException(SourcePosition));
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if (this->node == nullptr)
-				Throw(NotFoundException(SourcePosition, L"Invalid Key"));
+		if (Key.Length == 0)
+			Throw(NullPointException(SourcePosition));
 
-			NodeLex* targetNode = find(this->node, Key);
+		if (this->node == nullptr)
+			Throw(NotFoundException(SourcePosition, L"Invalid Key"));
 
-			if (targetNode == nullptr || targetNode->data == nullptr)
-				Throw(NotFoundException(SourcePosition, L"Invalid Key"));
+		NodeLex* targetNode = find(this->node, Key);
 
-			return targetNode->data->Value;
-		});
+		if (targetNode == nullptr || targetNode->data == nullptr)
+			Throw(NotFoundException(SourcePosition, L"Invalid Key"));
+
+		return targetNode->data->Value;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -572,20 +572,20 @@ namespace Seed::Core::Containers
 	})
 	inline TData& BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Find(const UString& Key)
 	{
-		return this->lock.SharedLock([&]()->TData & InlineLambda{
-			if (Key.Length == 0)
-				Throw(NullPointException(SourcePosition));
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if (this->node == nullptr)
-				Throw(NotFoundException(SourcePosition, L"Invalid Key"));
+		if (Key.Length == 0)
+			Throw(NullPointException(SourcePosition));
 
-			NodeLex* targetNode = find(this->node, Key);
+		if (this->node == nullptr)
+			Throw(NotFoundException(SourcePosition, L"Invalid Key"));
 
-			if (targetNode == nullptr || targetNode->data == nullptr)
-				Throw(NotFoundException(SourcePosition, L"Invalid Key"));
+		NodeLex* targetNode = find(this->node, Key);
 
-			return targetNode->data->Value;
-		});
+		if (targetNode == nullptr || targetNode->data == nullptr)
+			Throw(NotFoundException(SourcePosition, L"Invalid Key"));
+
+		return targetNode->data->Value;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -679,12 +679,12 @@ namespace Seed::Core::Containers
 	})
 	inline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(const UString& Key) const
 	{
-		return this->lock.SharedLock([&]() -> bool InlineLambda{
-			if (this->node == nullptr) return false;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			NodeLex* node = find(this->node, Key);
-			return (node == nullptr || node->data == nullptr) ? false : true;
-		});
+		if (this->node == nullptr) return false;
+
+		NodeLex* node = find(this->node, Key);
+		return (node == nullptr || node->data == nullptr) ? false : true;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -696,12 +696,12 @@ namespace Seed::Core::Containers
 	})
 	inline Boolean BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::IsExist(UString&& Key) const
 	{
-		return this->lock.SharedLock([&]() -> bool InlineLambda{
-			if (this->node == nullptr) return false;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			NodeLex* node = find(this->node, Key);
-			return (node == nullptr || node->data == nullptr) ? false : true;
-		});
+		if (this->node == nullptr) return false;
+
+		NodeLex* node = find(this->node, Key);
+		return (node == nullptr || node->data == nullptr) ? false : true;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -715,15 +715,15 @@ namespace Seed::Core::Containers
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>& 
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Remove(const TString& Key)
 	{
-		return this->lock.ExclusiveLock([&]() mutable->BaseConcurencyDictionary & InlineLambda{
-			bool flag = false;
-			this->node = remove_node(this->node, Key, flag);
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			if (flag)
-				--this->count;
+		bool flag = false;
+		this->node = remove_node(this->node, Key, flag);
 
-			return *this;
-		});
+		if (flag)
+			--this->count;
+
+		return *this;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -736,11 +736,11 @@ namespace Seed::Core::Containers
 	BaseConcurencyMap<THeap, TString, TData> 
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::ToMap()
 	{
-		return this->lock.SharedLock([&] () -> BaseConcurencyMap<THeap, TString, TData> {
-			BaseConcurencyMap<THeap, TString, TData> retVal;
-			ToMap(this, retVal);
-			return retVal;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		BaseConcurencyMap<THeap, TString, TData> retVal;
+		ToMap(this, retVal);
+		return retVal;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -748,12 +748,12 @@ namespace Seed::Core::Containers
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Clone() const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			BaseConcurencyDictionary result;
-			result.node = create_lex_clone_copy(this->node);
-			result.count = this->count;
-			return result;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		BaseConcurencyDictionary result;
+		result.node = create_lex_clone_copy(this->node);
+		result.count = this->count;
+		return result;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -761,12 +761,12 @@ namespace Seed::Core::Containers
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::Clone(TLambda&& lambda) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda{
-			BaseConcurencyDictionary result;
-			result.node = create_lex_clone_copy(this->node, lambda);
-			result.count = this->count;
-			return result;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		BaseConcurencyDictionary result;
+		result.node = create_lex_clone_copy(this->node, lambda);
+		result.count = this->count;
+		return result;
 	}
 
 #pragma region LINQ
@@ -866,18 +866,18 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const BasePair<THeap, TString, TData>&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDictionary & InlineLambda{
-				ForEachImplWithoutIndex(this, lambda);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			ForEachImplWithoutIndex(this, lambda);
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<LambdaT, const BasePair<THeap, TString, TData>&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDictionary & InlineLambda{
-				SizeT index = 0;
-				ForEachImplWithIndex(this, lambda, index);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			SizeT index = 0;
+			ForEachImplWithIndex(this, lambda, index);
+			return *this;
 		}
 		else
 		{
@@ -895,19 +895,18 @@ namespace Seed::Core::Containers
 		if constexpr (TypeTraits::IsInvocable<LambdaT, BasePair<THeap, TString, TData>&> ||
 			TypeTraits::IsInvocable<LambdaT, const BasePair<THeap, TString, TData>&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDictionary & InlineLambda{
-				ForEachImplWithoutIndex(this, lambda);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			ForEachImplWithoutIndex(this, lambda);
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<LambdaT, BasePair<THeap, TString, TData>&, SizeT> ||
 			TypeTraits::IsInvocable<LambdaT, const BasePair<THeap, TString, TData>&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDictionary & InlineLambda{
-				SizeT index = 0;
-				ForEachImplWithIndex(this, lambda, index);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+			SizeT index = 0;
+			ForEachImplWithIndex(this, lambda, index);
+			return *this;
 		}
 		else
 		{
@@ -1004,18 +1003,18 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const TString&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDictionary & InlineLambda{
-				ForEachKeyImplWithoutIndex(this, lambda);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			ForEachKeyImplWithoutIndex(this, lambda);
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<LambdaT, const TString&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDictionary & InlineLambda{
-				SizeT index = 0;
-				ForEachKeyImplWithIndex(this, lambda, index);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			SizeT index = 0;
+			ForEachKeyImplWithIndex(this, lambda, index);
+			return *this;
 		}
 		else
 		{
@@ -1032,18 +1031,18 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const TString&>)
 		{
-			return this->lock.SharedLock([&]() mutable->BaseConcurencyDictionary & InlineLambda{
-				ForEachKeyImplWithoutIndex(this, lambda);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			ForEachKeyImplWithoutIndex(this, lambda);
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<LambdaT, const TString&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() mutable->BaseConcurencyDictionary & InlineLambda{
-				SizeT index = 0;
-				ForEachKeyImplWithIndex(this, lambda, index);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			SizeT index = 0;
+			ForEachKeyImplWithIndex(this, lambda, index);
+			return *this;
 		}
 		else
 		{
@@ -1138,18 +1137,18 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<LambdaT, const TData&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDictionary & InlineLambda{
-				ForEachValueImplWithoutIndex(this, lambda);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			ForEachValueImplWithoutIndex(this, lambda);
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<LambdaT, const TData&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyDictionary & InlineLambda{
-				SizeT index = 0;
-				ForEachValueImplWithIndex(this, lambda, index);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			SizeT index = 0;
+			ForEachValueImplWithIndex(this, lambda, index);
+			return *this;
 		}
 		else
 		{
@@ -1167,19 +1166,19 @@ namespace Seed::Core::Containers
 		if constexpr (TypeTraits::IsInvocable<LambdaT, TData&> ||
 			TypeTraits::IsInvocable<LambdaT, const TData&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDictionary & InlineLambda{
-				ForEachValueImplWithoutIndex(this, lambda);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			ForEachValueImplWithoutIndex(this, lambda);
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<LambdaT, TData&, SizeT> ||
 			TypeTraits::IsInvocable<LambdaT, const TData&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyDictionary & InlineLambda{
-				SizeT index = 0;
-				ForEachValueImplWithIndex(this, lambda, index);
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			SizeT index = 0;
+			ForEachValueImplWithIndex(this, lambda, index);
+			return *this;
 		}
 		else
 		{
@@ -1244,11 +1243,11 @@ namespace Seed::Core::Containers
 	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::RemoveAllImpl()
 	{
-		return this->lock.ExclusiveLock([&]()->BaseConcurencyDictionary & InlineLambda{
-			this->node = destroy_node(this->node);
-			this->count = 0;
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		this->node = destroy_node(this->node);
+		this->count = 0;
+		return *this;
 	}
 
 	template<typename THeap, typename TString, typename TData, TCharacterComparator CharacterComparator>
@@ -1256,11 +1255,11 @@ namespace Seed::Core::Containers
 	inline BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>&
 	BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::RemoveAllWithImpl(TLambda&& lambda)
 	{
-		return this->lock.SharedLock([&]()->BaseConcurencyDictionary & InlineLambda{
-			this->node = destroy_node(this->node, lambda);
-			this->count = 0;
-			return *this;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		this->node = destroy_node(this->node, lambda);
+		this->count = 0;
+		return *this;
 	}
 #pragma endregion
 }

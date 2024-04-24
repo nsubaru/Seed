@@ -12,32 +12,32 @@ namespace Seed::Core
         if constexpr (Concepts::IsAsyncInvocable<Lambda, T&> ||
                 Concepts::IsAsyncInvocable<Lambda, const T&>)
         {
-            return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-                if (this->count == 0)
-                    co_return;
+            auto _ = Threading::SharedScoppedLock(lock);
 
-                for (SizeT i = this->count; i-- > 0;)
-                {
-                    co_await lambda(this->stack[i]);
-                }
-
+            if (this->count == 0)
                 co_return;
-            });
+
+            for (SizeT i = this->count; i-- > 0;)
+            {
+                co_await lambda(this->stack[i]);
+            }
+
+            co_return;
         }
         else if constexpr (Concepts::IsAsyncInvocable<Lambda, T&, SizeT> ||
             Concepts::IsAsyncInvocable<Lambda, const T&, SizeT>)
         {
-            return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-                if (this->count == 0)
-                    co_return;
+            auto _ = Threading::SharedScoppedLock(lock);
 
-                for (SizeT i = 0; i < count; i++)
-                {
-                    co_await lambda(this->stack[i], i);
-                }
-
+            if (this->count == 0)
                 co_return;
-            });
+
+            for (SizeT i = 0; i < count; i++)
+            {
+                co_await lambda(this->stack[i], i);
+            }
+
+            co_return;
         }
         else
         {
@@ -56,31 +56,31 @@ namespace Seed::Core
     {
         if constexpr (Concepts::IsAsyncInvocable<Lambda, const T&>)
         {
-            return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-                if (this->count == 0)
-                    co_return;
+            auto _ = Threading::SharedScoppedLock(lock);
 
-                for (SizeT i = 0; i < count; i++)
-                {
-                    co_await lambda(this->stack[i]);
-                }
-
+            if (this->count == 0)
                 co_return;
-            });
+
+            for (SizeT i = 0; i < count; i++)
+            {
+                co_await lambda(this->stack[i]);
+            }
+
+            co_return;
         }
         else if constexpr (Concepts::IsAsyncInvocable<Lambda, const T&, SizeT>)
         {
-            return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-                if (this->count == 0)
-                    co_return;
+            auto _ = Threading::SharedScoppedLock(lock);
 
-                for (SizeT i = 0; i < count; i++)
-                {
-                    co_await lambda(this->stack[i], i);
-                }
-
+            if (this->count == 0)
                 co_return;
-            });
+
+            for (SizeT i = 0; i < count; i++)
+            {
+                co_await lambda(this->stack[i], i);
+            }
+
+            co_return;
         }
         else
         {
@@ -97,16 +97,16 @@ namespace Seed::Core
     template<typename Lambda>
     inline Threading::BaseTask<void, void> Containers::BaseConcurencyFixedStack<THeap, TSize, T>::RemoveAllAsyncImpl(Lambda&& lambda)
     {
-        return this->lock.ExclusiveLock([&]()->Threading::BaseTask<void, void> InlineLambda {
-            for (SizeT i = 0; i < this->count; i++) 
-            {
-                co_await lambda(MoveRValue(this->stack[i])); 
-                this->stack[i].~T();
-            }
+        auto _ = Threading::ExclusiveScoppedLock(lock);
 
-            this->count = 0;
-            co_return;
-        });
+        for (SizeT i = 0; i < this->count; i++)
+        {
+            co_await lambda(MoveRValue(this->stack[i]));
+            this->stack[i].~T();
+        }
+
+        this->count = 0;
+        co_return;
     }
 #pragma endregion
 }

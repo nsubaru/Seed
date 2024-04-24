@@ -69,23 +69,25 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, T&> || TypeTraits::IsInvocable<TLambda, const T&>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyFixedArray & InlineLambda{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					lambda(this->array[i]);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+			
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				lambda(this->array[i]);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, T&, SizeT> || TypeTraits::IsInvocable<TLambda, const T&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->BaseConcurencyFixedArray & InlineLambda{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					lambda(this->array[i], i);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				lambda(this->array[i], i);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -102,23 +104,25 @@ namespace Seed::Core::Containers
 	{
 		if constexpr (TypeTraits::IsInvocable<TLambda, const T&>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyFixedArray & InlineLambda{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					lambda(this->array[i]);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				lambda(this->array[i]);
+			}
+
+			return *this;
 		}
 		else if constexpr (TypeTraits::IsInvocable<TLambda, const T&, SizeT>)
 		{
-			return this->lock.SharedLock([&]() -> const BaseConcurencyFixedArray & InlineLambda{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					lambda(this->array[i], i);
-				}
-				return *this;
-			});
+			auto _ = Threading::SharedScoppedLock(this->lock);
+
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				lambda(this->array[i], i);
+			}
+
+			return *this;
 		}
 		else
 		{
@@ -133,24 +137,26 @@ namespace Seed::Core::Containers
 	template<typename U, typename TLambda>
 	U BaseConcurencyFixedArray<THeap, TSize, T>::AggregateImpl(TLambda&& lambda, const U& value) const
 	{
-		return MoveRValue(this->lock.SharedLock([&]() mutable InlineLambda{
-			U result = value;
-			U & data = result;
-			for (SizeT i = 0; i < TSize; i++)
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		U result = value;
+		U& data = result;
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if constexpr (
+				Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
+				Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
 			{
-				if constexpr (
-					Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
-					Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
-				{
-					data = lambda(data, this->array[i]);
-				}
-				else
-				{
-					lambda(data, this->array[i]);
-				}
+				data = lambda(data, this->array[i]);
 			}
-			return MoveRValue(result);
-		}));
+			else
+			{
+				lambda(data, this->array[i]);
+			}
+		}
+
+		return MoveRValue(result);
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -158,22 +164,23 @@ namespace Seed::Core::Containers
 	template<typename U, typename TLambda>
 	U BaseConcurencyFixedArray<THeap, TSize, T>::AggregateImpl(TLambda&& lambda, U&& value) const
 	{
-		return MoveRValue(this->lock.SharedLock([&, value = MoveRValue(value)]() mutable InlineLambda{
-			for (SizeT i = 0; i < TSize; i++)
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if constexpr (
+				Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
+				Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
 			{
-				if constexpr (
-					Concepts::IsInvocableWithResult<TLambda, U&, U&, const T&> ||
-					Concepts::IsInvocableWithResult<TLambda, U, U&, const T&>)
-				{
-					value = lambda(value, this->array[i]);
-				}
-				else
-				{
-					lambda(value, this->array[i]);
-				}
+				value = lambda(value, this->array[i]);
 			}
-			return MoveRValue(value);
-		}));
+			else
+			{
+				lambda(value, this->array[i]);
+			}
+		}
+
+		return MoveRValue(value);
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -187,46 +194,49 @@ namespace Seed::Core::Containers
 	requires (TSize > 0)
 	template<typename TLambda>
 	bool BaseConcurencyFixedArray<THeap, TSize, T>::AnyImpl(TLambda&& lambda) const {
-		return MoveRValue(this->lock.SharedLock([&]() InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (lambda(this->array[i]))
-					return true;
-			}
-			return false;
-		}));
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (lambda(this->array[i]))
+				return true;
+		}
+
+		return false;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	bool BaseConcurencyFixedArray<THeap, TSize, T>::AllImpl(TLambda&& lambda) const {
-		return MoveRValue(this->lock.SharedLock([&]() InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (!lambda(this->array[i]))
-					return false;
-			}
-			return true;
-		}));
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (!lambda(this->array[i]))
+				return false;
+		}
+
+		return true;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	BaseConcurencyFixedArray<THeap, TSize, T>& BaseConcurencyFixedArray<THeap, TSize, T>::SortByImpl(bool IsDescending) {
-		return this->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
-			if (!IsDescending) {
-				auto lambda = [] (const T& v1, const T& v2) { return v1 < v2; };
-				QuickSort(this->array, 0, TSize - 1, lambda);
-			}
-			else 
-			{
-				auto lambda = [] (const T& v1, const T& v2) { return v1 > v2; };
-				QuickSort(this->array, 0, TSize - 1, lambda);
-			}
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			return *this;
-		});
+		if (!IsDescending)
+		{
+			auto lambda = [] (const T& v1, const T& v2) { return v1 < v2; };
+			QuickSort(this->array, 0, TSize - 1, lambda);
+		}
+		else
+		{
+			auto lambda = [] (const T& v1, const T& v2) { return v1 > v2; };
+			QuickSort(this->array, 0, TSize - 1, lambda);
+		}
+
+		return *this;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -239,13 +249,12 @@ namespace Seed::Core::Containers
 		}
 		else
 		{
-			return this->lock.ExclusiveLock([&]()->BaseConcurencyFixedArray & InlineLambda
-			{
-				auto l = [lambda = MoveRValue(lambda)] (const T& v1, const T& v2) { return !lambda(v1, v2); };
-				QuickSort(this->array, 0, TSize - 1, l);
+			auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-				return *this;
-			});
+			auto l = [lambda = MoveRValue(lambda)] (const T& v1, const T& v2) { return !lambda(v1, v2); };
+			QuickSort(this->array, 0, TSize - 1, l);
+
+			return *this;
 		}
 	}
 	
@@ -253,121 +262,123 @@ namespace Seed::Core::Containers
 	requires (TSize > 0)
 	template<typename TLambda>
 	T& BaseConcurencyFixedArray<THeap, TSize, T>::FirstImpl(TLambda&& lambda) {
-		return this->lock.SharedLock([&]() -> T& InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-				if (lambda(this->array[i]))
-					return static_cast<T&>(this->array[i]);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+		for (SizeT i = 0; i < TSize; i++)
+			if (lambda(this->array[i]))
+				return static_cast<T&>(this->array[i]);
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	T& BaseConcurencyFixedArray<THeap, TSize, T>::LastImpl(TLambda&& lambda) {
-		return this->lock.SharedLock([&]() -> T& InlineLambda {
-			SizeT Index = -1;
-			for (SizeT i = 0; i < TSize; i++)
-				if (lambda(this->array[i]))
-					Index = i;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if (Index != -1)
-				return static_cast<T&>(this->array[Index]);
+		SizeT Index = Math::Max<SizeT>();
 
-			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+		for (SizeT i = 0; i < TSize; i++)
+			if (lambda(this->array[i]))
+				Index = i;
+
+		if (Index != -1)
+			return static_cast<T&>(this->array[Index]);
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	const T& BaseConcurencyFixedArray<THeap, TSize, T>::FirstImpl(TLambda&& lambda) const {
-		return this->lock.SharedLock([&]() -> const T& InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-				if (lambda(this->array[i]))
-					return static_cast<const T&>(this->array[i]);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+		for (SizeT i = 0; i < TSize; i++)
+			if (lambda(this->array[i]))
+				return static_cast<const T&>(this->array[i]);
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	const T& BaseConcurencyFixedArray<THeap, TSize, T>::LastImpl(TLambda&& lambda) const {
-		return this->lock.SharedLock([&]() -> const T& InlineLambda {
-			SizeT Index = -1;
-			for (SizeT i = 0; i < TSize; i++)
-				if (lambda(this->array[i]))
-					Index = i;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			if (Index != -1)
-				return static_cast<const T&>(this->array[Index]);
+		SizeT Index = -1;
+		for (SizeT i = 0; i < TSize; i++)
+			if (lambda(this->array[i]))
+				Index = i;
 
-			Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
-		});
+		if (Index != -1)
+			return static_cast<const T&>(this->array[Index]);
+
+		Internals::Exceptions::ThrowNullPointException(SourcePosition, 0, 0);
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	T BaseConcurencyFixedArray<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, T&& item) const {
-		return this->lock.SharedLock([&, item = MoveRValue(item)]() InlineLambda {
-			if (TSize == 0)
-				return MoveRValue(item);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < TSize; i++)
-				if (lambda(this->array[i]))
-					return this->array[i];
-
+		if (TSize == 0)
 			return MoveRValue(item);
-		});
+
+		for (SizeT i = 0; i < TSize; i++)
+			if (lambda(this->array[i]))
+				return this->array[i];
+
+		return MoveRValue(item);
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	T BaseConcurencyFixedArray<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, T&& item) const {
-		return this->lock.SharedLock([&, item = MoveRValue(item)]() InlineLambda {
-			if (TSize == 0)
-				return MoveRValue(item);
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			SizeT Index = -1;
-			for (SizeT i = 0; i < TSize; i++)
-				if (lambda(this->array[i]))
-					Index = i;
+		if (TSize == 0)
+			return item;
 
-			if (Index != -1)
-				return this->array[Index];
+		SizeT Index = -1;
+		for (SizeT i = 0; i < TSize; i++)
+			if (lambda(this->array[i]))
+				Index = i;
 
-			return MoveRValue(item);
-		});
+		if (Index != -1)
+			return this->array[Index];
+
+		return item;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	T BaseConcurencyFixedArray<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, const T& item) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (TSize == 0)
-				return item;
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		if (TSize == 0)
+			return item;
 
 		for (SizeT i = 0; i < TSize; i++)
 			if (lambda(this->array[i]))
 				return this->array[i];
 
-			return item;
-		});
+		return item;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	T BaseConcurencyFixedArray<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, const T& item) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (TSize == 0)
-				return item;
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		if (TSize == 0)
+			return item;
 
 		SizeT Index = -1;
 		for (SizeT i = 0; i < TSize; i++)
@@ -377,33 +388,33 @@ namespace Seed::Core::Containers
 		if (Index != -1)
 			return this->array[Index];
 
-			return item;
-		});
+		return item;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda, typename TGetterLambda>
 	T BaseConcurencyFixedArray<THeap, TSize, T>::FirstOrImpl(TLambda&& lambda, TGetterLambda&& otherLambda) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (TSize == 0)
-				return otherLambda();
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < TSize; i++)
-				if (lambda(this->array[i]))
-					return this->array[i];
-
+		if (TSize == 0)
 			return otherLambda();
-		});
+
+		for (SizeT i = 0; i < TSize; i++)
+			if (lambda(this->array[i]))
+				return this->array[i];
+
+		return otherLambda();
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda, typename TGetterLambda>
 	T BaseConcurencyFixedArray<THeap, TSize, T>::LastOrImpl(TLambda&& lambda, TLambda&& otherLambda) const {
-		return this->lock.SharedLock([&]() InlineLambda {
-			if (TSize == 0)
-				return otherLambda();
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		if (TSize == 0)
+			return otherLambda();
 
 		SizeT Index = -1;
 		for (SizeT i = 0; i < TSize; i++)
@@ -413,19 +424,20 @@ namespace Seed::Core::Containers
 		if (Index != -1)
 			return this->array[Index];
 
-			return otherLambda();
-		});
+		return otherLambda();
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	BaseConcurencyFixedArray<THeap, TSize, T>& BaseConcurencyFixedArray<THeap, TSize, T>::ReverseImpl() {
-		return this->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
-			for (SizeT i = 0; i < TSize / 2; i++) {
-				Seed::Core::Swap(static_cast<T&>(this->array[i]), static_cast<T&>(this->array[(TSize - 1) - i]));
-			}
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize / 2; i++)
+		{
+			Seed::Core::Swap(static_cast<T&>(this->array[i]), static_cast<T&>(this->array[(TSize - 1) - i]));
+		}
+
+		return *this;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -445,41 +457,44 @@ namespace Seed::Core::Containers
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	BaseConcurencyFixedArray<THeap, TSize, T>& BaseConcurencyFixedArray<THeap, TSize, T>::RemoveAllImpl() {
-		return this->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
-			for (SizeT i = 0; i < TSize; i++) {
-				this->array[i].~T();
-			}
-			this->count = 0;
-			return *this;
-		});
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			this->array[i].~T();
+		}
+		this->count = 0;
+
+		return *this;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda>
 	BaseConcurencyFixedArray<THeap, TSize, T>& BaseConcurencyFixedArray<THeap, TSize, T>::RemoveAllImpl(TLambda&& lambda) {
-		return this->lock.ExclusiveLock([&]() -> BaseConcurencyFixedArray& InlineLambda {
-			for (SizeT i = 0; i < TSize; i++) {
-				lambda(MoveRValue(this->array[i]));
-			}
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
 
-			return *this;
-		});
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			lambda(MoveRValue(this->array[i]));
+		}
+
+		return *this;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	template<typename TLambda> requires (Concepts::IsInvocable<TLambda, const T&>)
 	SizeT BaseConcurencyFixedArray<THeap, TSize, T>::IndexOfImpl(TLambda&& lambda) const {
-		return lock.SharedLock([&]() InlineLambda{
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (lambda(this->array[i]))
-					return i;
-			}
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			return Math::Max<SizeT>();
-		});
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (lambda(this->array[i]))
+				return i;
+		}
+
+		return Math::Max<SizeT>();
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -536,52 +551,52 @@ namespace Seed::Core::Containers
 	requires (TSize > 0)
 	constexpr BaseConcurencyFixedArray<THeap, TSize, T>::BaseConcurencyFixedArray(const BaseConcurencyFixedArray& original): lock()
 	{
-		original.lock.SharedLock([&] () {
-			if (TypeTraits::IsCompileTimeEvaluating())
+		auto _ = Threading::SharedScoppedLock(original.lock);
+
+		if (TypeTraits::IsCompileTimeEvaluating())
+		{
+			for (SizeT i = 0; i < TSize; i++)
 			{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					array[i] = original.array[i];
-				}
+				array[i] = original.array[i];
 			}
-			else if constexpr (!TypeTraits::IsStandardLayout<T>)
+		}
+		else if constexpr (!TypeTraits::IsStandardLayout<T>)
+		{
+			for (SizeT i = 0; i < TSize; i++)
 			{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					array[i] = original.array[i];
-				}
+				array[i] = original.array[i];
 			}
-			else
-			{
-				Memory::Copy(original.array, this->array);
-			}
-		});
+		}
+		else
+		{
+			Memory::Copy(original.array, this->array);
+		}
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	constexpr BaseConcurencyFixedArray<THeap, TSize, T>::BaseConcurencyFixedArray(BaseConcurencyFixedArray&& original): lock()
 	{
-		original.lock.ExclusiveLock([&] () {
-			if (TypeTraits::IsCompileTimeEvaluating())
+		auto _ = Threading::ExclusiveScoppedLock(original.lock);
+
+		if (TypeTraits::IsCompileTimeEvaluating())
+		{
+			for (SizeT i = 0; i < TSize; i++)
 			{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					array[i] = MoveRValue(original.array[i]);
-				}
+				array[i] = MoveRValue(original.array[i]);
 			}
-			else if constexpr (!TypeTraits::IsStandardLayout<T>)
+		}
+		else if constexpr (!TypeTraits::IsStandardLayout<T>)
+		{
+			for (SizeT i = 0; i < TSize; i++)
 			{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					array[i] = MoveRValue(original.array[i]);
-				}
+				array[i] = MoveRValue(original.array[i]);
 			}
-			else
-			{
-				Memory::Copy(original.array, this->array);
-			}
-		});
+		}
+		else
+		{
+			Memory::Copy(original.array, this->array);
+		}
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -606,110 +621,116 @@ namespace Seed::Core::Containers
 	requires (TSize > 0)
 	ForceInline constexpr T& BaseConcurencyFixedArray<THeap, TSize, T>::operator[](SizeT Index)
 	{
-		return this->lock.SharedLock([&]()->T & InlineLambda{
-			if (Index < TSize)
-			{
-				return this->array[Index];
-			}
-			else
-			{
-				Internals::Exceptions::ThrowIndexOutOfRange(SourcePosition, Index, TSize);
-			}
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		if (Index < TSize)
+		{
+			return this->array[Index];
+		}
+		else
+		{
+			Internals::Exceptions::ThrowIndexOutOfRange(SourcePosition, Index, TSize);
+		}
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	ForceInline constexpr const T& BaseConcurencyFixedArray<THeap, TSize, T>::operator[](SizeT Index) const
 	{
-		return this->lock.SharedLock([&]() -> const T & InlineLambda{
-			if (Index < TSize)
-			{
-				return this->array[Index];
-			}
-			else
-			{
-				Internals::Exceptions::ThrowIndexOutOfRange(SourcePosition, Index, TSize);
-			}
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		if (Index < TSize)
+		{
+			return this->array[Index];
+		}
+		else
+		{
+			Internals::Exceptions::ThrowIndexOutOfRange(SourcePosition, Index, TSize);
+		}
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	constexpr bool BaseConcurencyFixedArray<THeap, TSize, T>::operator==(const BaseConcurencyFixedArray& other) const {
-		return this->lock.SharedLock([&]() -> const T & InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (other.array[i] != this->array[i])
-					return false;
-			}
-			return true;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (other.array[i] != this->array[i])
+				return false;
+		}
+
+		return true;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	constexpr bool BaseConcurencyFixedArray<THeap, TSize, T>::operator!=(const BaseConcurencyFixedArray& other) const {
-		return this->lock.SharedLock([&]() -> const T & InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (other.array[i] != this->array[i])
-					return true;
-			}
-			return false;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (other.array[i] != this->array[i])
+				return true;
+		}
+
+		return false;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	constexpr bool BaseConcurencyFixedArray<THeap, TSize, T>::operator==(const RawArray& other) const {
-		return this->lock.SharedLock([&]() -> const T & InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (other[i] != this->array[i])
-					return false;
-			}
-			return true;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (other[i] != this->array[i])
+				return false;
+		}
+
+		return true;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	constexpr bool operator==(const typename BaseConcurencyFixedArray<THeap, TSize, T>::RawArray& left, const BaseConcurencyFixedArray<THeap, TSize, T>& right) {
-		return this->lock.SharedLock([&]() -> const T & InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (left[i] != right.array[i])
-					return false;
-			}
-			return true;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (left[i] != right.array[i])
+				return false;
+		}
+
+		return true;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	constexpr bool BaseConcurencyFixedArray<THeap, TSize, T>::operator!=(const RawArray& other) const {
-		return this->lock.SharedLock([&]() -> const T & InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (other[i] != this->array[i])
-					return true;
-			}
-			return false;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (other[i] != this->array[i])
+				return true;
+		}
+
+		return false;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
 	constexpr bool operator!=(const typename BaseConcurencyFixedArray<THeap, TSize, T>::RawArray& left, const BaseConcurencyFixedArray<THeap, TSize, T>& right) {
-		return this->lock.SharedLock([&]() -> const T & InlineLambda {
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				if (left[i] != right.array[i])
-					return true;
-			}
-			return false;
-		});
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			if (left[i] != right.array[i])
+				return true;
+		}
+
+		return false;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -717,27 +738,30 @@ namespace Seed::Core::Containers
 	template<typename> requires (Concepts::IsClonable<T>)
 	constexpr BaseConcurencyFixedArray<THeap, TSize, T> BaseConcurencyFixedArray<THeap, TSize, T>::Clone() const
 	{
-		return this->lock.SharedLock([&]() InlineLambda {
-			BaseConcurencyFixedArray result;
-						
-			if (TypeTraits::IsCompileTimeEvaluating())
+		auto _ = Threading::SharedScoppedLock(this->lock);
+
+		BaseConcurencyFixedArray result;
+
+		if (TypeTraits::IsCompileTimeEvaluating())
+		{
+			for (SizeT i = 0; i < TSize; i++)
 			{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					result.array[i] = this->array[i];
-				}
+				result.array[i] = this->array[i];
 			}
-			else if constexpr (TypeTraits::IsStandardLayout<T>) {
-				Memory::Copy(this->array, result.array);
+		}
+		else if constexpr (TypeTraits::IsStandardLayout<T>)
+		{
+			Memory::Copy(this->array, result.array);
+		}
+		else
+		{
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				result.array[i] = Core::Clone(this->array[i]);
 			}
-			else {
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					result.array[i] = Core::Clone(this->array[i]);
-				}
-			}
-			return result;
-		});
+		}
+
+		return result;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>
@@ -745,16 +769,16 @@ namespace Seed::Core::Containers
 	template<typename TLambda> requires (Concepts::IsInvocableWithResult<TLambda, T, const T&>)
 	constexpr BaseConcurencyFixedArray<THeap, TSize, T> BaseConcurencyFixedArray<THeap, TSize, T>::Clone(TLambda&& lambda) const
 	{
-		return this->lock.SharedLock([&]() InlineLambda {
-			BaseConcurencyFixedArray result;
+		auto _ = Threading::SharedScoppedLock(this->lock);
 
-			for (SizeT i = 0; i < TSize; i++)
-			{
-				result.array[i] = lambda(this->array[i]);
-			}
-						
-			return result;
-		});
+		BaseConcurencyFixedArray result;
+
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			result.array[i] = lambda(this->array[i]);
+		}
+
+		return result;
 	}
 	
 	template<typename THeap, SizeT TSize, typename T>

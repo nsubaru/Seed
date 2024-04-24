@@ -288,15 +288,15 @@ namespace Seed::Core::IO::FS::Writers
 		template<Concepts::IsInvocableReturnSameAs<String> TLambda>
 		Threading::Task<String> AsyncWriteToFile(TLambda&& dataGen)
 		{
-			return BaseThis->lock.ExclusiveLockAsync([&] () -> Threading::Task<String> {
-				String data = dataGen();
-				auto dataLenght = data.Length * 2;
-				String result = co_await BaseThis->file.AsyncWrite(MoveRValue(data), BaseThis->position);
+			auto _ = Threading::ExclusiveScoppedLock(BaseThis->lock);
 
-				BaseThis->position += dataLenght;
+			String data = dataGen();
+			auto dataLenght = data.Length * 2;
+			String result = co_await BaseThis->file.AsyncWrite(MoveRValue(data), BaseThis->position);
 
-				co_return result;
-			});
+			BaseThis->position += dataLenght;
+
+			co_return result;
 		}
 
 	public:

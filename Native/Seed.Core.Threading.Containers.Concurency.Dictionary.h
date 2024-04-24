@@ -78,18 +78,18 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<LambdaT, const BasePair<THeap, TString, TData>&>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				co_await ForEachAsyncImplWithoutIndex(this, lambda);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			co_await ForEachAsyncImplWithoutIndex(this, lambda);
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<LambdaT, const BasePair<THeap, TString, TData>&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				SizeT index = 0;
-				co_await ForEachAsyncImplWithIndex(this, lambda, index);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			SizeT index = 0;
+			co_await ForEachAsyncImplWithIndex(this, lambda, index);
+			co_return;
 		}
 		else
 		{
@@ -107,19 +107,19 @@ namespace Seed::Core
 		if constexpr (Concepts::IsAsyncInvocable<LambdaT, BasePair<THeap, TString, TData>&> ||
 			Concepts::IsAsyncInvocable<LambdaT, const BasePair<THeap, TString, TData>&>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				co_await ForEachAsyncImplWithoutIndex(this, lambda);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			co_await ForEachAsyncImplWithoutIndex(this, lambda);
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<LambdaT, BasePair<THeap, TString, TData>&, SizeT> ||
 			Concepts::IsAsyncInvocable<LambdaT, const BasePair<THeap, TString, TData>&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				SizeT index = 0;
-				co_await ForEachAsyncImplWithIndex(this, lambda, index);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			SizeT index = 0;
+			co_await ForEachAsyncImplWithIndex(this, lambda, index);
+			co_return;
 		}
 		else
 		{
@@ -207,18 +207,18 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<LambdaT, const TString&>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				co_await ForEachAsyncKeyImplWithoutIndex(this, lambda);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			co_await ForEachAsyncKeyImplWithoutIndex(this, lambda);
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<LambdaT, const TString&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				SizeT index = 0;
-				co_await ForEachAsyncKeyImplWithIndex(this, lambda, index);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			SizeT index = 0;
+			co_await ForEachAsyncKeyImplWithIndex(this, lambda, index);
+			co_return;
 		}
 		else
 		{
@@ -235,18 +235,18 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<LambdaT, const TString&>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				co_await ForEachAsyncKeyImplWithoutIndex(this, lambda);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			co_await ForEachAsyncKeyImplWithoutIndex(this, lambda);
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<LambdaT, const TString&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				SizeT index = 0;
-				co_await ForEachAsyncKeyImplWithIndex(this, lambda, index);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			SizeT index = 0;
+			co_await ForEachAsyncKeyImplWithIndex(this, lambda, index);
+			co_return;
 		}
 		else
 		{
@@ -332,18 +332,18 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<LambdaT, const TData&>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				co_await ForEachAsyncValueImplWithoutIndex(this, lambda);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			co_await ForEachAsyncValueImplWithoutIndex(this, lambda);
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<LambdaT, const TData&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				SizeT index = 0;
-				co_await ForEachAsyncValueImplWithIndex(this, lambda, index);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			SizeT index = 0;
+			co_await ForEachAsyncValueImplWithIndex(this, lambda, index);
+			co_return;
 		}
 		else
 		{
@@ -361,19 +361,19 @@ namespace Seed::Core
 		if constexpr (Concepts::IsAsyncInvocable<LambdaT, TData&> ||
 			Concepts::IsAsyncInvocable<LambdaT, const TData&>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				co_await ForEachAsyncValueImplWithoutIndex(this, lambda);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			co_await ForEachAsyncValueImplWithoutIndex(this, lambda);
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<LambdaT, TData&, SizeT> ||
 			Concepts::IsAsyncInvocable<LambdaT, const TData&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				SizeT index = 0;
-				co_await ForEachAsyncValueImplWithIndex(this, lambda, index);
-				co_return;
-			});
+			auto _ = Threading::SharedScoppedLock(This->lock);
+
+			SizeT index = 0;
+			co_await ForEachAsyncValueImplWithIndex(this, lambda, index);
+			co_return;
 		}
 		else
 		{
@@ -443,12 +443,12 @@ namespace Seed::Core
 	template<typename TLambda>
 	inline Threading::BaseTask<void, void> Containers::BaseConcurencyDictionary<THeap, TString, TData, CharacterComparator>::RemoveAllWithImpl(TLambda&& lambda)
 	{
-		return this->lock.SharedLock([&]()->BaseConcurencyDictionary & InlineLambda{
-			this->node = co_await destroy_nodeAsync(this->node, lambda);
-			this->count = 0;
-			
-			co_return
-		});
+		auto _ = Threading::SharedScoppedLock(This->lock);
+
+		this->node = co_await destroy_nodeAsync(this->node, lambda);
+		this->count = 0;
+
+		co_return;
 	}
 #pragma endregion
 }

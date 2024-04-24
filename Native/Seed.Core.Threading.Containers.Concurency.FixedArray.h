@@ -11,25 +11,25 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, T&> || Concepts::IsAsyncInvocable<TLambda, const T&>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					co_await lambda(this->array[i]);
-				}
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				co_return;
-			});
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				co_await lambda(this->array[i]);
+			}
+
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, T&, SizeT> || Concepts::IsAsyncInvocable<TLambda, const T&, SizeT>)
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda{
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					co_await lambda(this->array[i], i);
-				}
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				co_return;
-			});
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				co_await lambda(this->array[i], i);
+			}
+
+			co_return;
 		}
 		else
 		{
@@ -46,25 +46,25 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&>) 
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda {
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					co_await lambda(this->array[i]);
-				}
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				co_return;
-			});
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				co_await lambda(this->array[i]);
+			}
+
+			co_return;
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const T&, SizeT>) 
 		{
-			return this->lock.SharedLock([&]()->Threading::BaseTask<void, void> InlineLambda {
-				for (SizeT i = 0; i < TSize; i++)
-				{
-					co_await lambda(this->array[i], i);
-				}
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				co_return;
-			});
+			for (SizeT i = 0; i < TSize; i++)
+			{
+				co_await lambda(this->array[i], i);
+			}
+
+			co_return;
 		}
 		else 
 		{
@@ -81,13 +81,14 @@ namespace Seed::Core
 	template<typename TLambda>
 	inline Threading::BaseTask<void, void> Containers::BaseConcurencyFixedArray<THeap, TSize, T>::RemoveAllAsyncImpl(TLambda&& lambda)
 	{
-		return this->lock.ExclusiveLock([&]()->Threading::BaseTask<void, void> InlineLambda {
-			for (SizeT i = 0; i < TSize; i++) {
-				co_await lambda(MoveRValue(this->array[i]));
-			}
+		auto _ = Threading::ExclusiveScoppedLock(lock);
 
-			co_return;
-		});
+		for (SizeT i = 0; i < TSize; i++)
+		{
+			co_await lambda(MoveRValue(this->array[i]));
+		}
+
+		co_return;
 	}
 #pragma endregion
 }

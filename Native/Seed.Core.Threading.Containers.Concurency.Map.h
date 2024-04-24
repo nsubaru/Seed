@@ -36,26 +36,26 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const BasePair<THeap, TKey, TValue>&>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::Task<void> InlineLambda {
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					co_await ForEachAsyncImplWithoutIndex(node, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				co_await ForEachAsyncImplWithoutIndex(node, lambda);
+			}
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::Task<void> InlineLambda {
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					co_await ForEachAsyncImplWithIndex(node, index, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				co_await ForEachAsyncImplWithIndex(node, index, lambda);
+			}
 		}
 		else
 		{
@@ -70,26 +70,26 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, BasePair<THeap, TKey, TValue>&> ||
 			Concepts::IsAsyncInvocable<TLambda, const BasePair<THeap, TKey, TValue>&>)
-		{ 
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::Task<void> InlineLambda {
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					co_await ForEachAsyncImplWithoutIndex(node, lambda);
-				}
-			});
+		{
+			auto _ = Threading::SharedScoppedLock(lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				co_await ForEachAsyncImplWithoutIndex(node, lambda);
+			}
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, BasePair<THeap, TKey, TValue>&, SizeT> ||
 			Concepts::IsAsyncInvocable<TLambda, const BasePair<THeap, TKey, TValue>&, SizeT>)
-		{ 
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::Task<void> InlineLambda {
-				auto node = this->root;
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					co_await ForEachAsyncImplWithIndex(node, index, lambda);
-				}
-			});
+		{
+			auto _ = Threading::SharedScoppedLock(lock);
+
+			auto node = this->root;
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				co_await ForEachAsyncImplWithIndex(node, index, lambda);
+			}
 		}
 		else 
 		{
@@ -134,26 +134,26 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const TKey&>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					co_await ForEachKeyAsyncImplWithoutIndex(node, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				co_await ForEachKeyAsyncImplWithoutIndex(node, lambda);
+			}
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const TKey&, SizeT>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					co_await ForEachKeyAsyncImplWithIndex(node, index, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				co_await ForEachKeyAsyncImplWithIndex(node, index, lambda);
+			}
 		}
 		else
 		{
@@ -168,26 +168,26 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const TKey&>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					co_await ForEachKeyAsyncImplWithoutIndex(node, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				co_await ForEachKeyAsyncImplWithoutIndex(node, lambda);
+			}
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const TKey&, SizeT>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					co_await ForEachKeyAsyncImplWithoutIndex(node, index, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				co_await ForEachKeyAsyncImplWithoutIndex(node, index, lambda);
+			}
 		}
 		else
 		{
@@ -230,26 +230,26 @@ namespace Seed::Core
 	{
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, const TValue&>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					co_await ForEachValueAsyncImplWithoutIndex(node, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				co_await ForEachValueAsyncImplWithoutIndex(node, lambda);
+			}
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, const TValue&, SizeT>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					co_await ForEachValueAsyncImplWithIndex(node, index, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				co_await ForEachValueAsyncImplWithIndex(node, index, lambda);
+			}
 		}
 		else
 		{
@@ -265,27 +265,27 @@ namespace Seed::Core
 		if constexpr (Concepts::IsAsyncInvocable<TLambda, TValue&> ||
 					Concepts::IsAsyncInvocable<TLambda, const TValue&>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					co_await ForEachValueAsyncImplWithoutIndex(node, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				co_await ForEachValueAsyncImplWithoutIndex(node, lambda);
+			}
 		}
 		else if constexpr (Concepts::IsAsyncInvocable<TLambda, TValue&, SizeT> ||
 			Concepts::IsAsyncInvocable<TLambda, const TValue&, SizeT>)
 		{
-			return this->lock.SharedLockAsync([&]() -> Seed::Core::Threading::BaseTask<void, void> InlineLambda{
-				auto node = this->root;
+			auto _ = Threading::SharedScoppedLock(lock);
 
-				if (node != nullptr)
-				{
-					SizeT index = 0;
-					co_await ForEachValueAsyncImplWithIndex(node, index, lambda);
-				}
-			});
+			auto node = this->root;
+
+			if (node != nullptr)
+			{
+				SizeT index = 0;
+				co_await ForEachValueAsyncImplWithIndex(node, index, lambda);
+			}
 		}
 		else
 		{
