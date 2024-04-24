@@ -39,7 +39,7 @@ namespace Seed::Core::Functionality
 
 	template<typename T> requires (!Concepts::IsSame<T, ExceptionHolderType>)
 	template<typename TLambda>
-	NoDiscard ForceInline Threading::Task<Result<typename Result<T>::AsyncRetType<TLambda>>> Result<T>::OnSuccess(TLambda&& lambda) && requires (Concepts::Void<T>&& Concepts::IsAsyncInvocable<TLambda>)
+	NoDiscard Threading::Task<Result<typename Result<T>::AsyncRetType<TLambda>>> Result<T>::OnSuccess(TLambda&& lambda) && requires (Concepts::Void<T>&& Concepts::IsAsyncInvocable<TLambda>)
 	{
 		using U = AsyncRetType<TLambda>;
 
@@ -76,7 +76,7 @@ namespace Seed::Core::Functionality
 		(Concepts::IsAsyncInvocable<TLambda, ExceptionHolderType> ||
 		Concepts::IsAsyncInvocable<TLambda, ExceptionHolderType&> ||
 		Concepts::IsAsyncInvocable<TLambda, const ExceptionHolderType&>)
-	NoDiscard ForceInline auto Result<T>::OnFail(TLambda&& lambda)&& -> Threading::Task<typename Result<T>::AsyncOnFailResult<TLambda>>
+	NoDiscard auto Result<T>::OnFail(TLambda&& lambda)&& -> Threading::Task<typename Result<T>::AsyncOnFailResult<TLambda>>
 	{
 		if constexpr (Concepts::IsSame<T, AsyncExceptionRetType<TLambda>>)
 		{
@@ -125,7 +125,7 @@ namespace Seed::Core::Functionality
 	template<typename T> requires (!Concepts::IsSame<T, ExceptionHolderType>)
 	template<typename TLambda>
 		requires Concepts::IsAsyncInvocable<TLambda>
-	NoDiscard ForceInline Threading::Task<Result<T>> Result<T>::OnFail(TLambda&& lambda)&&
+	NoDiscard Threading::Task<Result<T>> Result<T>::OnFail(TLambda&& lambda)&&
 	{
 		if (data.HoldedTypeNumber == 1)
 		{
