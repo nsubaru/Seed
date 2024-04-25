@@ -552,16 +552,19 @@ namespace Seed::Core
 
 			if (constMode.Read())
 			{
-				if (staticText.Length != TN - 1)
+				if (staticText.Length != TN)
 				{
 					return false;
 				}
 
-				for (SizeT i = 0; i < staticText.Length; i++)
+				if constexpr (TN != 0)
 				{
-					if (staticText[i] != second[i])
+					for (SizeT i = 0; i < staticText.Length; i++)
 					{
-						return false;
+						if (staticText[i] != second[i])
+						{
+							return false;
+						}
 					}
 				}
 
@@ -740,12 +743,15 @@ namespace Seed::Core
 			{
 				auto sz = Min(staticText.Length, TN + 1);
 
-				for (SizeT i = 0; i < sz; i++)
+				if constexpr (TN != 0)
 				{
-					auto r = staticText[i] <=> second[i];
-					if (r != 0)
+					for (SizeT i = 0; i < sz; i++)
 					{
-						return r;
+						auto r = staticText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
 					}
 				}
 
@@ -753,7 +759,21 @@ namespace Seed::Core
 			}
 			else
 			{
-				return dynamicText <=> second;
+				auto sz = Min(dynamicText.Length, TN + 1);
+
+				if constexpr (TN != 0)
+				{
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> dynamicText[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+				}
+
+				return dynamicText.Length <=> TN;
 			}
 		}
 

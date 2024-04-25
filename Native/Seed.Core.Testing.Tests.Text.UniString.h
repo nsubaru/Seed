@@ -27,5 +27,11 @@ namespace Seed::Core::Testing::Test::UniString::Comparing::Equality
 
 namespace Seed::Core::Testing::Test::UniString::Comparing::Spaceship
 {
-
+	SeedTestDef(UniStringConstSpaceship);
+	SeedTestDef(UniStringConstASpaceship);
+	SeedTestDef(UniStringStringSpaceship);
+	SeedTestDef(UniStringTextRefSpaceship);
+	SeedTestDef(UniStringTextARefSpaceship);
+	SeedTestDef(UniStringConstArrSpaceship);
+	SeedTestDef(UniStringConstArrACharSpaceship);
 }
