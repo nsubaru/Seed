@@ -23,6 +23,14 @@ namespace Seed::Core::Testing::Test::UniString::Comparing::Equality
 	SeedTestDef(UniStringTextARefEquality);
 	SeedTestDef(UniStringConstArrEquality);
 	SeedTestDef(UniStringConstArrACharEquality);
+
+	SeedTestDef(UniStringConstDifEquality);
+	SeedTestDef(UniStringConstADifEquality);
+	SeedTestDef(UniStringStringDifEquality);
+	SeedTestDef(UniStringTextRefDifEquality);
+	SeedTestDef(UniStringTextARefDifEquality);
+	SeedTestDef(UniStringConstArrDifEquality);
+	SeedTestDef(UniStringConstArrACharDifEquality);
 }
 
 namespace Seed::Core::Testing::Test::UniString::Comparing::Spaceship
@@ -34,4 +42,12 @@ namespace Seed::Core::Testing::Test::UniString::Comparing::Spaceship
 	SeedTestDef(UniStringTextARefSpaceship);
 	SeedTestDef(UniStringConstArrSpaceship);
 	SeedTestDef(UniStringConstArrACharSpaceship);
+
+	SeedTestDef(UniStringConstDifSpaceship);
+	SeedTestDef(UniStringConstADifSpaceship);
+	SeedTestDef(UniStringStringDifSpaceship);
+	SeedTestDef(UniStringTextRefDifSpaceship);
+	SeedTestDef(UniStringTextARefDifSpaceship);
+	SeedTestDef(UniStringConstArrDifSpaceship);
+	SeedTestDef(UniStringConstArrACharDifSpaceship);
 }

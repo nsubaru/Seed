@@ -741,10 +741,16 @@ namespace Seed::Core
 		{
 			if (constMode.Read())
 			{
-				auto sz = Min(staticText.Length, TN + 1);
-
-				if constexpr (TN != 0)
+				if constexpr (TN == 0)
 				{
+					return staticText.Length + 1 <=> TN;
+				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = staticText.Length + 1 <=> TN;
+
+					auto sz = Min(staticText.Length, TN - 1);
+
 					for (SizeT i = 0; i < sz; i++)
 					{
 						auto r = staticText[i] <=> second[i];
@@ -753,27 +759,67 @@ namespace Seed::Core
 							return r;
 						}
 					}
+
+					return szCmp;
 				}
-
-				return staticText.Length <=> TN;
-			}
-			else
-			{
-				auto sz = Min(dynamicText.Length, TN + 1);
-
-				if constexpr (TN != 0)
+				else
 				{
+					auto szCmp = staticText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(staticText.Length, TN);
+
 					for (SizeT i = 0; i < sz; i++)
 					{
-						auto r = dynamicText[i] <=> dynamicText[i];
+						auto r = staticText[i] <=> second[i];
 						if (r != 0)
 						{
 							return r;
 						}
 					}
-				}
 
-				return dynamicText.Length <=> TN;
+					return szCmp;
+				}
+			}
+			else
+			{
+				if constexpr (TN == 0)
+				{
+					return dynamicText.Length + 1 <=> TN;
+				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN;
+
+					auto sz = Min(dynamicText.Length, TN - 1);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
+				else
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(dynamicText.Length, TN);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
 			}
 		}
 
@@ -805,33 +851,85 @@ namespace Seed::Core
 		{
 			if (constMode.Read())
 			{
-				auto sz = Min(staticText.Length, TN + 1);
-
-				for (SizeT i = 0; i < sz; i++)
+				if constexpr (TN == 0)
 				{
-					auto r = staticText[i] <=> second[i];
-					if (r != 0)
-					{
-						return r;
-					}
+					return staticText.Length + 1 <=> TN;
 				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = staticText.Length + 1 <=> TN;
 
-				return staticText.Length <=> TN;
+					auto sz = Min(staticText.Length, TN - 1);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = staticText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
+				else
+				{
+					auto szCmp = staticText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(staticText.Length, TN);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = staticText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
 			}
 			else
 			{
-				auto sz = Min(dynamicText.Length, TN + 1);
-
-				for (SizeT i = 0; i < sz; i++)
+				if constexpr (TN == 0)
 				{
-					auto r = dynamicText[i] <=> second[i];
-					if (r != 0)
-					{
-						return r;
-					}
+					return dynamicText.Length + 1 <=> TN;
 				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN;
 
-				return dynamicText.Length <=> TN;
+					auto sz = Min(dynamicText.Length, TN - 1);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
+				else
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(dynamicText.Length, TN);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
 			}
 		};
 
