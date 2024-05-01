@@ -47,7 +47,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename T>
 	BaseConcurencyDynamicStack<THeap, T>::BaseConcurencyDynamicStack(InitilizerList<T>&& list): lock()
 	{
-		this->bufferSize = CurrentSettings().MemoryManager.StackReserveSize + list.size();
+		this->bufferSize = RuntimeConfigurations().MemoryManager.StackReserveSize + list.size();
 		this->stack = new T[this->bufferSize];
 
 		if (list.size() != 0)
@@ -82,7 +82,7 @@ namespace Seed::Core::Containers
 
 		if (this->count == this->bufferSize)
 		{
-			ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
+			ExtendBufferImpl(RuntimeConfigurations().MemoryManager.StackReserveSize);
 		}
 
 		this->stack[this->count] = item;
@@ -112,7 +112,7 @@ namespace Seed::Core::Containers
 
 		if (this->count == this->bufferSize)
 		{
-			ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
+			ExtendBufferImpl(RuntimeConfigurations().MemoryManager.StackReserveSize);
 		}
 
 		this->stack[this->count] = MoveRValue(item);

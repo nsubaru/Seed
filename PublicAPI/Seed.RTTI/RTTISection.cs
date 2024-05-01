@@ -1,4 +1,4 @@
-﻿using Seed.Core.Settings;
+﻿using Seed.Core.Configurations;
 using Seed.RTTI.Record;
 using System.Text;
 

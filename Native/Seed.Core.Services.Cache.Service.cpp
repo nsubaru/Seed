@@ -8,10 +8,13 @@ using namespace Seed::Core;
 using namespace Seed::Core::Services;
 using namespace Seed::Core::Services::Cache;
 
+template InMemoryCacheProviderService DI::DependencyInjection::Resolve<InMemoryCacheProviderService>();
+template RTTI::RttiTypeRecord TypeRecord<InMemoryCacheProviderService>();
+
 void InMemoryCacheProviderService::Dispose()
 {
 	This->eventService
-		.GetEventByName(CurrentSettings().StaticSettings.HostCommitLowEventName)
+		.GetEventByName(RuntimeConfigurations().StaticConfigurations.HostCommitLowEventName)
 		.UnRegisterCallback(This->lowMemoryCallbackId);
 
 	This->caches.CopyTo<Containers::Array>().RemoveAll([] (IMemoryCache* x) { ++x->GetRefCount(); delete x; });

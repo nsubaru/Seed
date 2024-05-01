@@ -42,7 +42,7 @@ namespace Seed::Core::Containers
 			return;
 
 		SizeT actuallyCopied = list.size();
-		bufferSize = list.size() > CurrentSettings().MemoryManager.QueueReserveSize ? list.size() : CurrentSettings().MemoryManager.QueueReserveSize;
+		bufferSize = list.size() > RuntimeConfigurations().MemoryManager.QueueReserveSize ? list.size() : RuntimeConfigurations().MemoryManager.QueueReserveSize;
 		queue = new T[bufferSize];
 		auto it = list.begin();
 
@@ -133,7 +133,7 @@ namespace Seed::Core::Containers
 				if (!isResizeIfFull)
 					this->flowController.WaitForConsumer();
 				else
-					ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
+					ExtendImpl(RuntimeConfigurations().MemoryManager.QueueReserveSize);
 			}
 
 			SizeT newRear = (this->rear + 1) % this->bufferSize;
@@ -150,7 +150,7 @@ namespace Seed::Core::Containers
 				if (!isResizeIfFull)
 					this->flowController.WaitForConsumer();
 				else
-					ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
+					ExtendImpl(RuntimeConfigurations().MemoryManager.QueueReserveSize);
 			}
 
 			SizeT newRear = (this->rear + 1) % this->bufferSize;

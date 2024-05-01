@@ -30,7 +30,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	ForceInline BaseDynamicQueue<THeap, T>::BaseDynamicQueue():
-		BaseDynamicQueue(CurrentSettings().MemoryManager.QueueReserveSize)
+		BaseDynamicQueue(RuntimeConfigurations().MemoryManager.QueueReserveSize)
 	{
 	}
 
@@ -122,7 +122,7 @@ namespace Seed::Core::Containers
 			return;
 
 		SizeT actuallyCopied = list.size();
-		bufferSize = list.size() > CurrentSettings().MemoryManager.QueueReserveSize ? list.size() : CurrentSettings().MemoryManager.QueueReserveSize;
+		bufferSize = list.size() > RuntimeConfigurations().MemoryManager.QueueReserveSize ? list.size() : RuntimeConfigurations().MemoryManager.QueueReserveSize;
 		queue = new T[bufferSize];
 		auto it = list.begin();
 		for (SizeT i = 0; i < actuallyCopied; i++)
@@ -139,7 +139,7 @@ namespace Seed::Core::Containers
 		if (count >= bufferSize)
 		{
 			if (isResizeIfFull)
-				this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
+				this->ExtendImpl(RuntimeConfigurations().MemoryManager.QueueReserveSize);
 			else
 				Throw(FullQueueException(SourcePosition, bufferSize));
 		}
@@ -156,7 +156,7 @@ namespace Seed::Core::Containers
 		if (count >= bufferSize)
 		{
 			if (isResizeIfFull)
-				this->ExtendImpl(CurrentSettings().MemoryManager.QueueReserveSize);
+				this->ExtendImpl(RuntimeConfigurations().MemoryManager.QueueReserveSize);
 			else
 				Throw(FullQueueException(SourcePosition, bufferSize));
 		}

@@ -59,7 +59,7 @@ namespace Seed::Core
     }
 
     template<typename T>
-    inline T Delegate::GetResult()
+    inline T Delegate::GetResult() const&
     {
         if (this->This == nullptr)
         {
@@ -80,7 +80,49 @@ namespace Seed::Core
     }
 
     template<typename T>
-    inline T Delegate::GetResult() volatile
+    inline T Delegate::GetResult() &&
+    {
+        if (this->This == nullptr)
+        {
+            Throw(NullPointException(SourcePosition, reinterpret_cast<SizeT>(this->This), NullPointException::Types::Read));
+        }
+
+        if (!this->This->function->IsStarted())
+        {
+            Throw(NullPointException(SourcePosition, reinterpret_cast<SizeT>(this->This->function), NullPointException::Types::Execute));
+        }
+
+        if (this->This->function->IsStarted() && !this->This->function->IsEnded())
+        {
+            Throw(AlredyExecute(SourcePosition));
+        }
+
+        return MoveRValue(*this->This->function).GetResult<T>();
+    }
+
+    template<typename T>
+    inline T Delegate::GetResult() volatile&&
+    {
+        if (this->This == nullptr)
+        {
+            Throw(NullPointException(SourcePosition, reinterpret_cast<SizeT>(this->This), NullPointException::Types::Read));
+        }
+
+        if (!this->This->function->IsStarted())
+        {
+            Throw(NullPointException(SourcePosition, reinterpret_cast<SizeT>(this->This->function), NullPointException::Types::Execute));
+        }
+
+        if (this->This->function->IsStarted() && !this->This->function->IsEnded())
+        {
+            Throw(AlredyExecute(SourcePosition));
+        }
+
+        return MoveRValue(*this->This->function).GetResult<T>();
+    }
+
+    template<typename T>
+    inline T Delegate::GetResult() const volatile&
     {
         if (this->This == nullptr)
         {

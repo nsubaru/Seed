@@ -17,8 +17,8 @@ namespace Seed::Core::Containers
 	template<typename THeap, typename T>
 	ForceInline BaseDynamicStack<THeap, T>::BaseDynamicStack():
 		count(0),
-		bufferSize(CurrentSettings().MemoryManager.StackReserveSize),
-		stack(new T[CurrentSettings().MemoryManager.StackReserveSize])
+		bufferSize(RuntimeConfigurations().MemoryManager.StackReserveSize),
+		stack(new T[RuntimeConfigurations().MemoryManager.StackReserveSize])
 	{
 	}
 
@@ -90,7 +90,7 @@ namespace Seed::Core::Containers
 		if (list.size() != 0)
 		{
 			count = list.size();
-			bufferSize = count + CurrentSettings().MemoryManager.StackReserveSize;
+			bufferSize = count + RuntimeConfigurations().MemoryManager.StackReserveSize;
 			this->stack = new T[bufferSize];
 
 			auto it = list.begin();
@@ -102,7 +102,7 @@ namespace Seed::Core::Containers
 		}
 		else
 		{
-			bufferSize = count + CurrentSettings().MemoryManager.StackReserveSize;
+			bufferSize = count + RuntimeConfigurations().MemoryManager.StackReserveSize;
 			this->stack = new T[bufferSize];
 		}
 	}
@@ -112,7 +112,7 @@ namespace Seed::Core::Containers
 	{
 		if (count == bufferSize)
 		{
-			ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
+			ExtendBufferImpl(RuntimeConfigurations().MemoryManager.StackReserveSize);
 		}
 
 		stack[count] = item;
@@ -124,7 +124,7 @@ namespace Seed::Core::Containers
 	{
 		if (count == bufferSize)
 		{
-			ExtendBufferImpl(CurrentSettings().MemoryManager.StackReserveSize);
+			ExtendBufferImpl(RuntimeConfigurations().MemoryManager.StackReserveSize);
 		}
 
 		stack[count] = MoveRValue(item);

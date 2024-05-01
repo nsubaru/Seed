@@ -1,6 +1,6 @@
-﻿namespace Seed.Core.Settings;
+﻿namespace Seed.Core.Configurations;
 
-[SerializableStruct("Seed::Core::Settings::SettingsData::KernelVersion")]
+[SerializableStruct("Seed::Core::Configurations::ConfigurationsData::KernelVersion")]
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 public struct KernelVersionT
 {

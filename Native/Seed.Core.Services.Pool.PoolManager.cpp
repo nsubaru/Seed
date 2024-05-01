@@ -5,17 +5,20 @@ using namespace Seed::Core;
 using namespace Seed::Core::Services;
 using namespace Seed::Core::Services::Pool;
 
+template PoolManager DI::DependencyInjection::Resolve<PoolManager>();
+template RTTI::RttiTypeRecord TypeRecord<PoolManager>();
+
 void PoolManager::Dispose()
 {
 	This->eventService
-		.GetEventByName(CurrentSettings().StaticSettings.HostCommitLowEventName)
+		.GetEventByName(RuntimeConfigurations().StaticConfigurations.HostCommitLowEventName)
 		.UnRegisterCallback(This->lowCommitConditionEvenHandlerId);
 }
 
 PoolManager::PoolManager(Services::EventService eventService): This(new Data(eventService))
 {
 	This->lowCommitConditionEvenHandlerId = eventService
-		.GetEventByName(CurrentSettings().StaticSettings.HostCommitLowEventName)
+		.GetEventByName(RuntimeConfigurations().StaticConfigurations.HostCommitLowEventName)
 		.RegisterCallback(new LowCommitConditionEventTarget(This));
 }
 

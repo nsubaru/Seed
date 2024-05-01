@@ -12,8 +12,13 @@ namespace Seed::Core::IO::FS::Writers
     template<typename T>
     concept IsAllFieldSupportable = CTTI::TypeTraits::CTTITypeMetaData<T>::Fields.FirstType([] <typename U> () constexpr
     {
-        return !Concepts::IsConvertibleToString<typename U::Type>;
-    }) == Math::Max<SizeT>();
+        return
+            Concepts::IsSame<typename U::Type, StringView> ||
+            Concepts::IsSame<typename U::Type, String> ||
+            Concepts::IsSame<typename U::Type, SensitiveString> ||
+            Concepts::IsSame<typename U::Type, SensitiveStringView> ||
+            Concepts::IsConvertibleToString<typename U::Type>;
+    }) != Math::Max<SizeT>();
 
     constexpr Char CsvDelimiter = L',';
     constexpr Char CsvDelimiterWithSpace[] = { CsvDelimiter, L' ', L'\0'};
@@ -79,6 +84,10 @@ namespace Seed::Core::IO::FS::Writers
                 CTTI::TypeTraits::CTTITypeMetaData<T>::Fields.ForEachType([&] <typename TField, SizeT N> ()
                 {
                     if constexpr (Concepts::IsConvertibleToStringFromString<typename TField::Type>)
+                    {
+                        This->buffer.CombineTo(TField::Selector(record));
+                    }
+                    else if constexpr (Concepts::IsSame<typename TField::Type, StringView>)
                     {
                         This->buffer.CombineTo(TField::Selector(record));
                     }
@@ -167,6 +176,10 @@ namespace Seed::Core::IO::FS::Writers
             CTTI::TypeTraits::CTTITypeMetaData<T>::Fields.ForEachType([&] <typename TField, SizeT N> ()
             {
                 if constexpr (Concepts::IsConvertibleToStringFromString<typename TField::Type>)
+                {
+                    This->buffer.CombineTo(TField::Selector(record));
+                }
+                else if constexpr (Concepts::IsSame<typename TField::Type, StringView>)
                 {
                     This->buffer.CombineTo(TField::Selector(record));
                 }
