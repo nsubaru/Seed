@@ -552,16 +552,19 @@ namespace Seed::Core
 
 			if (constMode.Read())
 			{
-				if (staticText.Length != TN - 1)
+				if (staticText.Length != TN)
 				{
 					return false;
 				}
 
-				for (SizeT i = 0; i < staticText.Length; i++)
+				if constexpr (TN != 0)
 				{
-					if (staticText[i] != second[i])
+					for (SizeT i = 0; i < staticText.Length; i++)
 					{
-						return false;
+						if (staticText[i] != second[i])
+						{
+							return false;
+						}
 					}
 				}
 
@@ -738,22 +741,85 @@ namespace Seed::Core
 		{
 			if (constMode.Read())
 			{
-				auto sz = Min(staticText.Length, TN + 1);
-
-				for (SizeT i = 0; i < sz; i++)
+				if constexpr (TN == 0)
 				{
-					auto r = staticText[i] <=> second[i];
-					if (r != 0)
-					{
-						return r;
-					}
+					return staticText.Length + 1 <=> TN;
 				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = staticText.Length + 1 <=> TN;
 
-				return staticText.Length <=> TN;
+					auto sz = Min(staticText.Length, TN - 1);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = staticText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
+				else
+				{
+					auto szCmp = staticText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(staticText.Length, TN);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = staticText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
 			}
 			else
 			{
-				return dynamicText <=> second;
+				if constexpr (TN == 0)
+				{
+					return dynamicText.Length + 1 <=> TN;
+				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN;
+
+					auto sz = Min(dynamicText.Length, TN - 1);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
+				else
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(dynamicText.Length, TN);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
 			}
 		}
 
@@ -785,33 +851,85 @@ namespace Seed::Core
 		{
 			if (constMode.Read())
 			{
-				auto sz = Min(staticText.Length, TN + 1);
-
-				for (SizeT i = 0; i < sz; i++)
+				if constexpr (TN == 0)
 				{
-					auto r = staticText[i] <=> second[i];
-					if (r != 0)
-					{
-						return r;
-					}
+					return staticText.Length + 1 <=> TN;
 				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = staticText.Length + 1 <=> TN;
 
-				return staticText.Length <=> TN;
+					auto sz = Min(staticText.Length, TN - 1);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = staticText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
+				else
+				{
+					auto szCmp = staticText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(staticText.Length, TN);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = staticText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
 			}
 			else
 			{
-				auto sz = Min(dynamicText.Length, TN + 1);
-
-				for (SizeT i = 0; i < sz; i++)
+				if constexpr (TN == 0)
 				{
-					auto r = dynamicText[i] <=> second[i];
-					if (r != 0)
-					{
-						return r;
-					}
+					return dynamicText.Length + 1 <=> TN;
 				}
+				else if (second[TN - 1] == '\0')
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN;
 
-				return dynamicText.Length <=> TN;
+					auto sz = Min(dynamicText.Length, TN - 1);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
+				else
+				{
+					auto szCmp = dynamicText.Length + 1 <=> TN + 1;
+
+					auto sz = Min(dynamicText.Length, TN);
+
+					for (SizeT i = 0; i < sz; i++)
+					{
+						auto r = dynamicText[i] <=> second[i];
+						if (r != 0)
+						{
+							return r;
+						}
+					}
+
+					return szCmp;
+				}
 			}
 		};
 

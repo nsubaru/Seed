@@ -329,7 +329,7 @@ namespace Seed::Core::Containers
 
 		if (node->This != nullptr) 
 		{
-			auto _ = Threading::SharedScoppedLock(this->lock);
+			auto _ = Threading::SharedScoppedLock(node->This->lock);
 
 			--node->RefCount;
 			if (node->right != nullptr)
@@ -369,7 +369,7 @@ namespace Seed::Core::Containers
 
 		if (node->This != nullptr) 
 		{
-			auto _ = Threading::SharedScoppedLock(this->lock);
+			auto _ = Threading::SharedScoppedLock(node->This->lock);
 
 			--node->RefCount;
 			if (node->left != nullptr)
