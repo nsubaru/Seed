@@ -314,11 +314,8 @@ namespace Seed::Core
 		};
 
 	private:
-		union
-		{
-			ConstString staticText;
-			BaseString<THeap> dynamicText;
-		};
+		ConstString staticText;
+		BaseString<THeap> dynamicText;
 
 		Atomic<bool> constMode;
 
