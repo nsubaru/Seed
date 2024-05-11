@@ -15,17 +15,18 @@ namespace Seed::Core::Serialization
         /// <param name="data">Data</param>
         /// <param name="rawStream">Raw stream</param>
         /// <param name="offset">Offset</param>
-        static void SerializeImpl(const Functionality::Either<TLeft, TRight>& data, Byte* rawStream, SizeT& offset)
+        /// <param name="helper">Additional serialization helpert</param>
+        static void SerializeImpl(const Functionality::Either<TLeft, TRight>& data, Byte* rawStream, SizeT& offset, SerializatorHelper helper)
         {
-            SerializationHandler<SizeT>::SerializeImpl(data.HoldedTypeNumber, rawStream, offset);
+            SerializationHandler<SizeT>::SerializeImpl(data.HoldedTypeNumber, rawStream, offset, helper);
 
             if (data.HoldedTypeNumber == 0)
             {
-                SerializationHandler<TLeft>::SerializeImpl(data.GetAs<TLeft>(), rawStream, offset);
+                SerializationHandler<TLeft>::SerializeImpl(data.GetAs<TLeft>(), rawStream, offset, helper);
             }
             else
             {
-                SerializationHandler<TRight>::SerializeImpl(data.GetAs<TRight>(), rawStream, offset);
+                SerializationHandler<TRight>::SerializeImpl(data.GetAs<TRight>(), rawStream, offset, helper);
             }
         }
 
@@ -33,11 +34,12 @@ namespace Seed::Core::Serialization
         /// Data size calculation method
         /// </summary>
         /// <param name="data">Data</param>
+        /// <patam name="helper">Additional serialization helper</param>
         /// <returns>Data size</returns>
-        static constexpr SizeT DataSize(const Functionality::Either<TLeft, TRight>& data) {
+        static constexpr SizeT DataSize(const Functionality::Either<TLeft, TRight>& data, SerializatorHelper helper) {
             return sizeof(SizeT) + (data.HoldedTypeNumber == 0
-                ? SerializationHandler<TLeft>::DataSize(data.GetAs<TLeft>())
-                : SerializationHandler<TRight>::DataSize(data.GetAs<TRight>()));
+                ? SerializationHandler<TLeft>::DataSize(data.GetAs<TLeft>(), helper)
+                : SerializationHandler<TRight>::DataSize(data.GetAs<TRight>(), helper));
         }
 
         /// <summary>
@@ -72,15 +74,16 @@ namespace Seed::Core::Serialization
         /// <param name="data">Data</param>
         /// <param name="rawStream">Raw stream</param>
         /// <param name="offset">Offset</param>
-        static void DeserializeImpl(Functionality::Either<TLeft, TRight>& data, const Byte* rawStream, SizeT& offset) {
+        /// <param name="helper">Additional serialization helper</param>
+        static void DeserializeImpl(Functionality::Either<TLeft, TRight>& data, const Byte* rawStream, SizeT& offset, SerializatorHelper helper) {
             SizeT i = {};
-            SerializationHandler<SizeT>::DeserializeImpl(i, rawStream, offset);
+            SerializationHandler<SizeT>::DeserializeImpl(i, rawStream, offset, helper);
             
             if (i == 0)
             {
                 TLeft obj = {};
 
-                SerializationHandler<TLeft>::DeserializeImpl(obj, rawStream, offset);
+                SerializationHandler<TLeft>::DeserializeImpl(obj, rawStream, offset, helper);
 
                 data = obj;
             }
@@ -88,7 +91,7 @@ namespace Seed::Core::Serialization
             {
                 TRight obj = {};
 
-                SerializationHandler<TRight>::DeserializeImpl(obj, rawStream, offset);
+                SerializationHandler<TRight>::DeserializeImpl(obj, rawStream, offset, helper);
 
                 data = obj;
             }

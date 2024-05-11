@@ -15,7 +15,7 @@ public struct DateTime
 
     public DateTime(ID ticks) { Ticks = ticks; }
 
-    public DateTime(System.DateTime dateTime) { Ticks = (ulong)dateTime.ToFileTime(); }
+    public DateTime(System.DateTime dateTime) { Ticks = dateTime != System.DateTime.MinValue ? (ulong)dateTime.ToFileTime() : 0; }
 
     public static implicit operator System.DateTime(DateTime time)
     {

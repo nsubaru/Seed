@@ -15,32 +15,49 @@ public class DynamicObjectSerializator : ICustomClassSerializator
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
         var fullTypeId = new UniversalTypeIdentifier() { };
-        dynamic dynFullTypeId = fullTypeId;
 
-        serializator.Deserialize(ref dynFullTypeId, serializationStream);
+        try
+        {    
+            dynamic dynFullTypeId = fullTypeId;
 
-        fullTypeId = dynFullTypeId;
+            serializator.Deserialize(ref dynFullTypeId, serializationStream);
 
-        serializator.Logger?.LogTrace("Deserialize dynamic with UIID: {fullTypeId}", fullTypeId);
+            fullTypeId = dynFullTypeId;
 
-        var rttiType = serializator.GetAllRttiTypes().First(x => x.FullTypeId == fullTypeId);
+            serializator.Logger?.LogTrace("Deserialize dynamic with UIID: {fullTypeId}", fullTypeId);
 
-        serializator.Logger?.LogTrace("Deserialize dynamic with Seed type: {0}", rttiType.TypeName);
+            var rttiType = serializator.GetAllRttiTypes().First(x => x.FullTypeId == fullTypeId);
 
-        if (rttiType.TypeName == "void")
-        {
-            return new DynamicObject();
+            serializator.Logger?.LogTrace("Deserialize dynamic with Seed type: {0}", rttiType.TypeName);
+
+            if (rttiType.TypeName == "void")
+            {
+                return new DynamicObject();
+            }
+
+            var typeRecord = serializator.GetSupportedTypes().First(x => x.FullTypeId == fullTypeId.Id);
+
+            serializator.Logger?.LogTrace("Deserialize dynamic with C# type: {0}", typeRecord.ClrType.FullName);
+
+            dynamic obj = serializator.CreateObjectByTypeRecord(typeRecord);
+
+            serializator.Deserialize(ref obj, serializationStream);
+
+            return new DynamicObject(obj, fullTypeId.Id);
         }
+        catch(InvalidOperationException) 
+        {
+            var rttiType = serializator.GetAllRttiTypes().FirstOrDefault(x => x.FullTypeId == fullTypeId);
 
-        var typeRecord = serializator.GetSupportedTypes().First(x => x.FullTypeId == fullTypeId.Id);
-
-        serializator.Logger?.LogTrace("Deserialize dynamic with C# type: {0}", typeRecord.ClrType.FullName);
-
-        dynamic obj = serializator.CreateObjectByTypeRecord(typeRecord);
-
-        serializator.Deserialize(ref obj, serializationStream);
-
-        return new DynamicObject(obj, fullTypeId.Id);
+            if( rttiType != null )
+            {
+                throw new ApplicationException($"Deserialize unserializable type. Seed type: {rttiType.TypeName}");
+            }
+            else
+            {
+                throw new ApplicationException($"Deserialize unserializable type. Seed type uknown. Uuid: {fullTypeId.Id}. Kernel version: {fullTypeId.KernelVersion}");
+            }
+        }
     }
 
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializator serializator)
