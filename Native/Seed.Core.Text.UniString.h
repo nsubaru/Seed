@@ -314,11 +314,8 @@ namespace Seed::Core
 		};
 
 	private:
-		union
-		{
-			ConstString staticText;
-			BaseString<THeap> dynamicText;
-		};
+		ConstString staticText;
+		BaseString<THeap> dynamicText;
 
 		Atomic<bool> constMode;
 
@@ -471,6 +468,7 @@ namespace Seed::Core
 			}
 		};
 
+#pragma region Equality
 	public:
 		/// <summary>
 		/// Equality operator
@@ -545,30 +543,9 @@ namespace Seed::Core
 		template<SizeT TN>
 		bool operator==(TypeTraits::ConstexprArray<AChar, TN>& second) const
 		{
-			if constexpr (TN == 0)
-			{
-				return staticText.Length == 0;
-			}
-
 			if (constMode.Read())
 			{
-				if (staticText.Length != TN)
-				{
-					return false;
-				}
-
-				if constexpr (TN != 0)
-				{
-					for (SizeT i = 0; i < staticText.Length; i++)
-					{
-						if (staticText[i] != second[i])
-						{
-							return false;
-						}
-					}
-				}
-
-				return true;
+				return staticText == second;
 			}
 			else
 			{
@@ -664,7 +641,9 @@ namespace Seed::Core
 				return dynamicText == second;
 			}
 		}
+#pragma endregion
 
+#pragma region Spaceship
 	public:
 		/// <summary>
 		/// Universal comparison operator
@@ -741,85 +720,11 @@ namespace Seed::Core
 		{
 			if (constMode.Read())
 			{
-				if constexpr (TN == 0)
-				{
-					return staticText.Length + 1 <=> TN;
-				}
-				else if (second[TN - 1] == '\0')
-				{
-					auto szCmp = staticText.Length + 1 <=> TN;
-
-					auto sz = Min(staticText.Length, TN - 1);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = staticText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
-				else
-				{
-					auto szCmp = staticText.Length + 1 <=> TN + 1;
-
-					auto sz = Min(staticText.Length, TN);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = staticText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
+				return staticText <=> second;
 			}
 			else
 			{
-				if constexpr (TN == 0)
-				{
-					return dynamicText.Length + 1 <=> TN;
-				}
-				else if (second[TN - 1] == '\0')
-				{
-					auto szCmp = dynamicText.Length + 1 <=> TN;
-
-					auto sz = Min(dynamicText.Length, TN - 1);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = dynamicText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
-				else
-				{
-					auto szCmp = dynamicText.Length + 1 <=> TN + 1;
-
-					auto sz = Min(dynamicText.Length, TN);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = dynamicText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
+				return dynamicText <=> second;
 			}
 		}
 
@@ -851,85 +756,11 @@ namespace Seed::Core
 		{
 			if (constMode.Read())
 			{
-				if constexpr (TN == 0)
-				{
-					return staticText.Length + 1 <=> TN;
-				}
-				else if (second[TN - 1] == '\0')
-				{
-					auto szCmp = staticText.Length + 1 <=> TN;
-
-					auto sz = Min(staticText.Length, TN - 1);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = staticText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
-				else
-				{
-					auto szCmp = staticText.Length + 1 <=> TN + 1;
-
-					auto sz = Min(staticText.Length, TN);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = staticText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
+				return staticText <=> second;
 			}
 			else
 			{
-				if constexpr (TN == 0)
-				{
-					return dynamicText.Length + 1 <=> TN;
-				}
-				else if (second[TN - 1] == '\0')
-				{
-					auto szCmp = dynamicText.Length + 1 <=> TN;
-
-					auto sz = Min(dynamicText.Length, TN - 1);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = dynamicText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
-				else
-				{
-					auto szCmp = dynamicText.Length + 1 <=> TN + 1;
-
-					auto sz = Min(dynamicText.Length, TN);
-
-					for (SizeT i = 0; i < sz; i++)
-					{
-						auto r = dynamicText[i] <=> second[i];
-						if (r != 0)
-						{
-							return r;
-						}
-					}
-
-					return szCmp;
-				}
+				return dynamicText <=> second;
 			}
 		};
 
@@ -966,6 +797,295 @@ namespace Seed::Core
 			{
 				return dynamicText <=> second;
 			}
+		}
+#pragma endregion
+
+#pragma region Contatenation
+	public:
+		BaseUniString operator+=(ConstString second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+
+		BaseUniString operator+=(ConstAString second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+=(TypeTraits::ConstexprArray<Char, TN> second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+=(TypeTraits::ConstexprArray<AChar, TN> second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+=(StaticTextRef<TN> second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+=(StaticATextRef<TN> second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+
+		BaseUniString operator+=(BaseString<THeap> second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+
+		template<typename UHeap>
+		BaseUniString operator+=(BaseString<UHeap> second)
+		{
+			DyncamicModePrepare();
+
+			dynamicText += second;
+
+			return *this;
+		}
+#pragma endregion
+
+	public:
+		BaseUniString operator+(const ConstString& second) const 
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + second.Length);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + second.Length);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+		BaseUniString operator+(const ConstAString& second) const
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + second.Length);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + second.Length);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+(const StaticTextRef<TN>& second) const
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + TN);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + TN);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+(const StaticATextRef<TN>& second) const
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + TN);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + TN);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+(const TypeTraits::ConstexprArray<Char, TN>& second) const
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + TN);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + TN);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+		template<SizeT TN>
+		BaseUniString operator+(const TypeTraits::ConstexprArray<AChar, TN>& second) const
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + TN);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + TN);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+		BaseUniString operator+(const BaseString<THeap>& second) const
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + second.Length);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + second.Length);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+		template<typename UHeap>
+		BaseUniString operator+(const BaseString<UHeap>& second) const
+		{
+			String text = String();
+
+			if (constMode.Read())
+			{
+				text.Reserve(staticText.Length + second.Length);
+
+				text += staticText;
+				text += second;
+			}
+			else
+			{
+				text.Reserve(dynamicText.Length + second.Length);
+
+				text += dynamicText;
+				text += second;
+			}
+
+			return text;
+		}
+
+	public:
+		/// <summary>
+		/// Explicit cast to String
+		/// </summary>
+		explicit operator BaseString<THeap>() const&
+		{
+			if (constMode.Read())
+			{
+				return staticText;
+			}
+			else
+			{
+				return dynamicText;
+			}
+		}
+
+		/// <summary>
+		/// Optimized explicit cast to String
+		/// </summary>
+		explicit operator BaseString<THeap>() &&
+		{
+			DyncamicModePrepare();
+
+			return MoveRValue(dynamicText);
 		}
 
 	public:
