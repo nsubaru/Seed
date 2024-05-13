@@ -9,12 +9,12 @@ namespace Seed::Core
 	/// </summary>
 	/// <typeparam name="THeap"></typeparam>
 	template <typename THeap>
-	class BaseUniString : public Memory::Allocator<THeap> {
+	class BaseUniString final : public Memory::Allocator<THeap> {
 	private:
 		/// <summary>
 		/// Proxy character object for UniString object
 		/// </summary>
-		class CharProxy {
+		class CharProxy final {
 		private:
 			BaseUniString& ref;
 			SizeT index;
@@ -352,7 +352,7 @@ namespace Seed::Core
 		/// <typeparam name="TN">Number of symbols</typeparam>
 		/// <param name="text">"Compile time ASCII" string</param>
 		template<SizeT TN>
-		BaseUniString(TypeTraits::ConstexprArray<Char, TN> text) : staticText(text), constMode(true) {};
+		BaseUniString(const TypeTraits::ConstexprArray<Char, TN>& text) : staticText(text), constMode(true) {};
 
 		/// <summary>
 		/// Constructor with "compile-time" string
@@ -360,7 +360,7 @@ namespace Seed::Core
 		/// <typeparam name="TN">Number of symbols</typeparam>
 		/// <param name="text">"Compile time" string</param>
 		template<SizeT TN>
-		BaseUniString(TypeTraits::ConstexprArray<AChar, TN> text) : dynamicText(text), constMode(false) {};
+		BaseUniString(const TypeTraits::ConstexprArray<AChar, TN>& text) : dynamicText(text), constMode(false) {};
 
 		/// <summary>
 		/// Constructor with the finished line literal
@@ -438,6 +438,21 @@ namespace Seed::Core
 			{
 				dynamicText = MoveRValue(orig.dynamicText);
 			}
+		}
+
+	public:
+		BaseUniString& operator=(const BaseUniString& orig)
+		{
+			this->BaseUniString::~BaseUniString();
+			this->BaseUniString::BaseUniString(orig);
+			return *this;
+		}
+
+		BaseUniString& operator=(BaseUniString&& orig)
+		{
+			this->BaseUniString::~BaseUniString();
+			this->BaseUniString::BaseUniString(orig);
+			return *this;
 		}
 
 	public:
@@ -1144,10 +1159,7 @@ namespace Seed::Core
 		bool Property(GetIsConstMode) IsConstMode;
 
 	public:
-		~BaseUniString()
-		{
-
-		}
+		~BaseUniString() {}
 	};
 
 	/// <summary>
