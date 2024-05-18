@@ -133,4 +133,30 @@ namespace Seed::Core
 	{
 		return This == nullptr || This->ptr == nullptr;
 	}
+
+	template<typename THeap, typename T>
+	inline BaseSmartPtr<THeap, T> Seed::Core::BaseWeakPtr<THeap, T>::CaptureRef()
+	{
+		if (This == nullptr)
+		{
+			Internals::Exceptions::ThrowNullPointException(SourcePosition);
+		}
+
+		// --------------------------------------------------------------------------------------------------
+		// Try to increment and check is data exist
+		// If after increment we get value "1" then data was deleted or 
+		//  being deleted but other thread alredy started execution of SmartPtr dtor 
+		//  (RefCount.DecrementAndCheckIsZero was called and Dispose branch was selected) 
+		// --------------------------------------------------------------------------------------------------
+		// If we got into "then" branch then we should restore previous value of RefCount and throw exception
+		if (This->RefCount.IncrementAndCheckWith(1))
+		{
+			--This->RefCount;
+			Internals::Exceptions::ThrowNullPointException(SourcePosition);
+		}
+
+		Data* newThis = This;
+
+		return BaseSmartPtr<THeap, T>(MoveRValue(newThis));
+	}
 }

@@ -845,7 +845,6 @@ namespace Seed::Core::Containers
 	{
 		auto _ = Threading::SharedScoppedLock(this->lock);
 
-
 		auto node = Find(this->root, key);
 
 		if (node == nullptr)
