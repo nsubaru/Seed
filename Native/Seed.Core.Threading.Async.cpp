@@ -26,12 +26,12 @@ static Containers::ConcurencyList<CoAwaitInformation>& CurentlyActiveTasks()
 }
 
 Containers::ConcurencyList<CoAwaitInformation>::Iterator Seed::Core::Threading::StoreTaskInformation(
-    Containers::Tuple<RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RawMemBlk, Handle>&& payloadInformation,
+    Containers::Tuple<RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RawMemBlk, Handle, RawMemBlk>&& payloadInformation,
     RTTI::RttiTypeRecord taskType,      
     RawMemBlk taskAddress, 
     RawMemBlk coroAddress)
 {
-    auto&& [ioObjType, ioObjIterface, ioObjIntefaceAddr, ioObjNtHandle] = payloadInformation;
+    auto&& [ioObjType, ioObjIterface, payloadType, ioObjIntefaceAddr, ioObjNtHandle, payloadAddress] = payloadInformation;
 
     return CurentlyActiveTasks().AddLast(CoAwaitInformation{
         .TaskType                      = taskType,
@@ -43,7 +43,9 @@ Containers::ConcurencyList<CoAwaitInformation>::Iterator Seed::Core::Threading::
         .TaskRequestorInterfaceType    = ioObjIterface,
         .TaskRequestorInterfaceAddress = ioObjIntefaceAddr,
         .TaskNtObjectHandle            = ioObjNtHandle,
-        .ThreadableContextId           = Threading::GetTLS()->contexts->GetObjId()
+        .ThreadableContextId           = Threading::GetTLS()->contexts->GetObjId(),
+        .PayloadType                   = payloadType,
+        .PayloadAddress                = payloadAddress
     });
 }
 
@@ -62,7 +64,8 @@ RTTI::RttiTypeRecord Seed::Core::Threading::AwaitTimePayload::GetTargetObjIntefa
     return TypeRecord<RawMemBlk>();
 }
 
-Containers::Tuple<RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RawMemBlk, Handle> Seed::Core::Threading::AwaitTimePayload::GetAwaitObjectInformation()
+Containers::Tuple<RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RawMemBlk, Handle, RawMemBlk> Seed::Core::Threading::AwaitTimePayload::GetAwaitObjectInformation()
 {
-    return Containers::Tuple<RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RawMemBlk, Handle>(TypeRecord<RawMemBlk>(), GetTargetObjIntefaceType(), tpHandle, nullptr);
+    return Containers::Tuple<RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RTTI::RttiTypeRecord, RawMemBlk, Handle, RawMemBlk>(
+        TypeRecord<RawMemBlk>(), GetTargetObjIntefaceType(), TypeRecord<AwaitTimePayload>(), tpHandle, nullptr, this);
 }

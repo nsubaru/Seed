@@ -130,11 +130,11 @@ namespace Seed::Core::Containers::LINQ
 			co_await thisCollectionRef.RemoveAllAsync([&](T&& item, SizeT index) -> Threading::Task<void> InlineLambda {
 				if constexpr (Concepts::AsyncMoveFunctionWithIdx<TLambda, T>)
 				{
-					co_await instance.UnsafeSet(co_await lambda(MoveRValue(item), index), index);
+					instance.UnsafeSet(co_await lambda(MoveRValue(item), index), index);
 				}
 				else
 				{
-					co_await instance.UnsafeSet(co_await lambda(MoveRValue(item)), index);
+					instance.UnsafeSet(co_await lambda(MoveRValue(item)), index);
 				}
 				index++;
 			});

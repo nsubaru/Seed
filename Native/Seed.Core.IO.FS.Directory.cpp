@@ -122,4 +122,44 @@ Directory::Directory(String&& path, OpeningMode mode, OpenDisposition policy, bo
 	This = new Data(hFile, MoveRValue(fullPath), mode, policy, ShareWithOs);
 }
 
+String Directory::GetFullDirectoryPath() const
+{
+	auto infSz = 1Kb;
+	UniqueArrayPtr<FILE_NAME_INFORMATION> inf;
+
+	while (true)
+	{
+		inf = (FILE_NAME_INFORMATION*) new Byte[infSz.Bytes];
+
+		IO_STATUS_BLOCK ioBlk;
+		NTSTATUS status = NtQueryInformationFile(
+			This->hDir, 
+			&ioBlk, 
+			*inf, 
+			(ULONG) infSz.Bytes, 
+			FileNameInformation);
+
+		if (status == STATUS_BUFFER_OVERFLOW || status == STATUS_BUFFER_TOO_SMALL)
+		{
+			infSz += 1Kb;
+
+			continue;
+		}
+
+		if (!NT_SUCCESS(status))
+		{
+			Throw(NtException(SourcePosition, status));
+		}
+
+		break;
+	}
+
+	if ((*inf)->FileNameLength == 0)
+	{
+		Throw(InvalidHandleUsage(SourcePosition));
+	}
+
+	return String((*inf)->FileName, (*inf)->FileNameLength / sizeof(Char)).RecalculateSize();
+}
+
 #pragma warning(pop)
