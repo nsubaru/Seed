@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::BaseSmartPtr&lt;*,*&gt;">
-    <DisplayString Condition="This->ptr != 0">{{Value : {* (*$T1) This->ptr}}}</DisplayString>
+    <DisplayString Condition="This->ptr != 0">{{Value : {* ($T2*) This->ptr}}}</DisplayString>
     <DisplayString Condition="This->ptr == 0">{{Value not loaded}}</DisplayString>
     <Expand>
-      <Item Name="Item">(*$T1) This->ptr</Item>
+      <Item Name="Item">($T2*) This->ptr</Item>
     </Expand>
   </Type>
 </AutoVisualizer>

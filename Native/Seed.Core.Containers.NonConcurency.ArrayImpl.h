@@ -889,6 +889,12 @@ namespace Seed::Core::Containers
 	}
 
 	template<typename THeap, typename T>
+	inline T*BaseArray<THeap, T>::GetRaw()
+	{
+		return array;
+	}
+
+	template<typename THeap, typename T>
 	inline const T* const BaseArray<THeap, T>::GetRaw() const
 	{
 		return array;
@@ -964,6 +970,18 @@ namespace Seed::Core
 
 namespace Seed::Core::Memory
 {
+	template<typename THeap>
+	void ZeroMemory(Containers::BaseArray<THeap, Byte>& blob)
+	{
+		MemBlkFill((void*) blob.GetRaw(), blob.Count, 0);
+	}
+
+	template<typename THeap>
+	void SecureZeroMemory(Containers::BaseArray<THeap, Byte>& blob)
+	{
+		SecureMemBlkZero((void*) blob.GetRaw(), blob.Count);
+	}
+
 	template<Concepts::IsStandardLayout T, SizeT count>
 	inline void Copy(const Containers::Blob& source, T(&destination)[count], SizeT offset)
 	{

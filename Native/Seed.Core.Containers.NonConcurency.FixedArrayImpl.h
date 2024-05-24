@@ -577,18 +577,6 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
-	constexpr bool BaseFixedArray<THeap, TSize, T>::operator!=(const BaseFixedArray& other) const
-	{
-		for (SizeT i = 0; i < TSize; i++)
-		{
-			if (other.array[i] != this->array[i])
-				return true;
-		}
-		return false;
-	}
-
-	template<typename THeap, SizeT TSize, typename T>
-	requires (TSize > 0)
 	constexpr bool BaseFixedArray<THeap, TSize, T>::operator==(const RawArray& other) const
 	{
 		for (SizeT i = 0; i < TSize; i++)
@@ -597,42 +585,6 @@ namespace Seed::Core::Containers
 				return false;
 		}
 		return true;
-	}
-
-	template<typename THeap, SizeT TSize, typename T>
-	requires (TSize > 0)
-	constexpr bool operator==(const typename BaseFixedArray<THeap, TSize, T>::RawArray& left, const BaseFixedArray<THeap, TSize, T>& right)
-	{
-		for (SizeT i = 0; i < TSize; i++)
-		{
-			if (left[i] != right.array[i])
-				return false;
-		}
-		return true;
-	}
-
-	template<typename THeap, SizeT TSize, typename T>
-	requires (TSize > 0)
-	constexpr bool BaseFixedArray<THeap, TSize, T>::operator!=(const RawArray& other) const
-	{
-		for (SizeT i = 0; i < TSize; i++)
-		{
-			if (other[i] != this->array[i])
-				return true;
-		}
-		return false;
-	}
-
-	template<typename THeap, SizeT TSize, typename T>
-	requires (TSize > 0)
-	constexpr bool operator!=(const typename BaseFixedArray<THeap, TSize, T>::RawArray& left, const BaseFixedArray<THeap, TSize, T>& right)
-	{
-		for (SizeT i = 0; i < TSize; i++)
-		{
-			if (left[i] != right.array[i])
-				return true;
-		}
-		return false;
 	}
 
 	template<typename THeap, SizeT TSize, typename T>
@@ -677,6 +629,13 @@ namespace Seed::Core::Containers
 		}
 
 		return result;
+	}
+
+	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
+	inline Byte* BaseFixedArray<THeap, TSize, T>::GetRaw()
+	{
+		return array;
 	}
 
 	template<typename THeap, SizeT TSize, typename T>

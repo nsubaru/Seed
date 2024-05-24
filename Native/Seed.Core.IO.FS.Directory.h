@@ -58,6 +58,13 @@ namespace Seed::Core::IO::FS
         Directory(const String& path, OpeningMode mode, OpenDisposition policy, bool ShareWithOs) : Directory(String(path), mode, policy, ShareWithOs) {}
 
     public:
+        /// <summary>
+        /// Returns full directory path
+        /// </summary>
+        /// <returns>Full directory path</returns>
+        String GetFullDirectoryPath() const;
+
+    public:
         RefCountClass(Directory);
     };
 }
