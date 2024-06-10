@@ -10,16 +10,15 @@ template RTTI::RttiTypeRecord TypeRecord<PoolManager>();
 
 void PoolManager::Dispose()
 {
-	This->eventService
-		.GetEventByName(RuntimeConfigurations().StaticConfigurations.HostCommitLowEventName)
-		.UnRegisterCallback(This->lowCommitConditionEvenHandlerId);
+	if (This->subscription.IsValid())
+	{
+		MoveRValue(This->subscription).UnSubscibe();
+	}
 }
 
-PoolManager::PoolManager(Services::EventService eventService): This(new Data(eventService))
+PoolManager::PoolManager(Services::InternalSensorsService sensorsService) : This(new Data())
 {
-	This->lowCommitConditionEvenHandlerId = eventService
-		.GetEventByName(RuntimeConfigurations().StaticConfigurations.HostCommitLowEventName)
-		.RegisterCallback(new LowCommitConditionEventTarget(This));
+	This->subscription = sensorsService.LowCommitMemoryEventSubscribe(new LowCommitConditionEventTarget(This));
 }
 
 Services::Pool::Pool PoolManager::CreatePool(String && poolName, SizeT maxPoolObjectSize, SizeT maxPoolObjectCount, SizeT startSize)
@@ -49,7 +48,10 @@ Containers::Array<PoolStatistics> Seed::Core::Services::Pool::PoolManager::GetSt
 	});
 }
 
-void PoolManager::LowCommitConditionEventTarget::onEvent(Events::GlobalEventTarget target, Events::EventState eventOnCallState, RTTI::Dynamic dynamic)
+void PoolManager::LowCommitConditionEventTarget::onEvent(bool isUp)
 {
-	This->activePools.ForEach([] (Pool& pool) { pool.FlushPool(); });
+	if (isUp)
+	{
+		This->activePools.ForEach([] (Pool& pool) { pool.FlushPool(); });
+	}
 }
