@@ -9,25 +9,19 @@ namespace Seed::Core
 		TValueType value;
 
 	private:
-		constexpr EnumBitFlags(TValueType value) : value(value)
-		{
-		}
+		constexpr EnumBitFlags(TValueType value) : value(value) {}
 
 	public:
 		/// <summary>
 		/// An empty constructor which initializes zero value
 		/// </summary>
-		constexpr EnumBitFlags() : value(0)
-		{
-		}
+		constexpr EnumBitFlags() : value(0) {}
 
 		/// <summary>
 		/// A constructor with possible rights value
 		/// </summary>
 		/// <param name="value">Rights value</param>
-		constexpr EnumBitFlags(TEnum value) : value(static_cast<TValueType>(value))
-		{
-		}
+		constexpr EnumBitFlags(TEnum value) : value(static_cast<TValueType>(value)) {}
 
 	public:
 		constexpr EnumBitFlags(const EnumBitFlags&) = default;
