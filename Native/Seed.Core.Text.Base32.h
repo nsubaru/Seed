@@ -1,5 +1,7 @@
 #pragma once
 #include "Seed.Core.Text.Base.h"
+#include "Seed.Core.Containers.NonConcurency.FixedArray.h"
+#include "Seed.Core.Containers.NonConcurency.FixedArrayImpl.h"
 
 namespace Seed::Core::Text
 {
@@ -219,6 +221,66 @@ namespace Seed::Core::Text
 
     public:
         /// <summary>
+        /// Convert data fixed blob to Base32 string
+        /// </summary>
+        /// <typeparam name="THeap">Result heap</typeparam>
+        /// <typeparam name="UHeap">Input heap</typeparam>
+        /// <typeparam name="TN">Count bytes in fixed byte array</typeparam>
+        /// <param name="blob">Input blob</param>
+        /// <returns>Base32 string</returns>
+        template<typename THeap = Memory::Heap, typename UHeap = Memory::Heap, SizeT TN = 10>
+        static BaseString<THeap> Encode(const Containers::BaseFixedArray<UHeap, TN, Byte>& blob) 
+        {
+            if constexpr (TN == 0)
+            {
+                return {};
+            }
+
+            auto result = BaseString<THeap>::CreateFilledString(((TN / 5) * 8) + (TN % 5 != 0 ? 8 : 0), L'=');
+            auto src = blob.GetRaw();
+            auto srcLenBits = TN * 8;
+            auto dest = (CharStr) (ConstCharStr) result;
+            auto didx = 0Sz;
+
+            for (SizeT i = 0; i < srcLenBits; i += 5)
+            {
+                Char sym;
+                SizeT sidx = i / 8;
+                SizeT bitOffset = i % 8;
+
+                if (bitOffset <= 3)
+                {
+                    // Entire symbol fits in that byte 
+                    sym = src[sidx] >> (3 - bitOffset);
+                }
+                else
+                {
+                    // Use the bits we have left 
+                    sym = src[sidx] << (bitOffset - 3);
+
+                    // Use the bits from the next byte, if any 
+                    if (i + 1 < srcLenBits)
+                    {
+                        sym |= src[sidx + 1] >> (11 - bitOffset);
+                    }
+                }
+
+                sym &= 0x1f;
+
+                // Pad incomplete symbol with 0 bits
+                if (srcLenBits - i < 5)
+                {
+                    sym &= 0x1f << (5 + i - srcLenBits);
+                }
+
+                dest[didx++] = base32map[sym];
+            }
+
+            return result;
+        }
+
+    public:
+        /// <summary>
         /// Converts Byte32 string to binnary data array
         /// </summary>
         /// <typeparam name="THeap">Result heap</typeparam>
@@ -240,6 +302,19 @@ namespace Seed::Core::Text
         /// <returns>Base32 string</returns>
         template<typename THeap = Memory::Heap, typename UHeap = Memory::Heap>
         static BaseString<THeap> Encode(Containers::BaseArray<UHeap, Byte>&& blob)
+        {
+            return Encode<THeap>(blob);
+        }
+
+        /// <summary>
+        /// Convert data blob to Base32 string
+        /// </summary>
+        /// <typeparam name="THeap">Result heap</typeparam>
+        /// <typeparam name="UHeap">Input heap</typeparam>
+        /// <param name="blob">Input blob</param>
+        /// <returns>Base32 string</returns>
+        template<typename THeap = Memory::Heap, typename UHeap = Memory::Heap, SizeT TN = 10>
+        static BaseString<THeap> Encode(Containers::BaseFixedArray<UHeap, TN, Byte>&& blob)
         {
             return Encode<THeap>(blob);
         }

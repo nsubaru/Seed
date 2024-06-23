@@ -94,7 +94,7 @@ public unsafe struct UniversalTypeIdentifier
 	public KernelVersionT KernelVersion;
 
     [SerializableStructFieldManual("TypeId", "Seed::Core::UInt64")]
-    [FieldOffset(4)]
+    [FieldOffset(8)]
 	public ID TypeId;
 
 	public override bool Equals(object? obj)

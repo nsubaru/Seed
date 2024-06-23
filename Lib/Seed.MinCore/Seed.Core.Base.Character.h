@@ -71,6 +71,16 @@ namespace Seed::Core
 			return (L'a' <= ch && ch <= L'z');
 		}
 
+		/// <summary>
+		/// Indicates whether the variable is a latin letter or digit
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if latin letter or digit</returns>
+		static bool IsAlphaNumeric(Char ch)
+		{
+			return IsDigit(ch) || IsLatinLetter(ch);
+		}
+
 #ifdef SeedKernel
 		/// <summary>
 		/// Case insensitive character comparing

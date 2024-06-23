@@ -860,7 +860,15 @@ namespace Seed::Core::Containers
 		auto node = otherList.root;
 		while (node != nullptr)
 		{
-			this->last->next = new elem(node->value, this, this->last);
+			if (this->size == 0)
+			{
+				this->last = this->root = new elem(node->value, this, this->last);
+			}
+			else
+			{
+				this->last->next = new elem(node->value, this, this->last);
+			}
+
 			this->last = this->last->next;
 			node = node->next;
 		}

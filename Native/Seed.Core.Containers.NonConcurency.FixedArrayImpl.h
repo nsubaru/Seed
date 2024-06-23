@@ -640,6 +640,13 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, SizeT TSize, typename T>
 	requires (TSize > 0)
+	inline const Byte* BaseFixedArray<THeap, TSize, T>::GetRaw() const
+	{
+		return array;
+	}
+
+	template<typename THeap, SizeT TSize, typename T>
+	requires (TSize > 0)
 	BaseFixedArray<THeap, TSize, T>::operator RawArray () const
 	{
 		return array;
