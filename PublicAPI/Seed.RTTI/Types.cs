@@ -89,11 +89,11 @@ public unsafe struct UniversalTypeIdentifier
     [FieldOffset(0)]
 	public UUID Id;
 
-	[SerializableStructFieldManual("KernelVersion", "Seed::Core::Configurations::ConfigurationsData::KernelVersion")]
-	[FieldOffset(0)]
+    [SerializableStructField]
+    [FieldOffset(0)]
 	public KernelVersionT KernelVersion;
 
-    [SerializableStructFieldManual("TypeId", "Seed::Core::UInt64")]
+    [SerializableStructField]
     [FieldOffset(8)]
 	public ID TypeId;
 

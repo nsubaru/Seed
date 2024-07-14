@@ -7,7 +7,7 @@ public partial class SeedSerializatorFactory
 {
     Type? GetBoxType(RTTI.Record.RttiTypeRecord record)
     {
-        if (record.TemplateTypeName == "Seed::Core::Functionality::Either")
+        if (record.TemplateTypeName == Constants.Types.Either)
         {
             var leftType = GetTypeWithOffset(0, record);
 
@@ -34,7 +34,7 @@ public partial class SeedSerializatorFactory
 
     private void AddBoxSer<T>(ref StringBuilder code, TypeRecord record)
     {
-        if (record.RttiType.TemplateTypeName == "Seed::Core::Functionality::Either")
+        if (record.RttiType.TemplateTypeName == Constants.Types.Either)
         {
             code.AppendLine($"UInt64 idx = data.IsLeft ? 0ul : 1ul;");
             code.AppendLine($"SerializeImpl(idx, stream);");
@@ -48,7 +48,7 @@ public partial class SeedSerializatorFactory
 
     private void AddBoxDer<T>(ref StringBuilder code, TypeRecord record)
     {
-        if (record.RttiType.TemplateTypeName == "Seed::Core::Functionality::Either")
+        if (record.RttiType.TemplateTypeName == Constants.Types.Either)
         {
             code.AppendLine($"UInt64 idx = 0ul;");
             code.AppendLine($"idx = DeserializeImpl(idx, stream);");

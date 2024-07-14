@@ -2,25 +2,24 @@
 #include "Seed.Core.Services.Pool.Base.h"
 #include "Seed.Core.Services.Pool.Pool.h"
 
-#include "Seed.Core.Services.EventService.h"
 #include "Seed.Core.Services.BootupServicesManager.h"
+#include "Seed.Core.Services.InternalSensors.h"
 
 namespace Seed::Core::Services::Pool
 {
 	/// <summary>
 	/// Pool builder service
 	/// </summary>
-	class PoolManager final : public IDisposable, IBootUpService<PoolManager, Services::EventService> {
+	class PoolManager final : public IDisposable, IBootUpService<PoolManager, Services::InternalSensorsService> {
 		struct Data {
-			Services::EventService eventService;
-			ID lowCommitConditionEvenHandlerId;
+			Events::LocalEventSubscription<bool> subscription;
 
 			Containers::ConcurencyList<Pool> activePools;
 
 			RefCountT RefCount;
 
-			Data(Services::EventService eventService) 
-				: eventService(eventService), lowCommitConditionEvenHandlerId(0), activePools(), RefCount(1) 
+			Data() 
+				: subscription(), activePools(), RefCount(1)
 			{}
 		};
 
@@ -34,7 +33,7 @@ namespace Seed::Core::Services::Pool
 		}
 
 	private:
-		class LowCommitConditionEventTarget final : public Events::IGlobalEventCallback {
+		class LowCommitConditionEventTarget final : public Events::ILocalEventCallback<bool> {
 		private:
 			Data* This;
 
@@ -46,18 +45,17 @@ namespace Seed::Core::Services::Pool
 			LowCommitConditionEventTarget(Data* This) : This(This) {
 			}
 
-			virtual void onEvent(Events::GlobalEventTarget target, Events::EventState eventOnCallState, RTTI::Dynamic dynamic) override;
+			virtual void onEvent(bool isUp) override;
 
 		public:
-			~LowCommitConditionEventTarget() {
-			}
+			~LowCommitConditionEventTarget() {}
 		};
 
 	public:
 		/// <summary>
 		/// Service constructor
 		/// </summary>
-		PoolManager(Services::EventService eventService);;
+		PoolManager(Services::InternalSensorsService sensorsService);
 
 	public:
 		/// <summary>

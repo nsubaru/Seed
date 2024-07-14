@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,7 +19,10 @@ public partial class SeedSerializatorFactory
                     var innerType = GetTypeWithOffset(0, record);
 
                     if (innerType == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ list type {1}", record.Fields.First().TypeName, record.TypeName);
                         return null;
+                    }
 
                     return typeof(LinkedList<>).MakeGenericType(innerType);
                 }
@@ -31,8 +35,15 @@ public partial class SeedSerializatorFactory
                     var innerTypeFirst = GetTypeWithOffset(1, record);
                     var innerTypeSecond = GetTypeWithOffset(2, record);
 
-                    if (innerTypeFirst == null || innerTypeSecond == null)
+                    if (innerTypeFirst == null)
                     {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ associative type {1}", record.Fields.First().TypeName, record.TypeName);
+                        return null;
+                    }
+
+                    if (innerTypeSecond == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ associative type {1}", record.Fields.Skip(1).First().TypeName, record.TypeName);
                         return null;
                     }
 
@@ -73,7 +84,10 @@ public partial class SeedSerializatorFactory
                     var innerType = GetTypeWithOffset(0, record);
 
                     if (innerType == null)
-                        return null;
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ array type {1}", record.Fields.First().TypeName, record.TypeName);
+                        return null; 
+                    }
 
                     return typeof(List<>).MakeGenericType(innerType);
                 }
@@ -83,8 +97,15 @@ public partial class SeedSerializatorFactory
                     var innerTypeFirst = GetTypeWithOffset(0, record);
                     var innerTypeSecond = GetTypeWithOffset(1, record);
 
-                    if (innerTypeFirst == null || innerTypeSecond == null)
+                    if (innerTypeFirst == null)
                     {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ pair type {1}", record.Fields.First().TypeName, record.TypeName);
+                        return null;
+                    }
+
+                    if (innerTypeSecond == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ pair type {1}", record.Fields.Skip(1).First().TypeName, record.TypeName);
                         return null;
                     }
 

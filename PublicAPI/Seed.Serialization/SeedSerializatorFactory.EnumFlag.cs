@@ -11,8 +11,10 @@ public partial class SeedSerializatorFactory
 {
     Type? TryGetAsEnumFlag(RTTI.Record.RttiTypeRecord record)
     {
-        if (!record.TypeName.StartsWith("Seed::Core::EnumFlag"))
-            return null;
+        if (!record.TypeName.StartsWith(Constants.Types.EnumFlag))
+        { 
+            return null; 
+        }
 
         var p1 = record.TypeName.IndexOf('<') + 1;
         var p2 = record.TypeName.IndexOf('>');
@@ -21,13 +23,17 @@ public partial class SeedSerializatorFactory
         var underlyingTypeRecord = this.allRttiTypes.FirstOrDefault(x => x.TypeName == types[1]);
 
         if (enumTypeRecord == null || underlyingTypeRecord == null)
-            return null;
+        { 
+            return null; 
+        }
 
         var enumType = BuildClrType(enumTypeRecord);
         var underlyingType = BuildClrType(underlyingTypeRecord);
 
         if (enumType == null || underlyingType == null)
+        {
             return null;
+        }
 
         return typeof(EnumFlag<,>).MakeGenericType(enumType, underlyingType);
     }

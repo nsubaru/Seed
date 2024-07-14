@@ -24,6 +24,7 @@ public partial class SeedSerializatorFactory
             "Seed::Core::UInt32" => typeof(System.UInt32),
             "Seed::Core::UInt64" => typeof(System.UInt64),
             "Seed::Core::SizeT" => typeof(System.UInt64),
+            "Seed::Core::ID" => typeof(System.UInt64),
             "Seed::Core::Memory::DataSizeT" => typeof(System.UInt64),
             "Seed::Core::Double" => typeof(System.Double),
             "Seed::Core::Float" => typeof(float),
