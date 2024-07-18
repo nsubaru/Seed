@@ -10,28 +10,40 @@ public partial class SeedSerializatorFactory
     {
         switch (typeRecord.TypeName)
         {
-            case "Seed::Core::Containers::Array":
-            case "Seed::Core::Containers::SensitiveArray":
-            case "Seed::Core::Containers::FixedArray":
-            case "Seed::Core::Containers::SensitiveFixedArray":
-            case "Seed::Core::Containers::ConcurencyArray":
-            case "Seed::Core::Containers::ConcurencySensitiveArray":
+            case Constants.Types.Array: 
+            case Constants.Types.SensitiveArray: 
+            case Constants.Types.ConcurencyArray: 
+            case Constants.Types.ConcurencySensitiveArray:
 
-            case "Seed::Core::Containers::DynamicStack":
-            case "Seed::Core::Containers::SensitiveDynamicStack":
-            case "Seed::Core::Containers::ConcurencyDynamicStack":
-            case "Seed::Core::Containers::ConcurencySensitiveDynamicStack":
+            case Constants.Types.FixedArray:
+            case Constants.Types.SensitiveFixedArray:
+            case Constants.Types.ConcurencyFixedArray:
+            case Constants.Types.ConcurencySensitiveFixedArray:
 
-            case "Seed::Core::Containers::FixedQueue":
-            case "Seed::Core::Containers::DynamicQueue":
-            case "Seed::Core::Containers::SensitiveDynamicQueue":
-            case "Seed::Core::Containers::ConcurencyDynamicQueue":
-            case "Seed::Core::Containers::ConcurencySensitiveDynamicQueue":
+            case Constants.Types.FixedStack:
+            case Constants.Types.SensitiveFixedStack:
+            case Constants.Types.ConcurencyFixedStack:
+            case Constants.Types.ConcurencySensitiveFixedStack:
 
-            case "Seed::Core::Containers::List":
-            case "Seed::Core::Containers::SensitiveList":
-            case "Seed::Core::Containers::ConcurencyList":
-            case "Seed::Core::Containers::ConcurencySensitiveList":
+            case Constants.Types.DynamicStack:
+            case Constants.Types.SensitiveDynamicStack:
+            case Constants.Types.ConcurencyDynamicStack:
+            case Constants.Types.ConcurencySensitiveDynamicStack:
+
+            case Constants.Types.FixedQueue:
+            case Constants.Types.SensitiveFixedQueue:
+            case Constants.Types.ConcurencyFixedQueue:
+            case Constants.Types.ConcurencySensitiveFixedQueue:
+
+            case Constants.Types.DynamicQueue:
+            case Constants.Types.SensitiveDynamicQueue:
+            case Constants.Types.ConcurencyDynamicQueue:
+            case Constants.Types.ConcurencySensitiveDynamicQueue:
+
+            case Constants.Types.List:
+            case Constants.Types.SensitiveList:
+            case Constants.Types.ConcurencyList:
+            case Constants.Types.ConcurencySensitiveList:
                 {
                     code.AppendLine($"var sz = (ulong) data.Count();");
                     code.AppendLine("this.SerializeImpl(sz, stream);");
@@ -51,45 +63,51 @@ public partial class SeedSerializatorFactory
 
         switch (typeRecord.TypeName)
         {
-            case "Seed::Core::Containers::Array":
-            case "Seed::Core::Containers::ConcurencyArray":
-            case "Seed::Core::Containers::ConcurencySensitiveArray":
-            case "Seed::Core::Containers::SensitiveArray":
+            case Constants.Types.Array:
+            case Constants.Types.SensitiveArray:
+            case Constants.Types.ConcurencyArray:
+            case Constants.Types.ConcurencySensitiveArray:
 
-            case "Seed::Core::Containers::FixedArray":
-            case "Seed::Core::Containers::SensitiveFixedArray":
-            case "Seed::Core::Containers::ConcurencyFixedArray":
-            case "Seed::Core::Containers::ConcurencySensitiveFixedArray":
+            case Constants.Types.FixedArray:
+            case Constants.Types.SensitiveFixedArray:
+            case Constants.Types.ConcurencyFixedArray:
+            case Constants.Types.ConcurencySensitiveFixedArray:
 
-            case "Seed::Core::Containers::FixedQueue":
-            case "Seed::Core::Containers::SensitiveFixedQueue":
-            case "Seed::Core::Containers::ConcurencyFixedQueue":
-            case "Seed::Core::Containers::ConcurencySensitiveFixedQueue":
+            case Constants.Types.FixedStack:
+            case Constants.Types.SensitiveFixedStack:
+            case Constants.Types.ConcurencyFixedStack:
+            case Constants.Types.ConcurencySensitiveFixedStack:
 
-            case "Seed::Core::Containers::DynamicQueue":
-            case "Seed::Core::Containers::SensitiveDynamicQueue":
-            case "Seed::Core::Containers::ConcurencyDynamicQueue":
-            case "Seed::Core::Containers::ConcurencySensitiveDynamicQueue":
+            case Constants.Types.DynamicStack:
+            case Constants.Types.SensitiveDynamicStack:
+            case Constants.Types.ConcurencyDynamicStack:
+            case Constants.Types.ConcurencySensitiveDynamicStack:
 
-            case "Seed::Core::Containers::DynamicStack":
-            case "Seed::Core::Containers::SensitiveDynamicStack":
-            case "Seed::Core::Containers::ConcurencyDynamicStack":
-            case "Seed::Core::Containers::ConcurencySensitiveDynamicStack":
+            case Constants.Types.FixedQueue:
+            case Constants.Types.SensitiveFixedQueue:
+            case Constants.Types.ConcurencyFixedQueue:
+            case Constants.Types.ConcurencySensitiveFixedQueue:
+
+            case Constants.Types.DynamicQueue:
+            case Constants.Types.SensitiveDynamicQueue:
+            case Constants.Types.ConcurencyDynamicQueue:
+            case Constants.Types.ConcurencySensitiveDynamicQueue:
                 code.AppendLine("for (UInt64 i = 0; i < count; i++){");
                 code.AppendLine($"var item = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}>();");
                 code.AppendLine("item = DeserializeImpl(item, stream);");
                 code.AppendLine("data.Add(item);}");
                 break;
 
-            case "Seed::Core::Containers::List":
-            case "Seed::Core::Containers::SensitiveList":
-            case "Seed::Core::Containers::ConcurencyList":
-            case "Seed::Core::Containers::ConcurencySensitiveList":
+            case Constants.Types.List:
+            case Constants.Types.SensitiveList:
+            case Constants.Types.ConcurencyList:
+            case Constants.Types.ConcurencySensitiveList:
                 code.AppendLine("for (UInt64 i = 0; i < count; i++){");
                 code.AppendLine($"var item = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}>();");
                 code.AppendLine("item = DeserializeImpl(item, stream);");
                 code.AppendLine("data.AddLast(item);}");
                 break;
+
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeRecord.TypeName} ' and type class ' {typeRecord.TypeName} ' not implemented");
         }

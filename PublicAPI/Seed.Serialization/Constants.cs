@@ -158,17 +158,17 @@ var plain = Encoding.Unicode.GetString(buffer);
 data = plain.ToCharArray().Aggregate(new SecureString(), (s, c) => {s.AppendChar(c); return s; }, (s) => {s.MakeReadOnly(); return s; });
 stream.Seek(2, SeekOrigin.Current);";
 
-        public const string TypeMetaDataRecord = @"var testMetaData = string.Empty; testMetaData = {DeserializationMethodName}(testMetaData, stream); data = new TypeMetaDataDecoder().DecodeTypeMetaData(testMetaData);";
-        public const string RTTISection = @"var bytesCount = (UInt64) 0; 
+        public const string TypeMetaDataRecord = $@"var testMetaData = string.Empty; testMetaData = {DeserializationMethodName}(testMetaData, stream); data = new TypeMetaDataDecoder().DecodeTypeMetaData(testMetaData);";
+        public const string RTTISection = $@"var bytesCount = (UInt64) 0; 
 bytesCount = {DeserializationMethodName}(bytesCount, stream); 
 byte[] bytes = new byte[bytesCount];
 stream.Read(bytes, 0, (int) bytesCount);
 data = new RTTI.RTTISection(bytes);";
 
-        public const string Collections = @"for (UInt64 i = 0; i < count; i++){
-var item = CreateObject<{FriendlyTypeName}>();
+        public const string Collections = $@"for (UInt64 i = 0; i < count; i++){{
+var item = CreateObject<$FriendlyTypeName>();
 item = {DeserializationMethodName}(item, stream);
-data.Add(item);}";
+data.Add(item);}}";
 
         public const string ListCollections = @"for (UInt64 i = 0; i < count; i++){
 var item = CreateObject<{FriendlyTypeName}>();
@@ -256,8 +256,8 @@ var bytes = Encoding.Unicode.GetBytes(chars);
 stream.Write(bytes, 0, bytes.Length);
 stream.Write(Encoding.Unicode.GetBytes(new char[] { '\0' }), 0, 1 * sizeof(char));";
 
-        public const string TypeMetaDataRecord = @"string serializationText = data.ToString(""S""); {SerializationMethodName}(serializationText, stream);";
-        public const string RTTISection = @"var bytes = data.Bytes; {SerializationMethodName}(bytes, stream);";
+        public const string TypeMetaDataRecord = $@"string serializationText = data.ToString(""S""); {SerializationMethodName}(serializationText, stream);";
+        public const string RTTISection = $@"var bytes = data.Bytes; {SerializationMethodName}(bytes, stream);";
 
         public const string Collections = @"var sz = (ulong) data.LongCount(); {SerializationMethodName}(sz, stream); foreach(var item in data) {SerializationMethodName}(item, stream);";
 

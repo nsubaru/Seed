@@ -279,6 +279,28 @@ namespace Seed::Core::Crypt::Algorithms
 		}
 
 	public:
+		/// <summary>
+		/// Create totp URI
+		/// </summary>
+		/// <param name="authority">Authority</param>
+		/// <param name="accountName">Account/principal name</param>
+		/// <returns></returns>
+		SensitiveString GetAsTotpUri(const SensitiveString& authority, const SensitiveString& accountName) const {
+			auto encodedAuthority = Text::Uri::Encode(authority);
+			auto encodedAccountName = Text::Uri::Encode(accountName);
+			auto base32secret = Text::Base32::Encode(This->secretHash).Trim(L'=');
+
+			auto uri = String::Combine(LR"(otpauth://totp/)", encodedAuthority, L":", encodedAccountName, 
+									   L"?secret=", base32secret, 
+									   L"&issuer=", encodedAuthority, 
+									   L"&algorithm=", L"SHA1", 
+									   L"&digits=", This->passwordSize, 
+									   L"&period=", This->timeIntervalInSeconds);
+
+			return uri;
+		}
+
+	public:
 		template<typename U>
 		friend struct Seed::Core::Serialization::SerializationHandler;
 

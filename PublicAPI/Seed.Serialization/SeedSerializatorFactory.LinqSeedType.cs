@@ -11,10 +11,10 @@ public partial class SeedSerializatorFactory
     {
         switch (record.TemplateTypeName)
         {
-            case "Seed::Core::Containers::List":
-            case "Seed::Core::Containers::SensitiveList":
-            case "Seed::Core::Containers::ConcurencyList":
-            case "Seed::Core::Containers::ConcurencySensitiveList":
+            case Constants.Types.List:
+            case Constants.Types.SensitiveList:
+            case Constants.Types.ConcurencyList:
+            case Constants.Types.ConcurencySensitiveList:
                 {
                     var innerType = GetTypeWithOffset(0, record);
 
@@ -26,11 +26,16 @@ public partial class SeedSerializatorFactory
 
                     return typeof(LinkedList<>).MakeGenericType(innerType);
                 }
-            case "Seed::Core::Containers::Dictionary":
-            case "Seed::Core::Containers::ConcurencyDictionary":
 
-            case "Seed::Core::Containers::Map":
-            case "Seed::Core::Containers::ConcurencyMap":
+            case Constants.Types.Dictionary:
+            case Constants.Types.SensitiveDictionary:
+            case Constants.Types.ConcurencyDictionary:
+            case Constants.Types.ConcurencySensitiveDictionary:
+
+            case Constants.Types.Map:
+            case Constants.Types.SensitiveMap:
+            case Constants.Types.ConcurencyMap:
+            case Constants.Types.ConcurencySensitiveMap:
                 {
                     var innerTypeFirst = GetTypeWithOffset(1, record);
                     var innerTypeSecond = GetTypeWithOffset(2, record);
@@ -51,35 +56,35 @@ public partial class SeedSerializatorFactory
 
                     return typeof(Dictionary<,>).MakeGenericType(innerTypes);
                 }
-            case "Seed::Core::Containers::Array":
-            case "Seed::Core::Containers::SensitiveArray":
-            case "Seed::Core::Containers::ConcurencyArray":
-            case "Seed::Core::Containers::ConcurencySensitiveArray":
+            case Constants.Types.Array:
+            case Constants.Types.SensitiveArray:
+            case Constants.Types.ConcurencyArray:
+            case Constants.Types.ConcurencySensitiveArray:
 
-            case "Seed::Core::Containers::FixedArray":
-            case "Seed::Core::Containers::SensitiveFixedArray":
-            case "Seed::Core::Containers::ConcurencyFixedArray":
-            case "Seed::Core::Containers::ConcurencySensitiveFixedArray":
+            case Constants.Types.FixedArray:
+            case Constants.Types.SensitiveFixedArray:
+            case Constants.Types.ConcurencyFixedArray:
+            case Constants.Types.ConcurencySensitiveFixedArray:
 
-            case "Seed::Core::Containers::DynamicStack":
-            case "Seed::Core::Containers::SensitiveDynamicStack":
-            case "Seed::Core::Containers::ConcurencyDynamicStack":
-            case "Seed::Core::Containers::ConcurencySensitiveDynamicStack":
+            case Constants.Types.DynamicStack:
+            case Constants.Types.SensitiveDynamicStack:
+            case Constants.Types.ConcurencyDynamicStack:
+            case Constants.Types.ConcurencySensitiveDynamicStack:
 
-            case "Seed::Core::Containers::FixedStack":
-            case "Seed::Core::Containers::SensitiveFixedStack":
-            case "Seed::Core::Containers::ConcurencyFixedStack":
-            case "Seed::Core::Containers::ConcurencySensitiveFixedStack":
+            case Constants.Types.FixedStack:
+            case Constants.Types.SensitiveFixedStack:
+            case Constants.Types.ConcurencyFixedStack:
+            case Constants.Types.ConcurencySensitiveFixedStack:
 
-            case "Seed::Core::Containers::DynamicQueue":
-            case "Seed::Core::Containers::SensitiveDynamicQueue":
-            case "Seed::Core::Containers::ConcurencyDynamicQueue":
-            case "Seed::Core::Containers::ConcurencySensitiveDynamicQueue":
+            case Constants.Types.FixedQueue:
+            case Constants.Types.SensitiveFixedQueue:
+            case Constants.Types.ConcurencyFixedQueue:
+            case Constants.Types.ConcurencySensitiveFixedQueue:
 
-            case "Seed::Core::Containers::FixedQueue":
-            case "Seed::Core::Containers::SensitiveFixedQueue":
-            case "Seed::Core::Containers::ConcurencyFixedQueue":
-            case "Seed::Core::Containers::ConcurencySensitiveFixedQueue":
+            case Constants.Types.DynamicQueue:
+            case Constants.Types.SensitiveDynamicQueue:
+            case Constants.Types.ConcurencyDynamicQueue:
+            case Constants.Types.ConcurencySensitiveDynamicQueue:
                 {
                     var innerType = GetTypeWithOffset(0, record);
 
@@ -91,8 +96,9 @@ public partial class SeedSerializatorFactory
 
                     return typeof(List<>).MakeGenericType(innerType);
                 }
-            case "Seed::Core::Containers::Pair":
-            case "Seed::Core::Containers::SensitivePair":
+
+            case Constants.Types.Pair:
+            case Constants.Types.SensitivePair:
                 {
                     var innerTypeFirst = GetTypeWithOffset(0, record);
                     var innerTypeSecond = GetTypeWithOffset(1, record);
