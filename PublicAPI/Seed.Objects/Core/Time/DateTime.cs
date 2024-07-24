@@ -8,7 +8,7 @@ namespace Seed.Core.Time;
 [SerializableStruct("Seed::Core::Time::DateTime")]
 public struct DateTime
 {
-    [SerializableStructFieldManual("Ticks", "Seed::Core::SizeT")]
+    [SerializableStructField]
     public ID Ticks { get; set; }
 
     public DateTime() { Ticks = 0; }
@@ -39,7 +39,7 @@ public struct DateTime
 [SerializableStruct("Seed::Core::Time::TimeSpan")]
 public struct TimeSpan
 {
-    [SerializableStructFieldManual("Ticks", "Seed::Core::SizeT")]
+    [SerializableStructField]
     public ID Ticks { get; set; }
 
     public TimeSpan() { Ticks = 0; }

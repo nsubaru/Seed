@@ -12,6 +12,7 @@ internal struct ObjectPropertiesFieldsInformation
 {
     public String Name { get; set; }
     public String TypeName { get; set; }
+    public UUID FullTypeId { get; set; }
 }
 
 public partial class SeedSerializatorFactory
@@ -30,8 +31,8 @@ public partial class SeedSerializatorFactory
         var clrTypeAttribute = type.GetCustomAttribute<SerializableObjectPropetiesAttribute>()!;
         var objectType = allRttiTypes.First(x => x.IsValid && x.TypeName == clrTypeAttribute.TargetObjectTypeName);
 
-        var props = new List<ObjectPropertiesFieldsInformation>() { new ObjectPropertiesFieldsInformation() { TypeName = "Seed::Oore::SizeT", Name = "ObjId" } };
-        props.AddRange((from prop in objectType.Properties select new ObjectPropertiesFieldsInformation() { TypeName = prop.TypeName, Name = prop.Name }));
+        var props = new List<ObjectPropertiesFieldsInformation>() { new ObjectPropertiesFieldsInformation() { TypeName = Constants.Types.UInt64, Name = "ObjId", FullTypeId = allRttiTypes.First(x => x.TypeName == Constants.Types.UInt64).FullTypeId.Id } };
+        props.AddRange((from prop in objectType.Properties select new ObjectPropertiesFieldsInformation() { TypeName = prop.TypeName, Name = prop.Name, FullTypeId = prop.FullTypeId.Id }));
 
         foreach (var item in props)
         {
@@ -51,23 +52,46 @@ public partial class SeedSerializatorFactory
                     .FieldInformation.FieldName == item.Name))
                 .FirstOrDefault() != null;
 
-            var isExistAutoPropAttrb = type
+            var autoPropType = type
                 .GetProperties()
+                .Where(prop => prop.Name == item.Name)
                 .Where(prop => prop
-                    .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false)
-                    .Any(attrbs => prop.Name ==
-                        item.Name &&
-                        prop.PropertyType.GetCustomAttribute<SeedSerializableAttribute>()?.SeedKernelTypeName is not null))
-                .FirstOrDefault() != null;
+                    .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any())
+                .FirstOrDefault();
 
-            var isExistAutoFieldAttrb = type
+            var autoFieldType = type
                 .GetFields()
+                .Where(field => field.Name == item.Name)
                 .Where(field => field
-                    .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false)
-                    .Any(attrbs =>
-                        field.Name == item.Name &&
-                        field.FieldType.GetCustomAttribute<SeedSerializableAttribute>()?.SeedKernelTypeName is not null))
-                .FirstOrDefault() != null;
+                    .GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any())
+                .FirstOrDefault();
+
+            var isExistAutoPropAttrb = autoPropType != null;
+            var isExistAutoFieldAttrb = autoFieldType != null;
+
+            if (isExistAutoPropAttrb)
+            {
+                isExistAutoPropAttrb = supportedTypesList.Any(x => x.TypeName == item.TypeName && x.ClrType == autoPropType!.PropertyType);
+
+                if (!isExistAutoPropAttrb)
+                {
+                    var fieldRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId.Id == item.FullTypeId);
+
+                    isExistAutoFieldAttrb = fieldRecord != null && BuildClrType(fieldRecord!) != null;
+                }
+            }
+
+            if (isExistAutoFieldAttrb)
+            {
+                isExistAutoFieldAttrb = supportedTypesList.Any(x => x.TypeName == item.TypeName && x.ClrType == autoFieldType!.FieldType);
+
+                if (!isExistAutoFieldAttrb)
+                {
+                    var fieldRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId.Id == item.FullTypeId);
+
+                    isExistAutoFieldAttrb = fieldRecord != null && BuildClrType(fieldRecord!) != null;
+                }
+            }
 
             if (!(isExistManualPropAttrb || isExistManualFieldAttrb || isExistAutoPropAttrb || isExistAutoFieldAttrb))
             {
@@ -88,7 +112,7 @@ public partial class SeedSerializatorFactory
 
         var autoFields =
             from field in typeof(T).GetProperties()
-            where field.GetCustomAttribute<SerializableStructFieldAttribute>() is not null && field.PropertyType.GetCustomAttribute<SeedSerializableAttribute>()?.SeedKernelTypeName is not null
+            where field.GetCustomAttribute<SerializableStructFieldAttribute>() is not null
             select new
             {
                 Field = field,
@@ -140,7 +164,7 @@ public partial class SeedSerializatorFactory
 
         var autoFields =
             from field in typeof(T).GetProperties()
-            where field.GetCustomAttribute<SerializableStructFieldAttribute>() is not null && field.PropertyType.GetCustomAttribute<SeedSerializableAttribute>()?.SeedKernelTypeName is not null
+            where field.GetCustomAttribute<SerializableStructFieldAttribute>() is not null
             select new
             {
                 Field = field,

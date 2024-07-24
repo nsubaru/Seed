@@ -30,6 +30,13 @@ namespace Seed::Core::Serialization
             }
         }
 
+        /// <summary>
+        /// Update dynamic type full type id
+        /// </summary>
+        /// <param name="rawStream">Serialized stream</param>
+        /// <param name="typeMap">Full type ids map</param>
+        /// <param name="offset">Data location in stream</param>
+        /// <param name="helper">Optional serialization helper</param>
         static void UpdateImpl(Byte* rawStream, const UpdateTypeMap& typeMap, SizeT& offset, SerializatorHelper helper)
         {
             auto tmpOffset = offset;

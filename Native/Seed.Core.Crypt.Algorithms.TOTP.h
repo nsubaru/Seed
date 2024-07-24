@@ -9,9 +9,9 @@ namespace Seed::Core::Crypt::Algorithms
 	/// </summary>
 	/// <typeparam name="THashProvider">Hashing algorithm</typeparam>
 	template<typename THashProvider> requires Concepts::IsBasedOn<Crypt::Hash::IHashProvider, THashProvider>
-	class TOTP final : public IDisposable {
+	class TOTP final : public IDisposable, public Memory::Allocator<Memory::SensitiveDataHeap>, public CTTI::TypeTraits::ICustomStructWithOverridedSerializationBase<true> {
 	private:
-		struct Data
+		struct Data : public Memory::Allocator<Memory::SensitiveDataHeap>
 		{
 			SizeT timeIntervalInSeconds;
 			Time::UnixTime startTime;
@@ -29,7 +29,8 @@ namespace Seed::Core::Crypt::Algorithms
 				startTime(startTime), 
 				secretHash(MoveRValue(secretHash)), 
 				passwordSize(passwordSize), 
-				RefCount(1) {}
+				RefCount(1)
+			{}
 		};
 
 		Data* This;
@@ -49,6 +50,12 @@ namespace Seed::Core::Crypt::Algorithms
 
 	protected: 
 		virtual void Dispose() override {}
+
+	public:
+		/// <summary>
+		/// Create empty instance of TOTP
+		/// </summary>
+		TOTP(): This(new Data(0, {}, {}, 0)) {}
 
 	public:
 		/// <summary>
@@ -202,7 +209,8 @@ namespace Seed::Core::Crypt::Algorithms
 		/// Creates current TOTP auth key
 		/// </summary>
 		/// <returns>Current TOTP auth key with length 6</returns>
-		String CreateOneTimePasskey() {
+		SensitiveString CreateOneTimePasskey() const
+		{
 			return CreateCustomTOTPKey(GetCurrentTimeIndex(), This->passwordSize);
 		}
 
@@ -212,7 +220,7 @@ namespace Seed::Core::Crypt::Algorithms
 		/// <param name="timeIndex">Time index</param>
 		/// <param name="passwordSize">Auth key length</param>
 		/// <returns>Custom TOTP auth key</returns>
-		String CreateCustomTOTPKey(SizeT timeIndex, SizeT passwordSize)
+		SensitiveString CreateCustomTOTPKey(SizeT timeIndex, SizeT passwordSize) const
 		{
 			//Hash computing
 			auto hashedData =
@@ -243,7 +251,7 @@ namespace Seed::Core::Crypt::Algorithms
 		/// Returns current TOTP time index
 		/// </summary>
 		/// <returns>Current TOTP time index</returns>
-		SizeT GetCurrentTimeIndex()
+		SizeT GetCurrentTimeIndex() const
 		{
 			return (Time::UnixTime::GetCurrentSystemTime() - This->startTime).Value / This->timeIntervalInSeconds;
 		}
@@ -253,7 +261,7 @@ namespace Seed::Core::Crypt::Algorithms
 		/// </summary>
 		/// <param name="key">TOTP auth key</param>
 		/// <returns>Validation result</returns>
-		Boolean ValidateTOTPKey(String key)
+		Boolean ValidateTOTPKey(SensitiveString&& key) const
 		{
 			auto keyLength = key.Length;
 
@@ -269,6 +277,32 @@ namespace Seed::Core::Crypt::Algorithms
 
 			return false;
 		}
+
+	public:
+		/// <summary>
+		/// Create totp URI
+		/// </summary>
+		/// <param name="authority">Authority</param>
+		/// <param name="accountName">Account/principal name</param>
+		/// <returns></returns>
+		SensitiveString GetAsTotpUri(const SensitiveString& authority, const SensitiveString& accountName) const {
+			auto encodedAuthority = Text::Uri::Encode(authority);
+			auto encodedAccountName = Text::Uri::Encode(accountName);
+			auto base32secret = Text::Base32::Encode(This->secretHash).Trim(L'=');
+
+			auto uri = String::Combine(LR"(otpauth://totp/)", encodedAuthority, L":", encodedAccountName, 
+									   L"?secret=", base32secret, 
+									   L"&issuer=", encodedAuthority, 
+									   L"&algorithm=", L"SHA1", 
+									   L"&digits=", This->passwordSize, 
+									   L"&period=", This->timeIntervalInSeconds);
+
+			return uri;
+		}
+
+	public:
+		template<typename U>
+		friend struct Seed::Core::Serialization::SerializationHandler;
 
 	public:
 		RefCountClass(TOTP, This);

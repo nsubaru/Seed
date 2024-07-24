@@ -860,7 +860,15 @@ namespace Seed::Core::Containers
 		auto node = otherList.root;
 		while (node != nullptr)
 		{
-			this->last->next = new elem(node->value, this, this->last);
+			if (this->size == 0)
+			{
+				this->last = this->root = new elem(node->value, this, this->last);
+			}
+			else
+			{
+				this->last->next = new elem(node->value, this, this->last);
+			}
+
 			this->last = this->last->next;
 			node = node->next;
 		}
@@ -1003,6 +1011,34 @@ namespace Seed::Core::Containers
 #pragma endregion
 
 #pragma region Add new value by iterator
+	template<class THeap, typename T>
+	BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddFirst(const T& Value) {
+		if (this->root == nullptr)
+		{
+			this->last = this->root = new elem(Value, this);
+			this->size = 1;
+			return this->last;
+		}
+
+		this->root = this->root->prev = new elem(Value, this, nullptr, this->root);
+		++this->size;
+		return this->last;
+	}
+
+	template<class THeap, typename T>
+	BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddFirst(T&& Value) {
+		if (this->root == nullptr)
+		{
+			this->last = this->root = new elem(MoveRValue(Value), this);
+			this->size = 1;
+			return this->last;
+		}
+
+		this->root = this->root->prev = new elem(MoveRValue(Value), this, nullptr, this->root);
+		++this->size;
+		return this->last;
+	}
+
 	template<class THeap, typename T>
 	BaseList<THeap, T>::Iterator BaseList<THeap, T>::AddLast(const T& Value)
 	{

@@ -181,7 +181,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         if (this.registeredRecords.Count == 0)
             LoadAllRegisteredTypes();
 
-        return this.registeredRecords;
+        return this.registeredRecords.ToList();
     }
 
     /// <summary>
@@ -321,4 +321,10 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// Section information
     /// </summary>
     public SectionDetails SectionDetails => GetSectionDetails();
+
+
+    /// <summary>
+    /// Returns section data
+    /// </summary>
+    public byte[] Bytes => data ?? new byte[] { };
 }

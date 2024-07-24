@@ -985,25 +985,25 @@ namespace Seed::Core::Memory
 	template<Concepts::IsStandardLayout T, SizeT count>
 	inline void Copy(const Containers::Blob& source, T(&destination)[count], SizeT offset)
 	{
-		Copy(((T*) (const T* const) source) + offset, destination, Min(source.Count - offset, (count * sizeof(T))));
+		Copy(((Byte*) (const Byte* const) source) + offset, destination, Min(source.Count - offset, (count * sizeof(T))));
 	}
 
 	template<Concepts::IsStandardLayout T, SizeT count>
 	inline void Copy(T(&source)[count], const Containers::Blob& destination, SizeT offset)
 	{
-		Copy(source, ((T*) (const T* const) destination) + offset, Min(destination.Count - offset, (count * sizeof(T))));
+		Copy(source, ((Byte*) (const Byte* const) destination) + offset, Min(destination.Count - offset, (count * sizeof(T))));
 	}
 
 	template<Concepts::IsStandardLayout T>
 	inline void Copy(const Containers::Blob& source, T destination, SizeT offset)
 	{
-		Copy(((T*) (const T* const) source) + offset, &destination, Min(source.Count - offset, sizeof(T)));
+		Copy(((Byte*) (const Byte* const) source) + offset, &destination, Min(source.Count - offset, sizeof(T)));
 	}
 
 	template<Concepts::IsStandardLayout T>
 	inline void Copy(T source, Containers::Blob& destination, SizeT offset)
 	{
-		Copy(source, ((T*) (const T* const) destination) + offset, Min(destination.Count - offset, (sizeof(T))));
+		Copy(&source, ((Byte*) (const Byte* const) destination) + offset, Min(destination.Count - offset, (sizeof(T))));
 	}
 }
 

@@ -21,6 +21,16 @@ namespace Seed::Core
 		}
 
 		/// <summary>
+		/// Indicates whether the variable is a  hex digit
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if hex digit</returns>
+		static bool IsHexDigit(Char ch)
+		{
+			return IsDigit(ch) || (L'a' <= ch && ch <= L'f') || (L'A' <= ch && ch <= L'F');
+		}
+
+		/// <summary>
 		/// Indicates whether the variable is a space
 		/// </summary>
 		/// <param name="ch">Given character</param>
@@ -69,6 +79,16 @@ namespace Seed::Core
 		static bool IsLowerLatinLetter(Char ch)
 		{
 			return (L'a' <= ch && ch <= L'z');
+		}
+
+		/// <summary>
+		/// Indicates whether the variable is a latin letter or digit
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if latin letter or digit</returns>
+		static bool IsAlphaNumeric(Char ch)
+		{
+			return IsDigit(ch) || IsLatinLetter(ch);
 		}
 
 #ifdef SeedKernel

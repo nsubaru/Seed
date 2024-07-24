@@ -889,22 +889,55 @@ namespace Seed::Core::Containers
 
 #pragma region Add new value by iterator
 	template<class THeap, typename T>
-	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::AddLast(const T& value)
-	{
+	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::AddFirst(T&& value) {
 		// Performs in exclusive lock
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		if (this->root == nullptr)
 		{
-			auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-			if (this->root == nullptr)
-			{
-				this->last = this->root = new elem(value, this);
-				this->size = 1;
-				return this->last;
-			}
-
-			this->last = this->last->next = new elem(value, this, this->last);
-			++this->size;
+			this->last = this->root = new elem(MoveRValue(value), this);
+			this->size = 1;
+			return this->last;
 		}
+
+		this->root = this->root->prev = new elem(MoveRValue(value), this, nullptr, this->prev);
+		++this->size;
+
+		return this->root;
+	}
+
+	template<class THeap, typename T>
+	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::AddFirst(const T& value) {
+		// Performs in exclusive lock
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		if (this->root == nullptr)
+		{
+			this->last = this->root = new elem(value, this);
+			this->size = 1;
+			return this->last;
+		}
+
+		this->root = this->root->prev = new elem(value, this, nullptr, this->prev);
+		++this->size;
+
+		return this->root;
+	}
+
+	template<class THeap, typename T>
+	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::AddLast(const T& value) {
+		// Performs in exclusive lock
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		if (this->root == nullptr)
+		{
+			this->last = this->root = new elem(value, this);
+			this->size = 1;
+			return this->last;
+		}
+
+		this->last = this->last->next = new elem(value, this, this->last);
+		++this->size;
 
 		return this->last;
 	}
@@ -913,19 +946,17 @@ namespace Seed::Core::Containers
 	BaseConcurencyList<THeap, T>::Iterator BaseConcurencyList<THeap, T>::AddLast(T&& value)
 	{
 		// Performs in exclusive lock
+		auto _ = Threading::ExclusiveScoppedLock(this->lock);
+
+		if (this->root == nullptr)
 		{
-			auto _ = Threading::ExclusiveScoppedLock(this->lock);
-
-			if (this->root == nullptr)
-			{
-				this->last = this->root = new elem(MoveRValue(value), this);
-				this->size = 1;
-				return this->last;
-			}
-
-			this->last = this->last->next = new elem(MoveRValue(value), this, this->last);
-			++this->size;
+			this->last = this->root = new elem(MoveRValue(value), this);
+			this->size = 1;
+			return this->last;
 		}
+
+		this->last = this->last->next = new elem(MoveRValue(value), this, this->last);
+		++this->size;
 
 		return this->last;
 	}
