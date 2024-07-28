@@ -131,19 +131,22 @@ internal unsafe struct MetaData
 	[FieldOffset(0)]
 	public SizeT OffsetToCttiMetaData;
 
-	[FieldOffset(8)]
+    [FieldOffset(8)]
+    public SizeT OffsetToAttributes;
+
+    [FieldOffset(32)]
 	public UniversalTypeIdentifier TypeId;
 
-	[FieldOffset(24)]
+	[FieldOffset(33)]
 	public ETypes TypeClass;
 
-	[FieldOffset(25)]
+	[FieldOffset(34)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(105)]
+	[FieldOffset(113)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(106)]
+	[FieldOffset(114)]
 	public TextMetaData TypeName;
 }
 
@@ -206,21 +209,24 @@ internal unsafe struct FieldMetaData
 	public SizeT SizeOfItem;
 
 	[FieldOffset(8)]
+	public SizeT OffsetToAttributesList;
+
+    [FieldOffset(16)]
 	public UniversalTypeIdentifier TypeId;
 
-	[FieldOffset(24)]
+	[FieldOffset(32)]
 	public ETypes TypeClass;
 
-	[FieldOffset(25)]
+	[FieldOffset(33)]
 	public SizeT Offset;
 
-	[FieldOffset(33)]
+	[FieldOffset(41)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(121)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(122)]
 	public TextMetaData FieldName;
 }
 
@@ -334,22 +340,25 @@ internal unsafe struct MethodMetaData
 	[FieldOffset(0)]
 	public SizeT SizeOfItem;
 
-	[FieldOffset(8)]
+    [FieldOffset(8)]
+    public SizeT OffsetToAttributeName;
+
+    [FieldOffset(16)]
 	public SizeT MethodArgsOffset;
 
-	[FieldOffset(16)]
+	[FieldOffset(24)]
 	public CvRefModificators MethodCVRefModificators;
 
-    [FieldOffset(24)]
+    [FieldOffset(32)]
     public bool IsAsync;
 
-    [FieldOffset(25)]
+    [FieldOffset(33)]
 	public DynamicCallerFunc DynamicCaller;
 
-    [FieldOffset(33)]
+    [FieldOffset(41)]
     public DynamicCallerFunc AsyncDynamicCaller;
 
-    [FieldOffset(41)]
+    [FieldOffset(49)]
 	public TextMetaData MethodName;
 }
 
@@ -365,10 +374,13 @@ internal unsafe struct PropertyRecord
 	[FieldOffset(16)]
 	public SizeT OffsetToSetters;
 
-	[FieldOffset(24)]
+    [FieldOffset(24)]
+    public SizeT OffsetToAttributes;
+
+    [FieldOffset(32)]
 	public TUnsafeGet UnsafeGet;
 
-	[FieldOffset(32)]
+	[FieldOffset(40)]
 	public FieldMetaDataRecord PropertyType;
 }
 

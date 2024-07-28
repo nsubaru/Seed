@@ -13,6 +13,15 @@ namespace Seed::Core::CTTI::TypeTraits
         Type, Method, Function, Field, Uknown
     };
 
+    /// <summary>
+    /// Possible attribute value types
+    /// </summary>
+    template<typename T>
+    concept ITAttributeValue = 
+        Core::TypeTraits::IsStandardLayout<T> ||
+        Core::TypeTraits::HasConstexprDefaultCtorV<T> ||
+        Core::Concepts::IsSame<Char, typename Core::TypeTraits::IsConstexprArrayT<T>::ItemType>;
+
     template<auto TAttributeTarget, auto TAttributeName, auto TAttributeValue>
     struct AtrributeCttiRecord {
         constexpr static auto Target = TAttributeTarget();
@@ -47,9 +56,7 @@ namespace Seed::Core::CTTI::TypeTraits
 
         static_assert(Core::Concepts::IsSame<Char, typename Core::TypeTraits::IsConstexprArrayT<Core::TypeTraits::RemoveConst<decltype(Name)>>::ItemType>);
 
-        static_assert(Core::TypeTraits::IsStandardLayout<Core::TypeTraits::RemoveConst<decltype(Value)>> || 
-                      Core::TypeTraits::HasConstexprDefaultCtorV<Core::TypeTraits::RemoveConst<decltype(Value)>> ||
-                      Core::Concepts::IsSame<Char, typename Core::TypeTraits::IsConstexprArrayT<Core::TypeTraits::RemoveConst<decltype(Value)>>::ItemType>);
+        static_assert(ITAttributeValue<Core::TypeTraits::RemoveConst<decltype(Value)>>);
 
         constexpr AtrributeCttiRecord() = default;
         constexpr AtrributeCttiRecord(const AtrributeCttiRecord&) = default;
@@ -78,6 +85,11 @@ namespace Seed::Core::CTTI::TypeTraits
 
 #define CttiMethodAttributeRecord(AttributeTarget, AttributeName, AttributeValue) Seed::Core::CTTI::TypeTraits::AtrributeCttiRecord< \
  [] () constexpr { return &AttributeTarget; }, \
+ [] () constexpr { return Seed::Core::TypeTraits::CreateTypeStr(AttributeName); }, \
+ [] () constexpr { return AttributeValue; }>
+
+#define CttiExtendedMethodAttributeRecord(AttributeTargetType, AttributeTarget, AttributeName, AttributeValue) Seed::Core::CTTI::TypeTraits::AtrributeCttiRecord< \
+ [] () constexpr { return (AttributeTargetType) &AttributeTarget; }, \
  [] () constexpr { return Seed::Core::TypeTraits::CreateTypeStr(AttributeName); }, \
  [] () constexpr { return AttributeValue; }>
 
