@@ -9,7 +9,7 @@ namespace Seed::Core
 	/// </summary>
 	/// <typeparam name="THeap"></typeparam>
 	template <typename THeap>
-	class BaseUniString final : public Memory::Allocator<THeap> {
+	class BaseUniString final : public Memory::Allocator<THeap>, public Containers::LINQ::IStringCollectionGenericBase {
 	private:
 		/// <summary>
 		/// Proxy character object for UniString object
@@ -1148,7 +1148,7 @@ namespace Seed::Core
 		/// Returns "True" if object in "const" mode
 		/// </summary>
 		/// <returns>"True" if object in "const" mode</returns>
-		bool GetIsConstMode()
+		bool GetIsConstMode() const
 		{
 			return constMode.Read();
 		}
@@ -1157,6 +1157,10 @@ namespace Seed::Core
 		/// Returns "True" if object in "const" mode
 		/// </summary>
 		bool Property(GetIsConstMode) IsConstMode;
+
+	public:
+		template<typename T>
+		friend struct ::Seed::Core::Serialization::SerializationHandler;
 
 	public:
 		~BaseUniString() {}
@@ -1176,4 +1180,31 @@ namespace Seed::Core
 	/// Exception heap UniString
 	/// </summary>
 	using ExceptionUniString = BaseUniString<Memory::ExceptionHeap>;
+}
+
+namespace Seed::Core::CTTI::TypeNameSpecializations
+{
+	template<>
+	struct TTypeName<Seed::Core::BaseUniString<Memory::Heap>> {
+		constexpr static auto TypeName() {
+			return
+				Seed::Core::Details::CreateTypeStr(L"Seed::Core::UniString");
+		}
+	};
+
+	template<>
+	struct TTypeName<Seed::Core::BaseUniString<Memory::SensitiveDataHeap>> {
+		constexpr static auto TypeName() {
+			return
+				Seed::Core::Details::CreateTypeStr(L"Seed::Core::SenitiveUniString");
+		}
+	};
+
+	template<>
+	struct TTypeName<Seed::Core::BaseUniString<Memory::ExceptionHeap>> {
+		constexpr static auto TypeName() {
+			return
+				Seed::Core::Details::CreateTypeStr(L"Seed::Core::ExceptionUniString");
+		}
+	};
 }

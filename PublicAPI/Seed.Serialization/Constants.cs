@@ -40,6 +40,11 @@ internal static partial class Constants
 
         public const string String = "Seed::Core::String";
         public const string SensitiveString = "Seed::Core::SensitiveString";
+        public const string ExceptionString = "Seed::Core::ExceptionString";
+
+        public const string UniString = "Seed::Core::UniString";
+        public const string SensitiveUniString = "Seed::Core::SensitiveUniString";
+        public const string ExceptionUniString = "Seed::Core::ExceptionUniString";
 
         public const string List = "Seed::Core::Containers::List";
         public const string Array = "Seed::Core::Containers::Array";
