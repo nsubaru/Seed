@@ -134,13 +134,13 @@ internal unsafe struct MetaData
     [FieldOffset(8)]
     public SizeT OffsetToAttributes;
 
-    [FieldOffset(32)]
+    [FieldOffset(16)]
 	public UniversalTypeIdentifier TypeId;
 
-	[FieldOffset(33)]
+	[FieldOffset(32)]
 	public ETypes TypeClass;
 
-	[FieldOffset(34)]
+	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
 	[FieldOffset(113)]
@@ -183,22 +183,25 @@ internal unsafe struct ItemBase
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 internal unsafe struct FieldMetaDataRecord
 {
-	[FieldOffset(0)]
+    [FieldOffset(0)]
+    SizeT OffsetToAttributesList;
+
+    [FieldOffset(8)]
 	public UniversalTypeIdentifier TypeId;
 
-	[FieldOffset(16)]
+    [FieldOffset(24)]
 	public ETypes TypeClass;
 
-	[FieldOffset(17)]
+	[FieldOffset(25)]
 	public SizeT Offset;
 
-	[FieldOffset(25)]
+	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(105)]
+	[FieldOffset(113)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(106)]
+	[FieldOffset(114)]
 	public TextMetaData FieldName;
 }
 
@@ -341,10 +344,10 @@ internal unsafe struct MethodMetaData
 	public SizeT SizeOfItem;
 
     [FieldOffset(8)]
-    public SizeT OffsetToAttributeName;
+    public SizeT MethodArgsOffset;
 
     [FieldOffset(16)]
-	public SizeT MethodArgsOffset;
+    public SizeT MethodAttributesOffset;
 
 	[FieldOffset(24)]
 	public CvRefModificators MethodCVRefModificators;
