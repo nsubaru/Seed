@@ -41,6 +41,20 @@ namespace Seed::Core::Serialization
 		}
 
 		/// <summary>
+		/// Update dynamic type full type id
+		/// </summary>
+		/// <param name="rawStream">Serialized stream</param>
+		/// <param name="typeMap">Full type ids map</param>
+		/// <param name="offset">Data location in stream</param>
+		/// <param name="helper">Optional serialization helper</param>
+		static void UpdateImpl(Byte* rawStream, const UpdateTypeMap& typeMap, SizeT& offset, SerializatorHelper helper) {
+			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->secretHash)>::UpdateImpl(rawStream, typeMap, offset, helper);
+			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->passwordSize)>::UpdateImpl(rawStream, typeMap, offset, helper);
+			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->startTime)>::UpdateImpl(rawStream, typeMap, offset, helper);
+			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->timeIntervalInSeconds)>::UpdateImpl(rawStream, typeMap, offset, helper);
+		}
+
+		/// <summary>
 		/// Indicates, is it possible to copy the item without any additional processing
 		/// </summary>
 		/// <returns>"True" if it is possible to copy the item without any additional processing</returns>
