@@ -162,7 +162,7 @@ namespace Seed::Core::Containers
 
 	template<typename THeap, typename T>
 	T BaseConcurencyDynamicQueue<THeap, T>::Dequeue() {
-		return this->flowController.Consume([&]() InlineLambda {
+		return this->flowController.Consume([&]() -> T InlineLambda {
 			while (this->count == 0) this->flowController.WaitForProducer();
 
 			T res = MoveRValue(this->queue[this->front]);

@@ -22,7 +22,7 @@
     <DisplayString IncludeView="noparens">{{Count = {1}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
   
@@ -31,8 +31,8 @@
     <DisplayString IncludeView="noparens">{{Count = {2}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
   
@@ -41,9 +41,9 @@
     <DisplayString IncludeView="noparens">{{Count = {3}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
   
@@ -52,10 +52,10 @@
     <DisplayString IncludeView="noparens">{{Count = {4}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
   
@@ -64,11 +64,11 @@
     <DisplayString IncludeView="noparens">{{Count = {5}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
   
@@ -77,13 +77,13 @@
     <DisplayString IncludeView="noparens">{{Count = {5}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
       
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
   
@@ -92,14 +92,14 @@
     <DisplayString IncludeView="noparens">{{Count = {7}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
       
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -108,15 +108,15 @@
     <DisplayString IncludeView="noparens">{{Count = {8}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -125,16 +125,16 @@
     <DisplayString IncludeView="noparens">{{Count = {9}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
-      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
+      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -143,17 +143,17 @@
     <DisplayString IncludeView="noparens">{{Count = {10}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
-      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leafs))</Item>
-      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
+      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leaves))</Item>
+      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -162,19 +162,19 @@
     <DisplayString IncludeView="noparens">{{Count = {11}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
-      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leafs))</Item>
-      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
+      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leaves))</Item>
+      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leaves))</Item>
       
-      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leafs))</Item>
+      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -183,20 +183,20 @@
     <DisplayString IncludeView="noparens">{{Count = {12}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
-      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leafs))</Item>
-      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
+      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leaves))</Item>
+      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leafs))</Item>
-      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leafs))</Item>
+      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leaves))</Item>
+      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -205,21 +205,21 @@
     <DisplayString IncludeView="noparens">{{Count = {13}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
-      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leafs))</Item>
-      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
+      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leaves))</Item>
+      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leafs))</Item>
-      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leafs))</Item>
-      <Item Name="[12]">(*((Seed::Core::Containers::Details::V2Leaf&lt;12,$T13&gt;*)&amp;leafs))</Item>
+      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leaves))</Item>
+      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leaves))</Item>
+      <Item Name="[12]">(*((Seed::Core::Containers::Details::V2Leaf&lt;12,$T13&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -228,22 +228,22 @@
     <DisplayString IncludeView="noparens">{{Count = {14}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
-      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leafs))</Item>
-      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
+      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leaves))</Item>
+      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leafs))</Item>
-      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leafs))</Item>
-      <Item Name="[12]">(*((Seed::Core::Containers::Details::V2Leaf&lt;12,$T13&gt;*)&amp;leafs))</Item>
-      <Item Name="[13]">(*((Seed::Core::Containers::Details::V2Leaf&lt;13,$T14&gt;*)&amp;leafs))</Item>
+      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leaves))</Item>
+      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leaves))</Item>
+      <Item Name="[12]">(*((Seed::Core::Containers::Details::V2Leaf&lt;12,$T13&gt;*)&amp;leaves))</Item>
+      <Item Name="[13]">(*((Seed::Core::Containers::Details::V2Leaf&lt;13,$T14&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
 
@@ -252,23 +252,23 @@
     <DisplayString IncludeView="noparens">{{Count = {15}}}</DisplayString>
     <DisplayString ExcludeView="noparens">({*this,view(noparens)})</DisplayString>
     <Expand>
-      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leafs))</Item>
-      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leafs))</Item>
-      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leafs))</Item>
-      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leafs))</Item>
-      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leafs))</Item>
+      <Item Name="[0]">(*((Seed::Core::Containers::Details::V2Leaf&lt;0,$T1&gt;*)&amp;leaves))</Item>
+      <Item Name="[1]">(*((Seed::Core::Containers::Details::V2Leaf&lt;1,$T2&gt;*)&amp;leaves))</Item>
+      <Item Name="[2]">(*((Seed::Core::Containers::Details::V2Leaf&lt;2,$T3&gt;*)&amp;leaves))</Item>
+      <Item Name="[3]">(*((Seed::Core::Containers::Details::V2Leaf&lt;3,$T4&gt;*)&amp;leaves))</Item>
+      <Item Name="[4]">(*((Seed::Core::Containers::Details::V2Leaf&lt;4,$T5&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leafs))</Item>
-      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leafs))</Item>
-      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leafs))</Item>
-      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leafs))</Item>
-      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leafs))</Item>
+      <Item Name="[5]">(*((Seed::Core::Containers::Details::V2Leaf&lt;5,$T6&gt;*)&amp;leaves))</Item>
+      <Item Name="[6]">(*((Seed::Core::Containers::Details::V2Leaf&lt;6,$T7&gt;*)&amp;leaves))</Item>
+      <Item Name="[7]">(*((Seed::Core::Containers::Details::V2Leaf&lt;7,$T8&gt;*)&amp;leaves))</Item>
+      <Item Name="[8]">(*((Seed::Core::Containers::Details::V2Leaf&lt;8,$T9&gt;*)&amp;leaves))</Item>
+      <Item Name="[9]">(*((Seed::Core::Containers::Details::V2Leaf&lt;9,$T10&gt;*)&amp;leaves))</Item>
 
-      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leafs))</Item>
-      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leafs))</Item>
-      <Item Name="[12]">(*((Seed::Core::Containers::Details::V2Leaf&lt;12,$T13&gt;*)&amp;leafs))</Item>
-      <Item Name="[13]">(*((Seed::Core::Containers::Details::V2Leaf&lt;13,$T14&gt;*)&amp;leafs))</Item>
-      <Item Name="[14]">(*((Seed::Core::Containers::Details::V2Leaf&lt;14,$T15&gt;*)&amp;leafs))</Item>
+      <Item Name="[10]">(*((Seed::Core::Containers::Details::V2Leaf&lt;10,$T11&gt;*)&amp;leaves))</Item>
+      <Item Name="[11]">(*((Seed::Core::Containers::Details::V2Leaf&lt;11,$T12&gt;*)&amp;leaves))</Item>
+      <Item Name="[12]">(*((Seed::Core::Containers::Details::V2Leaf&lt;12,$T13&gt;*)&amp;leaves))</Item>
+      <Item Name="[13]">(*((Seed::Core::Containers::Details::V2Leaf&lt;13,$T14&gt;*)&amp;leaves))</Item>
+      <Item Name="[14]">(*((Seed::Core::Containers::Details::V2Leaf&lt;14,$T15&gt;*)&amp;leaves))</Item>
     </Expand>
   </Type>
   
