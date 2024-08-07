@@ -900,7 +900,7 @@ namespace Seed::Core::Containers
 			return this->last;
 		}
 
-		this->root = this->root->prev = new elem(MoveRValue(value), this, nullptr, this->prev);
+		this->root = this->root->prev = new elem(MoveRValue(value), this, nullptr, this->root);
 		++this->size;
 
 		return this->root;
@@ -918,7 +918,7 @@ namespace Seed::Core::Containers
 			return this->last;
 		}
 
-		this->root = this->root->prev = new elem(value, this, nullptr, this->prev);
+		this->root = this->root->prev = new elem(value, this, nullptr, this->root);
 		++this->size;
 
 		return this->root;

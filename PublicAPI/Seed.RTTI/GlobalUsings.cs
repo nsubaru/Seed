@@ -16,6 +16,7 @@ global using TDtor = System.IntPtr;
 global using TSerialize = System.IntPtr;
 global using TDeserialize = System.IntPtr;
 global using TSerializizationSize = System.IntPtr;
+global using TUpdateSerialize = System.IntPtr;
 global using TToString = System.IntPtr;
 global using TUnsafeGet = System.IntPtr;
 global using TGetRttiRecord = System.IntPtr;

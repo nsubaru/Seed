@@ -47,11 +47,15 @@ namespace Seed::Core::Serialization
 		/// <param name="typeMap">Full type ids map</param>
 		/// <param name="offset">Data location in stream</param>
 		/// <param name="helper">Optional serialization helper</param>
-		static void UpdateImpl(Byte* rawStream, const UpdateTypeMap& typeMap, SizeT& offset, SerializatorHelper helper) {
-			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->secretHash)>::UpdateImpl(rawStream, typeMap, offset, helper);
-			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->passwordSize)>::UpdateImpl(rawStream, typeMap, offset, helper);
-			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->startTime)>::UpdateImpl(rawStream, typeMap, offset, helper);
-			SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->timeIntervalInSeconds)>::UpdateImpl(rawStream, typeMap, offset, helper);
+		static UInt64 UpdateImpl(Byte* rawStream, const UpdateTypeMap& typeMap, SizeT& offset, SerializatorHelper helper) {
+			UInt64 changesCount = 0;
+
+			changesCount += SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->secretHash)>::UpdateImpl(rawStream, typeMap, offset, helper);
+			changesCount += SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->passwordSize)>::UpdateImpl(rawStream, typeMap, offset, helper);
+			changesCount += SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->startTime)>::UpdateImpl(rawStream, typeMap, offset, helper);
+			changesCount += SerializationHandler<decltype(Crypt::Algorithms::TOTP<THashProvider>().This->timeIntervalInSeconds)>::UpdateImpl(rawStream, typeMap, offset, helper);
+
+			return changesCount;
 		}
 
 		/// <summary>

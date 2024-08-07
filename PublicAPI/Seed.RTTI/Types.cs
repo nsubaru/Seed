@@ -78,7 +78,10 @@ internal unsafe struct MetaDataForDynamicRecord
 	[FieldOffset(64)]
 	public TSerializizationSize FSerializizationSize;
 
-	[FieldOffset(72)]
+    [FieldOffset(72)]
+    public TUpdateSerialize FUpdateSerialization;
+
+    [FieldOffset(80)]
 	public TToString FToString;
 }
 
@@ -143,10 +146,10 @@ internal unsafe struct MetaData
 	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(121)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(122)]
 	public TextMetaData TypeName;
 }
 
@@ -198,10 +201,10 @@ internal unsafe struct FieldMetaDataRecord
 	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(121)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(122)]
 	public TextMetaData FieldName;
 }
 
@@ -226,10 +229,10 @@ internal unsafe struct FieldMetaData
 	[FieldOffset(41)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(121)]
+	[FieldOffset(129)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(122)]
+	[FieldOffset(130)]
 	public TextMetaData FieldName;
 }
 
@@ -248,10 +251,10 @@ internal unsafe struct ItemMetaData
 	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(105)]
+	[FieldOffset(113)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(106)]
+	[FieldOffset(114)]
 	public TextMetaData TypeName;
 }
 
@@ -270,13 +273,13 @@ internal unsafe struct ArgumentMetaData
 	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(105)]
+	[FieldOffset(113)]
 	public Boolean IsSerializable;
 
-	[FieldOffset(106)]
+	[FieldOffset(114)]
 	public CvRefModificators Flags;
 
-	[FieldOffset(114)]
+	[FieldOffset(122)]
 	public TextMetaData TypeName;
 }
 
@@ -327,13 +330,13 @@ internal unsafe struct InterfaceRecord
 	[FieldOffset(24)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(104)]
+	[FieldOffset(112)]
 	public DynamicConverterFunc DynamicConverterTo;
 
-	[FieldOffset(112)]
+	[FieldOffset(120)]
 	public DynamicConverterFunc DynamicConverterFrom;
 
-	[FieldOffset(120)]
+	[FieldOffset(128)]
 	public TextMetaData TypeName;
 }
 
