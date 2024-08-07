@@ -10,7 +10,7 @@ struct __attributes : Seed::Core::TypeTraits::LogicFalse{
 namespace Seed::Core::CTTI::TypeTraits
 {
     enum class EAttributeTargetType : UInt8 {
-        Type, Method, Function, Field, Uknown
+        Type, Method, Function, Field, Unknown
     };
 
     /// <summary>
@@ -48,11 +48,11 @@ namespace Seed::Core::CTTI::TypeTraits
             }
             else 
             {
-                return EAttributeTargetType::Uknown;
+                return EAttributeTargetType::Unknown;
             }
         }
 
-        static_assert(GetTargetType() != EAttributeTargetType::Uknown);
+        static_assert(GetTargetType() != EAttributeTargetType::Unknown);
 
         static_assert(Core::Concepts::IsSame<Char, typename Core::TypeTraits::IsConstexprArrayT<Core::TypeTraits::RemoveConst<decltype(Name)>>::ItemType>);
 
