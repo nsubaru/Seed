@@ -9,7 +9,7 @@ public partial class SeedSerializatorFactory
 {
     private void AddStringSer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
-        code.AppendLine($"ulong count = data.Length != 0 ? data.Length + 1ul : 0ul;");
+        code.AppendLine($"ulong count = data.Length != 0 ? ((ulong) data.Length) + 1ul : 0ul;");
         code.AppendLine($"SerializeImpl(count, stream);");
         code.AppendLine($"if (data.Length == 0) return;");
 
@@ -45,7 +45,7 @@ public partial class SeedSerializatorFactory
 
     private void AddStringDer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
-        code.AppendLine($"var strSize = (UInt64)0;");
+        code.AppendLine($"var strSize = (UInt64) 0;");
         code.AppendLine($"strSize = DeserializeImpl(strSize, stream);");
         code.AppendLine($"if (strSize == 0) return CreateObject<{GetFriendlyTypeName(typeof(T))}>();");
         code.AppendLine($"strSize *= 2;");
