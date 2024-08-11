@@ -58,7 +58,7 @@ namespace Seed::Core::Serialization
 			UInt64 changesCount = SerializationHandler<SizeT>::UpdateImpl(rawStream, typeMap, tmpOffset, helper);
 			SerializationHandler<SizeT>::DeserializeImpl(count, rawStream, offset, helper);
 
-			offset += count;
+			offset += count * sizeof(CharacterType);
 			return changesCount;
 		};
 
