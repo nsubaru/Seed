@@ -11,6 +11,6 @@ ExceptionString BadCast::toString() const
 {
 	return ExceptionString::Combine(
 		exceptionName, L". ",
-		location.toString(), L". "
+		location.toString(), L"."
 	);
 }

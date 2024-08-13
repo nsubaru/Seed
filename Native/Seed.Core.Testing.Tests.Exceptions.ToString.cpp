@@ -6,7 +6,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::AlreadyExistExceptionToStr
 	auto obj2 = AlreadyExistException({L"PathToFile",400 },L"Already exists");
 	auto expected = ExceptionString::Combine(L"Already exists. ",
 		L"Generated in line 400 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 	auto actual2 = obj2.toString();
 
@@ -20,7 +20,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::BadCastToString::Execute()
 	auto obj = BadCast({ L"PathToFile",300 });
 	auto expected = ExceptionString::Combine(L"Impossible to transform the type. ",
 		L"Generated in line 300 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -32,7 +32,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::BadExceptionToString::Exec
 	auto obj = BadException({ L"PathToFile",200 });
 	auto expected = ExceptionString::Combine(L"Invalid exception type. ",
 		L"Generated in line 200 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -44,7 +44,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::BadPureCallToString::Execu
 	auto obj = BadPureCall({ L"PathToFile",700 });
 	auto expected = ExceptionString::Combine(L"Impossible to call the virtual function. ",
 		L"Generated in line 700 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -56,7 +56,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::DivideByZeroToString::Exec
 	auto obj = DivideByZero({ L"PathToFile",600 });
 	auto expected = ExceptionString::Combine(L"The division by zero. ",
 		L"Generated in line 600 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -68,7 +68,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::EmptyQueueExceptionToStrin
 	auto obj = EmptyQueueException({ L"PathToFile",500 });
 	auto expected = ExceptionString::Combine(L"Trying to remove items from an empty queue. ",
 		L"Generated in line 500 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -80,7 +80,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::EmptyStackExceptionToStrin
 	auto obj = EmptyStackException({ L"PathToFile",500 });
 	auto expected = ExceptionString::Combine(L"Trying to remove items from an empty stack. ",
 		L"Generated in line 500 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -92,7 +92,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::EndNodeNotReferenceableToS
 	auto obj = EndNodeNotReferenceable({ L"PathToFile", 500 });
 	auto expected = ExceptionString::Combine(L"Not definned iterator at the end. ",
 		L"Generated in line 500 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -105,7 +105,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::FullQueueExceptionToString
 	auto expected = ExceptionString::Combine(L"Maximal queue size exceeded. ",
 		L"Maximal allowed size - 50. ",
 		L"Generated in line 500 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -118,7 +118,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::FullStackExceptionToString
 	auto expected = ExceptionString::Combine(L"Maximum stack size is exceeded. ",
 		L"Maximal allowed size - 50. ",
 		L"Generated in line 500 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -131,7 +131,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::IndexOutOfRangeToString::E
 	auto expected = ExceptionString::Combine(L"Out of range. ",
 		L"During the try to access the element by index 61 if maximal allowed index 59. ",
 		L"Generated in line 500 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -143,7 +143,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::IntegerOverflowExceptionTo
 	auto obj = IntegerOverflowException({ L"PathToFile", 500 });
 	auto expected = ExceptionString::Combine(L"Integer overflow. ",
 		L"Generated in line 500 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -156,7 +156,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::InternalErrorToString::Exe
 	auto expected = ExceptionString::Combine(
 		L"Kernel internal exception. ",
 		L"Generated in line 100 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -169,7 +169,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::InteruptExceptionToString:
 	auto expected = ExceptionString::Combine(
 		L"The operation is interrupted. ",
 		L"Generated in line 100 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -184,7 +184,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::InvalidArgumentExceptionTo
 		L"Invalid Argument",
 		L" argument. Additional description: Additional information. ",
 		L"Generated in line 100 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -197,7 +197,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::InvalidFormatExceptionToSt
 	auto expected = ExceptionString::Combine(
 		L"Invalid format. ",
 		L"Generated in line 100 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
@@ -210,7 +210,7 @@ bool Seed::Core::Testing::Test::Exceptions::ToString::InvalidHandleUsageToString
 	auto expected = ExceptionString::Combine(
 		L"Using the invalid descriptor. ",
 		L"Generated in line 100 in file PathToFile in thread with ID ",
-		Threading::GetTID());
+		Threading::GetTID(), L".");
 	auto actual = obj.toString();
 
 	Asserts::AssertEqual(expected, actual, SourcePosition);
