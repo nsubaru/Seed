@@ -5,7 +5,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::CantReadMoreDataTh
 	auto obj = Seed::Core::IO::FS::CantReadMoreDataThanInExistInFileException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: Unable to read more than is in file. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -19,7 +19,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::CantWriteDataAfter
 	auto obj = Seed::Core::IO::FS::CantWriteDataAfterEofException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: Unable to write data after end of file. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -33,7 +33,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::DirectoryIsNotFile
 	auto obj = Seed::Core::IO::FS::DirectoryIsNotFileException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: Unable to open the directory as a file. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -47,7 +47,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::FileBusyExceptionT
 	auto obj = Seed::Core::IO::FS::FileBusyException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: File is busy. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -61,7 +61,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::FileExistException
 	auto obj = Seed::Core::IO::FS::FileExistException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: File already exists. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -75,7 +75,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::FileIsCoruptedExce
 	auto obj = Seed::Core::IO::FS::FileIsCoruptedException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: File is corrupted, file system check required. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -89,7 +89,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::FileModeNoSupporte
 	auto obj = Seed::Core::IO::FS::FileModeNoSupportedByOperationException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: The operation is not available in the current file mode. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -103,7 +103,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::FileNameInvalidExc
 	auto obj = Seed::Core::IO::FS::FileNameInvalidException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: Invalid file name. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -117,7 +117,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::FileNotExistExcept
 	auto obj = Seed::Core::IO::FS::FileNotExistException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: File not found. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -148,13 +148,13 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::GenericFileExcepti
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: File not found. ",
 		L"With message: STATUS_SUCCESS Operation success. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto expected2 = ExceptionString::Combine(
 		L"File exception with message: File not found. ",
 		L"Unknown status with code: 0x87415610L. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
@@ -170,7 +170,7 @@ bool Seed::Core::Testing::Test::IO::FS::Exceptions::ToString::PathNotFoundExcept
 	auto obj = Seed::Core::IO::FS::PathNotFoundException({ L"PathToFile",400 }, L"SomeFile");
 	auto expected = ExceptionString::Combine(
 		L"File exception with message: Invalid object path. ",
-		L"Occurs while processing the file: \SomeFile\"",
+		L"Occurs while processing the file: \"SomeFile\"",
 		L"Generated in line 400 in file PathToFile in thread with ID. ",
 		Threading::GetTID());
 	auto actual = obj.toString();
