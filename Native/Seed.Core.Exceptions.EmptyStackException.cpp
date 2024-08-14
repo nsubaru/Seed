@@ -11,7 +11,7 @@ void EmptyStackException::ThrowMe()
 ExceptionString EmptyStackException::toString() const
 {
 	return ExceptionString::Combine(
-		exceptionName,
+		exceptionName, L" ",
 		location.toString(),
 		(innerException == nullptr) ? L"."C : (L". Also there is a nested exception: " + InnerException->toString())
 	);
