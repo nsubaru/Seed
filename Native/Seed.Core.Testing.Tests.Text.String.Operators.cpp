@@ -9,22 +9,11 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringLiteralTo
 	Core::String str;
 	str += L"";
 
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(str.Length, 0, SourcePosition);
-
-	str = Core::String();
-	str += L"\0";
-
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(str.Length, 0, SourcePosition);
 
 	str = Core::String();
 	str += L"123";
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -32,8 +21,6 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringLiteralTo
 	str = Core::String(L"123");
 	str += L"";
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -45,22 +32,11 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringALiteralT
 	Core::String str;
 	str += "";
 
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(str.Length, 0, SourcePosition);
-
-	str = Core::String();
-	str += "\0";
-
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(str.Length, 0, SourcePosition);
 
 	str = Core::String();
 	str += "123";
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -68,8 +44,6 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringALiteralT
 	str = Core::String(L"123");
 	str += "";
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -81,22 +55,11 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstStringToEm
 	Core::String str;
 	str += Core::ConstString(L"");
 
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(str.Length, 0, SourcePosition);
-
-	str = Core::String();
-	str += Core::ConstString(L"\0");
-
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(str.Length, 0, SourcePosition);
 
 	str = Core::String();
 	str += Core::ConstString(L"123");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -104,8 +67,6 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstStringToEm
 	str = Core::String(L"123");
 	str += Core::ConstString(L"");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -117,22 +78,11 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstAStringToE
 	Core::String str;
 	str += Core::ConstAString("");
 
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(str.Length, 0, SourcePosition);
-
-	str = Core::String();
-	str += Core::ConstAString("\0");
-
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(str.Length, 0, SourcePosition);
 
 	str = Core::String();
 	str += Core::ConstAString("123");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -140,8 +90,6 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstAStringToE
 	str = Core::String(L"123");
 	str += Core::ConstAString("");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -153,22 +101,11 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringWithOther
 	Core::String str;
 	str += Core::SensitiveString(L"");
 
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(str.Length, 0, SourcePosition);
-
-	str = Core::String();
-	str += Core::SensitiveString(L"\0");
-
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(str.Length, 0, SourcePosition);
 
 	str = Core::String();
 	str += Core::SensitiveString(L"123");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -176,8 +113,6 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringWithOther
 	str = Core::String(L"123");
 	str += Core::SensitiveString(L"");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -189,22 +124,11 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstExprString
 	Core::String str;
 	str += TypeTraits::CreateTypeStr(L"");
 
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(str.Length, 0, SourcePosition);
-
-	str = Core::String();
-	str += TypeTraits::CreateTypeStr(L"\0");
-
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(str.Length, 0, SourcePosition);
 
 	str = Core::String();
 	str += TypeTraits::CreateTypeStr(L"123");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -212,8 +136,6 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstExprString
 	str = Core::String(L"123");
 	str += TypeTraits::CreateTypeStr(L"");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -225,22 +147,11 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstExprAStrin
 	Core::String str;
 	str += TypeTraits::CreateTypeStr("");
 
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(str.Length, 0, SourcePosition);
-
-	str = Core::String();
-	str += TypeTraits::CreateTypeStr("\0");
-
-	Asserts::AssertEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(str.Length, 0, SourcePosition);
 
 	str = Core::String();
 	str += TypeTraits::CreateTypeStr("123");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -248,8 +159,6 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstExprAStrin
 	str = Core::String(L"123");
 	str += TypeTraits::CreateTypeStr("");
 
-	Asserts::AssertNotEqual((ConstCharStr) str, nullptr, SourcePosition);
-	Asserts::AssertEqual(str.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(str.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(str, L"123", SourcePosition);
@@ -263,20 +172,10 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationStringLiteralT
 	Core::String str;
 	Core::String res = str + L"";
 
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(res.Length, 0, SourcePosition);
-
-	res = str + L"\0";
-
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(res.Length, 0, SourcePosition);
 
 	res = str + L"123";
 
-	Asserts::AssertNotEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(res.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(res, L"123", SourcePosition);
@@ -288,20 +187,10 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationStringALiteral
 	Core::String str;
 	Core::String res = str + "";
 
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(res.Length, 0, SourcePosition);
-
-	res = str + "\0";
-
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(res.Length, 0, SourcePosition);
 
 	res = str + "123";
 
-	Asserts::AssertNotEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(res.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(res, L"123", SourcePosition);
@@ -313,20 +202,10 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstStringToE
 	Core::String str;
 	Core::String res = str + Core::ConstString(L"");
 
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(res.Length, 0, SourcePosition);
-
-	res = str + Core::ConstString(L"\0");
-
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(res.Length, 0, SourcePosition);
 
 	res = str + Core::ConstString(L"123");
 
-	Asserts::AssertNotEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(res.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(res, L"123", SourcePosition);
@@ -338,20 +217,10 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstAStringTo
 	Core::String str;
 	Core::String res = str + Core::ConstAString("");
 
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(res.Length, 0, SourcePosition);
-
-	res = str + Core::ConstAString("\0");
-
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(res.Length, 0, SourcePosition);
 
 	res = str + Core::ConstAString("123");
 
-	Asserts::AssertNotEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(res.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(res, L"123", SourcePosition);
@@ -363,20 +232,10 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationStringWithOthe
 	Core::String str;
 	Core::String res = str + Core::SensitiveString(L"");
 
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(res.Length, 0, SourcePosition);
-
-	res = str + Core::SensitiveString(L"\0");
-
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(res.Length, 0, SourcePosition);
 
 	res = str + Core::SensitiveString(L"123");
 
-	Asserts::AssertNotEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(res.Length, 3, SourcePosition);
 
 	Asserts::AssertEqual(res, L"123", SourcePosition);
@@ -388,19 +247,10 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstExprStrin
 	Core::String str;
 	Core::String res = str + TypeTraits::CreateTypeStr(L"");
 
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(res.Length, 0, SourcePosition);
-
-	res = str + TypeTraits::CreateTypeStr(L"\0");
-
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(res.Length, 0, SourcePosition);
 
 	res = str + TypeTraits::CreateTypeStr(L"123");
 
-	Asserts::AssertNotEqual((ConstCharStr) res, nullptr, SourcePosition);
 	Asserts::AssertEqual(res.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(res.Length, 3, SourcePosition);
 
@@ -413,19 +263,10 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstExprAStri
 	Core::String str;
 	Core::String res = str + TypeTraits::CreateTypeStr("");
 
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
-	Asserts::AssertEqual(res.Length, 0, SourcePosition);
-
-	res = str + TypeTraits::CreateTypeStr("\0");
-
-	Asserts::AssertEqual((ConstCharStr) res, nullptr, SourcePosition);
-	Asserts::AssertEqual(res.Size, 0Kb, SourcePosition);
 	Asserts::AssertEqual(res.Length, 0, SourcePosition);
 
 	res = str + TypeTraits::CreateTypeStr("123");
 
-	Asserts::AssertNotEqual((ConstCharStr) res, nullptr, SourcePosition);
 	Asserts::AssertEqual(res.Size, 8b, SourcePosition);
 	Asserts::AssertEqual(res.Length, 3, SourcePosition);
 
@@ -441,6 +282,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringLiteralTo
 	str += L"123";
 
 	Asserts::AssertEqual(str, L"123123", SourcePosition);
+	Asserts::AssertEqual(str.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -450,6 +292,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringALiteralT
 	str += "123";
 
 	Asserts::AssertEqual(str, L"123123", SourcePosition);
+	Asserts::AssertEqual(str.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -459,6 +302,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstStringToSt
 	str += Core::ConstString(L"123");
 
 	Asserts::AssertEqual(str, L"123123", SourcePosition);
+	Asserts::AssertEqual(str.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -468,6 +312,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstAStringToS
 	str += Core::ConstAString("123");
 
 	Asserts::AssertEqual(str, L"123123", SourcePosition);
+	Asserts::AssertEqual(str.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -477,6 +322,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionStringWithOther
 	str += Core::SensitiveString(L"123");
 
 	Asserts::AssertEqual(str, L"123123", SourcePosition);
+	Asserts::AssertEqual(str.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -486,6 +332,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstExprString
 	str += TypeTraits::CreateTypeStr(L"123");
 
 	Asserts::AssertEqual(str, L"123123", SourcePosition);
+	Asserts::AssertEqual(str.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -495,6 +342,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::AdditionConstExprAStrin
 	str += TypeTraits::CreateTypeStr("123");
 
 	Asserts::AssertEqual(str, L"123123", SourcePosition);
+	Asserts::AssertEqual(str.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -506,6 +354,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationStringLiteralT
 	Core::String res = str + L"123";
 
 	Asserts::AssertEqual(res, L"123123", SourcePosition);
+	Asserts::AssertEqual(res.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -515,6 +364,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationStringALiteral
 	Core::String res = str + "123";
 
 	Asserts::AssertEqual(res, L"123123", SourcePosition);
+	Asserts::AssertEqual(res.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -524,6 +374,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstStringToS
 	Core::String res = str + Core::ConstString(L"123");
 
 	Asserts::AssertEqual(res, L"123123", SourcePosition);
+	Asserts::AssertEqual(res.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -533,6 +384,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstAStringTo
 	Core::String res = str + Core::ConstAString("123");
 
 	Asserts::AssertEqual(res, L"123123", SourcePosition);
+	Asserts::AssertEqual(res.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -542,6 +394,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationStringWithOthe
 	Core::String res = str + Core::SensitiveString(L"123");
 
 	Asserts::AssertEqual(res, L"123123", SourcePosition);
+	Asserts::AssertEqual(res.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -551,6 +404,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstExprStrin
 	Core::String res = str + TypeTraits::CreateTypeStr(L"123");
 
 	Asserts::AssertEqual(res, L"123123", SourcePosition);
+	Asserts::AssertEqual(res.Length, 6, SourcePosition);
 
 	return true;
 }
@@ -560,6 +414,7 @@ bool Seed::Core::Testing::Test::Text::String::Operators::SummationConstExprAStri
 	Core::String res = str + TypeTraits::CreateTypeStr("123");
 
 	Asserts::AssertEqual(res, L"123123", SourcePosition);
+	Asserts::AssertEqual(res.Length, 6, SourcePosition);
 
 	return true;
 }
