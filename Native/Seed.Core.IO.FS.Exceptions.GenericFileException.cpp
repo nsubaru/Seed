@@ -11,7 +11,7 @@ ExceptionString Seed::Core::IO::FS::GenericFileException::toString() const
 {
 	return ExceptionString::Combine(
 		L"File exception with message: ", exceptionName, L". ",
-		GetStatusCodeMessageIfAvailable(), L". ",
+		GetStatusCodeMessageIfAvailable(),
 		L"Occurs while processing the file: \"", fileName, L"\"",
 		location.toString(),
 		(innerException == nullptr) ? L"."C : L". Also there is a nested exception: "C, InnerException->toString()
