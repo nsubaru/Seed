@@ -13,7 +13,6 @@ ExceptionString Seed::Core::IO::IoException::toString() const
 		exceptionName,
 		L". ",
 		location.toString(),
-		L" ",
 		(innerException == nullptr) ? L"."C : (L". Also there is a nested exception: " + InnerException->toString())
 	);
 }
