@@ -18,15 +18,22 @@ public partial class SeedSerializatorFactory
             types.Add(type);
         }
 
-        var tp = typeof(ValueTuple)
-            .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-            .First(mth => mth.Name == "Create" && mth.GetParameters().Length == types.Count)
-            .ReturnType
-            .GetGenericTypeDefinition();
+        if (types.Count == 0)
+        {
+            return typeof(ValueTuple);
+        }
+        else
+        {
+            var tp = typeof(ValueTuple)
+                .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                .First(mth => mth.Name == "Create" && mth.GetParameters().Length == types.Count)
+                .ReturnType
+                .GetGenericTypeDefinition();
 
-        if (tp == null) return null;
+            if (tp == null) return null;
 
-        return tp.MakeGenericType(types.ToArray());
+            return tp.MakeGenericType(types.ToArray());
+        }
     }
 
     private void AddTupleSer<T>(ref StringBuilder code, TypeRecord typeRecord)

@@ -15,6 +15,7 @@ namespace Seed::Core::Concepts
     concept AtomicType = 
         Concepts::IsInteger<T> || 
         Concepts::IsEnum<T> || 
+        TypeTraits::IsPointerV<T> ||
         TypeTraits::IsEnumFlagsV<T> || 
         TypeTraits::IsBoolean<T>;
 }
@@ -141,8 +142,11 @@ namespace Seed::Core
         template<Concepts::AtomicType U>
         friend struct Atomic;
 
-        template<typename U>
-        friend U CompareAndSwap(Atomic<U>& destination, U exchange, U comperand);
+        template<typename T>
+        friend T CompareAndSwap(Atomic<T>& destination, T exchange, T comperand);
+
+        template<Concepts::AtomicType T>
+        friend constexpr void Swap(Atomic<T>& l, Atomic<T>& r);
     };
 
     /// <summary>
@@ -405,11 +409,11 @@ namespace Seed::Core
         friend struct ReadOnlyAtomic;
 
     public:
-        template<typename U>
-        friend constexpr void Swap(U& l, U& r);
+        template<Concepts::AtomicType T>
+        friend constexpr void Swap(Atomic<T>& l, Atomic<T>& r);
 
-        template<typename U>
-        friend U CompareAndSwap(Atomic<U>& destination, U exchange, U comperand);
+        template<typename T>
+        friend T CompareAndSwap(Atomic<T>& destination, T exchange, T comperand);
     };
 
     /// <summary>

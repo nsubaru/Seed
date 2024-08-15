@@ -67,7 +67,7 @@ public partial class SeedSerializatorFactory
                 {
                     var fieldRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId == item.FullTypeId);
 
-                    isExistAutoFieldAttrb = fieldRecord != null && BuildClrType(fieldRecord!) != null;
+                    isExistAutoPropAttrb = fieldRecord != null && BuildClrType(fieldRecord!) != null;
                 }
             }
 
