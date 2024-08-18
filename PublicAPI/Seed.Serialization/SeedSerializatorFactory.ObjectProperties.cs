@@ -24,7 +24,7 @@ public partial class SeedSerializatorFactory
 
         if (type == null)
         {
-            logger?.LogWarning("Can not found correspondent Seed type for {0}", record.TypeName);
+            logger?.LogInformation("Can not found correspondent Seed type for {0}", record.TypeName);
             return null;
         }
 
