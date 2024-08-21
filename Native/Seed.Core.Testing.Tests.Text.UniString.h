@@ -51,3 +51,42 @@ namespace Seed::Core::Testing::Test::UniString::Comparing::Spaceship
 	SeedTestDef(UniStringConstArrDifSpaceship);
 	SeedTestDef(UniStringConstArrACharDifSpaceship);
 }
+
+namespace Seed::Core::Testing::Test::UniString::Comparing::Addition
+{
+	SeedTestDef(UniStringConstModeEmptyAdditionLiteral);
+	SeedTestDef(UniStringConstModeEmptyAdditionALiteral);
+	SeedTestDef(UniStringConstModeEmptyAdditionConst);
+	SeedTestDef(UniStringConstModeEmptyAdditionAConst);
+	SeedTestDef(UniStringConstModeEmptyAdditionString);
+	SeedTestDef(UniStringConstModeEmptyAdditionConstExpr);
+	SeedTestDef(UniStringConstModeEmptyAdditionConstAExpr);
+	SeedTestDef(UniStringConstModeEmptyAdditionUniStr);
+
+	SeedTestDef(UniStringConstModeAdditionLiteral);
+	SeedTestDef(UniStringConstModeAdditionALiteral);
+	SeedTestDef(UniStringConstModeAdditionConst);
+	SeedTestDef(UniStringConstModeAdditionAConst);
+	SeedTestDef(UniStringConstModeAdditionString);
+	SeedTestDef(UniStringConstModeAdditionConstExpr);
+	SeedTestDef(UniStringConstModeAdditionConstAExpr);
+	SeedTestDef(UniStringConstModeAdditionUniStr);
+
+	SeedTestDef(UniStringDynModeEmptyAdditionLiteral);
+	SeedTestDef(UniStringDynModeEmptyAdditionALiteral);
+	SeedTestDef(UniStringDynModeEmptyAdditionConst);
+	SeedTestDef(UniStringDynModeEmptyAdditionAConst);
+	SeedTestDef(UniStringDynModeEmptyAdditionString);
+	SeedTestDef(UniStringDynModeEmptyAdditionConstExpr);
+	SeedTestDef(UniStringDynModeEmptyAdditionConstAExpr);
+	SeedTestDef(UniStringDynModeEmptyAdditionUniStr);
+
+	SeedTestDef(UniStringDynModeAdditionLiteral);
+	SeedTestDef(UniStringDynModeAdditionALiteral);
+	SeedTestDef(UniStringDynModeAdditionConst);
+	SeedTestDef(UniStringDynModeAdditionAConst);
+	SeedTestDef(UniStringDynModeAdditionString);
+	SeedTestDef(UniStringDynModeAdditionConstExpr);
+	SeedTestDef(UniStringDynModeAdditionConstAExpr);
+	SeedTestDef(UniStringDynModeAdditionUniStr);
+}
