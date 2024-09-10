@@ -118,4 +118,3 @@ public struct EnumFlag<T, U>
         return string.Join(", ", result);
     }
 }
-
