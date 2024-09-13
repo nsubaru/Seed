@@ -36,7 +36,7 @@ Containers::ConcurencyList<CoAwaitInformation>::Iterator Seed::Core::Threading::
     return CurentlyActiveTasks().AddLast(CoAwaitInformation{
         .TaskType                      = taskType,
         .TaskObjAddress                = taskAddress,
-        .CoreAddress                   = coroAddress,
+        .CoroutineAddress                   = coroAddress,
         .InitiatedThreadId             = Threading::GetTID(),
         .InitiatedThreadThreadableType = Threading::GetTLS()->Threadable->GetThreadableType(),
         .TaskRequestorObjectType       = ioObjType,
