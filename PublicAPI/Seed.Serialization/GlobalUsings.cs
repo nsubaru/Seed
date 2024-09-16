@@ -22,6 +22,3 @@ global using TGetRttiRecord = System.IntPtr;
 global using TDynamicCtorCaller = System.IntPtr;
 global using DynamicConverterFunc = System.IntPtr;
 global using DynamicCallerFunc = System.IntPtr;
-
-global using TypeModificator = Seed.RTTI.ETypeModificators;
-global using CvRefModificators = Seed.RTTI.ECvRefModificators;
