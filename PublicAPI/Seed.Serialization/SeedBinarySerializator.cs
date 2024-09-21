@@ -18,7 +18,8 @@ public class SeedBinarySerializator : ISeedBinarySerializator
     private readonly ILogger<SeedBinarySerializator>? logger;
 
     public SeedBinarySerializator(
-        RTTISection rttiSection,
+        RTTISection rttiSection, 
+        IServiceProvider serviceProvider,
         ILogger<SeedBinarySerializator>? logger = null, 
         ILogger<SeedSerializatorFactory>? seedSerializatorFactory = null,
         ILogger<ISeedSerializator>? seedSerializatorImplLogger = null)
@@ -27,7 +28,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
         this.logger = logger;
 
         logger?.LogInformation("Create serializator factory");
-        SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection, seedSerializatorFactory, seedSerializatorImplLogger);
+        SeedSerializatorFactory serializatorFactory = new SeedSerializatorFactory(rttiSection, serviceProvider, seedSerializatorFactory, seedSerializatorImplLogger);
 
         logger?.LogInformation("Retrieve serializator implementation");
         seedSerializator = serializatorFactory.GetSeedSerializator();

@@ -7,8 +7,7 @@ namespace Seed.RTTI;
 //      whereas C# [Flags] atributed enum use enum value as bit mask
 
 [Flags]
-[SerializableEnum("Seed::Core::RTTI::ETypeModificators")]
-public enum ETypeModificators : byte
+public enum TypeModificator : byte
 {
 	Const        = 1, 
 	Volatile     = 2,
@@ -17,8 +16,7 @@ public enum ETypeModificators : byte
 }
 
 [Flags]
-[SerializableEnum("Seed::Core::RTTI::ECvRefModificators")]
-public enum ECvRefModificators : SizeT
+public enum CvRefModificators : SizeT
 {
 	Ref       = 1, 
 	RValueRef = 2,

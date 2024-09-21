@@ -1,4 +1,5 @@
-﻿using Seed.CTTI;
+﻿using LanguageExt.TypeClasses;
+using Seed.CTTI;
 
 namespace Seed.Core.Time;
 
@@ -31,6 +32,8 @@ public struct DateTime
     {
         return System.DateTime.FromFileTime((long)Ticks).ToString();
     }
+
+    public static DateTime MinValue = new DateTime(0);
 }
 
 /// <summary>
@@ -62,4 +65,6 @@ public struct TimeSpan
     {
         return new System.TimeSpan((long)Ticks).ToString();
     }
+
+    public static TimeSpan Zero = new TimeSpan(0);
 }
