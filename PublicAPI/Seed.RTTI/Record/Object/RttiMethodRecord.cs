@@ -78,6 +78,13 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
     /// </summary>
     public bool IsAsync => GetRecord()->IsAsync;
 
+    internal Collection* GetAttributesCollectionBase() => (Collection*)((byte*)GetRecord() + GetRecord()->MethodAttributesOffset);
+
+    /// <summary>
+    /// Attributes list
+    /// </summary>
+    public RttiCollection<RttiAttribute> Attributes => RttiAttribute.CreateCollection(GetAttributesCollectionBase(), it!.isValidCxxTypeId, it!.imageBase);
+
     /// <summary>
     /// Create collection of objects
     /// </summary>

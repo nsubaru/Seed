@@ -1,4 +1,6 @@
-﻿namespace Seed.RTTI.Record;
+﻿using System.Collections;
+
+namespace Seed.RTTI.Record;
 
 /// <summary>
 /// A base RTTI field class
@@ -85,6 +87,13 @@ public unsafe class RttiField : IRttiIterableObject<RttiField>
     /// Field type, for enum item it is item name
     /// </summary>
     public string TypeName => GetTypeName();
+
+    internal Collection* GetAttributesCollectionBase() => (Collection*) ((byte*)GetRecord() + GetRecord()->OffsetToAttributesList);
+
+    /// <summary>
+    /// Attributes list
+    /// </summary>
+    public RttiCollection<RttiAttribute> Attributes => RttiAttribute.CreateCollection(GetAttributesCollectionBase(), it!.isValidCxxTypeId, it!.imageBase);
 
     /// <summary>
     /// Create collection of objects

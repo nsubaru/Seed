@@ -1,8 +1,8 @@
 ﻿namespace Seed.Serialization;
 
-internal static partial class Constants
+public static partial class Constants
 {
-    internal static class Types
+    public static class Types
     {
         public const string Boolean = "Seed::Core::Boolean";
 
@@ -31,6 +31,8 @@ internal static partial class Constants
         public const string U32Char = "Seed::Core::U32Char";
 
         public const string Uuid = "Seed::Core::UUID";
+
+        public const string EmptyAttributeValueT = "Seed::Core::CTTI::TypeTraits::EmptyAttributeValueT";
 
         public const string EnumFlag = @"Seed::Core::EnumFlag";
 
@@ -113,7 +115,7 @@ internal static partial class Constants
         public const string ObjectProperties = "Seed::Core::RTTI::ObjectProperties";
     }
 
-    internal static partial class DerCodeBlocks
+    public static partial class DerCodeBlocks
     {
         public const string DeserializationMethodName = "DeserializeImpl";
 
@@ -211,7 +213,7 @@ data = {FriendlyTypeName}.Right({DeserializationMethodName}(value, stream));
         public const string EnumFlag = @"var value = data.AsInteger(); value = {DeserializationMethodName}(value, stream); data =  new {FriendlyTypeName} (value);";
     }
 
-    internal static partial class SerCodeBlocks
+    public static partial class SerCodeBlocks
     {
         public const string SerializationMethodName = "SerializeImpl";
 

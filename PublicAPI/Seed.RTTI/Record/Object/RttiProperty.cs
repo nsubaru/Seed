@@ -136,6 +136,13 @@ public unsafe class RttiProperty : IRttiIterableObject<RttiProperty>
     /// </summary>
     public bool IsRw => GetIsRw();
 
+    internal Collection* GetAttributesCollectionBase() => (Collection*)((byte*)GetRecord() + GetRecord()->OffsetToAttributes);
+
+    /// <summary>
+    /// Attributes list
+    /// </summary>
+    public RttiCollection<RttiAttribute> Attributes => RttiAttribute.CreateCollection(GetAttributesCollectionBase(), it!.isValidCxxTypeId, it!.imageBase);
+
     /// <summary>
     /// Create collection of objects
     /// </summary>
