@@ -1,8 +1,8 @@
 ﻿namespace Seed.Serialization;
 
-internal static partial class Constants
+public static partial class Constants
 {
-    internal static class Types
+    public static class Types
     {
         public const string Boolean = "Seed::Core::Boolean";
 
@@ -31,6 +31,8 @@ internal static partial class Constants
         public const string U32Char = "Seed::Core::U32Char";
 
         public const string Uuid = "Seed::Core::UUID";
+
+        public const string EmptyAttributeValueT = "Seed::Core::CTTI::TypeTraits::EmptyAttributeValueT";
 
         public const string EnumFlag = @"Seed::Core::EnumFlag";
 
@@ -113,7 +115,7 @@ internal static partial class Constants
         public const string ObjectProperties = "Seed::Core::RTTI::ObjectProperties";
     }
 
-    internal static partial class DerCodeBlocks
+    public static partial class DerCodeBlocks
     {
         public const string DeserializationMethodName = "DeserializeImpl";
 
@@ -209,9 +211,11 @@ data = {FriendlyTypeName}.Right({DeserializationMethodName}(value, stream));
         public const string ObjectPropertiesItem = @"data.{field} = {DeserializationMethodName}(data.{field}, stream);";
 
         public const string EnumFlag = @"var value = data.AsInteger(); value = {DeserializationMethodName}(value, stream); data =  new {FriendlyTypeName} (value);";
+
+        public const string EmptyAttributeValueT = @"var val = (byte) 0; stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));";
     }
 
-    internal static partial class SerCodeBlocks
+    public static partial class SerCodeBlocks
     {
         public const string SerializationMethodName = "SerializeImpl";
 
@@ -281,6 +285,8 @@ stream.Write(Encoding.Unicode.GetBytes(new char[] { '\0' }), 0, 1 * sizeof(char)
         public const string ObjectPropertiesItem = @"{SerializationMethodName}(data.{field}, stream);";
 
         public const string EnumFlag = @"var value = data.AsInteger(); {SerializationMethodName}(value, stream);";
+
+        public const string EmptyAttributeValueT = @"byte[] buffer = new byte[sizeof(byte)]; stream.Read(buffer, 0, sizeof(byte));";
     }
 
     public const string CreateObjectMethodBody = @"private T CreateObject<T>()

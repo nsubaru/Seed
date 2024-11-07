@@ -1,6 +1,4 @@
 ﻿using Seed.CTTI.MetaData;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Seed.Serialization;
@@ -14,6 +12,7 @@ public partial class SeedSerializatorFactory
             Constants.Types.RTTISection => typeof(RTTI.RTTISection),
             Constants.Types.TypeMetaDataRecord => typeof(TypeMetaDataRecord),
             Constants.Types.SensitiveTypeMetaDataRecord => typeof(TypeMetaDataRecord),
+            Constants.Types.EmptyAttributeValueT => typeof(EmptyAttributeValueT),
             _ => null,
         };
     }
@@ -34,6 +33,11 @@ public partial class SeedSerializatorFactory
                     code.AppendLine(Constants.SerCodeBlocks.RTTISection);
                     break;
                 }
+            case Constants.Types.EmptyAttributeValueT:
+                {
+                    code.AppendLine(Constants.SerCodeBlocks.EmptyAttributeValueT);
+                    break;
+                }
         }
     }
 
@@ -51,6 +55,11 @@ public partial class SeedSerializatorFactory
             case Constants.Types.RTTISection:
                 {
                     code.AppendLine(Constants.DerCodeBlocks.RTTISection);
+                    break;
+                }
+            case Constants.Types.EmptyAttributeValueT:
+                {
+                    code.AppendLine(Constants.DerCodeBlocks.EmptyAttributeValueT);
                     break;
                 }
         }

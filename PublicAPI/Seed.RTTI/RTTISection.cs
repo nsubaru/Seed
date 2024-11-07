@@ -1,5 +1,9 @@
 ﻿using Seed.Core.Configurations;
 using Seed.RTTI.Record;
+using Seed.Serialization;
+using System;
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text;
 
 namespace Seed.RTTI;
@@ -67,12 +71,12 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         rawArrayPtr = (Byte*) rawArrayPtrHandle.AddrOfPinnedObject();
         rawArrayLen = (SizeT) data.Length;
 
-        FixupAddreses();
+        FixupAddresses();
 
         registeredRecords = new List<RttiTypeRecord>();
     }
 
-    private void FixupAddreses()
+    private void FixupAddresses()
     {
         var magicNumer = Encoding.ASCII.GetBytes(MagicNumer.ToCharArray());
 
@@ -322,9 +326,301 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// </summary>
     public SectionDetails SectionDetails => GetSectionDetails();
 
-
     /// <summary>
     /// Returns section data
     /// </summary>
-    public byte[] Bytes => data ?? new byte[] { };
+    public byte[] Bytes => data ?? Array.Empty<byte>();
+
+    private T ReadAttribyteDataValueAsBuiltInType<T>(Byte* dataPtr) where T : unmanaged
+    {
+        return Marshal.PtrToStructure<T>((IntPtr) dataPtr);
+    }
+
+    #region Typed Attribute Value Readers
+    /// <summary>
+    /// Read attribute value
+    /// </summary>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="attribute">Attribute object</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException">Reading custom data from data attribute unsupported</exception>
+    /// <exception cref="InvalidCastException">Invalid type of attribute value</exception>
+    /// <exception cref="ApplicationException">Invalid attribute value category</exception>
+    public T GetAttributeValue<T>(RttiAttribute attribute) => attribute.ValueCategory switch
+    {
+        EAttributeValueCategoriess.None => (T)(object)new EmptyAttributeValueT { },
+        EAttributeValueCategoriess.Data => GetDataAttributeValue<T>(attribute),
+        EAttributeValueCategoriess.Text => GetTextAttributeValue<T>(attribute),
+        EAttributeValueCategoriess.Type => GetTypeAttributeValue<T>(attribute),
+        _ => throw new ApplicationException("Uknown attribute value category"),
+    };
+
+    /// <summary>
+    /// For type attributes value is type identifier, 
+    /// so we just return UniversalTypeIdentifier or search for type with same identifier depends on T
+    /// </summary>
+    /// <typeparam name="T"><see cref="UniversalTypeIdentifier"/> or <see cref="RttiTypeRecord"/></typeparam>
+    /// <param name="attribute">Target attribute</param>
+    /// <returns>Full type id as <see cref="UniversalTypeIdentifier"/> or type record as <see cref="RttiTypeRecord"/></returns>
+    /// <exception cref="InvalidCastException">If T is not <see cref="UniversalTypeIdentifier"/> or <see cref="RttiTypeRecord"/></exception>
+    private T GetTypeAttributeValue<T>(RttiAttribute attribute)
+    {
+        if (typeof(T) == typeof(UniversalTypeIdentifier))
+        {
+            return (T)(object)*(UniversalTypeIdentifier*)((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
+        }
+        else if (typeof(T) == typeof(RttiTypeRecord))
+        {
+            var fullTypeId = *(UniversalTypeIdentifier*)((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
+
+            return (T)(object)this.GetAllRegisteredTypes().First(x => x.FullTypeId == fullTypeId);
+        }
+        else
+        {
+            throw new InvalidCastException($"Invalid requested type for reading type attribute value; expected UniversalTypeIdentifier or RttiTypeRecord.");
+        }
+    }
+
+    /// <summary>
+    /// For text attribute value is TextMetaData which contain size and null-termianted character array
+    /// </summary>
+    /// <typeparam name="T">Should be <see cref="String"/></typeparam>
+    /// <param name="attribute">Target attribute</param>
+    /// <returns>String value</returns>
+    /// <exception cref="InvalidCastException">If T nor <see cref="String"/></exception>
+    private static T GetTextAttributeValue<T>(RttiAttribute attribute)
+    {
+        if (typeof(T) != typeof(String))
+        {
+            throw new InvalidCastException($"Invalid type requested for reading text attribute value");
+        }
+
+        var text = (TextMetaData*) ((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
+
+        return (T)(object)Marshal.PtrToStringAuto((IntPtr)text->Text);
+    }
+
+    /// <summary>
+    /// For data attribute we can read value as built-in type or use custom provider
+    /// </summary>
+    /// <typeparam name="T">Expected attribute value type</typeparam>
+    /// <param name="attribute">Target attribute record</param>
+    /// <returns>Attribute value</returns>
+    /// <exception cref="InvalidCastException">If <see cref="IAttributeValueProvider{T}"/> not found for target attribute value or expected type invalid</exception>
+    private T GetDataAttributeValue<T>(RttiAttribute attribute)
+    {
+        var value = TryReadAttributeDataValueAsBuiltInType(attribute);
+
+        if (value is T)
+        {
+            return (T) value;
+        }
+        else if (value != null)
+        {
+            throw new InvalidCastException($"Invalid requested type for reading data attribute value");
+        }
+        else
+        {
+            var providerType = GetProviderType<T>();
+
+            if (providerType != null)
+            {
+                var provider = (IAttributeValueProvider<T>)Activator.CreateInstance(providerType);
+
+                return provider.GetAttributeValue((IntPtr)rawArrayPtr);
+            }
+            else
+            {
+                throw new InvalidCastException($"Invalid requested type for reading data attribute value");
+            }
+        }
+    }
+    #endregion
+
+    #region Dynamic Attribute Value Readers
+    /// <summary>
+    /// Read attribute value
+    /// </summary>
+    /// <param name="attribute">Target attribute</param>
+    /// <returns>null or attribute value if read success</returns>
+    /// <exception cref="ApplicationException"></exception>
+    public object? GetAnyAttributeValue(RttiAttribute attribute) => attribute.ValueCategory switch
+    {
+        EAttributeValueCategoriess.None => new EmptyAttributeValueT { },
+        EAttributeValueCategoriess.Data => GetDataAttributeValue(attribute),
+        EAttributeValueCategoriess.Text => GetTextAttributeValue(attribute),
+        EAttributeValueCategoriess.Type => GetTypeAttributeValue(attribute),
+        _ => throw new ApplicationException("Unknown attribute value category"),
+    };
+
+    /// <summary>
+    /// For type attributes value is type identifier, so we just search for type with same identifier
+    /// </summary>
+    /// <param name="attribute">Target attribute</param>
+    /// <returns>RttiTypeRecord</returns>
+    private object GetTypeAttributeValue(RttiAttribute attribute)
+    {
+        var fullTypeId = *(UniversalTypeIdentifier*) ((Byte*) attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
+
+        return this.GetAllRegisteredTypes().First(x => x.FullTypeId == fullTypeId);
+    }
+
+    /// <summary>
+    /// For text attribute value is TextMetaData which contain size and null-termianted character array
+    /// </summary>
+    /// <param name="attribute">Target attribute</param>
+    /// <returns>String value</returns>
+    private static object GetTextAttributeValue(RttiAttribute attribute)
+    {
+        var text = (TextMetaData*) ((Byte*) attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
+
+        return Marshal.PtrToStringAuto((IntPtr)text->Text);
+    }
+
+    /// <summary>
+    /// For data attribute we can try read value as built-in type or use custom provider
+    /// </summary>
+    /// <param name="attribute">Target attribute</param>
+    /// <returns>Attribute value or null, if provider (<see cref="IAttributeValueProvider{T}"/>) not found</returns>
+    private object? GetDataAttributeValue(RttiAttribute attribute)
+    {
+        var value = TryReadAttributeDataValueAsBuiltInType(attribute);
+
+        if (value != null)
+        {
+            return value;
+        }
+
+        var providerType = GetRuntimeProviderType(attribute.TypeName);
+
+        if (providerType != null)
+        {
+            var provider = Activator.CreateInstance(providerType);
+            var targetMethod = providerType.GetMethod(nameof(IAttributeValueProvider<int>.GetAttributeValue));
+
+            return targetMethod.Invoke(attribute, new object[] { (IntPtr)rawArrayPtr });
+        }
+
+        // We can't read this value
+        return null;
+    }
+    #endregion
+
+    #region Attribute Value Readers Helpers
+    /// <summary>
+    /// For built-in types we can read data directly from attribute
+    /// </summary>
+    /// <param name="attribute">Target attribute record</param>
+    /// <returns>Value or null if type not built-in</returns>
+    private object? TryReadAttributeDataValueAsBuiltInType(RttiAttribute attribute)
+    {
+        return attribute.TypeName switch
+        {
+            Constants.Types.Int8  => ReadAttribyteDataValueAsBuiltInType<Int8>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Int16 => ReadAttribyteDataValueAsBuiltInType<Int16>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Int32 => ReadAttribyteDataValueAsBuiltInType<Int32>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Int64 => ReadAttribyteDataValueAsBuiltInType<Int64>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+
+            Constants.Types.UInt8  => ReadAttribyteDataValueAsBuiltInType<UInt8>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UInt16 => ReadAttribyteDataValueAsBuiltInType<UInt16>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UInt32 => ReadAttribyteDataValueAsBuiltInType<UInt32>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UInt64 => ReadAttribyteDataValueAsBuiltInType<UInt64>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+
+            Constants.Types.Float  => ReadAttribyteDataValueAsBuiltInType<Single>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Double => ReadAttribyteDataValueAsBuiltInType<Double>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+
+            Constants.Types.Boolean => ReadAttribyteDataValueAsBuiltInType<Boolean>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+
+            Constants.Types.UChar => ReadAttribyteDataValueAsBuiltInType<Char>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+
+            Constants.Types.Uuid => ReadAttribyteDataValueAsBuiltInType<Guid>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+
+            Constants.Types.DataSizeT => ReadAttribyteDataValueAsBuiltInType<SizeT>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+
+            Constants.Types.EmptyAttributeValueT => EmptyAttributeValueT.Empty,
+
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Static cache for provider types by type
+    /// </summary>
+    private static readonly ConcurrentDictionary<Type, Type> providerTypeCache = new();
+
+    /// <summary>
+    /// Static cache for provider types by type name
+    /// </summary>
+    private static readonly ConcurrentDictionary<String, Type> runtimeProviderTypeCache = new();
+
+    /// <summary>
+    /// Get provider type for target attribute value type
+    /// </summary>
+    /// <typeparam name="T">Requested type</typeparam>
+    /// <returns>Type of <see cref="IAttributeValueProvider{T}"/> if found, otherwise null</returns>
+    private static Type? GetProviderType<T>()
+    {
+        var targetType = typeof(IAttributeValueProvider<T>);
+        if (!providerTypeCache.TryGetValue(targetType, out var providerType))
+        {
+            providerType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.DefinedTypes)
+                .FirstOrDefault(x => x.GetInterfaces().Any(i => i == targetType));
+
+            if (providerType == null)
+            {
+                return null;
+            }
+
+            providerTypeCache[targetType] = providerType;
+        }
+        return providerType;
+    }
+
+    /// <summary>
+    /// Check is type has <see cref="SerializableStructAttribute"/> or <see cref="SerializableObjectAttribute"/> attribute with target typename
+    /// </summary>
+    /// <param name="type">Target type</param>
+    /// <param name="typeName">Target type name</param>
+    /// <returns>Check result</returns>
+    private static bool MatchesTypeNameAttribute(Type type, string typeName) =>
+        (type.GetCustomAttribute<SerializableStructAttribute>()?.SeedKernelTypeName == typeName) ||
+        (type.GetCustomAttribute<SerializableObjectAttribute>()?.SeedKernelTypeName == typeName);
+
+
+    /// <summary>
+    /// Get provider type for target attribute value type
+    /// </summary>
+    /// <param name="typeName">Attribute value typename</param>
+    /// <returns>Type of <seealso cref="IAttributeValueProvider{T}"/> if found, otherwise null</returns>
+    private static Type? GetRuntimeProviderType(String typeName)
+    {
+        if (!runtimeProviderTypeCache.TryGetValue(typeName, out var providerType))
+        {
+            providerType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.GetInterfaces()
+                    .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAttributeValueProvider<>))
+                )
+                .Where(type =>
+                {
+                    var genericArgument = type.GetInterfaces()
+                        .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAttributeValueProvider<>))
+                        .GetGenericArguments()[0];
+
+                    return MatchesTypeNameAttribute(genericArgument, typeName);
+                })
+                .FirstOrDefault();
+
+            if (providerType == null)
+            {
+                return null;
+            }
+
+            runtimeProviderTypeCache[typeName] = providerType;
+        }
+
+        return providerType;
+    }
+    #endregion
 }

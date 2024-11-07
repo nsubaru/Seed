@@ -9,10 +9,8 @@ namespace Seed.RTTI;
 [Flags]
 public enum TypeModificator : byte
 {
-	Const        = 1, 
-	Volatile     = 2,
-	Serializable  = 4,
-	TemplateType = 8
+	Serializable = 1,
+	TemplateType = 2
 }
 
 [Flags]
@@ -35,6 +33,50 @@ public enum ECustomTypeSchemaFormat : byte
 	RemoteObjectSchema,
 	Undefined
 }
+
+/// <summary>
+/// Possible CTTI attribute targets
+/// </summary>
+[SerializableEnum("Seed::Core::CTTI::TypeTraits::EAttributeTargetType")]
+public enum EAttributeTargetType : UInt8
+{
+    /// <summary>
+    /// Type itself is attribute target (e.g. attribute is class attribute)
+    /// </summary>
+    Type,
+
+    /// <summary>
+    /// Method is attribute target (e.g. attribute is method attribute)
+    /// </summary>
+    Method,
+
+    /// <summary>
+    /// Function or static method is attribute target (e.g. attribute is function attribute or attribute is static method attribute)
+    /// </summary>
+    Function,
+
+    /// <summary>
+    /// Field or property is attribute target (e.g. attribute is field attribute or attribute is property attribute)
+    /// </summary>
+    Field,
+
+    /// <summary>
+    /// Unknown attribute target
+    /// </summary>
+    Unknown = UInt8.MaxValue
+};
+
+/// <summary>
+/// Attrribute value category, can be data, text or type
+/// <para> None - attribute value unavailble </para>
+/// <para> Data - is any trivial copy type </para>
+/// <para> Text - is string </para>
+/// <para> Type - is type information, value is FullTypeId of type, also store reference to RttiTypeRecord </para>
+/// </summary>
+public enum EAttributeValueCategoriess : UInt8
+{
+    None, Data, Text, Type
+};
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 internal unsafe struct TextMetaData
@@ -314,6 +356,9 @@ internal unsafe struct ObjectMetaData
 
 	[FieldOffset(24)]
 	public SizeT MethodsOffset;
+
+    [FieldOffset(32)]
+    public SizeT StaticMethodsOffset;
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
@@ -364,6 +409,31 @@ internal unsafe struct MethodMetaData
 
     [FieldOffset(49)]
 	public TextMetaData MethodName;
+}
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct StaticMethodMetaData
+{
+    [FieldOffset(0)]
+    public SizeT SizeOfItem;
+
+    [FieldOffset(8)]
+    public SizeT MethodArgsOffset;
+
+    [FieldOffset(16)]
+    public SizeT MethodAttributesOffset;
+
+    [FieldOffset(24)]
+    public bool IsAsync;
+
+    [FieldOffset(25)]
+    public StaticDynamicCallerFunc DynamicCaller;
+
+    [FieldOffset(33)]
+    public StaticDynamicCallerFunc AsyncDynamicCaller;
+
+    [FieldOffset(41)]
+    public TextMetaData MethodName;
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
@@ -425,6 +495,40 @@ internal unsafe struct ObjectCustomTypeMetaData
 
 	[FieldOffset(25)]
 	public SizeT MethodsOffset;
+
+    [FieldOffset(33)]
+    public SizeT StaticMethodsOffset;
+}
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct AttributeRecord
+{
+    [FieldOffset(0)]
+    public SizeT SizeOfItem;
+
+    [FieldOffset(8)]
+    public SizeT OffsetToAttributeName;
+
+    [FieldOffset(16)]
+    public SizeT OffsetToAttributeValueTypeName;
+
+    [FieldOffset(24)]
+    public SizeT OffsetToAttributeValue;
+
+    [FieldOffset(32)]
+    public EAttributeTargetType AttributeTargetType;
+
+    [FieldOffset(33)]
+    public EAttributeValueCategoriess ValueCategory;
+
+    [FieldOffset(34)]
+    public MetaDataForDynamicRecord ValueTypeInformation;
+
+    [FieldOffset(122)]
+    public UniversalTypeIdentifier ValueTypeId;
+
+    [FieldOffset(138)]
+    public TextMetaData AttributeName;
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Ansi, Pack = 0)]

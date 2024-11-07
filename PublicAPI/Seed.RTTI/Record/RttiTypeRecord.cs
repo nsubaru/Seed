@@ -356,6 +356,40 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     }
 
     /// <summary>
+    /// Receiving the static methods of type record
+    /// </summary>
+    /// <returns>Type methods fields</returns>
+    private RttiCollection<RttiStaticMethodRecord> GetStaticMethods()
+    {
+        if (record->TypeClass == ETypes.Object || record->TypeClass == ETypes.Abstract)
+        {
+            var objRecord = GetObjectRecord();
+
+            return RttiStaticMethodRecord.CreateCollection(
+                (Collection*)(((Byte*)objRecord) + objRecord->StaticMethodsOffset),
+                isValidCxxTypeId,
+                imageBase);
+        }
+        else if (record->TypeClass == ETypes.Custom &&
+            (
+                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema ||
+                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema
+            ))
+        {
+            var customObjRecord = GetCustomTypeRecord();
+
+            return RttiStaticMethodRecord.CreateCollection(
+                (Collection*)(((Byte*)customObjRecord) + customObjRecord->StaticMethodsOffset),
+                isValidCxxTypeId,
+                imageBase);
+        }
+        else
+        {
+            return RttiStaticMethodRecord.CreateCollection(null, isValidCxxTypeId, imageBase);
+        }
+    }
+
+    /// <summary>
     /// Constructors of type record
     /// </summary>
     public RttiCollection<RttiConstructorRecord> Constructors => GetConstructors();
@@ -375,6 +409,21 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// Methods of type record
     /// </summary>
     public RttiCollection<RttiMethodRecord> Methods => GetMethods();
+
+    /// <summary>
+    /// Static methods of type record
+    /// </summary>
+    public RttiCollection<RttiStaticMethodRecord> StaticMethods => GetStaticMethods();
+
+    /// <summary>
+    /// Calculate memory address of the attributes collection by offset
+    /// </summary>
+    private Collection* GetAttributesCollectionBase() => (Collection*)((byte*)this.record + this.record->OffsetToAttributes);
+
+    /// <summary>
+    /// Attributes list
+    /// </summary>
+    public RttiCollection<RttiAttribute> Attributes => RttiAttribute.CreateCollection(GetAttributesCollectionBase(), isValidCxxTypeId, imageBase);
 
     /// <summary>
     /// Receive custom CTTI type schema format

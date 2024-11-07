@@ -23,3 +23,5 @@ global using TGetRttiRecord = System.IntPtr;
 global using TDynamicCtorCaller = System.IntPtr;
 global using DynamicConverterFunc = System.IntPtr;
 global using DynamicCallerFunc = System.IntPtr;
+global using StaticDynamicConverterFunc = System.IntPtr;
+global using StaticDynamicCallerFunc = System.IntPtr;
