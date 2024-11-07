@@ -25,7 +25,6 @@ public enum ETypes : byte
 	Abstract,
 	Function,
 	Union,
-	StandardLayout,
 	Custom,
 	Undefined = byte.MaxValue
 }
