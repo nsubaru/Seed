@@ -55,7 +55,7 @@ public class DynamicObjectSerializator : ICustomClassSerializator
             }
             else
             {
-                throw new ApplicationException($"Deserialize unserializable type. Seed type uknown. Uuid: {fullTypeId.Id}. Kernel version: {fullTypeId.KernelVersion}");
+                throw new ApplicationException($"Deserialize unserializable type. Seed type known. Uuid: {fullTypeId.Id}. Kernel version: {fullTypeId.KernelVersion}");
             }
         }
     }
@@ -73,7 +73,7 @@ public class DynamicObjectSerializator : ICustomClassSerializator
             ? new RTTI.UniversalTypeIdentifier() { Id = dynamicObject.FullTypeId }
             : VoidFullTypeId;
 
-        serializator.Logger?.LogTrace("Serilize dynamic with UIID: {fullTypeId}", fullTypeId);
+        serializator.Logger?.LogTrace("Serialize dynamic with UIID: {fullTypeId}", fullTypeId);
 
         serializator.Serialize(fullTypeId, serializationStream);
 
