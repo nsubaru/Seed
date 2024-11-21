@@ -212,7 +212,7 @@ data = {FriendlyTypeName}.Right({DeserializationMethodName}(value, stream));
 
         public const string EnumFlag = @"var value = data.AsInteger(); value = {DeserializationMethodName}(value, stream); data =  new {FriendlyTypeName} (value);";
 
-        public const string EmptyAttributeValueT = @"var val = (byte) 0; stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));";
+        public const string EmptyAttributeValueT = @"byte[] buffer = new byte[sizeof(byte)]; stream.Read(buffer, 0, sizeof(byte));";
     }
 
     public static partial class SerCodeBlocks
@@ -286,7 +286,7 @@ stream.Write(Encoding.Unicode.GetBytes(new char[] { '\0' }), 0, 1 * sizeof(char)
 
         public const string EnumFlag = @"var value = data.AsInteger(); {SerializationMethodName}(value, stream);";
 
-        public const string EmptyAttributeValueT = @"byte[] buffer = new byte[sizeof(byte)]; stream.Read(buffer, 0, sizeof(byte));";
+        public const string EmptyAttributeValueT = @"var val = (byte) 0; stream.WriteByte(val);";
     }
 
     public const string CreateObjectMethodBody = @"private T CreateObject<T>()
