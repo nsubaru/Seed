@@ -1,6 +1,7 @@
 ﻿using Seed.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,14 @@ public partial class SeedSerializatorFactory
 {
     Type? TryGetAsEnumFlag(RTTI.Record.RttiTypeRecord record)
     {
+        if (Debugger.IsAttached)
+        {
+            if(record.TemplateTypeName == "Seed::Core::EnumFlags")
+            {
+                Debugger.Break();
+            }
+        }
+
         if (!record.TypeName.StartsWith(Constants.Types.EnumFlag))
         { 
             return null; 

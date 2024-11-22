@@ -48,6 +48,9 @@ public static partial class Constants
         public const string SensitiveUniString = "Seed::Core::SensitiveUniString";
         public const string ExceptionUniString = "Seed::Core::ExceptionUniString";
 
+        public const string Blob = "Seed::Core::Containers::Blob";
+        public const string SensitiveBlob = "Seed::Core::Containers::SensitiveBlob";
+
         public const string List = "Seed::Core::Containers::List";
         public const string Array = "Seed::Core::Containers::Array";
         public const string DynamicStack = "Seed::Core::Containers::DynamicStack";

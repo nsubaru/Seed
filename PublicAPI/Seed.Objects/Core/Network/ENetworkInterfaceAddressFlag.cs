@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Seed.Core.Network;
 
-[SerializableEnum("Seed::Core::Services::Network::::NetworkInterfaceAddressFlag")]
+[SerializableEnum("Seed::Core::Services::Network::NetworkInterfaceAddressFlag")]
 [Flags]
 public enum ENetworkInterfaceAddressFlag : UInt32
 {

@@ -11,6 +11,10 @@ public partial class SeedSerializatorFactory
     {
         switch (record.TemplateTypeName)
         {
+            case Constants.Types.Blob:
+            case Constants.Types.SensitiveBlob:
+                return typeof(List<byte>);
+
             case Constants.Types.List:
             case Constants.Types.SensitiveList:
             case Constants.Types.ConcurencyList:
