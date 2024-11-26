@@ -156,7 +156,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         return GetCTTIMetaDataOffset() + *(SizeT*) (((Byte*)record) + GetCTTIMetaDataOffset());
     }
 
-    private SizeT GetCustomCttiTypeStrcutSchemaRttiOffset()
+    private SizeT GetCustomCttiTypeStructSchemaRttiOffset()
     {
         var metaData = (StructCustomTypeMetaData*) (((Byte*)record) + GetCTTIMetaDataOffset());
 
@@ -168,20 +168,30 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
                 : 0;
     }
 
+    private SizeT GetNumericCttiTypeOffset()
+    {
+        var numericMetaData = (NumericMetaData*)(((Byte*)record) + GetCTTIMetaDataOffset());
+
+        return numericMetaData->IsEnumFlag
+            ? GetCTTIMetaDataOffset() + (SizeT) Marshal.OffsetOf<NumericEnumFlagMetaData>("InnerTypes").ToInt64()
+            : 0;
+    }
+
     private SizeT GetFieldsRecordsOffset()
     {
         return record->TypeClass switch
         {
-            ETypes.Tuple => GetItemsCollectionOffset(),
-            ETypes.Enumeration => GetItemsCollectionOffset(),
-            ETypes.FixedArray => GetItemsCollectionOffset(),
-            ETypes.Struct => GetItemsCollectionOffset(),
-            ETypes.Union => GetItemsCollectionOffset(),
-            ETypes.Collection => GetItemsCollectionOffset(),
+            ETypes.Tuple                                                 => GetItemsCollectionOffset(),
+            ETypes.Enumeration                                           => GetItemsCollectionOffset(),
+            ETypes.FixedArray                                            => GetItemsCollectionOffset(),
+            ETypes.Struct                                                => GetItemsCollectionOffset(),
+            ETypes.Union                                                 => GetItemsCollectionOffset(),
+            ETypes.Collection                                            => GetItemsCollectionOffset(),
+            ETypes.FixedCollection                                       => GetItemsCollectionOffset(),
+            ETypes.Custom                                                => GetCustomCttiTypeStructSchemaRttiOffset(),
+            ETypes.Numeric                                               => GetNumericCttiTypeOffset(),
+            ETypes.AssociableCollection or ETypes.Reference              => GetItemsCollectionOffset(),
             ETypes.String or ETypes.Pointer or ETypes.Box or ETypes.Pair => GetItemsCollectionOffset(),
-            ETypes.FixedCollection => GetItemsCollectionOffset(),
-            ETypes.AssociableCollection or ETypes.Reference => GetItemsCollectionOffset(),
-            ETypes.Custom => GetCustomCttiTypeStrcutSchemaRttiOffset(),
             _ => 0,
         };
     }
