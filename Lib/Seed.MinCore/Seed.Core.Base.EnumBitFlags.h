@@ -3,7 +3,27 @@
 
 namespace Seed::Core
 {
-	template<typename TEnum, Concepts::Integer TValueType = TypeTraits::EnumUnderlyingTypeV<TEnum>, bool(*TfIsValid)(TValueType value) = +[](auto) { return true; } >
+	/// <summary>
+    /// Enum bit flag validator type
+	/// </summary>
+	/// <typeparam name="TValueType">Enum bit flag enum underlying type</typeparam>
+	template<Concepts::Integer TValueType>
+    using EnumBitFlagValidator = bool(*)(TValueType value);
+
+	/// <summary>
+    /// Default enum bit flag validator
+	/// </summary>
+	/// <typeparam name="TValueType">Enum bit flag enum underlying type</typeparam>
+	template<Concepts::Integer TValueType>
+    constexpr auto EnumBitFlagDefaultValidator = [] (TValueType) { return true; };
+
+	/// <summary>
+    /// Enum bit flags, a set of flags where enum values are used as flags values
+	/// </summary>
+	/// <typeparam name="TEnum">Enum type</typeparam>
+	/// <typeparam name="TValueType">Integer or bool type that used for storing flags value</typeparam>
+	/// <typeparam name="TfIsValid">Additional validator for validating that flags applicable</typeparam>
+	template<typename TEnum, Concepts::Integer TValueType = TypeTraits::EnumUnderlyingTypeV<TEnum>, EnumBitFlagValidator<TValueType> TfIsValid = EnumBitFlagDefaultValidator<TValueType>>
 	struct EnumBitFlags {
 	private:
 		TValueType value;
@@ -134,4 +154,16 @@ namespace Seed::Core
 		/// </summary>
 		bool Property(GetIsValid) IsValid;
 	};
+}
+
+namespace Seed::Core::TypeTraits 
+{
+	template<typename T>
+	struct IsEnumBitFlagsT : LogicFalse {};
+
+	template<typename T, typename TValue, auto TfIsValid>
+	struct IsEnumBitFlagsT<EnumBitFlags<T, TValue, TfIsValid>> : LogicTrue {};
+
+	template<typename T>
+	constexpr Boolean IsEnumBitFlagsV = IsEnumBitFlagsT<T>::State;
 }

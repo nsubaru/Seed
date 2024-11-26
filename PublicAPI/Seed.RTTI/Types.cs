@@ -479,6 +479,29 @@ internal unsafe struct StructCustomTypeMetaData
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct NumericMetaData
+{
+    [FieldOffset(0)]
+    public Boolean IsEnumFlag;
+
+    [FieldOffset(1)]
+    public Boolean IsSigned;
+}
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct NumericEnumFlagMetaData
+{
+    [FieldOffset(0)]
+    public Boolean IsEnumFlag;
+
+    [FieldOffset(1)]
+    public Boolean IsSigned;
+
+    [FieldOffset(2)]
+    public Collection InnerTypes;
+}
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 internal unsafe struct ObjectCustomTypeMetaData
 {
 	[FieldOffset(0)]
