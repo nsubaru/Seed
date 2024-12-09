@@ -1,4 +1,6 @@
 ﻿using LanguageExt;
+using LanguageExt.UnsafeValueAccess;
+using Seed.Core.Functionality;
 using System.Text;
 
 namespace Seed.Serialization;
@@ -21,6 +23,15 @@ public partial class SeedSerializatorFactory
 
             return typeof(Either<,>).MakeGenericType(leftType, rightType);
         }
+        else if (record.TemplateTypeName == Constants.Types.Optional)
+        {
+            var innerType = GetTypeWithOffset(0, record);
+
+            if (innerType == null)
+                return null;
+
+            return typeof(Option<>).MakeGenericType(innerType);
+        }
         else
         {
             var innerType = GetTypeWithOffset(0, record);
@@ -39,6 +50,11 @@ public partial class SeedSerializatorFactory
             code.AppendLine($"UInt64 idx = data.IsLeft ? 0ul : 1ul;");
             code.AppendLine($"SerializeImpl(idx, stream);");
             code.AppendLine($"data.Match(x => SerializeImpl(x, stream), x =>SerializeImpl(x, stream));");
+        }
+        else if (record.RttiType.TemplateTypeName == Constants.Types.Optional)
+        {
+            code.AppendLine($"SerializeImpl(data.IsSome, stream);");
+            code.AppendLine($"if (data.IsSome) {{ SerializeImpl(data.Value();, stream); }}");
         }
         else
         {
@@ -63,6 +79,17 @@ public partial class SeedSerializatorFactory
             code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().Last())}>();");
             code.AppendLine($"data = {GetFriendlyTypeName(typeof(T))}.Right(DeserializeImpl(value, stream));");
 
+            code.AppendLine($"}}");
+        }
+        else if (record.RttiType.TemplateTypeName == Constants.Types.Optional)
+        {
+            code.AppendLine($"bool hasValue = false;");
+            code.AppendLine($"DeserializeImpl(hasValue, stream);");
+            code.AppendLine($" data = new {GetFriendlyTypeName(typeof(T))}();");
+            code.AppendLine($"if(hasValue) {{");
+            code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}>();");
+            code.AppendLine($"value = DeserializeImpl(value, stream);");
+            code.AppendLine($"data = value;");
             code.AppendLine($"}}");
         }
         else

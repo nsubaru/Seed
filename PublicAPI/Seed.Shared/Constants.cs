@@ -35,6 +35,7 @@ public static partial class Constants
         public const string EmptyAttributeValueT = "Seed::Core::CTTI::TypeTraits::EmptyAttributeValueT";
 
         public const string EnumFlag = @"Seed::Core::EnumFlag";
+        public const string EnumBitFlag = @"Seed::Core::EnumBitFlags";
 
         public const string TypeMetaDataRecord = "Seed::Core::Serialization::TypeMetaDataRecord";
         public const string SensitiveTypeMetaDataRecord = "Seed::Core::Serialization::SensitiveTypeMetaDataRecord";
@@ -116,6 +117,8 @@ public static partial class Constants
         public const string Either = "Seed::Core::Functionality::Either";
 
         public const string ObjectProperties = "Seed::Core::RTTI::ObjectProperties";
+
+        public const string Date = "Seed::Core::Time::Date";
     }
 
     public static partial class DerCodeBlocks
