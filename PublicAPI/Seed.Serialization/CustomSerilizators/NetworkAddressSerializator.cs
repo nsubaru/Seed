@@ -61,6 +61,7 @@ public class NetworkAddressSerializator : ICustomClassSerializator
 
         return retObj;
     }
+
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializator serializator)
     {
         IPEndPoint address = (IPEndPoint)data;

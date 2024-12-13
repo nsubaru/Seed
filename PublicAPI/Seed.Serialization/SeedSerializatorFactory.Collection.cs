@@ -10,6 +10,9 @@ public partial class SeedSerializatorFactory
     {
         switch (typeRecord.TypeName)
         {
+            case Constants.Types.Blob:
+            case Constants.Types.SensitiveBlob:
+
             case Constants.Types.Array: 
             case Constants.Types.SensitiveArray: 
             case Constants.Types.ConcurencyArray: 
@@ -63,6 +66,9 @@ public partial class SeedSerializatorFactory
 
         switch (typeRecord.TypeName)
         {
+            case Constants.Types.Blob:
+            case Constants.Types.SensitiveBlob:
+
             case Constants.Types.Array:
             case Constants.Types.SensitiveArray:
             case Constants.Types.ConcurencyArray:

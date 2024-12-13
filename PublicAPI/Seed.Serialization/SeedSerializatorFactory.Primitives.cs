@@ -14,6 +14,15 @@ public partial class SeedSerializatorFactory
         {
             return res; 
         }
+        else
+        {
+            res = TryGetAsEnumBitFlag(record);
+        }
+
+        if (res != null)
+        {
+            return res;
+        }
 
         return record.TypeName switch
         {
@@ -50,11 +59,17 @@ public partial class SeedSerializatorFactory
 
     private void AddSimpleTypeSer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
-        if (typeRecord.RttiType.TypeName.StartsWith("Seed::Core::EnumFlag"))
+        if (typeRecord.RttiType.TypeName.StartsWith(Constants.Types.EnumFlag))
         {
             AddEnumFlagSer<T>(ref code, typeRecord);
             return;
-        }    
+        }
+
+        if (typeRecord.RttiType.TypeName.StartsWith(Constants.Types.EnumBitFlag))
+        {
+            AddEnumBitFlagSer<T>(ref code, typeRecord);
+            return;
+        }
 
         switch (typeRecord.Type)
         {
@@ -77,9 +92,15 @@ public partial class SeedSerializatorFactory
 
     private void AddSimpleTypeDer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
-        if (typeRecord.RttiType.TypeName.StartsWith("Seed::Core::EnumFlag"))
+        if (typeRecord.RttiType.TypeName.StartsWith(Constants.Types.EnumFlag))
         {
             AddEnumFlagDer<T>(ref code, typeRecord);
+            return;
+        }
+
+        if (typeRecord.RttiType.TypeName.StartsWith(Constants.Types.EnumBitFlag))
+        {
+            AddEnumBitFlagDer<T>(ref code, typeRecord);
             return;
         }
 

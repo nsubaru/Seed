@@ -10,12 +10,19 @@ public partial class SeedSerializatorFactory
 {
     Type? GetStructType(RTTI.Record.RttiTypeRecord record)
     {
+        var type = TryToGetPredefinedType(record);
+
+        if (type != null)
+        {
+            return type;
+        }
+
         if (record.TypeName.StartsWith(Constants.Types.ObjectProperties))
         { 
             return GetObjectProperties(record); 
         }
 
-        var type = serializableTypes
+        type = serializableTypes
             .FirstOrDefault(x => x.Attribute!.SeedKernelTypeName == record.TypeName).Type;
 
         if (type == null)
@@ -171,6 +178,11 @@ public partial class SeedSerializatorFactory
 
     private void AddStructSer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
+        if (AddPredefinedStructSer<T>(ref code, typeRecord))
+        {
+            return;
+        }
+
         AddPropertiesStructSer<T>(ref code, typeRecord);
         AddFieldsStructSer<T>(ref code, typeRecord);
     }
@@ -253,6 +265,11 @@ public partial class SeedSerializatorFactory
 
     private void AddStructDer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
+        if (AddPredefinedStructDer<T>(ref code, typeRecord))
+        {
+            return;
+        }
+
         AddPropertiesStructDer<T>(ref code, typeRecord);
         AddFieldsStructDer<T>(ref code, typeRecord);
     }

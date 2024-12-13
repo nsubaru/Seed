@@ -1,6 +1,7 @@
 ﻿using Seed.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,11 +17,8 @@ public partial class SeedSerializatorFactory
             return null; 
         }
 
-        var p1 = record.TypeName.IndexOf('<') + 1;
-        var p2 = record.TypeName.IndexOf('>');
-        var types = record.TypeName.Substring(p1, p2 - p1).Split(", ");
-        var enumTypeRecord = this.allRttiTypes.FirstOrDefault(x => x.TypeName == types[0]);
-        var underlyingTypeRecord = this.allRttiTypes.FirstOrDefault(x => x.TypeName == types[1]);
+        var enumTypeRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId == record.Fields.First().FullTypeId);
+        var underlyingTypeRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId == record.Fields.Last().FullTypeId);
 
         if (enumTypeRecord == null || underlyingTypeRecord == null)
         { 
