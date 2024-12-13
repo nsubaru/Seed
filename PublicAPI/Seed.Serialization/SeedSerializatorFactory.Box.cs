@@ -1,5 +1,6 @@
 ﻿using LanguageExt;
 using LanguageExt.UnsafeValueAccess;
+using Microsoft.CodeAnalysis;
 using Seed.Core.Functionality;
 using System.Text;
 
@@ -30,7 +31,7 @@ public partial class SeedSerializatorFactory
             if (innerType == null)
                 return null;
 
-            return typeof(Option<>).MakeGenericType(innerType);
+            return typeof(Optional<>).MakeGenericType(innerType);
         }
         else
         {
@@ -53,8 +54,8 @@ public partial class SeedSerializatorFactory
         }
         else if (record.RttiType.TemplateTypeName == Constants.Types.Optional)
         {
-            code.AppendLine($"SerializeImpl(data.IsSome, stream);");
-            code.AppendLine($"if (data.IsSome) {{ SerializeImpl(data.Value();, stream); }}");
+            code.AppendLine($"SerializeImpl(data.HasValue, stream);");
+            code.AppendLine($"if (data.HasValue) {{ SerializeImpl(data.Value, stream); }}");
         }
         else
         {
@@ -85,7 +86,7 @@ public partial class SeedSerializatorFactory
         {
             code.AppendLine($"bool hasValue = false;");
             code.AppendLine($"DeserializeImpl(hasValue, stream);");
-            code.AppendLine($" data = new {GetFriendlyTypeName(typeof(T))}();");
+            code.AppendLine($"data = new {GetFriendlyTypeName(typeof(T))}();");
             code.AppendLine($"if(hasValue) {{");
             code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}>();");
             code.AppendLine($"value = DeserializeImpl(value, stream);");
