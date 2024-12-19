@@ -6,13 +6,13 @@ namespace Seed.Core.Functionality;
 
 public class UnionType<T0>
 {
-    public int TypeId { get; private set; } = 0;
+    public SizeT TypeId { get; private set; } = 0;
 
     private object value;
 
     public UnionType() { 
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value)
@@ -52,7 +52,7 @@ public class UnionType<T0>
 
     public bool Is<T>()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             return false;
         }
@@ -63,14 +63,14 @@ public class UnionType<T0>
 
 public class UnionType<T0, T1>
 {
-    public int TypeId { get; private set; }
+    public SizeT TypeId { get; private set; }
 
     private object? value;
 
     public UnionType()
     {
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value)
@@ -87,7 +87,7 @@ public class UnionType<T0, T1>
 
     public object GetValue()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             throw new InvalidDataException();
         }
@@ -152,7 +152,7 @@ public class UnionType<T0, T1>
             case 1:
                 return typeof(T) == typeof(T1);
 
-            case -1:
+            case SizeT.MaxValue:
                 return false;
 
             default:
@@ -163,14 +163,14 @@ public class UnionType<T0, T1>
 
 public class UnionType<T0, T1, T2>
 {
-    public int TypeId { get; private set; }
+    public SizeT TypeId { get; private set; }
 
     private object? value;
 
     public UnionType()
     {
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value) 
@@ -193,7 +193,7 @@ public class UnionType<T0, T1, T2>
 
     public object GetValue()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             throw new InvalidDataException();
         }
@@ -275,7 +275,7 @@ public class UnionType<T0, T1, T2>
             case 2:
                 return typeof(T) == typeof(T2);
 
-            case -1:
+            case SizeT.MaxValue:
                 return false;
 
             default:
@@ -286,14 +286,14 @@ public class UnionType<T0, T1, T2>
 
 public class UnionType<T0, T1, T2, T3>
 {
-    public int TypeId { get; private set; }
+    public SizeT TypeId { get; private set; }
 
     private object? value;
 
     public UnionType()
     {
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value)
@@ -322,7 +322,7 @@ public class UnionType<T0, T1, T2, T3>
 
     public object GetValue()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             throw new InvalidDataException();
         }
@@ -421,7 +421,7 @@ public class UnionType<T0, T1, T2, T3>
             case 3:
                 return typeof(T) == typeof(T3);
 
-            case -1:
+            case SizeT.MaxValue:
                 return false;
 
             default:
@@ -432,14 +432,14 @@ public class UnionType<T0, T1, T2, T3>
 
 public class UnionType<T0, T1, T2, T3, T4>
 {
-    public int TypeId { get; private set; }
+    public SizeT TypeId { get; private set; }
 
     private object? value;
 
     public UnionType()
     {
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value)
@@ -474,7 +474,7 @@ public class UnionType<T0, T1, T2, T3, T4>
 
     public object GetValue()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             throw new InvalidDataException();
         }
@@ -590,7 +590,7 @@ public class UnionType<T0, T1, T2, T3, T4>
             case 4:
                 return typeof(T) == typeof(T4);
 
-            case -1:
+            case SizeT.MaxValue:
                 return false;
 
             default:
@@ -601,14 +601,14 @@ public class UnionType<T0, T1, T2, T3, T4>
 
 public class UnionType<T0, T1, T2, T3, T4, T5>
 {
-    public int TypeId { get; private set; }
+    public SizeT TypeId { get; private set; }
 
     private object? value;
 
     public UnionType()
     {
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value)
@@ -649,7 +649,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
 
     public object GetValue()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             throw new InvalidDataException();
         }
@@ -782,7 +782,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
             case 5:
                 return typeof(T) == typeof(T5);
 
-            case -1:
+            case SizeT.MaxValue:
                 return false;
 
             default:
@@ -793,14 +793,14 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
 
 public class UnionType<T0, T1, T2, T3, T4, T5, T6>
 {
-    public int TypeId { get; private set; }
+    public SizeT TypeId { get; private set; }
 
     private object? value;
 
     public UnionType()
     {
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value)
@@ -847,7 +847,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
 
     public object GetValue()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             throw new InvalidDataException();
         }
@@ -997,7 +997,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
             case 6:
                 return typeof(T) == typeof(T6);
 
-            case -1:
+            case SizeT.MaxValue:
                 return false;
 
             default:
@@ -1008,14 +1008,14 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
 
 public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
 {
-    public int TypeId { get; private set; }
+    public SizeT TypeId { get; private set; }
 
     private object? value;
 
     public UnionType()
     {
         value = default!;
-        TypeId = -1;
+        TypeId = SizeT.MaxValue;
     }
 
     public UnionType(T0 value)
@@ -1068,7 +1068,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
 
     public object GetValue()
     {
-        if (TypeId == -1)
+        if (TypeId == SizeT.MaxValue)
         {
             throw new InvalidDataException();
         }
@@ -1234,7 +1234,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
             case 7:
                 return typeof(T) == typeof(T7);
 
-            case -1:
+            case SizeT.MaxValue:
                 return false;
 
             default:

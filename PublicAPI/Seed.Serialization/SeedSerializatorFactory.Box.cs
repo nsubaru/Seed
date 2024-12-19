@@ -54,8 +54,9 @@ public partial class SeedSerializatorFactory
         }
         else if (record.RttiType.TemplateTypeName == Constants.Types.Optional)
         {
-            code.AppendLine($"SerializeImpl(data.HasValue, stream);");
-            code.AppendLine($"if (data.HasValue) {{ SerializeImpl(data.Value, stream); }}");
+            code.AppendLine($"var hasValue = data.HasValue;");
+            code.AppendLine($"SerializeImpl(hasValue, stream);");
+            code.AppendLine($"if (hasValue) {{ SerializeImpl(data.Value, stream); }}");
         }
         else
         {
@@ -85,7 +86,7 @@ public partial class SeedSerializatorFactory
         else if (record.RttiType.TemplateTypeName == Constants.Types.Optional)
         {
             code.AppendLine($"bool hasValue = false;");
-            code.AppendLine($"DeserializeImpl(hasValue, stream);");
+            code.AppendLine($"hasValue = DeserializeImpl(hasValue, stream);");
             code.AppendLine($"data = new {GetFriendlyTypeName(typeof(T))}();");
             code.AppendLine($"if(hasValue) {{");
             code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}>();");
