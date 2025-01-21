@@ -396,6 +396,43 @@ namespace Seed::Core
 
     public:
         /// <summary>
+        /// Atomically increment assignment
+        /// </summary>
+        /// <returns>Reference to current object</returns>
+        constexpr Atomic& operator+=(T value) requires Concepts::IsInteger<T>
+        {
+            if (TypeTraits::IsCompileTimeEvaluating())
+            {
+                this->value.value += value;
+                return *this;
+            }
+            else
+            {
+                Interlocked::InterlockedAdd(this->value.value, value);
+                return *this;
+            }
+        }
+
+        /// <summary>
+        /// Atomically decrement assignment
+        /// </summary>
+        /// <returns>Reference to current object</returns>
+        constexpr Atomic& operator-=(T value) requires Concepts::IsInteger<T>
+        {
+            if (TypeTraits::IsCompileTimeEvaluating())
+            {
+                this->value.value -= value;
+                return *this;
+            }
+            else
+            {
+                Interlocked::Decrement(this->value.value, value);
+                return *this;
+            }
+        }
+
+    public:
+        /// <summary>
         /// Converting to read only atomic (returns reference to current object)
         /// </summary>
         /// <returns>Reference to current object value as readonly</returns>
