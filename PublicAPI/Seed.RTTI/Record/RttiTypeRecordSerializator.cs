@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Seed.Core.RTTI;
 using Seed.Serialization;
 
 namespace Seed.RTTI.Record;
@@ -13,16 +14,16 @@ public class RttiTypeRecordSerializator : ICustomClassSerializator
 
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
-        serializator.Logger?.Log(LogLevel.Trace, "Start deserializing RttiTypeRecord");
+        serializator.Logger?.Log(LogLevel.Trace, "Start deserialization RttiTypeRecord");
         dynamic dynData = new UniversalTypeIdentifier();
         serializator.Deserialize(ref dynData, serializationStream);
         UniversalTypeIdentifier fullTypeId = dynData;
-        serializator.Logger?.Log(LogLevel.Trace, "Deserializing UniversalTypeIdentifier. Value {fullTypeId}", fullTypeId);
+        serializator.Logger?.Log(LogLevel.Trace, "Deserialization UniversalTypeIdentifier. Value {fullTypeId}", fullTypeId);
         var record = serializator.GetAllRttiTypes().FirstOrDefault(x => x.FullTypeId == dynData);
 
         if (record == null)
         {
-            serializator.Logger?.Log(LogLevel.Error, "RttiTypeRecord not found durring deserializing", fullTypeId);
+            serializator.Logger?.Log(LogLevel.Error, "RttiTypeRecord not found during deserialization", fullTypeId);
             throw new NullReferenceException();
         }
         else

@@ -54,7 +54,7 @@ public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, IRttiIte
     }
 
     /// <summary>
-    /// Recieving the count of collection items
+    /// Receiving the count of collection items
     /// </summary>
     /// <returns>Count of collection items</returns>
     public SizeT Count => @base == null ? 0 : @base->Count;

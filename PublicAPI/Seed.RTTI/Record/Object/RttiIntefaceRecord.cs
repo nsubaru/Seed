@@ -1,4 +1,6 @@
-﻿namespace Seed.RTTI.Record.Object;
+﻿using Seed.Core.RTTI;
+
+namespace Seed.RTTI.Record.Object;
 
 /// <summary>
 /// A base RTTI interface record class

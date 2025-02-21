@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Seed.Core.RTTI;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -70,7 +71,7 @@ public unsafe class RttiAttribute : IRttiIterableObject<RttiAttribute>
     /// <summary>
     /// Attribute value category
     /// </summary>
-    public EAttributeValueCategoriess ValueCategory => GetRecord()->ValueCategory;
+    public EAttributeValueCategories ValueCategory => GetRecord()->ValueCategory;
 
     internal String GetTypeName()
     {

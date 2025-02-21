@@ -1,4 +1,5 @@
-﻿using Seed.Serialization;
+﻿using Seed.Core.RTTI;
+using Seed.Serialization;
 
 namespace Seed.RTTI;
 

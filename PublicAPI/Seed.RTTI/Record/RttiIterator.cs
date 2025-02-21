@@ -36,7 +36,7 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     /// Iterator constructor
     /// </summary>
     /// <param name="item">Pointer to item value</param>
-    /// <param name="idx">Iterator item odinal number</param>
+    /// <param name="idx">Iterator item ordinal number</param>
     /// <param name="count">Items count in collection</param>
     /// <param name="imageBase">RTTI section image base</param>
     /// <param name="isValidCxxTypeId">True, if Cxx type info available</param>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Seed::Core::RTTI::UniversalTypeIdentifier">
+		<DisplayString>{ Id }</DisplayString>
+		<Expand>
+			<Item Name="FullTypeId">Id</Item>
+			<Item Name="Id">TypeId</Item>
+			<Item Name="KernelVersion">KernelVersion</Item>
+			<Item Name="TypeName">this-&gt;TryGetTypeName(), su</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

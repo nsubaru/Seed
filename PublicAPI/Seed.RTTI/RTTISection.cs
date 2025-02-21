@@ -1,4 +1,5 @@
 ﻿using Seed.Core.Configurations;
+using Seed.Core.RTTI;
 using Seed.RTTI.Record;
 using Seed.Serialization;
 using System;
@@ -348,10 +349,10 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// <exception cref="ApplicationException">Invalid attribute value category</exception>
     public T GetAttributeValue<T>(RttiAttribute attribute) => attribute.ValueCategory switch
     {
-        EAttributeValueCategoriess.None => (T)(object)new EmptyAttributeValueT { },
-        EAttributeValueCategoriess.Data => GetDataAttributeValue<T>(attribute),
-        EAttributeValueCategoriess.Text => GetTextAttributeValue<T>(attribute),
-        EAttributeValueCategoriess.Type => GetTypeAttributeValue<T>(attribute),
+        EAttributeValueCategories.None => (T)(object)new EmptyAttributeValueT { },
+        EAttributeValueCategories.Data => GetDataAttributeValue<T>(attribute),
+        EAttributeValueCategories.Text => GetTextAttributeValue<T>(attribute),
+        EAttributeValueCategories.Type => GetTypeAttributeValue<T>(attribute),
         _ => throw new ApplicationException("Uknown attribute value category"),
     };
 
@@ -446,10 +447,10 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// <exception cref="ApplicationException"></exception>
     public object? GetAnyAttributeValue(RttiAttribute attribute) => attribute.ValueCategory switch
     {
-        EAttributeValueCategoriess.None => new EmptyAttributeValueT { },
-        EAttributeValueCategoriess.Data => GetDataAttributeValue(attribute),
-        EAttributeValueCategoriess.Text => GetTextAttributeValue(attribute),
-        EAttributeValueCategoriess.Type => GetTypeAttributeValue(attribute),
+        EAttributeValueCategories.None => new EmptyAttributeValueT { },
+        EAttributeValueCategories.Data => GetDataAttributeValue(attribute),
+        EAttributeValueCategories.Text => GetTextAttributeValue(attribute),
+        EAttributeValueCategories.Type => GetTypeAttributeValue(attribute),
         _ => throw new ApplicationException("Unknown attribute value category"),
     };
 

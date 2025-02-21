@@ -6,6 +6,7 @@ using System.Collections;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.Contracts;
+using Seed.Core.RTTI;
 
 namespace Seed.CTTI;
 
@@ -81,10 +82,10 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             throw new NullReferenceException();
         }
 
-        logger?.LogInformation("Start serializing Seed type {0} with clr type {1}", targetType?.TypeName ?? "null", graph.GetType().FullName);
+        logger?.LogInformation("Start serializing Seed type {0} with CLR type {1}", targetType?.TypeName ?? "null", graph.GetType().FullName);
 
         Type? type = null;
-        UniversalTypeIdentifier Id = new UniversalTypeIdentifier();
+        var Id = new UniversalTypeIdentifier();
 
         if (targetType != null)
         {
@@ -188,7 +189,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
                 args[i] = GetType().GetRuntimeMethods().Where(x => x.Name == nameof(CreateObject))
                             .First()
                             .MakeGenericMethod(type.GenericTypeArguments[i])
-                            .Invoke(this, new object[] { serializationStream})!;
+                            .Invoke(this, [serializationStream])!;
             }
 
             obj = Activator.CreateInstance(type, args);
@@ -201,7 +202,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
             foreach (var field in obj!.GetType().GetFields())
             {
-                // Skip all field except public non static rw
+                // Skip all field except public non static RW
                 if (field.IsStatic || field.IsPrivate && field.IsInitOnly || field.IsLiteral)
                 {
                     continue;
@@ -281,7 +282,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
 
     public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null, Type? targetCsType = null)
     {
-        logger?.LogInformation("Start deserializing Seed type {0} with clr type {1}", targetType?.TypeName ?? "null", targetCsType?.FullName ?? "null");
+        logger?.LogInformation("Start deserialization Seed type {0} with CLR type {1}", targetType?.TypeName ?? "null", targetCsType?.FullName ?? "null");
 
         if (targetType != null && !mapingSheme.ContainsKey(targetType))
         {

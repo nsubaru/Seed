@@ -1,10 +1,11 @@
 ﻿using Seed.Core.Configurations;
+using Seed.Core.RTTI;
 
 namespace Seed.RTTI;
 
-//HACK: Enum values is incorect,
+//HACK: Enum values is incorrect,
 //      because Seed kernel EnumFlags use item index starting from 1 as index of bit
-//      whereas C# [Flags] atributed enum use enum value as bit mask
+//      whereas C# [Flags] attributed enum use enum value as bit mask
 
 [Flags]
 public enum TypeModificator : byte
@@ -67,13 +68,13 @@ public enum EAttributeTargetType : UInt8
 };
 
 /// <summary>
-/// Attrribute value category, can be data, text or type
-/// <para> None - attribute value unavailble </para>
+/// Attribute value category, can be data, text or type
+/// <para> None - attribute value unavailable </para>
 /// <para> Data - is any trivial copy type </para>
 /// <para> Text - is string </para>
 /// <para> Type - is type information, value is FullTypeId of type, also store reference to RttiTypeRecord </para>
 /// </summary>
-public enum EAttributeValueCategoriess : UInt8
+public enum EAttributeValueCategories : UInt8
 {
     None, Data, Text, Type
 };
@@ -116,56 +117,13 @@ internal unsafe struct MetaDataForDynamicRecord
 	public TDeserialize FDeserialize;
 
 	[FieldOffset(64)]
-	public TSerializizationSize FSerializizationSize;
+	public TSerializationSize FSerializationSize;
 
     [FieldOffset(72)]
     public TUpdateSerialize FUpdateSerialization;
 
     [FieldOffset(80)]
 	public TToString FToString;
-}
-
-[SerializableStruct("Seed::Core::RTTI::UniversalTypeIdentifier")]
-[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
-public unsafe struct UniversalTypeIdentifier
-{
-    [FieldOffset(0)]
-	public UUID Id;
-
-    [SerializableStructField]
-    [FieldOffset(0)]
-	public KernelVersionT KernelVersion;
-
-    [SerializableStructField]
-    [FieldOffset(8)]
-	public ID TypeId;
-
-	public override bool Equals(object? obj)
-	{
-		var item = (UniversalTypeIdentifier?) obj;
-
-		return this == item;
-	}
-
-	public override int GetHashCode()
-	{
-		return base.GetHashCode();
-	}
-
-	public override string ToString()
-	{
-		return this.Id.ToString();
-	}
-
-    static public bool operator ==(UniversalTypeIdentifier? item1, UniversalTypeIdentifier? item2)
-    {
-        return item1?.Id == item2?.Id;
-    }
-
-    static public bool operator !=(UniversalTypeIdentifier? item1, UniversalTypeIdentifier? item2)
-    {
-        return item1?.Id == item2?.Id;
-    }
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
@@ -193,8 +151,7 @@ internal unsafe struct MetaData
 	public TextMetaData TypeName;
 }
 
-[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
-internal unsafe struct StructMetaData
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)] unsafe struct StructMetaData
 {
 	[FieldOffset(0)]
 	public SizeT OffsetToCollection;
@@ -542,7 +499,7 @@ internal unsafe struct AttributeRecord
     public EAttributeTargetType AttributeTargetType;
 
     [FieldOffset(33)]
-    public EAttributeValueCategoriess ValueCategory;
+    public EAttributeValueCategories ValueCategory;
 
     [FieldOffset(34)]
     public MetaDataForDynamicRecord ValueTypeInformation;
@@ -558,7 +515,7 @@ internal unsafe struct AttributeRecord
 internal unsafe struct SectionHeaderType
 {
     [FieldOffset(0)]
-    public fixed Char SectionMagicNumbe[13];
+    public fixed Char SectionMagicNumber[13];
 
     [FieldOffset(13)]
     public KernelVersionT KernelVersion;

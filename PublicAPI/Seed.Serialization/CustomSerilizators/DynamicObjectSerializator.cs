@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Seed.Core.RTTI;
 using Seed.RTTI;
 
 namespace Seed.Serialization.CustomSerilizators;
@@ -70,7 +71,7 @@ public class DynamicObjectSerializator : ICustomClassSerializator
         }
 
         var fullTypeId = dynamicObject.IsValid 
-            ? new RTTI.UniversalTypeIdentifier() { Id = dynamicObject.FullTypeId }
+            ? new UniversalTypeIdentifier() { Id = dynamicObject.FullTypeId }
             : VoidFullTypeId;
 
         serializator.Logger?.LogTrace("Serialize dynamic with UIID: {fullTypeId}", fullTypeId);

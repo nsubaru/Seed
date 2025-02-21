@@ -1,4 +1,5 @@
-﻿using Seed.RTTI.Record.Object;
+﻿using Seed.Core.RTTI;
+using Seed.RTTI.Record.Object;
 
 namespace Seed.RTTI.Record;
 

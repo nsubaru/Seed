@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Seed.Core.RTTI;
+using System.Collections;
 
 namespace Seed.RTTI.Record;
 
