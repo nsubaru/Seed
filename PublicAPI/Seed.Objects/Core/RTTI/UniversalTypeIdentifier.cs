@@ -29,7 +29,7 @@ public unsafe struct UniversalTypeIdentifier
 
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+        return this.Id.GetHashCode();
     }
 
     public override string ToString()
@@ -44,6 +44,6 @@ public unsafe struct UniversalTypeIdentifier
 
     static public bool operator !=(UniversalTypeIdentifier? item1, UniversalTypeIdentifier? item2)
     {
-        return item1?.Id == item2?.Id;
+        return item1?.Id != item2?.Id;
     }
 }

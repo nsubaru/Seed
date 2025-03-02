@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net.NetworkInformation;
 
 namespace Seed.Serialization.CustomSerializators;
+
 public class PhysicalAddressSerializator : ICustomClassSerializator
 {
     public Type ClrType => typeof(PhysicalAddress);
@@ -21,11 +17,9 @@ public class PhysicalAddressSerializator : ICustomClassSerializator
         serializator.Deserialize(ref sizeDynamic, serializationStream);
         size = sizeDynamic;
 
-        byte[] dataBuffer = new byte[size];
-        dynamic dataBufferDynamic = dataBuffer;
+        var dataBuffer = new byte[(int) size];
 
-        serializator.Deserialize(ref dataBufferDynamic, serializationStream);
-        dataBuffer = dataBufferDynamic;
+        serializationStream.ReadExactly(dataBuffer);
 
         return new PhysicalAddress(dataBuffer);
     }
@@ -36,6 +30,6 @@ public class PhysicalAddressSerializator : ICustomClassSerializator
 
         serializator.Serialize((UInt64) dataBuffer.Length, serializationStream);
 
-        serializator.Serialize(dataBuffer, serializationStream);
+        serializationStream.Write(dataBuffer);
     }
 }

@@ -46,6 +46,6 @@ public partial class SeedSerializatorFactory
     {
         code.AppendLine($"var value = data.AsInteger();");
         code.AppendLine("value = this.DeserializeImpl(value, stream);");
-        code.AppendLine($"data =  new {GetFriendlyTypeName(typeof(T))} (value);");
+        code.AppendLine($"data = new {GetFriendlyTypeName(typeof(T))} (value);");
     }
 }

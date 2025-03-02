@@ -22,6 +22,7 @@ public static partial class Constants
         public const string SizeT = "Seed::Core::SizeT";
         public const string DataSizeT = "Seed::Core::Memory::DataSizeT";
         public const string Id = "Seed::Core::ID";
+        public const string RefCountT = "Seed::Core::RefCountT";
 
         public const string UChar = "Seed::Core::UChar";
         public const string AChar = "Seed::Core::AChar";

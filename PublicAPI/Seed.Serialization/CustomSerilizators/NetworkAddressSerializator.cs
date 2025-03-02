@@ -32,23 +32,28 @@ public class NetworkAddressSerializator : ICustomClassSerializator
         {
             case 2:
                 uint integerData = 0;
-                dynamic v4addrDyn = integerData;
-                serializator.Deserialize(ref v4addrDyn, serializationStream);
-                integerData = v4addrDyn;
+                Span<byte> v4AddrSpan = stackalloc byte[4];
+                serializationStream.ReadExactly(v4AddrSpan);
+
+                integerData = BitConverter.ToUInt32(v4AddrSpan);
 
                 retObj = new IPEndPoint(new IPAddress(integerData), port);
+
                 break; 
 
             case 23:
-                uint flowInfo = 0, scopeId = 0;
-                dynamic shortDyn = flowInfo;
-                serializator.Deserialize(ref shortDyn, serializationStream);
-                flowInfo = shortDyn;
+                dynamic shortDyn;
 
-                byte[] addr = new byte[16];
-                dynamic v6addrDyn = addr;
-                serializator.Deserialize (ref v6addrDyn, serializationStream);
-                addr = v6addrDyn;
+                // we ignore flowinfo since C# don't support it
+                uint flowInfo = 0;
+                shortDyn = flowInfo;
+
+                serializator.Deserialize(ref shortDyn, serializationStream);
+
+                uint scopeId = 0;
+
+                Span<byte> addr = stackalloc byte[16];
+                serializationStream.ReadExactly(addr);
 
                 shortDyn = scopeId;
                 serializator.Deserialize(ref shortDyn, serializationStream);
@@ -56,7 +61,8 @@ public class NetworkAddressSerializator : ICustomClassSerializator
 
                 retObj = new IPEndPoint(new IPAddress(addr, scopeId), port);
                 break;
-            default: throw new ArgumentException();
+
+            default: throw new ArgumentException(nameof(family));
         }
 
         return retObj;
@@ -79,30 +85,29 @@ public class NetworkAddressSerializator : ICustomClassSerializator
             case System.Net.Sockets.AddressFamily.InterNetwork:
                 byte[] v4Addr = new byte[4];
                 Span<byte> v4AddrSpan = new Span<byte>(v4Addr);
-                
+
                 address.Address.TryWriteBytes(v4AddrSpan, out outBytes);
-                
-                dynamic v4addrDyn = v4Addr;
-                serializator.Serialize(v4addrDyn, serializationStream);
+                serializationStream.Write(v4Addr);
                 return;
 
             case System.Net.Sockets.AddressFamily.InterNetworkV6:
-                serializator.Serialize(0, serializationStream);
+                // We should write flowinfo since C++ expect it
+                uint flowInfo = 0;
+                serializator.Serialize(flowInfo, serializationStream);
                 
-                byte[] v6Addr = new byte[16];
-                Span<byte> v6AddrSpan = new Span<byte>(v6Addr);
+                Span<byte> v6AddrSpan = stackalloc byte[16];
 
-                address.Address.TryWriteBytes(v6AddrSpan, out outBytes);
-
-                dynamic v6addrDyn = v6Addr;
-                serializator.Serialize(v6addrDyn, serializationStream);
+                address.Address.TryWriteBytes(v6AddrSpan, out outBytes); 
+                serializationStream.Write(v6AddrSpan);
 
                 uint scopeId = (uint) address.Address.ScopeId;
                 dynamic scopeDyn = scopeId;
+
                 serializator.Serialize(scopeDyn, serializationStream);
+
                 return;
 
-            default : throw new ArgumentException();
+            default : throw new ArgumentException(nameof(address.AddressFamily));
         }
     }
 }

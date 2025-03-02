@@ -12,13 +12,13 @@ public partial class SeedSerializatorFactory
         {
             case "Seed::Core::Float":
                 {
-                    code.AppendLine("var val = (float)data;");
+                    code.AppendLine("var val = (float) data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(float));");
                 }
                 break;
             case "Seed::Core::Double":
                 {
-                    code.AppendLine("var val = (double)data;");
+                    code.AppendLine("var val = (double) data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(double));");
                 }
                 break;
@@ -33,16 +33,16 @@ public partial class SeedSerializatorFactory
         {
             case "Seed::Core::Float":
                 {
-                    code.AppendLine("byte[] buffer = new byte[sizeof(float)];");
-                    code.AppendLine("stream.Read(buffer, 0, sizeof(float));");
-                    code.AppendLine("data = BitConverter.ToSingle(buffer, 0);");
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(float)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToSingle(buffer);");
                 }
                 break;
             case "Seed::Core::Double":
                 {
-                    code.AppendLine("byte[] buffer = new byte[sizeof(double)];");
-                    code.AppendLine("stream.Read(buffer, 0, sizeof(double));");
-                    code.AppendLine("data = BitConverter.ToDouble(buffer, 0);");
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(double)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToDouble(buffer);");
                 }
                 break;
             default:

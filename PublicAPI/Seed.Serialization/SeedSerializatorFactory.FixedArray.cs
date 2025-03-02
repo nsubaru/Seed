@@ -20,12 +20,16 @@ public partial class SeedSerializatorFactory
         }
 
         if (innerTypeRecord == null)
+        {
             return null;
+        }
 
         var innerType = BuildClrType(innerTypeRecord);
 
         if (innerType == null)
+        {
             return null;
+        }
 
         var type = innerType.MakeArrayType();
 

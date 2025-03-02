@@ -13,7 +13,7 @@ public partial class SeedSerializatorFactory
         {
             case Constants.Types.Blob:
             case Constants.Types.SensitiveBlob:
-                return typeof(List<byte>);
+                return typeof(byte[]);
 
             case Constants.Types.List:
             case Constants.Types.SensitiveList:

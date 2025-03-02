@@ -51,37 +51,37 @@ public partial class SeedSerializatorFactory
         {
             case Constants.Types.AChar:
                 {
-                    code.AppendLine("byte[] buffer = new byte[sizeof(byte)];");
-                    code.AppendLine("stream.Read(buffer, 0, sizeof(byte));");
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(byte)];");
+                    code.AppendLine("stream.Read(buffer);");
                     code.AppendLine("data = buffer[0];");
                 }
                 break;
             case Constants.Types.UChar:
                 {
-                    code.AppendLine("byte[] buffer = new byte[sizeof(char)];");
-                    code.AppendLine("stream.Read(buffer, 0, sizeof(char));");
-                    code.AppendLine("data = BitConverter.ToChar(buffer, 0);");
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(char)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToChar(buffer);");
                 }
                 break;
             case Constants.Types.U8Char:
                 {
-                    code.AppendLine("byte[] buffer = new byte[sizeof(byte)];");
-                    code.AppendLine("stream.Read(buffer, 0, sizeof(byte));");
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(byte)];");
+                    code.AppendLine("stream.Read(buffer);");
                     code.AppendLine("data = buffer[0];");
                 }
                 break;
             case Constants.Types.U16Char:
                 {
-                    code.AppendLine("byte[] buffer = new byte[sizeof(char)];");
-                    code.AppendLine("stream.Read(buffer, 0, sizeof(char));");
-                    code.AppendLine("data = BitConverter.ToChar(buffer, 0);");
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(char)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToChar(buffer);");
                 }
                 break;
             case Constants.Types.U32Char:
                 {
-                    code.AppendLine("byte[] buffer = new byte[sizeof(Int32)];");
-                    code.AppendLine("stream.Read(buffer, 0, sizeof(Int32));");
-                    code.AppendLine("data = BitConverter.ToUInt32(buffer, 0);");
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(uint)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToUInt32(buffer);");
                 }
                 break;
             default:

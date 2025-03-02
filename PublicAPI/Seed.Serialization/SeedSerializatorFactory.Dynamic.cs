@@ -8,9 +8,9 @@ public partial class SeedSerializatorFactory
 {
     private void AddDynamicSer<T>(ref StringBuilder code, TypeRecord _)
     {
-        code.AppendLine($"var record = typesDict.Where(x => x.Value.ClrType == data.Value.GetType()).First();");
+        code.AppendLine($"var record = reverseTypeDict[data.Value.GetType()];");
         code.AppendLine($"UniversalTypeIdentifier id = new UniversalTypeIdentifier();");
-        code.AppendLine($"id.Id = record.Key;");
+        code.AppendLine($"id.Id = record.Value.FullTypeId;");
         code.AppendLine($"Serialize(id, stream);");
         code.AppendLine($"record.Value.SerializeImpl.Invoke(this, new object[] {{data.Value,stream}});");
     }

@@ -5,17 +5,17 @@ namespace Seed.RTTI;
 public class RTTISectionSerializator : ICustomClassSerializator
 {
     public Type ClrType => typeof(RTTISection);
-    public string TypeName => "Seed::Core::RTTI::RTTISection";
+    public string TypeName => Constants.Types.RTTISection;
 
     public Type[] DependableTypes => new Type[] { typeof(List<UInt8>) };
 
     public object Deserialize(Stream serializationStream, ISeedSerializator serializator)
     {
-        dynamic data = new List<UInt8>();
+        dynamic data = new byte[1];
 
         serializator.Deserialize(ref data, serializationStream);
 
-        return new RTTISection((data as List<UInt8>)!.ToArray());
+        return new RTTISection((data as byte[])!);
     }
 
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializator serializator)
