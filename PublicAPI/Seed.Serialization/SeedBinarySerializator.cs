@@ -224,7 +224,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
             var elementType = type.GetElementType();
 
             var length = Expression.Constant(1);
-            var newArrayExpr = Expression.NewArrayBounds(elementType, length);
+            var newArrayExpr = Expression.NewArrayBounds(elementType!, length);
             factory = Expression.Lambda<Func<object>>(newArrayExpr).Compile();
 
             objectFactoryCache[type] = factory;
@@ -272,7 +272,7 @@ public class SeedBinarySerializator : ISeedBinarySerializator
                 throw new InvalidCastException();
             }
 
-            if (!mapingScheme.TryGetValue(record, out Type targetType))
+            if (!mapingScheme.TryGetValue(record, out Type? targetType))
             {
                 throw new InvalidCastException();
             }
