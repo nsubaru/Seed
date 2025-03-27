@@ -24,6 +24,20 @@ namespace Seed::Core::TypeTraits
     constexpr bool IsTaskV = TaskT<T>::State;
 
     /// <summary>
+    /// TypeTrait for checking is type T is void task (task that does not hold value)
+    /// </summary>
+    /// <typeparam name="T">Type for checking</typeparam>
+    template<typename T>
+    constexpr bool IsVoidTaskV = TaskT<T>::State && IsVoidV<typename TaskT<T>::T>;
+
+    /// <summary>
+    /// TypeTrait for checking is type T is non void task (task that hold value)
+    /// </summary>
+    /// <typeparam name="T">Type for checking</typeparam>
+    template<typename T>
+    constexpr bool IsNonVoidTaskV = TaskT<T>::State && !IsVoidV<typename TaskT<T>::T>;
+
+    /// <summary>
     /// Constexpr for checking is type T is task that hold value of type U
     /// </summary>
     /// <typeparam name="T">Type for checking</typeparam>
