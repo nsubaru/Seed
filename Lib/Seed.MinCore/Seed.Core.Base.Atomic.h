@@ -497,7 +497,8 @@ namespace Seed::Core
     }
 }
 
-namespace Seed::Core::TypeTraits {
+namespace Seed::Core::TypeTraits 
+{
     template<typename T>
     struct IsAtomicT : LogicFalse {};
 
@@ -510,7 +511,8 @@ namespace Seed::Core::TypeTraits {
     constexpr bool IsAtomicV = IsAtomicT<T>::State;
 }
 
-namespace Seed::Core::Concepts {
+namespace Seed::Core::Concepts 
+{
     template<typename T>
     concept Atomic = TypeTraits::IsAtomicV<T>;
 }
