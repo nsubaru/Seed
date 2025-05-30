@@ -162,4 +162,26 @@ public struct EnumFlag<T, U>
 
         return result.ToArray();
     }
+
+    /// <summary>
+    /// Combine flags from two enum flags values
+    /// </summary>
+    /// <param name="a">Left operand</param>
+    /// <param name="b">Right operand</param>
+    /// <returns>Combined flags from two enum flags values</returns>
+    public static EnumFlag<T, U> operator|(EnumFlag<T, U> a, EnumFlag<T, U> b)
+    {
+        return new EnumFlag<T, U>(a.AsInteger() | b.AsInteger());
+    }
+
+    /// <summary>
+    /// Combine flags from two enum flags values
+    /// </summary>
+    /// <param name="a">Left operand</param>
+    /// <param name="b">Right operand</param>
+    /// <returns>Combined flags from two enum flags values</returns>
+    public static EnumFlag<T, U> operator |(EnumFlag<T, U> a, T b)
+    {
+        return new EnumFlag<T, U>(a.AsInteger() | new EnumFlag<T, U>(b).AsInteger());
+    }
 }
