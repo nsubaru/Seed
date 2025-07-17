@@ -99,28 +99,6 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// </summary>
     public string CxxTypeName => GetCxxTypeName();
 
-    /// <summary>
-	/// Receiving the serialization schema for type record
-	/// </summary>
-	/// <returns>Serialization schema</returns>
-    internal string GetSerializationSchema()
-    {
-        var pTypeName = (TextMetaData*)(
-             (((Byte*)record) +
-             ((SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64()) + 
-             ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) +
-             (record->TypeName.Size * sizeof(Char)))
-        );
-
-        var pSchema = (TextMetaData*)(((Byte*) pTypeName->Text) + (pTypeName->Size * sizeof(Char)));
-
-        return Marshal.PtrToStringAuto((IntPtr) pSchema->Text) ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Serialization schema if type support serialization
-    /// </summary>
-    public string SerializationSchema => GetSerializationSchema();
 
     /// <summary>
     /// Receiving the template type name for type record
@@ -135,9 +113,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
              (record->TypeName.Size * sizeof(Char)))
         );
 
-        var pSchema = (TextMetaData*)(((Byte*)pTypeName->Text) + (pTypeName->Size * sizeof(Char)));
-
-        var pTemplateName = (TextMetaData*)(((Byte*)pSchema->Text) + (pSchema->Size * sizeof(Char)));
+        var pTemplateName = (TextMetaData*)(((Byte*)pTypeName->Text) + (pTypeName->Size * sizeof(Char)));
 
         return Marshal.PtrToStringAuto((IntPtr)pTemplateName->Text) ?? string.Empty;
     }
