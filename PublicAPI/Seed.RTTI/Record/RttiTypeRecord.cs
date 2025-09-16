@@ -446,9 +446,9 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     {
         if (record->TypeClass == ETypes.FixedArray || record->TypeClass == ETypes.FixedCollection)
         {
-            var collectionRecord = (Collection*)(((Byte*) record) + GetCTTIMetaDataOffset());
+            var collectionRecord = (FixedSizedCollection*)(((Byte*) record) + record->OffsetToCttiMetaData);
 
-            return collectionRecord->Count;
+            return collectionRecord->CountOfItems;
         }
         else
         {
@@ -469,20 +469,32 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     public int CompareTo(RttiTypeRecord? other)
     {
         if (other == null)
+        {
             return 1;
+        }
 
         if (this.record == other.record)
+        {
             return 0;
+        }
 
         if (this.record == null)
+        {
             return -1;
+        }
         else if (other.record == null)
+        {
             return 1;
+        }
 
         if (isValidCxxTypeId && other.isValidCxxTypeId)
+        {
             return this.record->TypeId.Id.CompareTo(other.record->TypeId.Id);
+        }
         else
+        {
             return this.CxxTypeName.CompareTo(other.CxxTypeName);
+        }
     }
 
     /// <summary>

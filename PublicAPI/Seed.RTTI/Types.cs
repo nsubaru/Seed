@@ -174,6 +174,58 @@ internal unsafe struct Collection
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct DynamicSizedCollection
+{
+    [FieldOffset(0)]
+    public SizeT OffsetToFirstItem;
+
+    [FieldOffset(8)]
+    public TDynamicForEach DynamicForEach;
+
+    [FieldOffset(16)]
+    public TUnsafeGet SizeGetter;
+};
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct FixedSizedCollection
+{
+    [FieldOffset(0)]
+    public SizeT OffsetToFirstItem;
+
+    [FieldOffset(8)]
+    public TDynamicForEach DynamicForEach;
+
+    [FieldOffset(16)]
+    public SizeT CountOfItems;
+};
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct AssociativeCollection
+{
+    [FieldOffset(0)]
+    public SizeT OffsetToFirstItem;
+
+    [FieldOffset(8)]
+    public TDynamicForEach DynamicForEach;
+
+    [FieldOffset(16)]
+    public TUnsafeGet SizeGetter;
+};
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct PairMetaData
+{
+    [FieldOffset(0)]
+    public SizeT OffsetToFirstItem;
+
+    [FieldOffset(8)]
+    public TPairComponentUnsafeGet KeyGetter;
+
+    [FieldOffset(16)]
+    public TPairComponentUnsafeGet ValueGetter;
+};
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
 internal unsafe struct ItemBase
 {
 	[FieldOffset(0)]
