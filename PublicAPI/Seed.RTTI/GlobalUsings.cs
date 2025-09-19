@@ -25,3 +25,5 @@ global using DynamicConverterFunc = System.IntPtr;
 global using DynamicCallerFunc = System.IntPtr;
 global using StaticDynamicConverterFunc = System.IntPtr;
 global using StaticDynamicCallerFunc = System.IntPtr;
+global using TDynamicForEach = System.IntPtr;
+global using TPairComponentUnsafeGet = System.IntPtr;
