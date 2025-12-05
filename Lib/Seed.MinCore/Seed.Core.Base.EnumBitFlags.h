@@ -15,7 +15,7 @@ namespace Seed::Core
 	/// </summary>
 	/// <typeparam name="TValueType">Enum bit flag enum underlying type</typeparam>
 	template<Concepts::Integer TValueType>
-    constexpr auto EnumBitFlagDefaultValidator = [] (TValueType) { return true; };
+	inline bool EnumBitFlagDefaultValidator(TValueType) { return true; }
 
 	/// <summary>
     /// Enum bit flags, a set of flags where enum values are used as flags values
