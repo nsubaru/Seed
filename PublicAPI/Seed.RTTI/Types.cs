@@ -122,7 +122,10 @@ internal unsafe struct MetaDataForDynamicRecord
     [FieldOffset(72)]
     public TUpdateSerialize FUpdateSerialization;
 
-    [FieldOffset(80)]
+	[FieldOffset(80)]
+	public TSerializationMetadata FSerializationMetadata;
+
+    [FieldOffset(88)]
 	public TToString FToString;
 }
 
@@ -144,14 +147,15 @@ internal unsafe struct MetaData
 	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(121)]
+	[FieldOffset(129)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(122)]
+	[FieldOffset(130)]
 	public TextMetaData TypeName;
 }
 
-[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)] unsafe struct StructMetaData
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)] 
+unsafe struct StructMetaData
 {
 	[FieldOffset(0)]
 	public SizeT OffsetToCollection;
@@ -250,10 +254,10 @@ internal unsafe struct FieldMetaDataRecord
 	[FieldOffset(33)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(121)]
+	[FieldOffset(129)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(122)]
+	[FieldOffset(130)]
 	public TextMetaData FieldName;
 }
 
@@ -278,10 +282,10 @@ internal unsafe struct FieldMetaData
 	[FieldOffset(41)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(129)]
+	[FieldOffset(137)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(130)]
+	[FieldOffset(138)]
 	public TextMetaData FieldName;
 }
 
@@ -300,10 +304,10 @@ internal unsafe struct ItemMetaData
 	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(121)]
 	public TypeModificator TypeModificators;
 
-	[FieldOffset(114)]
+	[FieldOffset(122)]
 	public TextMetaData TypeName;
 }
 
@@ -322,13 +326,13 @@ internal unsafe struct ArgumentMetaData
 	[FieldOffset(25)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(113)]
+	[FieldOffset(121)]
 	public Boolean IsSerializable;
 
-	[FieldOffset(114)]
+	[FieldOffset(122)]
 	public CvRefModificators Flags;
 
-	[FieldOffset(122)]
+	[FieldOffset(130)]
 	public TextMetaData TypeName;
 }
 
@@ -382,13 +386,13 @@ internal unsafe struct InterfaceRecord
 	[FieldOffset(24)]
 	public MetaDataForDynamicRecord MetaDataForDynamic;
 
-	[FieldOffset(112)]
+	[FieldOffset(120)]
 	public DynamicConverterFunc DynamicConverterTo;
 
-	[FieldOffset(120)]
+	[FieldOffset(128)]
 	public DynamicConverterFunc DynamicConverterFrom;
 
-	[FieldOffset(128)]
+	[FieldOffset(136)]
 	public TextMetaData TypeName;
 }
 
@@ -556,10 +560,10 @@ internal unsafe struct AttributeRecord
     [FieldOffset(34)]
     public MetaDataForDynamicRecord ValueTypeInformation;
 
-    [FieldOffset(122)]
+    [FieldOffset(130)]
     public UniversalTypeIdentifier ValueTypeId;
 
-    [FieldOffset(138)]
+    [FieldOffset(146)]
     public TextMetaData AttributeName;
 }
 
