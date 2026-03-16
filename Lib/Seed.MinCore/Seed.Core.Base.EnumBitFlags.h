@@ -127,7 +127,7 @@ namespace Seed::Core
 		/// </summary>
 		/// <param name="level">A right which is need to be checked</param>
 		/// <returns>The logical value</returns>
-		constexpr bool operator&(TEnum level)
+		constexpr bool operator&(TEnum level) const
 		{
 			return this->value & static_cast<TValueType>(level);
 		}

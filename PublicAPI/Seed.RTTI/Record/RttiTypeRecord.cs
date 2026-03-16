@@ -95,7 +95,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     }
 
     /// <summary>
-    /// Cxx type name without any formating
+    /// Cxx type name without any formatting
     /// </summary>
     public string CxxTypeName => GetCxxTypeName();
 
