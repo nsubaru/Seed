@@ -34,141 +34,45 @@ namespace Seed::Core::Containers
 		if (RequireCount == 0)
 			return 0;
 
-		if (StartPosition == 0)
+		if (StartPosition >= BitCount || RequireCount > BitCount - StartPosition)
 		{
-			return FindBitSequel(RequireCount);
+			return Math::Max<SizeT>();
 		}
-		else
+
+		SizeT rangeSize = 0;
+		SizeT rangeStart = StartPosition;
+
+		for (SizeT bit = StartPosition; bit < BitCount; bit++)
 		{
-			SizeT RangeSize = 0;
-			Boolean IsFound = false;
-
-			SizeT bitInFirstCluster = StartPosition % BitCountInFragment;
-			SizeT startCluster = StartPosition / BitCountInFragment;
-
-			for (SizeT bit = bitInFirstCluster; bit < BitCountInFragment; bit++)
+			if (IsZero(bit))
 			{
-				if (!Bits::BitCheck(bitMap[startCluster], bit))
-					if (IsFound == false)
-					{
-						RangeSize = 0; IsFound = true;
-					}
-					else
-					{
-						RangeSize++;
-						if (RangeSize == RequireCount)
-							return ((StartPosition * BitCountInFragment) + bit) - RequireCount;
-					}
-				else
-					if (IsFound == true)
-						IsFound = false;
-			}
+				if (rangeSize == 0)
+					rangeStart = bit;
 
-			for (SizeT byte = startCluster + 1; byte < FullClustersCount; byte++)
-			{
-				if (bitMap[byte] == Math::Max<T>())
-					continue;
-				for (SizeT bit = 0; bit < BitCountInFragment; bit++)
-				{
-					if (!Bits::BitCheck(bitMap[byte], bit))
-						if (IsFound == false)
-						{
-							RangeSize = 0; IsFound = true;
-						}
-						else
-						{
-							RangeSize++;
-							if (RangeSize == RequireCount)
-								return ((byte * BitCountInFragment) + bit) - RequireCount;
-						}
-					else
-						if (IsFound == true)
-							IsFound = false;
-				}
-			}
+				rangeSize++;
 
-			if constexpr (LastClusterBitsCount != 0)
-			{
-				for (SizeT bit = 0; bit < LastClusterBitsCount; bit++)
-				{
-					if (!Bits::BitCheck(bitMap[FullClustersCount], bit))
-						if (IsFound == false)
-						{
-							RangeSize = 0; IsFound = true;
-						}
-						else
-						{
-							RangeSize++;
-							if (RangeSize == RequireCount)
-								return ((FullClustersCount * BitCountInFragment) + bit) - RequireCount;
-						}
-					else
-						if (IsFound == true)
-							IsFound = false;
-				}
+				if (rangeSize == RequireCount)
+					return rangeStart;
 			}
-			return -1;
+			else
+			{
+				rangeSize = 0;
+			}
 		}
+
+		return Math::Max<SizeT>();
 	}
 
 	template<typename THeap, SizeT BitCount, typename T>
 	constexpr SizeT BaseBitMapT<THeap, BitCount, T>::FindBitSequel(SizeT RequireCount)
 	{
-		if (RequireCount == 0)
-			return 0;
-
-		SizeT RangeSize = 0;
-		Boolean IsFound = false;
-		for (SizeT byte = 0; byte < FullClustersCount; byte++)
-		{
-			if (bitMap[byte] == Math::Max<T>())
-				continue;
-			for (SizeT bit = 0; bit < BitCountInFragment; bit++)
-			{
-				if (!Bits::BitCheck(bitMap[byte], bit))
-					if (IsFound == false)
-					{
-						RangeSize = 0; IsFound = true;
-					}
-					else
-					{
-						RangeSize++;
-						if (RangeSize == RequireCount)
-							return ((byte * BitCountInFragment) + bit) - (RequireCount - 1);
-					}
-				else
-					if (IsFound == true)
-						IsFound = false;
-			}
-		}
-
-		if constexpr (LastClusterBitsCount != 0)
-		{
-			for (SizeT bit = 0; bit < LastClusterBitsCount; bit++)
-			{
-				if (!Bits::BitCheck(bitMap[FullClustersCount], bit))
-					if (IsFound == false)
-					{
-						RangeSize = 0; IsFound = true;
-					}
-					else
-					{
-						RangeSize++;
-						if (RangeSize == RequireCount)
-							return ((FullClustersCount * BitCountInFragment) + bit) - (RequireCount - 1);
-					}
-				else
-					if (IsFound == true)
-						IsFound = false;
-			}
-		}
-		return -1;
+		return FindBitSequalFrom(0, RequireCount);
 	};
 
 	template<typename THeap, SizeT BitCount, typename T>
 	constexpr void BaseBitMapT<THeap, BitCount, T>::SetBitSequel(SizeT Position, SizeT BitsCount)
 	{
-		if (Position + BitsCount > BitCount)
+		if (Position > BitCount || BitsCount > BitCount - Position)
 			Throw(IndexOutOfRange(SourcePosition, Position, BitCount + BitsCount));
 
 		SizeT StartCluster = Position / BitCountInFragment;
@@ -204,7 +108,7 @@ namespace Seed::Core::Containers
 				bitMap[EndCluster] = Math::Max<T>();
 			}
 
-			if (StartCluster - EndCluster > 1)
+			if (EndCluster - StartCluster > 1)
 			{
 				for (SizeT byte = StartCluster + 1; byte < EndCluster; byte++)
 					bitMap[byte] = Math::Max<T>();
@@ -215,7 +119,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, SizeT BitCount, typename T>
 	constexpr void BaseBitMapT<THeap, BitCount, T>::ResetBitSequel(SizeT Position, SizeT BitsCount)
 	{
-		if (Position + BitsCount > BitCount)
+		if (Position > BitCount || BitsCount > BitCount - Position)
 			Throw(IndexOutOfRange(SourcePosition, Position, BitCount + BitsCount));
 
 		SizeT StartCluster = Position / BitCountInFragment;
@@ -251,7 +155,7 @@ namespace Seed::Core::Containers
 				bitMap[EndCluster] = 0;
 			}
 
-			if (StartCluster - EndCluster > 1)
+			if (EndCluster - StartCluster > 1)
 			{
 				for (SizeT byte = StartCluster + 1; byte < EndCluster; byte++)
 					bitMap[byte] = 0;
@@ -262,7 +166,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, SizeT BitCount, typename T>
 	constexpr void BaseBitMapT<THeap, BitCount, T>::SetBit(SizeT Position)
 	{
-		if (Position > BitCount)
+		if (Position >= BitCount)
 			Throw(IndexOutOfRange(SourcePosition, Position, BitCount));
 		Bits::BitSet(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 	};
@@ -270,7 +174,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, SizeT BitCount, typename T>
 	constexpr void BaseBitMapT<THeap, BitCount, T>::ResetBit(SizeT Position)
 	{
-		if (Position > BitCount)
+		if (Position >= BitCount)
 			Throw(IndexOutOfRange(SourcePosition, Position, BitCount));
 		Bits::BitReset(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 	};
@@ -278,7 +182,7 @@ namespace Seed::Core::Containers
 	template<typename THeap, SizeT BitCount, typename T>
 	constexpr Boolean BaseBitMapT<THeap, BitCount, T>::IsZero(SizeT Position)
 	{
-		if (Position > BitCount)
+		if (Position >= BitCount)
 			Throw(IndexOutOfRange(SourcePosition, Position, BitCount));
 		return !Bits::BitCheck(bitMap[Position / BitCountInFragment], Position % BitCountInFragment);
 	};
@@ -295,16 +199,16 @@ namespace Seed::Core::Containers
 		SizeT setCount = 0;
 		for (SizeT byte = 0; byte < FullClustersCount; byte++)
 		{
-			if (bitMap[byte] == 0)
+			if (bitMap[byte] == Math::Max<T>())
 				setCount += BitCountInFragment;
 			else
 				for (SizeT j = 0; j < BitCountInFragment; j++)
 					if (Bits::BitCheck(bitMap[byte], j))
 						setCount++;
 		}
-		if constexpr (FullClustersCount > Size)
+		if constexpr (FullClustersCount < Size)
 		{
-			for (SizeT j = 0; j < BitCountInFragment; j++)
+			for (SizeT j = 0; j < LastClusterBitsCount; j++)
 				if (Bits::BitCheck(bitMap[FullClustersCount], j))
 					setCount++;
 		}
@@ -326,6 +230,7 @@ namespace Seed::Core::Containers
 			else
 				Bits::BitReset(this->bitMap[FullClustersCount], i);
 		}
+		return *this;
 	}
 
 	template<typename THeap, SizeT BitCount, typename T>
@@ -343,6 +248,7 @@ namespace Seed::Core::Containers
 			else
 				Bits::BitReset(this->bitMap[FullClustersCount], i);
 		}
+		return *this;
 	}
 
 	template<typename THeap, SizeT BitCount, typename T>
@@ -356,7 +262,7 @@ namespace Seed::Core::Containers
 
 		for (SizeT i = 0; i < LastClusterBitsCount; i++)
 		{
-			if (Bits::BitCheck(this->bitMap[FullClustersCount], i) == Bits::BitCheck(Second.bitMap[FullClustersCount], i))
+			if (Bits::BitCheck(this->bitMap[FullClustersCount], i) != Bits::BitCheck(Second.bitMap[FullClustersCount], i))
 				return false;
 		}
 		return true;
@@ -373,7 +279,7 @@ namespace Seed::Core::Containers
 
 		for (SizeT i = 0; i < LastClusterBitsCount; i++)
 		{
-			if (Bits::BitCheck(this->bitMap[FullClustersCount], i) == Bits::BitCheck(Second.bitMap[FullClustersCount], i))
+			if (Bits::BitCheck(this->bitMap[FullClustersCount], i) != Bits::BitCheck(Second.bitMap[FullClustersCount], i))
 				return true;
 		}
 		return false;

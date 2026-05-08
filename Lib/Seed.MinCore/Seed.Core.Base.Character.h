@@ -91,6 +91,29 @@ namespace Seed::Core
 			return IsDigit(ch) || IsLatinLetter(ch);
 		}
 
+		/// <summary>
+		/// Indicates whether the variable is a white space (includes spaces, tabs, newlines, etc.)
+		/// </summary>
+		/// <param name="ch">Given character</param>
+		/// <returns>"True" if white space</returns>
+		static bool IsWhiteSpace(Char ch) {
+			return ch == L' '   ||  // Space
+				   ch == L'\t'  ||  // Horizontal tab
+				   ch == L'\n'  ||  // Line feed
+				   ch == L'\v'  ||  // Vertical tab
+				   ch == L'\f'  ||  // Form feed
+				   ch == L'\r'  ||  // Carriage return
+				   ch == 0x85   ||  // NEXT LINE (NEL)
+				   ch == 0xa0   ||  // NO-BREAK SPACE
+				   ch == 0x1680 ||  // OGHAM SPACE MARK
+				   (ch >= 0x2000 && ch <= 0x200B) ||  // EN QUAD to ZERO WIDTH SPACE
+				   ch == 0x2028 ||  // LINE SEPARATOR
+				   ch == 0x2029 ||  // PARAGRAPH SEPARATOR
+				   ch == 0x202F ||  // NARROW NO-BREAK SPACE
+				   ch == 0x205F ||  // MEDIUM MATHEMATICAL SPACE
+				   ch == 0x3000;    // IDEOGRAPHIC SPACE
+		}
+
 #ifdef SeedKernel
 		/// <summary>
 		/// Case insensitive character comparing

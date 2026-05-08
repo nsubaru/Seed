@@ -6,6 +6,12 @@
 #include "Seed.Core.Base.EnumFlags.h"
 #include "Seed.Core.Base.Comparing.h"
 
+namespace Seed::Core::TypeTraits 
+{
+    template<typename>
+    struct IsCustomAtomicT : LogicFalse {};
+}
+
 namespace Seed::Core::Concepts
 {
     /// <summary>
@@ -17,7 +23,8 @@ namespace Seed::Core::Concepts
         Concepts::IsEnum<T> || 
         TypeTraits::IsPointerV<T> ||
         TypeTraits::IsEnumFlagsV<T> || 
-        TypeTraits::IsBoolean<T>;
+        TypeTraits::IsBoolean<T> ||
+        TypeTraits::IsCustomAtomicT<T>::State;
 }
 
 namespace Seed::Core 
@@ -426,7 +433,7 @@ namespace Seed::Core
             }
             else
             {
-                Interlocked::Decrement(this->value.value, value);
+                Interlocked::InterlockedAdd(this->value.value, ~value);
                 return *this;
             }
         }
