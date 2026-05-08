@@ -9,6 +9,7 @@ public partial class SeedSerializatorFactory
         switch (typeRecord.TypeName)
         {
             case Constants.Types.Blob:
+            case Constants.Types.BaseBlob:
             case Constants.Types.SensitiveBlob:
             {
                 code.AppendLine("var sz = (ulong)data.Length;"); // Get byte array size
@@ -83,6 +84,7 @@ public partial class SeedSerializatorFactory
         switch (typeRecord.TypeName)
         {
             case Constants.Types.Blob:
+            case Constants.Types.BaseBlob:
             case Constants.Types.SensitiveBlob:
             {
                 code.AppendLine("const int MaxStackAllocSize = 512;");  // 1KB stack limit

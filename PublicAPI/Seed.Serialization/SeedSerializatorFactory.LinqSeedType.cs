@@ -12,6 +12,7 @@ public partial class SeedSerializatorFactory
         switch (record.TemplateTypeName)
         {
             case Constants.Types.Blob:
+            case Constants.Types.BaseBlob:
             case Constants.Types.SensitiveBlob:
                 return typeof(byte[]);
 
