@@ -523,3 +523,7 @@ namespace Seed::Core::Concepts
     template<typename T>
     concept Atomic = TypeTraits::IsAtomicV<T>;
 }
+
+extern template Seed::Core::Atomic<Seed::Core::Boolean>;
+extern template Seed::Core::Atomic<Seed::Core::SizeT>;
+extern template Seed::Core::Atomic<Seed::Core::UInt64>;
