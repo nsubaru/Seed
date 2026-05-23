@@ -28,3 +28,5 @@ global using StaticDynamicCallerFunc = System.IntPtr;
 global using TDynamicForEach = System.IntPtr;
 global using TPairComponentUnsafeGet = System.IntPtr;
 global using TSerializationMetadata = System.IntPtr;
+global using TObjectPropertiesGetObjId = System.IntPtr;
+global using TObjectPropertiesForEach = System.IntPtr;
