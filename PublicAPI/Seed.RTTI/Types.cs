@@ -162,6 +162,9 @@ unsafe struct StructMetaData
 
 	[FieldOffset(8)]
 	public TUnsafeGet BaseGetter;
+
+	[FieldOffset(16)]
+    public Boolean IsFake;
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
@@ -489,6 +492,28 @@ internal unsafe struct StructCustomTypeMetaData
 
 	[FieldOffset(9)]
 	public TUnsafeGet BaseGetter;
+}
+
+[StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
+internal unsafe struct ObjectPropertiesMetaData
+{
+	[FieldOffset(0)]
+    public SizeT OffsetToCollection;
+
+	[FieldOffset(8)]
+    public TUnsafeGet BaseGetter;
+	
+    [FieldOffset(16)]
+    public Boolean IsFake;
+
+	[FieldOffset(24)]
+    public SizeT PropertiesCount;
+
+	[FieldOffset(32)]
+    public TObjectPropertiesGetObjId GetObjId;
+
+	[FieldOffset(40)]
+    public TObjectPropertiesForEach ForEach;
 }
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]
