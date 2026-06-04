@@ -9,7 +9,7 @@ public struct KernelVersionT
     public UInt16 Major;
 
     [SerializableStructField]
-    [FieldOffset(4)]
+    [FieldOffset(2)]
     public UInt16 Minor;
 
     [SerializableStructField]
