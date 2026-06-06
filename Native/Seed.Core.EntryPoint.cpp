@@ -32,7 +32,7 @@ Seed::Boolean Seed::Core::Init::StaticVariables() noexcept
 			if (*x) (*x)();
 	}
 	catch (...) {
-		toCoreLog(L"При ініціалізації статичних об'єктів було перехоплено неочікувану помилку");
+		toCoreLog(L"пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ'пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		return false;
 	}
 	return true;
@@ -49,7 +49,7 @@ void Seed::Core::Stop::StaticVariables() noexcept
 		delete dtorsList;
 	}
 	catch (...) {
-		toCoreLog(L"При деструкції статичних об'єктів було перехоплено неочікувану помилку");
+		toCoreLog(L"пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ'пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 }
 #pragma endregion
@@ -66,7 +66,7 @@ void Seed::Core::RuntimeEntryPoint()
 			return;
 		if (!Init::Exceptions())
 			return;
-		if (!Init::MemoryManagment())
+		if (!Init::MemoryManagement())
 			return;
 		if (!Init::Threading())
 			return;
@@ -80,7 +80,7 @@ void Seed::Core::RuntimeEntryPoint()
 	{
 		Stop::StaticVariables();
 		Stop::Threading();
-		Stop::MemoryManagment();
+		Stop::MemoryManagement();
 		Stop::Exceptions();
 		Stop::SettingsAPI();
 		Stop::Loging();

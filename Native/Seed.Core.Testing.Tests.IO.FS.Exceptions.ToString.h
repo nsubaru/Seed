@@ -9,7 +9,7 @@ namespace Seed::Core::Testing::Test::IO::FS::Exceptions::ToString
 	SeedTestDef(DirectoryIsNotFileExceptionToString);
 	SeedTestDef(FileBusyExceptionToString);
 	SeedTestDef(FileExistExceptionToString);
-	SeedTestDef(FileIsCoruptedExceptionToString);
+	SeedTestDef(FileIsCorruptedExceptionToString);
 	SeedTestDef(FileModeNoSupportedByOperationExceptionToString);
 	SeedTestDef(FileNameInvalidExceptionToString);
 	SeedTestDef(FileNotExistExceptionToString);

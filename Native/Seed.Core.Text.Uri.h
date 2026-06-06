@@ -1,7 +1,7 @@
 #pragma once
 #include "Seed.Core.Text.Base.h"
-#include "Seed.Core.Containers.NonConcurency.FixedArray.h"
-#include "Seed.Core.Containers.NonConcurency.FixedArrayImpl.h"
+#include "Seed.Core.Containers.NonConcurrency.FixedArray.h"
+#include "Seed.Core.Containers.NonConcurrency.FixedArrayImpl.h"
 
 namespace Seed::Core::Text
 {

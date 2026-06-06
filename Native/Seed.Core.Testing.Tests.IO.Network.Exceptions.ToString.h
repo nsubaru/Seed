@@ -14,5 +14,5 @@ namespace Seed::Core::Testing::Test::IO::Network::Exceptions::ToString
 	SeedTestDef(InvalidStateExceptionToString);
 	SeedTestDef(IOTimeoutExceptionToString);
 	SeedTestDef(NetworkUnreachableExceptionToString);
-	SeedTestDef(SoketExceptionToString);
+	SeedTestDef(SocketExceptionToString);
 }

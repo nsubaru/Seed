@@ -64,15 +64,15 @@ public static partial class Constants
         public const string SensitiveDynamicStack = "Seed::Core::Containers::SensitiveDynamicStack";
         public const string SensitiveDynamicQueue = "Seed::Core::Containers::SensitiveDynamicQueue";
 
-        public const string ConcurencyList = "Seed::Core::Containers::ConcurencyList";
-        public const string ConcurencyArray = "Seed::Core::Containers::ConcurencyArray";
-        public const string ConcurencyDynamicStack = "Seed::Core::Containers::ConcurencyDynamicStack";
-        public const string ConcurencyDynamicQueue = "Seed::Core::Containers::ConcurencyDynamicQueue";
+        public const string ConcurrencyList = "Seed::Core::Containers::ConcurrencyList";
+        public const string ConcurrencyArray = "Seed::Core::Containers::ConcurrencyArray";
+        public const string ConcurrencyDynamicStack = "Seed::Core::Containers::ConcurrencyDynamicStack";
+        public const string ConcurrencyDynamicQueue = "Seed::Core::Containers::ConcurrencyDynamicQueue";
 
-        public const string ConcurencySensitiveList = "Seed::Core::Containers::ConcurencySensitiveList";
-        public const string ConcurencySensitiveArray = "Seed::Core::Containers::ConcurencySensitiveArray";
-        public const string ConcurencySensitiveDynamicStack = "Seed::Core::Containers::ConcurencySensitiveDynamicStack";
-        public const string ConcurencySensitiveDynamicQueue = "Seed::Core::Containers::ConcurencySensitiveDynamicQueue";
+        public const string ConcurrencySensitiveList = "Seed::Core::Containers::ConcurrencySensitiveList";
+        public const string ConcurrencySensitiveArray = "Seed::Core::Containers::ConcurrencySensitiveArray";
+        public const string ConcurrencySensitiveDynamicStack = "Seed::Core::Containers::ConcurrencySensitiveDynamicStack";
+        public const string ConcurrencySensitiveDynamicQueue = "Seed::Core::Containers::ConcurrencySensitiveDynamicQueue";
 
         public const string FixedArray = "Seed::Core::Containers::FixedArray";
         public const string FixedQueue = "Seed::Core::Containers::FixedQueue";
@@ -82,13 +82,13 @@ public static partial class Constants
         public const string SensitiveFixedQueue = "Seed::Core::Containers::SensitiveFixedQueue";
         public const string SensitiveFixedStack = "Seed::Core::Containers::SensitiveFixedStack";
 
-        public const string ConcurencyFixedArray = "Seed::Core::Containers::ConcurencyFixedArray";
-        public const string ConcurencyFixedQueue = "Seed::Core::Containers::ConcurencyFixedQueue";
-        public const string ConcurencyFixedStack = "Seed::Core::Containers::ConcurencyFixedStack";
+        public const string ConcurrencyFixedArray = "Seed::Core::Containers::ConcurrencyFixedArray";
+        public const string ConcurrencyFixedQueue = "Seed::Core::Containers::ConcurrencyFixedQueue";
+        public const string ConcurrencyFixedStack = "Seed::Core::Containers::ConcurrencyFixedStack";
 
-        public const string ConcurencySensitiveFixedArray = "Seed::Core::Containers::ConcurencySensitiveFixedArray";
-        public const string ConcurencySensitiveFixedQueue = "Seed::Core::Containers::ConcurencySensitiveFixedQueue";
-        public const string ConcurencySensitiveFixedStack = "Seed::Core::Containers::ConcurencySensitiveFixedStack";
+        public const string ConcurrencySensitiveFixedArray = "Seed::Core::Containers::ConcurrencySensitiveFixedArray";
+        public const string ConcurrencySensitiveFixedQueue = "Seed::Core::Containers::ConcurrencySensitiveFixedQueue";
+        public const string ConcurrencySensitiveFixedStack = "Seed::Core::Containers::ConcurrencySensitiveFixedStack";
 
         public const string Pair = "Seed::Core::Containers::Pair";
         public const string SensitivePair = "Seed::Core::Containers::SensitivePair";
@@ -99,11 +99,11 @@ public static partial class Constants
         public const string SensitiveMap = "Seed::Core::Containers::SensitiveMap";
         public const string SensitiveDictionary = "Seed::Core::Containers::SensitiveDictionary";
 
-        public const string ConcurencyMap = "Seed::Core::Containers::ConcurencyMap";
-        public const string ConcurencyDictionary = "Seed::Core::Containers::ConcurencyDictionary";
+        public const string ConcurrencyMap = "Seed::Core::Containers::ConcurrencyMap";
+        public const string ConcurrencyDictionary = "Seed::Core::Containers::ConcurrencyDictionary";
 
-        public const string ConcurencySensitiveMap = "Seed::Core::Containers::ConcurencySensitiveMap";
-        public const string ConcurencySensitiveDictionary = "Seed::Core::Containers::ConcurencySensitiveDictionary";
+        public const string ConcurrencySensitiveMap = "Seed::Core::Containers::ConcurrencySensitiveMap";
+        public const string ConcurrencySensitiveDictionary = "Seed::Core::Containers::ConcurrencySensitiveDictionary";
 
         public const string Tuple = "Seed::Core::Containers::Tuple";
 

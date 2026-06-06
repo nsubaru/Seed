@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010"> 
+  <Type Name="Seed::Core::Containers::BaseConcurrencyMap&lt;*, *, *&gt;">
+    <DisplayString>{{ Lenght={count.value.value} }}</DisplayString>
+    <Expand>
+      <Item Name="[Lenght]">count.value.value</Item>
+      <TreeItems>
+        <Size>count.value.value</Size>
+        <HeadPointer>mapRoot</HeadPointer>
+        <LeftPointer>left</LeftPointer>
+        <RightPointer>right</RightPointer>
+        <ValueNode>data</ValueNode>
+      </TreeItems> 
+    </Expand>
+  </Type>
+</AutoVisualizer>

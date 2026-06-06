@@ -6,5 +6,5 @@
 [SerializableEnum("Seed::Core::Threading::EThreadableStates")]
 public enum EThreadableStates : UInt8
 {
-    NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interupted, Ended, Unknown = 255
+    NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interrupted, Ended, Unknown = 255
 };
