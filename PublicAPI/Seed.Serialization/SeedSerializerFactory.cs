@@ -160,6 +160,16 @@ public class SeedSerializer : ISeedSerializer {
         data = DeserializeImpl(cp, serializationStream); 
     }
 
+    public void SerializeImpl(object data, Stream stream) {
+        var typeName = data == null ? ""<null>"" : data.GetType().FullName;
+        throw new InvalidOperationException($""Serialize unsupported CLR type {typeName}. Check managed DTO or custom serializer registration for the corresponding Seed type."");
+    }
+
+    public object DeserializeImpl(object data, Stream stream) {
+        var typeName = data == null ? ""<null>"" : data.GetType().FullName;
+        throw new InvalidOperationException($""Deserialize unsupported CLR type {typeName}. Check managed DTO or custom serializer registration for the corresponding Seed type."");
+    }
+
     public List<TypeRecord> GetSupportedTypes() {
         return supportedTypesList;
     }
@@ -921,14 +931,18 @@ public class SeedSerializer : ISeedSerializer {
         {
             logger?.LogError("Compilation failed");
             var failures = result.Diagnostics.Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
+            var errorMessage = new StringBuilder("Compilation failed");
 
             foreach (Diagnostic diagnostic in failures)
             {
-                logger?.LogError($"Compilation errors: {diagnostic.Location}:{diagnostic.Id} - {diagnostic.GetMessage()}");
-                Debug.WriteLine($"{diagnostic.Location}:{diagnostic.Id} - {diagnostic.GetMessage()}");
+                var diagnosticMessage = $"{diagnostic.Location}:{diagnostic.Id} - {diagnostic.GetMessage()}";
+                logger?.LogError($"Compilation errors: {diagnosticMessage}");
+                Debug.WriteLine(diagnosticMessage);
+                errorMessage.AppendLine();
+                errorMessage.Append(diagnosticMessage);
             }
            
-            throw new Exception("Compilation failed");
+            throw new Exception(errorMessage.ToString());
         }
         else
         {

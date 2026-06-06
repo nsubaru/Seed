@@ -54,6 +54,9 @@ public static partial class Constants
         public const string BaseBlob = "Seed::Core::Containers::BaseBlob";
         public const string SensitiveBlob = "Seed::Core::Containers::SensitiveBlob";
 
+        public const string BaseArray = "Seed::Core::Containers::BaseArray";
+        public const string BaseList = "Seed::Core::Containers::BaseList";
+
         public const string List = "Seed::Core::Containers::List";
         public const string Array = "Seed::Core::Containers::Array";
         public const string DynamicStack = "Seed::Core::Containers::DynamicStack";

@@ -27,6 +27,7 @@ public partial class SeedSerializerFactory
                 break;
             }
 
+            case Constants.Types.BaseArray:
             case Constants.Types.Array: 
             case Constants.Types.SensitiveArray: 
             case Constants.Types.ConcurrencyArray:
@@ -57,6 +58,7 @@ public partial class SeedSerializerFactory
             case Constants.Types.ConcurrencyDynamicQueue:
             case Constants.Types.ConcurrencySensitiveDynamicQueue:
 
+            case Constants.Types.BaseList:
             case Constants.Types.List:
             case Constants.Types.SensitiveList:
             case Constants.Types.ConcurrencyList:
@@ -102,6 +104,7 @@ public partial class SeedSerializerFactory
                 break;
             }
 
+            case Constants.Types.BaseArray:
             case Constants.Types.Array:
             case Constants.Types.SensitiveArray:
             case Constants.Types.ConcurrencyArray:
@@ -140,6 +143,7 @@ public partial class SeedSerializerFactory
                 break;
             }
 
+            case Constants.Types.BaseList:
             case Constants.Types.List:
             case Constants.Types.SensitiveList:
             case Constants.Types.ConcurrencyList:

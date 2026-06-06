@@ -16,6 +16,7 @@ public partial class SeedSerializerFactory
             case Constants.Types.SensitiveBlob:
                 return typeof(byte[]);
 
+            case Constants.Types.BaseList:
             case Constants.Types.List:
             case Constants.Types.SensitiveList:
             case Constants.Types.ConcurrencyList:
@@ -61,6 +62,7 @@ public partial class SeedSerializerFactory
 
                     return typeof(Dictionary<,>).MakeGenericType(innerTypes);
                 }
+            case Constants.Types.BaseArray:
             case Constants.Types.Array:
             case Constants.Types.SensitiveArray:
             case Constants.Types.ConcurrencyArray:
