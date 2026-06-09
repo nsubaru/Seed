@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Seed::Core::RTTI::Record::RttiIntefaceRecord">
+		<DisplayString Condition="it.item != nullptr">{{ Interface = {((const Seed::Core::RTTI::MetaData::InterfaceRecord*) it.item)->TypeName.Text,sub} }}</DisplayString>
+		<DisplayString Condition="it.item == nullptr">{{ Invalid RttiIntefaceRecord }}</DisplayString>
+		<Expand>
+			<Item Condition="it.item != nullptr" Name="TypeName">((const Seed::Core::RTTI::MetaData::InterfaceRecord*) it.item)->TypeName.Text,sub</Item>
+			<Item Condition="it.item != nullptr" Name="FullTypeId">((const Seed::Core::RTTI::MetaData::InterfaceRecord*) it.item)->TypeId.Id</Item>
+			<Item Condition="it.item != nullptr" Name="InterfaceId">it.idx</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

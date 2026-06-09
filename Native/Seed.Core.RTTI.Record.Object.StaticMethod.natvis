@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Seed::Core::RTTI::Record::RttiStaticMethodRecord">
+		<DisplayString Condition="it.item != nullptr">{{ StaticMethod = {((const Seed::Core::RTTI::MetaData::StaticMethodMetaData*) it.item)->StaticMethodName.Text,sub} }}</DisplayString>
+		<DisplayString Condition="it.item == nullptr">{{ Invalid RttiStaticMethodRecord }}</DisplayString>
+		<Expand>
+			<Item Condition="it.item != nullptr" Name="Name">((const Seed::Core::RTTI::MetaData::StaticMethodMetaData*) it.item)->StaticMethodName.Text,sub</Item>
+			<Item Condition="it.item != nullptr" Name="IsAsync">((const Seed::Core::RTTI::MetaData::StaticMethodMetaData*) it.item)->IsAsync</Item>
+			<Item Condition="it.item != nullptr" Name="StaticMethodId">it.idx</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

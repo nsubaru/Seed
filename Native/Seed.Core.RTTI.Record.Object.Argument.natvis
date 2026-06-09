@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Seed::Core::RTTI::Record::RttiArgumentRecord">
+		<DisplayString Condition="it.item != nullptr">{{ Argument = {((const Seed::Core::RTTI::MetaData::ArgumentMetaData*) it.item)->TypeName.Text,sub} }}</DisplayString>
+		<DisplayString Condition="it.item == nullptr">{{ Invalid RttiArgumentRecord }}</DisplayString>
+		<Expand>
+			<Item Condition="it.item != nullptr" Name="TypeName">((const Seed::Core::RTTI::MetaData::ArgumentMetaData*) it.item)->TypeName.Text,sub</Item>
+			<Item Condition="it.item != nullptr" Name="FullTypeId">((const Seed::Core::RTTI::MetaData::ArgumentMetaData*) it.item)->TypeId.Id</Item>
+			<Item Condition="it.item != nullptr" Name="TypeClass">((const Seed::Core::RTTI::MetaData::ArgumentMetaData*) it.item)->TypeClass,en</Item>
+			<Item Condition="it.item != nullptr" Name="Flags">((const Seed::Core::RTTI::MetaData::ArgumentMetaData*) it.item)->Flags</Item>
+			<Item Condition="it.item != nullptr" Name="ArgumentId">it.idx</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

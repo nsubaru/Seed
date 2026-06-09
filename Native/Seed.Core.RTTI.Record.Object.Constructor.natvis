@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Seed::Core::RTTI::Record::RttiConstructorRecord">
+		<DisplayString Condition="it.item != nullptr">{{ ConstructorId = {it.idx} }}</DisplayString>
+		<DisplayString Condition="it.item == nullptr">{{ Invalid RttiConstructorRecord }}</DisplayString>
+		<Expand>
+			<Item Condition="it.item != nullptr" Name="ConstructorId">it.idx</Item>
+			<Item Condition="it.item != nullptr" Name="ArgumentsOffset">((const Seed::Core::RTTI::MetaData::Constructor*) it.item)->CtorArgsOffset</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>
