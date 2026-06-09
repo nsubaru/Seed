@@ -335,7 +335,7 @@ public class SeedSerializer : ISeedSerializer {
         {
             TypeName   = x.Key.TypeName,
             ClrType    = x.Value.ClrType,
-            Type       = ETypes.Custom,
+            Type       = x.Key.TypeClass,
             FullTypeId = x.Key.FullTypeId.Id,
             RttiType   = x.Key
         }).ToList();
