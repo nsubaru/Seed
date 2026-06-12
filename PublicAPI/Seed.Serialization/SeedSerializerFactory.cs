@@ -88,6 +88,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using System.Collections.Concurrent;
 using System.Security;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
@@ -117,7 +118,7 @@ public class SeedSerializer : ISeedSerializer {
     private readonly Dictionary<Guid, RttiTypeRecord> rttiTypeLookup;
     private readonly Dictionary<Type, Delegate> createObjectDelegateCache = new Dictionary<Type, Delegate>();
 
-    private static readonly Dictionary<Type, Func<object>> objectFactoryCache = new();
+    private static readonly ConcurrentDictionary<Type, Func<object>> objectFactoryCache = new();
 
     public SeedSerializer(
         IEnumerable<RttiTypeRecord> allKnowTypes, 
@@ -182,7 +183,7 @@ public class SeedSerializer : ISeedSerializer {
 
     private static object FastCreateInstance(Type type)
     {
-        if (!objectFactoryCache.TryGetValue(type, out var factory))
+        var factory = objectFactoryCache.GetOrAdd(type, static type =>
         {
             Expression body;
 
@@ -205,25 +206,23 @@ public class SeedSerializer : ISeedSerializer {
             // Required for value types: boxes T into object.
             body = Expression.Convert(body, typeof(object));
 
-            factory = Expression.Lambda<Func<object>>(body).Compile();
-            objectFactoryCache[type] = factory;
-        }
+            return Expression.Lambda<Func<object>>(body).Compile();
+        });
 
         return factory();
     }
 
     private static object FastCreateArrayInstance(Type type)
     {
-        if (!objectFactoryCache.TryGetValue(type, out var factory))
+        var factory = objectFactoryCache.GetOrAdd(type, static type =>
         {
-            var elementType = type.GetElementType();
+            var elementType = type.GetElementType()
+                ?? throw new InvalidOperationException($""Type {type} is not an array type"");
 
             var length = Expression.Constant(1);
             var newArrayExpr = Expression.NewArrayBounds(elementType, length);
-            factory = Expression.Lambda<Func<object>>(newArrayExpr).Compile();
-
-            objectFactoryCache[type] = factory;
-        }
+            return Expression.Lambda<Func<object>>(newArrayExpr).Compile();
+        });
 
         return factory();
     }
@@ -864,7 +863,8 @@ public class SeedSerializer : ISeedSerializer {
             Assembly.LoadFile(Path.Combine(assemblyPath, "Microsoft.CSharp.dll")),
             Assembly.LoadFile(Path.Combine(assemblyPath, "System.Runtime.InteropServices.dll")),
             Assembly.LoadFile(Path.Combine(assemblyPath, "System.Linq.dll")),
-            Assembly.LoadFile(Path.Combine(assemblyPath, "System.Linq.Expressions.dll"))
+            Assembly.LoadFile(Path.Combine(assemblyPath, "System.Linq.Expressions.dll")),
+            Assembly.LoadFile(Path.Combine(assemblyPath, "System.Collections.Concurrent.dll"))
         };
 
 

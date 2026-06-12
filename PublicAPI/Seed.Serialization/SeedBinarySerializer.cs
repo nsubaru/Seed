@@ -3,6 +3,7 @@ using Seed.RTTI;
 using Seed.Serialization;
 using Seed.RTTI.Record;
 using System.Collections;
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.Contracts;
@@ -33,7 +34,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer
 
     #region Additional caches
     private readonly Dictionary<Guid, RttiTypeRecord> rttiTypeLookup;
-    private static readonly Dictionary<Type, Func<object>> objectFactoryCache = new();
+    private static readonly ConcurrentDictionary<Type, Func<object>> objectFactoryCache = new();
     #endregion
 
     /// <summary>
@@ -199,7 +200,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer
 
     private static object FastCreateInstance(Type type)
     {
-        if (!objectFactoryCache.TryGetValue(type, out var factory))
+        var factory = objectFactoryCache.GetOrAdd(type, static type =>
         {
             var ctor = type.GetConstructor(Type.EmptyTypes);
 
@@ -209,26 +210,23 @@ public class SeedBinarySerializer : ISeedBinarySerializer
             }
 
             var newExpr = Expression.New(ctor);
-            factory = Expression.Lambda<Func<object>>(newExpr).Compile();
-
-            objectFactoryCache[type] = factory;
-        }
+            return Expression.Lambda<Func<object>>(newExpr).Compile();
+        });
 
         return factory();
     }
 
     private static object FastCreateArrayInstance(Type type)
     {
-        if (!objectFactoryCache.TryGetValue(type, out var factory))
+        var factory = objectFactoryCache.GetOrAdd(type, static type =>
         {
-            var elementType = type.GetElementType();
+            var elementType = type.GetElementType()
+                ?? throw new InvalidOperationException($"Type {type} is not an array type");
 
             var length = Expression.Constant(1);
-            var newArrayExpr = Expression.NewArrayBounds(elementType!, length);
-            factory = Expression.Lambda<Func<object>>(newArrayExpr).Compile();
-
-            objectFactoryCache[type] = factory;
-        }
+            var newArrayExpr = Expression.NewArrayBounds(elementType, length);
+            return Expression.Lambda<Func<object>>(newArrayExpr).Compile();
+        });
 
         return factory();
     }
