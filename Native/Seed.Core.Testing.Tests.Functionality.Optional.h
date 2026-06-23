@@ -6,6 +6,8 @@ namespace Seed::Core::Testing::Test::Functionality::Optional
     SeedTestDef(SetValueL);
     SeedTestDef(SetValueR);
 
+    SeedTestDef(AssignValueFromConvertible);
+
     SeedTestDef(SetValueL_WhenValueExist);
     SeedTestDef(SetValueR_WhenValueExist);
 
