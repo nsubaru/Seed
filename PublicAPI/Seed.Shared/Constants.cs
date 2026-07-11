@@ -45,6 +45,7 @@ public static partial class Constants
         public const string String = "Seed::Core::String";
         public const string SensitiveString = "Seed::Core::SensitiveString";
         public const string ExceptionString = "Seed::Core::ExceptionString";
+        public const string Utf8String = "Seed::Core::Utf8String";
 
         public const string UniString = "Seed::Core::UniString";
         public const string SensitiveUniString = "Seed::Core::SensitiveUniString";
