@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::Utf8String">
+    <DisplayString>{{ ByteCount={bytes.count} Text = {bytes.array,[bytes.count]s8} }}</DisplayString>
+    <StringView>bytes.array,[bytes.count]s8</StringView>
+    <Expand>
+      <Item Name="ByteCount">bytes.count</Item>
+      <ArrayItems>
+        <Size>bytes.count</Size>
+        <ValuePointer>bytes.array</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Seed::Core::ConstUtf8String">
+    <DisplayString>{{ ByteCount={byteCount} Text = {bytes,[byteCount]s8} }}</DisplayString>
+    <StringView>bytes,[byteCount]s8</StringView>
+    <Expand>
+      <Item Name="ByteCount">byteCount</Item>
+      <ArrayItems>
+        <Size>byteCount</Size>
+        <ValuePointer>bytes</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="Seed::Core::Utf8StringView">
+    <DisplayString>{{ ByteCount={byteCount} Text = {source->bytes.array + byteOffset,[byteCount]s8} }}</DisplayString>
+    <StringView>source->bytes.array + byteOffset,[byteCount]s8</StringView>
+    <Expand>
+      <Item Name="ByteOffset">byteOffset</Item>
+      <Item Name="ByteCount">byteCount</Item>
+      <Item Name="String">source</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
