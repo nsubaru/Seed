@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::BaseUniString&lt;*&gt;">
+    <DisplayString Condition="constMode.value.value">{{ Mode=Static, Length={staticText.size == 0 ? 0 : staticText.size - 1}, Text={staticText.str,su} }}</DisplayString>
+    <DisplayString Condition="!constMode.value.value">{{ Mode=Dynamic, Length={dynamicText.CurrentSize == 0 ? 0 : dynamicText.CurrentSize - 1}, Text={dynamicText.str,su} }}</DisplayString>
+    <StringView Condition="constMode.value.value">staticText.str,su</StringView>
+    <StringView Condition="!constMode.value.value">dynamicText.str,su</StringView>
+    <Expand>
+      <Item Name="[Static mode]">constMode.value.value</Item>
+      <Item Name="[Length]" Condition="constMode.value.value">staticText.size == 0 ? 0 : staticText.size - 1</Item>
+      <Item Name="[Length]" Condition="!constMode.value.value">dynamicText.CurrentSize == 0 ? 0 : dynamicText.CurrentSize - 1</Item>
+      <ArrayItems Condition="constMode.value.value">
+        <Size>staticText.size == 0 ? 0 : staticText.size - 1</Size>
+        <ValuePointer>staticText.str</ValuePointer>
+      </ArrayItems>
+      <ArrayItems Condition="!constMode.value.value">
+        <Size>dynamicText.CurrentSize == 0 ? 0 : dynamicText.CurrentSize - 1</Size>
+        <ValuePointer>dynamicText.str</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

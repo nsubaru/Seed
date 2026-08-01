@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Containers::BaseArray&lt;*, *&gt;">
-    <DisplayString>{{ Lenght={count} }}</DisplayString>
+    <DisplayString>{{ Length={count} }}</DisplayString>
     <Expand>
-      <Item Name="[Lenght]">count</Item>
+      <Item Name="[Length]">count</Item>
       <ArrayItems>
         <Size>count</Size>
         <ValuePointer>array</ValuePointer>

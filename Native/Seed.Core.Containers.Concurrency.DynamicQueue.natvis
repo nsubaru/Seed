@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Containers::BaseConcurrencyDynamicQueue&lt;*, *&gt;">
-    <DisplayString>{{ Lenght={count} }}</DisplayString>
+    <DisplayString>{{ Count={count.value.value}, Capacity={bufferSize.value.value}, Front={front.value.value}, Rear={rear.value.value} }}</DisplayString>
     <Expand>
-      <Item Name="[Lenght]">count</Item>
-      <Item Name="[Front idx]">front</Item>
-      <Item Name="[Rear idx]">rear</Item>
-      <Item Name="[Buffer length]">bufferSize</Item>
-      <ArrayItems>
-        <Size>bufferSize</Size>
-        <ValuePointer>queue</ValuePointer>
-      </ArrayItems>
+      <Item Name="[Count]">count.value.value</Item>
+      <Item Name="[Capacity]">bufferSize.value.value</Item>
+      <Item Name="[Front index]">front.value.value</Item>
+      <Item Name="[Rear index]">rear.value.value</Item>
+      <IndexListItems>
+        <Size>count.value.value</Size>
+        <ValueNode>queue[(front.value.value + $i) % bufferSize.value.value]</ValueNode>
+      </IndexListItems>
     </Expand>
   </Type>
 </AutoVisualizer>

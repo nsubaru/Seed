@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Containers::BaseFixedQueue&lt;*, *, *&gt;">
-    <DisplayString>{{ Lenght={count} }}</DisplayString>
+    <DisplayString>{{ Length={count} }}</DisplayString>
     <Expand>
-      <Item Name="[Lenght]">count</Item>
-      <Item Name="[Front idx]">front</Item>
-      <Item Name="[Rear idx]">rear</Item>
+      <Item Name="[Length]">count</Item>
+      <Item Name="[Front index]">front</Item>
+      <Item Name="[Rear index]">rear</Item>
       <Item Name="[Buffer length]">$T2</Item>
-      <ArrayItems>
-        <Size>$T2</Size>
-        <ValuePointer>queue</ValuePointer>
-      </ArrayItems>
+      <IndexListItems>
+        <Size>count</Size>
+        <ValueNode>queue[(front + $i) % $T2]</ValueNode>
+      </IndexListItems>
     </Expand>
   </Type>
 </AutoVisualizer>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Seed::Core::Containers::BaseConcurrencyDynamicStack&lt;*, *&gt;">
-    <DisplayString>{{ Lenght={count} }}</DisplayString>
+    <DisplayString>{{ Count={count.count}, Capacity={bufferSize} }}</DisplayString>
     <Expand>
-      <Item Name="[Lenght]">count</Item>
-      <Item Name="[Buffer length]">bufferSize</Item>
+      <Item Name="[Count]">count.count</Item>
+      <Item Name="[Capacity]">bufferSize</Item>
       <ArrayItems>
-        <Size>bufferSize</Size>
+        <Size>count.count</Size>
         <ValuePointer>stack</ValuePointer>
       </ArrayItems>
     </Expand>
