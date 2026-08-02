@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Seed::Core::Containers::BaseQueryable&lt;*,*&gt;">
+    <DisplayString Condition="Handle._Ptr == 0">empty, consumed={NextSourceIndex}</DisplayString>
+    <DisplayString>single-pass, consumed={NextSourceIndex}, frame={Handle._Ptr}</DisplayString>
+    <Expand>
+      <Item Name="Frame">Handle._Ptr</Item>
+      <Item Name="Consumed">NextSourceIndex</Item>
+    </Expand>
+  </Type>
+  <Type Name="Seed::Core::Containers::BaseAsyncQueryable&lt;*,*&gt;">
+    <DisplayString Condition="Handle._Ptr == 0">empty, consumed={NextSourceIndex}</DisplayString>
+    <DisplayString>async single-pass, consumed={NextSourceIndex}, frame={Handle._Ptr}</DisplayString>
+    <Expand>
+      <Item Name="Frame">Handle._Ptr</Item>
+      <Item Name="Consumed">NextSourceIndex</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
