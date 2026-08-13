@@ -72,11 +72,12 @@ public enum EAttributeTargetType : UInt8
 /// <para> None - attribute value unavailable </para>
 /// <para> Data - is any trivial copy type </para>
 /// <para> Text - is string </para>
+/// <para> AsciiText - is Ascii string </para>
 /// <para> Type - is type information, value is FullTypeId of type, also store reference to RttiTypeRecord </para>
 /// </summary>
 public enum EAttributeValueCategories : UInt8
 {
-    None, Data, Text, Type
+    None, Data, Text, AsciiText, Type
 };
 
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Pack = 0)]

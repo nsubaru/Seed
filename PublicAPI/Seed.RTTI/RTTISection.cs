@@ -447,10 +447,11 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// <exception cref="ApplicationException"></exception>
     public object? GetAnyAttributeValue(RttiAttribute attribute) => attribute.ValueCategory switch
     {
-        EAttributeValueCategories.None => new EmptyAttributeValueT { },
-        EAttributeValueCategories.Data => GetDataAttributeValue(attribute),
-        EAttributeValueCategories.Text => GetTextAttributeValue(attribute),
-        EAttributeValueCategories.Type => GetTypeAttributeValue(attribute),
+        EAttributeValueCategories.None      => new EmptyAttributeValueT { },
+        EAttributeValueCategories.Data      => GetDataAttributeValue(attribute),
+        EAttributeValueCategories.Text      => GetTextAttributeValue(attribute),
+        EAttributeValueCategories.AsciiText => GetTextAsciiAttributeValue(attribute),
+        EAttributeValueCategories.Type      => GetTypeAttributeValue(attribute),
         _ => throw new ApplicationException("Unknown attribute value category"),
     };
 
@@ -476,6 +477,18 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         var text = (TextMetaData*) ((Byte*) attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
 
         return Marshal.PtrToStringAuto((IntPtr)text->Text);
+    }
+
+    /// <summary>
+    /// For text attribute value is TextMetaData which contain size and null-termianted Ascii character array
+    /// </summary>
+    /// <param name="attribute">Target attribute</param>
+    /// <returns>String value</returns>
+    private static object GetTextAsciiAttributeValue(RttiAttribute attribute)
+    {
+        var text = (TextMetaData*)((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
+
+        return Marshal.PtrToStringAnsi((IntPtr)text->Text);
     }
 
     /// <summary>
