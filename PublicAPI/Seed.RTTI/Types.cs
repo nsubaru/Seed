@@ -23,7 +23,7 @@ public enum CvRefModificators : SizeT
 	Volatile  = 8
 }
 
-[SerializableEnum("Seed::Core::RTTI::ECustomTypeSchemaFormat")]
+[SerializableEnum("Seed::Core::CTTI::TypeTraits::ECustomTypeSchemaFormat")]
 public enum ECustomTypeSchemaFormat : byte
 {
 	None,

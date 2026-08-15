@@ -1,10 +1,10 @@
 ﻿namespace Seed.Core.RTTI;
 
-[SerializableEnum("Seed::Core::RTTI::ECvRefModificators")]
+[SerializableEnum("Seed::Core::CTTI::TypeTraits::ECvRefModificators")]
 public enum ECvRefModificators : SizeT
 {
-    Ref = 1,
-    RValueRef = 2,
-    Const = 4,
-    Volatile = 8
+    Ref,
+    RValueRef,
+    Const,
+    Volatile
 }

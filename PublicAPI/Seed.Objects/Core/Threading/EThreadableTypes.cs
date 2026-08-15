@@ -6,5 +6,5 @@
 [SerializableEnum("Seed::Core::Threading::EThreadableTypes")]
 public enum EThreadableTypes : UInt8
 {
-    Thread, JobTask, ScheduledTask, IoTask, AlpcTask, EventTask, AsyncSleep, ExternalCallback, Unknown = 255
+    Thread, JobTask, ScheduledTask, IoTask, IOverlapped, AlpcTask, EventTask, AsyncSleep, ExternalCallback, Unknown = 255
 };
