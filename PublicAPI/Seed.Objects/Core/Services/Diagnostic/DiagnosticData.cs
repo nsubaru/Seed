@@ -55,6 +55,9 @@ public struct DependencyInjectionServiceDiagnosticData
     public UniversalTypeIdentifier ServiceType { get; set; }
 
     [SerializableStructField]
+    public UniversalTypeIdentifier ResolverType { get; set; }
+
+    [SerializableStructField]
     public List<UniversalTypeIdentifier> Dependencies { get; set; }
 
     [SerializableStructField]
