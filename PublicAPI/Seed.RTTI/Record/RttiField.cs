@@ -89,7 +89,8 @@ public unsafe class RttiField : IRttiIterableObject<RttiField>
     /// </summary>
     public string TypeName => GetTypeName();
 
-    internal Collection* GetAttributesCollectionBase() => (Collection*) ((byte*)GetRecord() + GetRecord()->OffsetToAttributesList);
+    // The offset is relative to the field payload, after the collection item's header.
+    internal Collection* GetAttributesCollectionBase() => (Collection*) ((byte*)GetRecord() + sizeof(ItemBase) + GetRecord()->OffsetToAttributesList);
 
     /// <summary>
     /// Attributes list
