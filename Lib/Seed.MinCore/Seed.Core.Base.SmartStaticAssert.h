@@ -35,6 +35,9 @@ namespace Seed::Core::TypeTraits
         }
 
 	public:
+		/// <summary>
+		/// Compile-time result of the configured static assertion check.
+		/// </summary>
 		static constexpr auto Result = Check();
     };
 }

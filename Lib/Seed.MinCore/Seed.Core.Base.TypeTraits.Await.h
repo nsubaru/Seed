@@ -12,7 +12,14 @@ namespace Seed::Core::TypeTraits
     /// <typeparam name="T">Type for checking</typeparam>
     template<typename>
     struct TaskT: LogicFalse {
+        /// <summary>
+        /// Default task-result type used when no task specialization matches.
+        /// </summary>
         using T = void;
+
+        /// <summary>
+        /// Default task-payload type used when no task specialization matches.
+        /// </summary>
         using Payload = void;
     };
 

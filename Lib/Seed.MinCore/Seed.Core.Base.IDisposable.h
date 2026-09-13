@@ -10,6 +10,9 @@ namespace Seed::Core
     VirtualClass IDisposable
     {
     public:
+        /// <summary>
+        /// Destroys the disposable interface after the derived object cleanup.
+        /// </summary>
         [[msvc::noop_dtor]] virtual ~IDisposable() = 0 {};
 
     protected:
@@ -25,6 +28,9 @@ namespace Seed::Core
     VirtualClass IExtendedDisposable
     {
     public:
+        /// <summary>
+        /// Destroys the disposable interface after the derived object cleanup.
+        /// </summary>
         [[msvc::noop_dtor]] virtual ~IExtendedDisposable() = 0 {};
 
     protected:

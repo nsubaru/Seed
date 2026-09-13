@@ -8,6 +8,9 @@
 
 namespace Seed::Core::TypeTraits 
 {
+    /// <summary>
+    /// Compile-time customization point identifying types with a custom atomic representation.
+    /// </summary>
     template<typename>
     struct IsCustomAtomicT : LogicFalse {};
 }
@@ -29,6 +32,9 @@ namespace Seed::Core::Concepts
 
 namespace Seed::Core 
 {
+    /// <summary>
+    /// Atomic storage and operations for a supported value type.
+    /// </summary>
     template<Concepts::AtomicType T>
     struct Atomic;
 
@@ -193,13 +199,13 @@ namespace Seed::Core
         /// <summary>
         /// Copy ctor
         /// </summary>
-        /// <param name="value">Original source</param>
+        /// <param name="src">Source atomic whose stored value is copied.</param>
         constexpr Atomic(const Atomic& src) : value(src.value) {}
 
         /// <summary>
         /// Move ctor
         /// </summary>
-        /// <param name="value">Original source</param>
+        /// <param name="src">Source atomic whose stored value is copied.</param>
         constexpr Atomic(Atomic&& src) : value(MoveRValue(src.value)) {}
 
     public:
@@ -405,6 +411,7 @@ namespace Seed::Core
         /// <summary>
         /// Atomically increment assignment
         /// </summary>
+        /// <param name="value">Amount added to the stored integer.</param>
         /// <returns>Reference to current object</returns>
         constexpr Atomic& operator+=(T value) requires Concepts::IsInteger<T>
         {
@@ -423,6 +430,7 @@ namespace Seed::Core
         /// <summary>
         /// Atomically decrement assignment
         /// </summary>
+        /// <param name="value">Amount subtracted from the stored integer.</param>
         /// <returns>Reference to current object</returns>
         constexpr Atomic& operator-=(T value) requires Concepts::IsInteger<T>
         {
@@ -446,6 +454,9 @@ namespace Seed::Core
         constexpr ReadOnlyAtomic<T>& AsReadOnly() { return this->value; }
 
     public:
+        /// <summary>
+        /// Destroys the atomic value wrapper.
+        /// </summary>
         constexpr ~Atomic() {}
 
     public:
@@ -506,14 +517,26 @@ namespace Seed::Core
 
 namespace Seed::Core::TypeTraits 
 {
+    /// <summary>
+    /// Compile-time predicate recognizing Seed Atomic wrappers.
+    /// </summary>
     template<typename T>
     struct IsAtomicT : LogicFalse {};
 
+    /// <summary>
+    /// Compile-time predicate recognizing Seed Atomic wrappers.
+    /// </summary>
     template<typename T>
     struct IsAtomicT<Atomic<T>> : LogicTrue {
+        /// <summary>
+        /// Value type stored by the atomic wrapper.
+        /// </summary>
         using ValueType = T;
     };
 
+    /// <summary>
+    /// Whether T is a Seed Atomic wrapper.
+    /// </summary>
     template<typename T>
     constexpr bool IsAtomicV = IsAtomicT<T>::State;
 }

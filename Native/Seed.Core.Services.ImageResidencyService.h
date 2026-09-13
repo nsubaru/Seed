@@ -33,10 +33,28 @@ namespace Seed::Core::Services
         void RefreshRuntimeMappings();
 
     public:
+        /// <summary>
+        /// Creates the image-residency service for active runtime image mappings.
+        /// </summary>
+        /// <param name="runtimeManagementService">Service enumerating the active runtime images.</param>
         ImageResidencyService(RuntimeManagementService runtimeManagementService);
 
+        /// <summary>
+        /// Refreshes known runtime mappings and enables the primary image-residency session.
+        /// </summary>
+        /// <returns>Native status returned by image-residency activation.</returns>
         Memory::ImageResidency::NativeStatus Enable();
+
+        /// <summary>
+        /// Disables the current image-residency session.
+        /// </summary>
+        /// <returns>Native status returned by image-residency deactivation.</returns>
         Memory::ImageResidency::NativeStatus Disable();
+
+        /// <summary>
+        /// Gets the current image-residency state and accounting snapshot.
+        /// </summary>
+        /// <returns>Snapshot of the image-residency subsystem.</returns>
         Memory::ImageResidency::Snapshot Status();
 
     public:

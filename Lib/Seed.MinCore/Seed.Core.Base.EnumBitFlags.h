@@ -44,7 +44,15 @@ namespace Seed::Core
 		constexpr EnumBitFlags(TEnum value) : value(static_cast<TValueType>(value)) {}
 
 	public:
+		/// <summary>
+		/// Copies the underlying enumeration bit mask.
+		/// </summary>
 		constexpr EnumBitFlags(const EnumBitFlags&) = default;
+
+		/// <summary>
+		/// Copies the enum flag bit mask from another value.
+		/// </summary>
+		/// <returns>This flag value after assignment.</returns>
 		constexpr EnumBitFlags& operator=(const EnumBitFlags&) = default;
 
 	public:
@@ -158,12 +166,21 @@ namespace Seed::Core
 
 namespace Seed::Core::TypeTraits 
 {
+	/// <summary>
+	/// Compile-time predicate recognizing Seed enum bit-mask wrappers.
+	/// </summary>
 	template<typename T>
 	struct IsEnumBitFlagsT : LogicFalse {};
 
+	/// <summary>
+	/// Compile-time predicate recognizing Seed enum bit-mask wrappers.
+	/// </summary>
 	template<typename T, typename TValue, auto TfIsValid>
 	struct IsEnumBitFlagsT<EnumBitFlags<T, TValue, TfIsValid>> : LogicTrue {};
 
+	/// <summary>
+	/// Whether T is a Seed enum bit-mask wrapper.
+	/// </summary>
 	template<typename T>
 	constexpr Boolean IsEnumBitFlagsV = IsEnumBitFlagsT<T>::State;
 }
