@@ -10,18 +10,24 @@ public class TotpSha1Serializer : ICustomClassSerializer
 
     public Type[] DependableTypes => Array.Empty<Type>();
 
+    /// <summary>
+    /// Reconstructs the mapped value using statically dispatched calls to the session serializer.
+    /// </summary>
+    /// <param name="serializationStream">Stream positioned at the native value payload.</param>
+    /// <param name="serializer">Session serializer used for nested fields.</param>
+    /// <returns>The decoded managed value.</returns>
     public object Deserialize(Stream serializationStream, ISeedSerializer serializer)
     {
-        dynamic secretHash = new List<UInt8>();
+        object secretHash = new List<UInt8>();
         serializer.Deserialize(ref secretHash, serializationStream);
 
-        dynamic passwordSize = (UInt8)0;
+        object passwordSize = (UInt8)0;
         serializer.Deserialize(ref passwordSize, serializationStream);
 
-        dynamic startTime = (UInt64)0;
+        object startTime = (UInt64)0;
         serializer.Deserialize(ref startTime, serializationStream);
 
-        dynamic timeIntervalInSeconds = (SizeT)0;
+        object timeIntervalInSeconds = (SizeT)0;
         serializer.Deserialize(ref timeIntervalInSeconds, serializationStream);
 
         return new TotpSha1
@@ -33,20 +39,26 @@ public class TotpSha1Serializer : ICustomClassSerializer
         };
     }
 
+    /// <summary>
+    /// Writes the mapped value while keeping nested calls outside the dynamic overload binder.
+    /// </summary>
+    /// <param name="data">Managed value matching this serializer's CLR type.</param>
+    /// <param name="serializationStream">Destination for the native payload.</param>
+    /// <param name="serializer">Session serializer used for nested fields.</param>
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         var totp = (TotpSha1)data;
 
-        dynamic secretHash = totp.SecretHash ?? new List<UInt8>();
+        object secretHash = totp.SecretHash ?? new List<UInt8>();
         serializer.Serialize(secretHash, serializationStream);
 
-        dynamic passwordSize = totp.PasswordSize;
+        object passwordSize = totp.PasswordSize;
         serializer.Serialize(passwordSize, serializationStream);
 
-        dynamic startTime = totp.StartTime;
+        object startTime = totp.StartTime;
         serializer.Serialize(startTime, serializationStream);
 
-        dynamic timeIntervalInSeconds = totp.TimeIntervalInSeconds;
+        object timeIntervalInSeconds = totp.TimeIntervalInSeconds;
         serializer.Serialize(timeIntervalInSeconds, serializationStream);
     }
 }

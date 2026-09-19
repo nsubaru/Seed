@@ -14,17 +14,23 @@ public class NetworkAddressSerializer : ICustomClassSerializer
 
     public Type[] DependableTypes => Array.Empty<Type>();
 
+    /// <summary>
+    /// Reconstructs the mapped value using statically dispatched calls to the session serializer.
+    /// </summary>
+    /// <param name="serializationStream">Stream positioned at the native value payload.</param>
+    /// <param name="serializer">Session serializer used for nested fields.</param>
+    /// <returns>The decoded managed value.</returns>
     public object Deserialize(Stream serializationStream, ISeedSerializer serializer)
     {
         UInt16 family = 0, port = 0;
 
-        dynamic headDyn = family;
+        object headDyn = family;
         serializer.Deserialize(ref headDyn, serializationStream);
-        family = headDyn;
+        family = (UInt16)headDyn;
 
         headDyn = port;
         serializer.Deserialize(ref headDyn, serializationStream);
-        port = headDyn;
+        port = (UInt16)headDyn;
 
         IPEndPoint retObj;
 
@@ -42,7 +48,7 @@ public class NetworkAddressSerializer : ICustomClassSerializer
                 break; 
 
             case 23:
-                dynamic shortDyn;
+                object shortDyn;
 
                 // we ignore flowinfo since C# don't support it
                 uint flowInfo = 0;
@@ -57,7 +63,7 @@ public class NetworkAddressSerializer : ICustomClassSerializer
 
                 shortDyn = scopeId;
                 serializer.Deserialize(ref shortDyn, serializationStream);
-                scopeId = shortDyn;
+                scopeId = (uint)shortDyn;
 
                 retObj = new IPEndPoint(new IPAddress(addr, scopeId), port);
                 break;
@@ -68,10 +74,16 @@ public class NetworkAddressSerializer : ICustomClassSerializer
         return retObj;
     }
 
+    /// <summary>
+    /// Writes the mapped value while keeping nested calls outside the dynamic overload binder.
+    /// </summary>
+    /// <param name="data">Managed value matching this serializer's CLR type.</param>
+    /// <param name="serializationStream">Destination for the native payload.</param>
+    /// <param name="serializer">Session serializer used for nested fields.</param>
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         IPEndPoint address = (IPEndPoint)data;
-        dynamic addrHeadDyn = (UInt16) address.AddressFamily;
+        object addrHeadDyn = (UInt16) address.AddressFamily;
 
         serializer.Serialize(addrHeadDyn, serializationStream);
 
@@ -101,7 +113,7 @@ public class NetworkAddressSerializer : ICustomClassSerializer
                 serializationStream.Write(v6AddrSpan);
 
                 uint scopeId = (uint) address.Address.ScopeId;
-                dynamic scopeDyn = scopeId;
+                object scopeDyn = scopeId;
 
                 serializer.Serialize(scopeDyn, serializationStream);
 

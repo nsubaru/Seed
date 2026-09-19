@@ -41,7 +41,10 @@ public static class SeedSerializerCompilationResultExtensions
     }
 }
 
-public partial class SeedSerializerFactory : ISeedSerializerFactory
+/// <summary>
+/// Builds RTTI-to-CLR mappings and owns lazily generated, collectible serializer implementations.
+/// </summary>
+public partial class SeedSerializerFactory : ISeedSerializerFactory, IDisposable
 {
     private readonly string serializationClassString;
     private readonly List<TypeRecord> supportedTypesList = new();
@@ -51,7 +54,9 @@ public partial class SeedSerializerFactory : ISeedSerializerFactory
     private readonly IEnumerable<RttiTypeRecord> allRttiTypes;
     private readonly RTTISection section;
 
-    private readonly ISeedSerializer serializer;
+    private ISeedSerializer? serializer;
+    private readonly List<AssemblyLoadContext> assemblyContexts = new();
+    private bool disposed;
 
     private readonly List<(Type Type, SeedSerializableAttribute Attribute)> serializableTypes;
 
@@ -59,7 +64,15 @@ public partial class SeedSerializerFactory : ISeedSerializerFactory
     private readonly ILogger<ISeedSerializer>? serializerLogger;
     private readonly IServiceProvider serviceProvider;
 
-    public ISeedSerializer GetSeedSerializer() => serializer;
+    /// <summary>
+    /// Builds the serializer on first use and retains it until this factory is disposed.
+    /// </summary>
+    /// <returns>Serializer owned by this factory; callers must keep the factory alive while using it.</returns>
+    public ISeedSerializer GetSeedSerializer()
+    {
+        ObjectDisposedException.ThrowIf(disposed, this);
+        return serializer ??= BuildSeedSerializer();
+    }
 
     public RTTISection RTTISection => section;
 
@@ -72,6 +85,13 @@ public partial class SeedSerializerFactory : ISeedSerializerFactory
 
     public List<TypeRecord> GetSupportedTypes() => supportedTypesList;
 
+    /// <summary>
+    /// Discovers serializer mappings and prepares source without loading an executable implementation.
+    /// </summary>
+    /// <param name="section">Native RTTI that must remain valid for the factory's lifetime.</param>
+    /// <param name="serviceProvider">Services available to custom serializers.</param>
+    /// <param name="logger">Optional logger for mapping and compilation diagnostics.</param>
+    /// <param name="serializerLogger">Optional logger used by generated serializers.</param>
     public SeedSerializerFactory(RTTISection section, IServiceProvider serviceProvider, ILogger<SeedSerializerFactory>? logger = null, ILogger<ISeedSerializer>? serializerLogger = null)
     {
         serializationClassString = @"using System;
@@ -110,6 +130,7 @@ public class SeedSerializer : ISeedSerializer {
 
     private Dictionary<Guid, DynamicSerializationInfo> typesDict = new Dictionary<Guid, DynamicSerializationInfo>();   
     private Dictionary<Type, DynamicSerializationInfo> reverseTypesDict = new Dictionary<Type, DynamicSerializationInfo>();
+    private readonly Dictionary<Type, (Action<object, Stream> Serialize, Func<object, Stream, object> Deserialize)> valueHandlers = new();
 
     private readonly Dictionary<ulong, ICustomClassSerializer> customTypeMappingSchema;
     private readonly IEnumerable<RttiTypeRecord> allKnowTypes;
@@ -147,18 +168,27 @@ public class SeedSerializer : ISeedSerializer {
 
         this.reverseTypesDict = this.typesDict.DistinctBy(x => x.Value.ClrType).ToDictionary(x => x.Value.ClrType, x => x.Value);
 
+        // __SERIALIZER_VALUE_HANDLERS__
+
         this.allKnowTypes = allKnowTypes;
 
         rttiTypeLookup = allKnowTypes.DistinctBy(x => x.FullTypeId.Id).ToDictionary(x => x.FullTypeId.Id, x => x);
     }
 
-    public void Serialize(dynamic data, Stream serializationStream) { 
-        SerializeImpl(data, serializationStream); 
+    public void Serialize(dynamic data, Stream serializationStream) {
+        object value = data;
+        if (value != null && valueHandlers.TryGetValue(value.GetType(), out var handler)) {
+            handler.Serialize(value, serializationStream);
+        } else {
+            SerializeImpl(value, serializationStream);
+        }
     }
 
     public void Deserialize(ref dynamic data, Stream serializationStream) { 
-        dynamic cp = data;
-        data = DeserializeImpl(cp, serializationStream); 
+        object value = data;
+        data = value != null && valueHandlers.TryGetValue(value.GetType(), out var handler)
+            ? handler.Deserialize(value, serializationStream)
+            : DeserializeImpl(value, serializationStream);
     }
 
     public void SerializeImpl(object data, Stream stream) {
@@ -428,7 +458,6 @@ public class SeedSerializer : ISeedSerializer {
                 .Invoke(this, new object[] { typeRecord });
         }
 
-        serializer = BuildSeedSerializer();
     }
 
     private List<RttiTypeRecord> FilterAndOrderTypes(List<RttiTypeRecord> records)
@@ -808,14 +837,31 @@ public class SeedSerializer : ISeedSerializer {
         functions.Add(new KeyValuePair<string, string>( "der " + GetFriendlyTypeName(typeRecord.ClrType), derFunctionCode.ToString()));
     }
 
+    /// <summary>
+    /// Produces serializer source with instance-owned typed dispatch delegates.
+    /// </summary>
+    /// <returns>C# source for this factory's supported native-to-CLR mappings.</returns>
     public string GetSerializerClassCode()
     {
         var functionsCode = functions.DistinctBy(x => x.Key).Select(x => x.Value).Aggregate(string.Concat);
-        return serializationClassString + functionsCode + "}\n";
+        var handlers = new StringBuilder();
+        foreach (var type in supportedTypesList.Select(record => record.ClrType).Distinct())
+        {
+            var name = GetFriendlyTypeName(type);
+            handlers.AppendLine($"valueHandlers[typeof({name})] = ((value, stream) => SerializeImpl(({name})value, stream), (value, stream) => DeserializeImpl(({name})value, stream));");
+        }
+        // C# dynamic overload binding caches generated declaring types outside their load context.
+        // Compile direct, instance-owned delegates so using a serializer does not prevent unloading.
+        return serializationClassString.Replace("// __SERIALIZER_VALUE_HANDLERS__", handlers.ToString()) + functionsCode + "}\n";
     }
 
+    /// <summary>
+    /// Compiles serializer source without loading the emitted assembly into the process.
+    /// </summary>
+    /// <returns>Source and diagnostics plus PE/PDB streams that the caller must dispose.</returns>
     public SeedSerializerCompilationResult CompileSerializer()
     {
+        ObjectDisposedException.ThrowIf(disposed, this);
         logger?.LogInformation("Start codegen for serializer");
 
         var assemblyName = Path.GetRandomFileName();
@@ -924,8 +970,15 @@ public class SeedSerializer : ISeedSerializer {
         };
     }
 
+    /// <summary>
+    /// Compiles and loads a new serializer in a collectible context owned by this factory.
+    /// </summary>
+    /// <returns>A serializer valid until the factory is disposed; use GetSeedSerializer to reuse one instance.</returns>
     public ISeedSerializer BuildSeedSerializer() {
+        ObjectDisposedException.ThrowIf(disposed, this);
         var (code, supportedTypes, result, ms, pdbMs) = CompileSerializer();
+        using var peStream = ms;
+        using var pdbStream = pdbMs;
 
         if (!result.Success)
         {
@@ -953,31 +1006,58 @@ public class SeedSerializer : ISeedSerializer {
 
             logger?.LogInformation("Load serializer type");
 
-            var a = AssemblyLoadContext.Default.LoadFromStream(ms, pdbMs);
-            var serializerType = a.GetExportedTypes().First(x => x.GetInterfaces().Contains(typeof(ISeedSerializer)));
+            var loadContext = new AssemblyLoadContext("Seed serializer", isCollectible: true);
+            try
+            {
+                var a = loadContext.LoadFromStream(ms, pdbMs);
+                var serializerType = a.GetExportedTypes().First(x => x.GetInterfaces().Contains(typeof(ISeedSerializer)));
 
-            logger?.LogDebug("Build instance ctor args");
+                logger?.LogDebug("Build instance ctor args");
 
-            object?[] args = new object?[] { 
-                allRttiTypes, 
-                supportedTypes, 
-                customTypeMappingSchema, 
-                serializerLogger };
+                object?[] args = new object?[] {
+                    allRttiTypes,
+                    supportedTypes,
+                    customTypeMappingSchema,
+                    serializerLogger };
 
-            Type[] argsTypes = new Type[] { 
-                allRttiTypes.GetType(), 
-                supportedTypes.GetType(), 
-                customTypeMappingSchema.GetType(),
-                serializerLogger?.GetType() ?? typeof(ILogger<ISeedSerializer>) 
-            };
+                Type[] argsTypes = new Type[] {
+                    allRttiTypes.GetType(),
+                    supportedTypes.GetType(),
+                    customTypeMappingSchema.GetType(),
+                    serializerLogger?.GetType() ?? typeof(ILogger<ISeedSerializer>)
+                };
 
-            logger?.LogInformation("Create instance of serializer");
+                logger?.LogInformation("Create instance of serializer");
 
-            var serializer = serializerType
-                .GetConstructor(argsTypes)
-                !.Invoke(args) as ISeedSerializer;
+                var serializer = serializerType
+                    .GetConstructor(argsTypes)
+                    !.Invoke(args) as ISeedSerializer;
 
-            return serializer!;
+                assemblyContexts.Add(loadContext);
+                return serializer!;
+            }
+            catch
+            {
+                loadContext.Unload();
+                throw;
+            }
         }
+    }
+
+    /// <summary>
+    /// Releases generated serializers and requests unloading after their last external reference is released.
+    /// </summary>
+    public void Dispose()
+    {
+        if (disposed) return;
+        disposed = true;
+        serializer = null;
+        foreach (var context in assemblyContexts) context.Unload();
+        assemblyContexts.Clear();
+        customTypeMappingSchema.Clear();
+        customTemplatesSerializerFactory.Clear();
+        supportedTypesList.Clear();
+        serializableTypes.Clear();
+        functions.Clear();
     }
 }

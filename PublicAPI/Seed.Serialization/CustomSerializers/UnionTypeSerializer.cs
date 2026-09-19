@@ -11,14 +11,20 @@ public class UnionTypeObjectSerializer<T>(Type type, string typeName, IServicePr
 {
     public override Type[] DependableTypes => this.ClrType.GenericTypeArguments;
 
+    /// <summary>
+    /// Reconstructs the mapped value using statically dispatched calls to the session serializer.
+    /// </summary>
+    /// <param name="serializationStream">Stream positioned at the native value payload.</param>
+    /// <param name="serializer">Session serializer used for nested fields.</param>
+    /// <returns>The decoded managed value.</returns>
     public override object Deserialize(Stream serializationStream, ISeedSerializer serializer)
     {
         SizeT idx = 0;
-        dynamic headDyn = idx;
+        object headDyn = idx;
 
         serializer.Deserialize(ref headDyn, serializationStream);
 
-        idx = headDyn;
+        idx = (SizeT)headDyn;
         var type = DependableTypes[idx];
 
         return this.GetType()
@@ -30,13 +36,19 @@ public class UnionTypeObjectSerializer<T>(Type type, string typeName, IServicePr
     public object FinishDeserialize<U>(Stream serializationStream, ISeedSerializer serializer)
     {
         U ret = serializer.CreateObject<U>()!;
-        dynamic dataDyn = ret;
+        object dataDyn = ret;
         serializer.Deserialize(ref dataDyn, serializationStream);
-        ret = dataDyn;
+        ret = (U)dataDyn;
 
         return Activator.CreateInstance(typeof(T), [ret])!;
     }
 
+    /// <summary>
+    /// Writes the mapped value while keeping nested calls outside the dynamic overload binder.
+    /// </summary>
+    /// <param name="data">Managed value matching this serializer's CLR type.</param>
+    /// <param name="serializationStream">Destination for the native payload.</param>
+    /// <param name="serializer">Session serializer used for nested fields.</param>
     public override void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         SizeT idx = data.TypeId;
@@ -53,7 +65,8 @@ public class UnionTypeObjectSerializer<T>(Type type, string typeName, IServicePr
 
     public void CallSerialize<U>(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
-        serializer.Serialize(data.GetValue<U>(), serializationStream);
+        U value = data.GetValue<U>();
+        serializer.Serialize(value, serializationStream);
     }
 }
 
