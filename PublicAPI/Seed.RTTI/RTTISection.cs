@@ -40,7 +40,8 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 	private SizeT offset;
 	private Boolean direction;
 
-	private List<RttiTypeRecord> registeredRecords;
+    private readonly object registeredRecordsGate = new();
+    private volatile List<RttiTypeRecord>? registeredRecords;
     private bool disposedValue;
 
     internal byte[]? data;
@@ -52,7 +53,6 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     {
         this.data = null;
         this.direction = false;
-        this.registeredRecords = new List<RttiTypeRecord>();
         this.headerOffset = new SizeT();
         this.fa = null;
         this.fCount = 0;
@@ -73,8 +73,6 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         rawArrayLen = (SizeT) data.Length;
 
         FixupAddresses();
-
-        registeredRecords = new List<RttiTypeRecord>();
     }
 
     private void FixupAddresses()
@@ -136,7 +134,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         GC.SuppressFinalize(this);
     }
 
-    void LoadAllRegisteredTypes()
+    private List<RttiTypeRecord> LoadAllRegisteredTypes()
     {
         var @base = this.rawArrayPtr;
 
@@ -173,25 +171,35 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
                 false));
         }
 
-        this.registeredRecords = records;
+        return records;
     }
 
     /// <summary>
-    /// Return RttiTypeRecord from current section
-    /// This records have some limitation during that they don't have 
+    /// Creates an independent list of this section's cached record wrappers in section order.
     /// </summary>
-    /// <returns>Lis of </returns>
+    /// <returns>Record wrappers that remain valid for the section's lifetime.</returns>
     internal List<RttiTypeRecord> GetAllRegisteredTypes()
     {
-        if (this.registeredRecords.Count == 0)
-            LoadAllRegisteredTypes();
+        var records = registeredRecords;
+        if (records is null)
+        {
+            lock (registeredRecordsGate)
+            {
+                records = registeredRecords;
+                if (records is null)
+                {
+                    records = LoadAllRegisteredTypes();
+                    registeredRecords = records;
+                }
+            }
+        }
 
-        return this.registeredRecords.ToList();
+        return records.ToList();
     }
 
     /// <summary>
-    /// All records stored in this rtti section, 
-    /// not all records valid so ypu should check IsValid before use
+    /// Registered record wrappers in section order, valid for this section's lifetime.
+    /// The list is independent of the cache; entries may be invalid and must be checked before use.
     /// </summary>
     public List<RttiTypeRecord> AllRegisteredTypes => GetAllRegisteredTypes();
 
