@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,9 +11,7 @@ public partial class SeedSerializerFactory
     private Type? TryBuildFixedArrayType(RTTI.Record.RttiTypeRecord record, RTTI.RTTISection section)
     {
         var rank = TryGetFixedRank(record.TypeName);
-
         var innerTypeRecord = GetRecordByField(section, record.Fields.Skip(0).First());
-
         for (int i = 0; i < rank - 1; i++)
         {
             innerTypeRecord = GetRecordByField(section, innerTypeRecord!.Fields.Skip(0).First());
@@ -25,14 +23,12 @@ public partial class SeedSerializerFactory
         }
 
         var innerType = BuildClrType(innerTypeRecord);
-
         if (innerType == null)
         {
             return null;
         }
 
         var type = innerType.MakeArrayType();
-
         for (int i = 0; i < rank - 1; i++)
         {
             type = type.MakeArrayType();

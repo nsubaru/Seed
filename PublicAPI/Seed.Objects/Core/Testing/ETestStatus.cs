@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,6 +10,10 @@ namespace Seed.Core.Testing
     [SerializableEnum("Seed::Core::Testing::ETestStatus")]
     public enum ETestStatus : UInt8
     {
-        Success, Failure, Exception, Canceled, Unknown
+        Success,
+        Failure,
+        Exception,
+        Canceled,
+        Unknown
     };
 }

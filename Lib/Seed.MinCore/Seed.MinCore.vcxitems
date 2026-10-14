@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{116d8730-60de-5708-803c-74818675f2b2}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Atomic.h" />
+    <Natvis Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Atomic.natvis" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.BitOperations.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Bytes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Character.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Comparing.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Concepts.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Core.Base.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.CStr.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Definitions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.EnumBitFlags.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.EnumFlags.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.IClonable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.IDisposable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Interlocked.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Internals.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Math.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.NTAPI.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.RefCountT.h" />
+    <Natvis Include="$(MSBuildThisFileDirectory)Seed.Core.Base.RefCountT.natvis" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.SmartStaticAssert.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Swap.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeName.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Types.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Await.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Base.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Comparing.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.CVModificators.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Decay.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Function.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Invocable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Lambda.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.LogicOperations.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.NumericConverter.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Pack.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Pointer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Reference.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.ReferenceWraper.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.TypeClasification.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.TypeConvertions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.TypeTraits.Utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.Utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Base.UUID.h" />
+    <Natvis Include="$(MSBuildThisFileDirectory)Seed.Core.Base.UUID.natvis" />
+  </ItemGroup>
+</Project>

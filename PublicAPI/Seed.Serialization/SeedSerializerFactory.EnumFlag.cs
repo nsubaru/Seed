@@ -1,4 +1,4 @@
-﻿using Seed.Core;
+using Seed.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,21 +13,19 @@ public partial class SeedSerializerFactory
     Type? TryGetAsEnumFlag(RTTI.Record.RttiTypeRecord record)
     {
         if (!record.TypeName.StartsWith(Constants.Types.EnumFlag))
-        { 
-            return null; 
+        {
+            return null;
         }
 
         var enumTypeRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId == record.Fields.First().FullTypeId);
         var underlyingTypeRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId == record.Fields.Last().FullTypeId);
-
         if (enumTypeRecord == null || underlyingTypeRecord == null)
-        { 
-            return null; 
+        {
+            return null;
         }
 
         var enumType = BuildClrType(enumTypeRecord);
         var underlyingType = BuildClrType(underlyingTypeRecord);
-
         if (enumType == null || underlyingType == null)
         {
             return null;

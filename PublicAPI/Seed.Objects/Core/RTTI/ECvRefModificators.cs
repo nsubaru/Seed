@@ -1,4 +1,4 @@
-﻿namespace Seed.Core.RTTI;
+namespace Seed.Core.RTTI;
 
 [SerializableEnum("Seed::Core::CTTI::TypeTraits::ECvRefModificators")]
 public enum ECvRefModificators : SizeT

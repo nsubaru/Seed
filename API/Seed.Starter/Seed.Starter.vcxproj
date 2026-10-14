@@ -1,0 +1,18 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Coverage|x64"><Configuration>Coverage</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals"><ProjectGuid>{A4F30439-C526-47EE-959A-C4C98FFBE396}</ProjectGuid><WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion></PropertyGroup>
+  <Import Project="$(VCTargetsPath)/Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration"><ConfigurationType>DynamicLibrary</ConfigurationType><PlatformToolset>v145</PlatformToolset><CharacterSet>Unicode</CharacterSet></PropertyGroup>
+  <Import Project="$(VCTargetsPath)/Microsoft.Cpp.props" />
+  <PropertyGroup><SeedRoot>$(MSBuildThisFileDirectory)..\..\</SeedRoot><OutDir>$(SeedRoot)Artifacts\x64\$(Configuration)\API\Starter\</OutDir><IntDir>$(SeedRoot)Artifacts\Intermediate\x64\$(Configuration)\Starter\</IntDir><TargetName>Seed.Starter</TargetName></PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile><LanguageStandard>stdcpplatest</LanguageStandard><MultiProcessorCompilation>true</MultiProcessorCompilation><AdditionalIncludeDirectories>$(SeedRoot)Lib\NtApi;$(SeedRoot)Lib\WinApiHeaders;$(SeedRoot)Lib\NtIntSafe;$(SeedRoot)Lib\Intrinsics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories><GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles><DebugInformationFormat>ProgramDatabase</DebugInformationFormat><PreprocessorDefinitions>SEED_RT_ALLOW_INTERNAL_NT_API;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <Link><AdditionalDependencies>$(SeedRoot)Lib\NtApi\ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies><GenerateDebugInformation>true</GenerateDebugInformation></Link>
+  </ItemDefinitionGroup>
+  <ItemGroup><ClCompile Include="Seed.Starter.cpp" /></ItemGroup>
+  <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets" />
+</Project>

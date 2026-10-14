@@ -1,4 +1,4 @@
-﻿using Seed.Core.Configurations;
+using Seed.Core.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,11 +11,9 @@ public unsafe struct UniversalTypeIdentifier
 {
     [FieldOffset(0)]
     public UUID Id;
-
     [SerializableStructField]
     [FieldOffset(0)]
     public KernelVersionT KernelVersion;
-
     [SerializableStructField]
     [FieldOffset(8)]
     public ID TypeId;

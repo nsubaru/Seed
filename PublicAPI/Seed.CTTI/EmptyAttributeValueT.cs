@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Seed.CTTI;
 
-public struct EmptyAttributeValueT {
+public struct EmptyAttributeValueT
+{
     public static EmptyAttributeValueT Empty => new EmptyAttributeValueT();
 
     public override bool Equals(object? obj)
@@ -12,7 +13,8 @@ public struct EmptyAttributeValueT {
         return obj is EmptyAttributeValueT;
     }
 
-    public override int GetHashCode() {
+    public override int GetHashCode()
+    {
         return 0;
     }
 

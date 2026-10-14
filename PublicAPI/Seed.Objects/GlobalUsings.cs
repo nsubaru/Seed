@@ -1,6 +1,5 @@
-﻿global using System.Runtime.InteropServices;
+global using System.Runtime.InteropServices;
 global using Seed.CTTI;
-
 global using SizeT = System.UInt64;
 global using Сhar = System.Char;
 global using UUID = System.Guid;

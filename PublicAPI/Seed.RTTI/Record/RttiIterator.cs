@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Seed.RTTI.Record;
 
@@ -6,7 +6,8 @@ namespace Seed.RTTI.Record;
 /// Iterable object for RTTI iterator
 /// </summary>
 /// <typeparam name="T">Item type</typeparam>
-public interface IRttiIterableObject<T> where T : class, IRttiIterableObject<T>, new()
+public interface IRttiIterableObject<T>
+    where T : class, IRttiIterableObject<T>, new()
 {
     /// <summary>
     /// Create instance from iterator
@@ -21,8 +22,7 @@ public interface IRttiIterableObject<T> where T : class, IRttiIterableObject<T>,
 /// </summary>
 /// <typeparam name="THeap">Heap type</typeparam>
 /// <typeparam name="T">Item type</typeparam>
-public unsafe class RttiIterator<T> : IEnumerator<T>
-    where T : class, IRttiIterableObject<T>, new()
+public unsafe class RttiIterator<T> : IEnumerator<T> where T : class, IRttiIterableObject<T>, new()
 {
     internal ItemBase* item;
     internal ItemBase* originalItem;
@@ -62,12 +62,18 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
     /// <summary>
     /// Current item
     /// </summary>
-    T IEnumerator<T>.Current { get => GetObject(); }
+    T IEnumerator<T>.Current
+    {
+        get => GetObject();
+    }
 
     /// <summary>
     /// Current item
     /// </summary>
-    object IEnumerator.Current { get => GetObject(); }
+    object IEnumerator.Current
+    {
+        get => GetObject();
+    }
 
     /// <summary>
     /// Move iterator to next item
@@ -78,28 +84,30 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
         if (item == null || idx == count)
         {
             item = null;
+
             return false;
         }
 
         if (!isStartedEnumeration)
         {
             isStartedEnumeration = true;
+
             return true;
         }
 
         idx++;
-
         if (idx == count)
         {
             item = null;
+
             return false;
         }
         else
         {
             item = (ItemBase*)((byte*)item + item->SizeOfItem);
+
             return true;
         }
-
     }
 
     /// <summary>
@@ -121,5 +129,7 @@ public unsafe class RttiIterator<T> : IEnumerator<T>
         return new RttiIterator<T>(this.item, this.idx, this.count, this.imageBase, this.isValidCxxTypeId);
     }
 
-    public void Dispose() { }
+    public void Dispose()
+    {
+    }
 }

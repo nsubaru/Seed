@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="HTTP">
+      <UniqueIdentifier>{2D39F982-1279-56FD-90EF-B88B4F334F10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP\Tests">
+      <UniqueIdentifier>{6588825D-1849-5394-B11F-06B9C8DC066B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Base.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Client.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Parser.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Server.Service.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Testing.Certificates.h">
+      <Filter>HTTP\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Tests.h">
+      <Filter>HTTP\Tests</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Client.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Instantiations.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Parser.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Server.Service.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Tests.cpp">
+      <Filter>HTTP\Tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

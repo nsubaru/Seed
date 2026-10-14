@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="RTTI">
+      <UniqueIdentifier>{82D82A52-7C07-5AC9-9A16-B0526BFFD992}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)typeinfo.cpp">
+      <Filter>RTTI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)typeinfo.h">
+      <Filter>RTTI</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

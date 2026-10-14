@@ -1,4 +1,4 @@
-﻿namespace Seed.Core.Threading;
+namespace Seed.Core.Threading;
 
 /// <summary>
 /// Threadable entity states
@@ -6,5 +6,13 @@
 [SerializableEnum("Seed::Core::Threading::EThreadableStates")]
 public enum EThreadableStates : UInt8
 {
-    NotStarted, Starting, Executing, Paused, ExceptionProcessing, Interrupted, Ended, Killed, Unknown = 255
+    NotStarted,
+    Starting,
+    Executing,
+    Paused,
+    ExceptionProcessing,
+    Interrupted,
+    Ended,
+    Killed,
+    Unknown = 255
 };

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Seed.Core.RTTI;
 using Seed.Serialization;
 
@@ -22,7 +22,10 @@ public class RttiTypeRecordSerializer : ICustomClassSerializer
     /// <summary>
     /// Identifier type required to encode RTTI references.
     /// </summary>
-    public Type[] DependableTypes => new Type[] { typeof(UniversalTypeIdentifier) };
+    public Type[] DependableTypes => new Type[]
+    {
+        typeof(UniversalTypeIdentifier)
+    };
 
     /// <summary>
     /// Resolves a native RTTI reference, preserving an empty record when its identifier is zero.
@@ -37,14 +40,12 @@ public class RttiTypeRecordSerializer : ICustomClassSerializer
         serializer.Deserialize(ref data, serializationStream);
         var fullTypeId = (UniversalTypeIdentifier)data;
         serializer.Logger?.Log(LogLevel.Trace, "Deserialization UniversalTypeIdentifier. Value {fullTypeId}", fullTypeId);
-
         if (fullTypeId.Id == Guid.Empty)
         {
             return new RttiTypeRecord();
         }
 
         var record = serializer.GetAllRttiTypes().FirstOrDefault(x => x.FullTypeId == fullTypeId);
-
         if (record == null)
         {
             serializer.Logger?.Log(LogLevel.Error, "RttiTypeRecord {FullTypeId} not found during deserialization", fullTypeId);
@@ -52,6 +53,7 @@ public class RttiTypeRecordSerializer : ICustomClassSerializer
         }
 
         serializer.Logger?.Log(LogLevel.Trace, "Successfully deserialized record with typename {0}", record.TypeName);
+
         return record;
     }
 

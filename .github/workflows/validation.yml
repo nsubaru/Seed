@@ -1,0 +1,79 @@
+name: Seed validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Windows x64 ${{ matrix.configuration }}
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.4xx
+      - name: Validate exported source
+        run: ./Tools/Test-SeedSource.ps1
+      - name: Regenerate native imports
+        run: ./Tools/Update-NtdllImportLibrary.ps1
+      - name: Build shipped projects
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $msbuild = & $vswhere -latest -products '*' -requires Microsoft.Component.MSBuild -find 'MSBuild/**/Bin/MSBuild.exe' | Select-Object -First 1
+          if (-not $msbuild)
+          {
+              throw 'Visual Studio MSBuild is unavailable.'
+          }
+
+          & $msbuild Seed.slnx /m /restore /nologo /p:Platform=x64 /p:Configuration=${{ matrix.configuration }}
+          if ($LASTEXITCODE -ne 0)
+          {
+              throw 'Seed solution build failed.'
+          }
+      - name: Test under an ordinary Windows account
+        run: ./Tools/Invoke-SeedCiOrdinaryUser.ps1 -Configuration ${{ matrix.configuration }}
+      - name: Create local native test adapter package
+        if: matrix.configuration == 'Release'
+        run: |
+          $nuget = Join-Path $env:RUNNER_TEMP 'seed-nuget.exe'
+          Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile $nuget
+          ./Tools/Pack-SeedTestAdapter.ps1 -NuGetExe $nuget -Version 0.1.0-ci -NoBuild
+      - name: Upload validation reports and documentation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-${{ matrix.configuration }}
+          if-no-files-found: warn
+          path: |
+            Artifacts/tests/**/*.xml
+            Artifacts/e2e/**/*.trx
+            Artifacts/e2e/**/commands.log
+            Artifacts/test-adapter/**/*.trx
+            Artifacts/test-adapter/**/discovery.log
+            Artifacts/test-adapter/**/cancellation.log
+            Artifacts/packages/*.nupkg
+            Artifacts/integration/*.xml
+            Artifacts/audit/*.json
+            Artifacts/dependencies.json
+            Artifacts/tls-client/**
+            Artifacts/tls-identity/**
+            Artifacts/tls-server/**/*.log
+            Artifacts/tls-server/**/modules.txt
+            Artifacts/rsa-signing/**
+            Artifacts/configuration-validation/**
+            Artifacts/ci-ordinary-user*.log
+            Documentation/**

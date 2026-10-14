@@ -1,4 +1,4 @@
-﻿using Seed.CTTI.MetaData;
+using Seed.CTTI.MetaData;
 using System.Text;
 
 namespace Seed.Serialization;
@@ -33,6 +33,7 @@ public partial class SeedSerializerFactory
                     code.AppendLine(Constants.SerCodeBlocks.RTTISection);
                     break;
                 }
+
             case Constants.Types.EmptyAttributeValueT:
                 {
                     code.AppendLine(Constants.SerCodeBlocks.EmptyAttributeValueT);
@@ -57,6 +58,7 @@ public partial class SeedSerializerFactory
                     code.AppendLine(Constants.DerCodeBlocks.RTTISection);
                     break;
                 }
+
             case Constants.Types.EmptyAttributeValueT:
                 {
                     code.AppendLine(Constants.DerCodeBlocks.EmptyAttributeValueT);

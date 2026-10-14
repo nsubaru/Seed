@@ -9,20 +9,28 @@ public readonly struct Utf8String : IEquatable<Utf8String>
     public Utf8String(byte[] bytes)
     {
         if (bytes == null)
+        {
             throw new ArgumentNullException(nameof(bytes));
+        }
 
         // Validate once on ingress; storage and LLM paths keep the bytes after that.
         Encoding.GetString(bytes);
         Bytes = bytes.ToArray();
     }
 
-    public byte[] Bytes { get; }
+    public byte[] Bytes
+    {
+        get;
+    }
 
     public int ByteCount => Bytes?.Length ?? 0;
 
     public bool IsEmpty => ByteCount == 0;
 
-    public static Utf8String Empty { get; } = new(Array.Empty<byte>());
+    public static Utf8String Empty
+    {
+        get;
+    } = new(Array.Empty<byte>());
 
     public static Utf8String FromString(string? value)
     {
@@ -55,7 +63,9 @@ public readonly struct Utf8String : IEquatable<Utf8String>
         {
             var hash = 17;
             foreach (var item in Bytes ?? Array.Empty<byte>())
+            {
                 hash = hash * 31 + item;
+            }
 
             return hash;
         }

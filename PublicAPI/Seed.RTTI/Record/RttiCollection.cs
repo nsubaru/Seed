@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Seed.RTTI.Record;
 
@@ -31,12 +31,7 @@ public unsafe class RttiCollection<T> : IEnumerable<T> where T : class, IRttiIte
     {
         if (@base != null && @base->Count != 0)
         {
-            return new RttiIterator<T>(
-                (byte*)@base + @base->OffsetToFirstItem,
-                0,
-                @base->Count,
-                imageBase,
-                isValidCxxTypeId);
+            return new RttiIterator<T>((byte*)@base + @base->OffsetToFirstItem, 0, @base->Count, imageBase, isValidCxxTypeId);
         }
         else
         {

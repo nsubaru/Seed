@@ -1,0 +1,15 @@
+Seed
+Copyright 2026 Seed contributors
+
+Seed-owned code is intended for distribution under Apache License 2.0.
+This local extraction is not cleared for publication: retained contribution
+rights and support-header redistribution are still being audited.
+
+Native NT declarations include adaptations of phnt from Winsider Seminars &
+Solutions, Inc. phnt material retains its separate MIT license in
+Lib/NtApi/LICENSE.phnt. The phnt_windows.h file was acquired again from current
+MIT-licensed upstream; the older GPL-banner copy is not included.
+
+Compiler/SDK-derived support headers and certificate data require separate
+provenance records. No Apache-2.0 license grant is asserted for that material by
+this notice. Complete the audit or replace unverified material before release.

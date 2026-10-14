@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,4 +12,3 @@ public interface IAttributeValueProvider<T>
 {
     T GetAttributeValue(IntPtr rawData);
 }
-

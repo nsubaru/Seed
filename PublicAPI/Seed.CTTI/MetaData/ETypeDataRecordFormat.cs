@@ -1,4 +1,4 @@
-﻿namespace Seed.CTTI.MetaData;
+namespace Seed.CTTI.MetaData;
 
 public enum ETypeDataRecordFormat
 {

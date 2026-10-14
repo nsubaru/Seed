@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="KMS">
+      <UniqueIdentifier>{528D7CF4-D837-5DC8-A4B1-20F6E9D8B447}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Server.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Server.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,17 @@
+[
+  {"Name":"Seed.MinCore","Summary":"Primitive types, traits and ownership foundations.","Directory":"Lib/Seed.MinCore","Pattern":"*.h"},
+  {"Name":"Seed.Core","Summary":"Runtime, containers, async IO, reflection, serialization, diagnostics, DNS, DHCP and cryptography.","Directory":"Native","Pattern":"Seed.Core.*.h"},
+  {"Name":"Seed.Http","Summary":"HTTP/1.1 parser, native client and server handlers.","Directory":"Native","Pattern":"Seed.Http.*.h"},
+  {"Name":"Seed.Tls","Summary":"Native TLS client/server, signatures, certificate providers and RSA identities.","Directory":"Native","Pattern":"Seed.Tls.*.h"},
+  {"Name":"Seed.KMS","Summary":"Local console message transport, native test reports and selected runtime commands.","Directory":"Native","Pattern":"Seed.KMS.*.h"},
+  {"Name":"Seed.Runtime","Summary":"Standalone composition, reflected host configuration and demonstration contracts.","Directory":"Native","Pattern":"Seed.Runtime.*.h"},
+  {"Name":"Seed.KMS.Transport","Summary":"Independent managed local console transport.","Directory":"API/Seed.KMS.Transport","Pattern":"*.cs"},
+  {"Name":"Seed.Shared","Summary":"Managed primitive identities and contracts.","Directory":"PublicAPI/Seed.Shared","Pattern":"*.cs"},
+  {"Name":"Seed.CTTI","Summary":"Managed compile-time metadata mapping attributes.","Directory":"PublicAPI/Seed.CTTI","Pattern":"*.cs"},
+  {"Name":"Seed.Objects","Summary":"Selected Core contracts and dynamic value envelope.","Directory":"PublicAPI/Seed.Objects","Pattern":"*.cs"},
+  {"Name":"Seed.RTTI","Summary":"Managed native RTTI readers.","Directory":"PublicAPI/Seed.RTTI","Pattern":"*.cs"},
+  {"Name":"Seed.Serialization","Summary":"Managed RTTI-driven binary serialization.","Directory":"PublicAPI/Seed.Serialization","Pattern":"*.cs"},
+  {"Name":"Seed.E2E.Infrastructure","Summary":"Owned ordinary-user runtime lifecycle and bounded KMS exchanges.","Directory":"Lib/Seed.E2E.Infrastructure","Pattern":"*.cs"},
+  {"Name":"Seed.Testing.TestAdapter","Summary":"Visual Studio native test discovery and execution.","Directory":"Tools/Seed.Testing.TestAdapter","Pattern":"*.cs"},
+  {"Name":"Seed.Docker","Summary":"Windows source builds, ordinary-user container verification and runtime startup.","Directory":"Docker","Pattern":"*.ps1"}
+]

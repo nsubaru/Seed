@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{4534301d-5f62-5f57-a042-07dcb8abc030}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Base.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Client.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Client.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Instantiations.cpp">
+      <DebugInformationFormat>None</DebugInformationFormat>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Parser.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Parser.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Server.Service.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Server.Service.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Testing.Certificates.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Http.Tests.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Http.Tests.h" />
+  </ItemGroup>
+</Project>

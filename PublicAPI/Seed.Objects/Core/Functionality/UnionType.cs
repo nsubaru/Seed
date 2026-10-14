@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,11 +6,16 @@ namespace Seed.Core.Functionality;
 
 public class UnionType<T0>
 {
-    public SizeT TypeId { get; private set; } = 0;
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    } = 0;
 
     private object value;
 
-    public UnionType() { 
+    public UnionType()
+    {
         value = default!;
         TypeId = SizeT.MaxValue;
     }
@@ -56,14 +61,18 @@ public class UnionType<T0>
         {
             return false;
         }
-        
+
         return typeof(T) == typeof(T0);
     }
 }
 
 public class UnionType<T0, T1>
 {
-    public SizeT TypeId { get; private set; }
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    }
 
     private object? value;
 
@@ -108,6 +117,7 @@ public class UnionType<T0, T1>
                 {
                     throw new InvalidDataException();
                 }
+
             case 1:
                 if (typeof(T) == typeof(T1))
                 {
@@ -117,6 +127,7 @@ public class UnionType<T0, T1>
                 {
                     throw new InvalidDataException();
                 }
+
             default:
                 throw new InvalidDataException();
         }
@@ -148,13 +159,10 @@ public class UnionType<T0, T1>
         {
             case 0:
                 return typeof(T) == typeof(T0);
-
             case 1:
                 return typeof(T) == typeof(T1);
-
             case SizeT.MaxValue:
                 return false;
-
             default:
                 throw new InvalidDataException();
         }
@@ -163,7 +171,11 @@ public class UnionType<T0, T1>
 
 public class UnionType<T0, T1, T2>
 {
-    public SizeT TypeId { get; private set; }
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    }
 
     private object? value;
 
@@ -173,13 +185,13 @@ public class UnionType<T0, T1, T2>
         TypeId = SizeT.MaxValue;
     }
 
-    public UnionType(T0 value) 
+    public UnionType(T0 value)
     {
         this.value = value;
         TypeId = 0;
     }
 
-    public UnionType(T1 value) 
+    public UnionType(T1 value)
     {
         this.value = value;
         TypeId = 1;
@@ -208,30 +220,33 @@ public class UnionType<T0, T1, T2>
             case 0:
                 if (typeof(T) == typeof(T0))
                 {
-                    return (T) value!;
+                    return (T)value!;
                 }
                 else
                 {
                     throw new InvalidDataException();
                 }
+
             case 1:
                 if (typeof(T) == typeof(T1))
                 {
-                    return (T) value!;
+                    return (T)value!;
                 }
                 else
                 {
                     throw new InvalidDataException();
                 }
+
             case 2:
                 if (typeof(T) == typeof(T2))
                 {
-                    return (T) value!;
+                    return (T)value!;
                 }
                 else
                 {
                     throw new InvalidDataException();
                 }
+
             default:
                 throw new InvalidDataException();
         }
@@ -268,16 +283,12 @@ public class UnionType<T0, T1, T2>
         {
             case 0:
                 return typeof(T) == typeof(T0);
-
             case 1:
                 return typeof(T) == typeof(T1);
-
             case 2:
                 return typeof(T) == typeof(T2);
-
             case SizeT.MaxValue:
                 return false;
-
             default:
                 throw new InvalidDataException();
         }
@@ -286,7 +297,11 @@ public class UnionType<T0, T1, T2>
 
 public class UnionType<T0, T1, T2, T3>
 {
-    public SizeT TypeId { get; private set; }
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    }
 
     private object? value;
 
@@ -343,6 +358,7 @@ public class UnionType<T0, T1, T2, T3>
                 {
                     throw new InvalidDataException();
                 }
+
             case 1:
                 if (typeof(T) == typeof(T1))
                 {
@@ -352,6 +368,7 @@ public class UnionType<T0, T1, T2, T3>
                 {
                     throw new InvalidDataException();
                 }
+
             case 2:
                 if (typeof(T) == typeof(T2))
                 {
@@ -361,6 +378,7 @@ public class UnionType<T0, T1, T2, T3>
                 {
                     throw new InvalidDataException();
                 }
+
             case 3:
                 if (typeof(T) == typeof(T3))
                 {
@@ -370,6 +388,7 @@ public class UnionType<T0, T1, T2, T3>
                 {
                     throw new InvalidDataException();
                 }
+
             default:
                 throw new InvalidDataException();
         }
@@ -411,19 +430,14 @@ public class UnionType<T0, T1, T2, T3>
         {
             case 0:
                 return typeof(T) == typeof(T0);
-
             case 1:
                 return typeof(T) == typeof(T1);
-
             case 2:
                 return typeof(T) == typeof(T2);
-
             case 3:
                 return typeof(T) == typeof(T3);
-
             case SizeT.MaxValue:
                 return false;
-
             default:
                 throw new InvalidDataException();
         }
@@ -432,7 +446,11 @@ public class UnionType<T0, T1, T2, T3>
 
 public class UnionType<T0, T1, T2, T3, T4>
 {
-    public SizeT TypeId { get; private set; }
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    }
 
     private object? value;
 
@@ -495,6 +513,7 @@ public class UnionType<T0, T1, T2, T3, T4>
                 {
                     throw new InvalidDataException();
                 }
+
             case 1:
                 if (typeof(T) == typeof(T1))
                 {
@@ -504,6 +523,7 @@ public class UnionType<T0, T1, T2, T3, T4>
                 {
                     throw new InvalidDataException();
                 }
+
             case 2:
                 if (typeof(T) == typeof(T2))
                 {
@@ -513,6 +533,7 @@ public class UnionType<T0, T1, T2, T3, T4>
                 {
                     throw new InvalidDataException();
                 }
+
             case 3:
                 if (typeof(T) == typeof(T3))
                 {
@@ -522,6 +543,7 @@ public class UnionType<T0, T1, T2, T3, T4>
                 {
                     throw new InvalidDataException();
                 }
+
             case 4:
                 if (typeof(T) == typeof(T4))
                 {
@@ -531,6 +553,7 @@ public class UnionType<T0, T1, T2, T3, T4>
                 {
                     throw new InvalidDataException();
                 }
+
             default:
                 throw new InvalidDataException();
         }
@@ -577,22 +600,16 @@ public class UnionType<T0, T1, T2, T3, T4>
         {
             case 0:
                 return typeof(T) == typeof(T0);
-
             case 1:
                 return typeof(T) == typeof(T1);
-
             case 2:
                 return typeof(T) == typeof(T2);
-
             case 3:
                 return typeof(T) == typeof(T3);
-
             case 4:
                 return typeof(T) == typeof(T4);
-
             case SizeT.MaxValue:
                 return false;
-
             default:
                 throw new InvalidDataException();
         }
@@ -601,7 +618,11 @@ public class UnionType<T0, T1, T2, T3, T4>
 
 public class UnionType<T0, T1, T2, T3, T4, T5>
 {
-    public SizeT TypeId { get; private set; }
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    }
 
     private object? value;
 
@@ -670,6 +691,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
                 {
                     throw new InvalidDataException();
                 }
+
             case 1:
                 if (typeof(T) == typeof(T1))
                 {
@@ -679,6 +701,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
                 {
                     throw new InvalidDataException();
                 }
+
             case 2:
                 if (typeof(T) == typeof(T2))
                 {
@@ -688,6 +711,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
                 {
                     throw new InvalidDataException();
                 }
+
             case 3:
                 if (typeof(T) == typeof(T3))
                 {
@@ -697,6 +721,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
                 {
                     throw new InvalidDataException();
                 }
+
             case 4:
                 if (typeof(T) == typeof(T4))
                 {
@@ -706,6 +731,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
                 {
                     throw new InvalidDataException();
                 }
+
             case 5:
                 if (typeof(T) == typeof(T5))
                 {
@@ -715,6 +741,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
                 {
                     throw new InvalidDataException();
                 }
+
             default:
                 throw new InvalidDataException();
         }
@@ -766,25 +793,18 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
         {
             case 0:
                 return typeof(T) == typeof(T0);
-
             case 1:
                 return typeof(T) == typeof(T1);
-
             case 2:
                 return typeof(T) == typeof(T2);
-
             case 3:
                 return typeof(T) == typeof(T3);
-
             case 4:
                 return typeof(T) == typeof(T4);
-
             case 5:
                 return typeof(T) == typeof(T5);
-
             case SizeT.MaxValue:
                 return false;
-
             default:
                 throw new InvalidDataException();
         }
@@ -793,7 +813,11 @@ public class UnionType<T0, T1, T2, T3, T4, T5>
 
 public class UnionType<T0, T1, T2, T3, T4, T5, T6>
 {
-    public SizeT TypeId { get; private set; }
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    }
 
     private object? value;
 
@@ -868,6 +892,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
                 {
                     throw new InvalidDataException();
                 }
+
             case 1:
                 if (typeof(T) == typeof(T1))
                 {
@@ -877,6 +902,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
                 {
                     throw new InvalidDataException();
                 }
+
             case 2:
                 if (typeof(T) == typeof(T2))
                 {
@@ -886,6 +912,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
                 {
                     throw new InvalidDataException();
                 }
+
             case 3:
                 if (typeof(T) == typeof(T3))
                 {
@@ -895,6 +922,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
                 {
                     throw new InvalidDataException();
                 }
+
             case 4:
                 if (typeof(T) == typeof(T4))
                 {
@@ -904,6 +932,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
                 {
                     throw new InvalidDataException();
                 }
+
             case 5:
                 if (typeof(T) == typeof(T5))
                 {
@@ -913,6 +942,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
                 {
                     throw new InvalidDataException();
                 }
+
             case 6:
                 if (typeof(T) == typeof(T6))
                 {
@@ -922,6 +952,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
                 {
                     throw new InvalidDataException();
                 }
+
             default:
                 throw new InvalidDataException();
         }
@@ -978,28 +1009,20 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
         {
             case 0:
                 return typeof(T) == typeof(T0);
-
             case 1:
                 return typeof(T) == typeof(T1);
-
             case 2:
                 return typeof(T) == typeof(T2);
-
             case 3:
                 return typeof(T) == typeof(T3);
-
             case 4:
                 return typeof(T) == typeof(T4);
-
             case 5:
                 return typeof(T) == typeof(T5);
-
             case 6:
                 return typeof(T) == typeof(T6);
-
             case SizeT.MaxValue:
                 return false;
-
             default:
                 throw new InvalidDataException();
         }
@@ -1008,7 +1031,11 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6>
 
 public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
 {
-    public SizeT TypeId { get; private set; }
+    public SizeT TypeId
+    {
+        get;
+        private set;
+    }
 
     private object? value;
 
@@ -1078,7 +1105,8 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
 
     public T GetValue<T>()
     {
-        switch (TypeId) {
+        switch (TypeId)
+        {
             case 0:
                 if (typeof(T) == typeof(T0))
                 {
@@ -1088,6 +1116,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             case 1:
                 if (typeof(T) == typeof(T1))
                 {
@@ -1097,6 +1126,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             case 2:
                 if (typeof(T) == typeof(T2))
                 {
@@ -1106,6 +1136,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             case 3:
                 if (typeof(T) == typeof(T3))
                 {
@@ -1115,6 +1146,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             case 4:
                 if (typeof(T) == typeof(T4))
                 {
@@ -1124,6 +1156,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             case 5:
                 if (typeof(T) == typeof(T5))
                 {
@@ -1133,6 +1166,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             case 6:
                 if (typeof(T) == typeof(T6))
                 {
@@ -1142,6 +1176,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             case 7:
                 if (typeof(T) == typeof(T7))
                 {
@@ -1151,6 +1186,7 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
                 {
                     throw new InvalidDataException();
                 }
+
             default:
                 throw new InvalidDataException();
         }
@@ -1212,31 +1248,22 @@ public class UnionType<T0, T1, T2, T3, T4, T5, T6, T7>
         {
             case 0:
                 return typeof(T) == typeof(T0);
-
             case 1:
                 return typeof(T) == typeof(T1);
-
             case 2:
                 return typeof(T) == typeof(T2);
-
             case 3:
                 return typeof(T) == typeof(T3);
-
             case 4:
                 return typeof(T) == typeof(T4);
-
             case 5:
                 return typeof(T) == typeof(T5);
-
             case 6:
                 return typeof(T) == typeof(T6);
-
             case 7:
                 return typeof(T) == typeof(T7);
-
             case SizeT.MaxValue:
                 return false;
-
             default:
                 throw new InvalidDataException();
         }

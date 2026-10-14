@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework><LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable><IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="18.6.0" PrivateAssets="all" />
+    <ProjectReference Include="../Seed.Testing.Host/Seed.Testing.Host.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+  </ItemGroup>
+  <Target Name="StageTestingHost" AfterTargets="Build">
+    <ItemGroup><SeedHostFiles Include="../../Artifacts/x64/$(Configuration)/Seed.Testing.Host/*" /></ItemGroup>
+    <Copy SourceFiles="@(SeedHostFiles)" DestinationFolder="$(TargetDir)host" />
+  </Target>
+</Project>

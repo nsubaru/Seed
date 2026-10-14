@@ -1,4 +1,4 @@
-﻿using Seed.Core.RTTI;
+using Seed.Core.RTTI;
 
 namespace Seed.RTTI.Record.Object;
 
@@ -9,7 +9,10 @@ public unsafe class RttiIntefaceRecord : IRttiIterableObject<RttiIntefaceRecord>
 {
     internal RttiIterator<RttiIntefaceRecord>? it;
 
-    InterfaceRecord* GetRecord() { return (InterfaceRecord*)it!.item; }
+    InterfaceRecord* GetRecord()
+    {
+        return (InterfaceRecord*)it!.item;
+    }
 
     public RttiIntefaceRecord()
     {
@@ -47,7 +50,7 @@ public unsafe class RttiIntefaceRecord : IRttiIterableObject<RttiIntefaceRecord>
     /// <summary>
     /// Interface type name
     /// </summary>
-    public string TypeName => Marshal.PtrToStringAuto((IntPtr)  GetRecord()->TypeName.Text) ?? string.Empty;
+    public string TypeName => Marshal.PtrToStringAuto((IntPtr)GetRecord()->TypeName.Text) ?? string.Empty;
 
     /// <summary>
     /// Create collection of objects

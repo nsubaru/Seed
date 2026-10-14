@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="Starter">
+      <UniqueIdentifier>{FC47D232-6448-559E-99F6-0AADA5D482E5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Seed.Starter.cpp">
+      <Filter>Starter</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

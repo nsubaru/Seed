@@ -1,11 +1,13 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Seed.CTTI.MetaData;
 
 public class TypeMetaDataDecoder
 {
-    public TypeMetaDataDecoder() { }
+    public TypeMetaDataDecoder()
+    {
+    }
 
     #region Decoding TypeMetaDataRecord string format
     /// <summary>
@@ -22,7 +24,6 @@ public class TypeMetaDataDecoder
     private int SearchLevelEnd(string typeMetaData, int startPos)
     {
         var count = 0;
-
         for (int pos = startPos; pos < typeMetaData.Length; pos++)
         {
             switch (typeMetaData[pos])
@@ -39,6 +40,7 @@ public class TypeMetaDataDecoder
                             break;
                         }
                     }
+
                 case '{':
                     count++;
                     break;
@@ -50,18 +52,14 @@ public class TypeMetaDataDecoder
         return typeMetaData.Length;
     }
 
-    private TypeMetaDataRecord DecodeRecords(string typeMetaData)
-        => DecodeTypeMetaDataImpl(typeMetaData, 1, out int _);
+    private TypeMetaDataRecord DecodeRecords(string typeMetaData) => DecodeTypeMetaDataImpl(typeMetaData, 1, out int _);
 
     private TypeMetaDataRecord DecodeTypeMetaDataImpl(string typeMetaData, int startPos, out int endPos)
     {
         var indexOfOpenBracket = (ulong)typeMetaData.IndexOf('{', startPos);
         var indexOfCloseBracket = (ulong)typeMetaData.IndexOf('}', startPos);
-
         var isHaveNestedTypes = indexOfOpenBracket < indexOfCloseBracket;
-
         endPos = (int)(isHaveNestedTypes ? indexOfOpenBracket : indexOfCloseBracket);
-
         var thisTypeParts = typeMetaData.Substring(startPos, endPos - startPos).Split('|');
 
         return new TypeMetaDataRecord()
@@ -80,18 +78,19 @@ public class TypeMetaDataDecoder
         var result = new List<TypeMetaDataRecord>();
         var endIndex = SearchLevelEnd(typeMetaData, startPos);
         var i = startPos + 1;
-
         while (true)
         {
             result.Add(DecodeTypeMetaDataImpl(typeMetaData, i, out i));
-
             if (i == -1 || i >= endIndex)
+            {
                 break;
+            }
 
             i = typeMetaData.IndexOf('{', i);
-
             if (i == -1 || i >= endIndex)
+            {
                 break;
+            }
 
             i++;
         }
@@ -100,12 +99,10 @@ public class TypeMetaDataDecoder
 
         return result;
     }
+
     #endregion
-
     #region Decode struct\object schema
-
     private static readonly string structFieldsExtractPatter = @"(?<=\[).+?(?=\])";
-
     private static readonly Regex structFieldsExtractRegex = new(structFieldsExtractPatter, RegexOptions.Compiled);
 
     public List<StructFieldInformation> DecodeStructFieldsSchema(string textSchema)
@@ -114,13 +111,11 @@ public class TypeMetaDataDecoder
         foreach (Match match in structFieldsExtractRegex.Matches(textSchema))
         {
             var items = match.Value.Split('-');
-
-            fields.Add(
-                new StructFieldInformation
-                {
-                    FieldName = items[0],
-                    FieldTypeName = items[1]
-                });
+            fields.Add(new StructFieldInformation
+            {
+                FieldName = items[0],
+                FieldTypeName = items[1]
+            });
         }
 
         return fields;
@@ -136,6 +131,5 @@ public class TypeMetaDataDecoder
 
         return result.ToString();
     }
-
     #endregion
 }

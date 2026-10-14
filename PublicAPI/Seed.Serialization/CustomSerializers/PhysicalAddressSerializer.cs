@@ -1,4 +1,4 @@
-﻿using System.Net.NetworkInformation;
+using System.Net.NetworkInformation;
 
 namespace Seed.Serialization.CustomSerializers;
 
@@ -8,7 +8,10 @@ public class PhysicalAddressSerializer : ICustomClassSerializer
 
     public string TypeName => "Seed::Core::IO::Network::PhysicalAddress";
 
-    public Type[] DependableTypes => new Type[] { typeof(byte[]) };
+    public Type[] DependableTypes => new Type[]
+    {
+        typeof(byte[])
+    };
 
     /// <summary>
     /// Reconstructs the mapped value using statically dispatched calls to the session serializer.
@@ -22,9 +25,7 @@ public class PhysicalAddressSerializer : ICustomClassSerializer
         object sizeDynamic = size;
         serializer.Deserialize(ref sizeDynamic, serializationStream);
         size = (UInt64)sizeDynamic;
-
-        var dataBuffer = new byte[(int) size];
-
+        var dataBuffer = new byte[(int)size];
         serializationStream.ReadExactly(dataBuffer);
 
         return new PhysicalAddress(dataBuffer);
@@ -39,9 +40,7 @@ public class PhysicalAddressSerializer : ICustomClassSerializer
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         byte[] dataBuffer = (data as PhysicalAddress)!.GetAddressBytes();
-
-        serializer.Serialize((UInt64) dataBuffer.Length, serializationStream);
-
+        serializer.Serialize((UInt64)dataBuffer.Length, serializationStream);
         serializationStream.Write(dataBuffer);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Seed.RTTI.Record.Object;
+namespace Seed.RTTI.Record.Object;
 
 /// <summary>
 /// A base RTTI method record class
@@ -8,7 +8,10 @@ public unsafe class RttiStaticMethodRecord : IRttiIterableObject<RttiStaticMetho
 {
     internal RttiIterator<RttiStaticMethodRecord>? it;
 
-    StaticMethodMetaData* GetRecord() { return (StaticMethodMetaData*)it!.item; }
+    StaticMethodMetaData* GetRecord()
+    {
+        return (StaticMethodMetaData*)it!.item;
+    }
 
     /// <summary>
     /// Constructor
@@ -45,6 +48,7 @@ public unsafe class RttiStaticMethodRecord : IRttiIterableObject<RttiStaticMetho
         if (GetRecord() != null)
         {
             var collectionBase = (Collection*)((byte*)GetRecord() + GetRecord()->MethodArgsOffset);
+
             return RttiArgumentRecord.CreateCollection(collectionBase, it!.isValidCxxTypeId, it!.imageBase);
         }
         else

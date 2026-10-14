@@ -1,4 +1,4 @@
-﻿using Seed.RTTI.Record;
+using Seed.RTTI.Record;
 
 namespace Seed.Serialization;
 

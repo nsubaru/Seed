@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +9,6 @@ public partial class SeedSerializerFactory
     private void AddAssociableCollectionSer<T>(ref StringBuilder code, TypeRecord _)
     {
         code.AppendLine($"SerializeImpl((ulong)data.Count, stream);");
-
         code.AppendLine($"foreach (var item in data){{");
         code.AppendLine($"SerializeImpl(item, stream);}}");
     }
@@ -18,9 +17,7 @@ public partial class SeedSerializerFactory
     {
         code.AppendLine($"UInt64 count = 0;");
         code.AppendLine($"count = DeserializeImpl(count, stream);");
-
         code.AppendLine($"data = new {GetFriendlyTypeName(typeof(T))}();");
-
         code.AppendLine($"for (UInt64 i = 0; i < count; i++){{");
         code.AppendLine($"var item = new KeyValuePair<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}, {GetFriendlyTypeName(typeof(T).GetGenericArguments().Skip(1).First())} >();");
         code.AppendLine($"item = DeserializeImpl(item, stream);");

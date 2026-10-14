@@ -1,0 +1,42 @@
+root = true
+
+[Lib/Seed.MinCore/*.{h,cpp}]
+charset = utf-16le
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+[Lib/Seed.RTTI/*.{h,cpp}]
+charset = utf-16le
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+[API/Seed.Starter/*.{h,cpp}]
+charset = utf-16le
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+[*.cs]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+csharp_new_line_before_open_brace = all
+csharp_preserve_single_line_blocks = false
+csharp_preserve_single_line_statements = false
+csharp_prefer_braces = true:suggestion
+
+[*.ps1]
+charset = utf-8
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true

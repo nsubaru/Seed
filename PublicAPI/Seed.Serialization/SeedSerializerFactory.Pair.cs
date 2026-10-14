@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,7 +20,6 @@ public partial class SeedSerializerFactory
         code.AppendLine($"key = DeserializeImpl(key, stream);");
         code.AppendLine($"var value = data.Value;");
         code.AppendLine($"value = DeserializeImpl(value, stream);");
-
         code.AppendLine($"data = new {GetFriendlyTypeName(typeof(T))}(key, value);");
     }
 }

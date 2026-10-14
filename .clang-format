@@ -1,0 +1,67 @@
+BasedOnStyle: Microsoft
+Language: Cpp
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: false
+  AfterEnum: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterFunction: false
+  AfterNamespace: true
+  AfterExternBlock: true
+  AfterControlStatement: Always
+  AfterCaseLabel: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeWhile: false
+  BeforeLambdaBody: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: true
+NamespaceIndentation: All
+AccessModifierOffset: -4
+ColumnLimit: 0
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
+InsertBraces: true
+BinPackParameters: OnePerLine
+AllowAllParametersOfDeclarationOnNextLine: false
+AlignAfterOpenBracket: BlockIndent
+IndentPPDirectives: None
+IndentGotoLabels: false
+IndentCaseLabels: true
+IndentCaseBlocks: false
+ReflowComments: Never
+SortIncludes: Never
+SortUsingDeclarations: Never
+FixNamespaceComments: false
+SeparateDefinitionBlocks: Always
+PointerAlignment: Left
+ReferenceAlignment: Left
+SpaceAfterTemplateKeyword: false
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterFunctionDeclarationName: false
+  AfterFunctionDefinitionName: false
+  AfterForeachMacros: true
+  AfterIfMacros: true
+  BeforeNonEmptyParentheses: false
+StatementMacros:
+  - RefCountClassOutsideHeader
+  - RefCountClassOutside
+  - RefCountClass
+  - CttiClassRecord
+  - StructCttiDef
+  - EnumCttiDefinition

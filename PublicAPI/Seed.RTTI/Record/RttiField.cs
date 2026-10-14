@@ -1,4 +1,4 @@
-﻿using Seed.Core.RTTI;
+using Seed.Core.RTTI;
 using System.Collections;
 
 namespace Seed.RTTI.Record;
@@ -11,7 +11,10 @@ public unsafe class RttiField : IRttiIterableObject<RttiField>
 {
     internal RttiIterator<RttiField>? it;
 
-    FieldMetaData* GetRecord() { return (FieldMetaData*)it!.item; }
+    FieldMetaData* GetRecord()
+    {
+        return (FieldMetaData*)it!.item;
+    }
 
     /// <summary>
     /// Constructor
@@ -68,7 +71,7 @@ public unsafe class RttiField : IRttiIterableObject<RttiField>
     /// <summary>
     /// Field name, for enum item it is integer value
     /// </summary>
-    public string FieldName => Marshal.PtrToStringAuto((IntPtr) GetRecord()->FieldName.Text) ?? string.Empty;
+    public string FieldName => Marshal.PtrToStringAuto((IntPtr)GetRecord()->FieldName.Text) ?? string.Empty;
 
     /// <summary>
     /// Receiving the field record with type name
@@ -76,12 +79,9 @@ public unsafe class RttiField : IRttiIterableObject<RttiField>
     /// <returns>Record with type name</returns>
     internal string GetTypeName()
     {
-        var pTypeName = (TextMetaData*)(((Byte*)GetRecord()) +
-            ((SizeT)Marshal.OffsetOf<FieldMetaData>("FieldName").ToInt64()) +
-            ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) +
-            (GetRecord()->FieldName.Size * sizeof(Char)));
+        var pTypeName = (TextMetaData*)(((Byte*)GetRecord()) + ((SizeT)Marshal.OffsetOf<FieldMetaData>("FieldName").ToInt64()) + ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) + (GetRecord()->FieldName.Size * sizeof(Char)));
 
-        return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
+        return Marshal.PtrToStringAuto((IntPtr)pTypeName->Text) ?? string.Empty;
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public unsafe class RttiField : IRttiIterableObject<RttiField>
     public string TypeName => GetTypeName();
 
     // The offset is relative to the field payload, after the collection item's header.
-    internal Collection* GetAttributesCollectionBase() => (Collection*) ((byte*)GetRecord() + sizeof(ItemBase) + GetRecord()->OffsetToAttributesList);
+    internal Collection* GetAttributesCollectionBase() => (Collection*)((byte*)GetRecord() + sizeof(ItemBase) + GetRecord()->OffsetToAttributesList);
 
     /// <summary>
     /// Attributes list

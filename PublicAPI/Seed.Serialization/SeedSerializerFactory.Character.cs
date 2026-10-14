@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,30 +15,35 @@ public partial class SeedSerializerFactory
                     code.AppendLine("var val = (byte)data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));");
                 }
+
                 break;
             case Constants.Types.UChar:
                 {
                     code.AppendLine("var val = (char)data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));");
                 }
+
                 break;
             case Constants.Types.U8Char:
                 {
                     code.AppendLine("var val = (byte)data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));");
                 }
+
                 break;
             case Constants.Types.U16Char:
                 {
                     code.AppendLine("var val = (char)data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));");
                 }
+
                 break;
             case Constants.Types.U32Char:
                 {
                     code.AppendLine("var val = (UInt32)data;");
                     code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(int));");
                 }
+
                 break;
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeName} ' and type class ' {typeName} ' not implemented");
@@ -55,6 +60,7 @@ public partial class SeedSerializerFactory
                     code.AppendLine("stream.Read(buffer);");
                     code.AppendLine("data = buffer[0];");
                 }
+
                 break;
             case Constants.Types.UChar:
                 {
@@ -62,6 +68,7 @@ public partial class SeedSerializerFactory
                     code.AppendLine("stream.Read(buffer);");
                     code.AppendLine("data = BitConverter.ToChar(buffer);");
                 }
+
                 break;
             case Constants.Types.U8Char:
                 {
@@ -69,6 +76,7 @@ public partial class SeedSerializerFactory
                     code.AppendLine("stream.Read(buffer);");
                     code.AppendLine("data = buffer[0];");
                 }
+
                 break;
             case Constants.Types.U16Char:
                 {
@@ -76,6 +84,7 @@ public partial class SeedSerializerFactory
                     code.AppendLine("stream.Read(buffer);");
                     code.AppendLine("data = BitConverter.ToChar(buffer);");
                 }
+
                 break;
             case Constants.Types.U32Char:
                 {
@@ -83,6 +92,7 @@ public partial class SeedSerializerFactory
                     code.AppendLine("stream.Read(buffer);");
                     code.AppendLine("data = BitConverter.ToUInt32(buffer);");
                 }
+
                 break;
             default:
                 throw new NotImplementedException($"Deserialization of type  ' {typeName} ' and type class ' {typeName} ' not implemented");

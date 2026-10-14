@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Seed.RTTI;
 using Seed.Serialization;
 using Seed.RTTI.Record;
@@ -10,7 +10,6 @@ using System.Diagnostics.Contracts;
 using Seed.Core.RTTI;
 using LanguageExt;
 using System.Linq.Expressions;
-using Windows.UI.ViewManagement;
 
 namespace Seed.CTTI;
 
@@ -22,24 +21,22 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
     private readonly RTTISection rttiSection;
     private readonly SeedSerializerFactory serializerFactory;
     private ISeedSerializer? serializerImplementation;
-    private ISeedSerializer seedSerializer => serializerImplementation
-        ?? throw new ObjectDisposedException(nameof(SeedBinarySerializer));
+
+    private ISeedSerializer seedSerializer => serializerImplementation ?? throw new ObjectDisposedException(nameof(SeedBinarySerializer));
+
     private readonly Dictionary<RttiTypeRecord, Type> mappingScheme = new();
     private readonly Dictionary<Type, RttiTypeRecord> reverseMappingSchema = new();
-
     private readonly ILogger<SeedBinarySerializer>? logger;
-
     #region Caches for delegates
     private readonly Dictionary<Type, Delegate> serMethodDelegateCache = new Dictionary<Type, Delegate>();
     private readonly Dictionary<Type, Delegate> derMethodDelegateCache = new Dictionary<Type, Delegate>();
     private readonly Dictionary<Type, Delegate> createObjectDelegateCache = new Dictionary<Type, Delegate>();
     #endregion
-
     #region Additional caches
     private readonly Dictionary<Guid, RttiTypeRecord> rttiTypeLookup;
     private static readonly ConcurrentDictionary<Type, Func<object>> objectFactoryCache = new();
-    #endregion
 
+    #endregion
     /// <summary>
     /// Creates the serializer and native-to-CLR dispatch caches for the supplied RTTI.
     /// </summary>
@@ -48,46 +45,20 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
     /// <param name="logger">Serializer logger</param>
     /// <param name="seedSerializerFactory">Serializer implementation factory logger</param>
     /// <param name="seedSerializerImplLogger">Serializer implementation logger</param>
-    public SeedBinarySerializer(
-        RTTISection rttiSection, 
-        IServiceProvider serviceProvider,
-        ILogger<SeedBinarySerializer>? logger = null, 
-        ILogger<SeedSerializerFactory>? seedSerializerFactory = null,
-        ILogger<ISeedSerializer>? seedSerializerImplLogger = null)
+    public SeedBinarySerializer(RTTISection rttiSection, IServiceProvider serviceProvider, ILogger<SeedBinarySerializer>? logger = null, ILogger<SeedSerializerFactory>? seedSerializerFactory = null, ILogger<ISeedSerializer>? seedSerializerImplLogger = null)
     {
         this.rttiSection = rttiSection;
         this.logger = logger;
-
         logger?.LogInformation("Create serializer factory");
         serializerFactory = new SeedSerializerFactory(rttiSection, serviceProvider, seedSerializerFactory, seedSerializerImplLogger);
-
         logger?.LogInformation("Retrieve serializer implementation");
         try
         {
             serializerImplementation = serializerFactory.GetSeedSerializer();
-
             logger?.LogInformation("Load supported types from serializer implementation");
-
-
-            mappingScheme = seedSerializer
-                .GetSupportedTypes()
-                .OrderBy(x => x.RttiType.TypeClass)
-                .ThenBy(x => x.RttiType.TypeName)
-                .ToDictionary(x => x.RttiType, x => x.ClrType);
-
-            reverseMappingSchema = mappingScheme
-                .OrderBy(x => x.Key.TypeClass)
-                .ThenBy(x => x.Key.TypeName)
-                .GroupBy(x => x.Value)
-                .Select(g => g.First())
-                .ToDictionary(x => x.Value, x => x.Key);
-
-            rttiTypeLookup = rttiSection.AllRegisteredTypes
-                .OrderBy(x => x.TypeClass)
-                .ThenBy(x => x.TypeName)
-                .GroupBy(x => x.FullTypeId.Id)
-                .Select(g => g.First())
-                .ToDictionary(x => x.FullTypeId.Id, x => x);
+            mappingScheme = seedSerializer.GetSupportedTypes().OrderBy(x => x.RttiType.TypeClass).ThenBy(x => x.RttiType.TypeName).ToDictionary(x => x.RttiType, x => x.ClrType);
+            reverseMappingSchema = mappingScheme.OrderBy(x => x.Key.TypeClass).ThenBy(x => x.Key.TypeName).GroupBy(x => x.Value).Select(g => g.First()).ToDictionary(x => x.Value, x => x.Key);
+            rttiTypeLookup = rttiSection.AllRegisteredTypes.OrderBy(x => x.TypeClass).ThenBy(x => x.TypeName).GroupBy(x => x.FullTypeId.Id).Select(g => g.First()).ToDictionary(x => x.FullTypeId.Id, x => x);
         }
         catch
         {
@@ -120,21 +91,17 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         }
 
         var graphType = graph.GetType();
-
         logger?.LogInformation("Start serializing Seed type {0} with CLR type {1}", targetType?.TypeName ?? "null", graph.GetType().FullName);
-
         Type? type = null;
         var fullTypeId = new UniversalTypeIdentifier();
-
         if (targetType != null)
         {
             if (!mappingScheme.TryGetValue(targetType, out var mappedType))
             {
                 logger?.LogError("Serialize failed. Unknown type");
-
                 throw new ArgumentException("Unknown type");
             }
-            
+
             if (mappedType == graphType)
             {
                 fullTypeId = targetType.FullTypeId;
@@ -143,7 +110,6 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
             else
             {
                 logger?.LogError("Serialize failed. Unknown type");
-
                 throw new InvalidCastException();
             }
         }
@@ -155,23 +121,18 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         else
         {
             logger?.LogError("Serialize failed. Unknown type");
-
             throw new InvalidCastException();
         }
 
         logger?.LogDebug("Call serializer implementation for serialize full type id");
-
         seedSerializer.Serialize(fullTypeId, serializationStream);
-
         if (!rttiTypeLookup.TryGetValue(fullTypeId.Id, out RttiTypeRecord? record))
         {
             logger?.LogError("Serialize failed. Unknown full type id {fullTypeId}", fullTypeId);
-
             throw new ArgumentException("Unknown full type ID");
         }
 
         logger?.LogDebug("Call serializer implementation for serialize data");
-
         try
         {
             if (record.TypeClass == ETypes.FixedArray || record.TypeClass == ETypes.FixedCollection)
@@ -183,7 +144,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
                 InvokeSerializeMethod(serializationStream, record, type!, graph, nameof(SerializeImpl));
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger?.LogError("Serialization failed with exception: {0}", ex.ToString());
             throw;
@@ -208,8 +169,10 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
                     {
                         throw new InvalidCastException();
                     }
+
                     break;
                 }
+
             case ETypes.FixedArray:
                 {
                     var mirror = graph as Array;
@@ -217,6 +180,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
                     {
                         throw new InvalidCastException();
                     }
+
                     break;
                 }
         }
@@ -229,13 +193,13 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         var factory = objectFactoryCache.GetOrAdd(type, static type =>
         {
             var ctor = type.GetConstructor(Type.EmptyTypes);
-
             if (ctor == null)
             {
                 throw new InvalidOperationException($"Type {type} has no default constructor");
             }
 
             var newExpr = Expression.New(ctor);
+
             return Expression.Lambda<Func<object>>(Expression.Convert(newExpr, typeof(object))).Compile();
         });
 
@@ -246,11 +210,10 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
     {
         var factory = objectFactoryCache.GetOrAdd(type, static type =>
         {
-            var elementType = type.GetElementType()
-                ?? throw new InvalidOperationException($"Type {type} is not an array type");
-
+            var elementType = type.GetElementType() ?? throw new InvalidOperationException($"Type {type} is not an array type");
             var length = Expression.Constant(1);
             var newArrayExpr = Expression.NewArrayBounds(elementType, length);
+
             return Expression.Lambda<Func<object>>(newArrayExpr).Compile();
         });
 
@@ -269,28 +232,22 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
          * - type don't have empty ctor -> use RuntimeHelpers.GetUninitializedObject
          * - general case               -> use Activator.CreateInstance
          */
-
         Type type = typeof(T);
-
         object? obj = null;
-
         if (type == typeof(String))
         {
             obj = string.Empty;
 
-            return (T) obj!;
+            return (T)obj!;
         }
-        
+
         if (type == typeof(DynamicObject))
         {
             UniversalTypeIdentifier Id = new();
             object dynId = Id;
-
             var streamStartPos = serializationStream.Position;
             seedSerializer.Deserialize(ref dynId, serializationStream);
-
             Id = (UniversalTypeIdentifier)dynId;
-
             if (!rttiTypeLookup.TryGetValue(Id.Id, out RttiTypeRecord? record))
             {
                 throw new InvalidCastException();
@@ -302,13 +259,11 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
             }
 
             var innerObj = InvokeCreateObject(serializationStream, targetType);
-
             obj = new DynamicObject(innerObj!, Id.Id);
-
             // We need to restore position since CreateObject should create dummy object and we should not read any data from stream
             serializationStream.Position = streamStartPos;
 
-            return (T) obj!;
+            return (T)obj!;
         }
 
         if (typeof(T).GetConstructor(Type.EmptyTypes) != null)
@@ -336,15 +291,14 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
             }
         }
 
-        return (T) obj!;
+        return (T)obj!;
     }
-    #endregion
 
+    #endregion
     #region Deserialize
     public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null, Type? targetCsType = null)
     {
         logger?.LogInformation("Start deserialization Seed type {0} with CLR type {1}", targetType?.TypeName ?? "null", targetCsType?.FullName ?? "null");
-
         if (targetType != null && !mappingScheme.ContainsKey(targetType))
         {
             throw new ArgumentException("Unknown type");
@@ -353,16 +307,12 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         Type? type = targetCsType;
         var fullTypeId = new UniversalTypeIdentifier();
         object dynFullTypeId = fullTypeId;
-
         seedSerializer.Deserialize(ref dynFullTypeId, serializationStream);
         fullTypeId = (UniversalTypeIdentifier)dynFullTypeId;
-
         logger?.LogInformation("Deserialize type full type id: {0}", fullTypeId.Id.ToString());
-
         if (!rttiTypeLookup.TryGetValue(fullTypeId.Id, out var actualTargetType))
         {
             logger?.LogError("Deserialize failed. Unknown type");
-
             throw new InvalidCastException();
         }
 
@@ -371,7 +321,6 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
             if (targetType != null && targetType.FullTypeId != fullTypeId)
             {
                 logger?.LogError("Deserialize failed. Type mismatch");
-
                 throw new InvalidCastException();
             }
 
@@ -380,21 +329,17 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         else
         {
             logger?.LogError("Deserialize failed. Unknown type");
-
             throw new InvalidCastException();
         }
 
         object? retObj = null;
-
-        if (!rttiTypeLookup.TryGetValue(fullTypeId.Id, out RttiTypeRecord? record)) 
+        if (!rttiTypeLookup.TryGetValue(fullTypeId.Id, out RttiTypeRecord? record))
         {
             logger?.LogError("Deserialize failed. Unknown full type id {fullTypeId}", fullTypeId);
-
             throw new ArgumentException("Unknown full type ID");
         }
 
         logger?.LogDebug("Call deserializer implementation");
-
         try
         {
             switch (record.TypeClass)
@@ -403,11 +348,9 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
                 case ETypes.FixedCollection:
                     retObj = InvokeDeserializeMethod(serializationStream, record, type, nameof(DeserializeArrayImpl));
                     break;
-
                 case ETypes.Custom:
                     retObj = InvokeDeserializeMethod(serializationStream, record, type, nameof(DeserializeCustomImpl));
                     break;
-
                 default:
                     retObj = InvokeDeserializeMethod(serializationStream, record, type, nameof(DeserializeImpl));
                     break;
@@ -437,9 +380,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
     private T DeserializeCustomImpl<T>(Stream serializationStream, RttiTypeRecord _)
     {
         T beginObj = CreateObject<T>(serializationStream);
-
         Contract.Assume(beginObj != null);
-
         object data = beginObj;
         seedSerializer.Deserialize(ref data, serializationStream);
 
@@ -454,12 +395,9 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
             ETypes.FixedArray => Array.CreateInstance(typeof(T).GetElementType()!, (int)record.ArrayItemsCount),
             _ => throw new InvalidCastException(),
         };
-
         T obj = (T)beginObj!;
         object data = obj;
-
         seedSerializer.Deserialize(ref data, serializationStream);
-
         switch (record.TypeClass)
         {
             case ETypes.FixedCollection:
@@ -469,8 +407,10 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
                     {
                         throw new InvalidCastException();
                     }
+
                     break;
                 }
+
             case ETypes.FixedArray:
                 {
                     var mirror = obj as Array;
@@ -478,23 +418,25 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
                     {
                         throw new InvalidCastException();
                     }
+
                     break;
                 }
         }
 
         return (T)data;
     }
-    #endregion
 
+    #endregion
     #region Cached invokes
     private object InvokeDeserializeMethod(Stream serializationStream, RttiTypeRecord rttiType, Type type, string methodName)
     {
         if (!derMethodDelegateCache.TryGetValue(type, out var methodDelegate))
         {
             var methodInfo = GetType().GetRuntimeMethods().First(x => x.Name == methodName).MakeGenericMethod(type);
-
-            var delegateType = typeof(Func<,,>)!.MakeGenericType(new Type[] { typeof(Stream), typeof(RttiTypeRecord), type });
-
+            var delegateType = typeof(Func<,,>)!.MakeGenericType(new Type[]
+            {
+                typeof(Stream), typeof(RttiTypeRecord), type
+            });
             methodDelegate = methodInfo.CreateDelegate(delegateType, this);
             derMethodDelegateCache[type] = methodDelegate;
         }
@@ -507,9 +449,10 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         if (!serMethodDelegateCache.TryGetValue(type, out var methodDelegate))
         {
             var methodInfo = GetType().GetRuntimeMethods().First(x => x.Name == methodName).MakeGenericMethod(type);
-
-            var delegateType = typeof(Action<,,>)!.MakeGenericType(new Type[] { typeof(Stream), type, typeof(RttiTypeRecord) });
-
+            var delegateType = typeof(Action<,,>)!.MakeGenericType(new Type[]
+            {
+                typeof(Stream), type, typeof(RttiTypeRecord)
+            });
             methodDelegate = methodInfo.CreateDelegate(delegateType, this);
             serMethodDelegateCache[type] = methodDelegate;
         }
@@ -522,17 +465,18 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         if (!createObjectDelegateCache.TryGetValue(type, out var methodDelegate))
         {
             var methodInfo = GetType().GetRuntimeMethods().First(x => x.Name == nameof(CreateObject)).MakeGenericMethod(type);
-
-            var delegateType = typeof(Func<,>)!.MakeGenericType(new Type[] { typeof(Stream), type });
-
+            var delegateType = typeof(Func<,>)!.MakeGenericType(new Type[]
+            {
+                typeof(Stream), type
+            });
             methodDelegate = methodInfo.CreateDelegate(delegateType, this);
             createObjectDelegateCache[type] = methodDelegate;
         }
 
         return methodDelegate.DynamicInvoke(serializationStream)!;
     }
-    #endregion
 
+    #endregion
     #region Interface methods
     object ISeedBinarySerializer.Deserialize(Stream serializationStream, RttiTypeRecord? targetType)
     {
@@ -541,7 +485,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
 
     public T Deserialize<T>(Stream serializationStream, RttiTypeRecord? targetType = null)
     {
-        return (T) Deserialize(serializationStream, targetType, typeof(T));
+        return (T)Deserialize(serializationStream, targetType, typeof(T));
     }
 
     public IEnumerable<TypeRecord> SerializableTypes => seedSerializer.GetSupportedTypes();

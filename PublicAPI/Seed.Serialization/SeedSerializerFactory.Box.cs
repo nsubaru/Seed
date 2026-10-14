@@ -1,4 +1,4 @@
-﻿using LanguageExt;
+using LanguageExt;
 using LanguageExt.UnsafeValueAccess;
 using Microsoft.CodeAnalysis;
 using Seed.Core.Functionality;
@@ -13,32 +13,36 @@ public partial class SeedSerializerFactory
         if (record.TemplateTypeName == Constants.Types.Either)
         {
             var leftType = GetTypeWithOffset(0, record);
-
             if (leftType == null)
+            {
                 return null;
+            }
 
             var rightType = GetTypeWithOffset(1, record);
-
             if (rightType == null)
+            {
                 return null;
+            }
 
             return typeof(Either<,>).MakeGenericType(leftType, rightType);
         }
         else if (record.TemplateTypeName == Constants.Types.Optional)
         {
             var innerType = GetTypeWithOffset(0, record);
-
             if (innerType == null)
+            {
                 return null;
+            }
 
             return typeof(Optional<>).MakeGenericType(innerType);
         }
         else
         {
             var innerType = GetTypeWithOffset(0, record);
-
             if (innerType == null)
+            {
                 return null;
+            }
 
             return typeof(Lazy<>).MakeGenericType(innerType);
         }
@@ -70,17 +74,12 @@ public partial class SeedSerializerFactory
         {
             code.AppendLine($"UInt64 idx = 0ul;");
             code.AppendLine($"idx = DeserializeImpl(idx, stream);");
-
             code.AppendLine($"if (idx == 0) {{");
-
             code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().First())}>();");
             code.AppendLine($"data = {GetFriendlyTypeName(typeof(T))}.Left(DeserializeImpl(value, stream));");
-
             code.AppendLine($"}} else {{");
-
             code.AppendLine($"var value = CreateObject<{GetFriendlyTypeName(typeof(T).GetGenericArguments().Last())}>();");
             code.AppendLine($"data = {GetFriendlyTypeName(typeof(T))}.Right(DeserializeImpl(value, stream));");
-
             code.AppendLine($"}}");
         }
         else if (record.RttiType.TemplateTypeName == Constants.Types.Optional)

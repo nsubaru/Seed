@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,8 +12,10 @@ public partial class SeedSerializerFactory
         foreach (var item in record.Fields)
         {
             var type = GetTypeWithOffset(types.Count, record);
-
-            if (type == null) return null;
+            if (type == null)
+            {
+                return null;
+            }
 
             types.Add(type);
         }
@@ -24,13 +26,11 @@ public partial class SeedSerializerFactory
         }
         else
         {
-            var tp = typeof(ValueTuple)
-                .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-                .First(mth => mth.Name == "Create" && mth.GetParameters().Length == types.Count)
-                .ReturnType
-                .GetGenericTypeDefinition();
-
-            if (tp == null) return null;
+            var tp = typeof(ValueTuple).GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public).First(mth => mth.Name == "Create" && mth.GetParameters().Length == types.Count).ReturnType.GetGenericTypeDefinition();
+            if (tp == null)
+            {
+                return null;
+            }
 
             return tp.MakeGenericType(types.ToArray());
         }
@@ -41,13 +41,14 @@ public partial class SeedSerializerFactory
         switch (typeRecord.TypeName)
         {
             case "Seed::Core::Containers::Tuple":
-            {
-                foreach (var field in typeof(T).GetFields().Select(x => x.Name))
                 {
-                    code.AppendLine($"this.SerializeImpl(data.{field}, stream); ");
+                    foreach (var field in typeof(T).GetFields().Select(x => x.Name))
+                    {
+                        code.AppendLine($"this.SerializeImpl(data.{field}, stream); ");
+                    }
+
+                    break;
                 }
-                break;
-            }
 
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeRecord.TypeName} ' and type class ' {typeRecord.TypeName} ' not implemented");
@@ -66,6 +67,7 @@ public partial class SeedSerializerFactory
                         code.AppendLine($"data.{field} = this.DeserializeImpl({field}, stream);");
                     }
                 }
+
                 break;
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeRecord.TypeName} ' and type class ' {typeRecord.TypeName} ' not implemented");

@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{2ca7c157-9424-5f28-9efd-68a68abad6fd}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Base.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Certificate.Serialization.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.CertificateStore.Service.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.CertificateStore.Service.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.ClientStream.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.ClientStream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Handshake.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.Instantiations.cpp">
+      <DebugInformationFormat>None</DebugInformationFormat>
+    </ClCompile>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.KeySchedule.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Record.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.RecordProtection.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.Signatures.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Signatures.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.Tests.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Tests.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.CertificateValidation.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.CertificateValidation.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.ServerIdentity.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.ServerIdentity.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Tests.IdentityFixtures.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Tests.Identity.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.Tests.Identity.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.ServerStream.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.ServerStream.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Tls.Tests.Server.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Tls.Tests.Server.cpp" />
+  </ItemGroup>
+</Project>

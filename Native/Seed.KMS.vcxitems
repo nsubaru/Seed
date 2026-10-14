@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{e75bbc97-87b2-572c-8c64-b690cec7bd0f}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <PropertyGroup>
+    <HasSharedItems>true</HasSharedItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Server.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Server.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.h" />
+  </ItemGroup>
+</Project>

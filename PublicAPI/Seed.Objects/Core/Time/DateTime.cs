@@ -1,4 +1,4 @@
-﻿using LanguageExt.TypeClasses;
+using LanguageExt.TypeClasses;
 using Seed.CTTI;
 
 namespace Seed.Core.Time;
@@ -10,13 +10,26 @@ namespace Seed.Core.Time;
 public struct DateTime
 {
     [SerializableStructField]
-    public ID Ticks { get; set; }
+    public ID Ticks
+    {
+        get;
+        set;
+    }
 
-    public DateTime() { Ticks = 0; }
+    public DateTime()
+    {
+        Ticks = 0;
+    }
 
-    public DateTime(ID ticks) { Ticks = ticks; }
+    public DateTime(ID ticks)
+    {
+        Ticks = ticks;
+    }
 
-    public DateTime(System.DateTime dateTime) { Ticks = dateTime != System.DateTime.MinValue ? (ulong)dateTime.ToFileTime() : 0; }
+    public DateTime(System.DateTime dateTime)
+    {
+        Ticks = dateTime != System.DateTime.MinValue ? (ulong)dateTime.ToFileTime() : 0;
+    }
 
     public static implicit operator System.DateTime(DateTime time)
     {
@@ -43,13 +56,26 @@ public struct DateTime
 public struct TimeSpan
 {
     [SerializableStructField]
-    public ID Ticks { get; set; }
+    public ID Ticks
+    {
+        get;
+        set;
+    }
 
-    public TimeSpan() { Ticks = 0; }
+    public TimeSpan()
+    {
+        Ticks = 0;
+    }
 
-    public TimeSpan(ID ticks) { Ticks = ticks; }
+    public TimeSpan(ID ticks)
+    {
+        Ticks = ticks;
+    }
 
-    public TimeSpan(System.TimeSpan dateTime) { Ticks = (ulong)dateTime.Ticks; }
+    public TimeSpan(System.TimeSpan dateTime)
+    {
+        Ticks = (ulong)dateTime.Ticks;
+    }
 
     public static implicit operator System.TimeSpan(TimeSpan time)
     {

@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net10.0-windows10.0.26100.0</TargetFramework><LangVersion>latest</LangVersion><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><AllowUnsafeBlocks>true</AllowUnsafeBlocks></PropertyGroup><ItemGroup><PackageReference Include="LanguageExt.Core" Version="4.4.9" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.3.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
+        <PackageReference Include="morelinq" Version="4.4.0" />
+        <PackageReference Include="System.CodeDom" Version="10.0.9" />
+    <ProjectReference Include="..\Seed.Objects\Seed.Objects.csproj"/><ProjectReference Include="..\Seed.RTTI\Seed.RTTI.csproj"/><ProjectReference Include="..\Seed.CTTI\Seed.CTTI.csproj"/><ProjectReference Include="..\Seed.Shared\Seed.Shared.csproj"/></ItemGroup></Project>

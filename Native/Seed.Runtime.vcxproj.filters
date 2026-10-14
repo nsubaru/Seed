@@ -1,0 +1,4365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{84DDBE56-DC58-52BE-944A-157E4586102C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\BTLDR">
+      <UniqueIdentifier>{2F3ABC35-26BC-5CF0-86BB-42D2D7F8FEFB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Base">
+      <UniqueIdentifier>{F9AD525A-D3E7-50FC-9894-A5286927CF52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Base\TypeTraits">
+      <UniqueIdentifier>{C4AF849D-DAC8-59AC-A6A5-5B31685D693E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\CTTI">
+      <UniqueIdentifier>{E976B00C-12DF-5E47-B3D0-C88C94862B57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\CTTI\Concepts">
+      <UniqueIdentifier>{E6EED906-10E1-5EB4-9E2E-6ADC92E015E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\CTTI\TypeName">
+      <UniqueIdentifier>{D1965ACD-10C1-53DC-AC50-20E5CBBA2521}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\CTTI\TypeTraits">
+      <UniqueIdentifier>{F7C1533F-C5C6-5FFB-8607-029F0CF9BE6A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\CTTI\TypeTraits\Object">
+      <UniqueIdentifier>{1877105B-1FF7-54CC-B6F8-AC21BE10794B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Configurations">
+      <UniqueIdentifier>{6E4B4F97-4EAB-5786-A4B5-66755119D58A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Containers">
+      <UniqueIdentifier>{11533BFC-FF8F-57E5-BC30-2DE00A54D136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Containers\Concurrency">
+      <UniqueIdentifier>{DBBE520E-510C-58EC-ACED-3C2759017B6D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Containers\LINQ">
+      <UniqueIdentifier>{89084311-0A0A-5CC9-AF81-0458A22E33E7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Containers\NonConcurrency">
+      <UniqueIdentifier>{AF773B1E-AD03-5FE6-AE9C-776F0A186C5A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\CoreLog">
+      <UniqueIdentifier>{8637A571-3065-5335-A513-6B08A11C1EE4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Coroutine">
+      <UniqueIdentifier>{6ABBE849-A479-51BE-8773-82BBFA8C81A4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Crypt">
+      <UniqueIdentifier>{F25DDD1A-311C-5196-AFF8-0ABFAD7365C4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Crypt\Algorithms">
+      <UniqueIdentifier>{5D1E37B7-9CA6-52FD-944A-B7CC7F1112AA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Crypt\Hash">
+      <UniqueIdentifier>{C597C96F-14EA-5C1E-9BD0-52CC4A46D6B4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\DependencyInjection">
+      <UniqueIdentifier>{9152BD3E-01E5-5DAE-89CA-443F3ADEA2DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Events">
+      <UniqueIdentifier>{27EE6004-7F2A-5A9B-BD80-026F3D094414}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Exceptions">
+      <UniqueIdentifier>{0911E886-1999-53FE-A8D4-77949EB6AED7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Exceptions\ABI">
+      <UniqueIdentifier>{80167238-6187-5655-A524-4E949FBF710D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Exceptions\GenericExceptions">
+      <UniqueIdentifier>{5C3096B4-9616-59A5-9AAA-17FDA4067D16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Functionality">
+      <UniqueIdentifier>{A44B5E8C-9253-5B1D-A0FF-6042056AC565}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO">
+      <UniqueIdentifier>{10922040-F339-5DE7-A179-C23DFDE30244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\Exceptions">
+      <UniqueIdentifier>{78977FFA-A474-5118-A2B7-DD8FB07DB82F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\FS">
+      <UniqueIdentifier>{905EE8F8-61DA-5388-96BD-F8943F7F9935}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\FS\Exceptions">
+      <UniqueIdentifier>{D6856056-B726-51DD-A2AD-5D23D45611E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\FS\Writers">
+      <UniqueIdentifier>{835ABD32-5970-53B5-B78A-6F0B497062CC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\IPC">
+      <UniqueIdentifier>{92817D46-F278-5646-862B-A610549BE0BF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\IPC\Alpc">
+      <UniqueIdentifier>{D635A1E9-BACC-54E7-B340-B207024CF752}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\IPC\Alpc\Shared">
+      <UniqueIdentifier>{2453CFE4-6AF8-53BD-98B6-22278EB11CB3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\IPC\Pipes">
+      <UniqueIdentifier>{5A7AE56D-1D85-5DBF-B29F-34FC683DA50B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\IPC\Pipes\Exceptions">
+      <UniqueIdentifier>{A91AFA39-115D-5FDE-9784-4AC86E23158F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\Network">
+      <UniqueIdentifier>{6F972CC6-3A8F-5FB5-A915-C02AA747F7E2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\Network\Async">
+      <UniqueIdentifier>{A72AED56-65BD-5FFC-931B-F7E98C5D17AF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\Network\Async\Tcp">
+      <UniqueIdentifier>{7AC19D19-79E8-5C6D-A96F-C63D4F664637}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\Network\Async\Udp">
+      <UniqueIdentifier>{3F1EC812-64C7-5EA4-8475-6400C9A83C3D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\Network\Exceptions">
+      <UniqueIdentifier>{AF5E0557-DC0F-50E9-960E-6D4F65506B21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IO\Network\Overlapped">
+      <UniqueIdentifier>{5ADC9130-7491-5A69-A2FE-7EA1377F0E13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Json">
+      <UniqueIdentifier>{F5DA6233-AB69-51DE-805D-2B061F3D3A85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Logger">
+      <UniqueIdentifier>{3A42CB7C-6F7B-53F8-BA61-FCD67D0B1F6A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Math">
+      <UniqueIdentifier>{761949EA-80E5-553B-8CAE-685BDC9782D4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Memory">
+      <UniqueIdentifier>{209AE6AD-B37A-57F7-9149-E30EB264EE09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI">
+      <UniqueIdentifier>{81155B32-C006-5B93-A64B-0C6AB11D8928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Base">
+      <UniqueIdentifier>{0B4AD0D9-1235-5DBB-ACB6-2409FC9A8028}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Cxx">
+      <UniqueIdentifier>{9BDE4440-99EC-557E-9035-5DDC83C6D44B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Dynamic">
+      <UniqueIdentifier>{C3F5D276-9456-5A5B-9844-31594859B834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Exceptions">
+      <UniqueIdentifier>{A09299D0-8F4B-5578-9DF6-960AA0111FAC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Expandable">
+      <UniqueIdentifier>{0C680E61-5641-5B86-BAEA-DE0F733EC1F0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\MetaData">
+      <UniqueIdentifier>{0C8E00D6-6CB0-5042-9839-FA8F17A42619}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\MetaData\Object">
+      <UniqueIdentifier>{0266DC26-CFAF-595F-9BA9-7B55F5F607DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\ObjectProperties">
+      <UniqueIdentifier>{49813158-2828-5847-B8C0-354CA5212AE8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Record">
+      <UniqueIdentifier>{CD59E9CF-3CE0-5B05-906D-31D34D81270C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Record\Object">
+      <UniqueIdentifier>{C0FF1504-51EC-5355-BE15-31F3E7FE3819}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Section">
+      <UniqueIdentifier>{A9AE4AA1-089B-591F-BF27-6F3A47527CC1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\RTTI\Traveler">
+      <UniqueIdentifier>{30BC67DC-5CFF-5CEC-BBE0-39D4D96B7340}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Resources">
+      <UniqueIdentifier>{1DE700E2-2723-5CBA-B15F-7B1D30A6D595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Security">
+      <UniqueIdentifier>{16FF9D27-DC87-5FFB-A19C-43B3AECE8A61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Security\SecurityDescriptor">
+      <UniqueIdentifier>{89F3AE09-9CA2-525E-898C-C66BA46612FB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Serialization">
+      <UniqueIdentifier>{BDF62FBA-DC5A-5F1F-8AFF-761F6163DA73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Serialization\Custom">
+      <UniqueIdentifier>{2DFCDEC7-C952-5C93-BD7F-1119B685B0CE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services">
+      <UniqueIdentifier>{DD54394C-80FA-5362-B842-D45A5D9FF361}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\BufferManager">
+      <UniqueIdentifier>{6D27B296-9C67-5E62-894A-97B901E2A112}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Cache">
+      <UniqueIdentifier>{DA3622C6-D4CE-572B-9561-7540A72E5E86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Dhcp">
+      <UniqueIdentifier>{6B5EC320-AB49-5937-8489-C7D408B384C4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Diagnostic">
+      <UniqueIdentifier>{912D8371-6DEB-5644-AD06-27193EEAAE4E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Dns">
+      <UniqueIdentifier>{B478EF12-E7E7-5DF9-B4C4-851CB3BB88C5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Dns\Exceptions">
+      <UniqueIdentifier>{A8DA30DC-D8E6-56A4-9C34-C6D05B2A5318}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\FileWatcher">
+      <UniqueIdentifier>{E36F6523-AD52-52A9-B164-5DF419048882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Interfaces">
+      <UniqueIdentifier>{D0FDD725-9FB5-5CA7-A3B4-6BCF1E61A6E5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Logger">
+      <UniqueIdentifier>{75B477E2-340C-5BF5-9C9C-0E76AB29E01F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Network">
+      <UniqueIdentifier>{0382CFB5-65C6-570F-8AB3-550A1B445A8E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\Pool">
+      <UniqueIdentifier>{586277DD-2CED-5156-B494-6D67DC49B9DA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Services\RuntimeManagementService">
+      <UniqueIdentifier>{A76E2F68-D4FB-5D73-8B99-9F95801AF28F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing">
+      <UniqueIdentifier>{75946F43-435F-5F1D-96D1-70FB6BCC55D3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Asserts">
+      <UniqueIdentifier>{08ADEC6B-2074-53C5-A7A1-B1F82360741B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Asserts\Exceptions">
+      <UniqueIdentifier>{0A8857EE-FCD1-5F92-B86E-C9671042C3E9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests">
+      <UniqueIdentifier>{420342FC-0740-502D-97DB-5D95010A03F7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Bits">
+      <UniqueIdentifier>{090D31B8-67FB-5168-A4CB-B79DDD38A39C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\CTTI">
+      <UniqueIdentifier>{49F32298-6174-5FC3-9818-A588F252D9F5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Configurations">
+      <UniqueIdentifier>{F7177186-F9F1-5713-835C-D4B06887E6C9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Containers">
+      <UniqueIdentifier>{B8217602-F41A-50D1-8E74-8C8681A1A5BB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Containers\LINQ">
+      <UniqueIdentifier>{5AD4F15B-8950-5C5A-AF98-46081C2E93E5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Crypt">
+      <UniqueIdentifier>{56828341-572A-56DE-8EBE-F0EAC6B1883A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Crypt\RsaSigner">
+      <UniqueIdentifier>{9465D8EE-9B57-5ACE-92F3-883579808117}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\DI">
+      <UniqueIdentifier>{F52DCCE5-61EC-5FDC-BB38-9B796D64F528}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Events">
+      <UniqueIdentifier>{005F621C-DB63-57EE-8A5C-BE5CE2C4A53C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Exceptions">
+      <UniqueIdentifier>{2CF8054A-57DF-5ED0-B3AD-0D9FA04ED5F1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Exceptions\ToString">
+      <UniqueIdentifier>{0431C578-ECBD-5699-A300-C65C2C589621}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Functionality">
+      <UniqueIdentifier>{FCA83420-A076-5FF7-9AC5-6B0D9BA09262}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO">
+      <UniqueIdentifier>{A490C199-3A52-5089-9732-FA875AABB3A9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO\Alpc">
+      <UniqueIdentifier>{CF674D0A-4644-530D-911B-C9510240F6CE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO\FS">
+      <UniqueIdentifier>{A02518AD-A779-5920-B332-FC5E222FEAB5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO\FS\API">
+      <UniqueIdentifier>{9E648A74-E10C-5237-A0B8-D8C3B160956C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO\NamedPipe">
+      <UniqueIdentifier>{B3BB6CA6-DA01-5080-BE53-97673DC30FD9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO\NamedPipe\Async">
+      <UniqueIdentifier>{4EED7B0F-4995-5E2A-B688-79825FD4CE0F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO\NamedPipe\Sync">
+      <UniqueIdentifier>{3864AD6E-5DA0-5480-8435-6084122CAD91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\IO\Network">
+      <UniqueIdentifier>{3D6D29FE-9D1F-5FE8-813B-C070DD85C5A2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Memory">
+      <UniqueIdentifier>{E46F149C-F7E3-5BC0-AB6D-50F419270F63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\MultiThreading">
+      <UniqueIdentifier>{46F530CE-FAEA-5627-B0A2-C2D879E944A9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Reflection">
+      <UniqueIdentifier>{83B9B857-B84B-523E-9858-B29AAEE6FA95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Security">
+      <UniqueIdentifier>{21F7F241-F3A5-5598-9EC9-6D811B52938D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Serialization">
+      <UniqueIdentifier>{5F2671EC-6E52-5220-A8DA-68986F447D01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Serializer">
+      <UniqueIdentifier>{3E9A9BA5-8447-58CB-8B62-7E3ABB9A481C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Serializer\Serialization">
+      <UniqueIdentifier>{13358BA5-E5F9-5B14-A23E-9A09A0F53C09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Serializer\TypeMetadataRecord">
+      <UniqueIdentifier>{75E7BEC4-D765-5549-BBE8-9F042507CCC7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Serializer\Update">
+      <UniqueIdentifier>{6BE6B724-EC43-5833-82A5-3EBAB52C9D5F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Services">
+      <UniqueIdentifier>{E5BD8F69-B200-5D92-8184-B75762E479EF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Services\Dhcp">
+      <UniqueIdentifier>{3597EB53-A137-5565-A306-94731BDB86D5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Services\Pool">
+      <UniqueIdentifier>{FBEB64A2-1FD9-572A-AB02-AA7282C27DC3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Testing">
+      <UniqueIdentifier>{3A35B83E-2EEA-5BBB-9F7D-5732A98B498B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Text">
+      <UniqueIdentifier>{71C27069-1080-58C6-B6C9-AC77DEB936E1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Text\String">
+      <UniqueIdentifier>{21340010-D34D-5FB5-AE82-15408ED8B8CF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Text\UniString">
+      <UniqueIdentifier>{70AFC3DA-A372-5636-9F97-9318357CCC5C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Testing\Tests\Time">
+      <UniqueIdentifier>{E205871F-74D6-5A69-ACC0-1617D738597E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Text">
+      <UniqueIdentifier>{4766DF03-F853-5B57-81F4-63FC7BA738F8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Text\String">
+      <UniqueIdentifier>{5ADC1DD0-A4E7-5443-A736-3520503924CA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Text\StringView">
+      <UniqueIdentifier>{BBBDC7C4-ED20-579E-B637-26DD3AA1FF96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading">
+      <UniqueIdentifier>{8323E2CD-6B1F-5861-8358-BF50F5F786BB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Async">
+      <UniqueIdentifier>{608CC629-430A-58E8-B5BF-C2A94F0185E0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Containers">
+      <UniqueIdentifier>{476586D5-185D-5805-AC85-D175145E4370}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Containers\Concurrency">
+      <UniqueIdentifier>{11DE108F-6ADA-5103-AE92-ABA368883D1E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Containers\LINQ">
+      <UniqueIdentifier>{46656779-162F-5C32-89FB-AAA474AFCBD2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Containers\NonConcurrency">
+      <UniqueIdentifier>{0A79E5C1-D143-54A8-B6E1-1BF8FCCF19C1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Exceptions">
+      <UniqueIdentifier>{C6DE90C4-A669-508D-B1AF-9CE1112FB16F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Extensions">
+      <UniqueIdentifier>{38225122-2108-5755-975B-A8B02ABA9A55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Functionality">
+      <UniqueIdentifier>{889770BD-8ACE-5708-8290-407735E9F1FE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\TLS">
+      <UniqueIdentifier>{CA074135-59D3-5A19-A1FF-C661B5FB7497}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\Threadables">
+      <UniqueIdentifier>{3496FED7-5481-53B9-A851-69CC63A1F4A8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Threading\UnifiedThreadPool">
+      <UniqueIdentifier>{B99408A7-A3F3-56F1-A232-396FB472EBAF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Time">
+      <UniqueIdentifier>{5A0265A9-6C03-5B6E-8242-317C52AC3BF8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utils">
+      <UniqueIdentifier>{0C54998C-73ED-5D43-BAD6-F7AC5E27A602}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP">
+      <UniqueIdentifier>{2D39F982-1279-56FD-90EF-B88B4F334F10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTTP\Tests">
+      <UniqueIdentifier>{6588825D-1849-5394-B11F-06B9C8DC066B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KMS">
+      <UniqueIdentifier>{528D7CF4-D837-5DC8-A4B1-20F6E9D8B447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RTTI">
+      <UniqueIdentifier>{82D82A52-7C07-5AC9-9A16-B0526BFFD992}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Runtime">
+      <UniqueIdentifier>{1E6B94AE-BDC9-5526-B485-02781468EBAB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Runtime\HostConfigurations">
+      <UniqueIdentifier>{D0E9E972-DB87-535E-824F-66DA07E12A84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{6DFA3ED7-675D-5123-9194-254C047C5D23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TLS">
+      <UniqueIdentifier>{89A3AC0E-1C38-5D88-994F-CFEF5C188E3C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TLS\Tests">
+      <UniqueIdentifier>{8F1010F4-5C22-53D3-AE5B-BB5FB8E64467}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Atomic.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.BitOperations.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Bytes.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Character.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Comparing.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Concepts.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.CStr.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Definitions.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.EnumBitFlags.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.EnumFlags.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.IClonable.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.IDisposable.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Interlocked.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Internals.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Math.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.NTAPI.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.RefCountT.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.SmartStaticAssert.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Swap.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeName.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Types.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Await.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Base.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Comparing.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.CVModificators.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Decay.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Function.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Invocable.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Lambda.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.LogicOperations.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.NumericConverter.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Pack.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Pointer.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Reference.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.ReferenceWraper.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.TypeClasification.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.TypeConvertions.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.TypeTraits.Utils.h">
+      <Filter>Core\Base\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.Utils.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.MinCore\Seed.Core.Base.UUID.h">
+      <Filter>Core\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Seed.RTTI\typeinfo.h">
+      <Filter>RTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.API.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Btldr.CTTI.h">
+      <Filter>Core\BTLDR</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.BTLDR.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Btldr.Internals.h">
+      <Filter>Core\BTLDR</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Configurations.Base.h">
+      <Filter>Core\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Configurations.CTTI.h">
+      <Filter>Core\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Configurations.CurrentConfigurationsData.h">
+      <Filter>Core\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Configurations.Data.h">
+      <Filter>Core\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Configurations.h">
+      <Filter>Core\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Configurations.VirtualConfigurationsData.h">
+      <Filter>Core\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.ConstString.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.AtomicSmartPtr.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Base.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.BitMap.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.BitMapImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concepts.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.Array.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.ArrayImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.Base.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.Dictionary.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.DictionaryImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.DynamicQueue.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.DynamicQueueImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.DynamicStack.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.DynamicStackImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.FixedArray.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.FixedArrayImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.FixedQueue.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.FixedQueueImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.FixedStack.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.FixedStackImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.List.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.ListImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.Map.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Concurrency.MapImpl.h">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Delegate.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.DelegateImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Generator.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Internals.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Lazy.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.LazyImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.LINQ.Base.h">
+      <Filter>Core\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.LINQ.Collection.h">
+      <Filter>Core\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.LINQ.Collection.Impl.h">
+      <Filter>Core\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.LINQ.h">
+      <Filter>Core\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.LINQ.Materialization.h">
+      <Filter>Core\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.LINQ.Specializations.h">
+      <Filter>Core\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Markers.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.AlignedBlob.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.AlignedBlobImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.Array.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.ArrayImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.Base.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.Blob.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.BlobImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.Dictionary.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.DictionaryImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.DynamicQueue.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.DynamicQueueImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.DynamicStack.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.DynamicStackImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.FixedArray.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.FixedArrayImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.FixedQueue.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.FixedQueueImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.FixedStack.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.FixedStackImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.List.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.ListImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.Map.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.NonConcurrency.MapImpl.h">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Pair.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.PairImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Queryable.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.SmartPtr.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.SmartPtrImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.Tuple.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.TupleImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.TypeTraits.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniqueAlignArrayPtr.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniqueAlignArrayPtrImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniqueAlignPtr.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniqueAlignPtrImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniqueArrayPtr.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniqueArrayPtrImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniquePtr.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.UniquePtrImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.WeakPtr.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Containers.WeakPtrImpl.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CoreLog.h">
+      <Filter>Core\CoreLog</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CoreLog.Managed.h">
+      <Filter>Core\CoreLog</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Coroutine.h">
+      <Filter>Core\Coroutine</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.AES256.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Algorithms.AESGCM.h">
+      <Filter>Core\Crypt\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Algorithms.Base.h">
+      <Filter>Core\Crypt\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Algorithms.h">
+      <Filter>Core\Crypt\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Algorithms.HKDF.h">
+      <Filter>Core\Crypt\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Algorithms.HMAC.h">
+      <Filter>Core\Crypt\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Algorithms.TOTP.h">
+      <Filter>Core\Crypt\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Asn1.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Base.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.BigInteger.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Crc.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.ECDSA.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Hash.Base.h">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Hash.h">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Hash.SHA1.h">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Hash.SHA256.h">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Hash.SHA3.h">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Hash.SHA512.h">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Memory.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.MlKem.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.MlKem.Standalone.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Pem.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.Random.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.RSA.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.X25519.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.X509.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.Base.h">
+      <Filter>Core\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.Concepts.Base.h">
+      <Filter>Core\CTTI\Concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.Concepts.h">
+      <Filter>Core\CTTI\Concepts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.EType.h">
+      <Filter>Core\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.h">
+      <Filter>Core\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.Minimal.h">
+      <Filter>Core\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeName.Base.h">
+      <Filter>Core\CTTI\TypeName</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeName.Full.h">
+      <Filter>Core\CTTI\TypeName</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeName.h">
+      <Filter>Core\CTTI\TypeName</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeName.Minimal.h">
+      <Filter>Core\CTTI\TypeName</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Attributes.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Base.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.BaseTypes.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Collections.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Containers.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.CustomType.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Enum.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Function.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.HeapMetaData.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Minimal.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.Base.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.ClassRecord.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.Interfaces.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.Method.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.Property.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.Raii.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.RemoteDefinition.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Object.StaticMethod.h">
+      <Filter>Core\CTTI\TypeTraits\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Primitives.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.String.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.Struct.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.StructDefinitionBuild.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.CTTI.TypeTraits.StructRemoteDefinition.h">
+      <Filter>Core\CTTI\TypeTraits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.DependencyInjection.Base.h">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.DependencyInjection.DI.h">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.DependencyInjection.DiCircularDependencyException.h">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.DependencyInjection.DIRegisterServiceException.h">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.DependencyInjection.DIResolveException.h">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.DependencyInjection.h">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.DependencyInjection.IDI.h">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.EntryPoint.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Events.Base.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Events.EventAlreadyExistException.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Events.EventNotFoundException.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Events.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Events.LocalEvent.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Base.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Defines.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Internal.API.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Internal.HighLevelStructs.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Internal.Inlines.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Internal.Tls.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Internal.Types.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Public.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.SEH.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.ABI.Types.h">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.AlreadyExistException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.BadCast.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.BadException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.BadPureCall.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.Base.h">
+      <Filter>Core\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.DivideByZero.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.EmptyQueueException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.EmptyStackException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.EndNodeNotReferenceable.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.FullQueueException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.FullStackException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.h">
+      <Filter>Core\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.IndexOutOfRange.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.IntegerOverflowException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.InternalError.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.InterruptException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.InvalidArgumentException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.InvalidFormatException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.InvalidHandleUsage.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.InvalidOperationException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.InvalidTypeException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.KeyAlreadyExistException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.NotFoundException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.NotImplementedException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.NtException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.NtStatusCode.h">
+      <Filter>Core\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.NullPointException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.OutOfMemory.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.StackOverflowException.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Exceptions.StringToLong.h">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.Base.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.Either.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.Optional.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.Result.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.TypeTraits.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.UnionType.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Functionality.Utility.h">
+      <Filter>Core\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Init.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Base.h">
+      <Filter>Core\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Exceptions.Base.h">
+      <Filter>Core\IO\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Exceptions.h">
+      <Filter>Core\IO\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Exceptions.OperationCanceledException.h">
+      <Filter>Core\IO\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Exceptions.OperationTimeoutException.h">
+      <Filter>Core\IO\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.AsyncFile.h">
+      <Filter>Core\IO\FS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Base.h">
+      <Filter>Core\IO\FS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Directory.h">
+      <Filter>Core\IO\FS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.Base.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.CantReadMoreDataThanInExistInFileException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.CantWriteDataAfterEofException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.DirectoryIsNotFileException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.FileBusyException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.FileExistException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.FileIsCorruptedException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.FileModeNoSupportedByOperationException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.FileNameInvalidException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.FileNotExistException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.FsIoException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.GenericFileException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Exceptions.PathNotFoundException.h">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.File.h">
+      <Filter>Core\IO\FS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.h">
+      <Filter>Core\IO\FS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Writers.Base.h">
+      <Filter>Core\IO\FS\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Writers.CsvWriter.h">
+      <Filter>Core\IO\FS\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Writers.h">
+      <Filter>Core\IO\FS\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.FS.Writers.TextWriter.h">
+      <Filter>Core\IO\FS\Writers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.h">
+      <Filter>Core\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Alpc.Base.h">
+      <Filter>Core\IO\IPC\Alpc</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.ALPC.h">
+      <Filter>Core\IO\IPC</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Alpc.Shared.Base.h">
+      <Filter>Core\IO\IPC\Alpc\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Alpc.Shared.h">
+      <Filter>Core\IO\IPC\Alpc\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Alpc.Shared.Section.h">
+      <Filter>Core\IO\IPC\Alpc\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Base.h">
+      <Filter>Core\IO\IPC</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.h">
+      <Filter>Core\IO\IPC</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.AsyncNamedPipe.h">
+      <Filter>Core\IO\IPC\Pipes</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.Base.h">
+      <Filter>Core\IO\IPC\Pipes</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.Exceptions.Base.h">
+      <Filter>Core\IO\IPC\Pipes\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.Exceptions.h">
+      <Filter>Core\IO\IPC\Pipes\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.Exceptions.InvalidPipeException.h">
+      <Filter>Core\IO\IPC\Pipes\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.Exceptions.InvalidPipeModeException.h">
+      <Filter>Core\IO\IPC\Pipes\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.Exceptions.PipeBrokenException.h">
+      <Filter>Core\IO\IPC\Pipes\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.h">
+      <Filter>Core\IO\IPC\Pipes</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.IPC.Pipes.NamedPipe.h">
+      <Filter>Core\IO\IPC\Pipes</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Async.Base.h">
+      <Filter>Core\IO\Network\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.AsyncTcp.h">
+      <Filter>Core\IO\Network\Async\Tcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.AsyncUdp.h">
+      <Filter>Core\IO\Network\Async\Udp</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Base.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.ConnectionInfoResponce.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.AddressAlreadyBusyException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.Base.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.ConnectionAlreadyCloseException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.ConnectionClosedBadException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.InvalidAddressException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.InvalidAddressFamilyException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.InvalidDriverArgumentException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.InvalidNetworkFamilyException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.InvalidStateException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.IOTimeoutException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.NetworkUnreachableException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Exceptions.SocketException.h">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Icmp.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.NetworkAddress.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Overlapped.Base.h">
+      <Filter>Core\IO\Network\Overlapped</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Overlapped.h">
+      <Filter>Core\IO\Network\Overlapped</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Overlapped.Tcp.h">
+      <Filter>Core\IO\Network\Overlapped</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Overlapped.Udp.h">
+      <Filter>Core\IO\Network\Overlapped</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.PhysicalAddress.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Raw.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.RawHelper.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Serializers.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.TCP.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.UDP.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.Utils.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Json.Base.h">
+      <Filter>Core\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Json.Containers.h">
+      <Filter>Core\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Json.CustomSerialization.h">
+      <Filter>Core\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Json.Dynamic.h">
+      <Filter>Core\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Json.h">
+      <Filter>Core\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Json.JsonConverter.h">
+      <Filter>Core\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Logger.Base.h">
+      <Filter>Core\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Logger.h">
+      <Filter>Core\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Logger.StaticLogger.h">
+      <Filter>Core\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Logger.StaticLogger.Managed.h">
+      <Filter>Core\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Manage.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Math.h">
+      <Filter>Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Math.Internal.h">
+      <Filter>Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Math.SafeInt.h">
+      <Filter>Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.Allocators.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.AtomicDataSize.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.Base.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.DataSize.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.ImageResidency.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.Loging.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.Prefetch.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Memory.Unsafe.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Resources.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.Base.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.Exceptions.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.MetaData.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.Record.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.RttiInternals.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.Types.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Base.UniversalTypeIdentifier.h">
+      <Filter>Core\RTTI\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Cxx.ExceptionsData.h">
+      <Filter>Core\RTTI\Cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Cxx.Internals.h">
+      <Filter>Core\RTTI\Cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Cxx.Public.h">
+      <Filter>Core\RTTI\Cxx</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Dynamic.Base.h">
+      <Filter>Core\RTTI\Dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Dynamic.h">
+      <Filter>Core\RTTI\Dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Dynamic.Serialization.h">
+      <Filter>Core\RTTI\Dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Dynamic.Type.h">
+      <Filter>Core\RTTI\Dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.Base.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicCallException.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicCallInvalidArgumentsCount.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicCallInvalidArgumentType.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicCallInvalidTargetException.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicCtorCallException.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicCtorCallInvalidArgumentsCount.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicCtorCallInvalidArgumentType.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicInterfaceCastInvalidTargetException.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicStaticCallException.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicStaticCallInvalidArgumentsCount.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.DynamicStaticCallInvalidArgumentType.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.GenericRttiException.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Exceptions.InvalidRttiTypeException.h">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Expandable.Base.h">
+      <Filter>Core\RTTI\Expandable</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Expandable.h">
+      <Filter>Core\RTTI\Expandable</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Expandable.Type.h">
+      <Filter>Core\RTTI\Expandable</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.h">
+      <Filter>Core\RTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Base.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Box.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Collection.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Custom.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Dynamic.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Enumeration.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Function.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Object.Base.h">
+      <Filter>Core\RTTI\MetaData\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Object.Constructor.h">
+      <Filter>Core\RTTI\MetaData\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Object.h">
+      <Filter>Core\RTTI\MetaData\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Object.Interface.h">
+      <Filter>Core\RTTI\MetaData\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Object.Method.h">
+      <Filter>Core\RTTI\MetaData\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Object.Property.h">
+      <Filter>Core\RTTI\MetaData\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Object.StaticMethod.h">
+      <Filter>Core\RTTI\MetaData\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Primitives.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Struct.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.MetaData.Tuple.h">
+      <Filter>Core\RTTI\MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.ObjectProperties.Base.h">
+      <Filter>Core\RTTI\ObjectProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.ObjectProperties.h">
+      <Filter>Core\RTTI\ObjectProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.ObjectProperties.Serialization.h">
+      <Filter>Core\RTTI\ObjectProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.ObjectProperties.Type.h">
+      <Filter>Core\RTTI\ObjectProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Base.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.Argument.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.Base.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.Constructor.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.Interface.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.Method.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.Property.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Object.StaticMethod.h">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.RttiAttribute.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.RttiField.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.RttiICollection.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.RttiIterator.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.RttiTypeRecord.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Record.Seriliazation.h">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.RegisteredClass.h">
+      <Filter>Core\RTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Section.Base.h">
+      <Filter>Core\RTTI\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Section.h">
+      <Filter>Core\RTTI\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Section.Serialization.h">
+      <Filter>Core\RTTI\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Section.Type.h">
+      <Filter>Core\RTTI\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Traveler.Base.h">
+      <Filter>Core\RTTI\Traveler</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Traveler.h">
+      <Filter>Core\RTTI\Traveler</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.Traveler.Type.h">
+      <Filter>Core\RTTI\Traveler</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.RTTI.TypeRecord.h">
+      <Filter>Core\RTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.Base.h">
+      <Filter>Core\Security</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.DefaultSecurityDescriptor.h">
+      <Filter>Core\Security</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.h">
+      <Filter>Core\Security</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.SecurityDescriptor.Ace.h">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.SecurityDescriptor.Base.h">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.SecurityDescriptor.h">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.SecurityDescriptor.MandatoryLabel.h">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.SecurityDescriptor.ProcessRights.h">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.SecurityDescriptor.Sid.h">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Security.SecurityDescriptor.WellKnownSids.h">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Base.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Box.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Collection.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Composits.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Containers.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Core.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Custom.Base.h">
+      <Filter>Core\Serialization\Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Custom.h">
+      <Filter>Core\Serialization\Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Custom.Totp.h">
+      <Filter>Core\Serialization\Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Either.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.EmptyAttributeValue.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.IntegratedTypes.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.MetaData.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Optional.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.PublicAPI.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.String.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Struct.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.TypeMetaRecord.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.UnionType.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Serialization.Utf8String.h">
+      <Filter>Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.AutomaticSelfTesting.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Base.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.BootupServicesManager.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.BufferManager.Base.h">
+      <Filter>Core\Services\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.BufferManager.h">
+      <Filter>Core\Services\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.BufferManager.Manager.h">
+      <Filter>Core\Services\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.BufferManager.ManagerBuilder.h">
+      <Filter>Core\Services\BufferManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Cache.Base.h">
+      <Filter>Core\Services\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Cache.DynamicCircularBuffer.h">
+      <Filter>Core\Services\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Cache.h">
+      <Filter>Core\Services\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Cache.IInMemoryCacheProviderService.h">
+      <Filter>Core\Services\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Cache.NonPersistent.h">
+      <Filter>Core\Services\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Cache.Service.h">
+      <Filter>Core\Services\Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dhcp.Base.h">
+      <Filter>Core\Services\Dhcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dhcp.DhcpService.h">
+      <Filter>Core\Services\Dhcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Diagnostic.Base.h">
+      <Filter>Core\Services\Diagnostic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Diagnostic.ContextBlockViewDiagnosticProvider.h">
+      <Filter>Core\Services\Diagnostic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Diagnostic.DepencyInjectionDiagnosticProvider.h">
+      <Filter>Core\Services\Diagnostic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Diagnostic.h">
+      <Filter>Core\Services\Diagnostic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Diagnostic.Service.h">
+      <Filter>Core\Services\Diagnostic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Diagnostic.ServicesThreadableContextDiagnosticProvider.h">
+      <Filter>Core\Services\Diagnostic</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Base.h">
+      <Filter>Core\Services\Dns</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.DnsClient.h">
+      <Filter>Core\Services\Dns</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.Base.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.DnsActionRefusedException.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.DnsFormatErrorException.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.DnsNameFormatErrorException.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.DnsNotImplementedException.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.DnsServerFailureException.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.DnsServersNotAvailableException.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.Exceptions.h">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dns.h">
+      <Filter>Core\Services\Dns</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.FileWatcher.Base.h">
+      <Filter>Core\Services\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.FileWatcher.h">
+      <Filter>Core\Services\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.FileWatcher.WatcherFactory.h">
+      <Filter>Core\Services\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.FileWatcher.WatcherObject.h">
+      <Filter>Core\Services\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.IAutomaticSelfTesting.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.IBootupServicesManager.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.IExecutableStatusManagementService.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.IInternalSensorsService.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.ILoggerFactoryService.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.ImageResidencyService.h">
+      <Filter>Core\Services\RuntimeManagementService</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.IRttiService.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.ISerializationService.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.ISystemThreadPoolService.h">
+      <Filter>Core\Services\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.LoggerFactory.Base.h">
+      <Filter>Core\Services\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.LoggerFactory.BaseServiceLogger.h">
+      <Filter>Core\Services\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.LoggerFactory.DynamicLogger.h">
+      <Filter>Core\Services\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.LoggerFactory.h">
+      <Filter>Core\Services\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Network.Base.h">
+      <Filter>Core\Services\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Network.h">
+      <Filter>Core\Services\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Network.NetworkInterfaceInformation.h">
+      <Filter>Core\Services\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Network.NetworkService.h">
+      <Filter>Core\Services\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Pool.Base.h">
+      <Filter>Core\Services\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Pool.h">
+      <Filter>Core\Services\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Pool.Pool.h">
+      <Filter>Core\Services\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Pool.PoolEntity.h">
+      <Filter>Core\Services\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Pool.PoolManager.h">
+      <Filter>Core\Services\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.RttiService.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.RuntimeManagementService.CPUInfo.h">
+      <Filter>Core\Services\RuntimeManagementService</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.RuntimeManagementService.h">
+      <Filter>Core\Services\RuntimeManagementService</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.SerializationService.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.ServicesThreadableContext.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.SystemThreadPoolService.h">
+      <Filter>Core\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Stage1.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Stage2.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Stop.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.String.Convertors.h">
+      <Filter>Core\Text\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.String.h">
+      <Filter>Core\Text\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.String.HexPart.h">
+      <Filter>Core\Text\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.String.LinqApi.h">
+      <Filter>Core\Text\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.String.Manipulation.h">
+      <Filter>Core\Text\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.String.TryParsePart.h">
+      <Filter>Core\Text\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.StringView.Convertors.h">
+      <Filter>Core\Text\StringView</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.StringView.h">
+      <Filter>Core\Text\StringView</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.StringView.LINQ.h">
+      <Filter>Core\Text\StringView</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing,Tests.Serializer.Serialization.CollectionTests.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing,Tests.Serializer.Update.CollectionTests.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertEqual.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertFalse.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertIsNotSame.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertIsSame.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertNotEqual.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertNoThrowException.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertNotNull.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertThrowException.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.AssertTrue.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.Base.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.Exceptions.AssertEqualException.h">
+      <Filter>Core\Testing\Asserts\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.Exceptions.AssertNotEqualException.h">
+      <Filter>Core\Testing\Asserts\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.Exceptions.AssertNotSameException.h">
+      <Filter>Core\Testing\Asserts\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.Exceptions.AssertSameException.h">
+      <Filter>Core\Testing\Asserts\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.Exceptions.Base.h">
+      <Filter>Core\Testing\Asserts\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.Exceptions.h">
+      <Filter>Core\Testing\Asserts\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Asserts.h">
+      <Filter>Core\Testing\Asserts</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Base.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Register.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Security.SecurityDescriptor.h">
+      <Filter>Core\Testing\Tests\Security</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Test.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.TestPackResult.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.TestResult.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Bits.h">
+      <Filter>Core\Testing\Tests\Bits</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.Array.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.BitMap.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.Blob.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.CTTI.Metadata.Contract.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.Dictionary.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.DynamicQueue.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.DynamicStack.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.FixedArray.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.FixedQueue.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.FixedStack.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.JsonSerialization.Contract.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.LINQ.AssociableCollection.h">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.LINQ.Containers.h">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.LINQ.Contract.h">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.LINQ.FixedContainers.h">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.LINQ.Materialization.Contract.h">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.List.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.Map.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.Queryable.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.SmartPtr.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.Tuple.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Containers.WeakPtr.h">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.AES256.h">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.Algorithms.h">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.Hashing.h">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.MlKem.h">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.Random.h">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.X509.h">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.CTTI.Enum.h">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.CTTI.Object.h">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.CTTI.ToTuple.h">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.CTTI.TypeName.h">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.DI.h">
+      <Filter>Core\Testing\Tests\DI</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Events.LocalEvent.h">
+      <Filter>Core\Testing\Tests\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Exceptions.ABI.h">
+      <Filter>Core\Testing\Tests\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Exceptions.ToString.h">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Functionality.Optional.h">
+      <Filter>Core\Testing\Tests\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Functionality.Result.h">
+      <Filter>Core\Testing\Tests\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Functionality.UnionType.h">
+      <Filter>Core\Testing\Tests\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.Alpc.h">
+      <Filter>Core\Testing\Tests\IO\Alpc</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.Exceptions.ToString.h">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.FS.AsyncFile.h">
+      <Filter>Core\Testing\Tests\IO\FS\API</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.FS.Exceptions.ToString.h">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.FS.FileObject.h">
+      <Filter>Core\Testing\Tests\IO\FS\API</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.FS.NamedPipe.Async.h">
+      <Filter>Core\Testing\Tests\IO\NamedPipe\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.FS.NamedPipe.Sync.h">
+      <Filter>Core\Testing\Tests\IO\NamedPipe\Sync</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.FS.QueryPath.h">
+      <Filter>Core\Testing\Tests\IO\FS\API</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.Network.Exceptions.ToString.h">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.Network.Overlapped.h">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.Network.Serializers.h">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.NetworkV4.h">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.NetworkV4Async.h">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.NetworkV6.Async.h">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.NetworkV6.h">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Memory.HeapOperations.h">
+      <Filter>Core\Testing\Tests\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Memory.ImageResidency.h">
+      <Filter>Core\Testing\Tests\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.AwaitEvent.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.AwaitSleep.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.AwaitTask.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.CancellationToken.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.Context.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.ProducerAndConsumer.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.SRWLock.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.MultiThreading.UnifiedThreadPool.h">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Reflection.Attributes.h">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Reflection.ExpandableObject.h">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Reflection.IntrospectionData.h">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Reflection.ObjectMethods.h">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Reflection.ObjectProperties.h">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Reflection.ObjectStaticMethods.h">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Reflection.Travel.h">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serialization.PrimitiveSerilize.h">
+      <Filter>Core\Testing\Tests\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Serialization.Box.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Serialization.CompositsTests.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Serialization.Dynamic.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Serialization.ObjectProperties.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Serialization.Optional.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Serialization.PrimitiveSerialize.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Serialization.Struct.h">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.TypeMetadataRecord.TypeMetaDataRecord.h">
+      <Filter>Core\Testing\Tests\Serializer\TypeMetadataRecord</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.Box.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.CompositsTests.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.Dynamic.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.ObjectProperties.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.Optional.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.PrimitiveSerialize.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.Struct.h">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.h">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Services.Pool.h">
+      <Filter>Core\Testing\Tests\Services\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Testing.TestDiscover.h">
+      <Filter>Core\Testing\Tests\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.Base32.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.Json.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.Path.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.PrintF.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.String.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.StringView.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.UniString.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.Utf8String.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Text.WPrintf.h">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Time.h">
+      <Filter>Core\Testing\Tests\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.TestSession.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.TestSuitesResult.h">
+      <Filter>Core\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Text.Base.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Text.Base32.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Text.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Text.Path.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Text.Tokenizer.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Text.UniString.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Text.Uri.h">
+      <Filter>Core\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Async.Awaitable.h">
+      <Filter>Core\Threading\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Async.Base.h">
+      <Filter>Core\Threading\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Async.ChainedTask.h">
+      <Filter>Core\Threading\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Async.Debug.h">
+      <Filter>Core\Threading\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Async.h">
+      <Filter>Core\Threading\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Async.Sleep.h">
+      <Filter>Core\Threading\Async</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Base.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.CachedEvent.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Callback.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.CancellationToken.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.AlignedBlob.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Base.h">
+      <Filter>Core\Threading\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Blob.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.Array.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.Base.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.Dictionary.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.DynamicQueue.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.DynamicStack.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.FixedArray.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.FixedQueue.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.FixedStack.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.List.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Concurrency.Map.h">
+      <Filter>Core\Threading\Containers\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.h">
+      <Filter>Core\Threading\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.LINQ.Base.h">
+      <Filter>Core\Threading\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.LINQ.h">
+      <Filter>Core\Threading\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.LINQ.ICollection.Impl.h">
+      <Filter>Core\Threading\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.LINQ.Terminals.Base.h">
+      <Filter>Core\Threading\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.LINQ.Terminals.Impl.h">
+      <Filter>Core\Threading\Containers\LINQ</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.Array.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.Base.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.Dictionary.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.DynamicQueue.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.DynamicStack.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.FixedArray.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.FixedQueue.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.FixedStack.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.List.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.NonConcurrency.Map.h">
+      <Filter>Core\Threading\Containers\NonConcurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Containers.Queryable.h">
+      <Filter>Core\Threading\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Context.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.DataFlowController.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Debug.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Exceptions.Base.h">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Exceptions.CancellationRequestedException.h">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Exceptions.DeadlockExpectedException.h">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Exceptions.h">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Exceptions.InvalidThreadException.h">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Exceptions.InvalidThreadObjException.h">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Exceptions.ThreadableAlreadyStartedException.h">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Extensions.Base.h">
+      <Filter>Core\Threading\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Extensions.h">
+      <Filter>Core\Threading\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Extensions.RttiMethodExtensions.h">
+      <Filter>Core\Threading\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Extensions.RttiStaticMethodExtensions.h">
+      <Filter>Core\Threading\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Functionality.Base.h">
+      <Filter>Core\Threading\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Functionality.h">
+      <Filter>Core\Threading\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Functionality.Result.h">
+      <Filter>Core\Threading\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.IAwaitable.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Internal.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.IOUtils.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.IThreadable.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.LockPrimitives.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Parallel.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.ScopedLock.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Stats.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.SynchronizeEvent.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.SystemThreadPool.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Task.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Thread.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.Base.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.Base.Internal.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableCalback.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableChainedTask.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableThread.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolAlpcTask.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolAsyncSleep.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolIoTask.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolIOverlapped.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolJob.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolScheduledEvent.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolScheduledTask.h">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.ThreadableStateControlHelper.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.TLS.Base.h">
+      <Filter>Core\Threading\TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.TLS.GlobalTLSBlock.h">
+      <Filter>Core\Threading\TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.TLS.h">
+      <Filter>Core\Threading\TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.Alpc.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.Base.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.IO.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.Job.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.Overlapped.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.Pool.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.PoolBuilder.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.ScheduledTask.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.ScheduledTaskBuilder.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.UnifiedThreadPool.ThreadPoolThreadContext.h">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Threading.WithIsolatedContext.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Time.AtomicTime.h">
+      <Filter>Core\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Time.Base.h">
+      <Filter>Core\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Time.CTTI.h">
+      <Filter>Core\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Time.h">
+      <Filter>Core\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Utf8String.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Utils.Base.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Utils.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Utils.SafeNtHandle.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Utils.TextUtils.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Configurations.Validation.h">
+      <Filter>Core\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Configurations.Validation.h">
+      <Filter>Core\Testing\Tests\Configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dhcp.LeaseMaintenance.h">
+      <Filter>Core\Services\Dhcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Services.Dhcp.Maintenance.h">
+      <Filter>Core\Testing\Tests\Services\Dhcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Services.Dhcp.LeaseTiming.h">
+      <Filter>Core\Services\Dhcp</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Crypt.RsaSigner.h">
+      <Filter>Core\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.RsaSigner.h">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Crypt.RsaSigner.Vectors.h">
+      <Filter>Core\Testing\Tests\Crypt\RsaSigner</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.IO.Network.ByteStream.h">
+      <Filter>Core\IO\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.IO.ByteStream.h">
+      <Filter>Core\Testing\Tests\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Testing.Cancellation.h">
+      <Filter>Core\Testing\Tests\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Http.Base.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Http.Client.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Http.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Http.Parser.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Http.Server.Service.h">
+      <Filter>HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Http.Testing.Certificates.h">
+      <Filter>HTTP\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Http.Tests.h">
+      <Filter>HTTP\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Base.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Certificate.Serialization.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.CertificateStore.Service.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.ClientStream.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Handshake.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.KeySchedule.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Record.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.RecordProtection.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Signatures.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Tests.h">
+      <Filter>TLS\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.CertificateValidation.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.ServerIdentity.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Tests.IdentityFixtures.h">
+      <Filter>TLS\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Tests.Identity.h">
+      <Filter>TLS\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.ServerStream.h">
+      <Filter>TLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Tls.Tests.Server.h">
+      <Filter>TLS\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.KMS.Server.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.KMS.Commands.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Runtime.Models.h">
+      <Filter>Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Runtime.HostConfigurations.h">
+      <Filter>Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.Runtime.HostConfigurations.Tests.h">
+      <Filter>Runtime\HostConfigurations</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\Lib\Seed.MinCore\Seed.Core.Base.Atomic.natvis">
+      <Filter>Core\Base</Filter>
+    </Natvis>
+    <Natvis Include="..\Lib\Seed.MinCore\Seed.Core.Base.RefCountT.natvis">
+      <Filter>Core\Base</Filter>
+    </Natvis>
+    <Natvis Include="..\Lib\Seed.MinCore\Seed.Core.Base.UUID.natvis">
+      <Filter>Core\Base</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.ConstString.natvis">
+      <Filter>Core\Text</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.AtomicSmartPtr.natvis">
+      <Filter>Core\Containers</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.Array.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.Dictionary.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.DynamicQueue.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.DynamicStack.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.FixedArray.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.FixedQueue.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.FixedStack.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.List.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Concurrency.Map.natvis">
+      <Filter>Core\Containers\Concurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Lazy.natvis">
+      <Filter>Core\Containers</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.AlignedBlob.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.Array.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.Blob.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.Dictionary.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.DynamicQueue.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.DynamicStack.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.FixedArray.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.FixedQueue.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.FixedStack.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.List.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.NonConcurrency.Map.natvis">
+      <Filter>Core\Containers\NonConcurrency</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Pair.natvis">
+      <Filter>Core\Containers</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Queryable.natvis">
+      <Filter>Core\Containers</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.SmartPtr.natvis">
+      <Filter>Core\Containers</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Containers.Tuple.natvis">
+      <Filter>Core\Containers</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.DependencyInjection.DIRegisterServiceException.natvis">
+      <Filter>Core\DependencyInjection</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.DependencyInjection.DIResolveException.natvis">
+      <Filter>Core\DependencyInjection</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Events.EventAlreadyExistException.natvis">
+      <Filter>Core\Events</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Events.EventNotFoundException.natvis">
+      <Filter>Core\Events</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.AlreadyExistException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.BadCast.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.BadException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.BadPureCall.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.DivideByZero.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.EmptyQueueException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.EmptyStackException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.EndNodeNotReferenceable.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.FullQueueException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.FullStackException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.IndexOutOfRange.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.IntegerOverflowException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.InternalError.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.InterruptException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.InvalidArgumentException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.InvalidFormatException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.InvalidHandleUsage.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.InvalidOperationException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.InvalidTypeException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.KeyAlreadyExistException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.natvis">
+      <Filter>Core\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.NotFoundException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.NotImplementedException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.NtException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.NtStatusCode.natvis">
+      <Filter>Core\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.NullPointException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.OutOfMemory.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.StackOverflowException.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Exceptions.StringToLong.natvis">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Functionality.Either.natvis">
+      <Filter>Core\Functionality</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Functionality.Optional.natvis">
+      <Filter>Core\Functionality</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Functionality.Result.natvis">
+      <Filter>Core\Functionality</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Functionality.UnionType.natvis">
+      <Filter>Core\Functionality</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Exceptions.Base.natvis">
+      <Filter>Core\IO\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Exceptions.OperationCancelledException.natvis">
+      <Filter>Core\IO\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Exceptions.OperationTimeoutException.natvis">
+      <Filter>Core\IO\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.CantReadMoreDataThanInExistInFileException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.CantWriteDataAfterEofException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.DirectoryIsNotFileException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.FileBusyException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.FileExistException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.FileIsCorruptedException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.FileModeNoSupportedByOperationException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.FileNameInvalidException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.FileNotExistException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.FsIoException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.GenericFileException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.FS.Exceptions.PathNotFindException.natvis">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.AddressAlreadyBusyException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.ConnectionAlreadyCloseException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.ConnectionClosedBadException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.InvalidAddressException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.InvalidAddressFamilyException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.InvalidDriverArgumentException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.InvalidNetworkFamilyException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.InvalidStateException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.IOTimeoutException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.IO.Network.Exceptions.SocketException.natvis">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Base.UniversalTypeIdentifier.natvis">
+      <Filter>Core\RTTI\Base</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicCallException.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicCallInvalidArgumentsCount.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicCallInvalidArgumentType.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicCallInvalidTargetException.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicCtorCallException.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicCtorCallInvalidArgumentsCount.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicCtorCallInvalidArgumentType.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicInterfaceCastInvalidTargetException.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicStaticCallException.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicStaticCallInvalidArgumentsCount.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.DynamicStaticCallInvalidArgumentType.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.GenericRttiException.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Exceptions.InvalidRttiTypeException.natvis">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.Object.Argument.natvis">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.Object.Constructor.natvis">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.Object.Interface.natvis">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.Object.Method.natvis">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.Object.Property.natvis">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.Object.StaticMethod.natvis">
+      <Filter>Core\RTTI\Record\Object</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.RttiAttribute.natvis">
+      <Filter>Core\RTTI\Record</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.RttiField.natvis">
+      <Filter>Core\RTTI\Record</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.RTTI.Record.RttiTypeRecord.natvis">
+      <Filter>Core\RTTI\Record</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Services.Dns.Exceptions.DnsActionRefusedException.natvis">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Services.Dns.Exceptions.DnsException.natvis">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Services.Dns.Exceptions.DnsFormatErrorException.natvis">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Services.Dns.Exceptions.DnsNameFormatErrorException.natvis">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Services.Dns.Exceptions.DnsNotImplementedException.natvis">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Services.Dns.Exceptions.DnsServerFailureException.natvis">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Services.Dns.Exceptions.DnsServersNotAvailableException.natvis">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.String.natvis">
+      <Filter>Core\Text\String</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.StringView.natvis">
+      <Filter>Core\Text\StringView</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Text.UniString.natvis">
+      <Filter>Core\Text</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Threading.Exceptions.CancellationRequestedException.natvis">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Threading.Exceptions.DeadlockExpectedException.natvis">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Threading.Exceptions.InvalidThreadException.natvis">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Threading.Exceptions.InvalidThreadObjException.natvis">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Threading.Exceptions.ThreadableAlreadyStartedException.natvis">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </Natvis>
+    <Natvis Include="Seed.Core.Utf8String.natvis">
+      <Filter>Core</Filter>
+    </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Lib\Seed.MinCore\Seed.Core.Base.cpp">
+      <Filter>Core\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lib\Seed.RTTI\typeinfo.cpp">
+      <Filter>RTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.BTLDR.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Configurations.cpp">
+      <Filter>Core\Configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Configurations.CurrentKernelVersion.cpp">
+      <Filter>Core\Configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Configurations.Default.cpp">
+      <Filter>Core\Configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Configurations.GetCurrentConfigurationsData.cpp">
+      <Filter>Core\Configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Configurations.UpdateData.cpp">
+      <Filter>Core\Configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Containers.Base.cpp">
+      <Filter>Core\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.CoreLog.cpp">
+      <Filter>Core\CoreLog</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.AES256.cpp">
+      <Filter>Core\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.cpp">
+      <Filter>Core\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.Crc.cpp">
+      <Filter>Core\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.ECDSA.cpp">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.Hash.SHA1.cpp">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.Hash.SHA256.cpp">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.Hash.SHA3.cpp">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.Hash.SHA512.cpp">
+      <Filter>Core\Crypt\Hash</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.Memory.cpp">
+      <Filter>Core\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.MlKem.cpp">
+      <Filter>Core\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.CTTI.cpp">
+      <Filter>Core\CTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.DependencyInjection.cpp">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.DependencyInjection.DiCircularDependencyException.cpp">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.DependencyInjection.DIRegisterServiceException.cpp">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.DependencyInjection.DIResolveException.cpp">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.DependencyInjection.IDI.cpp">
+      <Filter>Core\DependencyInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Events.cpp">
+      <Filter>Core\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Exceptions.ABI.cpp">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Exceptions.ABI.Internal.API.cpp">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Exceptions.ABI.Throw.cpp">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Exceptions.Base.cpp">
+      <Filter>Core\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Exceptions.GenericException.cpp">
+      <Filter>Core\Exceptions\GenericExceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Exceptions.NtStatusCode.cpp">
+      <Filter>Core\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Functionality.cpp">
+      <Filter>Core\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Instantiations.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Exceptions.cpp">
+      <Filter>Core\IO\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.FS.AsyncFile.cpp">
+      <Filter>Core\IO\FS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.FS.Base.cpp">
+      <Filter>Core\IO\FS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.FS.Directory.cpp">
+      <Filter>Core\IO\FS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.FS.Exceptions.Base.cpp">
+      <Filter>Core\IO\FS\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.FS.File.cpp">
+      <Filter>Core\IO\FS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.IPC.Alpc.cpp">
+      <Filter>Core\IO\IPC\Alpc</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.IPC.Alpc.Shared.Section.cpp">
+      <Filter>Core\IO\IPC\Alpc\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.IPC.Pipes.AsyncNamedPipe.cpp">
+      <Filter>Core\IO\IPC\Pipes</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.IPC.Pipes.Exceptions.cpp">
+      <Filter>Core\IO\IPC\Pipes\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.IPC.Pipes.NamedPipe.cpp">
+      <Filter>Core\IO\IPC\Pipes</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Async.Helper.cpp">
+      <Filter>Core\IO\Network\Async</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.AsyncTcp.cpp">
+      <Filter>Core\IO\Network\Async\Tcp</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.AsyncUdp.cpp">
+      <Filter>Core\IO\Network\Async\Udp</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Base.cpp">
+      <Filter>Core\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Exceptions.cpp">
+      <Filter>Core\IO\Network\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Icmp.cpp">
+      <Filter>Core\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.NetworkAddress.cpp">
+      <Filter>Core\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Overlapped.Helper.cpp">
+      <Filter>Core\IO\Network\Overlapped</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Overlapped.Tcp.cpp">
+      <Filter>Core\IO\Network\Overlapped</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Overlapped.Udp.cpp">
+      <Filter>Core\IO\Network\Overlapped</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.Raw.cpp">
+      <Filter>Core\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.TCP.cpp">
+      <Filter>Core\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.UDP.cpp">
+      <Filter>Core\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Json.cpp">
+      <Filter>Core\Json</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Json.JsonConverter.cpp">
+      <Filter>Core\Json</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Logger.cpp">
+      <Filter>Core\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Manage.WinApi.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Math.Internal.cpp">
+      <Filter>Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Math.Internal.Impl.cpp">
+      <Filter>Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Math.SafeInt.cpp">
+      <Filter>Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Memory.cpp">
+      <Filter>Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Memory.ImageResidency.cpp">
+      <Filter>Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.cpp">
+      <Filter>Core\RTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Cxx.cpp">
+      <Filter>Core\RTTI\Cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Cxx.Public.cpp">
+      <Filter>Core\RTTI\Cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Dynamic.Type.cpp">
+      <Filter>Core\RTTI\Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Exceptions.cpp">
+      <Filter>Core\RTTI\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Expandable.cpp">
+      <Filter>Core\RTTI\Expandable</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Record.Instantiations.cpp">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Record.RttiTypeRecord.cpp">
+      <Filter>Core\RTTI\Record</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Resources.cpp">
+      <Filter>Core\RTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.Section.Type.cpp">
+      <Filter>Core\RTTI\Section</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.TypeRecord.cpp">
+      <Filter>Core\RTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.RTTI.TypeRecord.Instantiations.cpp">
+      <Filter>Core\RTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Security.cpp">
+      <Filter>Core\Security</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Security.ProcessSecurityDescriptor.cpp">
+      <Filter>Core\Security</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Security.SecurityDescriptor.cpp">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Security.SecurityDescriptor.WellKnownSids.cpp">
+      <Filter>Core\Security\SecurityDescriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Serialization.cpp">
+      <Filter>Core\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.AutomaticSelfTesting.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.BootupServicesManager.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.BufferManager.cpp">
+      <Filter>Core\Services\BufferManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Cache.Service.cpp">
+      <Filter>Core\Services\Cache</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Dhcp.DhcpService.cpp">
+      <Filter>Core\Services\Dhcp</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Diagnostic.cpp">
+      <Filter>Core\Services\Diagnostic</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Dns.DnsClient.cpp">
+      <Filter>Core\Services\Dns</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Dns.Exceptions.cpp">
+      <Filter>Core\Services\Dns\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.FileWatcher.cpp">
+      <Filter>Core\Services\FileWatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.ImageResidencyService.cpp">
+      <Filter>Core\Services\RuntimeManagementService</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Instantiations.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.LoggerFactory.cpp">
+      <Filter>Core\Services\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Network.NetworkService.cpp">
+      <Filter>Core\Services\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Pool.PoolManager.cpp">
+      <Filter>Core\Services\Pool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.RttiService.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.RuntimeManagementService.cpp">
+      <Filter>Core\Services\RuntimeManagementService</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.RuntimeManagementService.CpuInformation.cpp">
+      <Filter>Core\Services\RuntimeManagementService</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.SerializationService.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.ServicesThreadableContext.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.SystemThreadPoolService.cpp">
+      <Filter>Core\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Stage1.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Stage1.StaticVariableInitInternals.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Stage2.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing,Tests.Serializer.Update.CollectionTests.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Asserts.Exceptions.cpp">
+      <Filter>Core\Testing\Asserts\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Instantiations.cpp">
+      <Filter>Core\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Security.SecurityDescriptor.cpp">
+      <Filter>Core\Testing\Tests\Security</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Test.cpp">
+      <Filter>Core\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Bits.cpp">
+      <Filter>Core\Testing\Tests\Bits</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.AlignedBlob.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.AllHeaders.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Array.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Array.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.BitMap.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Blob.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Blob.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.Array.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.Dictionary.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.DynamicQueue.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.DynamicStack.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.FixedArray.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.FixedQueue.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.FixedStack.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.List.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Concurrency.Map.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Dictionary.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Dictionary.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.DynamicQueue.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.DynamicQueue.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.DynamicStack.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.DynamicStack.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.FixedArray.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.FixedArray.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.FixedQueue.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.FixedQueue.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.FixedStack.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.FixedStack.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Json.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.JsonSerialization.Contract.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LegacyMarkers.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.AssociableCollection.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.Async.Many.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.Async.ReverseGenerate.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.AsyncTerminals.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.Containers.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.Contract.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.FixedContainers.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.LINQ.Materialization.Contract.cpp">
+      <Filter>Core\Testing\Tests\Containers\LINQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.List.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.List.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Map.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Map.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Queryable.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.RTTI.RttiCollection.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Serialization.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.SmartPtr.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.String.Compile.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.Tuple.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Containers.WeakPtr.cpp">
+      <Filter>Core\Testing\Tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Crypt.AES256.cpp">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Crypt.Algorithms.cpp">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Crypt.Hashing.cpp">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Crypt.MlKem.cpp">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Crypt.Random.cpp">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Crypt.X509.cpp">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.CTTI.Enum.cpp">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.CTTI.Object.cpp">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.CTTI.ToTuple.cpp">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.CTTI.TypeName.cpp">
+      <Filter>Core\Testing\Tests\CTTI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.DI.cpp">
+      <Filter>Core\Testing\Tests\DI</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Events.LocalEvent.cpp">
+      <Filter>Core\Testing\Tests\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Exceptions.ABI.cpp">
+      <Filter>Core\Testing\Tests\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Exceptions.ToString.cpp">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Functionality.Optional.cpp">
+      <Filter>Core\Testing\Tests\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Functionality.Result.cpp">
+      <Filter>Core\Testing\Tests\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Functionality.UnionType.cpp">
+      <Filter>Core\Testing\Tests\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.Alpc.cpp">
+      <Filter>Core\Testing\Tests\IO\Alpc</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.Exceptions.ToString.cpp">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.FS.AsyncFile.cpp">
+      <Filter>Core\Testing\Tests\IO\FS\API</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.FS.Exceptions.ToString.cpp">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.FS.FileObject.cpp">
+      <Filter>Core\Testing\Tests\IO\FS\API</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.FS.NamedPipe.Async.cpp">
+      <Filter>Core\Testing\Tests\IO\NamedPipe\Async</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.FS.NamedPipe.Sync.cpp">
+      <Filter>Core\Testing\Tests\IO\NamedPipe\Sync</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.FS.QueryPath.cpp">
+      <Filter>Core\Testing\Tests\IO\FS\API</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.Network.Exceptions.ToString.cpp">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.Network.Overlapped.cpp">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.Network.Serializers.cpp">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.NetworkV4.cpp">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.NetworkV4Async.cpp">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.NetworkV6.Async.cpp">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.NetworkV6.cpp">
+      <Filter>Core\Testing\Tests\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Memory.HeapOperations.cpp">
+      <Filter>Core\Testing\Tests\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Memory.ImageResidency.cpp">
+      <Filter>Core\Testing\Tests\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.AwaitEvent.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.AwaitSleep.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.AwaitTask.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.CancellationToken.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.Context.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.ProducerAndConsumer.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.SRWLock.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.MultiThreading.UnifiedThreadPool.cpp">
+      <Filter>Core\Testing\Tests\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Reflection.Attributes.cpp">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Reflection.ExpandableObject.cpp">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Reflection.IntrospectionData.cpp">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Reflection.ObjectMethods.cpp">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Reflection.ObjectProperties.cpp">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Reflection.ObjectStaticMethods.cpp">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Reflection.Travel.cpp">
+      <Filter>Core\Testing\Tests\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.Box.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.CollectionTests.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.CompositsTests.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.Dynamic.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.ObjectProperties.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.Optional.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.PrimitiveSerialize.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Serialization.Struct.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.TypeMetadataRecord.TypeMetaDataRecord.cpp">
+      <Filter>Core\Testing\Tests\Serializer\TypeMetadataRecord</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.Box.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.CompositsTests.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.Dynamic.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.ObjectProperties.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.Optional.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.PrimitiveSerialize.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.Struct.cpp">
+      <Filter>Core\Testing\Tests\Serializer\Update</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.cpp">
+      <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Services.Pool.cpp">
+      <Filter>Core\Testing\Tests\Services\Pool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Testing.TestDiscover.cpp">
+      <Filter>Core\Testing\Tests\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.Base32.cpp">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.Json.cpp">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.Path.cpp">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.PrintF.cpp">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.ChangeTheCase.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.CompareStringCaseInsensitive.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.ComparingOperators.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.Contain.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.Convertion.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.Ctors.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.IsEndWith.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.IsStartWith.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.LinqApi.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.Operators.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.Other.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.Size.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.ToStringConvertion.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.String.Wildcard.cpp">
+      <Filter>Core\Testing\Tests\Text\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.StringView.cpp">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.UniString.Addition.cpp">
+      <Filter>Core\Testing\Tests\Text\UniString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.UniString.Comparing.cpp">
+      <Filter>Core\Testing\Tests\Text\UniString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.UniString.Creation.cpp">
+      <Filter>Core\Testing\Tests\Text\UniString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.UniString.DifferentComparing.cpp">
+      <Filter>Core\Testing\Tests\Text\UniString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.Utf8String.cpp">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Text.WPrintf.cpp">
+      <Filter>Core\Testing\Tests\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Time.cpp">
+      <Filter>Core\Testing\Tests\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.TestSession.cpp">
+      <Filter>Core\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.TestSuitesResult.cpp">
+      <Filter>Core\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Async.Awaitable.cpp">
+      <Filter>Core\Threading\Async</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Async.cpp">
+      <Filter>Core\Threading\Async</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Base.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.CachedEvent.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Callback.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.CancellationToken.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Context.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Debug.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Exceptions.cpp">
+      <Filter>Core\Threading\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.LocksImpl.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Stats.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.SynchronizeEvent.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.SystemThreadPool.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Task.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Thread.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.Base.Internal.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableCalback.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableChainedTask.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableThread.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolAlpcTask.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolAsyncSleep.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolIoTask.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolIOverlapped.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolJob.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolScheduledEvent.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.Threadables.ThreadableUnifiedThreadPoolScheduledTask.cpp">
+      <Filter>Core\Threading\Threadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.TLS.Initializing.cpp">
+      <Filter>Core\Threading\TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.UnifiedThreadPool.IO.cpp">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.UnifiedThreadPool.Job.cpp">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.UnifiedThreadPool.Overlapped.cpp">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.UnifiedThreadPool.Pool.cpp">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.UnifiedThreadPool.ScheduledTask.cpp">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.UnifiedThreadPool.ThreadPoolThreadContext.cpp">
+      <Filter>Core\Threading\UnifiedThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Threading.WithIsolatedContext.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Time.cpp">
+      <Filter>Core\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Utf8String.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Utils.SafeNtHandle.cpp">
+      <Filter>Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Utils.TextUtils.cpp">
+      <Filter>Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Configurations.Validation.cpp">
+      <Filter>Core\Configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Configurations.Validation.cpp">
+      <Filter>Core\Testing\Tests\Configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Services.Dhcp.LeaseMaintenance.cpp">
+      <Filter>Core\Services\Dhcp</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Services.Dhcp.Maintenance.cpp">
+      <Filter>Core\Testing\Tests\Services\Dhcp</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Crypt.RsaSigner.cpp">
+      <Filter>Core\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Crypt.RsaSigner.cpp">
+      <Filter>Core\Testing\Tests\Crypt</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.IO.Network.ByteStream.cpp">
+      <Filter>Core\IO\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.IO.ByteStream.cpp">
+      <Filter>Core\Testing\Tests\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Testing.Cancellation.cpp">
+      <Filter>Core\Testing\Tests\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Http.Client.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Http.Instantiations.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Http.Parser.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Http.Server.Service.cpp">
+      <Filter>HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Http.Tests.cpp">
+      <Filter>HTTP\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.CertificateStore.Service.cpp">
+      <Filter>TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.ClientStream.cpp">
+      <Filter>TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.Instantiations.cpp">
+      <Filter>TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.Signatures.cpp">
+      <Filter>TLS\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.Tests.cpp">
+      <Filter>TLS\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.CertificateValidation.cpp">
+      <Filter>TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.ServerIdentity.cpp">
+      <Filter>TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.Tests.Identity.cpp">
+      <Filter>TLS\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.ServerStream.cpp">
+      <Filter>TLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Tls.Tests.Server.cpp">
+      <Filter>TLS\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.KMS.Server.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.KMS.Commands.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Runtime.EntryPoint.cpp">
+      <Filter>Runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Runtime.Instantiations.cpp">
+      <Filter>Runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Runtime.HostConfigurations.cpp">
+      <Filter>Runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Runtime.HostConfigurations.Tests.cpp">
+      <Filter>Runtime\HostConfigurations</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../Lib/Seed.MinCore/Seed.MinCore.vcxitems">
+      <Filter>SDK</Filter>
+    </None>
+    <None Include="../Lib/Seed.RTTI/Seed.RTTI.vcxitems">
+      <Filter>SDK</Filter>
+    </None>
+    <None Include="Seed.Core.vcxitems">
+      <Filter>SDK</Filter>
+    </None>
+    <None Include="Seed.Http.vcxitems">
+      <Filter>SDK</Filter>
+    </None>
+    <None Include="Seed.Tls.vcxitems">
+      <Filter>SDK</Filter>
+    </None>
+    <None Include="Seed.KMS.vcxitems">
+      <Filter>SDK</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="handler.asm">
+      <Filter>Core\Exceptions\ABI</Filter>
+    </MASM>
+  </ItemGroup>
+</Project>

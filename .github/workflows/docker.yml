@@ -1,0 +1,36 @@
+name: Windows Docker validation
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: Seed build configuration
+        type: choice
+        options: [Release, Debug]
+        default: Release
+permissions:
+  contents: read
+jobs:
+  docker:
+    runs-on: [self-hosted, Windows, X64, seed-docker]
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build and test Windows container
+        run: ./Tools/Test-SeedDocker.ps1 -Configuration '${{ inputs.configuration }}'
+      - name: Retain container reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seed-docker-${{ inputs.configuration }}
+          path: |
+            Artifacts/docker/**/container.log
+            Artifacts/docker/**/*.trx
+            Artifacts/docker/**/*.xml
+            Artifacts/docker/**/commands.log
+            Artifacts/docker/**/identity.txt
+            Artifacts/docker/**/native-imports.txt
+            Artifacts/docker/**/container-build.json
+          if-no-files-found: warn

@@ -1,4 +1,4 @@
-﻿using Seed.Core.RTTI;
+using Seed.Core.RTTI;
 using Seed.RTTI.Record.Object;
 
 namespace Seed.RTTI.Record;
@@ -76,7 +76,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// <summary>
     /// Type name
     /// </summary>
-    public string TypeName => Marshal.PtrToStringAuto((IntPtr) record->TypeName.Text) ?? string.Empty;
+    public string TypeName => Marshal.PtrToStringAuto((IntPtr)record->TypeName.Text) ?? string.Empty;
 
     /// <summary>
     /// Receiving the type record with C++ type name
@@ -84,14 +84,9 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// <returns>Record with C++ type name</returns>
     internal string GetCxxTypeName()
     {
-        var pTypeName = (TextMetaData*)(
-             (((Byte*)record) +
-             (SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64() + 
-             (SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64() +
-             (record->TypeName.Size * sizeof(Char)))
-        );
+        var pTypeName = (TextMetaData*)((((Byte*)record) + (SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64() + (SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64() + (record->TypeName.Size * sizeof(Char))));
 
-        return Marshal.PtrToStringAuto((IntPtr) pTypeName->Text) ?? string.Empty;
+        return Marshal.PtrToStringAuto((IntPtr)pTypeName->Text) ?? string.Empty;
     }
 
     /// <summary>
@@ -99,20 +94,13 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// </summary>
     public string CxxTypeName => GetCxxTypeName();
 
-
     /// <summary>
     /// Receiving the template type name for type record
     /// </summary>
     /// <returns>Template type name</returns>
     internal string GetTemplateTypeName()
     {
-        var pTypeName = (TextMetaData*)(
-             (((Byte*)record) +
-             ((SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64()) +
-             ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) +
-             (record->TypeName.Size * sizeof(Char)))
-        );
-
+        var pTypeName = (TextMetaData*)((((Byte*)record) + ((SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64()) + ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) + (record->TypeName.Size * sizeof(Char))));
         var pTemplateName = (TextMetaData*)(((Byte*)pTypeName->Text) + (pTypeName->Size * sizeof(Char)));
 
         return Marshal.PtrToStringAuto((IntPtr)pTemplateName->Text) ?? string.Empty;
@@ -130,44 +118,37 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
 
     private SizeT GetItemsCollectionOffset()
     {
-        return GetCTTIMetaDataOffset() + *(SizeT*) (((Byte*)record) + GetCTTIMetaDataOffset());
+        return GetCTTIMetaDataOffset() + *(SizeT*)(((Byte*)record) + GetCTTIMetaDataOffset());
     }
 
     private SizeT GetCustomCttiTypeStructSchemaRttiOffset()
     {
-        var metaData = (StructCustomTypeMetaData*) (((Byte*)record) + GetCTTIMetaDataOffset());
+        var metaData = (StructCustomTypeMetaData*)(((Byte*)record) + GetCTTIMetaDataOffset());
 
-        return  (
-                    metaData->SchemaFormat == ECustomTypeSchemaFormat.StructSchema ||
-                    metaData->SchemaFormat == ECustomTypeSchemaFormat.RemoteStructSchema
-                )
-                ? metaData->OffsetToCollection
-                : 0;
+        return (metaData->SchemaFormat == ECustomTypeSchemaFormat.StructSchema || metaData->SchemaFormat == ECustomTypeSchemaFormat.RemoteStructSchema) ? metaData->OffsetToCollection : 0;
     }
 
     private SizeT GetNumericCttiTypeOffset()
     {
         var numericMetaData = (NumericMetaData*)(((Byte*)record) + GetCTTIMetaDataOffset());
 
-        return numericMetaData->IsEnumFlag
-            ? GetCTTIMetaDataOffset() + (SizeT) Marshal.OffsetOf<NumericEnumFlagMetaData>("InnerTypes").ToInt64()
-            : 0;
+        return numericMetaData->IsEnumFlag ? GetCTTIMetaDataOffset() + (SizeT)Marshal.OffsetOf<NumericEnumFlagMetaData>("InnerTypes").ToInt64() : 0;
     }
 
     private SizeT GetFieldsRecordsOffset()
     {
         return record->TypeClass switch
         {
-            ETypes.Tuple                                                 => GetItemsCollectionOffset(),
-            ETypes.Enumeration                                           => GetItemsCollectionOffset(),
-            ETypes.FixedArray                                            => GetItemsCollectionOffset(),
-            ETypes.Struct                                                => GetItemsCollectionOffset(),
-            ETypes.Union                                                 => GetItemsCollectionOffset(),
-            ETypes.Collection                                            => GetItemsCollectionOffset(),
-            ETypes.FixedCollection                                       => GetItemsCollectionOffset(),
-            ETypes.Custom                                                => GetCustomCttiTypeStructSchemaRttiOffset(),
-            ETypes.Numeric                                               => GetNumericCttiTypeOffset(),
-            ETypes.AssociableCollection or ETypes.Reference              => GetItemsCollectionOffset(),
+            ETypes.Tuple => GetItemsCollectionOffset(),
+            ETypes.Enumeration => GetItemsCollectionOffset(),
+            ETypes.FixedArray => GetItemsCollectionOffset(),
+            ETypes.Struct => GetItemsCollectionOffset(),
+            ETypes.Union => GetItemsCollectionOffset(),
+            ETypes.Collection => GetItemsCollectionOffset(),
+            ETypes.FixedCollection => GetItemsCollectionOffset(),
+            ETypes.Custom => GetCustomCttiTypeStructSchemaRttiOffset(),
+            ETypes.Numeric => GetNumericCttiTypeOffset(),
+            ETypes.AssociableCollection or ETypes.Reference => GetItemsCollectionOffset(),
             ETypes.String or ETypes.Pointer or ETypes.Box or ETypes.Pair => GetItemsCollectionOffset(),
             _ => 0,
         };
@@ -180,14 +161,13 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     private RttiCollection<RttiField> GetFields()
     {
         var offset = GetFieldsRecordsOffset();
-
         if (offset == 0)
         {
             return RttiField.CreateCollection(null, IsValidCxxTypeId, imageBase);
         }
         else
         {
-            return RttiField.CreateCollection((Collection*)(((Byte*) record) + offset), IsValidCxxTypeId, imageBase);
+            return RttiField.CreateCollection((Collection*)(((Byte*)record) + offset), IsValidCxxTypeId, imageBase);
         }
     }
 
@@ -212,27 +192,17 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// <returns>Type record constructors</returns>
     private RttiCollection<RttiConstructorRecord> GetConstructors()
     {
-        if(record->TypeClass == ETypes.Object ||record->TypeClass == ETypes.Abstract)
+        if (record->TypeClass == ETypes.Object || record->TypeClass == ETypes.Abstract)
         {
             var objRecord = GetObjectRecord();
 
-            return RttiConstructorRecord.CreateCollection(
-                (Collection*) (((Byte*)objRecord) + objRecord->ConstructorsOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiConstructorRecord.CreateCollection((Collection*)(((Byte*)objRecord) + objRecord->ConstructorsOffset), isValidCxxTypeId, imageBase);
         }
-        else if (record->TypeClass == ETypes.Custom &&
-            (
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema ||
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema
-            ))
+        else if (record->TypeClass == ETypes.Custom && (GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema || GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema))
         {
             var customObjRecord = GetCustomTypeRecord();
 
-            return RttiConstructorRecord.CreateCollection(
-                (Collection*)(((Byte*)customObjRecord) + customObjRecord->ConstructorsOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiConstructorRecord.CreateCollection((Collection*)(((Byte*)customObjRecord) + customObjRecord->ConstructorsOffset), isValidCxxTypeId, imageBase);
         }
         else
         {
@@ -250,23 +220,13 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         {
             var objRecord = GetObjectRecord();
 
-            return RttiIntefaceRecord.CreateCollection(
-                (Collection*)(((Byte*)objRecord) + objRecord->InterfacesOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiIntefaceRecord.CreateCollection((Collection*)(((Byte*)objRecord) + objRecord->InterfacesOffset), isValidCxxTypeId, imageBase);
         }
-        else if (record->TypeClass == ETypes.Custom &&
-            (
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema ||
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema
-            ))
+        else if (record->TypeClass == ETypes.Custom && (GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema || GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema))
         {
             var customObjRecord = GetCustomTypeRecord();
 
-            return RttiIntefaceRecord.CreateCollection(
-                (Collection*)(((Byte*)customObjRecord) + customObjRecord->InterfacesOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiIntefaceRecord.CreateCollection((Collection*)(((Byte*)customObjRecord) + customObjRecord->InterfacesOffset), isValidCxxTypeId, imageBase);
         }
         else
         {
@@ -284,23 +244,13 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         {
             var objRecord = GetObjectRecord();
 
-            return RttiProperty.CreateCollection(
-                (Collection*)(((Byte*)objRecord) + objRecord->PropertiesOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiProperty.CreateCollection((Collection*)(((Byte*)objRecord) + objRecord->PropertiesOffset), isValidCxxTypeId, imageBase);
         }
-        else if (record->TypeClass == ETypes.Custom &&
-            (
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema ||
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema
-            ))
+        else if (record->TypeClass == ETypes.Custom && (GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema || GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema))
         {
             var customObjRecord = GetCustomTypeRecord();
 
-            return RttiProperty.CreateCollection(
-                (Collection*)(((Byte*)customObjRecord) + customObjRecord->PropertiesOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiProperty.CreateCollection((Collection*)(((Byte*)customObjRecord) + customObjRecord->PropertiesOffset), isValidCxxTypeId, imageBase);
         }
         else
         {
@@ -318,23 +268,13 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         {
             var objRecord = GetObjectRecord();
 
-            return RttiMethodRecord.CreateCollection(
-                (Collection*)(((Byte*)objRecord) + objRecord->MethodsOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiMethodRecord.CreateCollection((Collection*)(((Byte*)objRecord) + objRecord->MethodsOffset), isValidCxxTypeId, imageBase);
         }
-        else if (record->TypeClass == ETypes.Custom &&
-            (
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema ||
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema
-            ))
+        else if (record->TypeClass == ETypes.Custom && (GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema || GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema))
         {
             var customObjRecord = GetCustomTypeRecord();
 
-            return RttiMethodRecord.CreateCollection(
-                (Collection*)(((Byte*)customObjRecord) + customObjRecord->MethodsOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiMethodRecord.CreateCollection((Collection*)(((Byte*)customObjRecord) + customObjRecord->MethodsOffset), isValidCxxTypeId, imageBase);
         }
         else
         {
@@ -352,23 +292,13 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
         {
             var objRecord = GetObjectRecord();
 
-            return RttiStaticMethodRecord.CreateCollection(
-                (Collection*)(((Byte*)objRecord) + objRecord->StaticMethodsOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiStaticMethodRecord.CreateCollection((Collection*)(((Byte*)objRecord) + objRecord->StaticMethodsOffset), isValidCxxTypeId, imageBase);
         }
-        else if (record->TypeClass == ETypes.Custom &&
-            (
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema ||
-                GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema
-            ))
+        else if (record->TypeClass == ETypes.Custom && (GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.ObjectSchema || GetCustomTypeRecord()->SchemaFormat == ECustomTypeSchemaFormat.RemoteObjectSchema))
         {
             var customObjRecord = GetCustomTypeRecord();
 
-            return RttiStaticMethodRecord.CreateCollection(
-                (Collection*)(((Byte*)customObjRecord) + customObjRecord->StaticMethodsOffset),
-                isValidCxxTypeId,
-                imageBase);
+            return RttiStaticMethodRecord.CreateCollection((Collection*)(((Byte*)customObjRecord) + customObjRecord->StaticMethodsOffset), isValidCxxTypeId, imageBase);
         }
         else
         {
@@ -385,7 +315,6 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// Interfaces of type record
     /// </summary>
     public RttiCollection<RttiIntefaceRecord> Interfaces => GetInterfaces();
-
 
     /// <summary>
     /// Properties of type record
@@ -446,7 +375,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     {
         if (record->TypeClass == ETypes.FixedArray || record->TypeClass == ETypes.FixedCollection)
         {
-            var collectionRecord = (FixedSizedCollection*)(((Byte*) record) + record->OffsetToCttiMetaData);
+            var collectionRecord = (FixedSizedCollection*)(((Byte*)record) + record->OffsetToCttiMetaData);
 
             return collectionRecord->CountOfItems;
         }

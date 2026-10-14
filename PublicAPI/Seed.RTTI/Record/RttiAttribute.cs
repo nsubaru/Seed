@@ -1,4 +1,4 @@
-﻿using Seed.Core.RTTI;
+using Seed.Core.RTTI;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +9,10 @@ public unsafe class RttiAttribute : IRttiIterableObject<RttiAttribute>
 {
     internal RttiIterator<RttiAttribute>? it;
 
-    internal AttributeRecord* GetRecord() { return (AttributeRecord*)it!.item; }
+    internal AttributeRecord* GetRecord()
+    {
+        return (AttributeRecord*)it!.item;
+    }
 
     /// <summary>
     /// Constructor
@@ -61,7 +64,7 @@ public unsafe class RttiAttribute : IRttiIterableObject<RttiAttribute>
     /// <summary>
     /// Attribute name
     /// </summary>
-    public String Name => Marshal.PtrToStringAuto((IntPtr) GetRecord()->AttributeName.Text) ?? string.Empty;
+    public String Name => Marshal.PtrToStringAuto((IntPtr)GetRecord()->AttributeName.Text) ?? string.Empty;
 
     /// <summary>
     /// Attribute target type
@@ -76,6 +79,7 @@ public unsafe class RttiAttribute : IRttiIterableObject<RttiAttribute>
     internal String GetTypeName()
     {
         var text = (TextMetaData*)((Byte*)GetRecord() + GetRecord()->OffsetToAttributeValueTypeName);
+
         return Marshal.PtrToStringAuto((IntPtr)text->Text) ?? string.Empty;
     }
 

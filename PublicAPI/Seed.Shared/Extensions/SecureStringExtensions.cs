@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -25,13 +25,13 @@ public static class SecureStringExtensions
     /// <returns>Secure string</returns>
     public static System.Security.SecureString ToSecureString(this String plainStr)
     {
-        var secStr = new System.Security.SecureString(); secStr.Clear();
-        
+        var secStr = new System.Security.SecureString();
+        secStr.Clear();
         foreach (char c in plainStr.ToCharArray())
         {
             secStr.AppendChar(c);
         }
-        
+
         return secStr;
     }
 }

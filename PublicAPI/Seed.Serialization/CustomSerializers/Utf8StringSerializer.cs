@@ -8,7 +8,11 @@ public class Utf8StringSerializer : ICustomClassSerializer
 
     public string TypeName => Constants.Types.Utf8String;
 
-    public Type[] DependableTypes => new[] { typeof(UInt64), typeof(byte[]) };
+    public Type[] DependableTypes => new[]
+    {
+        typeof(UInt64),
+        typeof(byte[])
+    };
 
     /// <summary>
     /// Reconstructs the mapped value using statically dispatched calls to the session serializer.
@@ -22,9 +26,10 @@ public class Utf8StringSerializer : ICustomClassSerializer
         object sizeDynamic = size;
         serializer.Deserialize(ref sizeDynamic, serializationStream);
         size = (UInt64)sizeDynamic;
-
         if (size > int.MaxValue)
+        {
             throw new InvalidDataException($"UTF-8 string payload is too large for managed deserialization: {size} bytes.");
+        }
 
         var dataBuffer = new byte[(int)size];
         serializationStream.ReadExactly(dataBuffer);
@@ -42,7 +47,6 @@ public class Utf8StringSerializer : ICustomClassSerializer
     {
         var utf8 = data is Utf8String value ? value : Utf8String.FromString(data?.ToString());
         var dataBuffer = utf8.ToArray();
-
         serializer.Serialize((UInt64)dataBuffer.Length, serializationStream);
         serializationStream.Write(dataBuffer);
     }

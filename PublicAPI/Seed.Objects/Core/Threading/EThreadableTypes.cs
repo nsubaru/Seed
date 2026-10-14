@@ -1,4 +1,4 @@
-﻿namespace Seed.Core.Threading;
+namespace Seed.Core.Threading;
 
 /// <summary>
 /// Threadable entity types
@@ -6,5 +6,14 @@
 [SerializableEnum("Seed::Core::Threading::EThreadableTypes")]
 public enum EThreadableTypes : UInt8
 {
-    Thread, JobTask, ScheduledTask, IoTask, IOverlapped, AlpcTask, EventTask, AsyncSleep, ExternalCallback, Unknown = 255
+    Thread,
+    JobTask,
+    ScheduledTask,
+    IoTask,
+    IOverlapped,
+    AlpcTask,
+    EventTask,
+    AsyncSleep,
+    ExternalCallback,
+    Unknown = 255
 };

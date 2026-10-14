@@ -4,5 +4,9 @@ namespace Seed.Core;
 public struct NtStatusCode
 {
     [SerializableStructField]
-    public Int32 Code { get; set; }
+    public Int32 Code
+    {
+        get;
+        set;
+    }
 }

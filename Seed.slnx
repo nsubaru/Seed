@@ -1,0 +1,99 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="Coverage" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Native/">
+    <Project Path="Native/Seed.Runtime.vcxproj" Id="F60963B3-0744-4C02-8D22-1D21DA6F196C" />
+    <Project Path="Native/Seed.Core.vcxitems" Id="28cba6d9-ec6b-548a-a283-552ca28bdcbd" />
+    <Project Path="Native/Seed.Http.vcxitems" Id="4534301d-5f62-5f57-a042-07dcb8abc030" />
+    <Project Path="Native/Seed.Tls.vcxitems" Id="2ca7c157-9424-5f28-9efd-68a68abad6fd" />
+    <Project Path="Native/Seed.KMS.vcxitems" Id="e75bbc97-87b2-572c-8c64-b690cec7bd0f" />
+    <Project Path="Lib/Seed.MinCore/Seed.MinCore.vcxitems" Id="116d8730-60de-5708-803c-74818675f2b2" />
+    <Project Path="Lib/Seed.RTTI/Seed.RTTI.vcxitems" Id="e11e0b03-f7f2-5142-b64e-3b79a2771a66" />
+  </Folder>
+  <Folder Name="/Adapters/">
+    <Project Path="API/Seed.Starter/Seed.Starter.vcxproj" Id="A4F30439-C526-47EE-959A-C4C98FFBE396" />
+    <Project Path="API/Seed.KMS.Transport/Seed.KMS.Transport.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Launcher/Seed.Console/Seed.Console.csproj">
+      <BuildDependency Project="API/Seed.Starter/Seed.Starter.vcxproj" />
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Examples/">
+    <Project Path="Examples/Seed.Managed.RoundTrip/Seed.Managed.RoundTrip.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Examples/Seed.Native.HttpClient/Seed.Native.HttpClient.csproj">
+      <BuildDependency Project="API/Seed.Starter/Seed.Starter.vcxproj" />
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Managed/">
+    <Project Path="PublicAPI/Seed.Shared/Seed.Shared.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="PublicAPI/Seed.CTTI/Seed.CTTI.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="PublicAPI/Seed.Objects/Seed.Objects.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="PublicAPI/Seed.RTTI/Seed.RTTI.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="PublicAPI/Seed.Serialization/Seed.Serialization.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/Seed.Managed.TestRunner/Seed.Managed.TestRunner.csproj">
+      <BuildDependency Project="API/Seed.Starter/Seed.Starter.vcxproj" />
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tools/Seed.XMLDocGen/Seed.XMLDocGen.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tools/Seed.Tls.TestPeer/Seed.Tls.TestPeer.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tools/Seed.Tls.ServerVerifier/Seed.Tls.ServerVerifier.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tools/Seed.KMS.Verifier/Seed.KMS.Verifier.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tools/Seed.Testing.Host/Seed.Testing.Host.csproj">
+      <BuildDependency Project="API/Seed.Starter/Seed.Starter.vcxproj" />
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tools/Seed.Testing.TestAdapter/Seed.Testing.TestAdapter.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Testing/">
+    <Project Path="Lib/Seed.E2E.Infrastructure/Seed.E2E.Infrastructure.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Testing/Seed.E2ETests/Seed.E2ETests.csproj">
+      <BuildDependency Project="API/Seed.Starter/Seed.Starter.vcxproj" />
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Guidance/">
+    <File Path="AGENTS.md" />
+    <File Path="README.md" />
+    <File Path="seed-components.json" />
+  </Folder>
+  <Folder Name="/Docker/">
+    <File Path="Docker/BuildTools.Dockerfile" />
+    <File Path="Docker/Seed.Dockerfile" />
+    <File Path="Docker/Build-SeedImage.ps1" />
+    <File Path="Docker/Invoke-SeedContainerTests.ps1" />
+    <File Path="Docker/Start-SeedContainer.ps1" />
+  </Folder>
+</Solution>

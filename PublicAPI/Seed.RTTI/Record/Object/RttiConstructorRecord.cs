@@ -1,4 +1,4 @@
-﻿namespace Seed.RTTI.Record.Object;
+namespace Seed.RTTI.Record.Object;
 
 /// <summary>
 /// A base RTTI constructor record class
@@ -7,7 +7,10 @@ public unsafe class RttiConstructorRecord : IRttiIterableObject<RttiConstructorR
 {
     internal RttiIterator<RttiConstructorRecord>? it;
 
-    Constructor* GetRecord() { return (Constructor*) it!.item; }
+    Constructor* GetRecord()
+    {
+        return (Constructor*)it!.item;
+    }
 
     /// <summary>
     /// Constructor

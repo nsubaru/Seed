@@ -1,0 +1,13 @@
+Artifacts/
+**/bin/
+**/obj/
+.vs/
+Documentation/*
+!Documentation/.gitkeep
+.codex/tmp/
+*.user
+*.pfx
+*.key
+Lib/NtApi/*.lib
+Lib/NtApi/*.exp
+Lib/NtApi/*.obj

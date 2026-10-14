@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Seed.CTTI;
 using System.Text;
 
@@ -8,12 +8,7 @@ public partial class SeedSerializerFactory
 {
     Type? GetCustomSerializerType(RTTI.Record.RttiTypeRecord record)
     {
-        return AppDomain.CurrentDomain
-            .GetAssemblies()
-            .SelectMany(x => x.GetTypes()
-                              .Where(x => Attribute.GetCustomAttribute(x, typeof(SerializableStructAttribute)) != null
-                        ))
-            .FirstOrDefault(x => x.FullName == record.TypeName);
+        return AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes().Where(x => Attribute.GetCustomAttribute(x, typeof(SerializableStructAttribute)) != null)).FirstOrDefault(x => x.FullName == record.TypeName);
     }
 
     private void AddCustomTypeSer<T>(ref StringBuilder code, TypeRecord typeRecord)

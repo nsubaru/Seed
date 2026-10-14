@@ -1,11 +1,13 @@
-﻿using Seed.Core.Functionality;
+using Seed.Core.Functionality;
 using Seed.RTTI.CustomSerializationSupport;
 using Seed.RTTI.Record;
 using System.Linq;
 
 namespace Seed.Serialization.CustomSerializers;
 
-public abstract class BaseUnionTypeObjectSerializer(Type type, string typeName, IServiceProvider serviceProvider) : TemplateCustomClassSerializerInstantiationBase(type, typeName, serviceProvider) { }
+public abstract class BaseUnionTypeObjectSerializer(Type type, string typeName, IServiceProvider serviceProvider) : TemplateCustomClassSerializerInstantiationBase(type, typeName, serviceProvider)
+{
+}
 
 public class UnionTypeObjectSerializer<T>(Type type, string typeName, IServiceProvider serviceProvider) : BaseUnionTypeObjectSerializer(type, typeName, serviceProvider)
 {
@@ -21,16 +23,11 @@ public class UnionTypeObjectSerializer<T>(Type type, string typeName, IServicePr
     {
         SizeT idx = 0;
         object headDyn = idx;
-
         serializer.Deserialize(ref headDyn, serializationStream);
-
         idx = (SizeT)headDyn;
         var type = DependableTypes[idx];
 
-        return this.GetType()
-            .GetMethod(nameof(FinishDeserialize))!
-            .MakeGenericMethod(type)
-            .Invoke(this, [serializationStream, serializer])!;
+        return this.GetType().GetMethod(nameof(FinishDeserialize))!.MakeGenericMethod(type).Invoke(this, [serializationStream, serializer])!;
     }
 
     public object FinishDeserialize<U>(Stream serializationStream, ISeedSerializer serializer)
@@ -52,15 +49,9 @@ public class UnionTypeObjectSerializer<T>(Type type, string typeName, IServicePr
     public override void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         SizeT idx = data.TypeId;
-
         serializer.Serialize(idx, serializationStream);
-
         var type = DependableTypes[idx];
-
-        this.GetType()
-            .GetMethod(nameof(CallSerialize))!
-            .MakeGenericMethod(type)
-            .Invoke(this, [data, serializationStream, serializer]);
+        this.GetType().GetMethod(nameof(CallSerialize))!.MakeGenericMethod(type).Invoke(this, [data, serializationStream, serializer]);
     }
 
     public void CallSerialize<U>(dynamic data, Stream serializationStream, ISeedSerializer serializer)
@@ -72,32 +63,27 @@ public class UnionTypeObjectSerializer<T>(Type type, string typeName, IServicePr
 
 public abstract class BaseUnionTypeSerializer : ITemplateCustomClassSerializerFactory
 {
-    public abstract Type GenericClrType { get; }
+    public abstract Type GenericClrType
+    {
+        get;
+    }
 
     public string TemplateTypeName => "Seed::Core::Functionality::UnionType";
 
     public TemplateCustomClassSerializerInstantiationBase? BuildSerializerForType(RttiTypeRecord typeRecord, ISeedSerializerFactory seedSerializerFactory, IServiceProvider serviceProvider)
     {
-        if ((int) typeRecord.Fields.Count != GenericClrType.GetGenericArguments().Length)
+        if ((int)typeRecord.Fields.Count != GenericClrType.GetGenericArguments().Length)
         {
             return null;
         }
 
-        var dependableTypes = typeRecord.Fields
-            .Select(x => seedSerializerFactory.RTTISection.AllRegisteredTypes.First(y => y.FullTypeId == x.FullTypeId))
-            .Select(seedSerializerFactory.BuildClrType)
-            .ToArray();
-
+        var dependableTypes = typeRecord.Fields.Select(x => seedSerializerFactory.RTTISection.AllRegisteredTypes.First(y => y.FullTypeId == x.FullTypeId)).Select(seedSerializerFactory.BuildClrType).ToArray();
         if (dependableTypes.Any(x => x == null))
         {
             return null;
         }
 
-        return typeof(UnionTypeObjectSerializer<>)
-            .MakeGenericType(GenericClrType.MakeGenericType(dependableTypes!))
-            .GetConstructors()
-            .First()
-            .Invoke([GenericClrType.MakeGenericType(dependableTypes!), typeRecord.TypeName, serviceProvider]) as BaseUnionTypeObjectSerializer;
+        return typeof(UnionTypeObjectSerializer<>).MakeGenericType(GenericClrType.MakeGenericType(dependableTypes!)).GetConstructors().First().Invoke([GenericClrType.MakeGenericType(dependableTypes!), typeRecord.TypeName, serviceProvider]) as BaseUnionTypeObjectSerializer;
     }
 }
 

@@ -1,4 +1,4 @@
-﻿using Seed.Core.RTTI;
+using Seed.Core.RTTI;
 
 namespace Seed.RTTI.AttributeValueReaderProviders;
 

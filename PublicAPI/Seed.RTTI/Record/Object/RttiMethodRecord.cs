@@ -1,4 +1,4 @@
-﻿namespace Seed.RTTI.Record.Object;
+namespace Seed.RTTI.Record.Object;
 
 /// <summary>
 /// A base RTTI method record class
@@ -8,7 +8,10 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
 {
     internal RttiIterator<RttiMethodRecord>? it;
 
-    MethodMetaData* GetRecord() { return (MethodMetaData*)it!.item; }
+    MethodMetaData* GetRecord()
+    {
+        return (MethodMetaData*)it!.item;
+    }
 
     /// <summary>
     /// Constructor
@@ -45,6 +48,7 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
         if (GetRecord() != null)
         {
             var collectionBase = (Collection*)((byte*)GetRecord() + GetRecord()->MethodArgsOffset);
+
             return RttiArgumentRecord.CreateCollection(collectionBase, it!.isValidCxxTypeId, it!.imageBase);
         }
         else
@@ -61,7 +65,7 @@ public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
     /// <summary>
     /// Method name
     /// </summary>
-    public string Name => Marshal.PtrToStringAuto((IntPtr)  GetRecord()->MethodName.Text) ?? string.Empty;
+    public string Name => Marshal.PtrToStringAuto((IntPtr)GetRecord()->MethodName.Text) ?? string.Empty;
 
     /// <summary>
     /// Method ID

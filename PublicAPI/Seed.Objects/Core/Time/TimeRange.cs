@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,6 +18,4 @@ public struct TimeRange()
     /// </summary>
     [SerializableStructField]
     public TimeSpan Duration = TimeSpan.Zero;
-
-
 }

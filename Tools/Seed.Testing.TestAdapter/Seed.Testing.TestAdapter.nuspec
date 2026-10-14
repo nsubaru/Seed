@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Seed.Testing.TestAdapter</id><version>$version$</version>
+    <authors>Seed contributors</authors>
+    <description>Visual Studio and VSTest adapter for native Seed ITest registrations and NUnit results.</description>
+    <license type="expression">Apache-2.0</license><readme>README.md</readme>
+    <projectUrl>https://github.com/nsubaru/Seed</projectUrl>
+    <repository type="git" url="https://github.com/nsubaru/Seed" />
+    <developmentDependency>true</developmentDependency><requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>Seed native testing vstest TestExplorer</tags>
+  </metadata>
+  <files>
+    <file src="Artifacts/x64/Release/Seed.Testing.TestAdapter/Seed.Testing.TestAdapter.dll" target="tools/adapter" />
+    <file src="Artifacts/x64/Release/Seed.Testing.TestAdapter/Seed.Testing.TestAdapter.xml" target="tools/adapter" />
+    <file src="Artifacts\x64\Release\Seed.Testing.TestAdapter\host\*" target="tools/adapter/host" />
+    <file src="Tools\Seed.Testing.TestAdapter\build\native\*.props" target="build/native" />
+    <file src="Tools\Seed.Testing.TestAdapter\build\native\*.targets" target="build/native" />
+    <file src="Tools/Seed.Testing.TestAdapter/README.md" target="README.md" />
+    <file src="LICENSE" target="LICENSE" /><file src="NOTICE" target="NOTICE" />
+    <file src="THIRD-PARTY-NOTICES.md" target="THIRD-PARTY-NOTICES.md" />
+    <file src="Lib/NtApi/LICENSE.phnt" target="licenses/LICENSE.phnt" />
+    <file src="Artifacts/dependencies.json" target="dependencies.json" />
+  </files>
+</package>

@@ -1,0 +1,3 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Condition="'$(TargetPath)' != ''"><TestContainer Include="$(TargetPath)" /></ItemGroup>
+</Project>

@@ -1,4 +1,4 @@
-﻿using Seed.Core.RTTI;
+using Seed.Core.RTTI;
 
 namespace Seed.RTTI.Record.Object;
 
@@ -9,7 +9,10 @@ public unsafe class RttiArgumentRecord : IRttiIterableObject<RttiArgumentRecord>
 {
     internal RttiIterator<RttiArgumentRecord>? it;
 
-    ArgumentMetaData* GetRecord() { return (ArgumentMetaData*)it!.item; }
+    ArgumentMetaData* GetRecord()
+    {
+        return (ArgumentMetaData*)it!.item;
+    }
 
     public RttiArgumentRecord()
     {
@@ -56,7 +59,7 @@ public unsafe class RttiArgumentRecord : IRttiIterableObject<RttiArgumentRecord>
     /// Receiving the argument record with type name
     /// </summary>
     /// <returns>Record with type name</returns>
-    public string TypeName => Marshal.PtrToStringAuto((IntPtr)  GetRecord()->TypeName.Text) ?? string.Empty;
+    public string TypeName => Marshal.PtrToStringAuto((IntPtr)GetRecord()->TypeName.Text) ?? string.Empty;
 
     /// <summary>
     /// Arguments type cv modificators
