@@ -800,6 +800,7 @@
     <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.PrimitiveSerialize.h" />
     <ClInclude Include="Seed.Core.Testing.Tests.Serializer.Update.Struct.h" />
     <ClInclude Include="Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.h" />
+    <ClInclude Include="Seed.Core.Testing.Tests.Services.BufferManager.h" />
     <ClInclude Include="Seed.Core.Testing.Tests.Services.Pool.h" />
     <ClInclude Include="Seed.Core.Testing.Tests.Testing.TestDiscover.h" />
     <ClInclude Include="Seed.Core.Testing.Tests.Text.Base32.h" />
@@ -1344,6 +1345,7 @@
     <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.PrimitiveSerialize.cpp" />
     <ClCompile Include="Seed.Core.Testing.Tests.Serializer.Update.Struct.cpp" />
     <ClCompile Include="Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.cpp" />
+    <ClCompile Include="Seed.Core.Testing.Tests.Services.BufferManager.cpp" />
     <ClCompile Include="Seed.Core.Testing.Tests.Services.Pool.cpp" />
     <ClCompile Include="Seed.Core.Testing.Tests.Testing.TestDiscover.cpp" />
     <ClCompile Include="Seed.Core.Testing.Tests.Text.Base32.cpp" />

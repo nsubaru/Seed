@@ -999,7 +999,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Serializer.Update.Struct.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Services.BufferManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Services.Pool.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Services.BufferManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Services.Pool.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Testing.TestDiscover.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Seed.Core.Testing.Tests.Testing.TestDiscover.h" />

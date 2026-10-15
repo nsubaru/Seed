@@ -2436,6 +2436,9 @@
     <ClInclude Include="Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.h">
       <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
     </ClInclude>
+    <ClInclude Include="Seed.Core.Testing.Tests.Services.BufferManager.h">
+      <Filter>Core\Testing\Tests\Services</Filter>
+    </ClInclude>
     <ClInclude Include="Seed.Core.Testing.Tests.Services.Pool.h">
       <Filter>Core\Testing\Tests\Services\Pool</Filter>
     </ClInclude>
@@ -4038,6 +4041,9 @@
     </ClCompile>
     <ClCompile Include="Seed.Core.Testing.Tests.Services.Dns.Exceptions.ToString.cpp">
       <Filter>Core\Testing\Tests\Exceptions\ToString</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.Core.Testing.Tests.Services.BufferManager.cpp">
+      <Filter>Core\Testing\Tests\Services</Filter>
     </ClCompile>
     <ClCompile Include="Seed.Core.Testing.Tests.Services.Pool.cpp">
       <Filter>Core\Testing\Tests\Services\Pool</Filter>

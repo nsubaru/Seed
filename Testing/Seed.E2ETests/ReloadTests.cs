@@ -6,27 +6,46 @@ namespace Seed.E2ETests;
 
 public sealed class ReloadTests : E2ETest<ReloadTests>
 {
-    [Fact]
-    public async Task ReconnectFollowsSavedPipeChangesAndIgnoresUnsavedPipeChanges()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ReconnectFollowsSavedPipeChangesAndIgnoresUnsavedPipeChanges(bool singleProcessor)
     {
+        if (singleProcessor)
+        {
+            // Exercise shutdown callbacks that remain queued while the main thread tears down services.
+            using var process = Process.GetProcessById(Runtime.ProcessId);
+            long affinity = process.ProcessorAffinity.ToInt64();
+            process.ProcessorAffinity = new IntPtr(affinity & -affinity);
+        }
+
         string custom = "Seed.KMS.ReloadTest." + Guid.NewGuid().ToString("N");
         await Runtime.DisconnectAsync();
+        
         await using var client = new KmsClient();
         var token = TestContext.Current.CancellationToken;
+        
         await client.ConnectAsync(TimeSpan.FromSeconds(5), token);
         await client.ExecuteAsync($"configurations.set host.kms.pipeName {custom}", cancellationToken: token);
         await client.ExecuteAsync("reload", cancellationToken: token);
+
         Assert.Contains("Seed 0.1.0", Text(await client.ExecuteAsync("version", cancellationToken: token)));
         Assert.Contains($"Next KMS endpoint: {KmsClient.DefaultPipeName}", Text(await client.ExecuteAsync("configurations.get host.kms.pipeName", cancellationToken: token)));
+        
         await client.ExecuteAsync($"configurations.set host.kms.pipeName {custom}", cancellationToken: token);
         await client.ExecuteAsync("configurations.save", cancellationToken: token);
+        
         Assert.Contains($"Next KMS endpoint: {custom}", Text(await client.ExecuteAsync("configurations.get host.kms.pipeName", cancellationToken: token)));
+        
         await client.ExecuteAsync("reload", cancellationToken: token);
+        
         Assert.Contains("Seed 0.1.0", Text(await client.ExecuteAsync("version", cancellationToken: token)));
         await client.ExecuteAsync("configurations.reset host.kms.pipeName", cancellationToken: token);
         await client.ExecuteAsync("configurations.save", cancellationToken: token);
         await client.ExecuteAsync("reload", cancellationToken: token);
+        
         Assert.Contains("Seed 0.1.0", Text(await client.ExecuteAsync("version", cancellationToken: token)));
+        
         await client.DisposeAsync();
         await Runtime.ReconnectAsync();
     }
@@ -111,7 +130,7 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
             if (!process.HasExited)
             {
                 process.Kill();
-                
+
                 await process.WaitForExitAsync(CancellationToken.None);
             }
         }
