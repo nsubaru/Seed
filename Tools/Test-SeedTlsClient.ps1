@@ -31,40 +31,62 @@ function Invoke-SeedTlsRequest(
     $seedBody      = Join-Path $Directory "$Name.txt"
     $seedClientLog = Join-Path $Directory "$Name.console.log"
 
-    & $seedClientExe --runtime $seedRuntime --url $Url --output $seedBody --trust-root $Root --tls $Protocol --connect-address $ConnectAddress *> $seedClientLog
-
-    $seedExit = $LASTEXITCODE
-
-    if ($ExpectedFailure)
+    try
     {
-        if ($seedExit -eq 0 -or -not (Test-Path -LiteralPath "$seedBody.error.txt"))
-        {
-            throw "TLS failure was not rejected: $Name"
-        }
+        & $seedClientExe --runtime $seedRuntime --url $Url --output $seedBody --trust-root $Root --tls $Protocol --connect-address $ConnectAddress *> $seedClientLog
 
-        if (-not (Select-String -LiteralPath "$seedBody.error.txt" -Pattern $ExpectedFailure -Quiet))
+        $seedExit = $LASTEXITCODE
+
+        if ($ExpectedFailure)
         {
-            throw "Unexpected TLS failure: $Name; see $seedClientLog"
+            if ($seedExit -eq 0 -or -not (Test-Path -LiteralPath "$seedBody.error.txt"))
+            {
+                throw "TLS failure was not rejected: $Name"
+            }
+
+            if (-not (Select-String -LiteralPath "$seedBody.error.txt" -Pattern $ExpectedFailure -Quiet))
+            {
+                throw "Unexpected TLS failure: $Name; see $seedClientLog"
+            }
+        }
+        else
+        {
+            if ($seedExit -ne 0)
+            {
+                throw "Native TLS client failed: $Name (exit $seedExit); see $seedClientLog"
+            }
+
+            if ([IO.File]::ReadAllText($seedBody) -cne "Seed TLS test OK`n")
+            {
+                throw "Incorrect TLS response: $Name"
+            }
+
+            $seedModules = @(Get-Content -LiteralPath "$seedBody.modules.txt" | Sort-Object)
+
+            if (($seedModules -join ',') -ine 'ntdll.dll,Seed.Runtime.exe')
+            {
+                throw "Unexpected native TLS modules: $seedModules"
+            }
         }
     }
-    else
+    catch
     {
-        if ($seedExit -ne 0)
+        if (Test-Path -LiteralPath "$seedBody.error.txt")
         {
-            throw "Native TLS client failed: $Name; see $seedClientLog"
+            Write-Host "Native TLS error: $seedBody.error.txt"
+            Get-Content -LiteralPath "$seedBody.error.txt" -TotalCount 1 | Out-Host
         }
 
-        if ([IO.File]::ReadAllText($seedBody) -cne "Seed TLS test OK`n")
+        foreach ($seedLog in @($seedClientLog, (Join-Path $Directory 'peer.log'), (Join-Path $Directory 'peer-error.log')))
         {
-            throw "Incorrect TLS response: $Name"
+            if (Test-Path -LiteralPath $seedLog)
+            {
+                Write-Host "TLS failure diagnostics: $seedLog"
+                Get-Content -LiteralPath $seedLog -Tail 40 | Out-Host
+            }
         }
 
-        $seedModules = @(Get-Content -LiteralPath "$seedBody.modules.txt" | Sort-Object)
-
-        if (($seedModules -join ',') -ine 'ntdll.dll,Seed.Runtime.exe')
-        {
-            throw "Unexpected native TLS modules: $seedModules"
-        }
+        throw
     }
 }
 

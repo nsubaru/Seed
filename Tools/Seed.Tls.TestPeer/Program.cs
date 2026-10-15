@@ -62,6 +62,7 @@ await File.WriteAllBytesAsync(Path.Combine(directory, "root.der"), root.Export(X
 await File.WriteAllTextAsync(Path.Combine(directory, "url.txt"), $"https://{(ipv6 ? "[::1]" : "localhost")}:{port}/health");
 
 Console.WriteLine($"Independent .NET TLS {args[1]} test peer on loopback port {port}.");
+Console.WriteLine($"TLS peer environment: .NET {Environment.Version}; {Environment.OSVersion.VersionString}.");
 
 using var cancellation = new CancellationTokenSource();
 
@@ -162,7 +163,7 @@ async Task Handle(TcpClient socket)
         }
         catch (Exception exception) when (exception is IOException or AuthenticationException or OperationCanceledException)
         {
-            Console.Error.WriteLine($"TLS test peer: {exception.GetType().Name}: {exception.Message}");
+            Console.Error.WriteLine($"TLS test peer: {exception}");
         }
     }
 }
