@@ -1,4 +1,7 @@
-param([ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug')
+param(
+    [ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug',
+    [string] $ConfigurationDirectory
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -10,7 +13,16 @@ $seedRoundTrip   = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Manage
 $seedKmsVerifier = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.KMS.Verifier/Seed.KMS.Verifier.exe"
 $seedOutput      = Join-Path $seedRoot 'Artifacts/integration'
 
-New-Item -ItemType Directory -Path $seedOutput -Force | Out-Null
+$seedConfigurationDirectory = if ($ConfigurationDirectory)
+{
+    [IO.Path]::GetFullPath($ConfigurationDirectory)
+}
+else
+{
+    Join-Path $seedOutput ('configuration-' + [Guid]::NewGuid().ToString('N'))
+}
+
+New-Item -ItemType Directory -Path $seedOutput, $seedConfigurationDirectory -Force | Out-Null
 
 if ([Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 {
@@ -45,7 +57,7 @@ foreach ($seedName in $seedEnvironmentNames)
     [Environment]::SetEnvironmentVariable($seedName, $null)
 }
 
-[Environment]::SetEnvironmentVariable('SEED_CONFIG_DIRECTORY', (Join-Path $seedOutput ('configuration-' + [Guid]::NewGuid().ToString('N'))))
+[Environment]::SetEnvironmentVariable('SEED_CONFIG_DIRECTORY', $seedConfigurationDirectory)
 [UInt64]$seedProcessId = 0
 
 $seedProcess = $null
@@ -391,6 +403,7 @@ try
         throw 'Orderly shutdown timed out.'
     }
 
+    Write-Output "Saved configuration fixture: $(Join-Path $seedConfigurationDirectory 'core.v1.bin')"
     Write-Output 'Seed local KMS, native cryptography, RTTI, managed JSON interoperability, HTTP, packet limits and NTAPI module checks passed.'
 }
 finally

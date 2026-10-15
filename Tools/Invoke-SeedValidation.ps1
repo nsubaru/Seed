@@ -1,9 +1,10 @@
 param([ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug')
 
 $ErrorActionPreference = 'Stop'
+$seedRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+
 if ($env:GITHUB_ACTIONS -ceq 'true')
 {
-    $seedRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
     $seedCiHome = Join-Path $seedRoot 'Artifacts/ci-home'
     $seedCiTemp = Join-Path $seedRoot 'Artifacts/ci-temp'
     New-Item -ItemType Directory -Path $seedCiHome, $seedCiTemp -Force | Out-Null
@@ -21,9 +22,11 @@ if ($env:GITHUB_ACTIONS -ceq 'true')
 
 & (Join-Path $PSScriptRoot 'Invoke-SeedWorkflow.ps1') -Action Tests -Configuration $Configuration -NoBuild
 
-& (Join-Path $PSScriptRoot 'Test-SeedIntegration.ps1') -Configuration $Configuration
+$seedConfigurationDirectory = Join-Path $seedRoot ("Artifacts/integration/$Configuration/configuration-" + [Guid]::NewGuid().ToString('N'))
 
-& (Join-Path $PSScriptRoot 'Test-SeedConfigurationStartup.ps1') -Configuration $Configuration
+& (Join-Path $PSScriptRoot 'Test-SeedIntegration.ps1') -Configuration $Configuration -ConfigurationDirectory $seedConfigurationDirectory
+
+& (Join-Path $PSScriptRoot 'Test-SeedConfigurationStartup.ps1') -Configuration $Configuration -FixturePath (Join-Path $seedConfigurationDirectory 'core.v1.bin')
 
 & (Join-Path $PSScriptRoot 'Test-SeedHostConfiguration.ps1') -Configuration $Configuration
 

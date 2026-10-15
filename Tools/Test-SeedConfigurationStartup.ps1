@@ -1,16 +1,19 @@
-param([ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug')
+param(
+    [ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug',
+    [Parameter(Mandatory = $true)][ValidateNotNullOrEmpty()][string] $FixturePath
+)
 
 $ErrorActionPreference = 'Stop'
 
 $seedRoot    = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
-$seedFixture = Join-Path $seedRoot 'Artifacts/integration/configuration/core.v1.bin'
+$seedFixture = [IO.Path]::GetFullPath($FixturePath)
 $seedRuntime = Join-Path $seedRoot "Artifacts/x64/$Configuration/Runtime/Seed.Runtime.exe"
 $seedRunner  = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Managed.TestRunner/Seed.Managed.TestRunner.exe"
-$seedOutput  = Join-Path $seedRoot "Artifacts/configuration-validation/$Configuration"
+$seedOutput  = Join-Path $seedRoot ("Artifacts/configuration-validation/$Configuration/" + [Guid]::NewGuid().ToString('N'))
 
-if (-not (Test-Path -LiteralPath $seedFixture))
+if (-not (Test-Path -LiteralPath $seedFixture -PathType Leaf))
 {
-    throw 'Run Seed integration first to create a saved configuration fixture.'
+    throw "Saved configuration fixture was not found: $seedFixture"
 }
 
 $seedBytes = [IO.File]::ReadAllBytes($seedFixture)
@@ -97,3 +100,5 @@ foreach ($seedCase in @('valid', 'invalid-values', 'bad-magic', 'bad-version', '
 
     Write-Host "Configuration startup scenario passed: $seedCase"
 }
+
+Write-Output "Configuration startup reports: $seedOutput"

@@ -55,6 +55,10 @@ internal sealed class TestingPage : ISourcePage
         Tools/Test-SeedConfigurationStartup.ps1 starts with a valid saved snapshot,
         then checks invalid values, identity/version mismatches, truncation and extra
         bytes. Rejected configuration files remain unchanged.
+        Pass -FixturePath with the core.v1.bin path printed by integration. Integration
+        accepts -ConfigurationDirectory to select its saved configuration directory;
+        Invoke-SeedValidation.ps1 passes a fresh directory and its exact fixture path
+        between these steps for each run and build configuration.
 
         Tools/Test-SeedHostConfiguration.ps1 checks pending versus saved settings,
         completed reload, HTTP port/disable behavior, changed local pipe names and

@@ -32,8 +32,9 @@ The initial validation targets are Windows 11 24H2 and Windows Server 2025.
 ./Tools/Update-NtdllImportLibrary.ps1
 MSBuild Seed.slnx /m /restore /p:Configuration=Debug /p:Platform=x64
 ./Tools/Invoke-SeedWorkflow.ps1 -Action Tests -NoBuild
-./Tools/Test-SeedIntegration.ps1
-./Tools/Test-SeedConfigurationStartup.ps1
+$seedConfigurationDirectory = Join-Path $PWD ('Artifacts/integration/configuration-' + [Guid]::NewGuid().ToString('N'))
+./Tools/Test-SeedIntegration.ps1 -ConfigurationDirectory $seedConfigurationDirectory
+./Tools/Test-SeedConfigurationStartup.ps1 -FixturePath (Join-Path $seedConfigurationDirectory 'core.v1.bin')
 ./Tools/Test-SeedHostConfiguration.ps1
 ./Tools/Test-SeedRsaSigning.ps1
 ./Tools/Test-SeedTlsIdentity.ps1
