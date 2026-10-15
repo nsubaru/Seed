@@ -1,9 +1,12 @@
 param([ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug')
 
 $ErrorActionPreference = 'Stop'
-$seedRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+
+$seedRoot   = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $seedOutput = Join-Path $seedRoot ("Artifacts/rsa-signing/$Configuration/" + [Guid]::NewGuid().ToString('N'))
+
 New-Item -ItemType Directory -Path $seedOutput -Force | Out-Null
+
 $seedPrevious = [Environment]::GetEnvironmentVariable('SEED_RSA_VERIFY_DIRECTORY')
 
 try
@@ -12,6 +15,7 @@ try
 
     & (Join-Path $PSScriptRoot 'Invoke-SeedWorkflow.ps1') -Action Tests -Configuration $Configuration -Wildcard '*RsaSigning*' -Output (Join-Path $seedOutput 'native.xml') -NoBuild
     [xml]$seedReport = Get-Content -LiteralPath (Join-Path $seedOutput 'native.xml') -Raw
+
     if ($seedReport.'test-run'.passed -ne '3' -or $seedReport.'test-run'.failed -ne '0')
     {
         throw 'The three RSA signing tests did not pass.'
@@ -38,6 +42,7 @@ try
             [int]$seedRead = 0
             $seedPublic = [Convert]::FromHexString($seedMatch.Groups[1].Value)
             $seedRsa.ImportRSAPublicKey($seedPublic, [ref]$seedRead)
+
             if ($seedRead -ne $seedPublic.Length)
             {
                 throw 'Public RSA fixture has trailing data.'
@@ -48,6 +53,7 @@ try
                 foreach ($seedPadding in @('pkcs1', 'pss'))
                 {
                     $seedSignature = [IO.File]::ReadAllBytes((Join-Path $seedOutput "$seedBits-$seedHash-$seedPadding.sig"))
+
                     $seedMode = if ($seedPadding -eq 'pss')
                     {
                         [Security.Cryptography.RSASignaturePadding]::Pss
@@ -63,6 +69,7 @@ try
                     }
 
                     $seedSignature[$seedSignature.Length - 1] = $seedSignature[$seedSignature.Length - 1] -bxor 1
+                    
                     if ($seedRsa.VerifyData($seedMessage, $seedSignature, [Security.Cryptography.HashAlgorithmName]::new($seedHash), $seedMode))
                     {
                         throw 'Independent RSA verification accepted a modified signature.'

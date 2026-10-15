@@ -12,9 +12,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$seedRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+
+$seedRoot   = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $seedDocker = Get-Command docker.exe -ErrorAction Stop
-$seedOs = & $seedDocker.Source info --format '{{.OSType}}'
+$seedOs     = & $seedDocker.Source info --format '{{.OSType}}'
+
 if ($LASTEXITCODE -ne 0 -or $seedOs -cne 'windows')
 {
     throw 'Use a running Docker Windows-container engine.'
@@ -34,6 +36,7 @@ if ($BuildMemory)
 if (-not $SkipBuildTools)
 {
     & $seedDocker.Source build @seedResourceArguments --isolation $Isolation --file (Join-Path $seedRoot 'Docker/BuildTools.Dockerfile') --build-arg "SDK_IMAGE=$SdkImage" --tag $BuildToolsImage $seedRoot
+
     if ($LASTEXITCODE -ne 0)
     {
         throw 'Seed Windows build-tools image creation failed.'
@@ -43,6 +46,7 @@ if (-not $SkipBuildTools)
 & $seedDocker.Source build @seedResourceArguments --isolation $Isolation --file (Join-Path $seedRoot 'Docker/Seed.Dockerfile') `
     --target $Target --build-arg "BUILD_TOOLS_IMAGE=$BuildToolsImage" --build-arg "RUNTIME_IMAGE=$RuntimeImage" `
     --build-arg "CONFIGURATION=$Configuration" --build-arg "SUBSYSTEM=$Subsystem" --tag $Image $seedRoot
+    
 if ($LASTEXITCODE -ne 0)
 {
     throw 'Seed Docker source build failed.'

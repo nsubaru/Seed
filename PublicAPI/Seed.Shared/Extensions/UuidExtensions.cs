@@ -15,6 +15,7 @@ public static class UuidExtensions
     public unsafe static Guid PackUuid(UInt64 first, UInt64 second)
     {
         ulong* ptr = stackalloc ulong[2];
+        
         ptr[0] = first;
         ptr[1] = second;
 

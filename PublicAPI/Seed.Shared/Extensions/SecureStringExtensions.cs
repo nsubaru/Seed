@@ -27,6 +27,7 @@ public static class SecureStringExtensions
     {
         var secStr = new System.Security.SecureString();
         secStr.Clear();
+        
         foreach (char c in plainStr.ToCharArray())
         {
             secStr.AppendChar(c);

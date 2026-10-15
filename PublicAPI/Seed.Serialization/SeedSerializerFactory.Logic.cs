@@ -9,11 +9,12 @@ public partial class SeedSerializerFactory
         switch (typeName)
         {
             case Constants.Types.Boolean:
-                {
-                    code.AppendLine($"bool val = (bool) data;");
-                    code.AppendLine($"stream.Write(BitConverter.GetBytes(val), 0, 1);");
-                    break;
-                }
+            {
+                code.AppendLine($"bool val = (bool) data;");
+                code.AppendLine($"stream.Write(BitConverter.GetBytes(val), 0, 1);");
+                
+                break;
+            }
 
             default:
                 throw new NotImplementedException($"Serialization of type  '{typeName}' and type class '{typeName}' not implemented");
@@ -25,12 +26,13 @@ public partial class SeedSerializerFactory
         switch (typeName)
         {
             case Constants.Types.Boolean:
-                {
-                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(bool)];");
-                    code.AppendLine("stream.Read(buffer);");
-                    code.AppendLine("data = BitConverter.ToBoolean(buffer);");
-                    break;
-                }
+            {
+                code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(bool)];");
+                code.AppendLine("stream.Read(buffer);");
+                code.AppendLine("data = BitConverter.ToBoolean(buffer);");
+
+                break;
+            }
 
             default:
                 throw new NotImplementedException($"Serialization of type  '{typeName}' and type class '{typeName}' not implemented");

@@ -18,19 +18,13 @@ public readonly struct Utf8String : IEquatable<Utf8String>
         Bytes = bytes.ToArray();
     }
 
-    public byte[] Bytes
-    {
-        get;
-    }
+    public byte[] Bytes { get; }
 
     public int ByteCount => Bytes?.Length ?? 0;
 
     public bool IsEmpty => ByteCount == 0;
 
-    public static Utf8String Empty
-    {
-        get;
-    } = new(Array.Empty<byte>());
+    public static Utf8String Empty { get; } = new(Array.Empty<byte>());
 
     public static Utf8String FromString(string? value)
     {
@@ -62,6 +56,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>
         unchecked
         {
             var hash = 17;
+            
             foreach (var item in Bytes ?? Array.Empty<byte>())
             {
                 hash = hash * 31 + item;

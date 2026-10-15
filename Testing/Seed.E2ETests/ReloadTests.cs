@@ -38,10 +38,14 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
     {
         string before = RuntimeSession.Composition(await Runtime.CommandAsync("status.kernel"));
         int processId = Runtime.ProcessId;
+
         await Runtime.DisconnectAsync();
+
         string runtime = Path.GetFullPath(Environment.GetEnvironmentVariable("SEED_E2E_RUNTIME")!);
         string console = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(runtime)!)!, "Seed.Console", "Seed.Console.exe");
+
         Assert.True(File.Exists(console), "Build the matching console demonstration before running its E2E checks.");
+
         var start = new ProcessStartInfo(console)
         {
             UseShellExecute = false,
@@ -50,6 +54,7 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
             RedirectStandardError = true,
             WorkingDirectory = Runtime.Directory
         };
+
         if (!interactive)
         {
             start.ArgumentList.Add("reload");
@@ -57,36 +62,46 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
 
         using var process = Process.Start(start)!;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+
         deadline.CancelAfter(TimeSpan.FromSeconds(30));
+
         try
         {
 #pragma warning disable xUnit1051 // The owned-process deadline is linked to the current test token.
 
             Task<string> output = process.StandardOutput.ReadToEndAsync(deadline.Token);
             Task<string> errors = process.StandardError.ReadToEndAsync(deadline.Token);
+
             if (interactive)
             {
                 await process.StandardInput.WriteLineAsync("reload".AsMemory(), deadline.Token);
                 await process.StandardInput.WriteLineAsync("version".AsMemory(), deadline.Token);
                 await process.StandardInput.WriteLineAsync("exit".AsMemory(), deadline.Token);
+
                 process.StandardInput.Close();
             }
 
             await process.WaitForExitAsync(deadline.Token);
+
 #pragma warning restore xUnit1051
             Assert.Equal(0, process.ExitCode);
             Assert.Empty(await errors);
+
             string text = await output;
+
             Assert.Contains("Runtime transition requested", text);
             Assert.Contains("Waiting for Seed runtime reinitialization...", text);
             Assert.Contains("Seed runtime reinitialized; KMS reconnected.", text);
+
             if (interactive)
             {
                 Assert.Contains("Seed 0.1.0", text);
             }
 
             await Runtime.ReconnectAsync();
+
             string after = RuntimeSession.Composition(await Runtime.CommandAsync("status.kernel"));
+
             Assert.NotEqual(before, after);
             Assert.Equal(processId, Runtime.ProcessId);
             Assert.False(Runtime.HasExited);
@@ -96,6 +111,7 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
             if (!process.HasExited)
             {
                 process.Kill();
+                
                 await process.WaitForExitAsync(CancellationToken.None);
             }
         }

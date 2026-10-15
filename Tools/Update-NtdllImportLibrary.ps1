@@ -14,6 +14,7 @@ function Find-VsTool
     param([string] $ToolName)
 
     $vsRoot = Join-Path ${env:ProgramFiles} "Microsoft Visual Studio"
+
     if (-not (Test-Path $vsRoot))
     {
         throw "Visual Studio root not found: $vsRoot"
@@ -63,8 +64,7 @@ function Write-DefExports
         [string[]] $Exports
     )
 
-    $seen =
-    @{}
+    $seen           = @{}
     $orderedExports = @()
 
     foreach ($export in $Exports)
@@ -85,7 +85,8 @@ function Get-SystemNtdllExports
     param([string] $DumpbinPath)
 
     $ntdllPath = Join-Path $env:SystemRoot "System32\ntdll.dll"
-    $output = & $DumpbinPath /exports $ntdllPath
+    $output    = & $DumpbinPath /exports $ntdllPath
+    
     if ($LASTEXITCODE -ne 0)
     {
         throw "dumpbin failed with exit code $LASTEXITCODE"
@@ -98,6 +99,7 @@ function Get-SystemNtdllExports
         if ($line -match "^\s*\d+\s+[0-9A-Fa-f]+\s+[0-9A-Fa-f]+\s+([^\s=]+)")
         {
             $name = $Matches[1]
+
             if ($name -ne "[NONAME]")
             {
                 $exports += $name
@@ -150,6 +152,7 @@ if (-not $SkipLib)
     }
 
     & $LibExe /def:$defPath /machine:amd64 /out:$libPath
+
     if ($LASTEXITCODE -ne 0)
     {
         throw "lib.exe failed with exit code $LASTEXITCODE"
@@ -157,6 +160,7 @@ if (-not $SkipLib)
 }
 
 Write-Host "Updated $defPath"
+
 if (-not $SkipLib)
 {
     Write-Host "Updated $libPath"

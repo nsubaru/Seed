@@ -136,22 +136,19 @@ namespace Seed::Examples
         /// </summary>
         /// <param name="location">Source position of the failed operation.</param>
         /// <param name="message">Message copied into exception-owned storage.</param>
-        FailureException(Core::SourceLocation location, Core::ConstString message) : Exception(location, message) {
-        }
+        FailureException(Core::SourceLocation location, Core::ConstString message) : Exception(location, message) {}
 
         /// <summary>
         /// Copies the failure and its inherited diagnostic state.
         /// </summary>
         /// <param name="other">Failure whose diagnostic state is retained.</param>
-        FailureException(const FailureException& other) : Exception(other) {
-        }
+        FailureException(const FailureException& other) : Exception(other) {}
 
         /// <summary>
         /// Transfers the failure and its inherited diagnostic state.
         /// </summary>
         /// <param name="other">Failure supplying the diagnostic state.</param>
-        FailureException(FailureException&& other) : Exception(Core::MoveRValue(other)) {
-        }
+        FailureException(FailureException&& other) : Exception(Core::MoveRValue(other)) {}
 
         /// <summary>
         /// Formats the inherited failure diagnostics on the exception heap.
@@ -177,10 +174,9 @@ namespace Seed::Examples
         /// <summary>
         /// Releases the inherited exception-owned diagnostic state.
         /// </summary>
-        ~FailureException() override {
-        }
+        ~FailureException() override {}
     };
-} // namespace Seed::Examples
+}
 ```
 
 ```cpp
@@ -253,40 +249,37 @@ namespace Seed::Examples
     public:
         RefCountClassOutsideHeader(ImageCountService);
     };
-} // namespace Seed::Examples
+}
 ```
 
 ```cpp
 // Example.ImageCountService.cpp
 #include "Example.ImageCountService.h"
 
-namespace Seed::Examples
-{
-    struct ImageCountService::Data {
-        Core::RefCountT RefCount;
-        Core::Services::RuntimeManagementService RuntimeManagement;
+using namespace Seed;
+using namespace Seed::Examples;
 
-        Data(Core::Services::RuntimeManagementService runtimeManagement) : RefCount(1),
-                                                                           RuntimeManagement(Core::MoveRValue(runtimeManagement)) {
-        }
-    };
+struct ImageCountService::Data {
+    Core::RefCountT RefCount;
+    Core::Services::RuntimeManagementService RuntimeManagement;
 
-    RefCountClassOutside(ImageCountService);
-
-    ImageCountService::ImageCountService(
-        Core::Services::RuntimeManagementService runtimeManagement
-    ) : This(new Data(Core::MoveRValue(runtimeManagement))) {
+    Data(Core::Services::RuntimeManagementService runtimeManagement) : RefCount(1),
+                                                                        RuntimeManagement(Core::MoveRValue(runtimeManagement)) {
     }
+};
 
-    void ImageCountService::Dispose() {
-    }
+RefCountClassOutside(ImageCountService);
 
-    Core::SizeT ImageCountService::GetImageCount() const {
-        auto instances = This->RuntimeManagement.GetActiveRuntimeInstances();
+ImageCountService::ImageCountService(Core::Services::RuntimeManagementService runtimeManagement)
+    : This(new Data(Core::MoveRValue(runtimeManagement))) {}
 
-        return instances.Count;
-    }
-} // namespace Seed::Examples
+void ImageCountService::Dispose() {}
+
+Core::SizeT ImageCountService::GetImageCount() const {
+    auto instances = This->RuntimeManagement.GetActiveRuntimeInstances();
+
+    return instances.Count;
+}
 ```
 
 The non-Core component's instantiation unit owns this helper and its retained
@@ -299,16 +292,17 @@ Do not assume that inheriting the CRTP helper alone instantiates its inline stat
 #include "Example.ImageCountService.h"
 #include "Seed.Core.Services.BootupServicesManager.h"
 
-namespace Seed::Examples
-{
-    /// <summary>
-    /// Declares the image-count service and its ordered IoC constructor dependencies.
-    /// </summary>
-    class ImageCountServiceDiRegistration final : protected Core::Services::IBootUpService<
-                                                      ImageCountService,
-                                                      Core::Services::RuntimeManagementService> {
-    };
-} // namespace Seed::Examples
+using namespace Seed;
+using namespace Seed::Examples;
+
+/// <summary>
+/// Declares the image-count service and its ordered IoC constructor dependencies.
+/// </summary>
+class ImageCountServiceDiRegistration final : 
+    protected Core::Services::IBootUpService<
+        ImageCountService,
+        Core::Services::RuntimeManagementService> {
+};
 
 template class Seed::Core::Services::IGeneralBootUpService<false, Seed::Examples::ImageCountService, Seed::Core::Services::RuntimeManagementService>;
 

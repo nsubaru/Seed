@@ -11,19 +11,11 @@ public struct StackTraceRecord
     /// The actual number of function addresses
     /// </summary>
     [SerializableStructField]
-    public SizeT Count
-    {
-        get;
-        set;
-    }
+    public SizeT Count { get; set; }
 
     /// <summary>
     /// Function addresses
     /// </summary>
     [SerializableStructField]
-    public SizeT[] FunctionAddress
-    {
-        get;
-        set;
-    }
+    public SizeT[] FunctionAddress { get; set; }
 };

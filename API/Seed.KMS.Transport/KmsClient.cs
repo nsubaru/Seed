@@ -12,20 +12,12 @@ public sealed record KmsDatagram
     /// <summary>
     /// Owning text payload decoded from a complete message-pipe packet.
     /// </summary>
-    public required string Text
-    {
-        get;
-        init;
-    }
+    public required string Text { get; init; }
 
     /// <summary>
     /// Whether the runtime reported this datagram as an error.
     /// </summary>
-    public required bool IsError
-    {
-        get;
-        init;
-    }
+    public required bool IsError { get; init; }
 }
 
 /// <summary>
@@ -61,6 +53,7 @@ public sealed class KmsClient : IAsyncDisposable
         }
 
         this.pipeName = pipeName;
+
         pipe = CreatePipe();
     }
 
@@ -83,7 +76,9 @@ public sealed class KmsClient : IAsyncDisposable
         }
 
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         deadline.CancelAfter(timeout);
+
         try
         {
             for (; ; )
@@ -91,8 +86,11 @@ public sealed class KmsClient : IAsyncDisposable
                 try
                 {
                     await pipe.ConnectAsync(deadline.Token).ConfigureAwait(false);
+
                     pipe.ReadMode = PipeTransmissionMode.Message;
+                    
                     var marker = await ReadPacketAsync(deadline.Token).ConfigureAwait(false);
+
                     if (marker.Category != 1 || marker.Subtype != 5 || marker.Text != "SEED_KMS/1")
                     {
                         throw new InvalidDataException("The endpoint did not initialize a Seed KMS version-one session.");
@@ -107,7 +105,9 @@ public sealed class KmsClient : IAsyncDisposable
                     // A restarting runtime can close the old pipe before initialization.
                     // No command has been sent, so opening a fresh session is safe.
                     await pipe.DisposeAsync().ConfigureAwait(false);
+
                     pipe = CreatePipe();
+
                     await Task.Delay(TimeSpan.FromMilliseconds(100), deadline.Token).ConfigureAwait(false);
                 }
             }
@@ -132,9 +132,11 @@ public sealed class KmsClient : IAsyncDisposable
     {
         var result = new List<KmsDatagram>();
         int outputBytes = 0;
+
         await foreach (var datagram in ExecuteStreamingAsync(command, argumentProvider, cancellationToken).ConfigureAwait(false))
         {
             outputBytes = checked(outputBytes + datagram.Text.Length * 2);
+
             if (outputBytes > 4 * 1024 * 1024)
             {
                 throw new InvalidDataException("The command response exceeds the console collection limit; use ExecuteStreamingAsync for live output.");
@@ -163,11 +165,16 @@ public sealed class KmsClient : IAsyncDisposable
         }
 
         await commandGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+
         bool completed = false;
         bool reload = command == "reload" || command.StartsWith("reload ", StringComparison.Ordinal);
+
         using var reloadDeadline = reload ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken) : null;
+
         reloadDeadline?.CancelAfter(TimeSpan.FromMinutes(1));
+
         var operationToken = reloadDeadline?.Token ?? cancellationToken;
+
         try
         {
             if (!connected)
@@ -177,18 +184,24 @@ public sealed class KmsClient : IAsyncDisposable
 
             string? previousComposition = null;
             string nextPipeName = pipeName;
+
             if (reload)
             {
                 previousComposition = Composition(await ExchangeTextAsync("status.kernel", operationToken).ConfigureAwait(false));
+
                 string settings = await ExchangeTextAsync("configurations.get host.kms.pipeName", operationToken).ConfigureAwait(false);
+
                 const string prefix = "Next KMS endpoint: ";
+
                 string[] endpoints = settings.Split('\n').Where(line => line.StartsWith(prefix, StringComparison.Ordinal)).ToArray();
+
                 if (endpoints.Length != 1)
                 {
                     throw new InvalidDataException("The runtime did not identify its saved KMS reload endpoint.");
                 }
 
                 nextPipeName = endpoints[0][prefix.Length..].Trim();
+
                 if (string.IsNullOrWhiteSpace(nextPipeName) || nextPipeName.IndexOfAny(['\\', '/']) >= 0)
                 {
                     throw new InvalidDataException("The runtime advertised an invalid local KMS reload endpoint.");
@@ -196,18 +209,24 @@ public sealed class KmsClient : IAsyncDisposable
             }
 
             await SendPacketAsync(6, command, operationToken).ConfigureAwait(false);
+
             if (command == "exit")
             {
                 connected = false;
+
                 await pipe.DisposeAsync().ConfigureAwait(false);
+
                 completed = true;
+
                 yield break;
             }
 
             bool rejected = false;
+
             for (; ; )
             {
                 var packet = await ReadPacketAsync(operationToken).ConfigureAwait(false);
+
                 if (packet.Category == 1 && packet.Subtype == 5)
                 {
                     if (packet.Text.Length != 0)
@@ -221,6 +240,7 @@ public sealed class KmsClient : IAsyncDisposable
                     }
 
                     completed = true;
+
                     yield break;
                 }
 
@@ -228,6 +248,7 @@ public sealed class KmsClient : IAsyncDisposable
                 {
                     var argument = await argumentProvider(packet.Text, operationToken).ConfigureAwait(false);
                     await SendPacketAsync(4, argument, operationToken).ConfigureAwait(false);
+
                     continue;
                 }
 
@@ -237,6 +258,7 @@ public sealed class KmsClient : IAsyncDisposable
                 }
 
                 rejected |= packet.Subtype == 4;
+
                 yield return new KmsDatagram
                 {
                     Text = packet.Text,
@@ -264,11 +286,14 @@ public sealed class KmsClient : IAsyncDisposable
     private async Task<string> ExchangeTextAsync(string command, CancellationToken token)
     {
         await SendPacketAsync(6, command, token).ConfigureAwait(false);
+
         var output = new StringBuilder();
         bool rejected = false;
+
         for (; ; )
         {
             var packet = await ReadPacketAsync(token).ConfigureAwait(false);
+
             if (packet.Category == 1 && packet.Subtype == 5 && packet.Text.Length == 0)
             {
                 if (rejected)
@@ -290,6 +315,7 @@ public sealed class KmsClient : IAsyncDisposable
             }
 
             output.Append(packet.Text);
+
             rejected |= packet.Subtype == 4;
         }
     }
@@ -297,13 +323,16 @@ public sealed class KmsClient : IAsyncDisposable
     private static string Composition(string status)
     {
         const string prefix = "Composition: ";
+
         string[] identifiers = status.Split('\n').Where(line => line.StartsWith(prefix, StringComparison.Ordinal)).ToArray();
+
         if (identifiers.Length != 1)
         {
             throw new InvalidDataException("The runtime did not identify one composition.");
         }
 
         string identifier = identifiers[0][prefix.Length..].Trim();
+
         if (identifier.Length == 0 || identifier.Any(character => character is < '0' or > '9'))
         {
             throw new InvalidDataException("The runtime composition identifier is malformed.");
@@ -315,16 +344,22 @@ public sealed class KmsClient : IAsyncDisposable
     private async Task ReconnectAfterReloadAsync(string previousComposition, string nextPipeName, CancellationToken token)
     {
         connected = false;
+
         await pipe.DisposeAsync().ConfigureAwait(false);
+
         pipeName = nextPipeName;
-        pipe = CreatePipe();
+        pipe     = CreatePipe();
+
         for (; ; )
         {
             token.ThrowIfCancellationRequested();
+
             await ConnectAsync(TimeSpan.FromMinutes(1), token).ConfigureAwait(false);
+
             try
             {
                 string status = await ExchangeTextAsync("status.kernel", token).ConfigureAwait(false);
+
                 if (Composition(status) != previousComposition)
                 {
                     return;
@@ -337,8 +372,11 @@ public sealed class KmsClient : IAsyncDisposable
             }
 
             connected = false;
+
             await pipe.DisposeAsync().ConfigureAwait(false);
+
             pipe = CreatePipe();
+
             await Task.Delay(TimeSpan.FromMilliseconds(100), token).ConfigureAwait(false);
         }
     }
@@ -351,6 +389,7 @@ public sealed class KmsClient : IAsyncDisposable
         }
 
         int length = checked(TextEncoding.GetByteCount(text) + 5);
+
         if (length > MaximumMessageBytes)
         {
             throw new ArgumentException("KMS packet exceeds the message limit.", nameof(text));
@@ -359,7 +398,9 @@ public sealed class KmsClient : IAsyncDisposable
         var bytes = new byte[length];
         bytes[0] = 1;
         bytes[1] = subtype;
+
         TextEncoding.GetBytes(text, bytes.AsSpan(5));
+
         await pipe.WriteAsync(bytes, token).ConfigureAwait(false);
     }
 
@@ -367,27 +408,32 @@ public sealed class KmsClient : IAsyncDisposable
     {
         var bytes = new byte[MaximumMessageBytes];
         int count = 0;
+
         do
         {
             int read = await pipe.ReadAsync(bytes.AsMemory(count), token).ConfigureAwait(false);
+
             if (read == 0)
             {
                 throw new EndOfStreamException("The Seed KMS session disconnected.");
             }
 
             count += read;
+
             if (count == bytes.Length && !pipe.IsMessageComplete)
             {
                 throw new InvalidDataException("KMS packet exceeds the message limit.");
             }
         }
         while (!pipe.IsMessageComplete);
+
         if (count < 5 || (count - 5) % 2 != 0 || bytes[3] != 0 || bytes[4] != 0 || (bytes[0] == 1 ? bytes[2] != 0 : bytes[1] != 0))
         {
             throw new InvalidDataException("Malformed KMS packet header or UTF-16 payload size.");
         }
 
         string text = TextEncoding.GetString(bytes, 5, count - 5);
+        
         if (text.Contains('\0'))
         {
             throw new InvalidDataException("KMS text contains a null character.");

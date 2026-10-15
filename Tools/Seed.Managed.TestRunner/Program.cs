@@ -4,6 +4,7 @@ using System.Security.Principal;
 using System.Xml.Linq;
 
 var options = new Dictionary<string, string>(StringComparer.Ordinal);
+
 for (var index = 0; index < args.Length; ++index)
 {
     if (!args[index].StartsWith("--") || index + 1 == args.Length)
@@ -15,14 +16,17 @@ for (var index = 0; index < args.Length; ++index)
 }
 
 string Option(string key, string fallback) => options.GetValueOrDefault(key, fallback);
-var root = Directory.GetCurrentDirectory();
-var runtime = Path.GetFullPath(Option("--runtime", Path.Combine(root, "Artifacts/x64/Debug/Runtime/Seed.Runtime.exe")));
-var report = Path.GetFullPath(Option("--report", Path.Combine(root, "Artifacts/tests/native.xml")));
-var selection = Option("--test", Option("--wildcard", "*"));
+
+var root          = Directory.GetCurrentDirectory();
+var runtime       = Path.GetFullPath(Option("--runtime", Path.Combine(root, "Artifacts/x64/Debug/Runtime/Seed.Runtime.exe")));
+var report        = Path.GetFullPath(Option("--report", Path.Combine(root, "Artifacts/tests/native.xml")));
+var selection     = Option("--test", Option("--wildcard", "*"));
 var configuration = Path.GetFullPath(Option("--configuration-directory", Path.Combine(root, "Artifacts/tests/configuration")));
-var metadata = options.TryGetValue("--rtti", out var rtti) ? Path.GetFullPath(rtti) : "";
-var elevated = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+var metadata      = options.TryGetValue("--rtti", out var rtti) ? Path.GetFullPath(rtti) : "";
+var elevated      = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+
 Console.WriteLine($"Elevated: {elevated}");
+
 if (elevated)
 {
     throw new InvalidOperationException("Run standard Seed tests under a non-elevated account.");
@@ -36,8 +40,10 @@ if (!File.Exists(runtime))
 // Network self-tests currently use fixed loopback ports. Keep runner invocations
 // under this Windows account sequential, including different checkout/configuration paths.
 using var testLease = await AcquireTestLeaseAsync();
+
 Directory.CreateDirectory(configuration);
 Directory.CreateDirectory(Path.GetDirectoryName(report)!);
+
 if (metadata.Length != 0)
 {
     Directory.CreateDirectory(Path.GetDirectoryName(metadata)!);
@@ -52,15 +58,19 @@ Environment.SetEnvironmentVariable("SEED_CONFIG_DIRECTORY", configuration);
 Environment.SetEnvironmentVariable("SEED_RUN_TESTS", selection);
 Environment.SetEnvironmentVariable("SEED_TEST_REPORT", report);
 Environment.SetEnvironmentVariable("SEED_RTTI_EXPORT", metadata);
+
 var status = Starter.SeedStartRuntime(runtime, "Seed.Runtime.exe", out var processId);
+
 if (status < 0)
 {
     throw new InvalidOperationException($"Native startup failed: NTSTATUS 0x{status:X8}.");
 }
 
 Console.WriteLine($"Started Seed process {processId}; selection {selection}.");
+
 using var process = Process.GetProcessById(checked((int)processId));
 using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(double.Parse(Option("--timeout-seconds", "600"), System.Globalization.CultureInfo.InvariantCulture)));
+
 try
 {
     await process.WaitForExitAsync(deadline.Token);
@@ -83,10 +93,14 @@ if (!File.Exists(report))
 
 var run = XDocument.Load(report).Root ?? throw new InvalidDataException("Empty test report.");
 var tests = run.Descendants("test-case").ToArray();
+
 bool IsIntentionalSkip(XElement test) => (string?)test.Attribute("result") == "Skipped" && test.Element("reason")?.Element("message")?.Value == "Returned false";
+
 var skipped = tests.Count(IsIntentionalSkip);
 var failed = tests.Count(test => (string?)test.Attribute("result") != "Passed" && !IsIntentionalSkip(test));
+
 Console.WriteLine($"Native tests: {tests.Length}; passed: {tests.Length - failed - skipped}; skipped: {skipped}; failed: {failed}; report: {report}.");
+
 foreach (var test in tests.Where(test => (string?)test.Attribute("result") != "Passed" && !IsIntentionalSkip(test)))
 {
     Console.WriteLine($"FAIL {(string?)test.Attribute("fullname")}: {test.Element("failure")?.Element("message")?.Value}");
@@ -98,6 +112,7 @@ if (tests.Length == 0 || failed != 0)
 }
 
 return 0;
+
 async Task<FileStream> AcquireTestLeaseAsync()
 {
     var path = Path.Combine(Path.GetTempPath(), "Seed.Native.TestRunner.v1.lock");

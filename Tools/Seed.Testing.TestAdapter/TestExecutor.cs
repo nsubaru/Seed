@@ -74,7 +74,13 @@ namespace Seed.Testing.TestAdapter
                 {
                     "FullyQualifiedName", "Name"
                 }, name => name == "FullyQualifiedName" ? TestCaseProperties.FullyQualifiedName : name == "Name" ? TestCaseProperties.DisplayName : null);
-                var selected = group.GroupBy(test => test.FullyQualifiedName).Select(items => items.First()).Where(test => filter is null || filter.MatchTestCase(test, name => name == "FullyQualifiedName" ? test.FullyQualifiedName : name == "Name" ? test.DisplayName : null)).ToArray();
+
+                var selected = group
+                    .GroupBy(test => test.FullyQualifiedName)
+                    .Select(items => items.First())
+                    .Where(test => filter is null || filter.MatchTestCase(test, name => name == "FullyQualifiedName" ? test.FullyQualifiedName : name == "Name" ? test.DisplayName : null))
+                    .ToArray();
+
                 if (selected.Length == 0)
                 {
                     continue;
@@ -89,8 +95,11 @@ namespace Seed.Testing.TestAdapter
                 {
                     string output = AdapterHost.NewOutputPath();
                     string selection = Path.Combine(Path.GetDirectoryName(output)!, "selection.xml");
+
                     new XDocument(new XElement("tests", selected.Select(test => new XElement("test", new XAttribute("name", test.FullyQualifiedName.Replace(".", "::")))))).Save(selection);
+                    
                     Action<int>? attach = null;
+
                     if (runContext.IsBeingDebugged)
                     {
                         if (!(frameworkHandle is IFrameworkHandle2 debugger))
@@ -108,7 +117,9 @@ namespace Seed.Testing.TestAdapter
                     }
 
                     AdapterHost.Invoke("run", group.Key, selection, output, canceled.Token, attach);
+
                     var results = XDocument.Load(output).Descendants("test-case").ToDictionary(test => (string)test.Attribute("fullname")!);
+
                     var mapped = selected.Select(test =>
                     {
                         if (!results.TryGetValue(test.FullyQualifiedName.Replace(".", "::"), out var native))
@@ -118,14 +129,15 @@ namespace Seed.Testing.TestAdapter
 
                         var result = new TestResult(test)
                         {
-                            Outcome = (string?)native.Attribute("result") == "Passed" ? TestOutcome.Passed : (string?)native.Attribute("result") == "Skipped" && native.Element("reason")?.Element("message")?.Value == "Returned false" ? TestOutcome.Skipped : TestOutcome.Failed,
-                            ErrorMessage = native.Element("failure")?.Element("message")?.Value ?? native.Element("reason")?.Element("message")?.Value,
+                            Outcome         = (string?)native.Attribute("result") == "Passed" ? TestOutcome.Passed : (string?)native.Attribute("result") == "Skipped" && native.Element("reason")?.Element("message")?.Value == "Returned false" ? TestOutcome.Skipped : TestOutcome.Failed,
+                            ErrorMessage    = native.Element("failure")?.Element("message")?.Value ?? native.Element("reason")?.Element("message")?.Value,
                             ErrorStackTrace = native.Element("failure")?.Element("stack-trace")?.Value,
-                            Duration = TimeSpan.FromSeconds(double.Parse((string?)native.Attribute("duration") ?? "0", CultureInfo.InvariantCulture))
+                            Duration        = TimeSpan.FromSeconds(double.Parse((string?)native.Attribute("duration") ?? "0", CultureInfo.InvariantCulture))
                         };
 
                         return result;
                     }).ToArray();
+
                     foreach (var result in mapped)
                     {
                         frameworkHandle.RecordResult(result);
@@ -135,14 +147,16 @@ namespace Seed.Testing.TestAdapter
                 catch (Exception exception)
                 {
                     frameworkHandle.SendMessage(TestMessageLevel.Error, exception.ToString());
+
                     foreach (var test in selected)
                     {
                         var result = new TestResult(test)
                         {
-                            Outcome = TestOutcome.Failed,
-                            ErrorMessage = exception.Message,
+                            Outcome         = TestOutcome.Failed,
+                            ErrorMessage    = exception.Message,
                             ErrorStackTrace = exception.ToString()
                         };
+
                         frameworkHandle.RecordResult(result);
                         frameworkHandle.RecordEnd(test, result.Outcome);
                     }

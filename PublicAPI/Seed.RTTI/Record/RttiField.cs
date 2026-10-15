@@ -6,7 +6,6 @@ namespace Seed.RTTI.Record;
 /// <summary>
 /// A base RTTI field class
 /// </summary>
-/// <typeparam name="THeap">Heap type</typeparam>
 public unsafe class RttiField : IRttiIterableObject<RttiField>
 {
     internal RttiIterator<RttiField>? it;

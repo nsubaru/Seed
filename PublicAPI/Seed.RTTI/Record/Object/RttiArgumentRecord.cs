@@ -11,7 +11,7 @@ public unsafe class RttiArgumentRecord : IRttiIterableObject<RttiArgumentRecord>
 
     ArgumentMetaData* GetRecord()
     {
-        return (ArgumentMetaData*)it!.item;
+        return (ArgumentMetaData*) it!.item;
     }
 
     public RttiArgumentRecord()

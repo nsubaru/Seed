@@ -7,193 +7,93 @@ namespace Seed.Core.Services.Diagnostic;
 public struct ContextRecordDiagnosticData
 {
     [SerializableStructField]
-    public UniversalTypeIdentifier ContextType
-    {
-        get;
-        set;
-    }
+    public UniversalTypeIdentifier ContextType { get; set; }
 
     [SerializableStructField]
-    public UInt64 ContextId
-    {
-        get;
-        set;
-    }
+    public UInt64 ContextId { get; set; }
 }
 
 [SerializableStruct("Seed::Core::Services::Diagnostic::ContextBlockViewDiagnosticData")]
 public struct ContextBlockViewDiagnosticData
 {
     [SerializableStructField]
-    public ID ContextBlockId
-    {
-        get;
-        set;
-    }
+    public ID ContextBlockId { get; set; }
 
     [SerializableStructField]
-    public ID ParentContextBlockId
-    {
-        get;
-        set;
-    }
+    public ID ParentContextBlockId { get; set; }
 
     [SerializableStructField]
-    public Boolean IsManual
-    {
-        get;
-        set;
-    }
+    public Boolean IsManual { get; set; }
 
     [SerializableStructField]
-    public EThreadableTypes ThreadableType
-    {
-        get;
-        set;
-    }
+    public EThreadableTypes ThreadableType { get; set; }
 
     [SerializableStructField]
-    public List<ContextRecordDiagnosticData> Contexts
-    {
-        get;
-        set;
-    }
+    public List<ContextRecordDiagnosticData> Contexts { get; set; }
 }
 
 [SerializableStruct("Seed::Core::Services::Diagnostic::ServicesThreadableContextDiagnosticProviderData")]
 public struct ServicesThreadableContextDiagnosticProviderData
 {
     [SerializableStructField]
-    public ID Id
-    {
-        get;
-        set;
-    }
+    public ID Id { get; set; }
 
     [SerializableStructField]
-    public ID DependencyInjectionId
-    {
-        get;
-        set;
-    }
+    public ID DependencyInjectionId { get; set; }
 
     [SerializableStructField]
-    public String ScopeName
-    {
-        get;
-        set;
-    }
+    public String ScopeName { get; set; }
 }
 
 [SerializableStruct("Seed::Core::Services::Diagnostic::DependencyInjectionServiceDiagnosticData")]
 public struct DependencyInjectionServiceDiagnosticData
 {
     [SerializableStructField]
-    public UInt64 ServiceAddress
-    {
-        get;
-        set;
-    }
+    public UInt64 ServiceAddress { get; set; }
 
     [SerializableStructField]
-    public UniversalTypeIdentifier ServiceType
-    {
-        get;
-        set;
-    }
+    public UniversalTypeIdentifier ServiceType { get; set; }
 
     [SerializableStructField]
-    public UniversalTypeIdentifier ResolverType
-    {
-        get;
-        set;
-    }
+    public UniversalTypeIdentifier ResolverType { get; set; }
 
     [SerializableStructField]
-    public List<UniversalTypeIdentifier> Dependencies
-    {
-        get;
-        set;
-    }
+    public List<UniversalTypeIdentifier> Dependencies { get; set; }
 
     [SerializableStructField]
-    public UniversalTypeIdentifier InterfaceType
-    {
-        get;
-        set;
-    }
+    public UniversalTypeIdentifier InterfaceType { get; set; }
 
     [SerializableStructField]
-    public Boolean IsStoredAsDynamic
-    {
-        get;
-        set;
-    }
+    public Boolean IsStoredAsDynamic { get; set; }
 
     [SerializableStructField]
-    public Boolean IsInitialized
-    {
-        get;
-        set;
-    }
+    public Boolean IsInitialized { get; set; }
 
     [SerializableStructField]
-    public Boolean IsReady
-    {
-        get;
-        set;
-    }
+    public Boolean IsReady { get; set; }
 }
 
 [SerializableStruct("Seed::Core::Services::Diagnostic::DepencyInjectionDiagnosticData")]
 public struct DepencyInjectionDiagnosticData
 {
     [SerializableStructField]
-    public ID DepencyInjectionId
-    {
-        get;
-        set;
-    }
+    public ID DepencyInjectionId { get; set; }
 
     [SerializableStructField]
-    public ID ParrentDepencyInjectionId
-    {
-        get;
-        set;
-    }
+    public ID ParrentDepencyInjectionId { get; set; }
 
     [SerializableStructField]
-    public UInt64 ConstructedServicesCount
-    {
-        get;
-        set;
-    }
+    public UInt64 ConstructedServicesCount { get; set; }
 
     [SerializableStructField]
-    public UInt64 ConstructibleServicesCount
-    {
-        get;
-        set;
-    }
+    public UInt64 ConstructibleServicesCount { get; set; }
 
     [SerializableStructField]
-    public UInt64 ReadyServicesCount
-    {
-        get;
-        set;
-    }
+    public UInt64 ReadyServicesCount { get; set; }
 
     [SerializableStructField]
-    public UInt64 ReadyabilityServicesCount
-    {
-        get;
-        set;
-    }
+    public UInt64 ReadyabilityServicesCount { get; set; }
 
     [SerializableStructField]
-    public List<DependencyInjectionServiceDiagnosticData> Services
-    {
-        get;
-        set;
-    }
+    public List<DependencyInjectionServiceDiagnosticData> Services { get; set; }
 }

@@ -13,18 +13,12 @@ public interface ITemplateCustomClassSerializerFactory
     /// <summary>
     /// Custom class .Net CLR type
     /// </summary>
-    Type GenericClrType
-    {
-        get;
-    }
+    Type GenericClrType { get; }
 
     /// <summary>
     /// Custom class name in the Seed kernel
     /// </summary>
-    string TemplateTypeName
-    {
-        get;
-    }
+    string TemplateTypeName { get; }
 
     TemplateCustomClassSerializerInstantiationBase? BuildSerializerForType(RttiTypeRecord typeRecord, ISeedSerializerFactory seedSerializerFactory, IServiceProvider serviceProvider);
 }
@@ -36,18 +30,12 @@ public abstract class TemplateCustomClassSerializerInstantiationBase : ICustomCl
     /// <summary>
     /// Custom class .Net CLR type
     /// </summary>
-    public Type ClrType
-    {
-        get;
-    }
+    public Type ClrType { get; }
 
     /// <summary>
     /// Custom class name in the Seed kernel
     /// </summary>
-    public string TypeName
-    {
-        get;
-    }
+    public string TypeName { get; }
 
     /// <summary>
     /// Serializes data into binnary string
@@ -65,16 +53,14 @@ public abstract class TemplateCustomClassSerializerInstantiationBase : ICustomCl
 
     public TemplateCustomClassSerializerInstantiationBase(Type clrType, string typename, IServiceProvider serviceProvider)
     {
-        ClrType = clrType;
+        ClrType  = clrType;
         TypeName = typename;
+
         this.serviceProvider = serviceProvider;
     }
 
     /// <summary>
     /// Types that require for this type
     /// </summary>
-    public abstract Type[] DependableTypes
-    {
-        get;
-    }
+    public abstract Type[] DependableTypes { get; }
 }

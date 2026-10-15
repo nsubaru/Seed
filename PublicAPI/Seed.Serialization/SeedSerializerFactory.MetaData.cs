@@ -23,22 +23,22 @@ public partial class SeedSerializerFactory
         {
             case Constants.Types.TypeMetaDataRecord:
             case Constants.Types.SensitiveTypeMetaDataRecord:
-                {
-                    code.AppendLine(Constants.SerCodeBlocks.TypeMetaDataRecord);
-                    break;
-                }
+            {
+                code.AppendLine(Constants.SerCodeBlocks.TypeMetaDataRecord);
+                break;
+            }
 
             case Constants.Types.RTTISection:
-                {
-                    code.AppendLine(Constants.SerCodeBlocks.RTTISection);
-                    break;
-                }
+            {
+                code.AppendLine(Constants.SerCodeBlocks.RTTISection);
+                break;
+            }
 
             case Constants.Types.EmptyAttributeValueT:
-                {
-                    code.AppendLine(Constants.SerCodeBlocks.EmptyAttributeValueT);
-                    break;
-                }
+            {
+                code.AppendLine(Constants.SerCodeBlocks.EmptyAttributeValueT);
+                break;
+            }
         }
     }
 
@@ -48,22 +48,22 @@ public partial class SeedSerializerFactory
         {
             case Constants.Types.TypeMetaDataRecord:
             case Constants.Types.SensitiveTypeMetaDataRecord:
-                {
-                    code.AppendLine(Constants.DerCodeBlocks.TypeMetaDataRecord);
-                    break;
-                }
+            {
+                code.AppendLine(Constants.DerCodeBlocks.TypeMetaDataRecord);
+                break;
+            }
 
             case Constants.Types.RTTISection:
-                {
-                    code.AppendLine(Constants.DerCodeBlocks.RTTISection);
-                    break;
-                }
+            {
+                code.AppendLine(Constants.DerCodeBlocks.RTTISection);
+                break;
+            }
 
             case Constants.Types.EmptyAttributeValueT:
-                {
-                    code.AppendLine(Constants.DerCodeBlocks.EmptyAttributeValueT);
-                    break;
-                }
+            {
+                code.AppendLine(Constants.DerCodeBlocks.EmptyAttributeValueT);
+                break;
+            }
         }
     }
 }

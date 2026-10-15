@@ -27,6 +27,7 @@ if (-not $NoBuild)
     $seedMsbuild = & $seedVswhere -latest -products '*' -requires Microsoft.Component.MSBuild -find 'MSBuild/**/Bin/MSBuild.exe' | Select-Object -First 1
 
     & $seedMsbuild (Join-Path $seedRoot 'Seed.slnx') /m /restore /nologo /p:Platform=x64 /p:Configuration=Release
+
     if ($LASTEXITCODE -ne 0)
     {
         throw 'Release build failed.'
@@ -38,6 +39,7 @@ $seedPackages = Join-Path $seedRoot 'Artifacts/packages'
 New-Item -ItemType Directory -Path $seedPackages -Force | Out-Null
 
 & $NuGetExe pack (Join-Path $seedRoot 'Tools/Seed.Testing.TestAdapter/Seed.Testing.TestAdapter.nuspec') -BasePath $seedRoot -Version $Version -OutputDirectory $seedPackages -NonInteractive
+
 if ($LASTEXITCODE -ne 0)
 {
     throw 'Test adapter package creation failed.'
@@ -52,11 +54,13 @@ try
     $seedRequiredEntries = @('tools/adapter/Seed.Testing.TestAdapter.dll',
         'build/native/Seed.Testing.TestAdapter.props', 'build/native/Seed.Testing.TestAdapter.targets',
         'README.md', 'LICENSE', 'NOTICE', 'THIRD-PARTY-NOTICES.md', 'licenses/LICENSE.phnt', 'dependencies.json')
+
     $seedHostDirectory = Join-Path $seedRoot 'Artifacts/x64/Release/Seed.Testing.TestAdapter/host'
+
     $seedRequiredEntries += @(Get-ChildItem -LiteralPath $seedHostDirectory -File | ForEach-Object `
-        {
-            'tools/adapter/host/' + $_.Name
-        })
+    {
+        'tools/adapter/host/' + $_.Name
+    })
 
     foreach ($seedRequired in $seedRequiredEntries)
     {

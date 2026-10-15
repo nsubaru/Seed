@@ -11,56 +11,32 @@ public class TypeMetaDataRecord : IFormattable
     /// <summary>
     /// String type name representation
     /// </summary>
-    public string TypeName
-    {
-        get;
-        set;
-    } = string.Empty;
+    public string TypeName { get; set; } = string.Empty;
 
     /// <summary>
     /// Type class all classes represented in <seealso cref="ETypes"/>
     /// </summary>
-    public ETypes Type
-    {
-        get;
-        set;
-    }
+    public ETypes Type { get; set; }
 
     /// <summary>
     /// Size of all fiels without sub types(in memory size)
     /// </summary>
-    public UInt64 SizeOfSize
-    {
-        get;
-        set;
-    }
+    public UInt64 SizeOfSize { get; set; }
 
     /// <summary>
     /// Zero or equal to size of size, if zero than in serialized data before data recorded size of data as UInt64
     /// </summary>
-    public UInt64 StaticSize
-    {
-        get;
-        set;
-    }
+    public UInt64 StaticSize { get; set; }
 
     /// <summary>
     /// Additional information witch is specific for type class
     /// </summary>
-    public string AdditionalInfo
-    {
-        get;
-        set;
-    } = string.Empty;
+    public string AdditionalInfo { get; set; } = string.Empty;
 
     /// <summary>
     /// List of contained type in data order
     /// </summary>
-    public List<TypeMetaDataRecord> NestedTypes
-    {
-        get;
-        set;
-    } = new List<TypeMetaDataRecord>();
+    public List<TypeMetaDataRecord> NestedTypes { get; set; } = new List<TypeMetaDataRecord>();
 
     /// <summary>
     /// String representation of type schema using default format and invariant culture
@@ -101,13 +77,14 @@ public class TypeMetaDataRecord : IFormattable
         {
             "C" => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.Console, formatProvider).ToString(),
             "L" => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.LongSchema, formatProvider).ToString(),
-            _ => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.SmallSchema, formatProvider).ToString(),
+            _   => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.SmallSchema, formatProvider).ToString(),
         };
     }
 
     private static StringBuilder PrintTypeMetaDataRecordList(List<TypeMetaDataRecord> records, int level, ETypeDataRecordFormat mode, IFormatProvider? formatProvider)
     {
         var result = new StringBuilder(string.Empty);
+        
         if (records == null || records.Count == 0)
         {
             return result;
@@ -124,6 +101,7 @@ public class TypeMetaDataRecord : IFormattable
     private static StringBuilder Tabs(int level, ETypeDataRecordFormat mode)
     {
         var result = new StringBuilder("");
+
         if (mode == 0 && level > 0)
         {
             for (int i = 0; i < level; i++)
@@ -138,10 +116,13 @@ public class TypeMetaDataRecord : IFormattable
     private static StringBuilder PrintTypeMetaDataObject(TypeMetaDataRecord record, ETypeDataRecordFormat mode, IFormatProvider? formatProvider, int level = 0)
     {
         StringBuilder result = new StringBuilder();
+        
         var endline = mode != ETypeDataRecordFormat.SmallSchema ? Environment.NewLine : string.Empty;
+
         if (mode == ETypeDataRecordFormat.Console)
         {
             var tabs = Tabs(level, mode);
+
             result.Append(tabs).Append("{").Append(endline);
             result.Append(tabs).Append($"Type          : {record.TypeName.ToString(formatProvider)}").Append(endline);
             result.Append(tabs).Append($"TypeClass     : {record.Type:G}").Append(endline);
@@ -154,6 +135,7 @@ public class TypeMetaDataRecord : IFormattable
         else
         {
             result.Append("{").Append(endline);
+
             result.Append($"{record.TypeName.ToString(formatProvider)}|").Append(endline);
             result.Append($"{record.Type:D}|").Append(endline);
             result.Append($"{record.SizeOfSize.ToString(formatProvider)}|").Append(endline);

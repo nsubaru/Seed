@@ -3,7 +3,6 @@ namespace Seed.RTTI.Record.Object;
 /// <summary>
 /// A base RTTI method record class
 /// </summary>
-/// <typeparam name="THeap">Heap type</typeparam>
 public unsafe class RttiMethodRecord : IRttiIterableObject<RttiMethodRecord>
 {
     internal RttiIterator<RttiMethodRecord>? it;

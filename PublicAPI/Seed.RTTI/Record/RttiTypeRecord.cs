@@ -6,7 +6,6 @@ namespace Seed.RTTI.Record;
 /// <summary>
 /// A base RTTI type record class
 /// </summary>
-/// <typeparam name="THeap">Heap type</typeparam>
 [SerializableObject("Seed::Core::RTTI::RttiTypeRecord")]
 public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
 {
@@ -22,8 +21,8 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// <param name="isValidCxxTypeId">True, if CxxTypeInfo available</param>
     internal RttiTypeRecord(MetaData* record, ulong imageBase, bool isValidCxxTypeId)
     {
-        this.record = record;
-        this.imageBase = imageBase;
+        this.record           = record;
+        this.imageBase        = imageBase;
         this.isValidCxxTypeId = isValidCxxTypeId;
     }
 
@@ -32,8 +31,8 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// </summary>
     public RttiTypeRecord()
     {
-        this.record = null;
-        this.imageBase = 0;
+        this.record           = null;
+        this.imageBase        = 0;
         this.isValidCxxTypeId = false;
     }
 
@@ -100,7 +99,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     /// <returns>Template type name</returns>
     internal string GetTemplateTypeName()
     {
-        var pTypeName = (TextMetaData*)((((Byte*)record) + ((SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64()) + ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) + (record->TypeName.Size * sizeof(Char))));
+        var pTypeName     = (TextMetaData*)((((Byte*)record) + ((SizeT)Marshal.OffsetOf<MetaData>("TypeName").ToInt64()) + ((SizeT)Marshal.OffsetOf<TextMetaData>("Text").ToInt64()) + (record->TypeName.Size * sizeof(Char))));
         var pTemplateName = (TextMetaData*)(((Byte*)pTypeName->Text) + (pTypeName->Size * sizeof(Char)));
 
         return Marshal.PtrToStringAuto((IntPtr)pTemplateName->Text) ?? string.Empty;
@@ -139,16 +138,16 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     {
         return record->TypeClass switch
         {
-            ETypes.Tuple => GetItemsCollectionOffset(),
-            ETypes.Enumeration => GetItemsCollectionOffset(),
-            ETypes.FixedArray => GetItemsCollectionOffset(),
-            ETypes.Struct => GetItemsCollectionOffset(),
-            ETypes.Union => GetItemsCollectionOffset(),
-            ETypes.Collection => GetItemsCollectionOffset(),
-            ETypes.FixedCollection => GetItemsCollectionOffset(),
-            ETypes.Custom => GetCustomCttiTypeStructSchemaRttiOffset(),
-            ETypes.Numeric => GetNumericCttiTypeOffset(),
-            ETypes.AssociableCollection or ETypes.Reference => GetItemsCollectionOffset(),
+            ETypes.Tuple                                                 => GetItemsCollectionOffset(),
+            ETypes.Enumeration                                           => GetItemsCollectionOffset(),
+            ETypes.FixedArray                                            => GetItemsCollectionOffset(),
+            ETypes.Struct                                                => GetItemsCollectionOffset(),
+            ETypes.Union                                                 => GetItemsCollectionOffset(),
+            ETypes.Collection                                            => GetItemsCollectionOffset(),
+            ETypes.FixedCollection                                       => GetItemsCollectionOffset(),
+            ETypes.Custom                                                => GetCustomCttiTypeStructSchemaRttiOffset(),
+            ETypes.Numeric                                               => GetNumericCttiTypeOffset(),
+            ETypes.AssociableCollection or ETypes.Reference              => GetItemsCollectionOffset(),
             ETypes.String or ETypes.Pointer or ETypes.Box or ETypes.Pair => GetItemsCollectionOffset(),
             _ => 0,
         };
@@ -161,6 +160,7 @@ public unsafe class RttiTypeRecord : IComparable<RttiTypeRecord>
     private RttiCollection<RttiField> GetFields()
     {
         var offset = GetFieldsRecordsOffset();
+
         if (offset == 0)
         {
             return RttiField.CreateCollection(null, IsValidCxxTypeId, imageBase);

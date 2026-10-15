@@ -19,6 +19,7 @@ RUN Invoke-WebRequest 'https://aka.ms/vs/stable/vs_BuildTools.exe' -OutFile C:\v
     Remove-Item -LiteralPath C:\vs_buildtools.exe
 
 ENV MSBUILD_EXE_PATH="C:\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
+
 RUN & $env:MSBUILD_EXE_PATH /version /nologo; if ($LASTEXITCODE -ne 0) { throw 'MSBuild unavailable' }; `
     dotnet --version; if ($LASTEXITCODE -ne 0) { throw '.NET SDK unavailable' }; `
     if (-not (Test-Path 'C:\BuildTools\MSBuild\Microsoft\VC\v180\Platforms\x64\PlatformToolsets\v145\Toolset.props')) { throw 'MSVC v145 unavailable' }; `

@@ -37,18 +37,23 @@ public class RttiTypeRecordSerializer : ICustomClassSerializer
     {
         serializer.Logger?.Log(LogLevel.Trace, "Start deserialization RttiTypeRecord");
         object data = new UniversalTypeIdentifier();
+
         serializer.Deserialize(ref data, serializationStream);
         var fullTypeId = (UniversalTypeIdentifier)data;
+
         serializer.Logger?.Log(LogLevel.Trace, "Deserialization UniversalTypeIdentifier. Value {fullTypeId}", fullTypeId);
+        
         if (fullTypeId.Id == Guid.Empty)
         {
             return new RttiTypeRecord();
         }
 
         var record = serializer.GetAllRttiTypes().FirstOrDefault(x => x.FullTypeId == fullTypeId);
+
         if (record == null)
         {
             serializer.Logger?.Log(LogLevel.Error, "RttiTypeRecord {FullTypeId} not found during deserialization", fullTypeId);
+
             throw new InvalidDataException($"RTTI type record {fullTypeId} was not found during deserialization");
         }
 
@@ -66,10 +71,13 @@ public class RttiTypeRecordSerializer : ICustomClassSerializer
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         serializer.Logger?.Log(LogLevel.Trace, "Start serializing RttiTypeRecord");
+
         var obj = data as RttiTypeRecord;
         object fullTypeId = obj!.FullTypeId;
+
         serializer.Logger?.Log(LogLevel.Trace, "Serializing RttiTypeRecord as UniversalTypeIdentifier");
         serializer.Serialize(fullTypeId, serializationStream);
+        
         serializer.Logger?.Log(LogLevel.Trace, "Serializing RttiTypeRecord completed");
     }
 }

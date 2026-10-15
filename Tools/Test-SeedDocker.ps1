@@ -29,8 +29,11 @@ if (-not $NoBuild)
 
 $seedName = 'seed-tests-' + [Guid]::NewGuid().ToString('N')
 $seedOutput = Join-Path $seedRoot "Artifacts/docker/$Configuration/$seedName"
+
 New-Item -ItemType Directory -Path $seedOutput -Force | Out-Null
+
 $seedArguments = @('-Configuration', $Configuration, '-NativeWildcard', $NativeWildcard)
+
 if ($Class)
 {
     $seedArguments += @('-Class', $Class)
@@ -47,12 +50,14 @@ if ($SkipNativeTests)
 }
 
 $seedCreated = $false
+
 if (-not $TestMemory -and $Isolation -eq 'hyperv')
 {
     $TestMemory = '8g'
 }
 
 $seedResourceArguments = @()
+
 if ($TestMemory)
 {
     $seedResourceArguments = @('--memory', $TestMemory)
@@ -61,6 +66,7 @@ if ($TestMemory)
 try
 {
     & docker create @seedResourceArguments --name $seedName --label "seed.test-run=$seedName" --isolation $Isolation $Image @seedArguments | Out-Null
+
     if ($LASTEXITCODE -ne 0)
     {
         throw 'Cannot create Seed test container.'
@@ -69,8 +75,10 @@ try
     $seedCreated = $true
 
     & docker start -a $seedName
+
     $seedAttachExit = $LASTEXITCODE
-    $seedState = (& docker inspect $seedName --format '{{json .State}}') | ConvertFrom-Json
+    $seedState      = (& docker inspect $seedName --format '{{json .State}}') | ConvertFrom-Json
+
     if ($LASTEXITCODE -ne 0 -or $seedState.Running)
     {
         throw 'Seed test container has not completed.'
@@ -93,9 +101,11 @@ finally
         & docker logs $seedName *> (Join-Path $seedOutput 'container.log')
 
         & docker cp "${seedName}:C:/results" (Join-Path $seedOutput 'results')
+
         $seedCopyExit = $LASTEXITCODE
 
         & docker rm -f $seedName | Out-Null
+
         if ($seedCopyExit -ne 0)
         {
             Write-Warning "Cannot copy all container reports; inspect $seedOutput/container.log."
@@ -104,6 +114,7 @@ finally
 }
 
 $seedReports = @(Get-ChildItem -LiteralPath $seedOutput -Filter '*.trx' -Recurse -File)
+
 if ($seedReports.Count -ne 1)
 {
     throw 'Docker E2E run did not preserve exactly one TRX report.'

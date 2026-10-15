@@ -17,6 +17,7 @@ internal unsafe static class Utils
             if (blob[i] == what[0])
             {
                 SizeT j = 1;
+                
                 for (; j < (SizeT)what.Length; j++)
                 {
                     if (blob[i + j] != what[j])

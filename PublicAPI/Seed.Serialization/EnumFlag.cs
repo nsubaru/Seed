@@ -35,15 +35,18 @@ public struct EnumFlag<T, U>
     {
         var values = (typeof(T).GetEnumValues() as T[]);
         var underlyingValues = (typeof(T).GetEnumValuesAsUnderlyingType() as U[]);
+
         if (values == null || underlyingValues == null)
         {
             throw new InvalidCastException();
         }
 
         var res = 0;
+
         for (int i = 0; i < underlyingValues.Length; i++)
         {
             int f = 0;
+
             for (U j = U.Zero; j < underlyingValues[i]; j++, f++)
             {
                 ;
@@ -67,15 +70,18 @@ public struct EnumFlag<T, U>
     {
         var values = (typeof(T).GetEnumValues() as T[]);
         var underlyingValues = (typeof(T).GetEnumValuesAsUnderlyingType() as U[]);
+
         if (values == null || underlyingValues == null)
         {
             throw new InvalidCastException();
         }
 
         var res = 0;
+
         for (int i = 0; i < underlyingValues.Length; i++)
         {
             int f = 0;
+
             for (U j = U.Zero; j < underlyingValues[i]; j++, f++)
             {
                 ;
@@ -97,19 +103,22 @@ public struct EnumFlag<T, U>
     /// <exception cref="InvalidCastException">If enum empty or T type is not enum</exception>
     public U AsInteger()
     {
-        var values = (typeof(T).GetEnumValues() as T[]);
+        var values           = (typeof(T).GetEnumValues() as T[]);
         var underlyingValues = (typeof(T).GetEnumValuesAsUnderlyingType() as U[]);
-        var v = this.value;
-        var value = Unsafe.As<T, U>(ref v);
+        var v                = this.value;
+        var value            = Unsafe.As<T, U>(ref v);
+
         if (values == null || underlyingValues == null)
         {
             throw new InvalidCastException();
         }
 
         U result = default;
+
         for (int i = 0; i < values.Length; i++)
         {
             int f = 0;
+
             for (U j = U.Zero; j < underlyingValues[i]; j++, f++)
             {
                 ;
@@ -136,11 +145,12 @@ public struct EnumFlag<T, U>
 
     private T[] GetValuesAsEnumArray()
     {
-        var result = new List<T>();
-        var v = this.value;
-        var value = Unsafe.As<T, U>(ref v);
-        var values = (typeof(T).GetEnumValues() as T[]);
+        var result           = new List<T>();
+        var v                = this.value;
+        var value            = Unsafe.As<T, U>(ref v);
+        var values           = (typeof(T).GetEnumValues() as T[]);
         var underlyingValues = (typeof(T).GetEnumValuesAsUnderlyingType() as U[]);
+
         if (values == null || underlyingValues == null)
         {
             throw new InvalidCastException();
@@ -149,6 +159,7 @@ public struct EnumFlag<T, U>
         for (int i = 0; i < values.Length; i++)
         {
             int f = 0;
+            
             for (U j = U.Zero; j < underlyingValues[i]; j++, f++)
             {
                 ;

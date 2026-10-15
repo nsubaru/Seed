@@ -9,10 +9,14 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
     public async Task CompletedConnectionsReleaseAdmissionCapacityBeforeTheNextAccept()
     {
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+
         deadline.CancelAfter(TimeSpan.FromSeconds(30));
+
         var sockets = new List<TcpClient>();
+
         byte[] headers = Encoding.ASCII.GetBytes("POST /echo HTTP/1.1\r\nHost: localhost\r\nContent-Length: 1\r\n\r\n");
         byte[] body = [(byte)'x'];
+
         try
         {
             // Keep every admitted request incomplete so the listener's retained
@@ -21,7 +25,9 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
             {
                 var socket = new TcpClient();
                 sockets.Add(socket);
+
                 await socket.ConnectAsync("127.0.0.1", 8080, deadline.Token);
+
                 await socket.GetStream().WriteAsync(headers, deadline.Token);
             }
 
@@ -31,6 +37,7 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
             {
                 await busyProbe.ConnectAsync("127.0.0.1", 8080, deadline.Token);
                 await busyProbe.GetStream().WriteAsync(Encoding.ASCII.GetBytes("GET /health HTTP/1.1\r\nHost: localhost\r\n\r\n"), deadline.Token);
+
                 try
                 {
                     Assert.Empty(await ReadResponseAsync(busyProbe, deadline.Token));
@@ -50,6 +57,7 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
             foreach (var socket in sockets)
             {
                 string response = await ReadResponseAsync(socket, deadline.Token);
+
                 Assert.StartsWith("HTTP/1.1 200 ", response);
                 Assert.EndsWith("\r\n\r\nx", response);
             }
@@ -57,9 +65,12 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
             // The listener was awaiting a connection while the preceding work
             // finished. Admission must reclaim that work after accept too.
             using var probe = new TcpClient();
+
             await probe.ConnectAsync("127.0.0.1", 8080, deadline.Token);
             await probe.GetStream().WriteAsync(Encoding.ASCII.GetBytes("GET /health HTTP/1.1\r\nHost: localhost\r\n\r\n"), deadline.Token);
+
             string health = await ReadResponseAsync(probe, deadline.Token);
+
             Assert.StartsWith("HTTP/1.1 200 ", health);
             Assert.EndsWith("\r\n\r\nSeed is running\n", health);
         }
@@ -78,8 +89,11 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
     private static async Task<string> ReadResponseAsync(TcpClient socket, CancellationToken token)
     {
         var buffer = new byte[4096];
+        
         using var response = new MemoryStream();
+
         int count;
+
         while ((count = await socket.GetStream().ReadAsync(buffer, token)) != 0)
         {
             response.Write(buffer, 0, count);

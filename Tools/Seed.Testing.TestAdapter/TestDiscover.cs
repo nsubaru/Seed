@@ -51,6 +51,7 @@ namespace Seed.Testing.TestAdapter
         internal static List<TestCase> FindTests(string source)
         {
             string output = AdapterHost.NewOutputPath();
+            
             AdapterHost.Invoke("discover", source, "-", output, null, null);
 
             return XDocument.Load(output).Descendants("test").Select(test => Create(source, (string)test.Attribute("name")!)).ToList();

@@ -19,15 +19,13 @@ public class UniversalTypeDefinitionSerializer : ICustomClassSerializer
         dynamic uuid = new UUID();
         serializer.Deserialize(ref uuid, serializationStream);
 
-        return new UniversalTypeIdentifier()
-        {
-            Id = uuid
-        };
+        return new UniversalTypeIdentifier() { Id = uuid };
     }
 
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         var uuid = ((UniversalTypeIdentifier)data).Id;
+        
         serializer.Serialize(uuid, serializationStream);
     }
 }

@@ -20,46 +20,26 @@ namespace Seed.Serialization;
 
 public struct SeedSerializerCompilationResult
 {
-    public string Code
-    {
-        get;
-        set;
-    }
+    public string Code { get; set; }
 
-    public List<TypeRecord> SupportedTypes
-    {
-        get;
-        set;
-    }
+    public List<TypeRecord> SupportedTypes { get; set; }
 
-    public EmitResult Result
-    {
-        get;
-        set;
-    }
+    public EmitResult Result { get; set; }
 
-    public MemoryStream PeStream
-    {
-        get;
-        set;
-    }
+    public MemoryStream PeStream { get; set; }
 
-    public MemoryStream PdbStream
-    {
-        get;
-        set;
-    }
+    public MemoryStream PdbStream { get; set; }
 }
 
 public static class SeedSerializerCompilationResultExtensions
 {
     public static void Deconstruct(this SeedSerializerCompilationResult compilationResult, out string code, out List<TypeRecord> supportedTypes, out EmitResult result, out MemoryStream peStream, out MemoryStream pdbStream)
     {
-        code = compilationResult.Code;
+        code           = compilationResult.Code;
         supportedTypes = compilationResult.SupportedTypes;
-        result = compilationResult.Result;
-        peStream = compilationResult.PeStream;
-        pdbStream = compilationResult.PdbStream;
+        result         = compilationResult.Result;
+        peStream       = compilationResult.PeStream;
+        pdbStream      = compilationResult.PdbStream;
     }
 }
 
@@ -354,6 +334,7 @@ public class SeedSerializer : ISeedSerializer {
         this.logger = logger;
         this.serializerLogger = serializerLogger;
         this.allRttiTypes = section.AllRegisteredTypes.Where(x => x.IsValid);
+
         logger?.LogInformation("Load custom serializers");
         var customSerializers = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !string.IsNullOrEmpty(x.Location)).SelectMany(x => x.ExportedTypes.Where(x => x.GetConstructors().Any(y =>
         {
@@ -365,8 +346,15 @@ public class SeedSerializer : ISeedSerializer {
             {
                 return false;
             }
-        })).Where(x => x.GetInterfaces().Contains(typeof(ICustomClassSerializer)) && x.IsClass && !x.IsAbstract)).Select(x => (ICustomClassSerializer)x.GetConstructors().First().Invoke(Array.Empty<object>())).ToList();
-        this.customTypeMappingSchema = customSerializers.Select(x => (Record: section.AllRegisteredTypes.FirstOrDefault(y => y.TypeName == x.TypeName), Serializer: x)).Where(x => x.Record != null).ToDictionary(x => x.Record!, x => x.Serializer);
+        })).Where(x => x.GetInterfaces().Contains(typeof(ICustomClassSerializer)) && x.IsClass && !x.IsAbstract))
+           .Select(x => (ICustomClassSerializer)x.GetConstructors().First().Invoke(Array.Empty<object>()))
+           .ToList();
+
+        this.customTypeMappingSchema = customSerializers
+            .Select(x => (Record: section.AllRegisteredTypes.FirstOrDefault(y => y.TypeName == x.TypeName), Serializer: x))
+            .Where(x => x.Record != null)
+            .ToDictionary(x => x.Record!, x => x.Serializer);
+
         var customSupportedTypes = customTypeMappingSchema.Select(x => new TypeRecord
         {
             TypeName = x.Key.TypeName,
@@ -375,7 +363,9 @@ public class SeedSerializer : ISeedSerializer {
             FullTypeId = x.Key.FullTypeId.Id,
             RttiType = x.Key
         }).ToList();
+
         logger?.LogInformation("Load custom templates serializers");
+
         var customTemplatesSerializerFactoriesList = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !string.IsNullOrEmpty(x.Location)).SelectMany(x => x.ExportedTypes.Where(x => x.GetConstructors().Any(y =>
         {
             try
@@ -386,12 +376,26 @@ public class SeedSerializer : ISeedSerializer {
             {
                 return false;
             }
-        })).Where(x => x.GetInterfaces().Contains(typeof(ITemplateCustomClassSerializerFactory)) && x.IsClass)).Select(x => (ITemplateCustomClassSerializerFactory)x.GetConstructors().First().Invoke(Array.Empty<object>())).Select(x => new KeyValuePair<String, ITemplateCustomClassSerializerFactory>(x.TemplateTypeName, x));
-        customTemplatesSerializerFactory = customTemplatesSerializerFactoriesList.Select(x => x.Key).Distinct().ToDictionary(x => x, x => customTemplatesSerializerFactoriesList.Where(y => y.Key == x).Select(y => y.Value).ToList());
+        })).Where(x => x.GetInterfaces().Contains(typeof(ITemplateCustomClassSerializerFactory)) && x.IsClass))
+           .Select(x => (ITemplateCustomClassSerializerFactory)x.GetConstructors().First().Invoke(Array.Empty<object>()))
+           .Select(x => new KeyValuePair<String, ITemplateCustomClassSerializerFactory>(x.TemplateTypeName, x));
+
+        customTemplatesSerializerFactory = customTemplatesSerializerFactoriesList
+            .Select(x => x.Key)
+            .Distinct()
+            .ToDictionary(x => x, x => customTemplatesSerializerFactoriesList.Where(y => y.Key == x).Select(y => y.Value).ToList());
+
         logger?.LogInformation("Load all serializable types");
-        serializableTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes().Where(x => x.GetCustomAttribute<SeedSerializableAttribute>() != null)).Where(x => !this.customTypeMappingSchema.Any(y => y.Value.ClrType == x)).Select(x => (Type: x, Attribute: x.GetCustomAttribute<SeedSerializableAttribute>()!)).ToList();
+
+        serializableTypes = AppDomain.CurrentDomain
+            .GetAssemblies()
+            .SelectMany(x => x.GetTypes().Where(x => x.GetCustomAttribute<SeedSerializableAttribute>() != null)).Where(x => !this.customTypeMappingSchema.Any(y => y.Value.ClrType == x))
+            .Select(x => (Type: x, Attribute: x.GetCustomAttribute<SeedSerializableAttribute>()!))
+            .ToList();
+        
         logger?.LogInformation("Found {0} types", supportedTypesList.Count);
         logger?.LogInformation("Add custom serializable types");
+
         foreach (var item in customSupportedTypes)
         {
             if (supportedTypesList.Any(x => x.RttiType.TypeName == item.RttiType.TypeName))
@@ -400,6 +404,7 @@ public class SeedSerializer : ISeedSerializer {
             }
 
             supportedTypesList.Add(item);
+
             typeof(SeedSerializerFactory)!.GetMethod("AddType")!.MakeGenericMethod(item.ClrType)!.Invoke(this, new object[]
             {
                 item
@@ -407,6 +412,7 @@ public class SeedSerializer : ISeedSerializer {
         }
 
         logger?.LogInformation("Add all serializable types");
+
         foreach (var item in FilterAndOrderTypes(section.AllRegisteredTypes))
         {
             var ClrType = this.BuildClrType(item);
@@ -417,19 +423,23 @@ public class SeedSerializer : ISeedSerializer {
 
             var typeRecord = new TypeRecord
             {
-                TypeName = !customTemplatesSerializerFactory.ContainsKey(item.TemplateTypeName) && item.TypeModificators.HasFlag(TypeModificator.TemplateType) && item.TemplateTypeName != Constants.Types.ObjectProperties ? item.TemplateTypeName : item.TypeName,
-                Type = item.TypeClass,
-                FullTypeId = item.FullTypeId.Id,
-                ClrType = ClrType,
-                RttiType = item,
+                TypeName           = !customTemplatesSerializerFactory.ContainsKey(item.TemplateTypeName) && item.TypeModificators.HasFlag(TypeModificator.TemplateType) && item.TemplateTypeName != Constants.Types.ObjectProperties 
+                    ? item.TemplateTypeName 
+                    : item.TypeName,
+                Type               = item.TypeClass,
+                FullTypeId         = item.FullTypeId.Id,
+                ClrType            = ClrType,
+                RttiType           = item,
                 IsObjectProperties = item.TemplateTypeName == Constants.Types.ObjectProperties
             };
+
             if (supportedTypesList.Any(x => x.RttiType.TypeName == typeRecord.RttiType.TypeName))
             {
                 continue;
             }
 
             supportedTypesList.Add(typeRecord);
+
             typeof(SeedSerializerFactory).GetMethod(nameof(AddType))!.MakeGenericMethod(ClrType).Invoke(this, new object[]
             {
                 typeRecord
@@ -450,7 +460,9 @@ public class SeedSerializer : ISeedSerializer {
         result.AddRange(records.Where(x => x.TypeClass == ETypes.String));
         result.AddRange(records.Where(x => x.TypeClass == ETypes.MetaData));
         result.AddRange(records.Where(x => x.TypeClass == ETypes.Dynamic));
+
         result.ForEach(x => records.RemoveAll(y => y.FullTypeId == x.FullTypeId));
+
         records.RemoveAll(x => x.TypeClass == ETypes.Undefined);
         records.RemoveAll(x => x.TypeClass == ETypes.Function);
         records.RemoveAll(x => x.TypeClass == ETypes.Pointer);
@@ -459,12 +471,25 @@ public class SeedSerializer : ISeedSerializer {
         records.RemoveAll(x => x.TypeClass == ETypes.Union);
         records.RemoveAll(x => x.TypeClass == ETypes.Object);
         records.RemoveAll(x => supportedTypesList.Any(y => x.FullTypeId.Id == y.FullTypeId));
+
         var oldCount = records.Count;
+
         do
         {
             oldCount = records.Count;
-            var newRecords = records.Where(x => x.Fields.All(y => result.Any(z => z.FullTypeId == y.FullTypeId) || supportedTypesList.Any(z => z.FullTypeId == y.FullTypeId.Id)) && x.Properties.All(y => result.Any(x => x.FullTypeId == y.FullTypeId) || supportedTypesList.Any(z => z.FullTypeId == y.FullTypeId.Id))).ToList();
+
+            var newRecords = records
+                .Where(x => x.Fields
+                    .All(y => result
+                        .Any(z => z.FullTypeId == y.FullTypeId) || supportedTypesList
+                        .Any(z => z.FullTypeId == y.FullTypeId.Id)) && x.Properties
+                    .All(y => result
+                        .Any(x => x.FullTypeId == y.FullTypeId) || supportedTypesList
+                        .Any(z => z.FullTypeId == y.FullTypeId.Id)))
+                .ToList();
+
             newRecords.ForEach(x => records.RemoveAll(y => y.FullTypeId == x.FullTypeId));
+
             result.AddRange(newRecords);
         }
         while (oldCount != records.Count);
@@ -482,6 +507,7 @@ public class SeedSerializer : ISeedSerializer {
     public Type? BuildClrType(RttiTypeRecord record)
     {
         logger?.LogDebug("Build clr type for {0}", record.TypeName);
+
         if (customTypeMappingSchema.ContainsKey(record))
         {
             return customTypeMappingSchema[record].ClrType;
@@ -490,15 +516,18 @@ public class SeedSerializer : ISeedSerializer {
         if (customTemplatesSerializerFactory.ContainsKey(record.TemplateTypeName))
         {
             var factories = customTemplatesSerializerFactory[record.TemplateTypeName];
+
             if (factories.Count == 0)
             {
                 return null;
             }
 
             ICustomClassSerializer? serializer = null;
+
             foreach (var factory in factories)
             {
                 serializer = factory.BuildSerializerForType(record, this, serviceProvider);
+
                 if (serializer != null)
                 {
                     break;
@@ -522,59 +551,31 @@ public class SeedSerializer : ISeedSerializer {
 
         switch (record.TypeClass)
         {
-            case ETypes.FloatNumeric:
-                return TryGetAsPrimitive(record);
-            case ETypes.Character:
-                return TryGetAsPrimitive(record);
-            case ETypes.Numeric:
-                return TryGetAsPrimitive(record);
-            case ETypes.Logic:
-                return TryGetAsPrimitive(record);
-            case ETypes.Collection:
-                return TryGetAsLinqSeedType(record);
-            case ETypes.FixedCollection:
-                return TryGetAsLinqSeedType(record);
-            case ETypes.AssociableCollection:
-                return TryGetAsLinqSeedType(record);
-            case ETypes.FixedArray:
-                {
-                    return TryGetAsLinqSeedType(record) ?? TryBuildFixedArrayType(record, section);
-                }
-
-            case ETypes.Pair:
-                return TryGetAsLinqSeedType(record);
-            case ETypes.MetaData:
-                return GetMetaDataType(record);
-            case ETypes.Enumeration:
-                return GetEnumUnderlyingType(record, section);
-            case ETypes.String:
-                return TryGetAsPrimitive(record);
-            case ETypes.Box:
-                return GetBoxType(record);
-            case ETypes.Tuple:
-                return GetTupleType(record);
-            case ETypes.Struct:
-                return GetStructType(record);
-            case ETypes.Dynamic:
-                return typeof(DynamicObject);
-            case ETypes.Custom:
-                return GetCustomSerializerType(record);
-            case ETypes.Pointer:
-                return null;
-            case ETypes.Reference:
-                return null;
-            case ETypes.Object:
-                return null;
-            case ETypes.Abstract:
-                return null;
-            case ETypes.Function:
-                return null;
-            case ETypes.Union:
-                return null;
-            case ETypes.Undefined:
-                return null;
-            default:
-                return null;
+            case ETypes.FloatNumeric:         return TryGetAsPrimitive(record);
+            case ETypes.Character:            return TryGetAsPrimitive(record);
+            case ETypes.Numeric:              return TryGetAsPrimitive(record);
+            case ETypes.Logic:                return TryGetAsPrimitive(record);
+            case ETypes.Collection:           return TryGetAsLinqSeedType(record);
+            case ETypes.FixedCollection:      return TryGetAsLinqSeedType(record);
+            case ETypes.AssociableCollection: return TryGetAsLinqSeedType(record);
+            case ETypes.FixedArray:           return TryGetAsLinqSeedType(record) ?? TryBuildFixedArrayType(record, section);
+            case ETypes.Pair:                 return TryGetAsLinqSeedType(record);
+            case ETypes.MetaData:             return GetMetaDataType(record);
+            case ETypes.Enumeration:          return GetEnumUnderlyingType(record, section);
+            case ETypes.String:               return TryGetAsPrimitive(record);
+            case ETypes.Box:                  return GetBoxType(record);
+            case ETypes.Tuple:                return GetTupleType(record);
+            case ETypes.Struct:               return GetStructType(record);
+            case ETypes.Dynamic:              return typeof(DynamicObject);
+            case ETypes.Custom:               return GetCustomSerializerType(record);
+            case ETypes.Pointer:              return null;
+            case ETypes.Reference:            return null;
+            case ETypes.Object:               return null;
+            case ETypes.Abstract:             return null;
+            case ETypes.Function:             return null;
+            case ETypes.Union:                return null;
+            case ETypes.Undefined:            return null;
+            default:                          return null;
         }
     }
 
@@ -586,6 +587,7 @@ public class SeedSerializer : ISeedSerializer {
     Type? GetTypeWithOffset(int offset, RTTI.Record.RttiTypeRecord record)
     {
         var innerTypeRecord = GetRecordByField(section, record.Fields.Skip(offset).First());
+
         if (innerTypeRecord == null)
         {
             return null;
@@ -600,6 +602,7 @@ public class SeedSerializer : ISeedSerializer {
         }
 
         var innerType = BuildClrType(innerTypeRecord);
+
         if (innerType == null)
         {
             return null;
@@ -629,7 +632,10 @@ public class SeedSerializer : ISeedSerializer {
         return type switch
         {
             ETypes.Pointer or ETypes.Reference or ETypes.Object or ETypes.Abstract or ETypes.Function or ETypes.Union or ETypes.Undefined => true,
-            ETypes.Box or ETypes.FloatNumeric or ETypes.Character or ETypes.Numeric or ETypes.Logic or ETypes.Collection or ETypes.FixedCollection or ETypes.AssociableCollection or ETypes.FixedArray or ETypes.Pair or ETypes.MetaData or ETypes.Enumeration or ETypes.String or ETypes.Tuple or ETypes.Struct or ETypes.Dynamic or ETypes.Custom => false,
+
+            ETypes.Box or ETypes.FloatNumeric or ETypes.Character or ETypes.Numeric or ETypes.Logic or ETypes.Collection or ETypes.FixedCollection or ETypes.AssociableCollection 
+                       or ETypes.FixedArray or ETypes.Pair or ETypes.MetaData or ETypes.Enumeration or ETypes.String or ETypes.Tuple or ETypes.Struct or ETypes.Dynamic or ETypes.Custom => false,
+
             _ => true,
         };
     }
@@ -637,6 +643,7 @@ public class SeedSerializer : ISeedSerializer {
     private void AddSerializer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
         AddSerHead<T>(ref code);
+
         if (typeRecord.IsObjectProperties)
         {
             AddFieldsObjectPropertiesSer<T>(ref code, typeRecord);
@@ -655,45 +662,59 @@ public class SeedSerializer : ISeedSerializer {
                 case ETypes.Logic:
                     AddSimpleTypeSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Box:
                     AddBoxSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Enumeration:
                     AddEnumSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Collection:
                     AddCollectionSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.String:
                     AddStringSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Struct:
                     AddStructSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Tuple:
                     AddTupleSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.FixedCollection:
                     AddFixedCollectionSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.AssociableCollection:
                     AddAssociableCollectionSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Pair:
                     AddPairSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.FixedArray:
                     AddFixedArraySer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Dynamic:
                     AddDynamicSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.MetaData:
                     AddMetaDataSer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Custom:
                     AddCustomTypeSer<T>(ref code, typeRecord);
                     break;
+
                 //Excluded types:
                 case ETypes.Pointer:
                 case ETypes.Reference:
@@ -713,6 +734,7 @@ public class SeedSerializer : ISeedSerializer {
     private void AddDeserializer<T>(ref StringBuilder code, TypeRecord typeRecord)
     {
         AddDeserHead<T>(ref code);
+
         if (typeRecord.IsObjectProperties)
         {
             AddFieldsObjectPropertiesDer<T>(ref code, typeRecord);
@@ -731,45 +753,59 @@ public class SeedSerializer : ISeedSerializer {
                 case ETypes.Logic:
                     AddSimpleTypeDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Box:
                     AddBoxDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Enumeration:
                     AddEnumDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Collection:
                     AddCollectionDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.String:
                     AddStringDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Struct:
                     AddStructDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Tuple:
                     AddTupleDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.FixedCollection:
                     AddFixedCollectionDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.AssociableCollection:
                     AddAssociableCollectionDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Pair:
                     AddPairDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.FixedArray:
                     AddFixedArrayDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Dynamic:
                     AddDynamicDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.MetaData:
                     AddMetaDataDer<T>(ref code, typeRecord);
                     break;
+
                 case ETypes.Custom:
                     AddCustomTypeDer<T>(ref code, typeRecord);
                     break;
+
                 //Excluded types:
                 case ETypes.Pointer:
                 case ETypes.Reference:
@@ -795,11 +831,15 @@ public class SeedSerializer : ISeedSerializer {
         }
 
         logger?.LogInformation("Add {0} type for Seed type {1}", typeRecord.ClrType.FullName, typeRecord.RttiType.TypeName);
+
         StringBuilder serFunctionCode = new StringBuilder();
         StringBuilder derFunctionCode = new StringBuilder();
+
         AddTypeAsSupported(typeRecord);
+
         AddSerializer<T>(ref serFunctionCode, typeRecord);
         AddDeserializer<T>(ref derFunctionCode, typeRecord);
+
         functions.Add(new KeyValuePair<string, string>("ser " + GetFriendlyTypeName(typeRecord.ClrType), serFunctionCode.ToString()));
         functions.Add(new KeyValuePair<string, string>("der " + GetFriendlyTypeName(typeRecord.ClrType), derFunctionCode.ToString()));
     }
@@ -812,9 +852,11 @@ public class SeedSerializer : ISeedSerializer {
     {
         var functionsCode = functions.DistinctBy(x => x.Key).Select(x => x.Value).Aggregate(string.Concat);
         var handlers = new StringBuilder();
+
         foreach (var type in supportedTypesList.Select(record => record.ClrType).Distinct())
         {
             var name = GetFriendlyTypeName(type);
+
             handlers.AppendLine($"valueHandlers[typeof({name})] = ((value, stream) => SerializeImpl(({name})value, stream), (value, stream) => DeserializeImpl(({name})value, stream));");
         }
 
@@ -831,20 +873,32 @@ public class SeedSerializer : ISeedSerializer {
     {
         ObjectDisposedException.ThrowIf(disposed, this);
         logger?.LogInformation("Start codegen for serializer");
+
         var assemblyName = Path.GetRandomFileName();
         var symbolsName = Path.ChangeExtension(assemblyName, "pdb");
         var sourceCodePath = "SeedSerializer.cs";
+
         logger?.LogInformation("Format code of serializer");
-        var codeText = CSharpSyntaxTree.ParseText(this.GetSerializerClassCode()).GetRoot().NormalizeWhitespace().SyntaxTree.GetText().ToString();
+        var codeText = CSharpSyntaxTree.ParseText(this.GetSerializerClassCode())
+            .GetRoot()
+            .NormalizeWhitespace().SyntaxTree
+            .GetText()
+            .ToString();
+
         using var stream = new MemoryStream();
         using var writer = new StreamWriter(stream);
+
         writer.Write(codeText);
         writer.Flush();
         stream.Position = 0;
+
         logger?.LogInformation("Load code of serializer");
         var code = SourceText.From(stream, Encoding.Default, canBeEmbedded: true);
+
         logger?.LogInformation("Search all assemblies for serializer");
+
         var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
+
         var assemblies = new List<Assembly>
         {
             typeof(System.Object).Assembly,
@@ -873,41 +927,44 @@ public class SeedSerializer : ISeedSerializer {
             Assembly.LoadFile(Path.Combine(assemblyPath, "System.Linq.Expressions.dll")),
             Assembly.LoadFile(Path.Combine(assemblyPath, "System.Collections.Concurrent.dll"))
         };
+
         assemblies.AddRange(customTypeMappingSchema.Select(x => x.Value.ClrType.Assembly).ToList().Concat(assemblies).DistinctBy(x => x.FullName).ToList());
+
         var supportedTypes = supportedTypesList.DistinctBy(x => x.FullTypeId).ToList();
+
         assemblies.AddRange(supportedTypes.Select(x => x.ClrType.Assembly).Concat(assemblies).ToList().DistinctBy(x => x.FullName).ToList());
+
         MetadataReference[] references = assemblies.DistinctBy(x => x.FullName).Select(x => MetadataReference.CreateFromFile(x.Location)).ToArray();
+        
         logger?.LogInformation("Compile code of serializer");
+
         var comp = CSharpCompilation.Create(
             assemblyName: assemblyName,
-            syntaxTrees: new[]
-            {
-                CSharpSyntaxTree.ParseText(code, path: sourceCodePath)
-            },
+            syntaxTrees: new[] { CSharpSyntaxTree.ParseText(code, path: sourceCodePath) },
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)
 #if DEBUG
                 .WithOptimizationLevel(OptimizationLevel.Debug)
 #endif
         );
+
         logger?.LogInformation("Create streams for serializer dll and pdb");
-        var ms = new MemoryStream();
-        var pdbMs = new MemoryStream();
-        var emitOptions = new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: symbolsName);
-        var embeddedTexts = new List<EmbeddedText>
-        {
-            EmbeddedText.FromSource(sourceCodePath, code),
-        };
+
+        var ms            = new MemoryStream();
+        var pdbMs         = new MemoryStream();
+        var emitOptions   = new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: symbolsName);
+        var embeddedTexts = new List<EmbeddedText> { EmbeddedText.FromSource(sourceCodePath, code) };
+
         logger?.LogInformation("Save compilation result to dll and pdb");
         EmitResult result = comp.Emit(peStream: ms, pdbStream: pdbMs, embeddedTexts: embeddedTexts, options: emitOptions);
 
         return new SeedSerializerCompilationResult
         {
-            Code = codeText,
+            Code           = codeText,
             SupportedTypes = supportedTypes,
-            Result = result,
-            PeStream = ms,
-            PdbStream = pdbMs
+            Result         = result,
+            PeStream       = ms,
+            PdbStream      = pdbMs
         };
     }
 
@@ -918,19 +975,26 @@ public class SeedSerializer : ISeedSerializer {
     public ISeedSerializer BuildSeedSerializer()
     {
         ObjectDisposedException.ThrowIf(disposed, this);
+
         var (code, supportedTypes, result, ms, pdbMs) = CompileSerializer();
+
         using var peStream = ms;
         using var pdbStream = pdbMs;
+
         if (!result.Success)
         {
             logger?.LogError("Compilation failed");
+
             var failures = result.Diagnostics.Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
             var errorMessage = new StringBuilder("Compilation failed");
+
             foreach (Diagnostic diagnostic in failures)
             {
                 var diagnosticMessage = $"{diagnostic.Location}:{diagnostic.Id} - {diagnostic.GetMessage()}";
+
                 logger?.LogError($"Compilation errors: {diagnosticMessage}");
                 Debug.WriteLine(diagnosticMessage);
+
                 errorMessage.AppendLine();
                 errorMessage.Append(diagnosticMessage);
             }
@@ -940,15 +1004,20 @@ public class SeedSerializer : ISeedSerializer {
         else
         {
             logger?.LogInformation("Compilation success");
+
             ms.Seek(0, SeekOrigin.Begin);
             pdbMs.Seek(0, SeekOrigin.Begin);
             logger?.LogInformation("Load serializer type");
+
             var loadContext = new AssemblyLoadContext("Seed serializer", isCollectible: true);
+
             try
             {
                 var a = loadContext.LoadFromStream(ms, pdbMs);
                 var serializerType = a.GetExportedTypes().First(x => x.GetInterfaces().Contains(typeof(ISeedSerializer)));
+
                 logger?.LogDebug("Build instance ctor args");
+
                 object?[] args = new object?[]
                 {
                     allRttiTypes,
@@ -956,6 +1025,7 @@ public class SeedSerializer : ISeedSerializer {
                     customTypeMappingSchema,
                     serializerLogger
                 };
+
                 Type[] argsTypes = new Type[]
                 {
                     allRttiTypes.GetType(),
@@ -963,6 +1033,7 @@ public class SeedSerializer : ISeedSerializer {
                     customTypeMappingSchema.GetType(),
                     serializerLogger?.GetType() ?? typeof(ILogger<ISeedSerializer>)
                 };
+
                 logger?.LogInformation("Create instance of serializer");
                 var serializer = serializerType.GetConstructor(argsTypes)!.Invoke(args) as ISeedSerializer;
                 assemblyContexts.Add(loadContext);
@@ -989,6 +1060,7 @@ public class SeedSerializer : ISeedSerializer {
 
         disposed = true;
         serializer = null;
+        
         foreach (var context in assemblyContexts)
         {
             context.Unload();

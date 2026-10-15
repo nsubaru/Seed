@@ -22,10 +22,13 @@ public class Utf8StringSerializer : ICustomClassSerializer
     /// <returns>The decoded managed value.</returns>
     public object Deserialize(Stream serializationStream, ISeedSerializer serializer)
     {
-        UInt64 size = 0;
+        UInt64 size        = 0;
         object sizeDynamic = size;
+
         serializer.Deserialize(ref sizeDynamic, serializationStream);
+
         size = (UInt64)sizeDynamic;
+
         if (size > int.MaxValue)
         {
             throw new InvalidDataException($"UTF-8 string payload is too large for managed deserialization: {size} bytes.");
@@ -45,8 +48,9 @@ public class Utf8StringSerializer : ICustomClassSerializer
     /// <param name="serializer">Session serializer used for nested fields.</param>
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
-        var utf8 = data is Utf8String value ? value : Utf8String.FromString(data?.ToString());
+        var utf8       = data is Utf8String value ? value : Utf8String.FromString(data?.ToString());
         var dataBuffer = utf8.ToArray();
+
         serializer.Serialize((UInt64)dataBuffer.Length, serializationStream);
         serializationStream.Write(dataBuffer);
     }

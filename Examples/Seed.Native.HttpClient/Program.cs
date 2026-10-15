@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 
 var options = new Dictionary<string, string>(StringComparer.Ordinal);
+
 for (int index = 0; index < args.Length; ++index)
 {
     if (!args[index].StartsWith("--", StringComparison.Ordinal) || index + 1 == args.Length)
@@ -24,6 +25,7 @@ if (!options.TryGetValue("--output", out string? target))
 }
 
 var root = Directory.GetCurrentDirectory();
+
 while (!File.Exists(Path.Combine(root, "Seed.slnx")))
 {
     root = Directory.GetParent(root)?.FullName ?? throw new DirectoryNotFoundException("Run this example from a Seed checkout.");
@@ -31,12 +33,14 @@ while (!File.Exists(Path.Combine(root, "Seed.slnx")))
 
 var runtime = Path.GetFullPath(options.GetValueOrDefault("--runtime", Path.Combine(root, "Artifacts/x64/Debug/Runtime/Seed.Runtime.exe")));
 var output = Path.GetFullPath(target);
+
 if (new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))
 {
     throw new InvalidOperationException("Run the client demonstration under a non-elevated account.");
 }
 
 Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+
 if (File.Exists(output))
 {
     File.Delete(output);
@@ -60,7 +64,9 @@ Environment.SetEnvironmentVariable("SEED_HTTP_OUTPUT", output);
 Environment.SetEnvironmentVariable("SEED_HTTP_TRUST_ROOT", options.TryGetValue("--trust-root", out var trustRoot) ? Path.GetFullPath(trustRoot) : null);
 Environment.SetEnvironmentVariable("SEED_HTTP_PROTOCOL", options.GetValueOrDefault("--tls"));
 Environment.SetEnvironmentVariable("SEED_HTTP_CONNECT_ADDRESS", options.GetValueOrDefault("--connect-address"));
+
 var status = Starter.SeedStartRuntime(runtime, "Seed.Runtime.exe", out ulong processId);
+
 if (status < 0)
 {
     throw new InvalidOperationException($"Native startup failed: NTSTATUS 0x{status:X8}.");
@@ -68,6 +74,7 @@ if (status < 0)
 
 using var process = Process.GetProcessById(checked((int)processId));
 using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+
 try
 {
     await process.WaitForExitAsync(deadline.Token);
@@ -90,7 +97,9 @@ if (process.ExitCode != 0 || !File.Exists(output + ".headers.txt"))
 
 Console.Write(await File.ReadAllTextAsync(output + ".headers.txt"));
 Console.WriteLine($"Native response body: {output} ({new FileInfo(output).Length} bytes).");
+
 return 0;
+
 internal static class Starter
 {
     [DllImport("Seed.Starter.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]

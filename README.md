@@ -4,18 +4,6 @@ Seed is an independent extraction of an NTAPI-first Windows runtime. It combines
 native containers, async IO, reflection, serialization, DNS, DHCP and cryptography
 with HTTP and TLS components and managed reflection/serialization assemblies.
 
-**This checkout is under construction and has not passed release validation.**
-The standalone native runtime, starter, console, managed assemblies and
-documentation generator build in Debug and Release. All 1,711 native self-tests
-passed in both configurations under an ordinary-user account. Local HTTP, console transport, live RTTI export
-and managed/native JSON and binary integration have passed. The native TLS client
-interoperates with independent .NET TLS 1.2 and TLS 1.3 servers, with certificate
-validation enabled, including DNS and IPv4/IPv6 identities. Redirects, chunked
-requests/responses, informational responses and malformed framing have local checks.
-Persisted Core configuration values are validated before applying or saving them.
-The HTTPS server also interoperates with .NET and OpenSSL clients over TLS 1.2/1.3.
-Isolated DHCP lifecycle validation and cryptographic/release acceptance remain in progress. No release is available yet.
-
 ## Source SDK
 
 - `Lib/Seed.MinCore`: primitive types, traits, reference counting and compiler ABI.
@@ -213,13 +201,7 @@ HTTP/1.1 is the protocol scope. Independent client tests cover TLS 1.2/1.3,
 fragmented responses, wrong hostnames, untrusted chains, expired certificates and
 incompatible protocol versions. Full failure acceptance
 remains a release requirement. The server supports HTTP and explicitly configured
-HTTPS. HTTP/2/3, QUIC, ACME, resumption, 0-RTT and mutual TLS
-are outside version 0.1.
-
-Filtered real history retains development commits reaching back to 2018. Hashes changed
-through filtering and Seed naming transformations; historical builds are not
-guaranteed. Contributor rights, support-header provenance and the final publication
-audit remain release gates.
+HTTPS.
 
 ## Licensing and contribution
 

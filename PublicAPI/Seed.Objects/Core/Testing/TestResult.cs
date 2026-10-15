@@ -8,30 +8,14 @@ namespace Seed.Core.Testing;
 public struct TestResult
 {
     [SerializableStructField]
-    public ETestStatus Status
-    {
-        get;
-        set;
-    }
+    public ETestStatus Status { get; set; }
 
     [SerializableStructField]
-    public String Name
-    {
-        get;
-        set;
-    }
+    public String Name { get; set; }
 
     [SerializableStructField]
-    public String Message
-    {
-        get;
-        set;
-    }
+    public String Message { get; set; }
 
     [SerializableStructField]
-    public TimeSpan Duration
-    {
-        get;
-        set;
-    }
+    public TimeSpan Duration { get; set; }
 }

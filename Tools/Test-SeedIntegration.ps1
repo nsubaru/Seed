@@ -1,14 +1,17 @@
 param([ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug')
 
 $ErrorActionPreference = 'Stop'
-$seedRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
-$seedRuntime = Join-Path $seedRoot "Artifacts/x64/$Configuration/Runtime/Seed.Runtime.exe"
-$seedConsole = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Console/Seed.Console.exe"
-$seedStarter = Join-Path $seedRoot "Artifacts/x64/$Configuration/API/Starter/Seed.Starter.dll"
-$seedRoundTrip = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Managed.RoundTrip/Seed.Managed.RoundTrip.exe"
+
+$seedRoot        = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+$seedRuntime     = Join-Path $seedRoot "Artifacts/x64/$Configuration/Runtime/Seed.Runtime.exe"
+$seedConsole     = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Console/Seed.Console.exe"
+$seedStarter     = Join-Path $seedRoot "Artifacts/x64/$Configuration/API/Starter/Seed.Starter.dll"
+$seedRoundTrip   = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Managed.RoundTrip/Seed.Managed.RoundTrip.exe"
 $seedKmsVerifier = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.KMS.Verifier/Seed.KMS.Verifier.exe"
-$seedOutput = Join-Path $seedRoot 'Artifacts/integration'
+$seedOutput      = Join-Path $seedRoot 'Artifacts/integration'
+
 New-Item -ItemType Directory -Path $seedOutput -Force | Out-Null
+
 if ([Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 {
     throw 'Run standard Seed integration under a non-elevated account.'
@@ -30,10 +33,11 @@ public static class SeedIntegrationStarter {
 }
 '@
 $seedLibrary = [Runtime.InteropServices.NativeLibrary]::Load($seedStarter)
+
 $seedEnvironmentNames = @('SEED_CONFIG_DIRECTORY', 'SEED_RUN_TESTS', 'SEED_TEST_REPORT', 'SEED_RTTI_EXPORT',
     'SEED_HTTP_URL', 'SEED_HTTP_OUTPUT', 'SEED_HTTP_TRUST_ROOT', 'SEED_HTTP_PROTOCOL', 'SEED_HTTP_CONNECT_ADDRESS')
-$seedEnvironment =
-@{}
+
+$seedEnvironment = @{}
 
 foreach ($seedName in $seedEnvironmentNames)
 {
@@ -43,10 +47,13 @@ foreach ($seedName in $seedEnvironmentNames)
 
 [Environment]::SetEnvironmentVariable('SEED_CONFIG_DIRECTORY', (Join-Path $seedOutput ('configuration-' + [Guid]::NewGuid().ToString('N'))))
 [UInt64]$seedProcessId = 0
+
 $seedProcess = $null
+
 function Invoke-SeedCommand([string] $Command, [string[]] $Arguments = @(), [int] $ExpectedExit = 0)
 {
     $seedCommandOutput = & $seedConsole $Command @Arguments 2>&1
+
     if ($LASTEXITCODE -ne $ExpectedExit)
     {
         throw "KMS command failed: $Command (exit $LASTEXITCODE)`n$seedCommandOutput"
@@ -62,19 +69,26 @@ function Assert-SeedHttpExchange([string] $Request, [int] $Status, [string] $Bod
     try
     {
         $seedSocket.Connect('127.0.0.1', 8080)
+
         $seedStream = $seedSocket.GetStream()
+
         $seedStream.ReadTimeout = 5000
         $seedStream.WriteTimeout = 5000
+
         $seedRequestBytes = [Text.Encoding]::ASCII.GetBytes($Request)
+
         $seedStream.Write($seedRequestBytes, 0, $seedRequestBytes.Length)
+
         $seedResponseBytes = [IO.MemoryStream]::new()
 
         try
         {
             $seedBuffer = [byte[]]::new(4096)
+
             while (($seedRead = $seedStream.Read($seedBuffer, 0, $seedBuffer.Length)) -gt 0)
             {
                 $seedResponseBytes.Write($seedBuffer, 0, $seedRead)
+
                 if ($seedResponseBytes.Length -gt 65536)
                 {
                     throw 'HTTP test response exceeded its limit.'
@@ -82,6 +96,7 @@ function Assert-SeedHttpExchange([string] $Request, [int] $Status, [string] $Bod
             }
 
             $seedResponseText = [Text.Encoding]::UTF8.GetString($seedResponseBytes.ToArray())
+
             if (-not $seedResponseText.StartsWith("HTTP/1.1 $Status ", [StringComparison]::Ordinal))
             {
                 throw "Unexpected HTTP status: $seedResponseText"
@@ -112,10 +127,12 @@ function Assert-RejectsPacket([byte[]] $Packet)
         $seedPipe.Connect(5000)
         $seedPipe.ReadMode = [IO.Pipes.PipeTransmissionMode]::Message
         $seedBuffer = [byte[]]::new(65535)
+
         do
         {
             $seedRead = $seedPipe.Read($seedBuffer, 0, $seedBuffer.Length)
         } while (-not $seedPipe.IsMessageComplete)
+
         if ($seedRead -lt 5)
         {
             throw 'Missing KMS initialization marker.'
@@ -127,6 +144,7 @@ function Assert-RejectsPacket([byte[]] $Packet)
         try
         {
             $seedRead = $seedPipe.ReadAsync($seedBuffer, 0, $seedBuffer.Length, $seedDeadline.Token).GetAwaiter().GetResult()
+
             if ($seedRead -ne 0)
             {
                 throw 'Malformed KMS packet was accepted.'
@@ -157,26 +175,53 @@ try
     }
 
     $seedProcess = [Diagnostics.Process]::GetProcessById([int]$seedProcessId)
+
     Invoke-SeedCommand version
     Invoke-SeedCommand status.kernel
     Invoke-SeedCommand exit | Out-Null
     Invoke-SeedCommand version | Out-Null
     Invoke-SeedCommand unavailable.command -ExpectedExit 1 | Out-Null
+
     $seedCommands = (Invoke-SeedCommand commands) -join "`n"
+
     if ($seedCommands -match '(?i)auth|login|password')
     {
         throw 'Unexpected authentication commands.'
     }
 
-    $seedExpectedCommands = @('help', 'commands', 'version', 'exit', 'status.kernel', 'shutdown', 'reload',
-        'configurations.list', 'configurations.get', 'configurations.set', 'configurations.save', 'configurations.reset',
-        'logging.view', 'logging.get', 'logging.set', 'logging.follow', 'tests.list', 'tests.run', 'tests.result.store',
-        'di.rtti.list', 'di.rtti.save', 'network.interfaces', 'network.dns.resolve',
-        'network.dhcp.start', 'network.dhcp.status', 'network.dhcp.stop')
+    $seedExpectedCommands = @(
+        'help', 
+        'commands',
+        'version', 
+        'exit', 
+        'status.kernel',
+        'shutdown', 
+        'reload',
+        'configurations.list', 
+        'configurations.get', 
+        'configurations.set', 
+        'configurations.save', 
+        'configurations.reset',
+        'logging.view', 
+        'logging.get', 
+        'logging.set', 
+        'logging.follow', 
+        'tests.list', 
+        'tests.run', 
+        'tests.result.store',
+        'di.rtti.list', 
+        'di.rtti.save', 
+        'network.interfaces', 
+        'network.dns.resolve',
+        'network.dhcp.start', 
+        'network.dhcp.status', 
+        'network.dhcp.stop')
+
     $seedActualCommands = @($seedCommands -split "`r?`n" | Where-Object `
-        {
-            $_
-        })
+    {
+        $_
+    })
+
     if ($seedActualCommands.Count -ne $seedExpectedCommands.Count -or
         @(Compare-Object ($seedExpectedCommands | Sort-Object) ($seedActualCommands | Sort-Object)).Count -ne 0)
     {
@@ -184,8 +229,10 @@ try
     }
 
     $seedConfigurationName = 'core.memory.stringReserveCharacters'
+
     Invoke-SeedCommand configurations.list
     Invoke-SeedCommand configurations.set @($seedConfigurationName, '73') | Out-Null
+
     if ((Invoke-SeedCommand configurations.get @($seedConfigurationName)) -notmatch '= 73 ')
     {
         throw 'Live configuration update failed.'
@@ -193,6 +240,7 @@ try
 
     Invoke-SeedCommand configurations.set @($seedConfigurationName, '-1') -ExpectedExit 1 | Out-Null
     Invoke-SeedCommand configurations.set @($seedConfigurationName, '18446744073709551616') -ExpectedExit 1 | Out-Null
+
     if ((Invoke-SeedCommand configurations.get @($seedConfigurationName)) -notmatch '= 73 ')
     {
         throw 'Rejected configuration modified live state.'
@@ -200,18 +248,21 @@ try
 
     Invoke-SeedCommand configurations.save | Out-Null
     Invoke-SeedCommand reload | Out-Null
+
     if ((Invoke-SeedCommand configurations.get @($seedConfigurationName)) -notmatch '= 73 ')
     {
         throw 'Saved configuration did not survive reload.'
     }
 
     Invoke-SeedCommand configurations.reset @($seedConfigurationName) | Out-Null
+
     if ((Invoke-SeedCommand configurations.get @($seedConfigurationName)) -notmatch '= 50 ')
     {
         throw 'Compiled configuration defaults were not restored.'
     }
 
     Invoke-SeedCommand configurations.save | Out-Null
+
     if ((Invoke-SeedCommand network.dhcp.status) -notmatch 'DHCP maintenance is idle')
     {
         throw 'DHCP started without an explicit eligible-interface request.'
@@ -224,6 +275,7 @@ try
 
     Invoke-SeedCommand network.dhcp.status @('unexpected') -ExpectedExit 1 | Out-Null
     Invoke-SeedCommand network.dhcp.stop @('0') | Out-Null
+
     if ((Invoke-SeedCommand network.dhcp.status) -notmatch 'DHCP maintenance is idle')
     {
         throw 'Rejected DHCP selection created a maintenance operation.'
@@ -231,6 +283,7 @@ try
 
     Invoke-SeedCommand logging.get
     Invoke-SeedCommand logging.set @('28', 'HTTP client') | Out-Null
+
     if ((Invoke-SeedCommand logging.get @('HTTP client')) -notmatch '= 28')
     {
         throw 'Live logger change failed.'
@@ -240,6 +293,7 @@ try
     Invoke-SeedCommand logging.set @('31', 'HTTP client') | Out-Null
 
     & $seedKmsVerifier
+
     if ($LASTEXITCODE -ne 0)
     {
         throw 'KMS streaming and live logging verification failed.'
@@ -248,13 +302,16 @@ try
     Invoke-SeedCommand tests.run @('*Crypt*')
     $seedReport = Join-Path $seedOutput 'kms-native.xml'
     Invoke-SeedCommand tests.result.store @($seedReport)
+
     [xml]$seedResults = Get-Content -LiteralPath $seedReport -Raw
+
     if ($seedResults.'test-run'.failed -ne '0' -or [int]$seedResults.'test-run'.testcasecount -le 0)
     {
         throw 'Native cryptography KMS report failed.'
     }
 
     $seedSelectedTypes = @('Seed::Core::Testing::Test::Crypt::Aes256::Aes256BlockBoundaryTest', 'Seed::Core::Testing::Test::Configurations::SnapshotValidationTest')
+
     if ((Invoke-SeedCommand tests.run $seedSelectedTypes) -notmatch '2 native tests passed')
     {
         throw 'Multiple explicit KMS test selections failed.'
@@ -264,10 +321,13 @@ try
     Invoke-SeedCommand tests.run @('"unterminated') -ExpectedExit 1 | Out-Null
     Invoke-SeedCommand logging.view | Out-Null
     Invoke-SeedCommand network.interfaces
+
     $seedRtti = Join-Path $seedOutput 'seed-rtti.dat'
+
     Invoke-SeedCommand di.rtti.save @($seedRtti)
 
     & $seedRoundTrip $seedRtti 'http://127.0.0.1:8080/' --verify-malformed
+
     if ($LASTEXITCODE -ne 0)
     {
         throw 'Managed/native interoperability failed.'
@@ -316,13 +376,16 @@ try
     Assert-RejectsPacket ([byte[]]@(1, 2, 0, 0, 0))
     Assert-RejectsPacket ([byte[]]@(1, 6, 0, 0, 0, 0, 216))
     Assert-RejectsPacket ([byte[]]::new(65536))
+    
     $seedModules = @($seedProcess.Modules | Select-Object -ExpandProperty ModuleName)
+
     if ($seedModules.Count -ne 2 -or $seedModules -notcontains 'ntdll.dll')
     {
         throw "Unexpected native modules: $seedModules"
     }
 
     Invoke-SeedCommand shutdown
+
     if (-not $seedProcess.WaitForExit(10000))
     {
         throw 'Orderly shutdown timed out.'
@@ -335,6 +398,7 @@ finally
     if ($seedProcess)
     {
         $seedProcess.Refresh()
+        
         if (-not $seedProcess.HasExited -and $seedProcess.MainModule.FileName -eq $seedRuntime)
         {
             $seedProcess.Kill()

@@ -3,14 +3,17 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 
 using var cancellation = new CancellationTokenSource();
+
 Console.CancelKeyPress += (_, eventArgs) =>
 {
     eventArgs.Cancel = true;
     cancellation.Cancel();
 };
+
 try
 {
     string pipeName = KmsClient.DefaultPipeName;
+
     if (args.Length > 0 && args[0] == "--pipe")
     {
         if (args.Length < 2)
@@ -24,6 +27,7 @@ try
 
     await using var client = new KmsClient(pipeName);
     if (args.Length > 0 && args[0] == "--start")
+
     {
         if (args.Length < 2)
         {
@@ -59,16 +63,19 @@ try
         }
 
         int status = Starter.SeedStartRuntime(runtime, "Seed.Runtime.exe", out ulong processId);
+
         if (status < 0)
         {
             throw new InvalidOperationException($"Native startup failed: NTSTATUS 0x{status:X8}.");
         }
 
         Console.WriteLine($"Started Seed runtime process {processId}.");
+
         args = args[2..];
     }
 
     await client.ConnectAsync(TimeSpan.FromSeconds(10), cancellation.Token);
+
     async Task<bool> Execute(string command)
     {
         bool reload = command == "reload" || command.StartsWith("reload ", StringComparison.Ordinal);
@@ -80,10 +87,12 @@ try
         bool succeeded = true;
         TextWriter? lastWriter = null;
         bool endsWithNewline = true;
+
         await foreach (var datagram in client.ExecuteStreamingAsync(command, cancellationToken: cancellation.Token))
         {
             var writer = datagram.IsError ? Console.Error : Console.Out;
             writer.Write(datagram.Text);
+
             if (datagram.Text.Length != 0)
             {
                 lastWriter = writer;
@@ -112,10 +121,12 @@ try
     }
 
     Console.WriteLine("Seed console; help lists commands. Ctrl+C cancels the session.");
+
     for (; ; )
     {
         Console.Write("seed> ");
         string? command = Console.ReadLine();
+
         if (command is null)
         {
             break;
@@ -127,6 +138,7 @@ try
         }
 
         await Execute(command);
+        
         if (command == "exit")
         {
             break;

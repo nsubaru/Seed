@@ -19,14 +19,22 @@ foreach ($seedFile in @($seedPeerExe, $seedClientExe, $seedRuntime))
     }
 }
 
-function Invoke-SeedTlsRequest([string] $Url, [string] $Directory, [string] $Root, [string] $Protocol,
-    [string] $Name, [string] $ExpectedFailure = '', [string] $ConnectAddress = '127.0.0.1')
+function Invoke-SeedTlsRequest(
+    [string] $Url, 
+    [string] $Directory,
+    [string] $Root, 
+    [string] $Protocol,
+    [string] $Name, 
+    [string] $ExpectedFailure = '', 
+    [string] $ConnectAddress = '127.0.0.1')
 {
-    $seedBody = Join-Path $Directory "$Name.txt"
+    $seedBody      = Join-Path $Directory "$Name.txt"
     $seedClientLog = Join-Path $Directory "$Name.console.log"
 
     & $seedClientExe --runtime $seedRuntime --url $Url --output $seedBody --trust-root $Root --tls $Protocol --connect-address $ConnectAddress *> $seedClientLog
+
     $seedExit = $LASTEXITCODE
+
     if ($ExpectedFailure)
     {
         if ($seedExit -eq 0 -or -not (Test-Path -LiteralPath "$seedBody.error.txt"))
@@ -52,6 +60,7 @@ function Invoke-SeedTlsRequest([string] $Url, [string] $Directory, [string] $Roo
         }
 
         $seedModules = @(Get-Content -LiteralPath "$seedBody.modules.txt" | Sort-Object)
+
         if (($seedModules -join ',') -ine 'ntdll.dll,Seed.Runtime.exe')
         {
             throw "Unexpected native TLS modules: $seedModules"
@@ -66,16 +75,20 @@ try
 {
     foreach ($seedCase in @(@('1.2', ''), @('1.3', ''), @('1.3', 'expired'), @('1.3', 'ipv6')))
     {
-        $seedProtocol = $seedCase[0]
+        $seedProtocol  = $seedCase[0]
         $seedDirectory = Join-Path $seedOutput ($seedProtocol + $seedCase[1])
+
         New-Item -ItemType Directory -Path $seedDirectory -Force | Out-Null
+
         $seedUrlPath = Join-Path $seedDirectory 'url.txt'
+
         if (Test-Path -LiteralPath $seedUrlPath)
         {
             Remove-Item -LiteralPath $seedUrlPath
         }
 
         $seedArguments = @('"' + $seedDirectory + '"', $seedProtocol)
+
         if ($seedCase[1])
         {
             $seedArguments += $seedCase[1]
@@ -86,6 +99,7 @@ try
         try
         {
             $seedDeadline = [DateTime]::UtcNow.AddSeconds(10)
+
             while (-not (Test-Path -LiteralPath $seedUrlPath))
             {
                 if ($seedPeer.HasExited -or [DateTime]::UtcNow -gt $seedDeadline)
@@ -97,8 +111,9 @@ try
                 Start-Sleep -Milliseconds 100
             }
 
-            $seedUrl = [IO.File]::ReadAllText($seedUrlPath)
+            $seedUrl     = [IO.File]::ReadAllText($seedUrlPath)
             $seedRootDer = Join-Path $seedDirectory 'root.der'
+
             if ($seedCase[1] -eq 'ipv6')
             {
                 Invoke-SeedTlsRequest $seedUrl $seedDirectory $seedRootDer $seedProtocol 'valid-ipv6' '' '::1'
@@ -115,6 +130,7 @@ try
                 Invoke-SeedTlsRequest ($seedUrl.Replace('localhost', '127.0.0.1')) $seedDirectory $seedRootDer $seedProtocol 'valid-ipv4'
                 Invoke-SeedTlsRequest ($seedUrl.Replace('localhost', '127.0.0.2')) $seedDirectory $seedRootDer $seedProtocol 'wrong-ipv4' 'not valid for the requested server name'
                 Invoke-SeedTlsRequest ($seedUrl.Replace('localhost', 'wrong.example')) $seedDirectory $seedRootDer $seedProtocol 'wrong-host' 'not valid for the requested server name'
+                
                 if ($seedProtocol -eq '1.3')
                 {
                     $seedOrigin = $seedUrl.Substring(0, $seedUrl.LastIndexOf('/'))

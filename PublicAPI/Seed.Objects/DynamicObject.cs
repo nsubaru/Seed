@@ -9,20 +9,12 @@ public class DynamicObject
     /// <summary>
     /// Object value, can be null if object is invalid
     /// </summary>
-    public object? Value
-    {
-        get;
-        private set;
-    }
+    public object? Value { get; private set; }
 
     /// <summary>
     /// Object full type id, can be Guid.Zero and in that case object value equals null
     /// </summary>
-    public Guid FullTypeId
-    {
-        get;
-        private set;
-    }
+    public Guid FullTypeId { get; private set; }
 
     /// <summary>
     /// Constructor with object and full type id
@@ -32,7 +24,7 @@ public class DynamicObject
     /// <exception cref="ArgumentNullException">If object value is null</exception>
     public DynamicObject(object value, Guid fullTypeId)
     {
-        Value = value ?? throw new ArgumentNullException(nameof(value));
+        Value      = value ?? throw new ArgumentNullException(nameof(value));
         FullTypeId = fullTypeId;
     }
 
@@ -41,7 +33,7 @@ public class DynamicObject
     /// </summary>
     public DynamicObject()
     {
-        Value = null;
+        Value      = null;
         FullTypeId = new Guid();
     }
 

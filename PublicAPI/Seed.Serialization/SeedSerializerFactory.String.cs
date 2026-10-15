@@ -12,6 +12,7 @@ public partial class SeedSerializerFactory
         code.AppendLine($"ulong count = data.Length != 0 ? ((ulong)data.Length) + 1ul : 0ul;");
         code.AppendLine($"SerializeImpl(count, stream);");
         code.AppendLine($"if (data.Length == 0) return;");
+
         if (typeRecord.TypeName == Constants.Types.SensitiveString || typeRecord.TypeName == Constants.Types.SensitiveUniString || typeof(T) == typeof(SecureString))
         {
             // Use unsafe for dirrect bind marshaled ptr to span
@@ -49,6 +50,7 @@ public partial class SeedSerializerFactory
         code.AppendLine("if (strSize == 0) return CreateObject<" + GetFriendlyTypeName(typeof(T)) + ">();");
         code.AppendLine("strSize *= 2;"); // Convert to byte size
         code.AppendLine("strSize -= 2;"); // Remove null terminator
+        
         // Handle SecureString separately
         if (typeRecord.TypeName == Constants.Types.SensitiveString || typeRecord.TypeName == Constants.Types.SensitiveUniString || typeof(T) == typeof(SecureString))
         {

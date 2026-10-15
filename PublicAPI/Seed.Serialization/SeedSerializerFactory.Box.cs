@@ -13,12 +13,14 @@ public partial class SeedSerializerFactory
         if (record.TemplateTypeName == Constants.Types.Either)
         {
             var leftType = GetTypeWithOffset(0, record);
+
             if (leftType == null)
             {
                 return null;
             }
 
             var rightType = GetTypeWithOffset(1, record);
+
             if (rightType == null)
             {
                 return null;
@@ -29,6 +31,7 @@ public partial class SeedSerializerFactory
         else if (record.TemplateTypeName == Constants.Types.Optional)
         {
             var innerType = GetTypeWithOffset(0, record);
+
             if (innerType == null)
             {
                 return null;
@@ -39,6 +42,7 @@ public partial class SeedSerializerFactory
         else
         {
             var innerType = GetTypeWithOffset(0, record);
+            
             if (innerType == null)
             {
                 return null;

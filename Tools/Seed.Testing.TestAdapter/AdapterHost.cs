@@ -17,6 +17,7 @@ namespace Seed.Testing.TestAdapter
             try
             {
                 using (var file = File.OpenRead(source))
+                
                 using (var reader = new PEReader(file))
                 {
                     var subsystem = reader.PEHeaders.PEHeader?.Subsystem;
@@ -49,6 +50,7 @@ namespace Seed.Testing.TestAdapter
         {
             var text = new StringBuilder("\"");
             int slashes = 0;
+
             foreach (char character in value)
             {
                 if (character == '\\')
@@ -77,6 +79,7 @@ namespace Seed.Testing.TestAdapter
         {
             string assemblyDirectory = Path.GetDirectoryName(typeof(AdapterHost).GetTypeInfo().Assembly.Location)!;
             string host = Path.Combine(assemblyDirectory, "host", "Seed.Testing.Host.exe");
+
             if (!File.Exists(host))
             {
                 throw new FileNotFoundException("The Seed .NET 10 test host is missing; build or restore the complete test adapter package.", host);
@@ -89,15 +92,18 @@ namespace Seed.Testing.TestAdapter
                     mode, Path.GetFullPath(source), selection, output
                 }.Select(Quote)))
                 {
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
+                    UseShellExecute        = false,
+                    CreateNoWindow         = true,
                     RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true
+                    RedirectStandardError  = true,
+                    RedirectStandardInput  = true
                 };
+
                 var diagnostics = new StringBuilder();
                 var gate = new object();
+
                 Exception? attachmentError = null;
+
                 process.OutputDataReceived += (_, item) =>
                 {
                     if (item.Data is null)
@@ -108,6 +114,7 @@ namespace Seed.Testing.TestAdapter
                     lock (gate)
                     {
                         diagnostics.AppendLine(item.Data);
+
                         if (diagnostics.Length > 65536)
                         {
                             diagnostics.Remove(0, diagnostics.Length - 65536);
@@ -128,6 +135,7 @@ namespace Seed.Testing.TestAdapter
                         }
                     }
                 };
+
                 process.ErrorDataReceived += (_, item) =>
                 {
                     if (item.Data is not null)
@@ -135,6 +143,7 @@ namespace Seed.Testing.TestAdapter
                         lock (gate)
                         {
                             diagnostics.AppendLine(item.Data);
+
                             if (diagnostics.Length > 65536)
                             {
                                 diagnostics.Remove(0, diagnostics.Length - 65536);
@@ -142,11 +151,14 @@ namespace Seed.Testing.TestAdapter
                         }
                     }
                 };
+                
                 process.Start();
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
-                var elapsed = Stopwatch.StartNew();
+
+                var elapsed     = Stopwatch.StartNew();
                 bool cancelSent = false;
+
                 while (!process.WaitForExit(100))
                 {
                     if (!cancelSent && (cancellation?.IsCancellationRequested == true || elapsed.Elapsed > TimeSpan.FromMinutes(16)))
@@ -170,12 +182,14 @@ namespace Seed.Testing.TestAdapter
                 }
 
                 process.WaitForExit();
+
                 if (attachmentError is not null)
                 {
                     throw new InvalidOperationException("Native debugger attachment failed.", attachmentError);
                 }
 
                 cancellation?.ThrowIfCancellationRequested();
+                
                 if (process.ExitCode != 0 || !File.Exists(output))
                 {
                     throw new InvalidOperationException($"Seed test host failed ({process.ExitCode}); artifacts: {output}\n{diagnostics}");

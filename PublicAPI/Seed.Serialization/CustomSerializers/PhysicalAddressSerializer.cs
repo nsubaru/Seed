@@ -24,6 +24,7 @@ public class PhysicalAddressSerializer : ICustomClassSerializer
         UInt64 size = 0;
         object sizeDynamic = size;
         serializer.Deserialize(ref sizeDynamic, serializationStream);
+
         size = (UInt64)sizeDynamic;
         var dataBuffer = new byte[(int)size];
         serializationStream.ReadExactly(dataBuffer);
@@ -40,6 +41,7 @@ public class PhysicalAddressSerializer : ICustomClassSerializer
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         byte[] dataBuffer = (data as PhysicalAddress)!.GetAddressBytes();
+        
         serializer.Serialize((UInt64)dataBuffer.Length, serializationStream);
         serializationStream.Write(dataBuffer);
     }
