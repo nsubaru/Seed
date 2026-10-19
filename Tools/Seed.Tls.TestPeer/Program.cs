@@ -99,12 +99,13 @@ async Task Handle(TcpClient socket)
 
         try
         {
+            // HTTP/1.1 can use TLS without ALPN. Keep this independent peer focused on
+            // record and certificate interoperability; the native round trips verify ALPN.
             await stream.AuthenticateAsServerAsync(new SslServerAuthenticationOptions
             {
                 ServerCertificateContext  = context,
                 ClientCertificateRequired = false,
-                EnabledSslProtocols       = args[1] == "1.2" ? SslProtocols.Tls12 : SslProtocols.Tls13,
-                ApplicationProtocols      = [SslApplicationProtocol.Http11]
+                EnabledSslProtocols       = args[1] == "1.2" ? SslProtocols.Tls12 : SslProtocols.Tls13
             }, deadline.Token);
 
             Console.WriteLine($"Negotiated {stream.SslProtocol}, {stream.NegotiatedCipherSuite}.");
