@@ -12,12 +12,138 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.cpp">
       <Filter>KMS</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.System.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Base.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Base.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Copy.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Delete.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Directory.Create.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Info.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.List.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Move.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Read.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Write.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Process.List.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Process.Terminate.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Base.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Get.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Key.Create.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Key.Delete.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.List.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Set.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Value.Delete.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Table.cpp">
+      <Filter>KMS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Server.h">
       <Filter>KMS</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.System.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Base.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Base.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Copy.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Delete.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Directory.Create.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Info.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.List.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Move.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Read.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.FS.Write.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Process.List.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Process.Terminate.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Base.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Get.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Key.Create.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Key.Delete.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.List.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Set.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Registry.Value.Delete.h">
+      <Filter>KMS</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Seed.KMS.Commands.Table.h">
       <Filter>KMS</Filter>
     </ClInclude>
   </ItemGroup>

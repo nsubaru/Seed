@@ -19,8 +19,13 @@ internal sealed class ManagedPage : ISourcePage
         license and provenance validation is part of release preparation.
 
         A runtime RTTI export must come from the live fixed-up Seed metadata section.
-        Native-to-managed round-trip validation and regenerated Seed fixtures are pending;
+        Use the shipped Seed.Managed.RoundTrip example to check mapped C# records,
+        local binary serialization and native JSON/binary exchanges against that
+        runtime. Re-export metadata after changing the producing native build;
         successful managed compilation alone does not validate the metadata ABI.
+
+        See [demonstrations](demonstrations.md) for export/invocation steps and
+        [verification](testing.md) for the owned-runtime integration workflow.
 
         See [API reference](api/index.md) for compiler-generated managed documentation.
         """;

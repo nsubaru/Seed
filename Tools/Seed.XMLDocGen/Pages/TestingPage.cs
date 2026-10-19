@@ -10,6 +10,8 @@ internal sealed class TestingPage : ISourcePage
         # Native and managed verification
 
         Build Seed.slnx with MSBuild /m for matching x64 configuration outputs.
+        Run local PowerShell verification helpers in PowerShell 7: integration uses
+        the NativeLibrary API, which Windows PowerShell 5.1 does not provide.
         The solution stages Seed.Starter.dll and its PDB beside Seed.Managed.TestRunner.
         Standard tests run under a non-elevated account; the runner checks its token
         and rejects an elevated session.

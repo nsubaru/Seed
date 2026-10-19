@@ -16,6 +16,9 @@ directives and labels stay at the left margin. Keep empty types/functions/lambda
 as `{}` when appropriate. Keep else and catch on separate lines from the preceding
 closing brace; the closing do/while form is `} while (...);`.
 
+Close named and anonymous namespaces with `}` alone. Omit namespace-ending
+comments such as `} // namespace Seed::KMS::Commands::Process`.
+
 For multiline function or method parameter lists, put `(` after the name and
 start the first parameter on the next line. Put one parameter per line, indented
 one level, and put `)` on its own line aligned with the declaration. A definition

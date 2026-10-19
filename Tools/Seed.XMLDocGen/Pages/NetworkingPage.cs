@@ -51,6 +51,15 @@ internal sealed class NetworkingPage : ISourcePage
         change a production interface. The initial native NSI layout baseline is Windows
         build 26100; supported system builds need explicit validation.
 
+        No DHCP maintenance worker starts automatically. Use `network.interfaces` to
+        identify an interface, then `network.dhcp.start <interface-index>` only in the
+        isolated fixture. Acquisition requires a connected eligible interface without
+        a usable IPv4 address. `network.dhcp.status` reports acquisition errors and
+        cleanup state; `network.dhcp.stop <interface-index>` cancels and joins the
+        selected worker and releases its owned configuration. The worker survives
+        console disconnection, and runtime shutdown stops all workers before their
+        dependencies are torn down. See [console commands](kms.md).
+
         The HTTP component provides an HTTP/1.1 parser, outbound client and raw/reflected
         JSON handlers. Both client and server use Seed TLS for HTTPS; see [TLS](tls.md)
         for negotiation, listener configuration and limits. The native client interoperates with independent .NET TLS

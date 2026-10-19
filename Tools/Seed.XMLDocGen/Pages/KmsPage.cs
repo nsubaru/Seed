@@ -14,6 +14,9 @@ internal sealed class KmsPage : ISourcePage
         before service teardown. Console disconnection closes the session; runtime
         ownership is independent of a console connection.
 
+        The endpoint serves one session at a time. Exit an interactive console
+        before connecting another client or invoking a separate one-command console.
+
         Connections use ordinary Windows object permissions and reject remote clients.
         The server first sends a command-request packet containing SEED_KMS/1. There
         is no login exchange. Packets contain five header bytes followed by bounded
@@ -53,8 +56,16 @@ internal sealed class KmsPage : ISourcePage
         | Reflection | di.rtti.list, di.rtti.save |
         | Networking | network.interfaces, network.dns.resolve |
         | DHCP | network.dhcp.start, .status, .stop |
+        | Files | fs.list, .info, .read, .write, .directory.create, .copy, .move, .delete |
+        | Processes | process.list, process.terminate |
+        | Windows registry | registry.list, .get, .set, .key.create, .key.delete, .value.delete |
+
+        See [system command examples](system-commands.md) for syntax, quoting,
+        filesystem limits and registry types. These commands call Seed IO and NTAPI
+        using the native process's existing Windows token. They do not request elevation.
 
         tests.run accepts several wildcard patterns or exact native test type names.
+        With no selection it runs all registered tests.
         All selections must match; overlapping selections execute each test once.
         A successful run reports pass and skip counts; a failed run sends an error
         datagram. tests.result.store

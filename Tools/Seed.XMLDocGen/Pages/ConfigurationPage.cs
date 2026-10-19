@@ -9,11 +9,13 @@ internal sealed class ConfigurationPage : ISourcePage
     public string Render(PageContext context) => """
         # Core and host configuration
 
+        ## Core storage and live controls
+
         Core retains typed early-startup configuration and its compiled defaults.
         SEED_CONFIG_DIRECTORY selects a writable configuration directory. If absent,
         the runtime uses Seed.Data beside its executable. The current early-startup
-        configuration file is core.v1.bin, containing a Seed identity, format version,
-        payload size and configuration snapshot.
+        configuration file is core.v1.bin, containing a version-one Seed envelope
+        with an identity, payload size and configuration snapshot.
 
         A missing file uses compiled defaults. Invalid sizes, values, an incompatible
         version or an incorrect identity fail startup with a native diagnostic. Value
@@ -32,6 +34,8 @@ internal sealed class ConfigurationPage : ISourcePage
         and timer coalescing. They need no runtime restart and are not saved implicitly.
         configurations.reset restores one exposed setting, or all exposed settings
         when no name is supplied, to this build's compiled defaults.
+
+        ## Reflected host options and persistence
 
         The runtime loads reflected HostOptions after Core service initialization.
         The fixed filename host.v1.bin now contains host envelope version 2, with a payload size and
@@ -64,6 +68,8 @@ internal sealed class ConfigurationPage : ISourcePage
         HTTPS composition loads and validates them through TlsServerIdentity. Enable
         HTTPS after setting both paths; an invalid identity fails startup explicitly.
 
+        ## Logger overrides and endpoint changes
+
         logging.set applies a validated live mask and records its host override.
         configurations.save persists those overrides; reload applies saved masks
         after the dynamic loggers have been created. A full configurations.reset
@@ -71,5 +77,9 @@ internal sealed class ConfigurationPage : ISourcePage
         save and reload. Use Seed.Console --pipe <name> for a changed local endpoint.
         status.kernel identifies each runtime composition so clients can wait for
         a requested reload to finish before checking the new listener or pipe.
+
+        See [demonstrations](demonstrations.md) for runnable console and HTTPS setup,
+        [KMS](kms.md) for logging masks and streaming, and [networking](networking.md)
+        for explicitly requested DHCP operations and their validation limits.
         """;
 }

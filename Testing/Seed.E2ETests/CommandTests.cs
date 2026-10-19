@@ -32,7 +32,23 @@ public sealed class CommandTests : E2ETest<CommandTests>
         "network.dns.resolve", 
         "network.dhcp.start", 
         "network.dhcp.status", 
-        "network.dhcp.stop"
+        "network.dhcp.stop",
+        "fs.list",
+        "fs.info",
+        "fs.read",
+        "fs.write",
+        "fs.directory.create",
+        "fs.copy",
+        "fs.move",
+        "fs.delete",
+        "process.list",
+        "process.terminate",
+        "registry.list",
+        "registry.get",
+        "registry.set",
+        "registry.key.create",
+        "registry.key.delete",
+        "registry.value.delete"
     ];
 
     [Fact]

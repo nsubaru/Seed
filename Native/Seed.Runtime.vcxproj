@@ -969,6 +969,27 @@
     <ClInclude Include="Seed.Tls.Tests.Server.h" />
     <ClInclude Include="Seed.KMS.Server.h" />
     <ClInclude Include="Seed.KMS.Commands.h" />
+    <ClInclude Include="Seed.KMS.Commands.System.h" />
+    <ClInclude Include="Seed.KMS.Commands.Base.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Base.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Copy.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Delete.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Directory.Create.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Info.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.List.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Move.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Read.h" />
+    <ClInclude Include="Seed.KMS.Commands.FS.Write.h" />
+    <ClInclude Include="Seed.KMS.Commands.Process.List.h" />
+    <ClInclude Include="Seed.KMS.Commands.Process.Terminate.h" />
+    <ClInclude Include="Seed.KMS.Commands.Registry.Base.h" />
+    <ClInclude Include="Seed.KMS.Commands.Registry.Get.h" />
+    <ClInclude Include="Seed.KMS.Commands.Registry.Key.Create.h" />
+    <ClInclude Include="Seed.KMS.Commands.Registry.Key.Delete.h" />
+    <ClInclude Include="Seed.KMS.Commands.Registry.List.h" />
+    <ClInclude Include="Seed.KMS.Commands.Registry.Set.h" />
+    <ClInclude Include="Seed.KMS.Commands.Registry.Value.Delete.h" />
+    <ClInclude Include="Seed.KMS.Commands.Table.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Lib\Seed.MinCore\Seed.Core.Base.Atomic.natvis" />
@@ -1445,6 +1466,27 @@
     <ClCompile Include="Seed.Tls.Tests.Server.cpp" />
     <ClCompile Include="Seed.KMS.Server.cpp" />
     <ClCompile Include="Seed.KMS.Commands.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.System.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Base.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Base.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Copy.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Delete.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Directory.Create.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Info.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.List.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Move.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Read.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.FS.Write.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Process.List.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Process.Terminate.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Registry.Base.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Registry.Get.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Registry.Key.Create.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Registry.Key.Delete.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Registry.List.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Registry.Set.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Registry.Value.Delete.cpp" />
+    <ClCompile Include="Seed.KMS.Commands.Table.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets" />
   <Import Project="$(VCTargetsPath)/BuildCustomizations/masm.targets" />

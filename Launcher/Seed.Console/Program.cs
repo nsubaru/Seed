@@ -1,4 +1,5 @@
 using Seed.KMS.Transport;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 
@@ -12,6 +13,73 @@ Console.CancelKeyPress += (_, eventArgs) =>
 
 try
 {
+    if (args.Length > 0 && args[0] == "--boot-demo")
+    {
+        if (args.Length != 3)
+        {
+            throw new ArgumentException("Use --boot-demo <Seed.Runtime.exe> <new-output-directory>.");
+        }
+
+        if (new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))
+        {
+            throw new InvalidOperationException("Start ordinary Seed demonstrations under a non-elevated account.");
+        }
+
+        string runtime = Path.GetFullPath(args[1]);
+        string directory = Path.GetFullPath(args[2]);
+
+        if (!File.Exists(runtime))
+        {
+            throw new FileNotFoundException("The Seed runtime was not found.", runtime);
+        }
+        if (Directory.Exists(directory) || File.Exists(directory))
+        {
+            throw new IOException("Choose a new output directory for the native demonstration.");
+        }
+
+        Directory.CreateDirectory(directory);
+        Environment.SetEnvironmentVariable("SEED_CONFIG_DIRECTORY", Path.Combine(directory, "Data"));
+
+        int status = Starter.SeedStartRuntime(runtime, $"Seed.Runtime.exe --boot-demo \"{directory}\"", out ulong processId);
+
+        if (status < 0)
+        {
+            throw new InvalidOperationException($"Native startup failed: NTSTATUS 0x{status:X8}.");
+        }
+
+        using var process = Process.GetProcessById(checked((int)processId));
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellation.Token);
+
+        deadline.CancelAfter(TimeSpan.FromMinutes(1));
+
+        try
+        {
+            await process.WaitForExitAsync(deadline.Token);
+            string report = Path.Combine(directory, "boot-demo.txt");
+
+            if (process.ExitCode != 0 || !File.Exists(report))
+            {
+                throw new InvalidOperationException($"Native demonstration failed with exit code {process.ExitCode}; output: {directory}");
+            }
+
+            Console.Write(await File.ReadAllTextAsync(report, cancellation.Token));
+
+            return 0;
+        }
+        catch (OperationCanceledException) when (!cancellation.IsCancellationRequested)
+        {
+            throw new TimeoutException("The native demonstration exceeded its one-minute deadline.");
+        }
+        finally
+        {
+            if (!process.HasExited)
+            {
+                process.Kill();
+                await process.WaitForExitAsync(CancellationToken.None);
+            }
+        }
+    }
+
     string pipeName = KmsClient.DefaultPipeName;
 
     if (args.Length > 0 && args[0] == "--pipe")
@@ -26,8 +94,8 @@ try
     }
 
     await using var client = new KmsClient(pipeName);
-    if (args.Length > 0 && args[0] == "--start")
 
+    if (args.Length > 0 && args[0] == "--start")
     {
         if (args.Length < 2)
         {
@@ -45,19 +113,7 @@ try
             throw new FileNotFoundException("The Seed runtime was not found.", runtime);
         }
 
-        foreach (string name in new[]
-        {
-            "SEED_RUN_TESTS",
-            "SEED_TEST_REPORT",
-            "SEED_RTTI_EXPORT",
-            "SEED_HTTP_URL",
-            "SEED_HTTP_OUTPUT",
-            "SEED_HTTP_TRUST_ROOT",
-            "SEED_HTTP_PROTOCOL",
-            "SEED_HTTP_CONNECT_ADDRESS"
-        }
-
-        )
+        foreach (string name in new[] { "SEED_RUN_TESTS", "SEED_TEST_REPORT", "SEED_RTTI_EXPORT", "SEED_HTTP_URL", "SEED_HTTP_OUTPUT", "SEED_HTTP_TRUST_ROOT", "SEED_HTTP_PROTOCOL", "SEED_HTTP_CONNECT_ADDRESS" })
         {
             Environment.SetEnvironmentVariable(name, null);
         }
@@ -79,6 +135,7 @@ try
     async Task<bool> Execute(string command)
     {
         bool reload = command == "reload" || command.StartsWith("reload ", StringComparison.Ordinal);
+
         if (reload)
         {
             Console.WriteLine("Waiting for Seed runtime reinitialization...");
@@ -117,7 +174,14 @@ try
 
     if (args.Length != 0)
     {
-        return await Execute(string.Join(' ', args)) ? 0 : 1;
+        bool quotedArguments = args[0].StartsWith("fs.", StringComparison.Ordinal) ||
+            args[0].StartsWith("registry.", StringComparison.Ordinal);
+
+        string command = quotedArguments
+            ? args[0] + " " + string.Join(' ', args.Skip(1).Select(value => "\"" + value.Replace("\"", "\"\"") + "\""))
+            : string.Join(' ', args);
+
+        return await Execute(command) ? 0 : 1;
     }
 
     Console.WriteLine("Seed console; help lists commands. Ctrl+C cancels the session.");
@@ -138,7 +202,7 @@ try
         }
 
         await Execute(command);
-        
+
         if (command == "exit")
         {
             break;

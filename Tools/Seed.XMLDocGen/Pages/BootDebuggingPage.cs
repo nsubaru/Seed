@@ -71,6 +71,16 @@ internal sealed class BootDebuggingPage : ISourcePage
         the custom exception ABI can produce expected debugger events; distinguish
         those from the failure being investigated.
 
+        ## Native functionality demonstration
+
+        The README demonstration shows file creation/read/copy/rename, aligned
+        file and process tables, a SYSTEM registry value and live RTTI export
+        before Windows logon. The bounded --boot-demo mode exits after these
+        commands so Windows startup can continue. See
+        [demonstrations](demonstrations.md) for its ordinary-user invocation.
+
+        ## Restore the guest
+
         Resume the VM and restore its debugging/boot configuration or revert the
         snapshot when finished. Do not apply test-VM boot changes to the development
         host. See [Microsoft process contexts](https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/-process--set-process-context-)
