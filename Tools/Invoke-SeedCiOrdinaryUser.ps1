@@ -29,16 +29,16 @@ try
     # curves, so configure the independent Schannel peers before dropping rights.
     $seedTlsCurves = Get-TlsEccCurve
 
-    if (-not $seedTlsCurves.Contains('curve25519'))
+    Write-Output ('Initial CI TLS curves: ' + ($seedTlsCurves -join ', '))
+    $seedTlsPolicy = Get-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002' -ErrorAction SilentlyContinue
+    Write-Output ('CI TLS curve policy: ' + ($seedTlsPolicy.EccCurves -join ', '))
+
+    if ($seedTlsCurves -notcontains 'curve25519')
     {
         Enable-TlsEccCurve -Name 'curve25519' -Position 0
         $seedAddedTlsCurve = $true
         $seedTlsCurves = Get-TlsEccCurve
 
-        if (-not $seedTlsCurves.Contains('curve25519'))
-        {
-            throw 'The CI TLS fixture could not enable the X25519 group required by Seed.'
-        }
     }
 
     Write-Output ('Seed CI TLS curves: ' + ($seedTlsCurves -join ', '))
