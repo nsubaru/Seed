@@ -63,6 +63,17 @@ await File.WriteAllTextAsync(Path.Combine(directory, "url.txt"), $"https://{(ipv
 
 Console.WriteLine($"Independent .NET TLS {args[1]} test peer on loopback port {port}.");
 Console.WriteLine($"TLS peer environment: .NET {Environment.Version}; {Environment.OSVersion.VersionString}.");
+Console.WriteLine($"Schannel version: {System.Diagnostics.FileVersionInfo.GetVersionInfo(Path.Combine(Environment.SystemDirectory, "schannel.dll")).FileVersion}; FIPS: {CryptoConfig.AllowOnlyFipsAlgorithms}.");
+
+using (var privateKey = certificate.GetRSAPrivateKey())
+{
+    Console.WriteLine($"TLS peer key: {privateKey?.GetType().Name}; {privateKey?.KeySize} bits; certificate signature {certificate.SignatureAlgorithm.Value}.");
+
+    if (privateKey is RSACng cng)
+    {
+        Console.WriteLine($"TLS peer key provider: {cng.Key.Provider?.Provider}; usage {cng.Key.KeyUsage}; machine key {cng.Key.IsMachineKey}.");
+    }
+}
 
 using var cancellation = new CancellationTokenSource();
 
@@ -99,6 +110,8 @@ async Task Handle(TcpClient socket)
 
         try
         {
+            await LogClientHello(socket, deadline.Token);
+
             // HTTP/1.1 can use TLS without ALPN. Keep this independent peer focused on
             // record and certificate interoperability; the native round trips verify ALPN.
             await stream.AuthenticateAsServerAsync(new SslServerAuthenticationOptions
@@ -166,5 +179,39 @@ async Task Handle(TcpClient socket)
         {
             Console.Error.WriteLine($"TLS test peer: {exception}");
         }
+    }
+}
+
+async Task LogClientHello(TcpClient socket, CancellationToken cancellationToken)
+{
+    var buffer = new byte[18437];
+
+    while (true)
+    {
+        int count = await socket.Client.ReceiveAsync(buffer, SocketFlags.Peek, cancellationToken);
+
+        if (count == 0)
+        {
+            throw new IOException("The client closed before sending its TLS record.");
+        }
+
+        if (count >= 5)
+        {
+            int recordLength = 5 + (buffer[3] << 8) + buffer[4];
+
+            if (recordLength > buffer.Length)
+            {
+                throw new IOException("The initial TLS record exceeds the diagnostic buffer.");
+            }
+
+            if (count >= recordLength)
+            {
+                Console.WriteLine($"TLS initial record: {Convert.ToHexString(buffer.AsSpan(0, recordLength))}");
+
+                return;
+            }
+        }
+
+        await Task.Delay(10, cancellationToken);
     }
 }

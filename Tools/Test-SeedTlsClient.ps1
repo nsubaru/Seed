@@ -6,6 +6,17 @@ $seedPeerExe = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Tls.TestPe
 $seedClientExe = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Native.HttpClient/Seed.Native.HttpClient.exe"
 $seedRuntime = Join-Path $seedRoot "Artifacts/x64/$Configuration/Runtime/Seed.Runtime.exe"
 $seedOutput = Join-Path $seedRoot 'Artifacts/tls-client'
+
+try
+{
+    Write-Host ('Schannel cipher suites: ' + ((Get-TlsCipherSuite).Name -join ', '))
+    Write-Host ('Schannel curves: ' + ((Get-TlsEccCurve) -join ', '))
+}
+catch
+{
+    Write-Host "Schannel capability diagnostics unavailable: $_"
+}
+
 if ([Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 {
     throw 'Run TLS client integration under a non-elevated account.'
