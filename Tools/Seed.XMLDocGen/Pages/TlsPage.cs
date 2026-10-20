@@ -31,8 +31,9 @@ internal sealed class TlsPage : ISourcePage
         Independent Schannel peers require curve25519 to be enabled for Seed's
         X25519 key exchange. A peer restricted to NIST curves cannot negotiate this
         implementation. On disposable GitHub runners, Tools/Invoke-SeedCiOrdinaryUser.ps1
-        temporarily enables curve25519 before launching the ordinary-user checks and
-        restores the prior curve selection afterward. Runtime and test processes
+        temporarily includes curve25519 in the effective curve policy or local list
+        before launching the ordinary-user checks and restores the prior setting
+        afterward. Runtime and test processes
         continue to run without elevation.
 
         The TLS negotiation workflow replays a public TLS 1.2 ClientHello fixture

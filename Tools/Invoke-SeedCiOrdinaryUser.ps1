@@ -21,7 +21,12 @@ $seedUserName   = 'SeedTest' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
 $seedPassword   = 'S!' + [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
 $seedCredential = [Management.Automation.PSCredential]::new("$env:COMPUTERNAME\$seedUserName", (ConvertTo-SecureString $seedPassword -AsPlainText -Force))
 $seedUser       = $null
+
 $seedAddedTlsCurve = $false
+$seedTlsPolicyKey = $null
+$seedTlsPolicyValue = $null
+$seedTlsPolicyKind = $null
+$seedChangedTlsPolicy = $false
 
 try
 {
@@ -35,10 +40,42 @@ try
 
     if ($seedTlsCurves -notcontains 'curve25519')
     {
-        Enable-TlsEccCurve -Name 'curve25519' -Position 0
-        $seedAddedTlsCurve = $true
-        $seedTlsCurves = Get-TlsEccCurve
+        $seedTlsPolicyKey = [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey('SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002', $true)
 
+        if ($seedTlsPolicyKey)
+        {
+            $seedTlsPolicyValue = $seedTlsPolicyKey.GetValue('EccCurves', $null)
+        }
+
+        if ($null -ne $seedTlsPolicyValue)
+        {
+            # An explicit ECC policy overrides Enable-TlsEccCurve's local list.
+            # Preserve the policy's value and kind for cleanup on this owned VM.
+            $seedTlsPolicyKind = $seedTlsPolicyKey.GetValueKind('EccCurves')
+
+            if ($seedTlsPolicyKind -eq [Microsoft.Win32.RegistryValueKind]::MultiString)
+            {
+                $seedFixtureCurves = [string[]](@('curve25519') + [string[]]$seedTlsPolicyValue)
+                $seedTlsPolicyKey.SetValue('EccCurves', $seedFixtureCurves, $seedTlsPolicyKind)
+            }
+            elseif ($seedTlsPolicyKind -eq [Microsoft.Win32.RegistryValueKind]::String)
+            {
+                $seedTlsPolicyKey.SetValue('EccCurves', "curve25519,$seedTlsPolicyValue", $seedTlsPolicyKind)
+            }
+            else
+            {
+                throw "Unsupported CI ECC policy value kind: $seedTlsPolicyKind."
+            }
+
+            $seedChangedTlsPolicy = $true
+        }
+        else
+        {
+            Enable-TlsEccCurve -Name 'curve25519' -Position 0
+            $seedAddedTlsCurve = $true
+        }
+
+        $seedTlsCurves = Get-TlsEccCurve
     }
 
     Write-Output ('Seed CI TLS curves: ' + ($seedTlsCurves -join ', '))
@@ -119,12 +156,27 @@ finally
     }
     finally
     {
-        if ($seedAddedTlsCurve)
+        try
         {
-            Disable-TlsEccCurve -Name 'curve25519'
+            if ($seedChangedTlsPolicy)
+            {
+                $seedTlsPolicyKey.SetValue('EccCurves', $seedTlsPolicyValue, $seedTlsPolicyKind)
+            }
         }
+        finally
+        {
+            if ($seedTlsPolicyKey)
+            {
+                $seedTlsPolicyKey.Dispose()
+            }
 
-        $seedPassword   = $null
-        $seedCredential = $null
+            if ($seedAddedTlsCurve)
+            {
+                Disable-TlsEccCurve -Name 'curve25519'
+            }
+
+            $seedPassword   = $null
+            $seedCredential = $null
+        }
     }
 }
