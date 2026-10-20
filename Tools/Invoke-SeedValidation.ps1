@@ -65,7 +65,7 @@ $seedConfigurationDirectory = Join-Path $seedRoot ("Artifacts/integration/$Confi
 
 & (Join-Path $PSScriptRoot 'Test-SeedTlsServer.ps1') -Configuration $Configuration
 
-& (Join-Path $PSScriptRoot 'Invoke-SeedWorkflow.ps1') -Action Documentation
+& (Join-Path $PSScriptRoot 'Invoke-SeedWorkflow.ps1') -Action Documentation -Configuration $Configuration -NoBuild
 
 & (Join-Path $PSScriptRoot 'Test-SeedDocumentation.ps1')
 

@@ -88,16 +88,21 @@ try
 
     Set-Acl -LiteralPath $seedRoot -AclObject $seedSourceAcl
 
-    # Native tests verify that this token is not elevated. Grant only artifact writes.
+    # Native tests verify that this token is not elevated. Grant generated-output writes.
     $seedArtifacts = Join-Path $seedRoot 'Artifacts'
-    New-Item -ItemType Directory -Path $seedArtifacts -Force | Out-Null
 
-    $seedAcl  = Get-Acl -LiteralPath $seedArtifacts
-    $seedRule = [Security.AccessControl.FileSystemAccessRule]::new($seedUser.SID, 'FullControl', 'ContainerInherit,ObjectInherit', 'None', 'Allow')
+    foreach ($seedOutputName in @('Artifacts', 'Documentation'))
+    {
+        $seedOutputDirectory = Join-Path $seedRoot $seedOutputName
+        New-Item -ItemType Directory -Path $seedOutputDirectory -Force | Out-Null
 
-    $seedAcl.AddAccessRule($seedRule)
+        $seedAcl  = Get-Acl -LiteralPath $seedOutputDirectory
+        $seedRule = [Security.AccessControl.FileSystemAccessRule]::new($seedUser.SID, 'FullControl', 'ContainerInherit,ObjectInherit', 'None', 'Allow')
 
-    Set-Acl -LiteralPath $seedArtifacts -AclObject $seedAcl
+        $seedAcl.AddAccessRule($seedRule)
+
+        Set-Acl -LiteralPath $seedOutputDirectory -AclObject $seedAcl
+    }
 
     $seedShell    = (Get-Process -Id $PID).Path
     $seedScript  = Join-Path $PSScriptRoot 'Invoke-SeedValidation.ps1'

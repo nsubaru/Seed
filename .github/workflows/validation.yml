@@ -18,6 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         configuration: [Debug, Release]
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}\Artifacts\ci-packages
     defaults:
       run:
         shell: pwsh

@@ -14,7 +14,22 @@ try
 {
     if ($Action -eq 'Documentation')
     {
-        dotnet run --project Tools/Seed.XMLDocGen -- $seedRoot (Join-Path $seedRoot 'Documentation')
+        if ($NoBuild)
+        {
+            $seedGenerator = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.XMLDocGen/Seed.XMLDocGen.exe"
+
+            if (-not (Test-Path -LiteralPath $seedGenerator))
+            {
+                throw "Documentation generator is unavailable: $seedGenerator"
+            }
+
+            & $seedGenerator $seedRoot (Join-Path $seedRoot 'Documentation')
+        }
+        else
+        {
+            dotnet run --project Tools/Seed.XMLDocGen --configuration $Configuration -- $seedRoot (Join-Path $seedRoot 'Documentation')
+        }
+
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Seed documentation generation failed.'
