@@ -11,6 +11,7 @@ try
 {
     Write-Host ('Schannel cipher suites: ' + ((Get-TlsCipherSuite).Name -join ', '))
     Write-Host ('Schannel curves: ' + ((Get-TlsEccCurve) -join ', '))
+    Write-Host ('Windows FIPS policy: ' + (Get-ItemPropertyValue -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy' -Name Enabled))
 }
 catch
 {

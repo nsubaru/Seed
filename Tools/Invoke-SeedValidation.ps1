@@ -1,4 +1,7 @@
-param([ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug')
+param(
+    [ValidateSet('Debug', 'Release', 'Coverage')][string] $Configuration = 'Debug',
+    [switch] $TlsProbe
+)
 
 $ErrorActionPreference = 'Stop'
 $seedRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
@@ -12,6 +15,23 @@ if ($env:GITHUB_ACTIONS -ceq 'true')
     [Environment]::SetEnvironmentVariable('NUGET_PACKAGES', (Join-Path $seedRoot 'Artifacts/ci-packages'))
     [Environment]::SetEnvironmentVariable('TEMP', $seedCiTemp)
     [Environment]::SetEnvironmentVariable('TMP', $seedCiTemp)
+}
+
+if ($TlsProbe)
+{
+    Write-Host ('Schannel cipher suites: ' + ((Get-TlsCipherSuite).Name -join ', '))
+    Write-Host ('Schannel curves: ' + ((Get-TlsEccCurve) -join ', '))
+    Write-Host ('Windows FIPS policy: ' + (Get-ItemPropertyValue -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy' -Name Enabled))
+
+    $seedPeer = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Tls.TestPeer/Seed.Tls.TestPeer.exe"
+    & $seedPeer probe (Join-Path $seedRoot 'Artifacts/tls-negotiation')
+
+    if ($LASTEXITCODE -ne 0)
+    {
+        throw 'TLS ClientHello negotiation probe failed.'
+    }
+
+    return
 }
 
 & (Join-Path $PSScriptRoot 'Test-SeedSource.ps1')

@@ -6,6 +6,13 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
+if (args is ["probe", string output])
+{
+    await ClientHelloProbe.Run(Path.Combine(AppContext.BaseDirectory, "ClientHello.tls12.hex"), output);
+
+    return;
+}
+
 if (args.Length is < 2 or > 3 || args[1] is not ("1.2" or "1.3") || (args.Length == 3 && args[2] is not ("expired" or "ipv6")))
 {
     throw new ArgumentException("Use <output-directory> <1.2|1.3> [expired|ipv6].");

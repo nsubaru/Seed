@@ -1,4 +1,7 @@
-param([ValidateSet('Debug', 'Release')][string] $Configuration = 'Debug')
+param(
+    [ValidateSet('Debug', 'Release')][string] $Configuration = 'Debug',
+    [switch] $TlsProbe
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -44,7 +47,14 @@ try
     $seedScript  = Join-Path $PSScriptRoot 'Invoke-SeedValidation.ps1'
     $seedStdout  = Join-Path $seedArtifacts 'ci-ordinary-user.log'
     $seedStderr  = Join-Path $seedArtifacts 'ci-ordinary-user-errors.log'
-    $seedProcess = Start-Process -FilePath $seedShell -Credential $seedCredential -LoadUserProfile -WindowStyle Hidden -WorkingDirectory $seedRoot -ArgumentList @('-NoProfile', '-NonInteractive', '-File', ('"' + $seedScript + '"'), '-Configuration', $Configuration) -RedirectStandardOutput $seedStdout -RedirectStandardError $seedStderr -PassThru
+    $seedArguments = @('-NoProfile', '-NonInteractive', '-File', ('"' + $seedScript + '"'), '-Configuration', $Configuration)
+
+    if ($TlsProbe)
+    {
+        $seedArguments += '-TlsProbe'
+    }
+
+    $seedProcess = Start-Process -FilePath $seedShell -Credential $seedCredential -LoadUserProfile -WindowStyle Hidden -WorkingDirectory $seedRoot -ArgumentList $seedArguments -RedirectStandardOutput $seedStdout -RedirectStandardError $seedStderr -PassThru
 
     try
     {
