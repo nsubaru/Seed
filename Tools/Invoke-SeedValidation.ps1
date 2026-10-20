@@ -19,9 +19,16 @@ if ($env:GITHUB_ACTIONS -ceq 'true')
 
 if ($TlsProbe)
 {
-    Write-Host ('Schannel cipher suites: ' + ((Get-TlsCipherSuite).Name -join ', '))
-    Write-Host ('Schannel curves: ' + ((Get-TlsEccCurve) -join ', '))
-    Write-Host ('Windows FIPS policy: ' + (Get-ItemPropertyValue -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy' -Name Enabled))
+    try
+    {
+        Write-Host ('Schannel cipher suites: ' + ((Get-TlsCipherSuite).Name -join ', '))
+        Write-Host ('Schannel curves: ' + ((Get-TlsEccCurve) -join ', '))
+        Write-Host ('Windows FIPS policy: ' + (Get-ItemPropertyValue -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy' -Name Enabled))
+    }
+    catch
+    {
+        Write-Host "Schannel capability diagnostics unavailable: $_"
+    }
 
     $seedPeer = Join-Path $seedRoot "Artifacts/x64/$Configuration/Seed.Tls.TestPeer/Seed.Tls.TestPeer.exe"
     & $seedPeer probe (Join-Path $seedRoot 'Artifacts/tls-negotiation')

@@ -26,7 +26,7 @@ internal static class ClientHelloProbe
         using var peer = Process.Start(start)!;
         var stdout = peer.StandardOutput.ReadToEndAsync();
         var stderr = peer.StandardError.ReadToEndAsync();
-        
+
         try
         {
             var deadline = DateTime.UtcNow.AddSeconds(10);
@@ -41,7 +41,7 @@ internal static class ClientHelloProbe
             bool nativeAccepted = false;
             var uri = new Uri(await File.ReadAllTextAsync(urlPath));
             byte[] original = Convert.FromHexString(await File.ReadAllTextAsync(template));
-        
+
             foreach (var (name, omitted, group, signatures) in new (string, int, byte[]?, byte[]?)[]
             {
                 ("native", -1, null, null),
@@ -69,7 +69,7 @@ internal static class ClientHelloProbe
                 Console.WriteLine($"{name}: type {header[0]}, body {Convert.ToHexString(body.AsSpan(0, Math.Min(8, body.Length)))}");
                 nativeAccepted |= name == "native" && header[0] == 22 && body.Length >= 4 && body[0] == 2;
             }
-        
+
             using var managed = new TcpClient();
             using var managedDeadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             await managed.ConnectAsync("127.0.0.1", uri.Port, managedDeadline.Token);
@@ -107,7 +107,7 @@ internal static class ClientHelloProbe
     }
 
     static int Read16(byte[] value, int offset) => (value[offset] << 8) + value[offset + 1];
-    
+
     static byte[] Modify(byte[] value, int omitted, byte[]? group, byte[]? signatures)
     {
         int offset = 9 + 34;

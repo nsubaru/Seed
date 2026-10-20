@@ -21,9 +21,28 @@ $seedUserName   = 'SeedTest' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
 $seedPassword   = 'S!' + [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
 $seedCredential = [Management.Automation.PSCredential]::new("$env:COMPUTERNAME\$seedUserName", (ConvertTo-SecureString $seedPassword -AsPlainText -Force))
 $seedUser       = $null
+$seedAddedTlsCurve = $false
 
 try
 {
+    # Seed implements X25519 key exchange. The hosted image can enable only NIST
+    # curves, so configure the independent Schannel peers before dropping rights.
+    $seedTlsCurves = Get-TlsEccCurve
+
+    if (-not $seedTlsCurves.Contains('curve25519'))
+    {
+        Enable-TlsEccCurve -Name 'curve25519' -Position 0
+        $seedAddedTlsCurve = $true
+        $seedTlsCurves = Get-TlsEccCurve
+
+        if (-not $seedTlsCurves.Contains('curve25519'))
+        {
+            throw 'The CI TLS fixture could not enable the X25519 group required by Seed.'
+        }
+    }
+
+    Write-Output ('Seed CI TLS curves: ' + ($seedTlsCurves -join ', '))
+
     $seedUser = New-LocalUser -Name $seedUserName -Password $seedCredential.Password -AccountExpires ([DateTime]::Now.AddHours(6)) -Description 'Disposable Seed CI validation account'
     Add-LocalGroupMember -SID 'S-1-5-32-545' -Member $seedUser
 
@@ -91,11 +110,21 @@ try
 }
 finally
 {
-    if ($seedUser)
+    try
     {
-        Remove-LocalUser -SID $seedUser.SID
+        if ($seedUser)
+        {
+            Remove-LocalUser -SID $seedUser.SID
+        }
     }
+    finally
+    {
+        if ($seedAddedTlsCurve)
+        {
+            Disable-TlsEccCurve -Name 'curve25519'
+        }
 
-    $seedPassword   = $null
-    $seedCredential = $null
+        $seedPassword   = $null
+        $seedCredential = $null
+    }
 }

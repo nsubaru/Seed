@@ -28,6 +28,19 @@ internal sealed class TlsPage : ISourcePage
         | TLS 1.2 transcript | Extended master secret when offered; secure renegotiation signalling |
         | Closing | Authenticated close-notify; server rejects record truncation |
 
+        Independent Schannel peers require curve25519 to be enabled for Seed's
+        X25519 key exchange. A peer restricted to NIST curves cannot negotiate this
+        implementation. On disposable GitHub runners, Tools/Invoke-SeedCiOrdinaryUser.ps1
+        temporarily enables curve25519 before launching the ordinary-user checks and
+        restores the prior curve selection afterward. Runtime and test processes
+        continue to run without elevation.
+
+        The TLS negotiation workflow replays a public TLS 1.2 ClientHello fixture
+        and a managed TLS control under that same ordinary-user account. It records
+        peer acceptance of the initial offer and diagnostic variants. Full handshake,
+        record and certificate checks run through Tools/Test-SeedTlsClient.ps1 and
+        Tools/Test-SeedTlsServer.ps1.
+
         TlsServerStream owns a common TcpByteStream and a retained immutable
         TlsServerIdentity. AuthenticateAsServer completes client Finished verification
         before application reads are enabled. It bounds records, reassembles fragmented
