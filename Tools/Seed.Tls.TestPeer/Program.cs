@@ -39,7 +39,7 @@ var serverRequest = new CertificateRequest("CN=localhost", serverKey, HashAlgori
 
 serverRequest.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
 serverRequest.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment, true));
-serverRequest.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection{ new Oid("1.3.6.1.5.5.7.3.1")}, true));
+serverRequest.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection { new Oid("1.3.6.1.5.5.7.3.1") }, true));
 
 var names = new SubjectAlternativeNameBuilder();
 names.AddDnsName("localhost");
@@ -121,10 +121,10 @@ async Task Handle(TcpClient socket)
 
             await stream.AuthenticateAsServerAsync(new SslServerAuthenticationOptions
             {
-                ServerCertificateContext  = context,
+                ServerCertificateContext = context,
                 ClientCertificateRequired = false,
-                EnabledSslProtocols       = args[1] == "1.2" ? SslProtocols.Tls12 : SslProtocols.Tls13,
-                ApplicationProtocols      = [SslApplicationProtocol.Http11]
+                EnabledSslProtocols = args[1] == "1.2" ? SslProtocols.Tls12 : SslProtocols.Tls13,
+                ApplicationProtocols = [SslApplicationProtocol.Http11]
             }, deadline.Token);
 
             Console.WriteLine($"Negotiated {stream.SslProtocol}, {stream.NegotiatedCipherSuite}.");
@@ -158,21 +158,21 @@ async Task Handle(TcpClient socket)
 
             string responseText = target switch
             {
-                "/redirect-relative"  => "HTTP/1.1 302 Found\r\nLocation: /health\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-                "/redirect-absolute"  => $"HTTP/1.1 307 Temporary Redirect\r\nLocation: https://127.0.0.1:{port}/health\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-                "/redirect-loop"      => "HTTP/1.1 302 Found\r\nLocation: /redirect-loop\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-                "/chunked"            => "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n7\r\nSeed TL\r\na\r\nS test OK\n\r\n0\r\nX-Trailer: complete\r\n\r\n",
-                "/informational"      => "HTTP/1.1 100 Continue\r\n\r\n" + success,
-                "/duplicate-length"   => "HTTP/1.1 200 OK\r\nContent-Length: 17\r\nContent-Length: 17\r\nConnection: close\r\n\r\nSeed TLS test OK\n",
+                "/redirect-relative" => "HTTP/1.1 302 Found\r\nLocation: /health\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                "/redirect-absolute" => $"HTTP/1.1 307 Temporary Redirect\r\nLocation: https://127.0.0.1:{port}/health\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                "/redirect-loop" => "HTTP/1.1 302 Found\r\nLocation: /redirect-loop\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                "/chunked" => "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n7\r\nSeed TL\r\na\r\nS test OK\n\r\n0\r\nX-Trailer: complete\r\n\r\n",
+                "/informational" => "HTTP/1.1 100 Continue\r\n\r\n" + success,
+                "/duplicate-length" => "HTTP/1.1 200 OK\r\nContent-Length: 17\r\nContent-Length: 17\r\nConnection: close\r\n\r\nSeed TLS test OK\n",
                 "/conflicting-length" => "HTTP/1.1 200 OK\r\nContent-Length: 17\r\nContent-Length: 5\r\nConnection: close\r\n\r\nSeed TLS test OK\n",
-                "/ambiguous-framing"  => "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nContent-Length: 17\r\nConnection: close\r\n\r\n11\r\nSeed TLS test OK\n\r\n0\r\n\r\n",
-                "/truncated"          => "HTTP/1.1 200 OK\r\nContent-Length: 17\r\nConnection: close\r\n\r\nshort",
-                "/invalid-chunk"      => "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\ng\r\ninvalid\r\n0\r\n\r\n",
-                _                     => success
+                "/ambiguous-framing" => "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nContent-Length: 17\r\nConnection: close\r\n\r\n11\r\nSeed TLS test OK\n\r\n0\r\n\r\n",
+                "/truncated" => "HTTP/1.1 200 OK\r\nContent-Length: 17\r\nConnection: close\r\n\r\nshort",
+                "/invalid-chunk" => "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\ng\r\ninvalid\r\n0\r\n\r\n",
+                _ => success
             };
 
             byte[] response = Encoding.ASCII.GetBytes(responseText);
-            
+
             // Intentionally fragment application writes for the native record reader.
             for (int index = 0; index < response.Length; index += 7)
             {

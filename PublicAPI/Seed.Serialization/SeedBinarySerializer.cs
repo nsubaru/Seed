@@ -59,9 +59,9 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
             serializerImplementation = serializerFactory.GetSeedSerializer();
 
             logger?.LogInformation("Load supported types from serializer implementation");
-            mappingScheme        = seedSerializer.GetSupportedTypes().OrderBy(x => x.RttiType.TypeClass).ThenBy(x => x.RttiType.TypeName).ToDictionary(x => x.RttiType, x => x.ClrType);
+            mappingScheme = seedSerializer.GetSupportedTypes().OrderBy(x => x.RttiType.TypeClass).ThenBy(x => x.RttiType.TypeName).ToDictionary(x => x.RttiType, x => x.ClrType);
             reverseMappingSchema = mappingScheme.OrderBy(x => x.Key.TypeClass).ThenBy(x => x.Key.TypeName).GroupBy(x => x.Value).Select(g => g.First()).ToDictionary(x => x.Value, x => x.Key);
-            rttiTypeLookup       = rttiSection.AllRegisteredTypes.OrderBy(x => x.TypeClass).ThenBy(x => x.TypeName).GroupBy(x => x.FullTypeId.Id).Select(g => g.First()).ToDictionary(x => x.FullTypeId.Id, x => x);
+            rttiTypeLookup = rttiSection.AllRegisteredTypes.OrderBy(x => x.TypeClass).ThenBy(x => x.TypeName).GroupBy(x => x.FullTypeId.Id).Select(g => g.First()).ToDictionary(x => x.FullTypeId.Id, x => x);
         }
         catch
         {
@@ -87,6 +87,12 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
     }
 
     #region Serialize
+    /// <summary>
+    /// Writes the native type identifier and value payload to the stream.
+    /// </summary>
+    /// <param name="serializationStream">The destination stream for the encoded value.</param>
+    /// <param name="graph">The non-null CLR value to encode.</param>
+    /// <param name="targetType">The optional native type record for the value. When omitted, the serializer uses the CLR type mapping.</param>
     public void Serialize(Stream serializationStream, object graph, RttiTypeRecord? targetType = null)
     {
         if (graph == null)
@@ -97,7 +103,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         var graphType = graph.GetType();
 
         logger?.LogInformation("Start serializing Seed type {0} with CLR type {1}", targetType?.TypeName ?? "null", graph.GetType().FullName);
-        Type? type     = null;
+        Type? type = null;
         var fullTypeId = new UniversalTypeIdentifier();
 
         if (targetType != null)
@@ -173,28 +179,28 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         switch (record.TypeClass)
         {
             case ETypes.FixedCollection:
-            {
-                var mirror = graph as IList;
-
-                if (mirror!.Count > (int)record.ArrayItemsCount)
                 {
-                    throw new InvalidCastException();
-                }
+                    var mirror = graph as IList;
 
-                break;
-            }
+                    if (mirror!.Count > (int)record.ArrayItemsCount)
+                    {
+                        throw new InvalidCastException();
+                    }
+
+                    break;
+                }
 
             case ETypes.FixedArray:
-            {
-                var mirror = graph as Array;
-
-                if (mirror!.Length != (int)record.ArrayItemsCount)
                 {
-                    throw new InvalidCastException();
-                }
+                    var mirror = graph as Array;
 
-                break;
-            }
+                    if (mirror!.Length != (int)record.ArrayItemsCount)
+                    {
+                        throw new InvalidCastException();
+                    }
+
+                    break;
+                }
         }
 
         SerializeImpl(serializationStream, graph, record);
@@ -223,8 +229,8 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
     {
         var factory = objectFactoryCache.GetOrAdd(type, static type =>
         {
-            var elementType  = type.GetElementType() ?? throw new InvalidOperationException($"Type {type} is not an array type");
-            var length       = Expression.Constant(1);
+            var elementType = type.GetElementType() ?? throw new InvalidOperationException($"Type {type} is not an array type");
+            var length = Expression.Constant(1);
             var newArrayExpr = Expression.NewArrayBounds(elementType, length);
 
             return Expression.Lambda<Func<object>>(newArrayExpr).Compile();
@@ -313,6 +319,13 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
 
     #endregion
     #region Deserialize
+    /// <summary>
+    /// Reads the native type identifier and reconstructs the value from the stream.
+    /// </summary>
+    /// <param name="serializationStream">The source stream positioned at the encoded value.</param>
+    /// <param name="targetType">The optional expected native type record. Its identifier must match the identifier stored in the stream.</param>
+    /// <param name="targetCsType">The optional initial CLR type. The encoded type identifier determines the registered mapping.</param>
+    /// <returns>The reconstructed CLR value.</returns>
     public object Deserialize(Stream serializationStream, RttiTypeRecord? targetType = null, Type? targetCsType = null)
     {
         logger?.LogInformation("Start deserialization Seed type {0} with CLR type {1}", targetType?.TypeName ?? "null", targetCsType?.FullName ?? "null");
@@ -322,15 +335,15 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
             throw new ArgumentException("Unknown type");
         }
 
-        Type? type           = targetCsType;
-        var fullTypeId       = new UniversalTypeIdentifier();
+        Type? type = targetCsType;
+        var fullTypeId = new UniversalTypeIdentifier();
         object dynFullTypeId = fullTypeId;
 
         seedSerializer.Deserialize(ref dynFullTypeId, serializationStream);
         fullTypeId = (UniversalTypeIdentifier)dynFullTypeId;
 
         logger?.LogInformation("Deserialize type full type id: {0}", fullTypeId.Id.ToString());
-        
+
         if (!rttiTypeLookup.TryGetValue(fullTypeId.Id, out var actualTargetType))
         {
             logger?.LogError("Deserialize failed. Unknown type");
@@ -354,7 +367,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         }
 
         object? retObj = null;
-        
+
         if (!rttiTypeLookup.TryGetValue(fullTypeId.Id, out RttiTypeRecord? record))
         {
             logger?.LogError("Deserialize failed. Unknown full type id {fullTypeId}", fullTypeId);
@@ -420,8 +433,8 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         object? beginObj = record.TypeClass switch
         {
             ETypes.FixedCollection => CreateObject<T>(serializationStream),
-            ETypes.FixedArray      => Array.CreateInstance(typeof(T).GetElementType()!, (int)record.ArrayItemsCount),
-            _                      => throw new InvalidCastException(),
+            ETypes.FixedArray => Array.CreateInstance(typeof(T).GetElementType()!, (int)record.ArrayItemsCount),
+            _ => throw new InvalidCastException(),
         };
 
         T obj = (T)beginObj!;
@@ -431,26 +444,26 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         switch (record.TypeClass)
         {
             case ETypes.FixedCollection:
-            {
-                var mirror = obj as IList;
-                if (mirror!.Count != (int)record.ArrayItemsCount)
                 {
-                    throw new InvalidCastException();
-                }
+                    var mirror = obj as IList;
+                    if (mirror!.Count != (int)record.ArrayItemsCount)
+                    {
+                        throw new InvalidCastException();
+                    }
 
-                break;
-            }
+                    break;
+                }
 
             case ETypes.FixedArray:
-            {
-                var mirror = obj as Array;
-                if (mirror!.Length != (int)record.ArrayItemsCount)
                 {
-                    throw new InvalidCastException();
-                }
+                    var mirror = obj as Array;
+                    if (mirror!.Length != (int)record.ArrayItemsCount)
+                    {
+                        throw new InvalidCastException();
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return (T)data;
@@ -499,7 +512,7 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         if (!createObjectDelegateCache.TryGetValue(type, out var methodDelegate))
         {
             var methodInfo = GetType().GetRuntimeMethods().First(x => x.Name == nameof(CreateObject)).MakeGenericMethod(type);
-            
+
             var delegateType = typeof(Func<,>)!.MakeGenericType(new Type[]
             {
                 typeof(Stream), type
@@ -519,13 +532,28 @@ public class SeedBinarySerializer : ISeedBinarySerializer, IDisposable
         return Deserialize(serializationStream, targetType, null);
     }
 
+    /// <summary>
+    /// Reads an encoded value and casts the reconstructed object to the requested CLR type.
+    /// </summary>
+    /// <typeparam name="T">The CLR type to which the decoded value is cast.</typeparam>
+    /// <param name="serializationStream">The source stream positioned at the encoded value.</param>
+    /// <param name="targetType">The optional expected native type record. Its identifier must match the identifier stored in the stream.</param>
+    /// <returns>The reconstructed value cast to the requested type.</returns>
     public T Deserialize<T>(Stream serializationStream, RttiTypeRecord? targetType = null)
     {
         return (T)Deserialize(serializationStream, targetType, typeof(T));
     }
 
+    /// <summary>
+    /// Type mappings available to the active serializer.
+    /// </summary>
     public IEnumerable<TypeRecord> SerializableTypes => seedSerializer.GetSupportedTypes();
 
+    /// <summary>
+    /// Finds the first registered mapping for an exact CLR type.
+    /// </summary>
+    /// <param name="type">The CLR type to match.</param>
+    /// <returns>The first supported mapping for the specified CLR type.</returns>
     public TypeRecord GetByClrType(Type type) => SerializableTypes.First(x => x.ClrType == type);
     #endregion
 }

@@ -11,6 +11,7 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
     [InlineData(true)]
     public async Task ReconnectFollowsSavedPipeChangesAndIgnoresUnsavedPipeChanges(bool singleProcessor)
     {
+        // Arrange
         if (singleProcessor)
         {
             // Exercise shutdown callbacks that remain queued while the main thread tears down services.
@@ -19,33 +20,47 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
             process.ProcessorAffinity = new IntPtr(affinity & -affinity);
         }
 
+        // Arrange
         string custom = "Seed.KMS.ReloadTest." + Guid.NewGuid().ToString("N");
+
+        // Act
         await Runtime.DisconnectAsync();
-        
+
+        // Arrange
         await using var client = new KmsClient();
         var token = TestContext.Current.CancellationToken;
-        
+
+        // Act
         await client.ConnectAsync(TimeSpan.FromSeconds(5), token);
         await client.ExecuteAsync($"configurations.set host.kms.pipeName {custom}", cancellationToken: token);
         await client.ExecuteAsync("reload", cancellationToken: token);
 
+        // Assert
         Assert.Contains("Seed 0.1.0", Text(await client.ExecuteAsync("version", cancellationToken: token)));
         Assert.Contains($"Next KMS endpoint: {KmsClient.DefaultPipeName}", Text(await client.ExecuteAsync("configurations.get host.kms.pipeName", cancellationToken: token)));
-        
+
+        // Act
         await client.ExecuteAsync($"configurations.set host.kms.pipeName {custom}", cancellationToken: token);
         await client.ExecuteAsync("configurations.save", cancellationToken: token);
-        
+
+        // Assert
         Assert.Contains($"Next KMS endpoint: {custom}", Text(await client.ExecuteAsync("configurations.get host.kms.pipeName", cancellationToken: token)));
-        
+
+        // Act
         await client.ExecuteAsync("reload", cancellationToken: token);
-        
+
+        // Assert
         Assert.Contains("Seed 0.1.0", Text(await client.ExecuteAsync("version", cancellationToken: token)));
+
+        // Act
         await client.ExecuteAsync("configurations.reset host.kms.pipeName", cancellationToken: token);
         await client.ExecuteAsync("configurations.save", cancellationToken: token);
         await client.ExecuteAsync("reload", cancellationToken: token);
-        
+
+        // Assert
         Assert.Contains("Seed 0.1.0", Text(await client.ExecuteAsync("version", cancellationToken: token)));
-        
+
+        // Act
         await client.DisposeAsync();
         await Runtime.ReconnectAsync();
     }
@@ -55,16 +70,23 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
     [InlineData(true)]
     public async Task ConsoleReloadWaitsForReinitializationAndRemainsConnected(bool interactive)
     {
+        // Act
         string before = RuntimeSession.Composition(await Runtime.CommandAsync("status.kernel"));
+
+        // Arrange
         int processId = Runtime.ProcessId;
 
+        // Act
         await Runtime.DisconnectAsync();
 
+        // Arrange
         string runtime = Path.GetFullPath(Environment.GetEnvironmentVariable("SEED_E2E_RUNTIME")!);
         string console = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(runtime)!)!, "Seed.Console", "Seed.Console.exe");
 
+        // Assert
         Assert.True(File.Exists(console), "Build the matching console demonstration before running its E2E checks.");
 
+        // Arrange
         var start = new ProcessStartInfo(console)
         {
             UseShellExecute = false,
@@ -74,16 +96,20 @@ public sealed class ReloadTests : E2ETest<ReloadTests>
             WorkingDirectory = Runtime.Directory
         };
 
+        // Act
         if (!interactive)
         {
             start.ArgumentList.Add("reload");
         }
 
+        // Arrange
         using var process = Process.Start(start)!;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
 
+        // Act
         deadline.CancelAfter(TimeSpan.FromSeconds(30));
 
+        // Assert
         try
         {
 #pragma warning disable xUnit1051 // The owned-process deadline is linked to the current test token.

@@ -28,13 +28,13 @@ async Task WriteControlledLogAsync(CancellationToken token)
 
     await socket.ConnectAsync("127.0.0.1", 8080, token);
 
-    var stream  = socket.GetStream();
+    var stream = socket.GetStream();
     var request = Encoding.ASCII.GetBytes("POST /echo HTTP/1.1\r\nHost: localhost\r\nContent-Length: 4\r\nContent-Length: 5\r\n\r\ntest");
 
     await stream.WriteAsync(request, token);
 
     var response = new byte[4096];
-    int read     = await stream.ReadAsync(response, token);
+    int read = await stream.ReadAsync(response, token);
 
     if (!Encoding.ASCII.GetString(response, 0, read).StartsWith("HTTP/1.1 400 ", StringComparison.Ordinal))
     {
@@ -142,7 +142,7 @@ for (int iteration = 0; iteration < 8; ++iteration)
         }
 
         var writes = Enumerable.Range(0, 8).Select(_ => WriteControlledLogAsync(deadline.Token)).ToArray();
-        
+
         await follow.DisposeAsync();
         await Task.WhenAll(writes);
     }

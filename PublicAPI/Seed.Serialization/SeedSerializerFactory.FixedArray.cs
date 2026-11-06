@@ -31,7 +31,7 @@ public partial class SeedSerializerFactory
         }
 
         var type = innerType.MakeArrayType();
-        
+
         for (int i = 0; i < rank - 1; i++)
         {
             type = type.MakeArrayType();

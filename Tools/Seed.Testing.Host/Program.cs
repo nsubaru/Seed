@@ -87,7 +87,7 @@ var results = new XElement("test-run");
 
 for (int offset = 0; offset < requested.Length;)
 {
-    var batch      = new List<string>();
+    var batch = new List<string>();
     int characters = 10;
 
     while (offset < requested.Length && batch.Count < 128 && characters + requested[offset].Length + 3 < 30000)
@@ -116,7 +116,7 @@ for (int offset = 0; offset < requested.Length;)
     await runtime.CommandAsync($"tests.result.store {report}");
 
     var cases = XDocument.Load(report).Descendants("test-case").ToArray();
-    
+
     if (cases.Length != batch.Count || !cases.Select(test => (string?)test.Attribute("fullname")).Order().SequenceEqual(batch.Order()))
     {
         throw new InvalidDataException("Native report does not match the complete requested batch.");

@@ -69,7 +69,7 @@ try
                     }
 
                     $seedSignature[$seedSignature.Length - 1] = $seedSignature[$seedSignature.Length - 1] -bxor 1
-                    
+
                     if ($seedRsa.VerifyData($seedMessage, $seedSignature, [Security.Cryptography.HashAlgorithmName]::new($seedHash), $seedMode))
                     {
                         throw 'Independent RSA verification accepted a modified signature.'

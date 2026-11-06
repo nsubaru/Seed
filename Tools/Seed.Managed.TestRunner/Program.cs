@@ -17,13 +17,13 @@ for (var index = 0; index < args.Length; ++index)
 
 string Option(string key, string fallback) => options.GetValueOrDefault(key, fallback);
 
-var root          = Directory.GetCurrentDirectory();
-var runtime       = Path.GetFullPath(Option("--runtime", Path.Combine(root, "Artifacts/x64/Debug/Runtime/Seed.Runtime.exe")));
-var report        = Path.GetFullPath(Option("--report", Path.Combine(root, "Artifacts/tests/native.xml")));
-var selection     = Option("--test", Option("--wildcard", "*"));
+var root = Directory.GetCurrentDirectory();
+var runtime = Path.GetFullPath(Option("--runtime", Path.Combine(root, "Artifacts/x64/Debug/Runtime/Seed.Runtime.exe")));
+var report = Path.GetFullPath(Option("--report", Path.Combine(root, "Artifacts/tests/native.xml")));
+var selection = Option("--test", Option("--wildcard", "*"));
 var configuration = Path.GetFullPath(Option("--configuration-directory", Path.Combine(root, "Artifacts/tests/configuration")));
-var metadata      = options.TryGetValue("--rtti", out var rtti) ? Path.GetFullPath(rtti) : "";
-var elevated      = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+var metadata = options.TryGetValue("--rtti", out var rtti) ? Path.GetFullPath(rtti) : "";
+var elevated = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
 Console.WriteLine($"Elevated: {elevated}");
 

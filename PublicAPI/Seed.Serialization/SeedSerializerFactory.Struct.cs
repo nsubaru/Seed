@@ -31,12 +31,12 @@ public partial class SeedSerializerFactory
 
         foreach (var item in record.Fields)
         {
-            var isExistManualPropAttrb  = type.GetProperties().Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldManualAttribute), false).Any(attrbs => (attrbs as SerializableStructFieldManualAttribute)!.FieldInformation.FieldName == item.FieldName)).FirstOrDefault() != null;
+            var isExistManualPropAttrb = type.GetProperties().Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldManualAttribute), false).Any(attrbs => (attrbs as SerializableStructFieldManualAttribute)!.FieldInformation.FieldName == item.FieldName)).FirstOrDefault() != null;
             var isExistManualFieldAttrb = type.GetFields().Where(field => field.GetCustomAttributes(typeof(SerializableStructFieldManualAttribute), false).Any(attrbs => (attrbs as SerializableStructFieldManualAttribute)!.FieldInformation.FieldName == item.FieldName)).FirstOrDefault() != null;
-            var autoPropType            = type.GetProperties().Where(prop => prop.Name == item.FieldName).Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
-            var autoFieldType           = type.GetFields().Where(field => field.Name == item.FieldName).Where(field => field.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
-            var isExistAutoPropAttrb    = autoPropType != null;
-            var isExistAutoFieldAttrb   = autoFieldType != null;
+            var autoPropType = type.GetProperties().Where(prop => prop.Name == item.FieldName).Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
+            var autoFieldType = type.GetFields().Where(field => field.Name == item.FieldName).Where(field => field.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
+            var isExistAutoPropAttrb = autoPropType != null;
+            var isExistAutoFieldAttrb = autoFieldType != null;
 
             if (isExistAutoPropAttrb)
             {
@@ -231,7 +231,7 @@ public partial class SeedSerializerFactory
         }
 
         var orderedFields = typeRecord.RttiType.Fields.Select(rttiField => fields.First(field => field.FieldInformation.FieldName == rttiField.FieldName).Field.Name);
-        
+
         foreach (var field in orderedFields)
         {
             code.AppendLine($"data.{field} = this.DeserializeImpl(data.{field}, stream);");

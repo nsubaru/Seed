@@ -46,7 +46,7 @@ if (-not $SkipBuildTools)
 & $seedDocker.Source build @seedResourceArguments --isolation $Isolation --file (Join-Path $seedRoot 'Docker/Seed.Dockerfile') `
     --target $Target --build-arg "BUILD_TOOLS_IMAGE=$BuildToolsImage" --build-arg "RUNTIME_IMAGE=$RuntimeImage" `
     --build-arg "CONFIGURATION=$Configuration" --build-arg "SUBSYSTEM=$Subsystem" --tag $Image $seedRoot
-    
+
 if ($LASTEXITCODE -ne 0)
 {
     throw 'Seed Docker source build failed.'

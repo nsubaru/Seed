@@ -86,7 +86,7 @@ function Get-SystemNtdllExports
 
     $ntdllPath = Join-Path $env:SystemRoot "System32\ntdll.dll"
     $output    = & $DumpbinPath /exports $ntdllPath
-    
+
     if ($LASTEXITCODE -ne 0)
     {
         throw "dumpbin failed with exit code $LASTEXITCODE"

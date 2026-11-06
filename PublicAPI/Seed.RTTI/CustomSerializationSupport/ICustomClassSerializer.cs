@@ -8,12 +8,18 @@ public interface ICustomClassSerializer
     /// <summary>
     /// Custom class .Net CLR type
     /// </summary>
-    Type ClrType { get; }
+    Type ClrType
+    {
+        get;
+    }
 
     /// <summary>
     /// Custom class name in the Seed kernel
     /// </summary>
-    string TypeName { get; }
+    string TypeName
+    {
+        get;
+    }
 
     /// <summary>
     /// Serializes data into binnary string
@@ -21,7 +27,7 @@ public interface ICustomClassSerializer
     /// <param name="data">Data to serialize</param>
     /// <param name="serializationStream">Target stream</param>
     void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer);
-    
+
     /// <summary>
     /// Deserializes data from binnary string
     /// </summary>

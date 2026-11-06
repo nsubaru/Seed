@@ -42,7 +42,7 @@ public partial class SeedSerializerFactory
         else
         {
             var innerType = GetTypeWithOffset(0, record);
-            
+
             if (innerType == null)
             {
                 return null;

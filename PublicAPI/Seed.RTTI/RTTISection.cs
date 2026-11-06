@@ -47,12 +47,12 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// </summary>
     public RTTISection()
     {
-        this.data          = null;
-        this.direction     = false;
-        this.headerOffset  = new SizeT();
-        this.fa            = null;
-        this.fCount        = 0;
-        this.offset        = new SizeT();
+        this.data = null;
+        this.direction = false;
+        this.headerOffset = new SizeT();
+        this.fa = null;
+        this.fCount = 0;
+        this.offset = new SizeT();
         this.disposedValue = false;
     }
 
@@ -70,8 +70,8 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         this.data = (byte[])data.Clone();
 
         rawArrayPtrHandle = GCHandle.Alloc(this.data, GCHandleType.Pinned);
-        rawArrayPtr       = (Byte*)rawArrayPtrHandle.AddrOfPinnedObject();
-        rawArrayLen       = (SizeT)data.Length;
+        rawArrayPtr = (Byte*)rawArrayPtrHandle.AddrOfPinnedObject();
+        rawArrayLen = (SizeT)data.Length;
 
         try
         {
@@ -81,8 +81,8 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         {
             rawArrayPtrHandle.Free();
 
-            rawArrayPtr   = null;
-            this.data     = null;
+            rawArrayPtr = null;
+            this.data = null;
             disposedValue = true;
 
             throw;
@@ -166,7 +166,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 
         bool direction = ((SizeT)@base) + magicNumberOffset < origHeaderAddr;
 
-        SizeT offset = (magicNumberOffset + (SizeT)@base) < origHeaderAddr 
+        SizeT offset = (magicNumberOffset + (SizeT)@base) < origHeaderAddr
             ? origHeaderAddr - (((SizeT)@base) + magicNumberOffset)
             : ((((SizeT)@base) + magicNumberOffset) - origHeaderAddr);
 
@@ -199,9 +199,9 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
             }
         }
 
-        this.fa        = (SizeT*)fa;
-        this.fCount    = count / sizeof(SizeT);
-        this.offset    = offset;
+        this.fa = (SizeT*)fa;
+        this.fCount = count / sizeof(SizeT);
+        this.offset = offset;
         this.direction = direction;
     }
 
@@ -321,7 +321,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         {
             fixed (byte* ap = a, bp = b)
             {
-                long* alp = (long*) ap, blp = (long*) bp;
+                long* alp = (long*)ap, blp = (long*)bp;
 
                 for (; len >= 8; len -= 8)
                 {
@@ -334,7 +334,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
                     blp++;
                 }
 
-                byte* ap2 = (byte*) alp, bp2 = (byte*) blp;
+                byte* ap2 = (byte*)alp, bp2 = (byte*)blp;
 
                 for (; len > 0; len--)
                 {
@@ -369,7 +369,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
             return false;
         }
 
-        RTTISection other = (RTTISection) obj;
+        RTTISection other = (RTTISection)obj;
 
         if (this.data == null && other.data == null)
         {
@@ -449,18 +449,18 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 
         return new SectionDetails
         {
-            SectionSize         = (SizeT)data.LongLength,
+            SectionSize = (SizeT)data.LongLength,
             SectionHeaderOffset = headerOffset,
-            KernelVersion       = header->KernelVersion,
-            OriginHeaderAddr    = header->OriginHeaderAddr,
-            FaAddr              = header->FaAddr,
-            FzAddr              = header->FzAddr,
-            VaAddr              = header->VaAddr,
-            VzAddr              = header->VzAddr,
-            ImageBase           = header->ImageBase,
-            TotalCount          = fCount - 1,
-            ValidCount          = (SizeT)registeredRecords.LongCount(x => x.IsValid),
-            Offset              = offset
+            KernelVersion = header->KernelVersion,
+            OriginHeaderAddr = header->OriginHeaderAddr,
+            FaAddr = header->FaAddr,
+            FzAddr = header->FzAddr,
+            VaAddr = header->VaAddr,
+            VzAddr = header->VzAddr,
+            ImageBase = header->ImageBase,
+            TotalCount = fCount - 1,
+            ValidCount = (SizeT)registeredRecords.LongCount(x => x.IsValid),
+            Offset = offset
         };
     }
 
@@ -491,12 +491,12 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// <exception cref="ApplicationException">Invalid attribute value category</exception>
     public T GetAttributeValue<T>(RttiAttribute attribute) => attribute.ValueCategory switch
     {
-        EAttributeValueCategories.None      => (T)(object)new EmptyAttributeValueT  {},
-        EAttributeValueCategories.Data      => GetDataAttributeValue<T>(attribute),
-        EAttributeValueCategories.Text      => GetTextAttributeValue<T>(attribute),
+        EAttributeValueCategories.None => (T)(object)new EmptyAttributeValueT { },
+        EAttributeValueCategories.Data => GetDataAttributeValue<T>(attribute),
+        EAttributeValueCategories.Text => GetTextAttributeValue<T>(attribute),
         EAttributeValueCategories.AsciiText => GetTextAsciiAttributeValue<T>(attribute),
-        EAttributeValueCategories.Type      => GetTypeAttributeValue<T>(attribute),
-        _                                   => throw new ApplicationException("Uknown attribute value category"),
+        EAttributeValueCategories.Type => GetTypeAttributeValue<T>(attribute),
+        _ => throw new ApplicationException("Uknown attribute value category"),
     };
 
     /// <summary>
@@ -557,10 +557,10 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
         {
             throw new InvalidCastException($"Invalid type requested for reading text attribute value");
         }
-    
+
         var text = (TextMetaData*)((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue);
 
-        return (T) (object) Marshal.PtrToStringAnsi((IntPtr)text->Text);
+        return (T)(object)Marshal.PtrToStringAnsi((IntPtr)text->Text);
     }
 
     /// <summary>
@@ -609,12 +609,12 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     /// <exception cref="ApplicationException"></exception>
     public object? GetAnyAttributeValue(RttiAttribute attribute) => attribute.ValueCategory switch
     {
-        EAttributeValueCategories.None      => new EmptyAttributeValueT {},
-        EAttributeValueCategories.Data      => GetDataAttributeValue(attribute),
-        EAttributeValueCategories.Text      => GetTextAttributeValue(attribute),
+        EAttributeValueCategories.None => new EmptyAttributeValueT { },
+        EAttributeValueCategories.Data => GetDataAttributeValue(attribute),
+        EAttributeValueCategories.Text => GetTextAttributeValue(attribute),
         EAttributeValueCategories.AsciiText => GetTextAsciiAttributeValue(attribute),
-        EAttributeValueCategories.Type      => GetTypeAttributeValue(attribute),
-        _                                   => throw new ApplicationException("Unknown attribute value category"),
+        EAttributeValueCategories.Type => GetTypeAttributeValue(attribute),
+        _ => throw new ApplicationException("Unknown attribute value category"),
     };
 
     /// <summary>
@@ -695,22 +695,22 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
     {
         return attribute.TypeName switch
         {
-            Constants.Types.Int8                 => ReadAttribyteDataValueAsBuiltInType<Int8>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.Int16                => ReadAttribyteDataValueAsBuiltInType<Int16>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.Int32                => ReadAttribyteDataValueAsBuiltInType<Int32>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.Int64                => ReadAttribyteDataValueAsBuiltInType<Int64>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.UInt8                => ReadAttribyteDataValueAsBuiltInType<UInt8>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.UInt16               => ReadAttribyteDataValueAsBuiltInType<UInt16>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.UInt32               => ReadAttribyteDataValueAsBuiltInType<UInt32>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.UInt64               => ReadAttribyteDataValueAsBuiltInType<UInt64>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.Float                => ReadAttribyteDataValueAsBuiltInType<Single>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.Double               => ReadAttribyteDataValueAsBuiltInType<Double>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.Boolean              => ReadAttribyteDataValueAsBuiltInType<Boolean>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.UChar                => ReadAttribyteDataValueAsBuiltInType<Char>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.Uuid                 => ReadAttribyteDataValueAsBuiltInType<Guid>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
-            Constants.Types.DataSizeT            => ReadAttribyteDataValueAsBuiltInType<SizeT>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Int8 => ReadAttribyteDataValueAsBuiltInType<Int8>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Int16 => ReadAttribyteDataValueAsBuiltInType<Int16>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Int32 => ReadAttribyteDataValueAsBuiltInType<Int32>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Int64 => ReadAttribyteDataValueAsBuiltInType<Int64>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UInt8 => ReadAttribyteDataValueAsBuiltInType<UInt8>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UInt16 => ReadAttribyteDataValueAsBuiltInType<UInt16>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UInt32 => ReadAttribyteDataValueAsBuiltInType<UInt32>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UInt64 => ReadAttribyteDataValueAsBuiltInType<UInt64>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Float => ReadAttribyteDataValueAsBuiltInType<Single>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Double => ReadAttribyteDataValueAsBuiltInType<Double>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Boolean => ReadAttribyteDataValueAsBuiltInType<Boolean>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.UChar => ReadAttribyteDataValueAsBuiltInType<Char>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.Uuid => ReadAttribyteDataValueAsBuiltInType<Guid>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
+            Constants.Types.DataSizeT => ReadAttribyteDataValueAsBuiltInType<SizeT>((Byte*)attribute.GetRecord() + attribute.GetRecord()->OffsetToAttributeValue),
             Constants.Types.EmptyAttributeValueT => EmptyAttributeValueT.Empty,
-            _                                    => null
+            _ => null
         };
     }
 
@@ -771,7 +771,7 @@ public unsafe class RTTISection : IDisposable, IEquatable<RTTISection?>
 
                 return MatchesTypeNameAttribute(genericArgument, typeName);
             }).FirstOrDefault();
-            
+
             if (providerType == null)
             {
                 return null;

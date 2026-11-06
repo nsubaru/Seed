@@ -42,7 +42,7 @@ public class RttiTypeRecordSerializer : ICustomClassSerializer
         var fullTypeId = (UniversalTypeIdentifier)data;
 
         serializer.Logger?.Log(LogLevel.Trace, "Deserialization UniversalTypeIdentifier. Value {fullTypeId}", fullTypeId);
-        
+
         if (fullTypeId.Id == Guid.Empty)
         {
             return new RttiTypeRecord();
@@ -77,7 +77,7 @@ public class RttiTypeRecordSerializer : ICustomClassSerializer
 
         serializer.Logger?.Log(LogLevel.Trace, "Serializing RttiTypeRecord as UniversalTypeIdentifier");
         serializer.Serialize(fullTypeId, serializationStream);
-        
+
         serializer.Logger?.Log(LogLevel.Trace, "Serializing RttiTypeRecord completed");
     }
 }

@@ -47,7 +47,7 @@ if ($seedReport.TestRun.ResultSummary.Counters.total -ne '1' -or $seedReport.Tes
     throw 'VSTest must report exactly one selected native test passing.'
 }
 
-$seedHost= Join-Path $AdapterDirectory 'host/Seed.Testing.Host.exe'
+$seedHost = Join-Path $AdapterDirectory 'host/Seed.Testing.Host.exe'
 
 $seedSelection = Join-Path $seedOutput 'cancellation-selection.xml'
     '<tests><test name="Seed::Core::Testing::Test::Configurations::SnapshotValidationTest" /></tests>' | Set-Content -LiteralPath $seedSelection -Encoding utf8
@@ -86,7 +86,7 @@ try
 
     # Cancel before acknowledging execution: no selected native case may run.
     $seedCancelProcess.StandardInput.WriteLine('cancel')
-    
+
     if (-not $seedCancelProcess.WaitForExit(30000))
     {
         throw 'Cancellation host exceeded its cleanup deadline.'

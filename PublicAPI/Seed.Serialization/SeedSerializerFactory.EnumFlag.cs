@@ -27,7 +27,7 @@ public partial class SeedSerializerFactory
 
         var enumType = BuildClrType(enumTypeRecord);
         var underlyingType = BuildClrType(underlyingTypeRecord);
-        
+
         if (enumType == null || underlyingType == null)
         {
             return null;

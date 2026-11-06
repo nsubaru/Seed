@@ -97,7 +97,7 @@ namespace Seed.Testing.TestAdapter
                     string selection = Path.Combine(Path.GetDirectoryName(output)!, "selection.xml");
 
                     new XDocument(new XElement("tests", selected.Select(test => new XElement("test", new XAttribute("name", test.FullyQualifiedName.Replace(".", "::")))))).Save(selection);
-                    
+
                     Action<int>? attach = null;
 
                     if (runContext.IsBeingDebugged)
@@ -129,10 +129,10 @@ namespace Seed.Testing.TestAdapter
 
                         var result = new TestResult(test)
                         {
-                            Outcome         = (string?)native.Attribute("result") == "Passed" ? TestOutcome.Passed : (string?)native.Attribute("result") == "Skipped" && native.Element("reason")?.Element("message")?.Value == "Returned false" ? TestOutcome.Skipped : TestOutcome.Failed,
-                            ErrorMessage    = native.Element("failure")?.Element("message")?.Value ?? native.Element("reason")?.Element("message")?.Value,
+                            Outcome = (string?)native.Attribute("result") == "Passed" ? TestOutcome.Passed : (string?)native.Attribute("result") == "Skipped" && native.Element("reason")?.Element("message")?.Value == "Returned false" ? TestOutcome.Skipped : TestOutcome.Failed,
+                            ErrorMessage = native.Element("failure")?.Element("message")?.Value ?? native.Element("reason")?.Element("message")?.Value,
                             ErrorStackTrace = native.Element("failure")?.Element("stack-trace")?.Value,
-                            Duration        = TimeSpan.FromSeconds(double.Parse((string?)native.Attribute("duration") ?? "0", CultureInfo.InvariantCulture))
+                            Duration = TimeSpan.FromSeconds(double.Parse((string?)native.Attribute("duration") ?? "0", CultureInfo.InvariantCulture))
                         };
 
                         return result;
@@ -152,8 +152,8 @@ namespace Seed.Testing.TestAdapter
                     {
                         var result = new TestResult(test)
                         {
-                            Outcome         = TestOutcome.Failed,
-                            ErrorMessage    = exception.Message,
+                            Outcome = TestOutcome.Failed,
+                            ErrorMessage = exception.Message,
                             ErrorStackTrace = exception.ToString()
                         };
 

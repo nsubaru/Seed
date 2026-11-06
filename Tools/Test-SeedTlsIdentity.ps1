@@ -89,7 +89,7 @@ try
     & (Join-Path $PSScriptRoot 'Invoke-SeedWorkflow.ps1') -Action Tests -Configuration $Configuration -Wildcard '*IO::ByteStream::*' -Output (Join-Path $seedOutput 'transport.xml') -NoBuild
 
     [xml]$seedTransportReport = Get-Content -LiteralPath (Join-Path $seedOutput 'transport.xml') -Raw
-    
+
     if ($seedTransportReport.'test-run'.passed -ne '3' -or $seedTransportReport.'test-run'.failed -ne '0')
     {
         throw 'The byte transport round-trip, cancellation and timeout tests did not all pass.'

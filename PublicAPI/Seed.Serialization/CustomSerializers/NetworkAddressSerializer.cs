@@ -7,12 +7,24 @@ using System.Threading.Tasks;
 
 namespace Seed.Serialization.CustomSerializers;
 
+/// <summary>
+/// Maps native network endpoints to IPEndPoint instances for binary serialization.
+/// </summary>
 public class NetworkAddressSerializer : ICustomClassSerializer
 {
+    /// <summary>
+    /// The CLR type used to represent native network endpoints.
+    /// </summary>
     public Type ClrType => typeof(IPEndPoint);
 
+    /// <summary>
+    /// The native RTTI name used to select the serializer for native network endpoints.
+    /// </summary>
     public string TypeName => "Seed::Core::IO::Network::NetworkAddress";
 
+    /// <summary>
+    /// An empty array because endpoint payloads need no additional CLR type mappings.
+    /// </summary>
     public Type[] DependableTypes => Array.Empty<Type>();
 
     /// <summary>
@@ -43,7 +55,7 @@ public class NetworkAddressSerializer : ICustomClassSerializer
                 serializationStream.ReadExactly(v4AddrSpan);
 
                 integerData = BitConverter.ToUInt32(v4AddrSpan);
-                retObj      = new IPEndPoint(new IPAddress(integerData), port);
+                retObj = new IPEndPoint(new IPAddress(integerData), port);
 
                 break;
 
@@ -62,7 +74,7 @@ public class NetworkAddressSerializer : ICustomClassSerializer
                 serializer.Deserialize(ref shortDyn, serializationStream);
 
                 scopeId = (uint)shortDyn;
-                retObj  = new IPEndPoint(new IPAddress(addr, scopeId), port);
+                retObj = new IPEndPoint(new IPAddress(addr, scopeId), port);
 
                 break;
 
@@ -93,7 +105,7 @@ public class NetworkAddressSerializer : ICustomClassSerializer
         switch (address.AddressFamily)
         {
             case System.Net.Sockets.AddressFamily.InterNetwork:
-                byte[] v4Addr        = new byte[4];
+                byte[] v4Addr = new byte[4];
                 Span<byte> v4AddrSpan = new Span<byte>(v4Addr);
 
                 address.Address.TryWriteBytes(v4AddrSpan, out outBytes);
@@ -109,12 +121,12 @@ public class NetworkAddressSerializer : ICustomClassSerializer
                 address.Address.TryWriteBytes(v6AddrSpan, out outBytes);
                 serializationStream.Write(v6AddrSpan);
 
-                uint scopeId    = (uint)address.Address.ScopeId;
+                uint scopeId = (uint)address.Address.ScopeId;
                 object scopeDyn = scopeId;
                 serializer.Serialize(scopeDyn, serializationStream);
 
                 return;
-                
+
             default:
                 throw new ArgumentException(nameof(address.AddressFamily));
         }

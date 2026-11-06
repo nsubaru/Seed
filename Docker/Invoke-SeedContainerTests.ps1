@@ -48,7 +48,7 @@ if (-not $SkipNativeTests)
         --runtime (Join-Path $seedArtifacts 'Runtime/Seed.Runtime.exe') `
         --wildcard $NativeWildcard --report (Join-Path $seedOutput 'native.xml') `
         --configuration-directory (Join-Path $seedOutput 'native-configuration')
-        
+
     if ($LASTEXITCODE -ne 0)
     {
         throw 'Container native tests failed; inspect native.xml.'

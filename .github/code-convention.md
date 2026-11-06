@@ -21,16 +21,26 @@ comments such as `} // namespace Seed::KMS::Commands::Process`.
 
 For multiline function or method parameter lists, put `(` after the name and
 start the first parameter on the next line. Put one parameter per line, indented
-one level, and put `)` on its own line aligned with the declaration. A definition
-opens its body on that closing signature line; a declaration ends with `;`.
-Trailing qualifiers remain between `)` and `{`. Preserve valid constructor
-initializers and put the body brace after the final initializer.
+one level, and attach the closing `)` to the last parameter. A definition opens
+its body on that signature line after trailing qualifiers. A declaration ends
+with `;`. Keep the closer and suffix ahead of a trailing parameter comment. For
+a complex default object, keep `= Type{` with its parameter and attach `)` after
+the last parameter's closing brace when the object spans lines.
+
+For initialized constructors, keep an empty body and the initializer list on one
+line if the compact signature before `{}` fits 160 columns and has no intrinsically
+multiline content or comments that prevent compaction. Otherwise, put each
+initializer on its own line when the signature exceeds 160 columns, more than
+three initializers are nonempty, or at least five initializers are written. Count
+outer entries. `member()` and `member{}` are empty, while `member(0)` and
+`member(Type{})` are nonempty. A wrapped list ends the heading at `:` and indents
+every initializer one level. Start the body on a separate constructor-aligned
+line when the list wraps or the body contains statements.
 
 ```cpp
 Core::String DescribeListener(
     const Core::String& address,
-    Core::UInt16 port
-) {
+    Core::UInt16 port) {
     if (port == 0)
     {
         return address;
@@ -56,15 +66,29 @@ Prefer aggregate/designated initialization in declaration order. Align `=` in
 one logical initializer group. Use assignments for subsequent/staged updates.
 Do not change initialization semantics while formatting.
 
-Outside macros, public XML documentation uses separate `/// <summary>`, body and
-`/// </summary>` lines. Put complete param/typeparam/returns tags on individual
-lines after the summary; omit empty tags. Fields/properties have summaries only.
-Separate documented declarations with a blank line except enum entries and the
-last member. Macro separator lines retain the continuation backslash.
+## Width and wrapping
+
+Use a contextual 160-column target. Count indentation, alignment, suffixes and
+trailing comments. Measure a template header independently of its declaration.
+Keep fitting signatures, calls, aliases, inheritance lists, assignments and
+ternaries compact. Preserve intrinsically multiline content and indivisible types
+or names, even when a complete unit exceeds the target.
+
+Keep complete leading and trailing return types intact. If the leading prefix
+exceeds the target, break between the return type and the complete qualified
+name. Then measure parameters on the name line independently. Move an overlong
+leading `requires` clause below its template header before wrapping the template
+list. A wrapped template or alias argument list starts each complete outer item
+on its own continuation line. Wrap long inheritance at complete base types.
+
+For long constraints, concepts and concept-derived `constexpr` predicates, put
+each outer operand on its own continuation line. Keep each joining operator with
+its preceding operand. Preserve grouping and recursively expand overlong inner
+groups. Keep a short inner group intact.
 
 ## File shape and ownership
 
-Use dotted component names that mirror the native namespace: for example,
+Use dotted component names that mirror the native namespace. For example,
 `Seed.Core.IO.ByteStream.h` belongs to `Seed::Core::IO`. A component's `Base.h`
 contains common includes and declarations, focused `.h`/`.cpp` pairs own their
 implementation, and its public `.h` collects the supported surface. Exceptions
@@ -85,28 +109,72 @@ and friends may stay consecutive. Split long inheritance lists into continuation
 
 Keep call parentheses tight, spaces after control keywords and commas, and pointer
 or reference markers beside their types. Lambda parameter lists use `[&] (const
-Value& value)`. Put else and catch on separate lines; do/while closes as
-`} while (...);`. Spaces surround binary/assignment/ternary operators. Preserve
-intentional multiline alignment in expressions, parameters and CTTI/RTTI macros.
+Value& value)`. Write C-style casts as `(UInt64) count`. Spaces surround binary,
+assignment and ternary operators. Preserve intentional multiline alignment in
+expressions, parameters and CTTI/RTTI macros.
+
+Place `Seed.Core.Base.NTAPI.h` last among includes, normally in the implementation
+file. Prefer multiline calls for NTAPI operations with more than four arguments.
+Keep `InitializeObjectAttributes` and calls with at most four arguments compact
+when they fit. Put one argument on each continuation line of a multiline NTAPI
+call and attach `)` to the last argument.
+
+Exclude constructor and overloaded operator declarations from assignment
+alignment. Write `operator=` and `operator+=` with tight punctuation. Use
+one space on each side of `=` in `= default`, `= delete` and `= 0` suffixes.
+Check these suffixes after clang-format, which may pad them.
+
+Treat cryptographic algorithm constants as formatter-exempt data. Preserve the
+literal spelling, order, row breaks and column alignment of substitution boxes,
+lookup tables, round constants and fixed byte sequences. Use `// clang-format off`
+and `// clang-format on` around the affected declaration and initializer. Keep the
+region limited to the constants and preserve it in any custom formatting pass.
 
 For records, prefer designated initialization in declaration order. Retain defaults
 and ownership semantics. Use later assignments only for genuine staged updates,
-aligning related assignments as one group. Never merge unrelated groups to align them.
+aligning related assignments as one group. Indent multiline designated fields one
+level and align their `=` signs using the longest field name in that group. Give
+each nested initializer its own alignment and close at the containing statement's
+indentation. Recheck the width after alignment. Keep unrelated groups separate.
+
+Leave a blank line before and after a multiline result assignment. Follow a
+multiline call with a blank line when another call or assignment follows. Separate
+sibling control blocks and lifetime scopes without padding scope edges or runs of
+closing braces. Separate `break`, `continue`, `return` and `co_return` from
+preceding work in the same scope. Keep attached explanations with the transfer
+and share any existing separator. Align one-statement switch mappings on single
+rows. Preserve ordinary layout for longer or multi-statement cases.
+
+Label native and managed test blocks `Arrange`, `Act` and `Assert` by their
+purpose. Keep each comment next to its first statement and separate phases with
+a blank line. Keep consecutive assertions together, including expected-exception
+assertions with a lambda. Preserve domain explanations and skip labels for a
+final framework return.
 
 ## Public contracts
 
-Meaningful XML summaries are required for handwritten public types, enum values,
-aliases, constructors, destructors, operators, methods, constants and fields.
-Document at the declaration. Describe fields/properties as values, including units,
-sentinel values, scope and ownership where relevant. Callable declarations receive
-matching parameter names, applicable type parameters and returns for non-void
-operations. Constructors, destructors and void operations have no returns tag.
-Use multiline remarks for additional explanation; no empty documentation tags.
+Document handwritten public types, enum values, aliases, constructors,
+destructors, operators, methods, constants, fields and properties at their
+declarations. Use separate `/// <summary>`, body and `/// </summary>` lines.
+Describe fields and properties as values, including units, sentinel values and
+ownership where relevant. Fields and properties need only their summary.
+
+Place each complete `<typeparam>`, `<param>` and `<returns>` on its own line after
+the summary. Match parameter and type parameter names exactly. Describe the
+result of every non-void method, including a task representing completion for
+`Task<void>`. Omit `<returns>` for constructors, destructors and void methods.
+Use multiline `<remarks>` for extra context and omit empty tags. Leave a blank
+line after a documented declaration or its inline body, except at the end of a
+scope and between enum entries. Private implementation and test-only declarations
+are exempt from the public API coverage requirement.
 
 CTTI is mandatory for reflected surfaces. CttiClassRecord belongs at the top of
 the public class surface; StructCttiDef follows the fields in serialization order.
 Use EnumCttiDefinition for reflected enums. Document inherited metadata and helpers
 reachable through TypeTraits::CTTITypeMetaData, including Details records.
+Preserve macro argument grouping and the established XML block comments for
+macro-generated declarations. Blank lines in continued macros retain their
+continuation backslash.
 
 ## Runtime behavior while editing
 
@@ -145,8 +213,10 @@ these rules to changed code without a formatting sweep of unrelated files.
 Managed code may use the .NET patterns at its adapter boundary. Use PascalCase
 for public types/members, camelCase for parameters/private fields and four spaces.
 Keep namespaces aligned with the shipped component and meaningful XML summaries
-on public non-test APIs. Prefer small source files for independent documentation
-pages and test topics. Do not export excluded domain contracts through helper DTOs.
+on public non-test APIs. Follow the applicable `.editorconfig` for C# layout and
+the public XML documentation rules above for comments. Prefer small source files
+for independent documentation pages and test topics. Do not export excluded
+domain contracts through helper DTOs.
 
 Build native changes with MSBuild /m and compiler /MP, then run focused meaningful
 tests. Keep runtime source edits outside an active native build. Standard startup,

@@ -11,44 +11,44 @@ public partial class SeedSerializerFactory
         switch (typeName)
         {
             case Constants.Types.AChar:
-            {
-                code.AppendLine("var val = (byte)data;");
-                code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));");
+                {
+                    code.AppendLine("var val = (byte)data;");
+                    code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.UChar:
-            {
-                code.AppendLine("var val = (char)data;");
-                code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));");
+                {
+                    code.AppendLine("var val = (char)data;");
+                    code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.U8Char:
-            {
-                code.AppendLine("var val = (byte)data;");
-                code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));");
+                {
+                    code.AppendLine("var val = (byte)data;");
+                    code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(byte));");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.U16Char:
-            {
-                code.AppendLine("var val = (char)data;");
-                code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));");
+                {
+                    code.AppendLine("var val = (char)data;");
+                    code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(char));");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.U32Char:
-            {
-                code.AppendLine("var val = (UInt32)data;");
-                code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(int));");
+                {
+                    code.AppendLine("var val = (UInt32)data;");
+                    code.AppendLine("stream.Write(BitConverter.GetBytes(val), 0, sizeof(int));");
 
-                break;
-            }
+                    break;
+                }
 
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeName} ' and type class ' {typeName} ' not implemented");
@@ -60,50 +60,50 @@ public partial class SeedSerializerFactory
         switch (typeName)
         {
             case Constants.Types.AChar:
-            {
-                code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(byte)];");
-                code.AppendLine("stream.Read(buffer);");
-                code.AppendLine("data = buffer[0];");
+                {
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(byte)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = buffer[0];");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.UChar:
-            {
-                code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(char)];");
-                code.AppendLine("stream.Read(buffer);");
-                code.AppendLine("data = BitConverter.ToChar(buffer);");
+                {
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(char)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToChar(buffer);");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.U8Char:
-            {
-                code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(byte)];");
-                code.AppendLine("stream.Read(buffer);");
-                code.AppendLine("data = buffer[0];");
+                {
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(byte)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = buffer[0];");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.U16Char:
-            {
-                code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(char)];");
-                code.AppendLine("stream.Read(buffer);");
-                code.AppendLine("data = BitConverter.ToChar(buffer);");
+                {
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(char)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToChar(buffer);");
 
-                break;
-            }
+                    break;
+                }
 
             case Constants.Types.U32Char:
-            {
-                code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(uint)];");
-                code.AppendLine("stream.Read(buffer);");
-                code.AppendLine("data = BitConverter.ToUInt32(buffer);");
+                {
+                    code.AppendLine("Span<byte> buffer = stackalloc byte[(int) sizeof(uint)];");
+                    code.AppendLine("stream.Read(buffer);");
+                    code.AppendLine("data = BitConverter.ToUInt32(buffer);");
 
-                break;
-            }
-            
+                    break;
+                }
+
             default:
                 throw new NotImplementedException($"Deserialization of type  ' {typeName} ' and type class ' {typeName} ' not implemented");
         }

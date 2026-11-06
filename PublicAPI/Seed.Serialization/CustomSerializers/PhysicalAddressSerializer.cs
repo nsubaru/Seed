@@ -2,12 +2,24 @@ using System.Net.NetworkInformation;
 
 namespace Seed.Serialization.CustomSerializers;
 
+/// <summary>
+/// Maps native physical network addresses to PhysicalAddress instances for binary serialization.
+/// </summary>
 public class PhysicalAddressSerializer : ICustomClassSerializer
 {
+    /// <summary>
+    /// The CLR type used to represent native physical network addresses.
+    /// </summary>
     public Type ClrType => typeof(PhysicalAddress);
 
+    /// <summary>
+    /// The native RTTI name used to select the serializer for native physical network addresses.
+    /// </summary>
     public string TypeName => "Seed::Core::IO::Network::PhysicalAddress";
 
+    /// <summary>
+    /// The byte-array type used for the address bytes.
+    /// </summary>
     public Type[] DependableTypes => new Type[]
     {
         typeof(byte[])
@@ -41,7 +53,7 @@ public class PhysicalAddressSerializer : ICustomClassSerializer
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         byte[] dataBuffer = (data as PhysicalAddress)!.GetAddressBytes();
-        
+
         serializer.Serialize((UInt64)dataBuffer.Length, serializationStream);
         serializationStream.Write(dataBuffer);
     }

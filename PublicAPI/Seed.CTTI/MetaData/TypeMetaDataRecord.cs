@@ -16,17 +16,26 @@ public class TypeMetaDataRecord : IFormattable
     /// <summary>
     /// Type class all classes represented in <seealso cref="ETypes"/>
     /// </summary>
-    public ETypes Type { get; set; }
+    public ETypes Type
+    {
+        get; set;
+    }
 
     /// <summary>
     /// Size of all fiels without sub types(in memory size)
     /// </summary>
-    public UInt64 SizeOfSize { get; set; }
+    public UInt64 SizeOfSize
+    {
+        get; set;
+    }
 
     /// <summary>
     /// Zero or equal to size of size, if zero than in serialized data before data recorded size of data as UInt64
     /// </summary>
-    public UInt64 StaticSize { get; set; }
+    public UInt64 StaticSize
+    {
+        get; set;
+    }
 
     /// <summary>
     /// Additional information witch is specific for type class
@@ -77,14 +86,14 @@ public class TypeMetaDataRecord : IFormattable
         {
             "C" => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.Console, formatProvider).ToString(),
             "L" => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.LongSchema, formatProvider).ToString(),
-            _   => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.SmallSchema, formatProvider).ToString(),
+            _ => PrintTypeMetaDataObject(this, ETypeDataRecordFormat.SmallSchema, formatProvider).ToString(),
         };
     }
 
     private static StringBuilder PrintTypeMetaDataRecordList(List<TypeMetaDataRecord> records, int level, ETypeDataRecordFormat mode, IFormatProvider? formatProvider)
     {
         var result = new StringBuilder(string.Empty);
-        
+
         if (records == null || records.Count == 0)
         {
             return result;
@@ -116,7 +125,7 @@ public class TypeMetaDataRecord : IFormattable
     private static StringBuilder PrintTypeMetaDataObject(TypeMetaDataRecord record, ETypeDataRecordFormat mode, IFormatProvider? formatProvider, int level = 0)
     {
         StringBuilder result = new StringBuilder();
-        
+
         var endline = mode != ETypeDataRecordFormat.SmallSchema ? Environment.NewLine : string.Empty;
 
         if (mode == ETypeDataRecordFormat.Console)

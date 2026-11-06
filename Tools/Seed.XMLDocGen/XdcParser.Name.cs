@@ -166,8 +166,8 @@ internal partial class XdcParser
             return name;
         }
 
-        var methodArgs       = name.Substring(name.IndexOf('(') + 1, name.IndexOf(')') - name.IndexOf('(') - 1);
-        var methodArg        = methodArgs.Split(',');
+        var methodArgs = name.Substring(name.IndexOf('(') + 1, name.IndexOf(')') - name.IndexOf('(') - 1);
+        var methodArg = methodArgs.Split(',');
         var parsedMethodName = name.Substring(0, name.IndexOf('(') + 1);
 
         foreach (var arg in methodArg)
@@ -176,77 +176,57 @@ internal partial class XdcParser
             switch (argPart.Count)
             {
                 case 1:
-                {
-                    parsedMethodName += ($"{argPart[0]}, ");
-                    continue;
-                }
+                    {
+                        parsedMethodName += ($"{argPart[0]}, ");
+                        continue;
+                    }
 
                 case 2:
-                {
-                    if (argPart[0] == "=FunctionPtr")
                     {
-                        parsedMethodName += $"{argPart[1]}(*)(), ";
-                    }
-
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsImplicitlyDereferenced"))
-                    {
-                        if (argPart[0].Last() == '*')
+                        if (argPart[0] == "=FunctionPtr")
                         {
-                            parsedMethodName += string.Concat(argPart[0].AsSpan(0, argPart[0].Length - 1), "&, ");
-                        }
-                        else
-                        {
-                            parsedMethodName += ($"{argPart[0]}&, ");
+                            parsedMethodName += $"{argPart[1]}(*)(), ";
                         }
 
-                        continue;
-                    }
-
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsConst*"))
-                    {
-                        parsedMethodName += ($"const {argPart[0]} *, ");
-                        continue;
-                    }
-
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsVolatile*"))
-                    {
-                        parsedMethodName += ($"volatile {argPart[0]} *, ");
-                        continue;
-                    }
-
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsConst"))
-                    {
-                        parsedMethodName += ($"const {argPart[0]}");
-                        continue;
-                    }
-
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsVolatile"))
-                    {
-                        parsedMethodName += ($"volatile {argPart[0]}");
-                        continue;
-                    }
-
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsSignUnspecifiedByte"))
-                    {
-                        parsedMethodName += ($"{signToUnSignTable[argPart[0]]}*, ");
-                    }
-
-                    continue;
-                }
-
-                case 3:
-                {
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsSignUnspecifiedByte"))
-                    {
-                        if (argPart[2].Contains("System.Runtime.CompilerServices.IsConst*"))
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsImplicitlyDereferenced"))
                         {
-                            parsedMethodName += ($"const {signToUnSignTable[argPart[0]]}*, ");
+                            if (argPart[0].Last() == '*')
+                            {
+                                parsedMethodName += string.Concat(argPart[0].AsSpan(0, argPart[0].Length - 1), "&, ");
+                            }
+                            else
+                            {
+                                parsedMethodName += ($"{argPart[0]}&, ");
+                            }
+
+                            continue;
                         }
-                        else if (argPart[2].Contains("System.Runtime.CompilerServices.IsVolatile*"))
+
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsConst*"))
                         {
-                            parsedMethodName += ($"volatile {signToUnSignTable[argPart[0]]}*, ");
+                            parsedMethodName += ($"const {argPart[0]} *, ");
+                            continue;
                         }
-                        else
+
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsVolatile*"))
+                        {
+                            parsedMethodName += ($"volatile {argPart[0]} *, ");
+                            continue;
+                        }
+
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsConst"))
+                        {
+                            parsedMethodName += ($"const {argPart[0]}");
+                            continue;
+                        }
+
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsVolatile"))
+                        {
+                            parsedMethodName += ($"volatile {argPart[0]}");
+                            continue;
+                        }
+
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsSignUnspecifiedByte"))
                         {
                             parsedMethodName += ($"{signToUnSignTable[argPart[0]]}*, ");
                         }
@@ -254,34 +234,54 @@ internal partial class XdcParser
                         continue;
                     }
 
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsConst*"))
+                case 3:
                     {
-                        if (argPart[2].Contains("System.Runtime.CompilerServices.IsImplicitlyDereferenced"))
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsSignUnspecifiedByte"))
                         {
-                            parsedMethodName += ($"const {argPart[0]} &, ");
+                            if (argPart[2].Contains("System.Runtime.CompilerServices.IsConst*"))
+                            {
+                                parsedMethodName += ($"const {signToUnSignTable[argPart[0]]}*, ");
+                            }
+                            else if (argPart[2].Contains("System.Runtime.CompilerServices.IsVolatile*"))
+                            {
+                                parsedMethodName += ($"volatile {signToUnSignTable[argPart[0]]}*, ");
+                            }
+                            else
+                            {
+                                parsedMethodName += ($"{signToUnSignTable[argPart[0]]}*, ");
+                            }
+
+                            continue;
+                        }
+
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsConst*"))
+                        {
+                            if (argPart[2].Contains("System.Runtime.CompilerServices.IsImplicitlyDereferenced"))
+                            {
+                                parsedMethodName += ($"const {argPart[0]} &, ");
+                            }
+
+                            continue;
+                        }
+
+                        if (argPart[1].Contains("System.Runtime.CompilerServices.IsVolatile*"))
+                        {
+                            if (argPart[2].Contains("System.Runtime.CompilerServices.IsImplicitlyDereferenced"))
+                            {
+                                parsedMethodName += ($"volatile {argPart[0]} &, ");
+                            }
+
+                            continue;
                         }
 
                         continue;
                     }
-
-                    if (argPart[1].Contains("System.Runtime.CompilerServices.IsVolatile*"))
-                    {
-                        if (argPart[2].Contains("System.Runtime.CompilerServices.IsImplicitlyDereferenced"))
-                        {
-                            parsedMethodName += ($"volatile {argPart[0]} &, ");
-                        }
-
-                        continue;
-                    }
-
-                    continue;
-                }
 
                 default:
-                {
-                    parsedMethodName += ($"{argPart[0]}, ");
-                    continue;
-                }
+                    {
+                        parsedMethodName += ($"{argPart[0]}, ");
+                        continue;
+                    }
             }
         }
 

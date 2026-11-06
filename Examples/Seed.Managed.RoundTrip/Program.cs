@@ -1,12 +1,12 @@
 using Seed.CTTI;
 using Seed.RTTI;
 
-var path     = args.Length > 0 ? args[0] : "Artifacts/tests/seed-rtti.dat";
+var path = args.Length > 0 ? args[0] : "Artifacts/tests/seed-rtti.dat";
 var metadata = File.ReadAllBytes(path);
 
 using var section = new RTTISection(metadata);
 
-var types     = section.AllRegisteredTypes.Where(type => type.IsValid).ToArray();
+var types = section.AllRegisteredTypes.Where(type => type.IsValid).ToArray();
 var roundTrip = types.Single(type => type.TypeName == "Seed::Runtime::RoundTripMessage");
 
 Console.WriteLine($"Read {types.Length} live Seed RTTI records; round-trip contract: {roundTrip.TypeName}.");
@@ -34,7 +34,7 @@ if (actual.Sequence != expected.Sequence || actual.Message != expected.Message)
 Console.WriteLine($"Managed binary round trip passed: {stream.Length} bytes.");
 
 var leaseStatus = types.Single(type => type.TypeName == "Seed::Core::Services::Dhcp::LeaseMaintenanceStatus");
-var phaseField  = leaseStatus.Fields.Single(field => field.FieldName == "Phase");
+var phaseField = leaseStatus.Fields.Single(field => field.FieldName == "Phase");
 
 if (phaseField.TypeClass != ETypes.String)
 {
@@ -44,10 +44,10 @@ if (phaseField.TypeClass != ETypes.String)
 var leaseExpected = new LeaseStatusProbe
 {
     InterfaceIndex = 17,
-    Phase          = "bound",
-    Address        = "192.0.2.17",
-    LastError      = "",
-    IsRunning      = true
+    Phase = "bound",
+    Address = "192.0.2.17",
+    LastError = "",
+    IsRunning = true
 };
 
 using var leaseStream = new MemoryStream();
@@ -80,9 +80,9 @@ if (args.Skip(1).Contains("--verify-malformed", StringComparer.Ordinal))
     Reject(Array.Empty<byte>());
     Reject(metadata.Take(32).ToArray());
 
-    var marker  = System.Text.Encoding.ASCII.GetBytes("SEED_RXX_RTTI\0");
-    int first   = metadata.AsSpan().IndexOf(marker);
-    int header  = first + 1 + metadata.AsSpan(first + 1).IndexOf(marker);
+    var marker = System.Text.Encoding.ASCII.GetBytes("SEED_RXX_RTTI\0");
+    int first = metadata.AsSpan().IndexOf(marker);
+    int header = first + 1 + metadata.AsSpan(first + 1).IndexOf(marker);
     var damaged = (byte[])metadata.Clone();
 
     damaged[first] = 0;
@@ -123,14 +123,14 @@ if (serverUrl is not null)
 
     Console.WriteLine("Native HTTP JSON round trip passed.");
 
-    foreach (string message in new[] { expected.Message, "",  "Seed \U0001F338\0 binary" })
+    foreach (string message in new[] { expected.Message, "", "Seed \U0001F338\0 binary" })
     {
         var binaryExpected = new RoundTripMessage
         {
             Sequence = -42,
             Message = message
         };
-        
+
         using var binaryStream = new MemoryStream();
 
         serializer.Serialize(binaryStream, binaryExpected, roundTrip);
@@ -185,7 +185,10 @@ public sealed class LeaseStatusProbe
     /// Selected Windows IPv4 interface index; the demonstration uses a synthetic value.
     /// </summary>
     [SerializableStructField]
-    public ulong InterfaceIndex { get; set; }
+    public ulong InterfaceIndex
+    {
+        get; set;
+    }
 
     /// <summary>
     /// Current maintenance phase represented as Unicode text by native UniString metadata.
@@ -209,13 +212,19 @@ public sealed class LeaseStatusProbe
     /// Whether the selected maintenance worker is running.
     /// </summary>
     [SerializableStructField]
-    public bool IsRunning { get; set; }
+    public bool IsRunning
+    {
+        get; set;
+    }
 
     /// <summary>
     /// Whether the operation still owns transient interface configuration awaiting cleanup.
     /// </summary>
     [SerializableStructField]
-    public bool CleanupPending { get; set; }
+    public bool CleanupPending
+    {
+        get; set;
+    }
 }
 
 /// <summary>
@@ -228,7 +237,10 @@ public sealed class RoundTripMessage
     /// Caller sequence number preserved by native and managed serialization.
     /// </summary>
     [SerializableStructField]
-    public long Sequence { get; set; }
+    public long Sequence
+    {
+        get; set;
+    }
 
     /// <summary>
     /// Unicode text preserved by the round-trip endpoints.

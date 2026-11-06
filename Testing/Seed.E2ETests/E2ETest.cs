@@ -10,10 +10,10 @@ public abstract class E2ETest<T> : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        string runtime = Environment.GetEnvironmentVariable("SEED_E2E_RUNTIME") 
+        string runtime = Environment.GetEnvironmentVariable("SEED_E2E_RUNTIME")
             ?? throw new InvalidOperationException("Use Tools/Test-SeedE2E.ps1 or set SEED_E2E_RUNTIME to the matching native image.");
 
-        string output = Environment.GetEnvironmentVariable("SEED_E2E_OUTPUT") 
+        string output = Environment.GetEnvironmentVariable("SEED_E2E_OUTPUT")
             ?? Path.Combine(Path.GetTempPath(), "Seed.E2E");
 
         Runtime = await RuntimeSession.StartAsync(runtime, Path.Combine(output, typeof(T).Name), TestContext.Current.CancellationToken);

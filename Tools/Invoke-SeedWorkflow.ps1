@@ -105,7 +105,7 @@ try
         }
 
         [xml]$coverage = Get-Content -LiteralPath (Join-Path $coverageDirectory 'coverage.xml') -Raw
-        
+
         if ([int]$coverage.coverage.'lines-valid' -le 0)
         {
             throw 'Collector did not attribute native source lines; the child-process debugger path needs review.'

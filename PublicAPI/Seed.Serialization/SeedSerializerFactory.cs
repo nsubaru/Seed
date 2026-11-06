@@ -18,28 +18,73 @@ using LanguageExt;
 
 namespace Seed.Serialization;
 
+/// <summary>
+/// Contains generated serializer source, type mappings and compiler output.
+/// </summary>
 public struct SeedSerializerCompilationResult
 {
-    public string Code { get; set; }
+    /// <summary>
+    /// Generated C# source for the serializer.
+    /// </summary>
+    public string Code
+    {
+        get; set;
+    }
 
-    public List<TypeRecord> SupportedTypes { get; set; }
+    /// <summary>
+    /// Mappings for the types supported by the generated serializer.
+    /// </summary>
+    public List<TypeRecord> SupportedTypes
+    {
+        get; set;
+    }
 
-    public EmitResult Result { get; set; }
+    /// <summary>
+    /// Roslyn emit status and diagnostics for the generated assembly.
+    /// </summary>
+    public EmitResult Result
+    {
+        get; set;
+    }
 
-    public MemoryStream PeStream { get; set; }
+    /// <summary>
+    /// Stream holding the emitted PE assembly image.
+    /// </summary>
+    public MemoryStream PeStream
+    {
+        get; set;
+    }
 
-    public MemoryStream PdbStream { get; set; }
+    /// <summary>
+    /// Stream holding the emitted debugging symbols.
+    /// </summary>
+    public MemoryStream PdbStream
+    {
+        get; set;
+    }
 }
 
+/// <summary>
+/// Provides deconstruction of a serializer compilation result.
+/// </summary>
 public static class SeedSerializerCompilationResultExtensions
 {
+    /// <summary>
+    /// Extracts the source, mappings and compiler outputs from the result.
+    /// </summary>
+    /// <param name="compilationResult">The result to deconstruct.</param>
+    /// <param name="code">Receives the generated C# source.</param>
+    /// <param name="supportedTypes">Receives the list of supported type mappings.</param>
+    /// <param name="result">Receives the compiler emit status and diagnostics.</param>
+    /// <param name="peStream">Receives the stream containing the emitted assembly image.</param>
+    /// <param name="pdbStream">Receives the stream containing the emitted debugging symbols.</param>
     public static void Deconstruct(this SeedSerializerCompilationResult compilationResult, out string code, out List<TypeRecord> supportedTypes, out EmitResult result, out MemoryStream peStream, out MemoryStream pdbStream)
     {
-        code           = compilationResult.Code;
+        code = compilationResult.Code;
         supportedTypes = compilationResult.SupportedTypes;
-        result         = compilationResult.Result;
-        peStream       = compilationResult.PeStream;
-        pdbStream      = compilationResult.PdbStream;
+        result = compilationResult.Result;
+        peStream = compilationResult.PeStream;
+        pdbStream = compilationResult.PdbStream;
     }
 }
 
@@ -74,8 +119,16 @@ public partial class SeedSerializerFactory : ISeedSerializerFactory, IDisposable
         return serializer ??= BuildSeedSerializer();
     }
 
+    /// <summary>
+    /// The native RTTI section used to discover and generate serializer mappings.
+    /// </summary>
     public RTTISection RTTISection => section;
 
+    /// <summary>
+    /// Formats a CLR type as a C# type reference for generated serializer source.
+    /// </summary>
+    /// <param name="type">The CLR type to format.</param>
+    /// <returns>The C# spelling returned by the CodeDOM provider.</returns>
     public static string GetFriendlyTypeName(Type type)
     {
         using var p = new CSharpCodeProvider();
@@ -84,6 +137,10 @@ public partial class SeedSerializerFactory : ISeedSerializerFactory, IDisposable
         return p.GetTypeOutput(r);
     }
 
+    /// <summary>
+    /// Gets the type mappings discovered by this factory.
+    /// </summary>
+    /// <returns>The factory-owned list of supported type mappings.</returns>
     public List<TypeRecord> GetSupportedTypes() => supportedTypesList;
 
     /// <summary>
@@ -392,7 +449,7 @@ public class SeedSerializer : ISeedSerializer {
             .SelectMany(x => x.GetTypes().Where(x => x.GetCustomAttribute<SeedSerializableAttribute>() != null)).Where(x => !this.customTypeMappingSchema.Any(y => y.Value.ClrType == x))
             .Select(x => (Type: x, Attribute: x.GetCustomAttribute<SeedSerializableAttribute>()!))
             .ToList();
-        
+
         logger?.LogInformation("Found {0} types", supportedTypesList.Count);
         logger?.LogInformation("Add custom serializable types");
 
@@ -423,13 +480,13 @@ public class SeedSerializer : ISeedSerializer {
 
             var typeRecord = new TypeRecord
             {
-                TypeName           = !customTemplatesSerializerFactory.ContainsKey(item.TemplateTypeName) && item.TypeModificators.HasFlag(TypeModificator.TemplateType) && item.TemplateTypeName != Constants.Types.ObjectProperties 
-                    ? item.TemplateTypeName 
+                TypeName = !customTemplatesSerializerFactory.ContainsKey(item.TemplateTypeName) && item.TypeModificators.HasFlag(TypeModificator.TemplateType) && item.TemplateTypeName != Constants.Types.ObjectProperties
+                    ? item.TemplateTypeName
                     : item.TypeName,
-                Type               = item.TypeClass,
-                FullTypeId         = item.FullTypeId.Id,
-                ClrType            = ClrType,
-                RttiType           = item,
+                Type = item.TypeClass,
+                FullTypeId = item.FullTypeId.Id,
+                ClrType = ClrType,
+                RttiType = item,
                 IsObjectProperties = item.TemplateTypeName == Constants.Types.ObjectProperties
             };
 
@@ -504,6 +561,11 @@ public class SeedSerializer : ISeedSerializer {
         supportedTypesList.Add(typeRecord);
     }
 
+    /// <summary>
+    /// Resolves a native type record to its managed representation.
+    /// </summary>
+    /// <param name="record">The native RTTI record to resolve.</param>
+    /// <returns>The mapped CLR type, or null when the factory cannot resolve a mapping.</returns>
     public Type? BuildClrType(RttiTypeRecord record)
     {
         logger?.LogDebug("Build clr type for {0}", record.TypeName);
@@ -551,31 +613,56 @@ public class SeedSerializer : ISeedSerializer {
 
         switch (record.TypeClass)
         {
-            case ETypes.FloatNumeric:         return TryGetAsPrimitive(record);
-            case ETypes.Character:            return TryGetAsPrimitive(record);
-            case ETypes.Numeric:              return TryGetAsPrimitive(record);
-            case ETypes.Logic:                return TryGetAsPrimitive(record);
-            case ETypes.Collection:           return TryGetAsLinqSeedType(record);
-            case ETypes.FixedCollection:      return TryGetAsLinqSeedType(record);
-            case ETypes.AssociableCollection: return TryGetAsLinqSeedType(record);
-            case ETypes.FixedArray:           return TryGetAsLinqSeedType(record) ?? TryBuildFixedArrayType(record, section);
-            case ETypes.Pair:                 return TryGetAsLinqSeedType(record);
-            case ETypes.MetaData:             return GetMetaDataType(record);
-            case ETypes.Enumeration:          return GetEnumUnderlyingType(record, section);
-            case ETypes.String:               return TryGetAsPrimitive(record);
-            case ETypes.Box:                  return GetBoxType(record);
-            case ETypes.Tuple:                return GetTupleType(record);
-            case ETypes.Struct:               return GetStructType(record);
-            case ETypes.Dynamic:              return typeof(DynamicObject);
-            case ETypes.Custom:               return GetCustomSerializerType(record);
-            case ETypes.Pointer:              return null;
-            case ETypes.Reference:            return null;
-            case ETypes.Object:               return null;
-            case ETypes.Abstract:             return null;
-            case ETypes.Function:             return null;
-            case ETypes.Union:                return null;
-            case ETypes.Undefined:            return null;
-            default:                          return null;
+            case ETypes.FloatNumeric:
+                return TryGetAsPrimitive(record);
+            case ETypes.Character:
+                return TryGetAsPrimitive(record);
+            case ETypes.Numeric:
+                return TryGetAsPrimitive(record);
+            case ETypes.Logic:
+                return TryGetAsPrimitive(record);
+            case ETypes.Collection:
+                return TryGetAsLinqSeedType(record);
+            case ETypes.FixedCollection:
+                return TryGetAsLinqSeedType(record);
+            case ETypes.AssociableCollection:
+                return TryGetAsLinqSeedType(record);
+            case ETypes.FixedArray:
+                return TryGetAsLinqSeedType(record) ?? TryBuildFixedArrayType(record, section);
+            case ETypes.Pair:
+                return TryGetAsLinqSeedType(record);
+            case ETypes.MetaData:
+                return GetMetaDataType(record);
+            case ETypes.Enumeration:
+                return GetEnumUnderlyingType(record, section);
+            case ETypes.String:
+                return TryGetAsPrimitive(record);
+            case ETypes.Box:
+                return GetBoxType(record);
+            case ETypes.Tuple:
+                return GetTupleType(record);
+            case ETypes.Struct:
+                return GetStructType(record);
+            case ETypes.Dynamic:
+                return typeof(DynamicObject);
+            case ETypes.Custom:
+                return GetCustomSerializerType(record);
+            case ETypes.Pointer:
+                return null;
+            case ETypes.Reference:
+                return null;
+            case ETypes.Object:
+                return null;
+            case ETypes.Abstract:
+                return null;
+            case ETypes.Function:
+                return null;
+            case ETypes.Union:
+                return null;
+            case ETypes.Undefined:
+                return null;
+            default:
+                return null;
         }
     }
 
@@ -633,7 +720,7 @@ public class SeedSerializer : ISeedSerializer {
         {
             ETypes.Pointer or ETypes.Reference or ETypes.Object or ETypes.Abstract or ETypes.Function or ETypes.Union or ETypes.Undefined => true,
 
-            ETypes.Box or ETypes.FloatNumeric or ETypes.Character or ETypes.Numeric or ETypes.Logic or ETypes.Collection or ETypes.FixedCollection or ETypes.AssociableCollection 
+            ETypes.Box or ETypes.FloatNumeric or ETypes.Character or ETypes.Numeric or ETypes.Logic or ETypes.Collection or ETypes.FixedCollection or ETypes.AssociableCollection
                        or ETypes.FixedArray or ETypes.Pair or ETypes.MetaData or ETypes.Enumeration or ETypes.String or ETypes.Tuple or ETypes.Struct or ETypes.Dynamic or ETypes.Custom => false,
 
             _ => true,
@@ -823,6 +910,11 @@ public class SeedSerializer : ISeedSerializer {
     }
 
     #endregion
+    /// <summary>
+    /// Registers a supported type mapping and generates its serialization methods.
+    /// </summary>
+    /// <typeparam name="T">The managed type used in the generated serializer.</typeparam>
+    /// <param name="typeRecord">The native-to-managed mapping used to generate serialization methods.</param>
     public void AddType<T>(TypeRecord typeRecord)
     {
         if (CheckForExcludedTypes(typeRecord.Type))
@@ -935,7 +1027,7 @@ public class SeedSerializer : ISeedSerializer {
         assemblies.AddRange(supportedTypes.Select(x => x.ClrType.Assembly).Concat(assemblies).ToList().DistinctBy(x => x.FullName).ToList());
 
         MetadataReference[] references = assemblies.DistinctBy(x => x.FullName).Select(x => MetadataReference.CreateFromFile(x.Location)).ToArray();
-        
+
         logger?.LogInformation("Compile code of serializer");
 
         var comp = CSharpCompilation.Create(
@@ -950,9 +1042,9 @@ public class SeedSerializer : ISeedSerializer {
 
         logger?.LogInformation("Create streams for serializer dll and pdb");
 
-        var ms            = new MemoryStream();
-        var pdbMs         = new MemoryStream();
-        var emitOptions   = new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: symbolsName);
+        var ms = new MemoryStream();
+        var pdbMs = new MemoryStream();
+        var emitOptions = new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: symbolsName);
         var embeddedTexts = new List<EmbeddedText> { EmbeddedText.FromSource(sourceCodePath, code) };
 
         logger?.LogInformation("Save compilation result to dll and pdb");
@@ -960,11 +1052,11 @@ public class SeedSerializer : ISeedSerializer {
 
         return new SeedSerializerCompilationResult
         {
-            Code           = codeText,
+            Code = codeText,
             SupportedTypes = supportedTypes,
-            Result         = result,
-            PeStream       = ms,
-            PdbStream      = pdbMs
+            Result = result,
+            PeStream = ms,
+            PdbStream = pdbMs
         };
     }
 
@@ -1060,7 +1152,7 @@ public class SeedSerializer : ISeedSerializer {
 
         disposed = true;
         serializer = null;
-        
+
         foreach (var context in assemblyContexts)
         {
             context.Unload();

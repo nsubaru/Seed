@@ -81,7 +81,7 @@ internal unsafe struct TextMetaData
 {
     [FieldOffset(0)]
     public SizeT Size;
-    
+
     [FieldOffset(8)]
     public fixed Char Text[1];
 }
@@ -185,7 +185,7 @@ internal unsafe struct DynamicSizedCollection
 
     [FieldOffset(8)]
     public TDynamicForEach DynamicForEach;
-    
+
     [FieldOffset(16)]
     public TUnsafeGet SizeGetter;
 }
@@ -319,7 +319,7 @@ internal unsafe struct ArgumentMetaData
 
     [FieldOffset(8)]
     public UniversalTypeIdentifier TypeId;
-    
+
     [FieldOffset(24)]
     public ETypes TypeClass;
 
@@ -499,13 +499,13 @@ internal unsafe struct ObjectPropertiesMetaData
 
     [FieldOffset(8)]
     public TUnsafeGet BaseGetter;
-    
+
     [FieldOffset(16)]
     public Boolean IsFake;
 
     [FieldOffset(24)]
     public SizeT PropertiesCount;
-    
+
     [FieldOffset(32)]
     public TObjectPropertiesGetObjId GetObjId;
 
@@ -563,7 +563,7 @@ internal unsafe struct AttributeRecord
 {
     [FieldOffset(0)]
     public SizeT SizeOfItem;
-    
+
     [FieldOffset(8)]
     public SizeT OffsetToAttributeName;
 
@@ -606,7 +606,7 @@ internal unsafe struct SectionHeaderType
 
     [FieldOffset(38)]
     public RawMemBlk FzAddr;
-    
+
     [FieldOffset(46)]
     public RawMemBlk VaAddr;
 
@@ -619,27 +619,63 @@ internal unsafe struct SectionHeaderType
 
 public struct SectionDetails
 {
-    public SizeT SectionSize { get; set; }
+    public SizeT SectionSize
+    {
+        get; set;
+    }
 
-    public SizeT SectionHeaderOffset { get; set; }
+    public SizeT SectionHeaderOffset
+    {
+        get; set;
+    }
 
-    public KernelVersionT KernelVersion { get; set; }
+    public KernelVersionT KernelVersion
+    {
+        get; set;
+    }
 
-    public RawMemBlk OriginHeaderAddr { get; set; }
+    public RawMemBlk OriginHeaderAddr
+    {
+        get; set;
+    }
 
-    public RawMemBlk FaAddr { get; set; }
+    public RawMemBlk FaAddr
+    {
+        get; set;
+    }
 
-    public RawMemBlk FzAddr { get; set; }
+    public RawMemBlk FzAddr
+    {
+        get; set;
+    }
 
-    public RawMemBlk VaAddr { get; set; }
+    public RawMemBlk VaAddr
+    {
+        get; set;
+    }
 
-    public RawMemBlk VzAddr { get; set; }
+    public RawMemBlk VzAddr
+    {
+        get; set;
+    }
 
-    public RawMemBlk ImageBase { get; set; }
+    public RawMemBlk ImageBase
+    {
+        get; set;
+    }
 
-    public SizeT Offset { get; set; }
+    public SizeT Offset
+    {
+        get; set;
+    }
 
-    public SizeT TotalCount { get; set; }
+    public SizeT TotalCount
+    {
+        get; set;
+    }
 
-    public SizeT ValidCount { get; set; }
+    public SizeT ValidCount
+    {
+        get; set;
+    }
 }

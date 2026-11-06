@@ -5,7 +5,9 @@ namespace Seed.CTTI.MetaData;
 
 public class TypeMetaDataDecoder
 {
-    public TypeMetaDataDecoder() {}
+    public TypeMetaDataDecoder()
+    {
+    }
 
     #region Decoding TypeMetaDataRecord string format
     /// <summary>
@@ -27,17 +29,17 @@ public class TypeMetaDataDecoder
             switch (typeMetaData[pos])
             {
                 case '}':
-                {
-                    if (count == 0)
                     {
-                        return pos;
+                        if (count == 0)
+                        {
+                            return pos;
+                        }
+                        else
+                        {
+                            count--;
+                            break;
+                        }
                     }
-                    else
-                    {
-                        count--;
-                        break;
-                    }
-                }
 
                 case '{':
                     count++;
@@ -55,30 +57,30 @@ public class TypeMetaDataDecoder
 
     private TypeMetaDataRecord DecodeTypeMetaDataImpl(string typeMetaData, int startPos, out int endPos)
     {
-        var indexOfOpenBracket  = (ulong) typeMetaData.IndexOf('{', startPos);
-        var indexOfCloseBracket = (ulong) typeMetaData.IndexOf('}', startPos);
-        var isHaveNestedTypes   = indexOfOpenBracket < indexOfCloseBracket;
+        var indexOfOpenBracket = (ulong)typeMetaData.IndexOf('{', startPos);
+        var indexOfCloseBracket = (ulong)typeMetaData.IndexOf('}', startPos);
+        var isHaveNestedTypes = indexOfOpenBracket < indexOfCloseBracket;
 
-        endPos = (int) (isHaveNestedTypes ? indexOfOpenBracket : indexOfCloseBracket);
+        endPos = (int)(isHaveNestedTypes ? indexOfOpenBracket : indexOfCloseBracket);
 
         var thisTypeParts = typeMetaData.Substring(startPos, endPos - startPos).Split('|');
 
         return new TypeMetaDataRecord()
         {
-            TypeName       = thisTypeParts[0].Trim(),
-            Type           = (ETypes)Enum.Parse(typeof(ETypes), thisTypeParts[1]),
-            SizeOfSize     = ulong.Parse(thisTypeParts[2]),
-            StaticSize     = ulong.Parse(thisTypeParts[3]),
+            TypeName = thisTypeParts[0].Trim(),
+            Type = (ETypes)Enum.Parse(typeof(ETypes), thisTypeParts[1]),
+            SizeOfSize = ulong.Parse(thisTypeParts[2]),
+            StaticSize = ulong.Parse(thisTypeParts[3]),
             AdditionalInfo = thisTypeParts[4].Trim(),
-            NestedTypes    = isHaveNestedTypes ? DecodeTypeMetaDataLevelImpl(typeMetaData, ref endPos) : new()
+            NestedTypes = isHaveNestedTypes ? DecodeTypeMetaDataLevelImpl(typeMetaData, ref endPos) : new()
         };
     }
 
     private List<TypeMetaDataRecord> DecodeTypeMetaDataLevelImpl(string typeMetaData, ref int startPos)
     {
-        var result   = new List<TypeMetaDataRecord>();
+        var result = new List<TypeMetaDataRecord>();
         var endIndex = SearchLevelEnd(typeMetaData, startPos);
-        var i        = startPos + 1;
+        var i = startPos + 1;
 
         while (true)
         {
@@ -119,7 +121,7 @@ public class TypeMetaDataDecoder
 
             fields.Add(new StructFieldInformation
             {
-                FieldName     = items[0],
+                FieldName = items[0],
                 FieldTypeName = items[1]
             });
         }
@@ -130,7 +132,7 @@ public class TypeMetaDataDecoder
     public string EncodeStructFieldSchema(List<StructFieldInformation> structFieldInformation)
     {
         var result = new StringBuilder();
-        
+
         foreach (var fieldInformation in structFieldInformation)
         {
             result.Append($"[{fieldInformation.FieldName}-{fieldInformation.FieldTypeName}]");

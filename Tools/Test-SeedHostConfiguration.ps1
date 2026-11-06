@@ -367,7 +367,7 @@ finally
     if ($seedProcess)
     {
         $seedProcess.Refresh()
-        
+
         if (-not $seedProcess.HasExited -and $seedProcess.MainModule.FileName -eq $seedRuntime)
         {
             $seedProcess.Kill()

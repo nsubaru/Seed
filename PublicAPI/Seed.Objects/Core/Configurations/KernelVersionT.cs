@@ -15,7 +15,7 @@ public struct KernelVersionT
     [SerializableStructField]
     [FieldOffset(4)]
     public UInt16 StableBuildNumber;
-    
+
     [SerializableStructField]
     [FieldOffset(6)]
     public UInt16 BuildNumber;

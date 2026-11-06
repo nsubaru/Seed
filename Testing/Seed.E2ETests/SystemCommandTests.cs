@@ -12,64 +12,89 @@ public sealed class SystemCommandTests : E2ETest<SystemCommandTests>
     [Fact]
     public async Task FilesSupportUnicodeQuotingAndNonDestructiveMutations()
     {
+        // Arrange
         string directory = Path.Combine(Runtime.Directory, "files with spaces 🌱");
         string source = Path.Combine(directory, "first.txt");
         string copy = Path.Combine(directory, "copy.txt");
         string moved = Path.Combine(directory, "renamed.txt");
         const string text = "Seed says \"hello\" 🌱";
 
+        // Act
         await Runtime.CommandAsync($"fs.directory.create {Quote(directory)}");
         await Runtime.CommandAsync($"fs.write {Quote(source)} {Quote(text)}");
 
+        // Assert
         Assert.Equal(text, await File.ReadAllTextAsync(source, TestContext.Current.CancellationToken));
         Assert.Equal(text, await Runtime.CommandAsync($"fs.read {Quote(source)}"));
         Assert.Contains($"Size: {Encoding.UTF8.GetByteCount(text)} bytes", await Runtime.CommandAsync($"fs.info {Quote(source)}"));
         Assert.Contains("first.txt", await Runtime.CommandAsync($"fs.list {Quote(directory)}"));
 
+        // Act
         await Runtime.CommandAsync($"fs.write {Quote(source)} replacement", expectError: true);
         await Runtime.CommandAsync($"fs.copy {Quote(source)} {Quote(copy)}");
         await Runtime.CommandAsync($"fs.copy {Quote(source)} {Quote(copy)}", expectError: true);
         await Runtime.CommandAsync($"fs.move {Quote(source)} {Quote(copy)}", expectError: true);
 
+        // Assert
         Assert.True(File.Exists(source));
         Assert.Equal(text, await File.ReadAllTextAsync(copy, TestContext.Current.CancellationToken));
 
+        // Act
         await Runtime.CommandAsync($"fs.move {Quote(copy)} {Quote(moved)}");
 
+        // Assert
         Assert.False(File.Exists(copy));
         Assert.True(File.Exists(moved));
 
+        // Act
         await Runtime.CommandAsync($"fs.delete {Quote(directory)}", expectError: true);
 
+        // Act
         await Runtime.CommandAsync($"fs.delete {Quote(source)}");
         await Runtime.CommandAsync($"fs.delete {Quote(moved)}");
         await Runtime.CommandAsync($"fs.delete {Quote(directory)}");
 
+        // Assert
         Assert.False(Directory.Exists(directory));
     }
 
     [Fact]
     public async Task FileTablesAlignNumericSizesAndKeepUnicodeNamesIntact()
     {
+        // Arrange
         string directory = Path.Combine(Runtime.Directory, "table");
 
+        // Arrange
         Directory.CreateDirectory(directory);
         Directory.CreateDirectory(Path.Combine(directory, "subdirectory"));
 
+        // Arrange
         await File.WriteAllBytesAsync(Path.Combine(directory, "a.txt"), new byte[1], TestContext.Current.CancellationToken);
+
+        // Arrange
         const string longName = "long file name with spaces 🌱.txt";
+
+        // Arrange
         await File.WriteAllBytesAsync(Path.Combine(directory, longName), new byte[12345], TestContext.Current.CancellationToken);
 
+        // Act
         string output = await Runtime.CommandAsync($"fs.list {Quote(directory)}");
+
+        // Assert
         Assert.DoesNotContain('\t', output);
 
+        // Arrange
         string[] lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+        // Assert
         Assert.Equal(5, lines.Length);
 
+        // Arrange
         int nameColumn = lines[0].IndexOf("Name", StringComparison.Ordinal);
         int sizeEnd = lines[0].IndexOf("Size (bytes)", StringComparison.Ordinal) + "Size (bytes)".Length;
         var rows = lines.Skip(2).Select(line => Regex.Match(line, @"^(File|Directory)  +(\d+|-)  +(.+)$")).ToArray();
 
+        // Assert
         Assert.All(rows, row =>
         {
             Assert.True(row.Success);
@@ -82,59 +107,83 @@ public sealed class SystemCommandTests : E2ETest<SystemCommandTests>
         Assert.Equal("1", Assert.Single(rows, row => row.Groups[3].Value == "a.txt").Groups[2].Value);
         Assert.Equal("-", Assert.Single(rows, row => row.Groups[3].Value == "subdirectory").Groups[2].Value);
 
+        // Arrange
         string empty = Path.Combine(directory, "empty");
+
+        // Arrange
         Directory.CreateDirectory(empty);
 
+        // Act
         string emptyTable = await Runtime.CommandAsync($"fs.list {Quote(empty)}");
+
+        // Assert
         Assert.Equal(2, emptyTable.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length);
     }
 
     [Fact]
     public async Task BinaryCopiesSpanChunksAndTextReadsRejectInvalidInput()
     {
+        // Arrange
         string source = Path.Combine(Runtime.Directory, "binary.dat");
         string copy = Path.Combine(Runtime.Directory, "binary-copy.dat");
 
+        // Arrange
         byte[] bytes = new byte[256 * 1024 + 17];
+
+        // Act
         new Random(42).NextBytes(bytes);
 
+        // Arrange
         await File.WriteAllBytesAsync(source, bytes, TestContext.Current.CancellationToken);
 
+        // Act
         await Runtime.CommandAsync($"fs.copy {Quote(source)} {Quote(copy)}");
 
+        // Assert
         Assert.Equal(bytes, await File.ReadAllBytesAsync(copy, TestContext.Current.CancellationToken));
 
+        // Act
         await Runtime.CommandAsync($"fs.read {Quote(source)}", expectError: true);
 
+        // Arrange
         string invalid = Path.Combine(Runtime.Directory, "invalid.txt");
 
+        // Arrange
         await File.WriteAllBytesAsync(invalid, new byte[] { 0xC0, 0xAF }, TestContext.Current.CancellationToken);
         await Runtime.CommandAsync($"fs.read {Quote(invalid)}", expectError: true);
 
+        // Arrange
         string empty = Path.Combine(Runtime.Directory, "empty.txt");
 
+        // Act
         await Runtime.CommandAsync($"fs.write {Quote(empty)} {Quote("")}");
 
+        // Assert
         Assert.Equal(0, new FileInfo(empty).Length);
         Assert.Empty(await Runtime.CommandAsync($"fs.read {Quote(empty)}"));
 
+        // Act
         await Runtime.CommandAsync("fs.read relative.txt", expectError: true);
         await Runtime.CommandAsync("fs.write", expectError: true);
         await Runtime.CommandAsync("fs.read \"unterminated", expectError: true);
         await Runtime.CommandAsync("registry.unavailable", expectError: true);
 
+        // Assert
         Assert.StartsWith("Seed ", await Runtime.CommandAsync("version"));
     }
 
     [Fact]
     public async Task RegistryValuesRoundTripThroughTheWindowsRegistry()
     {
+        // Arrange
         string relative = "Software\\Seed.DemoTests." + Guid.NewGuid().ToString("N");
         string key = "HKCU\\" + relative;
         string child = key + "\\Child key";
 
+        // Arrange
         using var fixture = Registry.CurrentUser.CreateSubKey(relative);
 
+        // Assert
         try
         {
             await Runtime.CommandAsync($"registry.key.create {Quote(child)}");
@@ -177,19 +226,23 @@ public sealed class SystemCommandTests : E2ETest<SystemCommandTests>
     [Fact]
     public async Task ProcessesListAndTerminateOnlyTheSelectedOwnedChild()
     {
+        // Arrange
         var start = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe"))
         {
             UseShellExecute = false,
             CreateNoWindow = true
         };
 
+        // Act
         foreach (string argument in new[] { "-NoProfile", "-NonInteractive", "-Command", "Start-Sleep -Seconds 120" })
         {
             start.ArgumentList.Add(argument);
         }
 
+        // Arrange
         using var child = Process.Start(start)!;
 
+        // Assert
         try
         {
             string list = await Runtime.CommandAsync("process.list");
@@ -237,14 +290,18 @@ public sealed class SystemCommandTests : E2ETest<SystemCommandTests>
     [Fact]
     public async Task ConsolePreservesSpacesAndQuotes()
     {
+        // Act
         await Runtime.DisconnectAsync();
 
+        // Arrange
         string runtime = Path.GetFullPath(Environment.GetEnvironmentVariable("SEED_E2E_RUNTIME")!);
         string console = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(runtime)!)!, "Seed.Console", "Seed.Console.exe");
         string path = Path.Combine(Runtime.Directory, "console file 🌱.txt");
 
+        // Arrange
         const string text = "A \"quoted\" console value 🌱";
 
+        // Arrange
         var start = new ProcessStartInfo(console)
         {
             UseShellExecute = false,
@@ -253,16 +310,20 @@ public sealed class SystemCommandTests : E2ETest<SystemCommandTests>
             RedirectStandardError = true
         };
 
+        // Act
         foreach (string argument in new[] { "fs.write", path, text })
         {
             start.ArgumentList.Add(argument);
         }
 
+        // Arrange
         using var process = Process.Start(start)!;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
 
+        // Act
         deadline.CancelAfter(TimeSpan.FromSeconds(15));
 
+        // Assert
         try
         {
 #pragma warning disable xUnit1051 // The owned-process deadline is linked to the test token.

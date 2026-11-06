@@ -2,12 +2,24 @@ using Seed.Core.Crypt.Algorithms;
 
 namespace Seed.Serialization.CustomSerializers;
 
+/// <summary>
+/// Maps native SHA-1 TOTP configuration values to TotpSha1 instances for binary serialization.
+/// </summary>
 public class TotpSha1Serializer : ICustomClassSerializer
 {
+    /// <summary>
+    /// The CLR type used to represent native SHA-1 TOTP configuration values.
+    /// </summary>
     public Type ClrType => typeof(TotpSha1);
 
+    /// <summary>
+    /// The native RTTI name used to select the serializer for native SHA-1 TOTP configuration values.
+    /// </summary>
     public string TypeName => "Seed::Core::Crypt::Algorithms::TOTP<Seed::Core::Crypt::Hash::SHA1Hash>";
 
+    /// <summary>
+    /// An empty array because the serializer declares no additional CLR type dependencies.
+    /// </summary>
     public Type[] DependableTypes => Array.Empty<Type>();
 
     /// <summary>
@@ -32,9 +44,9 @@ public class TotpSha1Serializer : ICustomClassSerializer
 
         return new TotpSha1
         {
-            SecretHash            = (List<UInt8>)secretHash,
-            PasswordSize          = (UInt8)passwordSize,
-            StartTime             = (UInt64)startTime,
+            SecretHash = (List<UInt8>)secretHash,
+            PasswordSize = (UInt8)passwordSize,
+            StartTime = (UInt64)startTime,
             TimeIntervalInSeconds = (SizeT)timeIntervalInSeconds
         };
     }
@@ -48,7 +60,7 @@ public class TotpSha1Serializer : ICustomClassSerializer
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         var totp = (TotpSha1)data;
-        
+
         object secretHash = totp.SecretHash ?? new List<UInt8>();
         serializer.Serialize(secretHash, serializationStream);
 

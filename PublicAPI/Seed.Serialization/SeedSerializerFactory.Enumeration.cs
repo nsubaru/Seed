@@ -25,7 +25,7 @@ public partial class SeedSerializerFactory
 
         var seedItems = record.Fields.Where(item => item.FieldName != "UnderlyingType").Select(item => (Name: item.TypeName, Value: item.FieldName)).OrderBy(item => item.Name, StringComparer.Ordinal).ToList();
         var managedItems = Enum.GetValues(type).Cast<object>().Select(value => (Name: Enum.GetName(type, value) ?? string.Empty, Value: Enum.Format(type, value, "d"))).OrderBy(item => item.Name, StringComparer.Ordinal).ToList();
-        
+
         if (seedItems.Count != 0 && !seedItems.SequenceEqual(managedItems))
         {
             var missingItems = seedItems.Except(managedItems).Select(item => $"{item.Name}={item.Value}");

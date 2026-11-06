@@ -44,14 +44,14 @@ public partial class SeedSerializerFactory
         switch (typeRecord.TypeName)
         {
             case "Seed::Core::Containers::Tuple":
-            {
-                foreach (var field in typeof(T).GetFields().Select(x => x.Name))
                 {
-                    code.AppendLine($"this.SerializeImpl(data.{field}, stream); ");
-                }
+                    foreach (var field in typeof(T).GetFields().Select(x => x.Name))
+                    {
+                        code.AppendLine($"this.SerializeImpl(data.{field}, stream); ");
+                    }
 
-                break;
-            }
+                    break;
+                }
 
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeRecord.TypeName} ' and type class ' {typeRecord.TypeName} ' not implemented");
@@ -63,16 +63,16 @@ public partial class SeedSerializerFactory
         switch (typeRecord.TypeName)
         {
             case "Seed::Core::Containers::Tuple":
-            {
-                foreach (var field in typeof(T).GetFields().Select(x => x.Name))
                 {
-                    code.AppendLine($"var {field} = data.{field};");
-                    code.AppendLine($"data.{field} = this.DeserializeImpl({field}, stream);");
+                    foreach (var field in typeof(T).GetFields().Select(x => x.Name))
+                    {
+                        code.AppendLine($"var {field} = data.{field};");
+                        code.AppendLine($"data.{field} = this.DeserializeImpl({field}, stream);");
+                    }
+
+                    break;
                 }
 
-                break;
-            }
-            
             default:
                 throw new NotImplementedException($"Serialization of type  ' {typeRecord.TypeName} ' and type class ' {typeRecord.TypeName} ' not implemented");
         }

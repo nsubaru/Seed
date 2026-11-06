@@ -202,31 +202,31 @@ try
     }
 
     $seedExpectedCommands = @(
-        'help', 
+        'help',
         'commands',
-        'version', 
-        'exit', 
+        'version',
+        'exit',
         'status.kernel',
-        'shutdown', 
+        'shutdown',
         'reload',
-        'configurations.list', 
-        'configurations.get', 
-        'configurations.set', 
-        'configurations.save', 
+        'configurations.list',
+        'configurations.get',
+        'configurations.set',
+        'configurations.save',
         'configurations.reset',
-        'logging.view', 
-        'logging.get', 
-        'logging.set', 
-        'logging.follow', 
-        'tests.list', 
-        'tests.run', 
+        'logging.view',
+        'logging.get',
+        'logging.set',
+        'logging.follow',
+        'tests.list',
+        'tests.run',
         'tests.result.store',
-        'di.rtti.list', 
-        'di.rtti.save', 
-        'network.interfaces', 
+        'di.rtti.list',
+        'di.rtti.save',
+        'network.interfaces',
         'network.dns.resolve',
-        'network.dhcp.start', 
-        'network.dhcp.status', 
+        'network.dhcp.start',
+        'network.dhcp.status',
         'network.dhcp.stop',
         'fs.list',
         'fs.info',
@@ -404,7 +404,7 @@ try
     Assert-RejectsPacket ([byte[]]@(1, 2, 0, 0, 0))
     Assert-RejectsPacket ([byte[]]@(1, 6, 0, 0, 0, 0, 216))
     Assert-RejectsPacket ([byte[]]::new(65536))
-    
+
     $seedModules = @($seedProcess.Modules | Select-Object -ExpandProperty ModuleName)
 
     if ($seedModules.Count -ne 2 -or $seedModules -notcontains 'ntdll.dll')
@@ -427,7 +427,7 @@ finally
     if ($seedProcess)
     {
         $seedProcess.Refresh()
-        
+
         if (-not $seedProcess.HasExited -and $seedProcess.MainModule.FileName -eq $seedRuntime)
         {
             $seedProcess.Kill()

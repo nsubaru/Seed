@@ -70,7 +70,7 @@ namespace Seed::Examples
     public:
         RefCountClassOutsideHeader(SharedLabel);
     };
-} // namespace Seed::Examples
+}
 ```
 
 ```cpp
@@ -83,23 +83,19 @@ namespace Seed::Examples
         Core::RefCountT RefCount;
         Core::String Value;
 
-        Data(Core::ConstString value) : RefCount(1),
-                                        Value(value) {
-        }
+        Data(Core::ConstString value) : RefCount(1), Value(value) {}
     };
 
     RefCountClassOutside(SharedLabel);
 
-    SharedLabel::SharedLabel(Core::ConstString value) : This(new Data(value)) {
-    }
+    SharedLabel::SharedLabel(Core::ConstString value) : This(new Data(value)) {}
 
-    void SharedLabel::Dispose() {
-    }
+    void SharedLabel::Dispose() {}
 
     Core::String SharedLabel::GetText() const {
         return This->Value;
     }
-} // namespace Seed::Examples
+}
 ```
 
 `Dispose()` runs after `RefCount` reaches zero. Here the generated destructor
@@ -263,15 +259,12 @@ struct ImageCountService::Data {
     Core::RefCountT RefCount;
     Core::Services::RuntimeManagementService RuntimeManagement;
 
-    Data(Core::Services::RuntimeManagementService runtimeManagement) : RefCount(1),
-                                                                        RuntimeManagement(Core::MoveRValue(runtimeManagement)) {
-    }
+    Data(Core::Services::RuntimeManagementService runtimeManagement) : RefCount(1), RuntimeManagement(Core::MoveRValue(runtimeManagement)) {}
 };
 
 RefCountClassOutside(ImageCountService);
 
-ImageCountService::ImageCountService(Core::Services::RuntimeManagementService runtimeManagement)
-    : This(new Data(Core::MoveRValue(runtimeManagement))) {}
+ImageCountService::ImageCountService(Core::Services::RuntimeManagementService runtimeManagement) : This(new Data(Core::MoveRValue(runtimeManagement))) {}
 
 void ImageCountService::Dispose() {}
 
@@ -298,11 +291,7 @@ using namespace Seed::Examples;
 /// <summary>
 /// Declares the image-count service and its ordered IoC constructor dependencies.
 /// </summary>
-class ImageCountServiceDiRegistration final : 
-    protected Core::Services::IBootUpService<
-        ImageCountService,
-        Core::Services::RuntimeManagementService> {
-};
+class ImageCountServiceDiRegistration final : protected Core::Services::IBootUpService<ImageCountService, Core::Services::RuntimeManagementService> {};
 
 template class Seed::Core::Services::IGeneralBootUpService<false, Seed::Examples::ImageCountService, Seed::Core::Services::RuntimeManagementService>;
 

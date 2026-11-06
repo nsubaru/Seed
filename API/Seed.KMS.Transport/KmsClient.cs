@@ -12,12 +12,18 @@ public sealed record KmsDatagram
     /// <summary>
     /// Owning text payload decoded from a complete message-pipe packet.
     /// </summary>
-    public required string Text { get; init; }
+    public required string Text
+    {
+        get; init;
+    }
 
     /// <summary>
     /// Whether the runtime reported this datagram as an error.
     /// </summary>
-    public required bool IsError { get; init; }
+    public required bool IsError
+    {
+        get; init;
+    }
 }
 
 /// <summary>
@@ -88,7 +94,7 @@ public sealed class KmsClient : IAsyncDisposable
                     await pipe.ConnectAsync(deadline.Token).ConfigureAwait(false);
 
                     pipe.ReadMode = PipeTransmissionMode.Message;
-                    
+
                     var marker = await ReadPacketAsync(deadline.Token).ConfigureAwait(false);
 
                     if (marker.Category != 1 || marker.Subtype != 5 || marker.Text != "SEED_KMS/1")
@@ -348,7 +354,7 @@ public sealed class KmsClient : IAsyncDisposable
         await pipe.DisposeAsync().ConfigureAwait(false);
 
         pipeName = nextPipeName;
-        pipe     = CreatePipe();
+        pipe = CreatePipe();
 
         for (; ; )
         {
@@ -433,7 +439,7 @@ public sealed class KmsClient : IAsyncDisposable
         }
 
         string text = TextEncoding.GetString(bytes, 5, count - 5);
-        
+
         if (text.Contains('\0'))
         {
             throw new InvalidDataException("KMS text contains a null character.");

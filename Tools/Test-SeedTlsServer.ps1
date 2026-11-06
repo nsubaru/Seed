@@ -199,7 +199,7 @@ try
     Invoke-TlsCommand configurations.set @('host.https.port', "$seedPort") | Out-Null
     Invoke-TlsCommand configurations.set @('host.https.enabled', 'true') | Out-Null
     Invoke-TlsCommand configurations.save | Out-Null
-    
+
     Invoke-TlsReload
 
     & $seedVerifier "$seedPort" (Join-Path $seedOutput 'identity/root.der') *> (Join-Path $seedOutput 'peer.log')
@@ -260,7 +260,7 @@ finally
     if ($seedProcess)
     {
         $seedProcess.Refresh()
-        
+
         if (-not $seedProcess.HasExited -and $seedProcess.MainModule.FileName -eq $seedRuntime)
         {
             $seedProcess.Kill()

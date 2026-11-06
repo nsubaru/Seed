@@ -8,15 +8,20 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
     [Fact]
     public async Task CompletedConnectionsReleaseAdmissionCapacityBeforeTheNextAccept()
     {
+        // Arrange
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
 
+        // Act
         deadline.CancelAfter(TimeSpan.FromSeconds(30));
 
+        // Arrange
         var sockets = new List<TcpClient>();
 
+        // Arrange
         byte[] headers = Encoding.ASCII.GetBytes("POST /echo HTTP/1.1\r\nHost: localhost\r\nContent-Length: 1\r\n\r\n");
         byte[] body = [(byte)'x'];
 
+        // Assert
         try
         {
             // Keep every admitted request incomplete so the listener's retained
@@ -89,7 +94,7 @@ public sealed class HttpLifecycleTests : E2ETest<HttpLifecycleTests>
     private static async Task<string> ReadResponseAsync(TcpClient socket, CancellationToken token)
     {
         var buffer = new byte[4096];
-        
+
         using var response = new MemoryStream();
 
         int count;

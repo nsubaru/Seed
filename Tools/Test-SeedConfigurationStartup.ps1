@@ -81,7 +81,7 @@ foreach ($seedCase in @('valid', 'invalid-values', 'bad-magic', 'bad-version', '
         }
 
         [xml]$seedResult = Get-Content -LiteralPath $seedReport -Raw
-        
+
         if ($seedResult.'test-run'.passed -ne '1' -or $seedResult.'test-run'.failed -ne '0')
         {
             throw 'The saved configuration validation test did not pass.'

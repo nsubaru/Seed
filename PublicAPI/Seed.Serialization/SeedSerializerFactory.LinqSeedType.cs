@@ -21,18 +21,18 @@ public partial class SeedSerializerFactory
             case Constants.Types.SensitiveList:
             case Constants.Types.ConcurrencyList:
             case Constants.Types.ConcurrencySensitiveList:
-            {
-                var innerType = GetTypeWithOffset(0, record);
-
-                if (innerType == null)
                 {
-                    logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ list type {1}", record.Fields.First().TypeName, record.TypeName);
+                    var innerType = GetTypeWithOffset(0, record);
 
-                    return null;
+                    if (innerType == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ list type {1}", record.Fields.First().TypeName, record.TypeName);
+
+                        return null;
+                    }
+
+                    return typeof(LinkedList<>).MakeGenericType(innerType);
                 }
-
-                return typeof(LinkedList<>).MakeGenericType(innerType);
-            }
 
             case Constants.Types.Dictionary:
             case Constants.Types.SensitiveDictionary:
@@ -42,32 +42,32 @@ public partial class SeedSerializerFactory
             case Constants.Types.SensitiveMap:
             case Constants.Types.ConcurrencyMap:
             case Constants.Types.ConcurrencySensitiveMap:
-            {
-                var innerTypeFirst = GetTypeWithOffset(1, record);
-                var innerTypeSecond = GetTypeWithOffset(2, record);
-
-                if (innerTypeFirst == null)
                 {
-                    logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ associative type {1}", record.Fields.First().TypeName, record.TypeName);
+                    var innerTypeFirst = GetTypeWithOffset(1, record);
+                    var innerTypeSecond = GetTypeWithOffset(2, record);
 
-                    return null;
-                }
+                    if (innerTypeFirst == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ associative type {1}", record.Fields.First().TypeName, record.TypeName);
 
-                if (innerTypeSecond == null)
-                {
-                    logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ associative type {1}", record.Fields.Skip(1).First().TypeName, record.TypeName);
+                        return null;
+                    }
 
-                    return null;
-                }
+                    if (innerTypeSecond == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ associative type {1}", record.Fields.Skip(1).First().TypeName, record.TypeName);
 
-                Type[] innerTypes =
-                {
+                        return null;
+                    }
+
+                    Type[] innerTypes =
+                    {
                     innerTypeFirst,
                     innerTypeSecond
                 };
 
-                return typeof(Dictionary<,>).MakeGenericType(innerTypes);
-            }
+                    return typeof(Dictionary<,>).MakeGenericType(innerTypes);
+                }
 
             case Constants.Types.BaseArray:
             case Constants.Types.Array:
@@ -94,47 +94,47 @@ public partial class SeedSerializerFactory
             case Constants.Types.SensitiveDynamicQueue:
             case Constants.Types.ConcurrencyDynamicQueue:
             case Constants.Types.ConcurrencySensitiveDynamicQueue:
-            {
-                var innerType = GetTypeWithOffset(0, record);
-                
-                if (innerType == null)
                 {
-                    logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ array type {1}", record.Fields.First().TypeName, record.TypeName);
+                    var innerType = GetTypeWithOffset(0, record);
 
-                    return null;
+                    if (innerType == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ array type {1}", record.Fields.First().TypeName, record.TypeName);
+
+                        return null;
+                    }
+
+                    return typeof(List<>).MakeGenericType(innerType);
                 }
-
-                return typeof(List<>).MakeGenericType(innerType);
-            }
 
             case Constants.Types.Pair:
             case Constants.Types.SensitivePair:
-            {
-                var innerTypeFirst = GetTypeWithOffset(0, record);
-                var innerTypeSecond = GetTypeWithOffset(1, record);
-
-                if (innerTypeFirst == null)
                 {
-                    logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ pair type {1}", record.Fields.First().TypeName, record.TypeName);
+                    var innerTypeFirst = GetTypeWithOffset(0, record);
+                    var innerTypeSecond = GetTypeWithOffset(1, record);
 
-                    return null;
-                }
+                    if (innerTypeFirst == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ pair type {1}", record.Fields.First().TypeName, record.TypeName);
 
-                if (innerTypeSecond == null)
-                {
-                    logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ pair type {1}", record.Fields.Skip(1).First().TypeName, record.TypeName);
+                        return null;
+                    }
 
-                    return null;
-                }
+                    if (innerTypeSecond == null)
+                    {
+                        logger?.LogWarning("Can not found correspondent Seed type {0} for LINQ pair type {1}", record.Fields.Skip(1).First().TypeName, record.TypeName);
 
-                Type[] innerTypes =
-                {
+                        return null;
+                    }
+
+                    Type[] innerTypes =
+                    {
                     innerTypeFirst,
                     innerTypeSecond
                 };
 
-                return typeof(KeyValuePair<,>).MakeGenericType(innerTypes);
-            }
+                    return typeof(KeyValuePair<,>).MakeGenericType(innerTypes);
+                }
 
             default:
                 return null;

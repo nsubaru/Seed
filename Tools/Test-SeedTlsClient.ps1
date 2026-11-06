@@ -32,12 +32,12 @@ foreach ($seedFile in @($seedPeerExe, $seedClientExe, $seedRuntime))
 }
 
 function Invoke-SeedTlsRequest(
-    [string] $Url, 
+    [string] $Url,
     [string] $Directory,
-    [string] $Root, 
+    [string] $Root,
     [string] $Protocol,
-    [string] $Name, 
-    [string] $ExpectedFailure = '', 
+    [string] $Name,
+    [string] $ExpectedFailure = '',
     [string] $ConnectAddress = '127.0.0.1')
 {
     $seedBody      = Join-Path $Directory "$Name.txt"
@@ -164,7 +164,7 @@ try
                 Invoke-SeedTlsRequest ($seedUrl.Replace('localhost', '127.0.0.1')) $seedDirectory $seedRootDer $seedProtocol 'valid-ipv4'
                 Invoke-SeedTlsRequest ($seedUrl.Replace('localhost', '127.0.0.2')) $seedDirectory $seedRootDer $seedProtocol 'wrong-ipv4' 'not valid for the requested server name'
                 Invoke-SeedTlsRequest ($seedUrl.Replace('localhost', 'wrong.example')) $seedDirectory $seedRootDer $seedProtocol 'wrong-host' 'not valid for the requested server name'
-                
+
                 if ($seedProtocol -eq '1.3')
                 {
                     $seedOrigin = $seedUrl.Substring(0, $seedUrl.LastIndexOf('/'))

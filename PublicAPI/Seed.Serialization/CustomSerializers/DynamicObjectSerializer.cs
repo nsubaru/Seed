@@ -4,14 +4,29 @@ using Seed.RTTI;
 
 namespace Seed.Serialization.CustomSerializers;
 
+/// <summary>
+/// Maps native dynamic values to DynamicObject instances for binary serialization.
+/// </summary>
 public class DynamicObjectSerializer : ICustomClassSerializer
 {
+    /// <summary>
+    /// The CLR type used to represent native dynamic values.
+    /// </summary>
     public Type ClrType => typeof(DynamicObject);
 
+    /// <summary>
+    /// Cached native void type identifier used to encode an invalid dynamic value. An empty identifier triggers lookup.
+    /// </summary>
     public UniversalTypeIdentifier VoidFullTypeId;
 
+    /// <summary>
+    /// The native RTTI name used to select the serializer for native dynamic values.
+    /// </summary>
     public string TypeName => "Seed::Core::RTTI::Dynamic";
 
+    /// <summary>
+    /// The identifier type used to read and write the wrapped native type.
+    /// </summary>
     public Type[] DependableTypes => new Type[]
     {
         typeof(UniversalTypeIdentifier)
@@ -25,7 +40,7 @@ public class DynamicObjectSerializer : ICustomClassSerializer
     /// <returns>The decoded managed value.</returns>
     public object Deserialize(Stream serializationStream, ISeedSerializer serializer)
     {
-        var fullTypeId = new UniversalTypeIdentifier() {};
+        var fullTypeId = new UniversalTypeIdentifier() { };
 
         try
         {
@@ -81,13 +96,13 @@ public class DynamicObjectSerializer : ICustomClassSerializer
             VoidFullTypeId = serializer.GetAllRttiTypes().First(x => x.TypeName == "void").FullTypeId;
         }
 
-        var fullTypeId = dynamicObject.IsValid 
+        var fullTypeId = dynamicObject.IsValid
             ? new UniversalTypeIdentifier() { Id = dynamicObject.FullTypeId }
             : VoidFullTypeId;
 
         serializer.Logger?.LogTrace("Serialize dynamic with UIID: {fullTypeId}", fullTypeId);
         serializer.Serialize(fullTypeId, serializationStream);
-        
+
         if (dynamicObject.IsValid)
         {
             serializer.Serialize(dynamicObject.Value!, serializationStream);

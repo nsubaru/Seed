@@ -25,7 +25,7 @@ public class UniversalTypeDefinitionSerializer : ICustomClassSerializer
     public void Serialize(dynamic data, Stream serializationStream, ISeedSerializer serializer)
     {
         var uuid = ((UniversalTypeIdentifier)data).Id;
-        
+
         serializer.Serialize(uuid, serializationStream);
     }
 }

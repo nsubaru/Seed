@@ -8,6 +8,9 @@ namespace Seed.RTTI.CustomSerializationSupport;
 public interface ISeedSerializerFactory
 {
     Type? BuildClrType(RttiTypeRecord record);
-    
-    RTTISection RTTISection { get; }
+
+    RTTISection RTTISection
+    {
+        get;
+    }
 }

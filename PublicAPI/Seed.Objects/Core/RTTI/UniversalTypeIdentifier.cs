@@ -15,7 +15,7 @@ public unsafe struct UniversalTypeIdentifier
     [SerializableStructField]
     [FieldOffset(0)]
     public KernelVersionT KernelVersion;
-    
+
     [SerializableStructField]
     [FieldOffset(8)]
     public ID TypeId;

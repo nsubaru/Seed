@@ -124,7 +124,7 @@ internal static class ClientHelloProbe
             if (kind != omitted && (omitted != -2 || kind is 10 or 13 or 11 or 65281))
             {
                 byte[] payload = kind == 10 && group != null ? group : kind == 13 && signatures != null ? signatures : value.AsSpan(offset + 4, count).ToArray();
-                result.AddRange(new byte[] {(byte)(kind >> 8), (byte)kind, (byte)(payload.Length >> 8), (byte)payload.Length});
+                result.AddRange(new byte[] { (byte)(kind >> 8), (byte)kind, (byte)(payload.Length >> 8), (byte)payload.Length });
                 result.AddRange(payload);
             }
             offset += 4 + count;

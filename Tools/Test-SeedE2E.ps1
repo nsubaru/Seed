@@ -87,7 +87,7 @@ try
     }
 
     [xml]$seedReport = Get-Content -LiteralPath $seedReports[0].FullName -Raw
-    
+
     if ([int]$seedReport.TestRun.ResultSummary.Counters.total -le 0 -or [int]$seedReport.TestRun.ResultSummary.Counters.failed -ne 0)
     {
         throw 'The E2E selection was empty or contained failed tests.'

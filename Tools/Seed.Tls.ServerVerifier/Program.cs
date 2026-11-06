@@ -29,16 +29,16 @@ using var wrongRoot = wrongRequest.CreateSelfSigned(DateTimeOffset.UtcNow.AddHou
 
 SslClientAuthenticationOptions Options(SslProtocols version, string name, X509Certificate2 anchor, bool wrongAlpn = false) => new()
 {
-    TargetHost           = name,
-    EnabledSslProtocols  = version,
-    AllowRenegotiation   = false,
+    TargetHost = name,
+    EnabledSslProtocols = version,
+    AllowRenegotiation = false,
     ApplicationProtocols = [wrongAlpn ? SslApplicationProtocol.Http2 : SslApplicationProtocol.Http11],
 
     CertificateChainPolicy = new X509ChainPolicy
     {
-        TrustMode                   = X509ChainTrustMode.CustomRootTrust,
-        CustomTrustStore            = { anchor },
-        RevocationMode              = X509RevocationMode.NoCheck,
+        TrustMode = X509ChainTrustMode.CustomRootTrust,
+        CustomTrustStore = { anchor },
+        RevocationMode = X509RevocationMode.NoCheck,
         DisableCertificateDownloads = true
     }
 };
@@ -287,7 +287,7 @@ async Task VerifyRecordProxyAsync(SslProtocols version, bool tamper)
                     byte[] fragmentHeader = (byte[])header.Clone();
 
                     BinaryPrimitives.WriteUInt16BigEndian(fragmentHeader.AsSpan(3), (ushort)count);
-                    
+
                     await ForwardFragmentAsync(fragmentHeader, body.AsMemory(offset, count));
                 }
             }

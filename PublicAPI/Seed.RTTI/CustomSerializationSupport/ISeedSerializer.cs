@@ -51,5 +51,8 @@ public interface ISeedSerializer
     /// <summary>
     /// Serializer logger
     /// </summary>
-    public ILogger<ISeedSerializer>? Logger { get; }
+    public ILogger<ISeedSerializer>? Logger
+    {
+        get;
+    }
 }

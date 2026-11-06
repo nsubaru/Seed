@@ -19,7 +19,7 @@ public partial class SeedSerializerFactory
 
         var enumTypeRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId == record.Fields.First().FullTypeId);
         var underlyingTypeRecord = allRttiTypes.FirstOrDefault(x => x.FullTypeId == record.Fields.Last().FullTypeId);
-        
+
         if (enumTypeRecord == null || underlyingTypeRecord == null)
         {
             return null;

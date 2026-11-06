@@ -17,7 +17,7 @@ namespace Seed.Testing.TestAdapter
             try
             {
                 using (var file = File.OpenRead(source))
-                
+
                 using (var reader = new PEReader(file))
                 {
                     var subsystem = reader.PEHeaders.PEHeader?.Subsystem;
@@ -92,11 +92,11 @@ namespace Seed.Testing.TestAdapter
                     mode, Path.GetFullPath(source), selection, output
                 }.Select(Quote)))
                 {
-                    UseShellExecute        = false,
-                    CreateNoWindow         = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
                     RedirectStandardOutput = true,
-                    RedirectStandardError  = true,
-                    RedirectStandardInput  = true
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true
                 };
 
                 var diagnostics = new StringBuilder();
@@ -151,12 +151,12 @@ namespace Seed.Testing.TestAdapter
                         }
                     }
                 };
-                
+
                 process.Start();
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                var elapsed     = Stopwatch.StartNew();
+                var elapsed = Stopwatch.StartNew();
                 bool cancelSent = false;
 
                 while (!process.WaitForExit(100))
@@ -189,7 +189,7 @@ namespace Seed.Testing.TestAdapter
                 }
 
                 cancellation?.ThrowIfCancellationRequested();
-                
+
                 if (process.ExitCode != 0 || !File.Exists(output))
                 {
                     throw new InvalidOperationException($"Seed test host failed ({process.ExitCode}); artifacts: {output}\n{diagnostics}");

@@ -7,10 +7,12 @@ public sealed class BootDemoTests
     [Fact]
     public async Task BoundedNativeDemoProducesFilesAndReturnsWithoutAnEndpoint()
     {
+        // Arrange
         string runtime = Path.GetFullPath(Environment.GetEnvironmentVariable("SEED_E2E_RUNTIME")!);
         string console = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(runtime)!)!, "Seed.Console", "Seed.Console.exe");
         string directory = Path.Combine(Environment.GetEnvironmentVariable("SEED_E2E_OUTPUT")!, "native demo " + Guid.NewGuid().ToString("N"));
 
+        // Arrange
         var start = new ProcessStartInfo(console)
         {
             UseShellExecute = false,
@@ -19,16 +21,20 @@ public sealed class BootDemoTests
             RedirectStandardError = true
         };
 
+        // Act
         foreach (string argument in new[] { "--boot-demo", runtime, directory })
         {
             start.ArgumentList.Add(argument);
         }
 
+        // Arrange
         using var process = Process.Start(start)!;
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
 
+        // Act
         deadline.CancelAfter(TimeSpan.FromSeconds(75));
 
+        // Assert
         try
         {
 #pragma warning disable xUnit1051 // The owned-process deadline is linked to the test token.

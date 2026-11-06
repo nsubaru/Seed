@@ -10,11 +10,20 @@ namespace Seed.Serialization;
 
 internal struct ObjectPropertiesFieldsInformation
 {
-    public String Name { get; set; }
+    public String Name
+    {
+        get; set;
+    }
 
-    public String TypeName { get; set; }
+    public String TypeName
+    {
+        get; set;
+    }
 
-    public UUID FullTypeId { get; set; }
+    public UUID FullTypeId
+    {
+        get; set;
+    }
 }
 
 public partial class SeedSerializerFactory
@@ -31,7 +40,7 @@ public partial class SeedSerializerFactory
         }
 
         var clrTypeAttribute = type.GetCustomAttribute<SerializableObjectPropetiesAttribute>()!;
-        var objectType       = allRttiTypes.First(x => x.IsValid && x.TypeName == clrTypeAttribute.TargetObjectTypeName);
+        var objectType = allRttiTypes.First(x => x.IsValid && x.TypeName == clrTypeAttribute.TargetObjectTypeName);
 
         var props = new List<ObjectPropertiesFieldsInformation>()
         {
@@ -53,12 +62,12 @@ public partial class SeedSerializerFactory
             }));
         foreach (var item in props)
         {
-            var isExistManualPropAttrb  = type.GetProperties().Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldManualAttribute), false).Any(attrbs => (attrbs as SerializableStructFieldManualAttribute)!.FieldInformation.FieldName == item.Name)).FirstOrDefault() != null;
+            var isExistManualPropAttrb = type.GetProperties().Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldManualAttribute), false).Any(attrbs => (attrbs as SerializableStructFieldManualAttribute)!.FieldInformation.FieldName == item.Name)).FirstOrDefault() != null;
             var isExistManualFieldAttrb = type.GetFields().Where(field => field.GetCustomAttributes(typeof(SerializableStructFieldManualAttribute), false).Any(attrbs => (attrbs as SerializableStructFieldManualAttribute)!.FieldInformation.FieldName == item.Name)).FirstOrDefault() != null;
-            var autoPropType            = type.GetProperties().Where(prop => prop.Name == item.Name).Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
-            var autoFieldType           = type.GetFields().Where(field => field.Name == item.Name).Where(field => field.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
-            var isExistAutoPropAttrb    = autoPropType != null;
-            var isExistAutoFieldAttrb   = autoFieldType != null;
+            var autoPropType = type.GetProperties().Where(prop => prop.Name == item.Name).Where(prop => prop.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
+            var autoFieldType = type.GetFields().Where(field => field.Name == item.Name).Where(field => field.GetCustomAttributes(typeof(SerializableStructFieldAttribute), false).Any()).FirstOrDefault();
+            var isExistAutoPropAttrb = autoPropType != null;
+            var isExistAutoFieldAttrb = autoFieldType != null;
 
             if (isExistAutoPropAttrb)
             {
@@ -126,14 +135,14 @@ public partial class SeedSerializerFactory
         }
 
         var type = serializableTypes.FirstOrDefault(x => x.Attribute!.SeedKernelTypeName == typeRecord.TypeName).Type;
-        
+
         if (type == null)
         {
             return;
         }
 
         var clrTypeAttribute = type.GetCustomAttribute<SerializableObjectPropetiesAttribute>()!;
-        var objectType       = allRttiTypes.First(x => x.IsValid && x.TypeName == clrTypeAttribute.TargetObjectTypeName);
+        var objectType = allRttiTypes.First(x => x.IsValid && x.TypeName == clrTypeAttribute.TargetObjectTypeName);
 
         var props = new List<ObjectPropertiesFieldsInformation>()
         {
@@ -149,9 +158,9 @@ public partial class SeedSerializerFactory
             select new ObjectPropertiesFieldsInformation()
             {
                 TypeName = prop.TypeName,
-                Name     = prop.Name
+                Name = prop.Name
             }));
-            
+
         var orderedFields = props.Select(rttiField => fields.First(field => field.FieldInformation.FieldName == rttiField.Name).Field.Name);
 
         foreach (var field in orderedFields)
@@ -199,7 +208,7 @@ public partial class SeedSerializerFactory
         }
 
         var clrTypeAttribute = type.GetCustomAttribute<SerializableObjectPropetiesAttribute>()!;
-        var objectType       = allRttiTypes.First(x => x.IsValid && x.TypeName == clrTypeAttribute.TargetObjectTypeName);
+        var objectType = allRttiTypes.First(x => x.IsValid && x.TypeName == clrTypeAttribute.TargetObjectTypeName);
 
         var props = new List<ObjectPropertiesFieldsInformation>()
         {
@@ -219,7 +228,7 @@ public partial class SeedSerializerFactory
             }));
 
         var orderedFields = props.Select(rttiField => fields.First(field => field.FieldInformation.FieldName == rttiField.Name).Field.Name);
-        
+
         foreach (var field in orderedFields)
         {
             code.AppendLine($"data.{field} = this.DeserializeImpl(data.{field}, stream);");

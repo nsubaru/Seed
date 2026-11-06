@@ -10,7 +10,10 @@ namespace Seed.Core.Time;
 public struct DateTime
 {
     [SerializableStructField]
-    public ID Ticks { get; set; }
+    public ID Ticks
+    {
+        get; set;
+    }
 
     public DateTime()
     {
@@ -52,7 +55,10 @@ public struct DateTime
 public struct TimeSpan
 {
     [SerializableStructField]
-    public ID Ticks { get; set; }
+    public ID Ticks
+    {
+        get; set;
+    }
 
     public TimeSpan()
     {

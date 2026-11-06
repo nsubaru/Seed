@@ -29,7 +29,7 @@ try
     }
 
     $seedProcess = [Diagnostics.Process]::GetProcessById([int]$Matches[1])
-    
+
     while (-not $seedProcess.WaitForExit(1000))
     {
     }

@@ -185,7 +185,7 @@ foreach ($seedRelative in $seedFiles | Sort-Object -Unique)
                 $seedSharedPath = [IO.Path]::GetFullPath((Join-Path $seedOwningDirectory $seedImport.Project))
 
                 [xml]$seedSharedProject = [IO.File]::ReadAllText($seedSharedPath)
-                
+
                 $seedNativeInputs += [pscustomobject]@{ Document = $seedSharedProject; Directory = [IO.Path]::GetDirectoryName($seedSharedPath) }
             }
 
@@ -240,7 +240,7 @@ foreach ($seedRelative in $seedFiles | Sort-Object -Unique)
                     {
                         $seedIndexedMetadata = $seedDeclaration.SelectSingleNode("*[local-name()='$($seedMetadata.LocalName)']")
                         if (-not $seedIndexedMetadata -or $seedIndexedMetadata.InnerText -ne $seedMetadata.InnerText -or $seedIndexedMetadata.GetAttribute('Condition') -ne $seedMetadata.GetAttribute('Condition'))
-                        
+
                         {
                             $seedErrors.Add("SDK compiler metadata differs: $seedRelative -> $seedInputKey / $($seedMetadata.LocalName)")
                         }
